@@ -1,5 +1,4 @@
-from peewee import CharField, DateTimeField, FloatField, BooleanField, IntegerField, Check
-from datetime import datetime
+from peewee import CharField, FloatField, BooleanField, IntegerField, Check
 from src.database.base import BaseModel
 
 
@@ -60,7 +59,3 @@ class PropellerSetting(BaseModel):
     line_color_of_overload_curve = CharField(max_length=20)
 
     alarm_enabled_of_overload_curve = BooleanField(default=False)
-
-    created_at = DateTimeField(default=datetime.now)
-
-    update_at = DateTimeField(default=datetime.now)

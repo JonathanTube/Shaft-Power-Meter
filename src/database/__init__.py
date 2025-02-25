@@ -1,6 +1,8 @@
 from .base import db
 from .models.ship_info import ShipInfo
 from .models.propeller_setting import PropellerSetting
+from .models.breach_reason import BreachReason
+from .models.breach_log import BreachLog
 
 
 def initialize_db():
@@ -12,4 +14,5 @@ def initialize_db():
     db.close()
 
 
-__all__ = ['db', 'ShipInfo', 'PropellerSetting', 'initialize_db']
+__all__ = ['db', 'initialize_db', 'ShipInfo',
+           'PropellerSetting', 'BreachReason', 'BreachLog']

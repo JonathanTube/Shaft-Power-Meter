@@ -1,7 +1,5 @@
 import unittest
-from datetime import datetime
-from unittest import mock
-from peewee import IntegrityError, SqliteDatabase
+from peewee import SqliteDatabase
 from src.database.models.propeller_setting import PropellerSetting
 
 
