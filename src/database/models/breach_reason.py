@@ -12,3 +12,6 @@ class BreachReason(BaseModel):
         help_text="原因必填，且不能为空",
         verbose_name="Reason Description for Power Reserve Breach"
     )
+
+    class Meta:
+        table_name = 'breach_reason'

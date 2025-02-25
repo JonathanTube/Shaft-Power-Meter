@@ -59,3 +59,6 @@ class PropellerSetting(BaseModel):
     line_color_of_overload_curve = CharField(max_length=20)
 
     alarm_enabled_of_overload_curve = BooleanField(default=False)
+
+    class Meta:
+        table_name = 'propeller_setting'

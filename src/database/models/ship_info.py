@@ -32,3 +32,6 @@ class ShipInfo(BaseModel):
     created_at = DateTimeField(default=datetime.now)
 
     update_at = DateTimeField(default=datetime.now)
+
+    class Meta:
+        table_name = 'ship_info'

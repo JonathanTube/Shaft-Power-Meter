@@ -1,30 +1,24 @@
-from peewee import CharField, FloatField, IntegerField, Check
+from peewee import CharField, TextField, Check, ForeignKeyField, DateTimeField
 from src.database.base import BaseModel
+from src.database.models.breach_reason import BreachReason
 
 
 class BreachLog(BaseModel):
-    reason_for_power_reserve_breach = CharField(
-        max_length=100, verbose_name="Reason for Power Reserve Breach")
+    breach_reason = ForeignKeyField(
+        BreachReason, index=True, backref="BreachLog", verbose_name="功率突破原因")
 
-    ship_name = CharField(max_length=100, verbose_name="船名", index=True)
+    started_at = DateTimeField(null=False, constraints=[
+                               Check("started_at IS NOT NULL")], verbose_name="功率突破发生时间")
 
-    imo_number = IntegerField(
-        unique=True,
-        verbose_name="IMO编号",
-        constraints=[Check('imo_number BETWEEN 1000000 AND 9999999')]
-    )
+    ship_position_when_started = CharField(
+        max_length=100, verbose_name="发生功率突破时的船舶位置")
 
-    dwt = FloatField(verbose_name="船舶最大载荷能力（重量单位：吨）",
-                     constraints=[Check('dwt > 0')])
+    ended_at = DateTimeField(null=True, verbose_name="功率突破结束时间")
 
-    gt = FloatField(verbose_name="船舶总容积（无单位）", constraints=[Check('gt > 0')])
+    ship_position_when_ended = CharField(null=True,
+                                         max_length=100, verbose_name="功率恢复到正常时的船舶位置")
 
-    max_unlimited_power = FloatField(  # Maximum unlimited shaft/engine power (kW)
-        verbose_name="无限航区最大轴功率",
-        constraints=[Check('max_unlimited_power > 0')]
-    )
+    note = TextField(null=True, verbose_name="备注说明")
 
-    limited_power = FloatField(  # Limited shaft/engine power (kW)
-        verbose_name="限制作业轴功率",
-        constraints=[Check('limited_power > 0')]
-    )
+    class Meta:
+        table_name = 'breach_log'
