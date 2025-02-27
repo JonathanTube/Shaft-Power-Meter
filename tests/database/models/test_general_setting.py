@@ -1,21 +1,19 @@
 import pytest
 from peewee import SqliteDatabase
-from src.database.models.general_setting import GeneralSetting
-
-# Use an in-memory SQLite database for testing
-test_db = SqliteDatabase(':memory:')
+from src.database.models.general_setting import GeneralSetting, BaseModel
 
 
 @pytest.fixture(scope='module')
 def setup_database():
     # Bind model to test database
-    test_db.bind([GeneralSetting])
-    test_db.connect()
-    test_db.create_tables([GeneralSetting])
+    db = SqliteDatabase(':memory:')
+    BaseModel._meta.database = db
+    db.connect()
+    db.create_tables([GeneralSetting])
     yield
     # Drop tables and close connection
-    test_db.drop_tables([GeneralSetting])
-    test_db.close()
+    db.drop_tables([GeneralSetting])
+    db.close()
 
 
 def test_create_general_setting(setup_database):
