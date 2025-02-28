@@ -18,7 +18,7 @@ class FormulaCalculator:
         float: The calculated torque.
         """
         # Calculate 极惯性矩 (polar moment of inertia)
-        polar_moment_of_inertia = (D**3 - d**2) * math.pi / 32
+        polar_moment_of_inertia = (D**4 - d**4) * math.pi / 32
 
         # Calculate 剪切模量 (shear modulus)
         shear_modulus = E / (2000 * (μ + 1))
@@ -28,13 +28,13 @@ class FormulaCalculator:
         return torque
 
     @staticmethod
-    def calculate_thrust(R, r, E, μ, k):
+    def calculate_thrust(D, d, E, μ, k):
         """
         Calculate the thrust.
 
         Parameters:
-        R (float): Shaft outer radius (in mm).
-        r (float): Shaft inner radius (in mm).
+        D (float): Bearing outer diameter (in mm).
+        d (float): Bearing inner diameter (in mm).
         E (float): Elastic modulus (in GPa).
         μ (float): Poisson's ratio.
         k (float): Sensitivity factor.
@@ -42,6 +42,8 @@ class FormulaCalculator:
         Returns:
         float: The calculated thrust.
         """
+        R = D/2
+        r = d/2
         # Calculate 截面积 (cross-sectional area)
         cross_sectional_area = (R**2 - r**2) * math.pi
 

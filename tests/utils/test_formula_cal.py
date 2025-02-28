@@ -10,7 +10,7 @@ def test_calculate_torque():
     μ = 0.3    # Poisson's ratio
     k = 1.5    # Sensitivity factor
 
-    expected_torque = 0.02372903080928083913318373399204  # Nm
+    expected_torque = 2.230172068541432  # Nm
 
     calculated_torque = FormulaCalculator.calculate_torque(D, d, E, μ, k)
 
@@ -18,8 +18,8 @@ def test_calculate_torque():
 
 
 def test_calculate_thrust():
-    R = 25.0   # mm
-    r = 10.0   # mm
+    D = 50.0   # mm
+    d = 20.0   # mm
     E = 210.0  # GPa
     μ = 0.3    # Poisson's ratio
     k = 1.5    # Sensitivity factor
@@ -27,7 +27,7 @@ def test_calculate_thrust():
     # Fixed expected value calculated using the formula
     expected_thrust = 79.929366936524931817039946078436  # N
 
-    calculated_thrust = FormulaCalculator.calculate_thrust(R, r, E, μ, k)
+    calculated_thrust = FormulaCalculator.calculate_thrust(D, d, E, μ, k)
 
     assert pytest.approx(calculated_thrust, 0.0001) == expected_thrust
 

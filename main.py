@@ -1,6 +1,6 @@
 import tkinter as tk
 import ctypes
-from ttkbootstrap import Style, Separator
+from ttkbootstrap import Style, Window, Separator
 from src.ui.components.header import Header
 
 
@@ -9,7 +9,6 @@ class PLCApp:
         self.root = root
         self.root.title("Shaft Power Meter")
         self.root.geometry("1280x800")  # Set window resolution
-        self.style = Style(theme="litera")
 
         # root.overrideredirect(True)  # True 表示无边框窗口
         # # 设置拖拽区域（例如整个窗口背景）
@@ -41,6 +40,6 @@ class PLCApp:
 
 
 if __name__ == "__main__":
-    root = tk.Tk()
+    root = Window(themename="darkly")
     app = PLCApp(root)
     root.mainloop()
