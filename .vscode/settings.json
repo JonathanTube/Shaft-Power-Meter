@@ -2,9 +2,9 @@
     "python.testing.unittestArgs": [
         "-v", // 详细输出
         "-s", // 指定测试发现的 根目录（即测试文件所在路径）
-        "./tests", // 测试根路径（相对当前工作区）
+        "./src", // 测试根路径（相对当前工作区）
         "-p", // 指定文件名匹配模式（glob 语法），只有匹配的测试文件才会被加载
-        "*test_*.py", // 允许任意层子目录中的测试文件
+        "*_test.py", // 允许任意层子目录中的测试文件
         "--failfast" // 遇到失败时停止
     ],
     "python.testing.pytestEnabled": true,
