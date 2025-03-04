@@ -104,5 +104,5 @@ def createPowerLineChart():
         min_x=0,
         max_x=9,
         # animate=5000
-        expand=True
+        # expand=True
     )

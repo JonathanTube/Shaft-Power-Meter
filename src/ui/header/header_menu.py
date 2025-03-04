@@ -1,6 +1,7 @@
 import flet as ft
 
 from ui.home.index import createHome
+from ui.setting.index import createSetting
 
 
 class HeaderMenu(ft.Row):
@@ -37,5 +38,5 @@ class HeaderMenu(ft.Row):
         elif (e.control.text == "REPORT"):
             self.pageContent.content = ft.Text("Report")
         else:
-            self.pageContent.content = ft.Text("Setting")
+            self.pageContent.content = createSetting()
         self.pageContent.update()

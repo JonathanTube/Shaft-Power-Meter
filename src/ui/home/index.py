@@ -7,6 +7,15 @@ from ui.home.alarm.index import createAlarm
 from ui.home.logs.index import createLogs
 
 
+def _tab_content(content):
+    return ft.Container(
+        content=content,
+        padding=ft.padding.only(left=20, right=20, bottom=0, top=10),
+        bgcolor=ft.colors.RED_100,
+        expand=True
+    )
+
+
 def createHome():
     return ft.Tabs(
         selected_index=0,
@@ -16,49 +25,47 @@ def createHome():
         unselected_label_color=ft.colors.GREY_600,  # 未选中时文本颜色
         tabs=[
             ft.Tab(
-                # text="Dashboard",
-                # icon=ft.Icons.DASHBOARD_OUTLINED,
                 tab_content=ft.Row(controls=[
                     ft.Icon(name=ft.Icons.DASHBOARD_OUTLINED),
                     ft.Text("Dashboard")
                 ]),
-                content=createDashboard(),
+                content=_tab_content(content=createDashboard())
             ),
             ft.Tab(
                 tab_content=ft.Row(controls=[
                     ft.Icon(name=ft.Icons.TIMER_OUTLINED),
                     ft.Text("Counter")
                 ]),
-                content=createCounter(),
+                content=_tab_content(createCounter())
             ),
             ft.Tab(
                 tab_content=ft.Row(controls=[
                     ft.Icon(name=ft.Icons.TRENDING_UP_OUTLINED),
                     ft.Text("TrendView")
                 ]),
-                content=createTrendview(),
+                content=_tab_content(createTrendview())
             ),
             ft.Tab(
                 tab_content=ft.Row(controls=[
                     ft.Icon(name=ft.Icons.STACKED_LINE_CHART_OUTLINED),
                     ft.Text("Propeller Curve")
                 ]),
-                content=CreatePropellerCurve(),
+                content=_tab_content(CreatePropellerCurve())
             ),
             ft.Tab(
                 tab_content=ft.Row(controls=[
                     ft.Icon(name=ft.Icons.ALARM_OUTLINED),
                     ft.Text("Alarm")
                 ]),
-                content=createAlarm(),
+                content=_tab_content(createAlarm())
             ),
             ft.Tab(
                 tab_content=ft.Row(controls=[
                     ft.Icon(name=ft.Icons.EMERGENCY_RECORDING_OUTLINED),
                     ft.Text("Logs")
                 ]),
-                content=createLogs(),
+                content=_tab_content(createLogs())
             )
         ],
-        expand=1
+        expand=True
     )
