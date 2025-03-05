@@ -49,29 +49,35 @@ def _create_factor_conf():
             ft.TextField(label="Shaft Inner Diameter(d)", suffix_text="mm"),
             ft.TextField(label="Sensitivity Factor(k)"),
             ft.TextField(label="Elastic Modulus(E)", suffix_text="Gpa"),
-            ft.TextField(label="Poisson's Ratio(μ)", suffix_text="Gpa")
+            ft.TextField(label="Poisson's Ratio(μ)")
         ]
     ))
 
 
 def createSystemConf():
-    return ft.ResponsiveRow(
-        # expand=True,
-        alignment=ft.CrossAxisAlignment.START,
+    return ft.Column(
+        expand=True,
         controls=[
-            _create_settings_card(),
-            _create_ship_info(),
-            _create_factor_conf(),
-            ft.Row(
+            ft.ResponsiveRow(
                 # expand=True,
-                col={'xs': 12},
-                alignment=ft.MainAxisAlignment.CENTER,
+                alignment=ft.CrossAxisAlignment.START,
                 controls=[
-                    ft.ElevatedButton(text="Save", width=120, height=40),
-                    ft.OutlinedButton(text="Cancel", width=120, height=40)
-                ])
-        ]
-    )
+                    _create_settings_card(),
+                    _create_ship_info(),
+                    _create_factor_conf(),
+                    ft.Row(
+                        # expand=True,
+                        col={'xs': 12},
+                        alignment=ft.MainAxisAlignment.CENTER,
+                        controls=[
+                            ft.ElevatedButton(
+                                text="Save", width=120, height=40),
+                            ft.OutlinedButton(
+                                text="Cancel", width=120, height=40)
+                        ])
+                ]
+            )
+        ])
 
 
 # def main(page: ft.Page):

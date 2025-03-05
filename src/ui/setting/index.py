@@ -7,8 +7,7 @@ from ui.setting.system_conf import createSystemConf
 right_content = ft.Container(
     expand=True,
     padding=20,
-    content=createSystemConf(),
-    bgcolor=ft.Colors.AMBER_100
+    content=createSystemConf()
 )
 
 
