@@ -1,7 +1,7 @@
 import datetime
 import flet as ft
 
-from .custom_card import createCard
+from ..common.custom_card import createCard
 
 
 def _create_preferences():

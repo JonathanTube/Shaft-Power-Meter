@@ -1,5 +1,12 @@
 import flet as ft
 
+from ui.home.counter.interval import createInterval
+
 
 def createCounter():
-    return ft.Text("This is Counter Tab")
+    return ft.Row(
+        controls=[
+            createInterval(),
+            createInterval(),
+            createInterval()
+        ])

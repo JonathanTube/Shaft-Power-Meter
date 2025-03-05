@@ -1,5 +1,5 @@
 import flet as ft
-from ui.setting.custom_card import createCard
+from ui.common.custom_card import createCard
 
 
 def _createMCROperatingPoint():
