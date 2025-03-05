@@ -4,16 +4,16 @@ import flet as ft
 def createCard(heading: str, body: ft.Control, col={"md": 6}):
     return ft.Card(
         col=col,
-        expand=True,
+        # expand=True,
         content=ft.Container(
             padding=ft.padding.symmetric(10, 10),
-            expand=True,
+            # expand=True,
             content=ft.Column(
-                expand=True,
+                # expand=True,
                 spacing=0,
                 controls=[
                     ft.Container(
-                        expand=True,
+                        # expand=True,
                         padding=ft.padding.only(bottom=20),
                         content=ft.Row(
                             expand=True,

@@ -1,8 +1,13 @@
 import flet as ft
 
+from ui.setting.authority import createAuthority
+from ui.setting.data_dumping import createDataDumping
+from ui.setting.io import createIO
 from ui.setting.general import createGeneral
 from ui.setting.propeller_setting import createPropellerSetting
+from ui.setting.self_test import createSelfTest
 from ui.setting.system_conf import createSystemConf
+from ui.setting.zero_cal import createZeroCal
 
 right_content = ft.Container(
     expand=True,
@@ -13,12 +18,23 @@ right_content = ft.Container(
 
 def _set_content(e):
     idx = e.control.selected_index
-    if (idx == 0):
+    if idx == 0:
         right_content.content = createSystemConf()
-    elif (idx == 1):
+    elif idx == 1:
         right_content.content = createGeneral()
-    elif (idx == 2):
+    elif idx == 2:
         right_content.content = createPropellerSetting()
+    elif idx == 3:
+        right_content.content = createZeroCal()
+    elif idx == 4:
+        right_content.content = createIO()
+    elif idx == 5:
+        right_content.content = createSelfTest()
+    elif idx == 6:
+        right_content.content = createAuthority()
+    elif idx == 7:
+        right_content.content = createDataDumping()
+
     right_content.update()
 
 
