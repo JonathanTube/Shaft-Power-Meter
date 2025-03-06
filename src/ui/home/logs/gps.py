@@ -1,6 +1,7 @@
 import flet as ft
 
 from ui.common.custom_card import createCard
+import flet as ft
 
 
 def _createDateTable():
@@ -8,19 +9,15 @@ def _createDateTable():
         expand=True,
         columns=[
             ft.DataColumn(ft.Text("No.")),
-            ft.DataColumn(ft.Text("Date Time")),
-            ft.DataColumn(ft.Text("Event")),
-            ft.DataColumn(ft.Text("Acknowledge Time")),
-            ft.DataColumn(ft.Text("Status"))
+            ft.DataColumn(ft.Text("UTC Date/Time")),
+            ft.DataColumn(ft.Text("Ship Position"))
         ],
         rows=[
             ft.DataRow(
                 cells=[
                     ft.DataCell(ft.Text("#1")),
                     ft.DataCell(ft.Text(11)),
-                    ft.DataCell(ft.Text(22)),
-                    ft.DataCell(ft.Text(33)),
-                    ft.DataCell(ft.Text(44))
+                    ft.DataCell(ft.Text(22))
                 ])
         ])
 
@@ -28,18 +25,13 @@ def _createDateTable():
 def _createSearch():
     return createCard(
         heading="Search",
-        body=ft.Row(
-            alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
-            controls=[
-                ft.Row(controls=[
+        body=ft.Row(controls=[
                     ft.TextField(label="Start Date"),
                     ft.TextField(label="End Date")
-                ]),
-                ft.FilledButton("Export")
-            ]))
+                    ]))
 
 
-def createAlarm():
+def createGpsLog():
     return ft.Column(
         expand=True,
         controls=[

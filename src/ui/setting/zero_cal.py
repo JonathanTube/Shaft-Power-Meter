@@ -21,7 +21,7 @@ def _create_zero_cal():
 
             ft.ResponsiveRow(controls=[
                 createCard(heading="Instant Records", body=ft.DataTable(
-                    col={"md": 6},
+                    col={"xs": 12},
                     expand=True,
                     columns=[
                         ft.DataColumn(ft.Text("No.")),

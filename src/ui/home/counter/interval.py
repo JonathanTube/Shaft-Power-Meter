@@ -1,35 +1,27 @@
 import flet as ft
 
 from ui.common.custom_card import createCard
+from ui.home.counter.display import createDisplay
 
 
-def _createItem(label: str, value: str, unit: str = ''):
-    with_unit_control = ft.Row(
-        vertical_alignment=ft.VerticalAlignment.END,
-        controls=[
-            ft.Text(value, size=24, weight=ft.FontWeight.BOLD),
-            ft.Text(unit, size=12, color=ft.Colors.GREY_600)
-        ])
-
-    return ft.Row(
-        vertical_alignment=ft.VerticalAlignment.END,
-        run_alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
-        controls=[
-            ft.Text(label, size=14, text_align=ft.TextAlign.RIGHT, width=140),
-            with_unit_control if unit else ft.Text(
-                value, size=28, weight=ft.FontWeight.BOLD)
-        ])
-
-
-def createInterval():
+def createInterval(propellerName: str):
     return createCard(
-        heading="Interval",
+        heading=f"Interval({propellerName})" if propellerName else "Interval",
         expand=True,
-        body=ft.Container(content=ft.Column(
+        height=380,
+        body=ft.Column(
+            horizontal_alignment=ft.CrossAxisAlignment.CENTER,
             controls=[
-                _createItem('Sum Power', 111, 'kWh'),
-                _createItem('Average Power', 222, 'kWh'),
-                _createItem('Revolution', 333),
-                _createItem('Average Revolution', 444, 'rpm')
-            ]
-        )))
+                createDisplay(11, 22, 33, 44),
+
+                ft.Text("00:20:12 left", weight=ft.FontWeight.BOLD,
+                        bgcolor=ft.Colors.GREEN_200),
+
+                ft.TextField(
+                    label="Interval Setting",
+                    suffix_text="h",
+                    prefix_icon=ft.Icons.PUNCH_CLOCK_OUTLINED
+                ),
+
+                ft.Text("running 0.5h starting at 08:04")
+            ]))

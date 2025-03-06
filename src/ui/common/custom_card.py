@@ -1,11 +1,11 @@
 import flet as ft
 
 
-def createCard(heading: str, body: ft.Control, col={"md": 6}, expand: bool = False):
+def createCard(heading: str, body: ft.Control, col={"md": 6}, expand: bool = False, height: int = None):
     return ft.Card(
         col=col,
         expand=expand,
-        height=300,
+        height=height,
         content=ft.Container(
             padding=ft.padding.symmetric(10, 10),
             # expand=True,
@@ -25,7 +25,7 @@ def createCard(heading: str, body: ft.Control, col={"md": 6}, expand: bool = Fal
                             ]
                         )),
                     ft.Container(
-                        # expand=True,
+                        expand=expand,
                         # bgcolor=ft.Colors.RED,
                         padding=ft.padding.symmetric(0, 20),
                         content=body
