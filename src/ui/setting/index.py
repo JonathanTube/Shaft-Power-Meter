@@ -1,25 +1,25 @@
 import flet as ft
 
-from ui.setting.authority import createAuthority
-from ui.setting.data_dumping import createDataDumping
-from ui.setting.io import createIO
-from ui.setting.general import createGeneral
-from ui.setting.propeller_setting import createPropellerSetting
-from ui.setting.self_test import createSelfTest
-from ui.setting.system_conf import createSystemConf
-from ui.setting.zero_cal import createZeroCal
+from .authority import create_authority
+from .data_dumping import create_data_dumping
+from .io import createIO
+from .general import createGeneral
+from .propeller_setting import createPropellerSetting
+from .self_test import createSelfTest
+from .system_conf import SystemConf
+from .zero_cal import createZeroCal
 
 right_content = ft.Container(
     expand=True,
     padding=20,
-    content=createSystemConf()
+    content=SystemConf().create()
 )
 
 
 def _set_content(e):
     idx = e.control.selected_index
     if idx == 0:
-        right_content.content = createSystemConf()
+        right_content.content = SystemConf().create()
     elif idx == 1:
         right_content.content = createGeneral()
     elif idx == 2:
@@ -31,15 +31,14 @@ def _set_content(e):
     elif idx == 5:
         right_content.content = createSelfTest()
     elif idx == 6:
-        right_content.content = createAuthority()
+        right_content.content = create_authority()
     elif idx == 7:
-        right_content.content = createDataDumping()
+        right_content.content = create_data_dumping()
 
     right_content.update()
 
 
 def createSetting():
-
     rail = ft.NavigationRail(
         selected_index=0,
         label_type=ft.NavigationRailLabelType.ALL,

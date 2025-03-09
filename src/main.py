@@ -6,14 +6,14 @@ from ui.home.index import createHome
 
 def main(page: ft.Page):
     page.theme_mode = ft.ThemeMode.LIGHT
-    pageContent = ft.Container(expand=True)
+    page_content = ft.Container(expand=True)
 
-    page.appbar = Header(pageContent)
+    page.appbar = Header(page_content)
 
-    pageContent.content = createHome()
+    page_content.content = createHome()
 
     page.padding = ft.padding.only(left=20, right=20, top=0, bottom=20)
-    page.add(pageContent)
+    page.add(page_content)
 
 
 ft.app(main)

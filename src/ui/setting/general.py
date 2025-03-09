@@ -1,12 +1,12 @@
 import datetime
 import flet as ft
 
-from ..common.custom_card import createCard
+from ..common.custom_card import create_card
 
 
 def _create_preferences():
     col = {"md": 6}
-    return createCard(
+    return create_card(
         'Preference',
         ft.ResponsiveRow(controls=[
             ft.Row(
@@ -29,14 +29,14 @@ def _create_preferences():
 
 
 def _create_max_parameter():
-    return createCard('Max Parameter', ft.Column(controls=[
+    return create_card('Max Parameter', ft.Column(controls=[
         ft.TextField(suffix_text="rpm", label="Speed"),
         ft.TextField(suffix_text="kNm", label="Torque"),
         ft.TextField(suffix_text="kW", label="Power")]))
 
 
 def _create_warning_parameter():
-    return createCard('Warning Parameter', ft.Column(controls=[
+    return create_card('Warning Parameter', ft.Column(controls=[
         ft.TextField(suffix_text="rpm", label="Speed"),
         ft.TextField(suffix_text="kNm", label="Torque"),
         ft.TextField(suffix_text="kW", label="Power")]))
@@ -77,7 +77,7 @@ time_picker = ft.TextField(
 
 
 def _create_utc_date_time():
-    return createCard(
+    return create_card(
         'Date And Time',
         ft.ResponsiveRow(controls=[
             date_picker,

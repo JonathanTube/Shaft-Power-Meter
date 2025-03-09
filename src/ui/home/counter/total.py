@@ -1,11 +1,11 @@
 import flet as ft
 
-from ui.common.custom_card import createCard
+from src.ui.common.custom_card import create_card
 from ui.home.counter.display import createDisplay
 
 
 def createTotal():
-    return createCard(
+    return create_card(
         heading="Total",
         expand=True,
         height=380,

@@ -1,4 +1,4 @@
-from ui.common.custom_card import createCard
+from src.ui.common.custom_card import create_card
 import flet as ft
 
 
@@ -32,12 +32,12 @@ def _createDateTable():
 
 
 def _createSearch():
-    return createCard(
+    return create_card(
         heading="Search",
         body=ft.Row(controls=[
-                    ft.TextField(label="Start Date"),
-                    ft.TextField(label="End Date")
-                    ]))
+            ft.TextField(label="Start Date"),
+            ft.TextField(label="End Date")
+        ]))
 
 
 def createBreachLog():

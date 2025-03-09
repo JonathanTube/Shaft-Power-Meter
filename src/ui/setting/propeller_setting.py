@@ -1,10 +1,10 @@
 import flet as ft
-from ui.common.custom_card import createCard
+from src.ui.common.custom_card import create_card
 
 
 def _createMCROperatingPoint():
     col = {"md": 6}
-    return createCard(
+    return create_card(
         'MCR Operating Point',
         ft.ResponsiveRow(
             controls=[
@@ -16,7 +16,7 @@ def _createMCROperatingPoint():
 
 
 def _createNormalPropellerCurve():
-    return createCard('Normal Propeller Curve (1)', ft.Column(controls=[
+    return create_card('Normal Propeller Curve (1)', ft.Column(controls=[
         ft.TextField(label="RPM Left", suffix_text='[%]'),
         ft.TextField(label="BHP Left", suffix_text='[%]'),
         ft.TextField(label="RPM Right", suffix_text='[%]'),
@@ -26,21 +26,21 @@ def _createNormalPropellerCurve():
 
 
 def _createLightPropellerCurve():
-    return createCard('Light Propeller Curve (2)', ft.Column(controls=[
+    return create_card('Light Propeller Curve (2)', ft.Column(controls=[
         ft.TextField(label="Light", suffix_text="[% below (1)]"),
         ft.TextField(label="Line Color")
     ]))
 
 
 def _createSpeedLimitCruve():
-    return createCard('Speed Limit Curve (3)', ft.Column(controls=[
+    return create_card('Speed Limit Curve (3)', ft.Column(controls=[
         ft.TextField(label="Limit", suffix_text="[% MCR rpm]"),
         ft.TextField(label="Line Color")
     ]))
 
 
 def _createTorqueLoadLimitCurve():
-    return createCard('Torque/Load Limit Curve (4)', ft.Column(controls=[
+    return create_card('Torque/Load Limit Curve (4)', ft.Column(controls=[
         ft.TextField(label="RPM Left", suffix_text='[%]'),
         ft.TextField(label="BHP Left", suffix_text='[%]'),
         ft.TextField(label="RPM Right", suffix_text='[%]'),
@@ -51,7 +51,7 @@ def _createTorqueLoadLimitCurve():
 
 def _createOverloadCurve():
     col = {"md": 6}
-    return createCard('Overload Curve (5)',
+    return create_card('Overload Curve (5)',
                       ft.ResponsiveRow(controls=[
                           ft.TextField(label="Overload",
                                        suffix_text="[% above (4)]", col=col),

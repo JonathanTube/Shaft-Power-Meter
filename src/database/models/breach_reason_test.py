@@ -4,7 +4,7 @@ from src.database.models.breach_reason import BreachReason, BaseModel
 
 
 @pytest.fixture(scope="module", autouse=True)
-def setUp():
+def setup():
     db = SqliteDatabase(':memory:')
     BaseModel._meta.database = db
     db.connect()

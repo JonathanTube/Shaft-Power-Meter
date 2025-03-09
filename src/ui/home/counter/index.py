@@ -1,6 +1,6 @@
 import flet as ft
 
-from ui.home.counter.interval import createInterval
+from src.ui.home.counter.interval import createInterval
 from ui.home.counter.manually import createManually
 from ui.home.counter.total import createTotal
 

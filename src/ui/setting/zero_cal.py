@@ -1,12 +1,12 @@
 import flet as ft
 
-from ui.common.custom_card import createCard
+from src.ui.common.custom_card import create_card
 
 
 def _create_zero_cal():
     return ft.Column(
         controls=[
-            createCard(
+            create_card(
                 heading="Tips",
                 body=ft.ResponsiveRow(controls=[
                     ft.Text(
@@ -14,13 +14,13 @@ def _create_zero_cal():
                         col={"md": 6}
                     ),
                     ft.Text(
-                        "Recommand Next performing time：2024/07/18 13:00:01",
+                        "Recommend Next performing time：2024/07/18 13:00:01",
                         col={"md": 6}
                     )
                 ])),
 
             ft.ResponsiveRow(controls=[
-                createCard(heading="Instant Records", body=ft.DataTable(
+                create_card(heading="Instant Records", body=ft.DataTable(
                     col={"xs": 12},
                     expand=True,
                     columns=[
@@ -38,7 +38,7 @@ def _create_zero_cal():
                                 ft.DataCell(ft.Text(22))
                             ])
                     ])),
-                createCard(
+                create_card(
                     heading="Progress",
                     body=ft.PieChart(
                         col={"md": 6},
@@ -61,11 +61,11 @@ def _create_zero_cal():
 def _create_history():
     return ft.Column(
         controls=[
-            createCard(heading="Search", body=ft.Row(controls=[
+            create_card(heading="Search", body=ft.Row(controls=[
                 ft.TextField(label="Start Date"),
                 ft.TextField(label="End Date")
             ])),
-            createCard(heading="History", body=ft.DataTable(
+            create_card(heading="History", body=ft.DataTable(
                 expand=True,
                 columns=[
                     ft.DataColumn(ft.Text("No.")),
