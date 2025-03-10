@@ -1,6 +1,6 @@
 import flet as ft
 
-from ui.common.custom_card import createCard
+from src.ui.common.custom_card import create_card
 
 
 def _createDateTable():
@@ -26,7 +26,7 @@ def _createDateTable():
 
 
 def _createSearch():
-    return createCard(
+    return create_card(
         heading="Search",
         body=ft.Row(
             alignment=ft.MainAxisAlignment.SPACE_BETWEEN,

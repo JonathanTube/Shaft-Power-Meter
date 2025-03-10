@@ -1,6 +1,6 @@
 import pytest
 from peewee import SqliteDatabase
-from src.database.models.general_setting import GeneralSetting, BaseModel
+from src.database.models.factor_conf import GeneralSetting, BaseModel
 
 
 @pytest.fixture(scope='module')

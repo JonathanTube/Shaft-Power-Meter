@@ -1,7 +1,7 @@
 import random
 import flet as ft
 
-from ui.common.custom_card import createCard
+from src.ui.common.custom_card import create_card
 
 
 def _get_y_axis_labels():
@@ -114,9 +114,9 @@ def createTrendView():
     return ft.Column(
         expand=True,
         controls=[
-            createCard(heading="Search", body=ft.Row(controls=[
+            create_card(heading="Search", body=ft.Row(controls=[
                 ft.TextField(label="Start Date"),
                 ft.TextField(label="End Date")
             ])),
-            createCard(expand=True, heading="Chart", body=createLineChart())
+            create_card(expand=True, heading="Chart", body=createLineChart())
         ])

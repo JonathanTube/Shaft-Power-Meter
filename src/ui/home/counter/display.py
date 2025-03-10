@@ -1,6 +1,6 @@
 import flet as ft
 
-from ui.common.custom_card import createCard
+from src.ui.common.custom_card import create_card
 
 
 def _createItem(label: str, value: str, unit: str = ''):

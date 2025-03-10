@@ -4,7 +4,7 @@ from src.database.models.ship_info import ShipInfo, BaseModel
 
 
 @pytest.fixture(scope="module", autouse=True)
-def setUp():
+def setup():
     """测试前：初始化内存数据库和表"""
     db = SqliteDatabase(':memory:')  # 使用内存数据库保证测试隔离
     BaseModel._meta.database = db

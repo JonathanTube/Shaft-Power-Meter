@@ -1,12 +1,14 @@
-from peewee import SqliteDatabase, DateTimeField, Model
+from peewee import SqliteDatabase, DateTimeField, Model, IntegerField
 from datetime import datetime
-db = SqliteDatabase('main.db')
 
+db = SqliteDatabase('../main.db')
 
 class BaseModel(Model):
     """ 所有模型的基类 """
     class Meta:
         database = db  # 统一继承数据库连接
+
+    id = IntegerField(primary_key=True)
 
     created_at = DateTimeField(default=datetime.now)
 

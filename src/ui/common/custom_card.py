@@ -1,7 +1,9 @@
 import flet as ft
 
 
-def createCard(heading: str, body: ft.Control, col={"md": 6}, expand: bool = False, height: int = None):
+def create_card(heading: str, body: ft.Control, col=None, expand: bool = False, height: int = None):
+    if col is None:
+        col = {"md": 6}
     return ft.Card(
         col=col,
         expand=expand,

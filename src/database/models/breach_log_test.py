@@ -1,12 +1,12 @@
 import pytest
-from peewee import SqliteDatabase, IntegrityError
+from peewee import SqliteDatabase
 from src.database.models.breach_log import BreachLog, BaseModel
 from src.database.models.breach_reason import BreachReason
 from datetime import datetime
 
 
 @pytest.fixture(scope="module", autouse=True)
-def setUp():
+def setup():
     db = SqliteDatabase(':memory:')
     BaseModel._meta.database = db
     db.connect()

@@ -19,9 +19,9 @@ def createHome():
     return ft.Tabs(
         selected_index=0,
         animation_duration=300,
-        indicator_color=ft.colors.PRIMARY,
-        label_color=ft.colors.PRIMARY,  # 选中时文本颜色
-        unselected_label_color=ft.colors.GREY_600,  # 未选中时文本颜色
+        indicator_color=ft.Colors.PRIMARY,
+        label_color=ft.Colors.PRIMARY,  # 选中时文本颜色
+        unselected_label_color=ft.Colors.GREY_600,  # 未选中时文本颜色
         tabs=[
             ft.Tab(
                 tab_content=ft.Row(controls=[
