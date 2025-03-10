@@ -1,15 +1,15 @@
 import flet as ft
 
-from ui.home.index import createHome
-from ui.report.index import createReport
-from ui.setting.index import createSetting
+from src.ui.home.index import createHome
+from src.ui.report.report_list import ReportList
+from src.ui.setting.index import createSetting
 
 
 class HeaderMenu(ft.Row):
-    def __init__(self, pageContent: ft.Container):
+    def __init__(self, page_content: ft.Container):
         super().__init__()
 
-        self.pageContent = pageContent
+        self.pageContent = page_content
 
         self.controls = [
             ft.ElevatedButton(text="HOME", icon=ft.Icons.HOME, color=ft.Colors.WHITE,
@@ -36,8 +36,8 @@ class HeaderMenu(ft.Row):
 
         if e.control.text == "HOME":
             self.pageContent.content = createHome()
-        elif (e.control.text == "REPORT"):
-            self.pageContent.content = createReport()
+        elif e.control.text == "REPORT":
+            self.pageContent.content = ReportList().create()
         else:
             self.pageContent.content = createSetting()
         self.pageContent.update()

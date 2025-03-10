@@ -4,7 +4,7 @@ from .authority import create_authority
 from .data_dumping import create_data_dumping
 from .io import createIO
 from .general import General
-from .propeller_setting import createPropellerSetting
+from .propeller_conf import PropellerConf
 from .self_test import createSelfTest
 from .system_conf import SystemConf
 from .zero_cal import createZeroCal
@@ -23,7 +23,7 @@ def _set_content(e):
     elif idx == 1:
         right_content.content = General().create()
     elif idx == 2:
-        right_content.content = createPropellerSetting()
+        right_content.content = PropellerConf().create()
     elif idx == 3:
         right_content.content = createZeroCal()
     elif idx == 4:

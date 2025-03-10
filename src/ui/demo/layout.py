@@ -1,6 +1,5 @@
 import flet as ft
 
-
 def main(page: ft.Page):
     width = 40
     height = 40
