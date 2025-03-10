@@ -1,119 +1,257 @@
 import datetime
+
 import flet as ft
 
+from src.database.models.date_time_conf import DateTimeConf
+from src.database.models.limitations import Limitations
+from src.database.models.preference import Preference
 from ..common.custom_card import create_card
+from ..common.toast import Toast
 
 
-def _create_preferences():
-    col = {"md": 6}
-    return create_card(
-        'Preference',
-        ft.ResponsiveRow(controls=[
-            ft.Row(
-                controls=[
-                    ft.Text("System Units"),
-                    ft.RadioGroup(content=ft.Row([
-                        ft.Radio(value=0, label="SI"),
-                        ft.Radio(value=1, label="Metric")]))],
-                col={"md": 6}),
+class General:
+    def __init__(self):
+        self.last_preference = Preference.select().order_by(Preference.id.desc()).first()
+        if self.last_preference is None:
+            self.last_preference = Preference.create(system_unit=0, language=0, data_refresh_interval=5)
 
-            ft.Row(controls=[
-                ft.Text("Language"),
-                ft.RadioGroup(content=ft.Row([
-                    ft.Radio(value=0, label="English"),
-                    ft.Radio(value=1, label="中文")
-                ]))],
-                col={"md": 6}),
-            ft.TextField(label="Data Refresh Interval", suffix_text="seconds")]),
-        col={"xs": 12})
+        self.last_limitations = Limitations.select().order_by(Limitations.id.desc()).first()
+        if self.last_limitations is None:
+            self.last_limitations = Limitations.create(
+                speed_max=0, torque_max=0, power_max=0,
+                speed_warning=0, torque_warning=0, power_warning=0
+            )
 
+        self.last_date_time_conf = DateTimeConf.select().order_by(DateTimeConf.id.desc()).first()
+        if self.last_date_time_conf is None:
+            self.last_date_time_conf = DateTimeConf.create(
+                utc_date=datetime.datetime.now().date(),
+                utc_time=datetime.datetime.now().time().strftime('%H:%M:%S'),
+                system_date=datetime.datetime.now().date(),
+                system_time=datetime.datetime.now().time().strftime('%H:%M:%S'),
+                sync_with_gps=False,
+                date_time_format='YYYY-MM-dd HH:mm:ss'
+            )
 
-def _create_max_parameter():
-    return create_card('Max Parameter', ft.Column(controls=[
-        ft.TextField(suffix_text="rpm", label="Speed"),
-        ft.TextField(suffix_text="kNm", label="Torque"),
-        ft.TextField(suffix_text="kW", label="Power")]))
+    def __set_preference(self, name: str, value: str):
+        if name == 'system_unit':
+            self.last_preference.system_unit = value
+        elif name == 'language':
+            self.last_preference.language = value
+        elif name == 'data_refresh_interval':
+            self.last_preference.data_refresh_interval = value
 
+    def __create_preference_card(self):
+        self.system_unit = ft.RadioGroup(
+            content=ft.Row([
+                ft.Radio(value="0", label="SI"),
+                ft.Radio(value="1", label="Metric")
+            ]),
+            value=self.last_preference.system_unit,
+            on_change=lambda e: self.__set_preference('system_unit', e.control.value)
+        )
 
-def _create_warning_parameter():
-    return create_card('Warning Parameter', ft.Column(controls=[
-        ft.TextField(suffix_text="rpm", label="Speed"),
-        ft.TextField(suffix_text="kNm", label="Torque"),
-        ft.TextField(suffix_text="kW", label="Power")]))
+        self.language = ft.RadioGroup(
+            content=ft.Row([
+                ft.Radio(value="0", label="English"),
+                ft.Radio(value="1", label="中文")
+            ]),
+            value=self.last_preference.language,
+            on_change=lambda e: self.__set_preference('language', e.control.value)
+        )
 
+        self.data_refresh_interval = ft.TextField(
+            label="Data Refresh Interval",
+            suffix_text="seconds",
+            value=self.last_preference.data_refresh_interval,
+            col={"md": 6},
+            on_change=lambda e: self.__set_preference('data_refresh_interval', e.control.value))
 
-date_picker = ft.TextField(
-    label="Date",
-    col={"md": 6},
-    on_click=lambda e: e.page.open(ft.DatePicker(
-        first_date=datetime.datetime(
-            year=2023, month=10, day=1),
-        last_date=datetime.datetime(
-            year=2024, month=10, day=1),
-        on_change=handle_date_change
-    )))
-
-
-def handle_date_change(e):
-    print(e.control.value.strftime('%Y-%m-%d'))
-    date_picker.value = e.control.value.strftime('%Y-%m-%d')
-    date_picker.update()
-
-
-def handle_time_change(e):
-    time_picker.value = e.control.value.strftime('%H:%M:%S')
-    time_picker.update()
-
-
-time_picker = ft.TextField(
-    label="Time",
-    col={"md": 6},
-    on_click=lambda e: e.page.open(ft.TimePicker(
-        confirm_text="Confirm",
-        error_invalid_text="Time out of range",
-        help_text="Pick your time slot",
-        on_change=handle_time_change
-    )))
-
-
-def _create_utc_date_time():
-    return create_card(
-        'Date And Time',
-        ft.ResponsiveRow(controls=[
-            date_picker,
-            time_picker,
-            ft.Dropdown(label="Time Format", col={"md": 6},
-                        options=[ft.DropdownOption(key="YYYY-MM-dd HH:mm:ss"),
-                                 ft.DropdownOption(key="YYYY/MM/dd HH:mm:ss"),
-                                 ft.DropdownOption(key="dd/MM/YYYY HH:mm:ss"),
-                                 ft.DropdownOption(key="MM/dd/YYYY HH:mm:ss")]),
-            ft.Switch(label='Sync With GPS', col={"md": 6}, value=False)]),
-        col={"xs": 12})
-
-
-def createGeneral():
-    return ft.Column(
-        expand=True,
-        controls=[
+        self.preference_card = create_card(
+            'Preference',
             ft.ResponsiveRow(controls=[
-                _create_preferences(),
-                _create_max_parameter(),
-                _create_warning_parameter(),
-                _create_utc_date_time(),
-                ft.Row(
-                    alignment=ft.MainAxisAlignment.CENTER,
+                ft.Row(controls=[ft.Text("System Units"), self.system_unit], col={"md": 6}),
+                self.data_refresh_interval,
+                ft.Row(controls=[ft.Text("Language"), self.language], col={"md": 6})
+            ]),
+            col={"xs": 12}
+        )
+
+    def __set_max_limitations(self, name: str, value: str):
+        if name == 'speed_max':
+            self.last_limitations.speed_max = value
+        elif name == 'torque_max':
+            self.last_limitations.torque_max = value
+        elif name == 'power_max':
+            self.last_limitations.power_max = value
+
+    def __create_max_limitations_card(self):
+        self.speed_max = ft.TextField(
+            suffix_text="rpm", label="Speed", value=self.last_limitations.speed_max,
+            on_change=lambda e: self.__set_max_limitations('speed_max', e.control.value)
+        )
+
+        self.torque_max = ft.TextField(
+            suffix_text="kNm", label="Torque", value=self.last_limitations.torque_max,
+            on_change=lambda e: self.__set_max_limitations('torque_max', e.control.value)
+        )
+
+        self.power_max = ft.TextField(
+            suffix_text="kW", label="Power", value=self.last_limitations.power_max,
+            on_change=lambda e: self.__set_max_limitations('power_max', e.control.value)
+        )
+        self.max_limitations_card = create_card(
+            'Max Parameter',
+            ft.Column(controls=[
+                self.speed_max,
+                self.torque_max,
+                self.power_max
+            ]))
+
+    def __set_warning_limitations(self, name: str, value: str):
+        if name == 'speed_warning':
+            self.last_limitations.speed_warning = value
+        elif name == 'torque_warning':
+            self.last_limitations.torque_warning = value
+        elif name == 'power_warning':
+            self.last_limitations.power_warning = value
+
+    def __create_warning_limitations_card(self):
+        self.torque_warning = ft.TextField(
+            suffix_text="kNm", label="Torque", value=self.last_limitations.torque_warning,
+            on_change=lambda e: self.__set_warning_limitations('torque_warning', e.control.value)
+        )
+
+        self.speed_warning = ft.TextField(
+            suffix_text="rpm", label="Speed", value=self.last_limitations.speed_warning,
+            on_change=lambda e: self.__set_warning_limitations('speed_warning', e.control.value)
+        )
+
+        self.power_warning = ft.TextField(
+            suffix_text="kW", label="Power", value=self.last_limitations.power_warning,
+            on_change=lambda e: self.__set_warning_limitations('power_warning', e.control.value)
+        )
+        self.warning_limitations_card = create_card(
+            'Warning Parameter',
+            ft.Column(controls=[
+                self.speed_warning,
+                self.torque_warning,
+                self.power_warning
+            ]))
+
+    def __handle_date_change(self, e):
+        utc_date = e.control.value.strftime('%Y-%m-%d')
+        self.utc_date.value = utc_date
+        self.utc_date.update()
+        self.last_date_time_conf.utc_date = utc_date
+
+    def __handle_time_change(self, e):
+        utc_time = e.control.value.strftime('%H:%M:%S')
+        self.utc_time.value = utc_time
+        self.utc_time.update()
+        self.last_date_time_conf.utc_time = utc_time
+
+    def __set_date_time(self, name: str, value: str):
+        if name == 'date_time_format':
+            self.last_date_time_conf.date_time_format = value
+        elif name == 'sync_with_gps':
+            self.last_date_time_conf.sync_with_gps = value
+
+    def __create_date_time_card(self):
+        self.utc_date = ft.TextField(
+            label="Date",
+            col={"md": 6},
+            value=self.last_date_time_conf.utc_date,
+            on_click=lambda e: e.page.open(ft.DatePicker(on_change=self.__handle_date_change)))
+
+        self.utc_time = ft.TextField(
+            label="Time",
+            col={"md": 6},
+            value=self.last_date_time_conf.utc_time,
+            on_click=lambda e: e.page.open(ft.TimePicker(on_change=self.__handle_time_change)))
+
+        self.date_time_format = ft.Dropdown(
+            label="Date Time Format", col={"md": 6},
+            value=self.last_date_time_conf.date_time_format,
+            options=[ft.DropdownOption(key="YYYY-MM-dd HH:mm:ss"),
+                     ft.DropdownOption(key="YYYY/MM/dd HH:mm:ss"),
+                     ft.DropdownOption(key="dd/MM/YYYY HH:mm:ss"),
+                     ft.DropdownOption(key="MM/dd/YYYY HH:mm:ss")],
+            on_change=lambda e: self.__set_date_time('date_time_format', e.control.value)
+        )
+
+        self.sync_with_gps = ft.Switch(
+            label='Sync With GPS',
+            col={"md": 6},
+            value=self.last_date_time_conf.sync_with_gps,
+            on_change=lambda e: self.__set_date_time('sync_with_gps', e.control.value)
+        )
+
+        self.date_time_card = create_card(
+            'Date And Time',
+            ft.ResponsiveRow(
+                controls=[
+                    self.utc_date,
+                    self.utc_time,
+                    self.date_time_format,
+                    self.sync_with_gps
+                ]
+            ),
+            col={"xs": 12}
+        )
+
+    def __save_data(self, e):
+        self.last_preference.save()
+        self.last_limitations.save()
+        self.last_date_time_conf.save()
+        Toast.show_success(e.page, message="保存成功")
+
+    def __cancel_data(self, e):
+        self.last_preference = Preference.select().order_by(Preference.id.desc()).first()
+        self.last_limitations = Limitations.select().order_by(Limitations.id.desc()).first()
+        self.last_date_time_conf = DateTimeConf.select().order_by(DateTimeConf.id.desc()).first()
+
+        self.system_unit.value = self.last_preference.system_unit
+        self.language.value = self.last_preference.language
+        self.data_refresh_interval.value = self.last_preference.data_refresh_interval
+        self.preference_card.update()
+
+        self.speed_max.value = self.last_limitations.speed_max
+        self.power_max.value = self.last_limitations.power_max
+        self.torque_max.value = self.last_limitations.torque_max
+        self.max_limitations_card.update()
+
+        self.speed_warning.value = self.last_limitations.speed_warning
+        self.power_warning.value = self.last_limitations.power_warning
+        self.torque_warning.value = self.last_limitations.torque_warning
+        self.warning_limitations_card.update()
+
+        self.utc_date.value = self.last_date_time_conf.utc_date
+        self.utc_time.value = self.last_date_time_conf.utc_time
+        self.date_time_format.value = self.last_date_time_conf.date_time_format
+        self.sync_with_gps.value = self.last_date_time_conf.sync_with_gps
+        self.date_time_card.update()
+        Toast.show_success(e.page, message="已取消")
+
+    def create(self):
+        self.__create_preference_card(),
+        self.__create_max_limitations_card(),
+        self.__create_warning_limitations_card(),
+        self.__create_date_time_card(),
+        return ft.Column(
+            expand=True,
+            controls=[
+                ft.ResponsiveRow(
                     controls=[
-                        ft.ElevatedButton(
-                            text="Save", width=120, height=40),
-                        ft.OutlinedButton(
-                            text="Cancel", width=120, height=40)
+                        self.preference_card,
+                        self.max_limitations_card,
+                        self.warning_limitations_card,
+                        self.date_time_card,
+                        ft.Row(
+                            alignment=ft.MainAxisAlignment.CENTER,
+                            controls=[
+                                ft.FilledButton(text="Save", width=120, height=40, on_click=self.__save_data),
+                                ft.OutlinedButton(text="Cancel", width=120, height=40, on_click=self.__cancel_data)
+                            ])
                     ])
             ])
-        ])
-
-
-# def main(page: ft.Page):
-#     page.add(createGeneral())
-
-
-# ft.app(main)

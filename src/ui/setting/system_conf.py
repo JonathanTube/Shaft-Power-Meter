@@ -1,9 +1,9 @@
 import flet as ft
 
-from ..common.custom_card import create_card
-from src.database.models.system_settings import SystemSettings
 from src.database.models.factor_conf import FactorConf
 from src.database.models.ship_info import ShipInfo
+from src.database.models.system_settings import SystemSettings
+from ..common.custom_card import create_card
 from ..common.toast import Toast
 
 
@@ -39,7 +39,7 @@ class SystemConf:
         elif name == 'sha_po_li':
             self.last_system_settings.sha_po_li = value
 
-    def __create_settings(self):
+    def __create_settings_card(self):
         # ft.Row(
         #     col={"md": 6},
         #     controls=[
@@ -54,14 +54,14 @@ class SystemConf:
         #     ]
         # ),
         self.display_thrust = ft.Switch(
-            col={"md": 6}, label="Display Thrust",
+            col={"md": 4}, label="Display Thrust",
             label_position=ft.LabelPosition.LEFT,
             value=self.last_system_settings.display_thrust,
             on_change=lambda e: self.__set_system_settings('display_thrust', e.control.value)
         )
 
         self.sha_po_li = ft.Switch(
-            col={"md": 6}, label="ShaPoLi",
+            col={"md": 4}, label="ShaPoLi",
             label_position=ft.LabelPosition.LEFT,
             value=self.last_system_settings.sha_po_li,
             on_change=lambda e: self.__set_system_settings('sha_po_li', e.control.value)
@@ -84,7 +84,7 @@ class SystemConf:
                     self.display_thrust,
                     self.sha_po_li,
                     ft.Row(
-                        col={"md": 6},
+                        col={"md": 4},
                         controls=[
                             ft.Text("Amount Of Propeller", width=140, text_align=ft.TextAlign.RIGHT),
                             self.amount_of_propeller
@@ -104,7 +104,7 @@ class SystemConf:
         elif name == 'ship_size':
             self.last_ship_info.ship_size = value
 
-    def __create_ship_info(self):
+    def __create_ship_info_card(self):
         self.ship_type = ft.TextField(
             label="Ship Type",
             value=self.last_ship_info.ship_type,
@@ -126,7 +126,7 @@ class SystemConf:
             on_change=lambda e: self.__set_ship_info('ship_size', e.control.value)
         )
 
-        self.ship_info = create_card(
+        self.ship_info_card = create_card(
             'Ship Info',
             ft.Column(
                 controls=[
@@ -150,7 +150,7 @@ class SystemConf:
         elif name == 'poisson_ratio_mu':
             self.last_factor_conf.poisson_ratio_mu = value
 
-    def __create_factor_conf(self):
+    def __create_factor_conf_card(self):
         self.shaft_outer_diameter = ft.TextField(
             label="Shaft Outer Diameter(D)", suffix_text="mm",
             value=self.last_factor_conf.bearing_outer_diameter_D,
@@ -183,7 +183,7 @@ class SystemConf:
             on_change=lambda e: self.__set_factor_conf('poisson_ratio_mu', e.control.value)
         )
 
-        self.factor_conf = create_card(
+        self.factor_conf_card = create_card(
             'Factor Conf.',
             ft.Column(
                 controls=[
@@ -209,29 +209,29 @@ class SystemConf:
         self.last_factor_conf = FactorConf.select().order_by(FactorConf.id.desc()).first()
 
         self.display_thrust.value = self.last_system_settings.display_thrust
-        self.sha_po_li = self.last_system_settings.sha_po_li
-        self.amount_of_propeller = self.last_system_settings.amount_of_propeller
+        self.sha_po_li.value = self.last_system_settings.sha_po_li
+        self.amount_of_propeller.value = self.last_system_settings.amount_of_propeller
         self.settings_card.update()
 
         self.ship_type.value = self.last_ship_info.ship_type
         self.ship_name.value = self.last_ship_info.ship_name
-        self.imo_number = self.last_ship_info.imo_number
-        self.ship_size = self.last_ship_info.ship_size
-        self.ship_info.update()
+        self.imo_number.value = self.last_ship_info.imo_number
+        self.ship_size.value = self.last_ship_info.ship_size
+        self.ship_info_card.update()
 
         self.shaft_outer_diameter.value = self.last_factor_conf.bearing_outer_diameter_D
         self.shaft_inner_diameter.value = self.last_factor_conf.bearing_inner_diameter_d
         self.sensitivity_factor_k.value = self.last_factor_conf.sensitivity_factor_k
         self.elastic_modulus_E.value = self.last_factor_conf.elastic_modulus_E
         self.poisson_ratio_mu.value = self.last_factor_conf.poisson_ratio_mu
-        self.shaft_outer_diameter.update()
+        self.factor_conf_card.update()
 
         Toast.show_success(e.page, message="已取消")
 
     def create(self):
-        self.__create_settings()
-        self.__create_ship_info()
-        self.__create_factor_conf()
+        self.__create_settings_card(),
+        self.__create_ship_info_card(),
+        self.__create_factor_conf_card(),
         self.system_conf = ft.Column(
             expand=True,
             controls=[
@@ -240,8 +240,8 @@ class SystemConf:
                     alignment=ft.MainAxisAlignment.START,
                     controls=[
                         self.settings_card,
-                        self.ship_info,
-                        self.factor_conf,
+                        self.ship_info_card,
+                        self.factor_conf_card,
                         ft.Row(
                             # expand=True,
                             col={'xs': 12},

@@ -3,7 +3,7 @@ import flet as ft
 from .authority import create_authority
 from .data_dumping import create_data_dumping
 from .io import createIO
-from .general import createGeneral
+from .general import General
 from .propeller_setting import createPropellerSetting
 from .self_test import createSelfTest
 from .system_conf import SystemConf
@@ -21,7 +21,7 @@ def _set_content(e):
     if idx == 0:
         right_content.content = SystemConf().create()
     elif idx == 1:
-        right_content.content = createGeneral()
+        right_content.content = General().create()
     elif idx == 2:
         right_content.content = createPropellerSetting()
     elif idx == 3:

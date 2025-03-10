@@ -1,5 +1,4 @@
-from peewee import CharField, DateTimeField, IntegerField, Check
-from datetime import datetime
+from peewee import CharField
 from src.database.base import BaseModel, db
 
 
