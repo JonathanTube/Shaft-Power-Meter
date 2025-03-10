@@ -14,6 +14,8 @@ def main(page: ft.Page):
 
     page.padding = ft.padding.only(left=20, right=20, top=0, bottom=20)
     page.add(pageContent)
+    print('page.window.width=', page.window.width)
+    print('page.width=', page.width)
 
 
 ft.app(main)

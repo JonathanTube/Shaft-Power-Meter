@@ -1,6 +1,7 @@
 import flet as ft
 
 from ui.home.index import createHome
+from ui.report.index import createReport
 from ui.setting.index import createSetting
 
 
@@ -25,7 +26,7 @@ class HeaderMenu(ft.Row):
 
     def on_click(self, e):
         for control in self.controls:
-            if (e.control.text == control.text):
+            if e.control.text == control.text:
                 control.bgcolor = ft.Colors.BLUE_600
                 control.color = ft.Colors.WHITE
             else:
@@ -33,10 +34,10 @@ class HeaderMenu(ft.Row):
                 control.color = ft.Colors.GREY_800
             control.update()
 
-        if (e.control.text == "HOME"):
+        if e.control.text == "HOME":
             self.pageContent.content = createHome()
         elif (e.control.text == "REPORT"):
-            self.pageContent.content = ft.Text("Report")
+            self.pageContent.content = createReport()
         else:
             self.pageContent.content = createSetting()
         self.pageContent.update()
