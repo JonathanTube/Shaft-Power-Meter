@@ -7,7 +7,7 @@ from .general import General
 from .propeller_conf import PropellerConf
 from .self_test import createSelfTest
 from .system_conf import SystemConf
-from .zero_cal import createZeroCal
+from .zero_cal import ZeroCal
 
 right_content = ft.Container(
     expand=True,
@@ -25,7 +25,7 @@ def _set_content(e):
     elif idx == 2:
         right_content.content = PropellerConf().create()
     elif idx == 3:
-        right_content.content = createZeroCal()
+        right_content.content = ZeroCal.create()
     elif idx == 4:
         right_content.content = createIO()
     elif idx == 5:

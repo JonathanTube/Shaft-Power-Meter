@@ -17,7 +17,7 @@ def create_card(heading: str, body: ft.Control, col=None, expand: bool = False, 
                 controls=[
                     ft.Container(
                         # expand=True,
-                        padding=ft.padding.only(bottom=20),
+                        padding=ft.padding.only(bottom=10),
                         content=ft.Row(
                             # expand=True,
                             controls=[
