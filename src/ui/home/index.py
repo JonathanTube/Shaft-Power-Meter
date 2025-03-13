@@ -1,10 +1,11 @@
 import flet as ft
-from ui.home.dashboard.index import createDashboard
-from ui.home.counter.index import createCounter
-from ui.home.trendview.index import createTrendView
-from ui.home.propeller_curve.index import CreatePropellerCurve
-from ui.home.alarm.index import createAlarm
-from ui.home.logs.index import createLogs
+
+from src.ui.home.alarm.index import createAlarm
+from src.ui.home.counter.index import createCounter
+from src.ui.home.dashboard.index import create_dashboard
+from src.ui.home.logs.index import createLogs
+from src.ui.home.propeller_curve.index import CreatePropellerCurve
+from src.ui.home.trendview.index import createTrendView
 
 
 def _tab_content(content):
@@ -28,7 +29,7 @@ def createHome():
                     ft.Icon(name=ft.Icons.DASHBOARD_OUTLINED),
                     ft.Text("Dashboard")
                 ]),
-                content=_tab_content(content=createDashboard())
+                content=_tab_content(content=create_dashboard())
             ),
             ft.Tab(
                 tab_content=ft.Row(controls=[

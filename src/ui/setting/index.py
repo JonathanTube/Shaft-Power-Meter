@@ -2,8 +2,8 @@ import flet as ft
 
 from .authority import create_authority
 from .data_dumping import create_data_dumping
-from .io import createIO
 from .general import General
+from .io import IO
 from .propeller_conf import PropellerConf
 from .self_test import createSelfTest
 from .system_conf import SystemConf
@@ -27,7 +27,7 @@ def _set_content(e):
     elif idx == 3:
         right_content.content = ZeroCal.create()
     elif idx == 4:
-        right_content.content = createIO()
+        right_content.content = IO().create()
     elif idx == 5:
         right_content.content = createSelfTest()
     elif idx == 6:

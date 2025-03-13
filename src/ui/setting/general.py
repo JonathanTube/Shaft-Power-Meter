@@ -33,14 +33,6 @@ class General:
                 date_time_format='YYYY-MM-dd HH:mm:ss'
             )
 
-    def __set_preference(self, name: str, value: str):
-        if name == 'system_unit':
-            self.last_preference.system_unit = value
-        elif name == 'language':
-            self.last_preference.language = value
-        elif name == 'data_refresh_interval':
-            self.last_preference.data_refresh_interval = value
-
     def __create_preference_card(self):
         self.system_unit = ft.RadioGroup(
             content=ft.Row([
@@ -48,7 +40,7 @@ class General:
                 ft.Radio(value="1", label="Metric")
             ]),
             value=self.last_preference.system_unit,
-            on_change=lambda e: self.__set_preference('system_unit', e.control.value)
+            on_change=lambda e: setattr(self.last_preference, 'system_unit', e.control.value)
         )
 
         self.language = ft.RadioGroup(
@@ -57,7 +49,7 @@ class General:
                 ft.Radio(value="1", label="中文")
             ]),
             value=self.last_preference.language,
-            on_change=lambda e: self.__set_preference('language', e.control.value)
+            on_change=lambda e: setattr(self.last_preference, 'language', e.control.value)
         )
 
         self.data_refresh_interval = ft.TextField(
@@ -65,7 +57,7 @@ class General:
             suffix_text="seconds",
             value=self.last_preference.data_refresh_interval,
             col={"md": 6},
-            on_change=lambda e: self.__set_preference('data_refresh_interval', e.control.value))
+            on_change=lambda e: setattr(self.last_preference, 'data_refresh_interval', e.control.value))
 
         self.preference_card = create_card(
             'Preference',
@@ -74,65 +66,48 @@ class General:
                 self.data_refresh_interval,
                 ft.Row(controls=[ft.Text("Language"), self.language], col={"md": 6})
             ]),
-            col={"xs": 12}
-        )
-
-    def __set_max_limitations(self, name: str, value: str):
-        if name == 'speed_max':
-            self.last_limitations.speed_max = value
-        elif name == 'torque_max':
-            self.last_limitations.torque_max = value
-        elif name == 'power_max':
-            self.last_limitations.power_max = value
+            col={"xs": 12})
 
     def __create_max_limitations_card(self):
         self.speed_max = ft.TextField(
             suffix_text="rpm", label="Speed", value=self.last_limitations.speed_max,
-            on_change=lambda e: self.__set_max_limitations('speed_max', e.control.value)
+            on_change=lambda e: setattr(self.last_limitations, 'speed_max', e.control.value)
         )
 
         self.torque_max = ft.TextField(
             suffix_text="kNm", label="Torque", value=self.last_limitations.torque_max,
-            on_change=lambda e: self.__set_max_limitations('torque_max', e.control.value)
+            on_change=lambda e: setattr(self.last_limitations, 'torque_max', e.control.value)
         )
 
         self.power_max = ft.TextField(
             suffix_text="kW", label="Power", value=self.last_limitations.power_max,
-            on_change=lambda e: self.__set_max_limitations('power_max', e.control.value)
+            on_change=lambda e: setattr(self.last_limitations, 'power_max', e.control.value)
         )
         self.max_limitations_card = create_card(
-            'Max Parameter',
+            'Maximum Limitations',
             ft.Column(controls=[
                 self.speed_max,
                 self.torque_max,
                 self.power_max
             ]))
 
-    def __set_warning_limitations(self, name: str, value: str):
-        if name == 'speed_warning':
-            self.last_limitations.speed_warning = value
-        elif name == 'torque_warning':
-            self.last_limitations.torque_warning = value
-        elif name == 'power_warning':
-            self.last_limitations.power_warning = value
-
     def __create_warning_limitations_card(self):
         self.torque_warning = ft.TextField(
             suffix_text="kNm", label="Torque", value=self.last_limitations.torque_warning,
-            on_change=lambda e: self.__set_warning_limitations('torque_warning', e.control.value)
+            on_change=lambda e: setattr(self.last_limitations, 'torque_warning', e.control.value)
         )
 
         self.speed_warning = ft.TextField(
             suffix_text="rpm", label="Speed", value=self.last_limitations.speed_warning,
-            on_change=lambda e: self.__set_warning_limitations('speed_warning', e.control.value)
+            on_change=lambda e: setattr(self.last_limitations, 'speed_warning', e.control.value)
         )
 
         self.power_warning = ft.TextField(
             suffix_text="kW", label="Power", value=self.last_limitations.power_warning,
-            on_change=lambda e: self.__set_warning_limitations('power_warning', e.control.value)
+            on_change=lambda e: setattr(self.last_limitations, 'power_warning', e.control.value)
         )
         self.warning_limitations_card = create_card(
-            'Warning Parameter',
+            'Warning Limitations',
             ft.Column(controls=[
                 self.speed_warning,
                 self.torque_warning,

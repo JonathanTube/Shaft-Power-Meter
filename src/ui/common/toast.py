@@ -1,30 +1,31 @@
-import flet as ft
 import time
+
+import flet as ft
 
 
 class Toast:
 
     @staticmethod
     def show_success(page: ft.Page, message: str):
-        Toast.show_toast(page, message, ft.Colors.PRIMARY_CONTAINER)
+        Toast.show_toast(page, message, ft.Colors.GREEN_500, ft.Colors.WHITE)
 
     @staticmethod
     def show_warning(page: ft.Page, message: str):
-        Toast.show_toast(page, message, ft.Colors.SECONDARY_CONTAINER)
+        Toast.show_toast(page, message, ft.Colors.ORANGE_500, ft.Colors.WHITE)
 
     @staticmethod
     def show_error(page: ft.Page, message: str):
-        Toast.show_toast(page, message, ft.Colors.ERROR_CONTAINER)
+        Toast.show_toast(page, message, ft.Colors.RED_500, ft.Colors.WHITE)
 
     @staticmethod
-    def show_toast(page: ft.Page, message: str, bg_color: ft.Colors, duration=2):
+    def show_toast(page: ft.Page, message: str, bg_color: ft.Colors, color: ft.Colors, duration=2):
         # 创建 Toast 控件
         toast = ft.Container(
             expand=True,
             content=ft.Row(
                 expand=True,
                 alignment=ft.MainAxisAlignment.CENTER,
-                controls=[ft.Text(message,size=16)]),
+                controls=[ft.Text(message, size=16, color=color)]),
             bgcolor=bg_color,
             padding=10,
             border_radius=5,
