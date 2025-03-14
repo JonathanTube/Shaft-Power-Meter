@@ -1,6 +1,6 @@
 import pytest
-from peewee import SqliteDatabase, IntegrityError
-from src.database.models.gps_log import GpsLog, BaseModel
+from peewee import SqliteDatabase
+from src.db.models.gps_log import GpsLog, BaseModel
 from datetime import datetime
 
 

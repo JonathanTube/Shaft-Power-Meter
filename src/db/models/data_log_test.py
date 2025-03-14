@@ -1,6 +1,6 @@
 import pytest
 from peewee import SqliteDatabase
-from src.database.models.data_log import DataLog, BaseModel
+from src.db.models.data_log import DataLog, BaseModel
 import random
 
 

@@ -1,8 +1,8 @@
 import flet as ft
 
 from src.ui.home.counter.interval import createInterval
-from ui.home.counter.manually import createManually
-from ui.home.counter.total import createTotal
+from src.ui.home.counter.manually import createManually
+from src.ui.home.counter.total import createTotal
 
 
 def createCounter(dual: bool = False):

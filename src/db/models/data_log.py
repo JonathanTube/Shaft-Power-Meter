@@ -1,5 +1,5 @@
 from peewee import FloatField
-from src.database.base import BaseModel
+from src.db.base import BaseModel
 
 
 class DataLog(BaseModel):

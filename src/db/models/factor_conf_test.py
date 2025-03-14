@@ -1,11 +1,11 @@
 import pytest
 from peewee import SqliteDatabase
-from src.database.models.factor_conf import GeneralSetting, BaseModel
+from src.db.models.factor_conf import GeneralSetting, BaseModel
 
 
 @pytest.fixture(scope='module')
 def setup_database():
-    # Bind model to test database
+    # Bind model to test db
     db = SqliteDatabase(':memory:')
     BaseModel._meta.database = db
     db.connect()
@@ -30,7 +30,7 @@ def test_create_general_setting(setup_database):
         tension_compression_coefficient=1.2
     )
 
-    # Retrieve the instance from the database
+    # Retrieve the instance from the db
     retrieved_setting = GeneralSetting.get_by_id(setting.id)
 
     # Assert that the retrieved values match the created values
@@ -63,7 +63,7 @@ def test_update_general_setting(setup_database):
     setting.bearing_outer_diameter_D = 110.0
     setting.save()
 
-    # Retrieve the updated instance from the database
+    # Retrieve the updated instance from the db
     updated_setting = GeneralSetting.get_by_id(setting.id)
 
     # Assert that the updated values match the new values
@@ -88,6 +88,6 @@ def test_delete_general_setting(setup_database):
     setting_id = setting.id
     setting.delete_instance()
 
-    # Assert that the instance no longer exists in the database
+    # Assert that the instance no longer exists in the db
     with pytest.raises(GeneralSetting.DoesNotExist):
         GeneralSetting.get_by_id(setting_id)

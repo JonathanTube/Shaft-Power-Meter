@@ -1,6 +1,6 @@
 import flet as ft
 
-from src.database.models.propeller_setting import PropellerSetting
+from src.db.models.propeller_setting import PropellerSetting
 from src.ui.common.color_picker import ColorDialog
 from src.ui.common.custom_card import create_card
 from src.ui.common.toast import Toast

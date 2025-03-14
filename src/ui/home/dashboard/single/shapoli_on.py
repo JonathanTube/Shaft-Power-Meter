@@ -2,38 +2,52 @@ import flet as ft
 
 from src.ui.common.Meter import Meter
 from src.ui.common.custom_card import create_card
-from src.ui.home.dashboard.power_line_chart import createPowerLineChart
+from src.ui.home.dashboard.power_chart import PowerChart
 
 
 class DashboardShaPoLiOn:
 
     def __create_left(self):
-        col = ft.Column(
-            spacing=40,
+        column = ft.Column(
             expand=True,
+            spacing=20,
             horizontal_alignment=ft.CrossAxisAlignment.CENTER,
             controls=[
                 ft.Text('EEXI Limited Power(%)', weight=ft.FontWeight.BOLD, size=20),
-                Meter(radius=160).create()
+                Meter(radius=150).create()
             ])
 
-        container = ft.Container(expand=True, padding=ft.padding.symmetric(30, 40), content=col)
+        container = ft.Container(expand=True, padding=ft.padding.symmetric(10, 10), content=column)
 
-        self.left = ft.Card(expand=True, content=container)
+        self.left = ft.Card(content=container)
 
     def __create_right(self):
-        self.right = ft.GridView(
-            expand=True,  # 填满父容器
-            child_aspect_ratio=1,  # 子项宽高比
-            # max_extent=400,  # 子项最大宽度
-            runs_count=2,  # 每行分割为2份
-            spacing=10,  # 子项间距
-            run_spacing=10,  # 行间距
+        self.right = ft.Column(
+            expand=True,
             controls=[
-                create_card(heading="Power", body=ft.Text('9999 kw')),
-                create_card(heading="Speed", body=ft.Text('9999 rpm')),
-                create_card(heading="Torque", body=ft.Text('9999 kNm')),
-                create_card(heading="Thrust", body=ft.Text('9999 kN'))
+                ft.Row(
+                    expand=True,
+                    controls=[
+                        create_card(expand=True, heading="Power",
+                                    body=ft.Row(
+                                        expand=True,
+                                        alignment=ft.MainAxisAlignment.CENTER,
+                                        vertical_alignment=ft.CrossAxisAlignment.CENTER,
+                                        run_alignment=ft.MainAxisAlignment.CENTER,
+                                        controls=[
+                                            ft.Text('9999', size=28, weight=ft.FontWeight.W_600),
+                                            ft.Text('kw', size=18)
+                                        ])),
+                        create_card(expand=True, heading="Speed", body=ft.Text('9999 rpm')),
+                        create_card(expand=True, heading="Torque", body=ft.Text('9999 kNm')),
+                    ]),
+                ft.Row(
+                    expand=True,
+                    controls=[
+                        create_card(expand=True, heading="Thrust", body=ft.Text('9999 kN')),
+                        create_card(expand=True, heading="Unlimited Power", body=ft.Text('100 kW')),
+                        create_card(expand=True, heading="Limited Power", body=ft.Text('180 kW'))
+                    ])
             ]
         )
 
@@ -53,5 +67,5 @@ class DashboardShaPoLiOn:
             expand=True,
             controls=[
                 self.summary,
-                createPowerLineChart()
+                PowerChart().create()
             ])

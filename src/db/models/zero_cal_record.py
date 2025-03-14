@@ -1,7 +1,7 @@
 from peewee import FloatField, ForeignKeyField
 
-from src.database.base import BaseModel, db
-from src.database.models.zero_cal_info import ZeroCalInfo
+from src.db.base import BaseModel
+from src.db.models.zero_cal_info import ZeroCalInfo
 
 
 class ZeroCalRecord(BaseModel):

@@ -36,11 +36,12 @@ class Meter:
         )
 
     def __create_center(self):
-        container_width = self.max_radius * 0.6
+        container_width = self.inner_center_space_radius * 0.8
         left = self.max_radius - container_width * 0.5
-        top = self.max_radius * 0.7
+        top = self.inner_center_space_radius
+        font_size = self.max_radius * 0.25
 
-        self.center_text = ft.Text(value="91", size=40,
+        self.center_text = ft.Text(value="91", size=font_size,
                                    text_align=ft.TextAlign.CENTER,
                                    color=ft.Colors.INVERSE_SURFACE)
 
@@ -69,7 +70,7 @@ class Meter:
         return ft.Stack(
             width=self.max_radius * 2,
             height=self.max_radius,
-            controls=[ft.Container(content=meter, top=0)]
+            controls=[ft.Container(bgcolor='red', content=meter, top=0)]
         )
 #
 #

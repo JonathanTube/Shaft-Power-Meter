@@ -169,7 +169,7 @@ cython_debug/
 
 # PyPI configuration file
 .pypirc
-main.db
+src/main.db
 /.idea/inspectionProfiles/profiles_settings.xml
 /.idea/.gitignore
 /.idea/dataSources.xml

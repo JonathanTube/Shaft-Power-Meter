@@ -1,7 +1,6 @@
 import pytest
 from peewee import SqliteDatabase
-from src.database.models.counter_log import CounterLog, BaseModel
-from datetime import datetime
+from src.db.models.counter_log import CounterLog, BaseModel
 
 
 @pytest.fixture(scope="module", autouse=True)

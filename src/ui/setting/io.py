@@ -1,6 +1,6 @@
 import flet as ft
 
-from src.database.models.io_conf import IOConf
+from src.db.models.io_conf import IOConf
 from src.ui.common.custom_card import create_card
 from src.ui.common.toast import Toast
 

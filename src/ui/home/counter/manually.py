@@ -1,7 +1,7 @@
 import flet as ft
 
 from src.ui.common.custom_card import create_card
-from ui.home.counter.display import createDisplay
+from src.ui.home.counter.display import createDisplay
 
 
 def createManually():

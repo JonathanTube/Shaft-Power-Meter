@@ -1,6 +1,6 @@
 import pytest
 from peewee import SqliteDatabase, IntegrityError
-from src.database.models.breach_reason import BreachReason, BaseModel
+from src.db.models.breach_reason import BreachReason, BaseModel
 
 
 @pytest.fixture(scope="module", autouse=True)

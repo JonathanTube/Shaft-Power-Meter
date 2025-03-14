@@ -4,8 +4,8 @@ from datetime import datetime
 import flet as ft
 from dateutil.relativedelta import relativedelta
 
-from src.database.models.zero_cal_info import ZeroCalInfo
-from src.database.models.zero_cal_record import ZeroCalRecord
+from src.db.models.zero_cal_info import ZeroCalInfo
+from src.db.models.zero_cal_record import ZeroCalRecord
 from src.ui.common.custom_card import create_card
 from src.ui.common.toast import Toast
 

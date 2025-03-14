@@ -1,8 +1,8 @@
 import flet as ft
 
-from src.database.models.factor_conf import FactorConf
-from src.database.models.ship_info import ShipInfo
-from src.database.models.system_settings import SystemSettings
+from src.db.models.factor_conf import FactorConf
+from src.db.models.ship_info import ShipInfo
+from src.db.models.system_settings import SystemSettings
 from ..common.custom_card import create_card
 from ..common.toast import Toast
 

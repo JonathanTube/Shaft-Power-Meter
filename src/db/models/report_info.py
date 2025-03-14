@@ -1,5 +1,5 @@
 from peewee import CharField, DateTimeField
-from src.database.base import BaseModel
+from src.db.base import BaseModel
 
 
 class ReportInfo(BaseModel):

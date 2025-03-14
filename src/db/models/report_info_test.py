@@ -1,6 +1,6 @@
 import pytest
 from peewee import SqliteDatabase
-from src.database.models.report_info import ReportInfo, BaseModel
+from src.db.models.report_info import ReportInfo, BaseModel
 
 
 @pytest.fixture(scope="module", autouse=True)

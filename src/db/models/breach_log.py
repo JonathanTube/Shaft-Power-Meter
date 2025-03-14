@@ -1,6 +1,6 @@
 from peewee import CharField, TextField, Check, ForeignKeyField, DateTimeField
-from src.database.base import BaseModel
-from src.database.models.breach_reason import BreachReason
+from src.db.base import BaseModel
+from src.db.models.breach_reason import BreachReason
 
 
 class BreachLog(BaseModel):

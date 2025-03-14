@@ -1,6 +1,6 @@
 import pytest
 from peewee import SqliteDatabase
-from src.database.models.propeller_setting import PropellerSetting
+from src.db.models.propeller_setting import PropellerSetting
 
 
 @pytest.fixture(scope="module", autouse=True)

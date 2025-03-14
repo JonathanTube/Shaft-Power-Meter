@@ -1,6 +1,6 @@
 from peewee import IntegerField, CharField, BooleanField
 
-from src.database.base import BaseModel, db
+from src.db.base import BaseModel, db
 
 
 class IOConf(BaseModel):

@@ -1,6 +1,6 @@
 import pytest
 from peewee import SqliteDatabase, IntegrityError
-from src.database.models.ship_info import ShipInfo, BaseModel
+from src.db.models.ship_info import ShipInfo, BaseModel
 
 
 @pytest.fixture(scope="module", autouse=True)

@@ -1,8 +1,8 @@
 import flet as ft
 
-from ui.home.logs.breach import createBreachLog
-from ui.home.logs.data import createDataLog
-from ui.home.logs.gps import createGpsLog
+from src.ui.home.logs.breach import createBreachLog
+from src.ui.home.logs.data import createDataLog
+from src.ui.home.logs.gps import createGpsLog
 
 
 def createLogs():

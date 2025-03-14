@@ -1,5 +1,3 @@
-import flet as ft
-
 from src.ui.common.custom_card import create_card
 import flet as ft
 

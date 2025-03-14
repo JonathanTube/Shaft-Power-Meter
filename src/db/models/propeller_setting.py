@@ -1,5 +1,5 @@
-from peewee import CharField, FloatField, BooleanField, IntegerField, Check
-from src.database.base import BaseModel,db
+from peewee import CharField, FloatField, BooleanField, Check
+from src.db.base import BaseModel,db
 
 
 class PropellerSetting(BaseModel):
