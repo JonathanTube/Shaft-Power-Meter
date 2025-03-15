@@ -1,6 +1,6 @@
 import flet as ft
 
-from src.ui.home.index import createHome
+from src.ui.home.index import create_home
 from src.ui.report.report_list import ReportList
 from src.ui.setting.index import createSetting
 
@@ -35,7 +35,7 @@ class HeaderMenu(ft.Row):
             control.update()
 
         if e.control.text == "HOME":
-            self.pageContent.content = createHome()
+            self.pageContent.content = create_home()
         elif e.control.text == "REPORT":
             self.pageContent.content = ReportList().create()
         else:

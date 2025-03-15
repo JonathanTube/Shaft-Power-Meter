@@ -1,8 +1,8 @@
 import flet as ft
 
-from src.ui.common.Meter import Meter
-from src.ui.common.custom_card import create_card
-from src.ui.home.dashboard.power_chart import PowerChart
+from ....common.Meter import Meter
+from ....common.custom_card import create_card
+from ..power_chart import PowerChart
 
 
 class DashboardShaPoLiOn:

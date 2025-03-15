@@ -2,9 +2,9 @@ import datetime
 
 import flet as ft
 
-from src.db.models.date_time_conf import DateTimeConf
-from src.db.models.limitations import Limitations
-from src.db.models.preference import Preference
+from ...db.models.date_time_conf import DateTimeConf
+from ...db.models.limitations import Limitations
+from ...db.models.preference import Preference
 from ..common.custom_card import create_card
 from ..common.toast import Toast
 

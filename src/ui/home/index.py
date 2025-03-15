@@ -1,11 +1,11 @@
 import flet as ft
 
-from src.ui.home.alarm.index import createAlarm
-from src.ui.home.counter.index import createCounter
-from src.ui.home.dashboard.index import create_dashboard
-from src.ui.home.logs.index import createLogs
-from src.ui.home.propeller_curve.index import CreatePropellerCurve
-from src.ui.home.trendview.index import createTrendView
+from .dashboard.index import create_dashboard
+from .alarm.index import createAlarm
+from .counter.index import createCounter
+from .logs.index import createLogs
+from .propeller_curve.index import CreatePropellerCurve
+from .trendview.index import createTrendView
 
 
 def _tab_content(content):
@@ -16,7 +16,7 @@ def _tab_content(content):
     )
 
 
-def createHome():
+def create_home():
     return ft.Tabs(
         selected_index=0,
         animation_duration=300,
