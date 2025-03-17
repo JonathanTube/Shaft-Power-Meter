@@ -1,7 +1,7 @@
 import flet as ft
 
 
-class Meter:
+class MeterHalf:
     def __init__(self, radius: int):
         self.max_radius = radius
         self.outer_radius = radius * 0.35
@@ -12,6 +12,7 @@ class Meter:
 
     def __create_outer(self):
         self.outer = ft.PieChart(
+            sections_space=0,
             sections=[
                 ft.PieChartSection(160, color=ft.Colors.GREEN, radius=self.outer_radius),
                 ft.PieChartSection(20, color=ft.Colors.GREY_200, radius=self.outer_radius),
@@ -24,6 +25,7 @@ class Meter:
 
     def __create_inner(self):
         self.inner = ft.PieChart(
+            sections_space=0,
             sections=[
                 ft.PieChartSection(140, color=ft.Colors.GREEN, radius=self.inner_radius),
                 ft.PieChartSection(20, color=ft.Colors.ORANGE, radius=self.inner_radius),
@@ -36,7 +38,7 @@ class Meter:
         )
 
     def __create_center(self):
-        container_width = self.inner_center_space_radius * 0.8
+        container_width = self.inner_center_space_radius * 2 * 0.8
         left = self.max_radius - container_width * 0.5
         top = self.inner_center_space_radius
         font_size = self.max_radius * 0.25
@@ -70,7 +72,7 @@ class Meter:
         return ft.Stack(
             width=self.max_radius * 2,
             height=self.max_radius,
-            controls=[ft.Container(bgcolor='red', content=meter, top=0)]
+            controls=[ft.Container(content=meter, top=0)]
         )
 #
 #

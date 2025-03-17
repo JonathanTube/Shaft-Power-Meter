@@ -16,13 +16,13 @@ def main(page: ft.Page):
     page.window.max_width = 1024
     page.window.max_height = 768
     page.window.frameless = True
-    page.window.prevent_close = True
+    # page.window.prevent_close = True
 
     page.appbar = Header(page_content)
 
     page_content.content = create_home()
 
-    page.padding = ft.padding.only(left=20, right=20, top=0, bottom=20)
+    page.padding = ft.padding.only(left=0, right=0, top=0, bottom=0)
 
     page.add(page_content)
     print('page.window.width=', page.window.width)
