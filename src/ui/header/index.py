@@ -1,9 +1,9 @@
 import flet as ft
 
-from .shapoli_button import ShaPoLiButton
-from .header_logo import HeaderLogo
-from .header_menu import HeaderMenu
-from .theme_button import ThemeButton
+from ui.header.shapoli_button import ShaPoLiButton
+from ui.header.header_logo import HeaderLogo
+from ui.header.header_menu import HeaderMenu
+from ui.header.theme_button import ThemeButton
 
 
 class Header(ft.AppBar):

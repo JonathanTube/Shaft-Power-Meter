@@ -1,10 +1,10 @@
 import flet as ft
 
-from ...db.models.factor_conf import FactorConf
-from ...db.models.ship_info import ShipInfo
-from ...db.models.system_settings import SystemSettings
-from ..common.custom_card import create_card
-from ..common.toast import Toast
+from db.models.factor_conf import FactorConf
+from db.models.ship_info import ShipInfo
+from db.models.system_settings import SystemSettings
+from ui.common.custom_card import create_card
+from ui.common.toast import Toast
 
 
 class SystemConf:

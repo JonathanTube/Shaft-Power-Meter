@@ -1,7 +1,7 @@
 import flet as ft
 
-from .zero_cal_executor import ZeroCalExecutor
-from .zero_cal_his import ZeroCalHis
+from ui.setting.zero_cal_executor import ZeroCalExecutor
+from ui.setting.zero_cal_his import ZeroCalHis
 
 
 class ZeroCal:

@@ -1,7 +1,7 @@
 import random
 import flet as ft
 
-from ...common.custom_card import create_card
+from ui.common.custom_card import create_card
 
 
 def _get_y_axis_labels():

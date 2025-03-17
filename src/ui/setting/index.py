@@ -1,13 +1,13 @@
 import flet as ft
 
-from .authority import create_authority
-from .data_dumping import create_data_dumping
-from .general import General
-from .io import IO
-from .propeller_conf import PropellerConf
-from .self_test import createSelfTest
-from .system_conf import SystemConf
-from .zero_cal import ZeroCal
+from ui.setting.authority import create_authority
+from ui.setting.data_dumping import create_data_dumping
+from ui.setting.general import General
+from ui.setting.io import IO
+from ui.setting.propeller_conf import PropellerConf
+from ui.setting.self_test import createSelfTest
+from ui.setting.system_conf import SystemConf
+from ui.setting.zero_cal import ZeroCal
 
 right_content = ft.Container(
     expand=True,

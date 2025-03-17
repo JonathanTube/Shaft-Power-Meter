@@ -1,9 +1,9 @@
 import flet as ft
 
-from ...db.models.propeller_setting import PropellerSetting
-from ..common.color_picker import ColorDialog
-from ..common.custom_card import create_card
-from ..common.toast import Toast
+from db.models.propeller_setting import PropellerSetting
+from ui.common.color_picker import ColorDialog
+from ui.common.custom_card import create_card
+from ui.common.toast import Toast
 
 
 class PropellerConf:

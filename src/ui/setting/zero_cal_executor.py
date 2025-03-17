@@ -4,10 +4,10 @@ from datetime import datetime
 import flet as ft
 from dateutil.relativedelta import relativedelta
 
-from ...db.models.zero_cal_info import ZeroCalInfo
-from ...db.models.zero_cal_record import ZeroCalRecord
-from ...ui.common.custom_card import create_card
-from ...ui.common.toast import Toast
+from db.models.zero_cal_info import ZeroCalInfo
+from db.models.zero_cal_record import ZeroCalRecord
+from ui.common.custom_card import create_card
+from ui.common.toast import Toast
 
 
 class ZeroCalExecutor:

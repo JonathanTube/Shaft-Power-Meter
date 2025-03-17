@@ -1,8 +1,8 @@
 import flet as ft
 
-from ...db.models.zero_cal_info import ZeroCalInfo
-from ..common.custom_card import create_card
-from ..common.toast import Toast
+from db.models.zero_cal_info import ZeroCalInfo
+from ui.common.custom_card import create_card
+from ui.common.toast import Toast
 
 
 class ZeroCalHis:

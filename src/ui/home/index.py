@@ -1,12 +1,12 @@
 import flet as ft
 
-from .alarm.index import createAlarm
-from .counter.index import createCounter
-from .dashboard.index import create_dashboard
-from .logs.index import createLogs
-from .notice.index import Notice
-from .propeller_curve.index import CreatePropellerCurve
-from .trendview.index import createTrendView
+from ui.home.alarm.index import createAlarm
+from ui.home.counter.index import createCounter
+from ui.home.dashboard.index import create_dashboard
+from ui.home.logs.index import createLogs
+from ui.home.notice.index import Notice
+from ui.home.propeller_curve.index import CreatePropellerCurve
+from ui.home.trendview.index import createTrendView
 
 
 def __create_tab_content(content):

@@ -1,10 +1,10 @@
 import flet as ft
 
-from app.db.base import db
-from app.db.models.zero_cal_info import ZeroCalInfo
-from app.db.models.zero_cal_record import ZeroCalRecord
-from app.ui.header.index import Header
-from app.ui.home.index import create_home
+from db.base import db
+from db.models.zero_cal_info import ZeroCalInfo
+from db.models.zero_cal_record import ZeroCalRecord
+from ui.header.index import Header
+from ui.home.index import create_home
 
 
 def main(page: ft.Page):

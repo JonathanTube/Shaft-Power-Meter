@@ -1,4 +1,4 @@
-from ...common.custom_card import create_card
+from ui.common.custom_card import create_card
 import flet as ft
 
 
