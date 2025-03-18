@@ -2,7 +2,7 @@ from ui.common.custom_card import create_card
 import flet as ft
 
 
-class BreachLog(ft.Container):
+class BreachLogger(ft.Container):
     def __init__(self):
         super().__init__()
         self.content = self.__create()
@@ -21,15 +21,6 @@ class BreachLog(ft.Container):
                 ft.DataColumn(
                     ft.Text("Ship Position\nWhen Returning To\nLimited Power")),
                 ft.DataColumn(ft.Text("Action"))
-                # ft.DataColumn(ft.Text("Reason For Power Reserve Breach")),
-                # ft.DataColumn(ft.Text("Date/Time Of Power Reserve Breach")),
-                # ft.DataColumn(
-                #     ft.Text("Ship Position Of Power Reserve Breach")),
-                # ft.DataColumn(
-                #     ft.Text("Date/Time When Returning To Limited Power")),
-                # ft.DataColumn(
-                #     ft.Text("Ship Position When Returning To Limited Power")),
-                # ft.DataColumn(ft.Text("Action"))
             ],
             rows=[
                 ft.DataRow(

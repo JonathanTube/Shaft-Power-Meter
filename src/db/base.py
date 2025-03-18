@@ -1,7 +1,14 @@
+import os
 from peewee import SqliteDatabase, DateTimeField, Model, IntegerField
 from datetime import datetime
 
-db = SqliteDatabase('../../main.db')
+# Get the absolute path to the project root directory
+PROJECT_ROOT = os.path.dirname(os.path.dirname(
+    os.path.dirname(os.path.abspath(__file__))))
+DB_PATH = os.path.join(PROJECT_ROOT, 'main.db')
+
+db = SqliteDatabase(DB_PATH)
+
 
 class BaseModel(Model):
     """ 所有模型的基类 """

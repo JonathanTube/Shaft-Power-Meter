@@ -2,7 +2,7 @@ import flet as ft
 from ui.common.custom_card import create_card
 
 
-class DataLog(ft.Container):
+class DataLogger(ft.Container):
     def __init__(self):
         super().__init__()
         self.content = self.__create()

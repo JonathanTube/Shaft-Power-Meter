@@ -1,8 +1,8 @@
 import flet as ft
 
-from ui.setting.logs.breach import BreachLog
-from ui.setting.logs.data import DataLog
-from ui.setting.logs.gps import GpsLog
+from ui.setting.logs.breach_logger import BreachLogger
+from ui.setting.logs.data_logger import DataLogger
+from ui.setting.logs.gps_logger import GpsLogger
 
 
 class Logs(ft.Container):
@@ -14,9 +14,9 @@ class Logs(ft.Container):
         return ft.Tabs(
             selected_index=0,
             tabs=[
-                ft.Tab(text="Breach Log", content=BreachLog()),
-                ft.Tab(text="Data Log", content=DataLog()),
-                ft.Tab(text="GPS Log", content=GpsLog())
+                ft.Tab(text="Breach Log", content=BreachLogger()),
+                ft.Tab(text="Data Log", content=DataLogger()),
+                ft.Tab(text="GPS Log", content=GpsLogger())
             ],
             expand=True
         )

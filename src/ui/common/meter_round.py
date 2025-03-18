@@ -20,8 +20,6 @@ class MeterRound(ft.Container):
         self.outer_radius = radius * 0.35
         self.outer_center_space_radius = radius - self.outer_radius
 
-        self.content = self.__create()
-
         if shadow:
             self.padding = ft.padding.only(
                 left=20, right=20, top=10, bottom=10
@@ -34,6 +32,8 @@ class MeterRound(ft.Container):
                 offset=ft.Offset(0, 1),
                 blur_style=ft.ShadowBlurStyle.OUTER
             )
+
+        self.content = self.__create()
 
     def __create_ring(self):
         green_section = (360 - hide_section) * self.value / self.max_value

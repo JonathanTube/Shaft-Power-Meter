@@ -1,5 +1,5 @@
 from peewee import CharField, TimeField, DateField
-from ..base import BaseModel
+from ..base import BaseModel, db
 
 
 class GpsLog(BaseModel):
@@ -13,3 +13,7 @@ class GpsLog(BaseModel):
 
     class Meta:
         table_name = 'gps_log'
+
+
+with db:
+    db.create_tables([GpsLog], safe=True)

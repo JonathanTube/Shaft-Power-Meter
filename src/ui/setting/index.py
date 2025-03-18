@@ -72,8 +72,8 @@ def createSetting():
                 label="I/O"
             ),
             ft.NavigationRailDestination(
-                icon=ft.Icons.TAPAS_OUTLINED,
-                selected_icon=ft.Icon(ft.Icons.TAPAS),
+                icon=ft.Icons.ABC_OUTLINED,
+                selected_icon=ft.Icon(ft.Icons.ABC),
                 label="Logs"
             ),
             ft.NavigationRailDestination(
