@@ -3,7 +3,22 @@ import random
 import flet as ft
 
 
-class PowerChart:
+class PowerChart(ft.Container):
+    def __init__(self):
+        super().__init__()
+        self.content = self.create()
+        self.padding = ft.padding.only(left=20, right=20, top=20, bottom=20)
+        self.margin = ft.margin.only(left=0, right=0, top=0, bottom=10)
+        self.expand = True
+        self.border_radius = ft.border_radius.all(10)
+        self.shadow = ft.BoxShadow(
+            spread_radius=2,
+            blur_radius=4,
+            color=ft.colors.with_opacity(0.15, ft.colors.INVERSE_SURFACE),
+            offset=ft.Offset(0, 1),
+            blur_style=ft.ShadowBlurStyle.OUTER
+        )
+
     def __get_y_axis_labels(self):
         labels = []
         for val in range(6):

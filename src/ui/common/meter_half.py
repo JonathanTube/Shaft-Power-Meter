@@ -1,14 +1,17 @@
 import flet as ft
 
 
-class MeterHalf:
+class MeterHalf(ft.Container):
     def __init__(self, radius: int):
+        super().__init__()
         self.max_radius = radius
         self.outer_radius = radius * 0.35
         self.outer_center_space_radius = radius - self.outer_radius
 
         self.inner_radius = self.outer_center_space_radius * 0.05
         self.inner_center_space_radius = (self.outer_center_space_radius - self.inner_radius) * 0.9
+
+        self.content = self.__create()
 
     def __create_outer(self):
         self.outer = ft.PieChart(
@@ -54,7 +57,7 @@ class MeterHalf:
             top=top
         )
 
-    def create(self):
+    def __create(self):
         self.__create_outer()
         self.__create_inner()
         self.__create_center()
