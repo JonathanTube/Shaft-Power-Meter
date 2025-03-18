@@ -73,8 +73,8 @@ class SystemConf:
 
         self.amount_of_propeller_radios = ft.RadioGroup(
             content=ft.Row([
-                ft.Radio(value="0", label="Single"),
-                ft.Radio(value="1", label="Dual")
+                ft.Radio(value="1", label="Single"),
+                ft.Radio(value="2", label="Dual")
             ]),
             value=self.last_system_settings.amount_of_propeller,
             on_change=lambda e: self.__set_system_settings(

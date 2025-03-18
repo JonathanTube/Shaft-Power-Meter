@@ -12,14 +12,26 @@ class HeaderMenu(ft.Row):
         self.pageContent = page_content
 
         self.controls = [
-            ft.ElevatedButton(text="HOME", icon=ft.Icons.HOME, color=ft.Colors.WHITE,
-                              bgcolor=ft.Colors.BLUE_600, on_click=self.on_click),
+            ft.FilledButton(text="HOME",
+                            icon=ft.Icons.HOME_OUTLINED,
+                            icon_color=ft.Colors.WHITE,
+                            color=ft.Colors.WHITE,
+                            bgcolor=ft.Colors.BLUE_800,
+                            on_click=self.on_click),
 
-            ft.ElevatedButton(text="REPORT", icon=ft.Icons.REPORT, color=ft.Colors.GREY_800,
-                              bgcolor=None, on_click=self.on_click),
+            ft.ElevatedButton(text="REPORT",
+                              icon=ft.Icons.REPORT_OUTLINED,
+                              icon_color=ft.Colors.GREY_800,
+                              color=ft.Colors.GREY_800,
+                              bgcolor=ft.Colors.LIGHT_BLUE_100,
+                              on_click=self.on_click),
 
-            ft.ElevatedButton(text="SETTING", icon=ft.Icons.SETTINGS, color=ft.Colors.GREY_800,
-                              bgcolor=None, on_click=self.on_click)
+            ft.ElevatedButton(text="SETTING",
+                              icon=ft.Icons.SETTINGS_OUTLINED,
+                              icon_color=ft.Colors.GREY_800,
+                              color=ft.Colors.GREY_800,
+                              bgcolor=ft.Colors.LIGHT_BLUE_100,
+                              on_click=self.on_click)
         ]
 
         self.padding = 20
@@ -27,10 +39,12 @@ class HeaderMenu(ft.Row):
     def on_click(self, e):
         for control in self.controls:
             if e.control.text == control.text:
-                control.bgcolor = ft.Colors.BLUE_600
+                control.bgcolor = ft.Colors.BLUE_800
+                control.icon_color = ft.Colors.WHITE
                 control.color = ft.Colors.WHITE
             else:
-                control.bgcolor = None
+                control.bgcolor = ft.Colors.LIGHT_BLUE_100
+                control.icon_color = ft.Colors.GREY_800
                 control.color = ft.Colors.GREY_800
             control.update()
 

@@ -3,7 +3,7 @@ import flet as ft
 from ui.common.meter_half import MeterHalf
 
 
-class DashboardShaPoLiOn(ft.Container):
+class SingleShaPoLiOn(ft.Container):
     def __init__(self):
         super().__init__()
         self.content = self.__create()
@@ -70,7 +70,7 @@ class DashboardShaPoLiOn(ft.Container):
             ]
         )
 
-        self.right = ft.Container(expand=False, width=300, height=300, content=content)
+        self.right = ft.Container(expand=False, width=360, height=300, content=content)
 
     def __create(self):
         self.__create_left()
@@ -78,7 +78,7 @@ class DashboardShaPoLiOn(ft.Container):
         # empty_placeholder = ft.Container(width=150, height=100)
         return ft.Row(
             expand=False,
-            alignment=ft.MainAxisAlignment.START,
+            alignment=ft.MainAxisAlignment.CENTER,
             vertical_alignment=ft.CrossAxisAlignment.CENTER,
             controls=[self.left, self.right]
         )

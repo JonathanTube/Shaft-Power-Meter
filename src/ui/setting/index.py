@@ -4,6 +4,7 @@ from ui.setting.authority import create_authority
 from ui.setting.data_dumping import create_data_dumping
 from ui.setting.general import General
 from ui.setting.io import IO
+from ui.setting.logs.index import Logs
 from ui.setting.propeller_conf import PropellerConf
 from ui.setting.self_test import createSelfTest
 from ui.setting.system_conf import SystemConf
@@ -11,7 +12,7 @@ from ui.setting.zero_cal import ZeroCal
 
 right_content = ft.Container(
     expand=True,
-    padding=20,
+    padding=ft.padding.only(left=5, right=5, top=5, bottom=5),
     content=SystemConf().create()
 )
 
@@ -29,10 +30,12 @@ def _set_content(e):
     elif idx == 4:
         right_content.content = IO().create()
     elif idx == 5:
-        right_content.content = createSelfTest()
+        right_content.content = Logs()
     elif idx == 6:
-        right_content.content = create_authority()
+        right_content.content = createSelfTest()
     elif idx == 7:
+        right_content.content = create_authority()
+    elif idx == 8:
         right_content.content = create_data_dumping()
 
     right_content.update()
@@ -69,6 +72,11 @@ def createSetting():
                 label="I/O"
             ),
             ft.NavigationRailDestination(
+                icon=ft.Icons.TAPAS_OUTLINED,
+                selected_icon=ft.Icon(ft.Icons.TAPAS),
+                label="Logs"
+            ),
+            ft.NavigationRailDestination(
                 icon=ft.Icons.ASSIGNMENT_OUTLINED,
                 selected_icon=ft.Icon(ft.Icons.ASSIGNMENT),
                 label="Self-test"
@@ -87,7 +95,8 @@ def createSetting():
         on_change=_set_content
     )
     row = ft.Row(
-        [
+        spacing=0,
+        controls=[
             rail,
             ft.VerticalDivider(width=1),
             right_content

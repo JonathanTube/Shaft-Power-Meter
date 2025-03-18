@@ -6,7 +6,10 @@ hide_section = 90
 
 
 class MeterRound(ft.Container):
-    def __init__(self, heading: str, radius: int, value: float, max_value: float, limit_value: float, unit: str):
+    def __init__(self, heading: str, radius: int,
+                 value: float, max_value: float,
+                 limit_value: float, unit: str,
+                 shadow: bool = True):
         super().__init__()
         self.heading = heading
         self.max_value = max_value
@@ -18,15 +21,19 @@ class MeterRound(ft.Container):
         self.outer_center_space_radius = radius - self.outer_radius
 
         self.content = self.__create()
-        self.padding = ft.padding.only(left=20, right=20, top=10, bottom=10)
-        self.border_radius = ft.border_radius.all(10)
-        self.shadow = ft.BoxShadow(
-            spread_radius=2,
-            blur_radius=4,
-            color=ft.colors.with_opacity(0.15, ft.colors.INVERSE_SURFACE),
-            offset=ft.Offset(0, 1),
-            blur_style=ft.ShadowBlurStyle.OUTER
-        )
+
+        if shadow:
+            self.padding = ft.padding.only(
+                left=20, right=20, top=10, bottom=10
+            )
+            self.border_radius = ft.border_radius.all(10)
+            self.shadow = ft.BoxShadow(
+                spread_radius=2,
+                blur_radius=4,
+                color=ft.colors.with_opacity(0.15, ft.colors.INVERSE_SURFACE),
+                offset=ft.Offset(0, 1),
+                blur_style=ft.ShadowBlurStyle.OUTER
+            )
 
     def __create_ring(self):
         green_section = (360 - hide_section) * self.value / self.max_value

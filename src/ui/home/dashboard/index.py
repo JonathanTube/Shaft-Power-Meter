@@ -1,9 +1,11 @@
 import flet as ft
 
+from ui.home.dashboard.dual.dual_shapoli_off import DualShaPoLiOff
+from ui.home.dashboard.dual.dual_shapoli_on import DualShaPoLiOn
 from ui.home.dashboard.fixed_right import FixedRight
 from ui.home.dashboard.power_chart import PowerChart
-from ui.home.dashboard.single.shapoli_off import DashboardShaPoLiOff
-from ui.home.dashboard.single.shapoli_on import DashboardShaPoLiOn
+from ui.home.dashboard.single.single_shapoli_off import SingleShaPoLiOff
+from ui.home.dashboard.single.single_shapoli_on import SingleShaPoLiOn
 from db.models.system_settings import SystemSettings
 
 
@@ -16,10 +18,18 @@ class Dashboard(ft.Container):
         self.content = self.__create()
 
     def __create(self):
-        if self.system_settings is not None and self.system_settings.sha_po_li:
-            self.dashboard = DashboardShaPoLiOn()
+        print(self.system_settings)
+        if self.system_settings is None:
+            sha_po_li = False
+            amount_of_power = 1
         else:
-            self.dashboard = DashboardShaPoLiOff()
+            sha_po_li = self.system_settings.sha_po_li
+            amount_of_power = self.system_settings.amount_of_propeller
+
+        if amount_of_power == 1:
+            self.dashboard = SingleShaPoLiOn() if sha_po_li else SingleShaPoLiOff()
+        elif amount_of_power == 2:
+            self.dashboard = DualShaPoLiOn() if sha_po_li else DualShaPoLiOff()
 
         main_content = ft.Column(
             expand=True,
