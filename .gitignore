@@ -169,7 +169,6 @@ cython_debug/
 
 # PyPI configuration file
 .pypirc
-src/main.db
 /.idea/inspectionProfiles/profiles_settings.xml
 /.idea/.gitignore
 /.idea/dataSources.xml
@@ -177,3 +176,4 @@ src/main.db
 /.idea/modules.xml
 /.idea/Shaft-Power-Meter.iml
 /.idea/vcs.xml
+main.db

@@ -12,10 +12,10 @@ class GpsLogger(ft.Container):
     def __load_data(self):
         self.data = GpsLog.select().order_by(GpsLog.id.desc()).limit(10)
         self.rows = []
-        for index, item in enumerate(self.data):
+        for item in self.data:
             self.rows.append(
                 ft.DataRow(cells=[
-                    ft.DataCell(ft.Text(f"#{index+1}")),
+                    ft.DataCell(ft.Text(item.id)),
                     ft.DataCell(ft.Text(f"{item.utc_date} {item.utc_time}")),
                     ft.DataCell(ft.Text(f"{item.latitude}, {item.longitude}"))
                 ])
@@ -40,12 +40,19 @@ class GpsLogger(ft.Container):
     def __create_search(self):
         self.search_start_date = ft.TextField(label="Start Date", height=40)
         self.search_end_date = ft.TextField(label="End Date", height=40)
+        self.search_button = ft.FilledButton(
+            text="Search",
+            icon=ft.icons.SEARCH,
+            height=40,
+            on_click=lambda _: self.__load_data()
+        )
         self.search_card = create_card(
             heading="Search",
             body=ft.Row(
                 controls=[
                     self.search_start_date,
-                    self.search_end_date
+                    self.search_end_date,
+                    self.search_button
                 ]))
 
     def __create(self):

@@ -26,8 +26,8 @@ class GpsLogger:
             gps_data = GpsLog.create(
                 utc_date=datetime.now().date(),
                 utc_time=datetime.now().time(),
-                longitude=random.uniform(-180, 180),
-                latitude=random.uniform(-90, 90),
+                longitude=round(random.uniform(-180, 180), 2),
+                latitude=round(random.uniform(-90, 90), 2)
             )
             print(f"Generated GPS data: {gps_data}")
         except Exception as e:

@@ -1,5 +1,5 @@
 from peewee import CharField, Check
-from ..base import BaseModel
+from ..base import BaseModel, db
 
 
 class BreachReason(BaseModel):
@@ -15,3 +15,7 @@ class BreachReason(BaseModel):
 
     class Meta:
         table_name = 'breach_reason'
+
+
+with db:
+    db.create_tables([BreachReason], safe=True)

@@ -1,8 +1,12 @@
-from peewee import FloatField
+from peewee import FloatField, DateField, TimeField
 from ..base import BaseModel, db
 
 
 class DataLog(BaseModel):
+    utc_date = DateField(verbose_name="UTC日期")
+
+    utc_time = TimeField(verbose_name="UTC时间")
+
     revolution = FloatField(verbose_name="转速(Rev/Min)")
 
     power = FloatField(verbose_name="功率(kW)")

@@ -1,9 +1,9 @@
 from peewee import CharField, TextField, Check, ForeignKeyField, DateTimeField
-from ..base import BaseModel
+from ..base import BaseModel, db
 from .breach_reason import BreachReason
 
 
-class BreachLog(BaseModel):
+class EventLog(BaseModel):
     breach_reason = ForeignKeyField(
         BreachReason, index=True, backref="BreachLog", verbose_name="功率突破原因")
 
@@ -22,3 +22,7 @@ class BreachLog(BaseModel):
 
     class Meta:
         table_name = 'breach_log'
+
+
+with db:
+    db.create_tables([EventLog], safe=True)
