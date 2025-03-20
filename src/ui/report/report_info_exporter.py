@@ -1,11 +1,13 @@
+import os
 from fpdf import FPDF
+
 
 class ReportInfoExporter(FPDF):
     def __init__(self):
         super().__init__()
         self.add_page()
 
-    def generate_pdf(self,path):
+    def generate_pdf(self, path):
         self.__handle_report_title()
 
         self.__handle_basic_info()
@@ -19,22 +21,22 @@ class ReportInfoExporter(FPDF):
     # 插入水平分隔线
     def __insert_horizontal_line(self):
         self.ln(5)
-        self.set_draw_color(221,221,221)
+        self.set_draw_color(221, 221, 221)
         self.line(10, self.get_y(), self.w - 10, self.get_y())
         self.ln(5)
 
-    def __insert_subtitle(self, title):
+    def __insert_subtitle(self, title: str):
         self.set_font(family="Arial", style='B', size=12)
         self.cell(0, 10, title, ln=1, align='C')
         self.ln(5)
 
-    def __insert_label(self,text,w:int=35):
-        self.set_fill_color(221,221,221)
-        self.cell(w, 10, f'{text}:', align='R', fill=True)
+    def __insert_label(self, text: str, w: int = 35):
+        self.set_fill_color(221, 221, 221)
+        self.cell(w, 10, f'{text}:', align='L', fill=False)
 
-    def __insert_value(self,text,w:int=60):
-        self.set_fill_color(221,221,101)
-        self.cell(w, 10, text, align='L', fill=True)
+    def __insert_value(self, text: str, w: int = 60):
+        self.set_fill_color(221, 221, 101)
+        self.cell(w, 10, text, align='R', fill=False)
 
     # 设置标题
     def __handle_report_title(self):
@@ -42,7 +44,7 @@ class ReportInfoExporter(FPDF):
         self.set_font(family="Arial", style='B', size=16)
         # 主标题
         self.cell(0, 20, "Compliance Reporting", ln=1, align='C')
-        self.ln(5) #下移5mm
+        self.ln(5)  # 下移5mm
 
     # 第一部分：基本信息
     def __handle_basic_info(self):
@@ -68,75 +70,79 @@ class ReportInfoExporter(FPDF):
 
         self.__insert_horizontal_line()
 
-    # 第二部分：ShaPoLi事件日志
-    def __handle_event_log(self):
-        self.__insert_subtitle('ShaPoLi Event Log')
-        self.set_font(family="Arial", size=12)
-        event_data = [
-            (),
-            ("Ice condition:", "None", "Reason for reserve usage:", "Storm avoidance"),
-            ("Return to limited power datetime:", "2025-03-20 16:45 UTC","Return position:", "36°05'N 140°12'E"),
-            ("Return Beaufort number:", "4","Return wave height:", "2.1 m"),
-            ("Return ice condition:", "None")
-        ]
-
-        self.__insert_label("Date/Time of Power Reserve Breach")
+    def __handle_event_log_start(self):
+        self.__insert_label("Date/Time of Power Reserve Breach", w=90)
         self.__insert_value("2025-03-20 14:30 UTC")
         self.ln()
 
-        self.__insert_label("Ship position of power reserve breach")
+        self.__insert_label("Ship position of power reserve breach", w=90)
         self.__insert_value("35°12'N 139°46'E")
         self.ln()
 
-        self.__insert_label("Beaufort number")
+        self.__insert_label("Beaufort number", w=90)
         self.__insert_value("6")
-        self.__insert_label("Wave height")
+        self.ln()
+
+        self.__insert_label("Wave height", w=90)
         self.__insert_value("4.2 m")
         self.ln()
 
-        self.__insert_label("Ice condition")
+        self.__insert_label("Ice condition", w=90)
         self.__insert_value("None")
         self.ln()
 
-        self.__insert_label("Reason for reserve usage")
-        self.__insert_value("Storm avoidance")
-        self.ln()
-
-
-
-
-        self.__insert_label("Return to limited power datetime")
-        self.__insert_value("2025-03-20 16:45 UTC")
-        self.ln()
-
-        self.__insert_label("Return position")
-        self.__insert_value("36°05'N 140°12'E")
-        self.ln()
-
-        self.__insert_label("Return Beaufort number")
-        self.__insert_value("4")
-        self.__insert_label("Return wave height")
-        self.__insert_value("2.1 m")    
-        self.ln()
-
-
-        self.__insert_label("Return ice condition")
-        self.__insert_value("None")
-        self.ln()
-        
-        self.__insert_label("Reason for reserve usage")
+        self.__insert_label("Reason for reserve usage", w=90)
         self.__insert_value("Storm avoidance")
         self.ln()
 
         self.__insert_horizontal_line()
 
+    def __handle_event_log_end(self):
+        self.__insert_label("Date/Time when returning to limited power", w=90)
+        self.__insert_value("2025-03-20 16:45 UTC")
+        self.ln()
+
+        self.__insert_label(
+            "Ship position when returning to limited power", w=90)
+        self.__insert_value("36°05'N 140°12'E")
+        self.ln()
+
+        self.__insert_label("Beaufort number", w=90)
+        self.__insert_value("4")
+        self.ln()
+
+        self.__insert_label("Wave height", w=90)
+        self.__insert_value("2.1 m")
+        self.ln()
+
+        self.__insert_label("Ice condition", w=90)
+        self.__insert_value("None")
+        self.ln()
+
+        self.__insert_label("Reason for reserve usage", w=90)
+        self.__insert_value("Storm avoidance")
+        self.ln()
+
+        self.__insert_horizontal_line()
+
+    # 第二部分：ShaPoLi事件日志
+    def __handle_event_log(self):
+        self.__insert_subtitle('ShaPoLi Event Log')
+        self.set_font(family="Arial", size=12)
+
+        self.__handle_event_log_start()
+
+        self.__handle_event_log_end()
+
     # 第三部分：数据日志表格
+
     def __handle_data_log(self):
         self.__insert_subtitle('ShaPoLi Data Log')
         self.set_font(family="Arial", size=12)
         # 表头
         col_widths = [15, 35, 35, 35, 35, 35]
-        headers = ["No.", "Date/Time", "Speed(rpm)", "Torque(kNm)", "Power(kW)", "Total Power(kW)"]
+        headers = ["No.", "Date/Time",
+                   "Speed(rpm)", "Torque(kNm)", "Power(kW)", "Total Power(kW)"]
 
         self.set_font("Arial", 'B', 10)
 
@@ -158,4 +164,10 @@ class ReportInfoExporter(FPDF):
                 self.cell(col_widths[i], 10, item, border=1)
             self.ln()
 
-ReportInfoExporter().generate_pdf('C:\\Users\\Administrator\\Desktop\\111\\test.pdf')
+
+file_path = 'C:\\Users\\Administrator\\Desktop\\test.pdf'
+
+if os.path.exists(file_path):
+    os.remove(file_path)
+
+ReportInfoExporter().generate_pdf(file_path)
