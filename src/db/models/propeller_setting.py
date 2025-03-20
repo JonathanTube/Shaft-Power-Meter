@@ -1,5 +1,5 @@
 from peewee import CharField, FloatField, BooleanField, Check
-from ..base import BaseModel,db
+from ..base import BaseModel, db
 
 
 class PropellerSetting(BaseModel):
@@ -62,6 +62,3 @@ class PropellerSetting(BaseModel):
 
     class Meta:
         table_name = 'propeller_setting'
-
-with db:
-    db.create_tables([PropellerSetting], safe=True)

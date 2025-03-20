@@ -1,5 +1,5 @@
 from peewee import FloatField
-from ..base import BaseModel,db
+from ..base import BaseModel, db
 
 
 class FactorConf(BaseModel):
@@ -26,6 +26,3 @@ class FactorConf(BaseModel):
 
     class Meta:
         table_name = 'factor_conf'
-
-with db:
-    db.create_tables([FactorConf], safe=True)

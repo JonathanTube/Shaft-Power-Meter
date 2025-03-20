@@ -17,7 +17,3 @@ class DataLog(BaseModel):
 
     class Meta:
         table_name = 'data_log'
-
-
-with db:
-    db.create_tables([DataLog], safe=True)

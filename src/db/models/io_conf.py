@@ -16,13 +16,11 @@ class IOConf(BaseModel):
 
     output_speed = BooleanField(verbose_name="Speed(kN)", default=False)
 
-    output_avg_power = BooleanField(verbose_name="Average Power(kw)", default=False)
+    output_avg_power = BooleanField(
+        verbose_name="Average Power(kw)", default=False)
 
-    output_sum_power = BooleanField(verbose_name="Sum of Power(kw)", default=False)
+    output_sum_power = BooleanField(
+        verbose_name="Sum of Power(kw)", default=False)
 
     class Meta:
         table_name = 'io_conf'
-
-
-with db:
-    db.create_tables([IOConf], safe=True)

@@ -13,7 +13,3 @@ class GpsLog(BaseModel):
 
     class Meta:
         table_name = 'gps_log'
-
-
-with db:
-    db.create_tables([GpsLog], safe=True)

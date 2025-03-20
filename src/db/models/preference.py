@@ -11,7 +11,3 @@ class Preference(BaseModel):
 
     class Meta:
         table_name = 'preference'
-
-
-with db:
-    db.create_tables([Preference], safe=True)

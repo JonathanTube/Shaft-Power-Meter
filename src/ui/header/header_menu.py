@@ -1,7 +1,7 @@
 import flet as ft
 
 from ..home.index import Home
-from ..report.report_list import ReportList
+from ..report.report_info_table import ReportInfoTable
 from ..setting.index import Setting
 
 
@@ -20,7 +20,7 @@ class HeaderMenu(ft.Row):
                             on_click=self.on_click),
 
             ft.ElevatedButton(text="REPORT",
-                              icon=ft.Icons.REPORT_OUTLINED,
+                              icon=ft.Icons.PICTURE_AS_PDF_OUTLINED,
                               icon_color=ft.Colors.GREY_800,
                               color=ft.Colors.GREY_800,
                               bgcolor=ft.Colors.LIGHT_BLUE_100,
@@ -51,7 +51,7 @@ class HeaderMenu(ft.Row):
         if e.control.text == "HOME":
             self.pageContent.content = Home()
         elif e.control.text == "REPORT":
-            self.pageContent.content = ReportList()
+            self.pageContent.content = ReportInfoTable()
         else:
             self.pageContent.content = Setting()
         self.pageContent.update()

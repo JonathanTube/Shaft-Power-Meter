@@ -28,7 +28,3 @@ class ShipInfo(BaseModel):
 
     class Meta:
         table_name = 'ship_info'
-
-
-with db:
-    db.create_tables([ShipInfo], safe=True)

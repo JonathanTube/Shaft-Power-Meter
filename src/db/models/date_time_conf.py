@@ -18,7 +18,3 @@ class DateTimeConf(BaseModel):
 
     class Meta:
         table_name = 'date_time_conf'
-
-
-with db:
-    db.create_tables([DateTimeConf], safe=True)

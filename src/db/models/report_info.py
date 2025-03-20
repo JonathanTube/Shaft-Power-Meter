@@ -1,11 +1,9 @@
-from peewee import CharField, DateTimeField
-from ..base import BaseModel
+from peewee import CharField
+from ..base import BaseModel, db
 
 
 class ReportInfo(BaseModel):
-    report_name = CharField(max_length=255)
-    start_at = DateTimeField()
-    end_at = DateTimeField()
+    report_name = CharField()
 
     class Meta:
         table_name = 'report_info'

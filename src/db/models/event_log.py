@@ -22,7 +22,3 @@ class EventLog(BaseModel):
 
     class Meta:
         table_name = 'breach_log'
-
-
-with db:
-    db.create_tables([EventLog], safe=True)
