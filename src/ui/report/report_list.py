@@ -2,8 +2,17 @@ import flet as ft
 
 from ..common.custom_card import create_card
 
-class ReportList:
-    def __create_search(self):
+
+class ReportList(ft.Column):
+    def __init__(self):
+        super().__init__()
+        self.__create_search_card()
+        self.__create_table_card()
+        self.controls = [self.search_card, self.table_card]
+        self.scroll = ft.ScrollMode.ADAPTIVE
+        self.expand = True
+
+    def __create_search_card(self):
         self.search_card = create_card(
             heading="Search",
             body=ft.Row(
@@ -16,8 +25,7 @@ class ReportList:
                     ft.FilledButton("New Report")
                 ]))
 
-
-    def __create_data_table(self):
+    def __create_table_card(self):
         self.data_table = ft.DataTable(
             expand=True,
             width=4000,
@@ -37,11 +45,7 @@ class ReportList:
                     ])
             ])
 
-
-    def create(self):
-        self.__create_search()
-        self.__create_data_table()
-        return ft.Column(
+        self.table_card = ft.Card(
             expand=True,
-            controls=[self.search_card,self.data_table]
+            content=self.data_table
         )

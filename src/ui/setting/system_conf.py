@@ -7,8 +7,9 @@ from ui.common.custom_card import create_card
 from ui.common.toast import Toast
 
 
-class SystemConf:
+class SystemConf(ft.Container):
     def __init__(self):
+        super().__init__()
         self.system_conf = None
 
         self.last_system_settings = SystemSettings.select().order_by(
@@ -30,6 +31,7 @@ class SystemConf:
                                                       sensitivity_factor_k=0,
                                                       elastic_modulus_E=0,
                                                       poisson_ratio_mu=0)
+        self.content = self.__create()
 
     def __set_system_settings(self, name, value):
         if name == 'running_mode':
@@ -250,7 +252,7 @@ class SystemConf:
 
         Toast.show_success(e.page, message="已取消")
 
-    def create(self):
+    def __create(self):
         self.__create_settings_card(),
         self.__create_ship_info_card(),
         self.__create_factor_conf_card(),
