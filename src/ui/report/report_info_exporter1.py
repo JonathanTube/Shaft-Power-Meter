@@ -2,7 +2,7 @@ import flet as ft
 from fpdf import FPDF
 from ui.common.toast import Toast
 
-class ReportInfoExporter(FPDF):
+class ReportInfoExporter1(FPDF):
     def __init__(self):
         super().__init__()
         self.path = None

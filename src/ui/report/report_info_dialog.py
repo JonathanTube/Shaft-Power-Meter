@@ -29,10 +29,10 @@ class ReportInfoDialog(ft.AlertDialog):
         self.content = self.__create()
 
     def __create_label(self, text):
-        return ft.Text(text, col="4", text_align=ft.TextAlign.LEFT, weight=ft.FontWeight.W_500)
+        return ft.Text(text, col=4, text_align=ft.TextAlign.LEFT, weight=ft.FontWeight.W_500)
 
     def __create_value(self, text):
-        return ft.Text(text, col="2", text_align=ft.TextAlign.LEFT)
+        return ft.Text(text, col=2, text_align=ft.TextAlign.LEFT)
 
     def __create_container(self, content):
         return ft.Container(

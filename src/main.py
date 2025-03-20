@@ -86,12 +86,17 @@ def start_loggers():
     asyncio.create_task(data_logger.start())
     asyncio.create_task(breach_logger.start())
 
+def add_file_picker(page:ft.Page):
+    file_picker = ft.FilePicker()
+    page.overlay.append(file_picker)
+    page.session.set('file_picker_for_pdf_export',file_picker)
 
 async def main(page: ft.Page):
     init_tables()
     init_data()
     init_test_data()
     # start_loggers()
+    add_file_picker(page)
 
     page.theme_mode = ft.ThemeMode.LIGHT
     page.window.maximized = True

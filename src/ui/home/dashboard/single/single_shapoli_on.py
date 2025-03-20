@@ -15,11 +15,13 @@ class SingleShaPoLiOn(ft.Container):
             spacing=20,
             horizontal_alignment=ft.CrossAxisAlignment.CENTER,
             controls=[
-                ft.Text('EEXI Limited Power(%)', weight=ft.FontWeight.BOLD, size=20),
-                MeterHalf(radius=200)
+                ft.Text('EEXI Limited Power(%)',
+                        weight=ft.FontWeight.BOLD, size=20),
+                MeterHalf(radius=180)
             ])
 
-        container = ft.Container(expand=False, padding=ft.padding.symmetric(10, 10), content=column)
+        container = ft.Container(
+            expand=False, padding=ft.padding.symmetric(10, 10), content=column)
 
         self.left = ft.Card(expand=False, content=container)
 
@@ -29,7 +31,8 @@ class SingleShaPoLiOn(ft.Container):
             expand=True,
             content=ft.Stack(
                 controls=[
-                    ft.Text(heading, weight=ft.FontWeight.W_600, size=16, left=10, top=10),
+                    ft.Text(heading, weight=ft.FontWeight.W_600,
+                            size=16, left=10, top=10),
                     ft.Row(controls=controls, right=10, bottom=30)
                 ]
             ))
@@ -60,7 +63,8 @@ class SingleShaPoLiOn(ft.Container):
                     controls=[
                         self.__create_small_card(
                             heading="Torque",
-                            controls=[self.torque_text, ft.Text('kNm', size=18)]
+                            controls=[self.torque_text,
+                                      ft.Text('kNm', size=18)]
                         ),
                         self.__create_small_card(
                             heading="Thrust",
@@ -70,7 +74,8 @@ class SingleShaPoLiOn(ft.Container):
             ]
         )
 
-        self.right = ft.Container(expand=False, width=360, height=300, content=content)
+        self.right = ft.Container(
+            expand=False, width=360, height=300, content=content)
 
     def __create(self):
         self.__create_left()
@@ -78,7 +83,7 @@ class SingleShaPoLiOn(ft.Container):
         # empty_placeholder = ft.Container(width=150, height=100)
         return ft.Row(
             expand=False,
-            alignment=ft.MainAxisAlignment.CENTER,
-            vertical_alignment=ft.CrossAxisAlignment.CENTER,
+            # alignment=ft.MainAxisAlignment.CENTER,
+            # vertical_alignment=ft.CrossAxisAlignment.CENTER,
             controls=[self.left, self.right]
         )

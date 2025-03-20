@@ -7,6 +7,7 @@ class SingleShaPoLiOff(ft.Container):
     def __init__(self):
         super().__init__()
         self.content = self.__create()
+        self.padding = ft.padding.only(left=40)
 
     def __create(self):
         self.speed_meter = MeterRound(
@@ -20,8 +21,8 @@ class SingleShaPoLiOff(ft.Container):
         )
         return ft.Row(
             # expand=True,
-            alignment=ft.MainAxisAlignment.CENTER,
-            vertical_alignment=ft.CrossAxisAlignment.CENTER,
+            # alignment=ft.MainAxisAlignment.CENTER,
+            # vertical_alignment=ft.CrossAxisAlignment.CENTER,
             spacing=20,
             controls=[
                 self.speed_meter,

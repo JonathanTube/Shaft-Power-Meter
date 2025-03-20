@@ -3,6 +3,8 @@ import flet as ft
 from db.models.report_info import ReportInfo
 from ui.report.report_info_dialog import ReportInfoDialog
 
+from src.ui.report.report_info_exporter import ReportInfoExporter
+
 
 class ReportInfoTable(ft.Container):
     def __init__(self):
@@ -11,11 +13,11 @@ class ReportInfoTable(ft.Container):
         self.content = self.__create()
         self.padding = 5
 
-    def __view_report(self, e, id):
-        e.page.open(ReportInfoDialog(id))
+    def __view_report(self, e, _id:str):
+        e.page.open(ReportInfoDialog(_id))
 
-    def __export_report(self, e, id):
-        print(id)
+    def __export_report(self, e, _id):
+        ReportInfoExporter().export(e.page,_id)
 
     def __load_data(self):
         data = ReportInfo.select().order_by(ReportInfo.id.desc()).limit(10)
