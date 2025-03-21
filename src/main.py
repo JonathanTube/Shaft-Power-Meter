@@ -86,10 +86,12 @@ def start_loggers():
     asyncio.create_task(data_logger.start())
     asyncio.create_task(breach_logger.start())
 
-def add_file_picker(page:ft.Page):
+
+def add_file_picker(page: ft.Page):
     file_picker = ft.FilePicker()
     page.overlay.append(file_picker)
-    page.session.set('file_picker_for_pdf_export',file_picker)
+    page.session.set('file_picker_for_pdf_export', file_picker)
+
 
 async def main(page: ft.Page):
     init_tables()
@@ -101,8 +103,8 @@ async def main(page: ft.Page):
     page.theme_mode = ft.ThemeMode.LIGHT
     page.window.maximized = True
     page.window.resizable = False
-    page.window.max_width = 1024
-    page.window.max_height = 768
+    # page.window.max_width = 1024
+    # page.window.max_height = 768
     page.window.frameless = True
     page.padding = 0
     # page.window.prevent_close = True

@@ -24,9 +24,9 @@ class BreachLogger:
             breach_data = EventLog.create(
                 breach_reason=1,
                 started_at=datetime.now(),
-                ship_position_when_started="2021-01-01 00:00:00",
+                started_position="2021-01-01 00:00:00",
                 ended_at=datetime.now(),
-                ship_position_when_ended="2021-01-01 00:00:00",
+                ended_position="2021-01-01 00:00:00",
                 note="test"
             )
             print(f"Generated Breach data: {breach_data}")

@@ -4,7 +4,6 @@ from ui.setting.authority import create_authority
 from ui.setting.data_dumping import create_data_dumping
 from ui.setting.general import General
 from ui.setting.io import IO
-from ui.setting.logs.index import Logs
 from ui.setting.propeller_conf import PropellerConf
 from ui.setting.self_test import createSelfTest
 from ui.setting.system_conf import SystemConf
@@ -34,12 +33,10 @@ class Setting(ft.Container):
         elif idx == 4:
             self.right_content.content = IO().create()
         elif idx == 5:
-            self.right_content.content = Logs()
-        elif idx == 6:
             self.right_content.content = createSelfTest()
-        elif idx == 7:
+        elif idx == 6:
             self.right_content.content = create_authority()
-        elif idx == 8:
+        elif idx == 7:
             self.right_content.content = create_data_dumping()
 
         self.right_content.update()
@@ -73,11 +70,6 @@ class Setting(ft.Container):
                     icon=ft.Icons.USB_OUTLINED,
                     selected_icon=ft.Icon(ft.Icons.USB),
                     label="I/O"
-                ),
-                ft.NavigationRailDestination(
-                    icon=ft.Icons.ABC_OUTLINED,
-                    selected_icon=ft.Icon(ft.Icons.ABC),
-                    label="Logs"
                 ),
                 ft.NavigationRailDestination(
                     icon=ft.Icons.ASSIGNMENT_OUTLINED,

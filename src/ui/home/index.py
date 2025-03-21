@@ -3,6 +3,7 @@ import flet as ft
 from ui.home.alarm.index import createAlarm
 from ui.home.counter.index import createCounter
 from ui.home.dashboard.index import Dashboard
+from ui.home.logs.index import Logs
 from ui.home.notice.index import Notice
 from ui.home.propeller_curve.index import CreatePropellerCurve
 from ui.home.trendview.index import createTrendView
@@ -66,6 +67,13 @@ class Home(ft.Stack):
                         ft.Text("Alarm")
                     ]),
                     content=self.__create_tab_content(createAlarm())
+                ),
+                ft.Tab(
+                    tab_content=ft.Row(spacing=spacing, controls=[
+                        ft.Icon(name=ft.Icons.SECURITY_OUTLINED),
+                        ft.Text("Logs")
+                    ]),
+                    content=self.__create_tab_content(Logs())
                 )
             ],
             expand=True

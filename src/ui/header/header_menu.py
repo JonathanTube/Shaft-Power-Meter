@@ -1,7 +1,7 @@
 import flet as ft
 
 from ..home.index import Home
-from ..report.report_info_table import ReportInfoTable
+from ..report.report_info_list import ReportInfoList
 from ..setting.index import Setting
 
 
@@ -51,7 +51,7 @@ class HeaderMenu(ft.Row):
         if e.control.text == "HOME":
             self.pageContent.content = Home()
         elif e.control.text == "REPORT":
-            self.pageContent.content = ReportInfoTable()
+            self.pageContent.content = ReportInfoList()
         else:
             self.pageContent.content = Setting()
         self.pageContent.update()
