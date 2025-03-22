@@ -28,6 +28,7 @@ from utils.data_logger import DataLogger
 
 def init_tables():
     # db.drop_tables([DataLog, BreachLog], safe=False)
+    # db.drop_tables([SystemSettings], safe=False)
     db.create_tables([
         BreachReason,
         CounterLog,
@@ -97,15 +98,18 @@ async def main(page: ft.Page):
     init_tables()
     init_data()
     init_test_data()
-    # start_loggers()
+    start_loggers()
     add_file_picker(page)
 
-    page.theme_mode = ft.ThemeMode.LIGHT
-    page.window.maximized = True
+    # page.theme_mode = ft.ThemeMode.LIGHT
+    # page.window.maximized = True
     page.window.resizable = False
-    # page.window.max_width = 1024
-    # page.window.max_height = 768
+    page.window.width = 1024
+    page.window.height = 768
+    page.window.alignment = ft.alignment.center
+    page.window.always_on_top = True
     page.window.frameless = True
+    page.window.title_bar_hidden = True
     page.padding = 0
     # page.window.prevent_close = True
 
@@ -114,8 +118,5 @@ async def main(page: ft.Page):
     page.appbar = Header(page_content)
 
     page.add(page_content)
-    print('page.window.width=', page.window.width)
-    print('page.width=', page.width)
-
 
 ft.app(main)

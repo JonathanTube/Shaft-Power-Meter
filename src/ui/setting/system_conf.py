@@ -15,8 +15,11 @@ class SystemConf(ft.Container):
         self.last_system_settings = SystemSettings.select().order_by(
             SystemSettings.id.desc()).first()
         if self.last_system_settings is None:
-            self.last_system_settings = SystemSettings.create(running_mode=0, master_slave=0, display_thrust=False,
-                                                              amount_of_propeller=1, sha_po_li=False)
+            self.last_system_settings = SystemSettings.create(running_mode=0, 
+                                                              master_slave=0, 
+                                                              display_thrust=False,
+                                                              amount_of_propeller=1, 
+                                                              sha_po_li=False)
 
         self.last_ship_info = ShipInfo.select().order_by(ShipInfo.id.desc()).first()
         if self.last_ship_info is None:

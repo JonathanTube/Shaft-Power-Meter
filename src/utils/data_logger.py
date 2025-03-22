@@ -26,10 +26,10 @@ class DataLogger:
             data = DataLog.create(
                 utc_date=datetime.now().date(),
                 utc_time=datetime.now().time(),
-                revolution=round(random.uniform(0, 100), 2),  # Rev/Min
-                power=round(random.uniform(0, 1000), 2),  # kW
-                thrust=round(random.uniform(0, 100), 2),  # kN
-                torque=round(random.uniform(0, 100), 2)  # kNm
+                revolution=round(random.uniform(900, 1100), 2),  # Rev/Min
+                power=round(random.uniform(900, 1100), 2),  # kW
+                thrust=round(random.uniform(900, 1100), 2),  # kN
+                torque=round(random.uniform(900, 1100), 2)  # kNm
             )
             print(f"Generated data: {data}")
         except Exception as e:
