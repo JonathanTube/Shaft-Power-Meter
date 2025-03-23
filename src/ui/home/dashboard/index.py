@@ -12,8 +12,7 @@ class Dashboard(ft.Container):
     def __init__(self):
         super().__init__()
         self.padding = ft.padding.only(left=10, right=10, top=10, bottom=10)
-        self.system_settings = SystemSettings.select().order_by(
-            SystemSettings.id.desc()).first()
+        self.system_settings = SystemSettings.get_or_none()
 
     def build(self):
         if self.system_settings is None:
@@ -29,7 +28,8 @@ class Dashboard(ft.Container):
             self.dashboard = DualShaPoLiOn() if sha_po_li else DualShaPoLiOff()
 
         self.content = ft.Column(
+            alignment=ft.MainAxisAlignment.CENTER,
             expand=True,
-            spacing=20,
+            spacing=10,
             controls=[self.dashboard, PowerChart()]
         )

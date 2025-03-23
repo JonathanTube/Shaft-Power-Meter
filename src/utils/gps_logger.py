@@ -29,6 +29,6 @@ class GpsLogger:
                 longitude=round(random.uniform(-180, 180), 2),
                 latitude=round(random.uniform(-90, 90), 2)
             )
-            print(f"Generated GPS data: {gps_data}")
+            # print(f"Generated GPS data: {gps_data}")
         except Exception as e:
             print(f"Error generating GPS data: {e}")

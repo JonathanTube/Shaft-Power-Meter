@@ -1,0 +1,44 @@
+from db.models.breach_reason import BreachReason
+from db.models.counter_log import CounterLog
+from db.models.data_log import DataLog
+from db.models.date_time_conf import DateTimeConf
+from db.models.event_log import EventLog
+from db.models.factor_conf import FactorConf
+from db.models.gps_log import GpsLog
+from db.models.io_conf import IOConf
+from db.models.limitations import Limitations
+from db.models.preference import Preference
+from db.models.propeller_setting import PropellerSetting
+from db.models.report_detail import ReportDetail
+from db.models.report_info import ReportInfo
+from db.models.ship_info import ShipInfo
+from db.models.system_settings import SystemSettings
+from db.models.zero_cal_info import ZeroCalInfo
+from db.models.zero_cal_record import ZeroCalRecord
+from db.base import db
+
+
+class TableInit:
+    @staticmethod
+    def init():
+        # db.drop_tables([DataLog, BreachLog], safe=False)
+        # db.drop_tables([SystemSettings], safe=False)
+        db.create_tables([
+            BreachReason,
+            CounterLog,
+            DataLog,
+            DateTimeConf,
+            EventLog,
+            FactorConf,
+            GpsLog,
+            IOConf,
+            Limitations,
+            Preference,
+            PropellerSetting,
+            ReportDetail,
+            ReportInfo,
+            ShipInfo,
+            SystemSettings,
+            ZeroCalInfo,
+            ZeroCalRecord
+        ], safe=True)

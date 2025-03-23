@@ -8,6 +8,7 @@ from ..setting.index import Setting
 class HeaderMenu(ft.Row):
     def __init__(self, page_content: ft.Container):
         super().__init__()
+        self.active_name = "HOME"
 
         self.pageContent = page_content
 
@@ -37,6 +38,9 @@ class HeaderMenu(ft.Row):
         self.padding = 20
 
     def on_click(self, e):
+        if self.active_name == e.control.text:
+            return
+
         for control in self.controls:
             if e.control.text == control.text:
                 control.bgcolor = ft.Colors.BLUE_800
@@ -54,4 +58,7 @@ class HeaderMenu(ft.Row):
             self.pageContent.content = ReportInfoList()
         else:
             self.pageContent.content = Setting()
+
+        self.active_name = e.control.text
+
         self.pageContent.update()

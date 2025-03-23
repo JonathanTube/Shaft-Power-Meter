@@ -26,24 +26,11 @@ class DataLogger:
             data = DataLog.create(
                 utc_date=datetime.now().date(),
                 utc_time=datetime.now().time(),
-                revolution=round(random.uniform(900, 1100), 2),  # Rev/Min
-                power=round(random.uniform(900, 1100), 2),  # kW
-                thrust=round(random.uniform(900, 1100), 2),  # kN
-                torque=round(random.uniform(900, 1100), 2)  # kNm
+                revolution=round(random.uniform(500, 1000), 2),  # Rev/Min
+                power=round(random.uniform(500, 1000), 2),  # kW
+                thrust=round(random.uniform(500, 1000), 2),  # kN
+                torque=round(random.uniform(500, 1000), 2)  # kNm
             )
-            print(f"Generated data: {data}")
+            # print(f"Generated data: {data}")
         except Exception as e:
             print(f"Error generating data: {e}")
-
-
-# async def main():
-#     logger = DataLogger()
-#     try:
-#         await logger.start()
-#     except KeyboardInterrupt:
-#         logger.stop()
-#         print("Data logger stopped")
-
-
-# if __name__ == "__main__":
-#     asyncio.run(main())

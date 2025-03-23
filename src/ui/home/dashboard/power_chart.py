@@ -6,9 +6,8 @@ import flet as ft
 class PowerChart(ft.Container):
     def __init__(self):
         super().__init__()
-        self.content = self.create()
         self.padding = ft.padding.only(left=20, right=20, top=20, bottom=20)
-        self.margin = ft.margin.only(left=0, right=0, top=0, bottom=10)
+        self.margin = ft.margin.only(left=20, right=20, top=0, bottom=20)
         self.expand = True
         self.border_radius = ft.border_radius.all(10)
         self.shadow = ft.BoxShadow(
@@ -17,6 +16,43 @@ class PowerChart(ft.Container):
             color=ft.colors.with_opacity(0.15, ft.colors.INVERSE_SURFACE),
             offset=ft.Offset(0, 1),
             blur_style=ft.ShadowBlurStyle.OUTER
+        )
+
+    def build(self):
+        self.__get_x_axis_labels()
+        self.__get_y_axis_labels()
+        self.__get_data_serials()
+        self.content = ft.LineChart(
+            data_series=self.data_serials,
+            border=ft.border.only(
+                left=ft.BorderSide(
+                    1, ft.Colors.with_opacity(0.2, ft.Colors.ON_SURFACE)
+                ),
+                bottom=ft.BorderSide(
+                    1, ft.Colors.with_opacity(0.2, ft.Colors.ON_SURFACE)
+                )
+            ),
+            horizontal_grid_lines=ft.ChartGridLines(
+                interval=5, color=ft.Colors.with_opacity(0.2, ft.Colors.ON_SURFACE), width=1
+            ),
+            vertical_grid_lines=ft.ChartGridLines(
+                interval=1, color=ft.Colors.with_opacity(0.2, ft.Colors.ON_SURFACE), width=1
+            ),
+            left_axis=ft.ChartAxis(
+                labels=self.y_axis_labels,
+                labels_size=40,
+            ),
+            bottom_axis=ft.ChartAxis(
+                labels=self.x_axis_labels,
+                labels_size=32,
+            ),
+            tooltip_bgcolor=ft.Colors.with_opacity(0.8, ft.Colors.BLUE_GREY),
+            min_y=0,
+            max_y=50,
+            min_x=0,
+            max_x=9,
+            # animate=5000
+            # expand=True
         )
 
     def __get_y_axis_labels(self):
@@ -85,40 +121,3 @@ class PowerChart(ft.Container):
             )
         ]
         self.data_serials = data_serials
-
-    def create(self):
-        self.__get_x_axis_labels()
-        self.__get_y_axis_labels()
-        self.__get_data_serials()
-        return ft.LineChart(
-            data_series=self.data_serials,
-            border=ft.border.only(
-                left=ft.BorderSide(
-                    1, ft.Colors.with_opacity(0.2, ft.Colors.ON_SURFACE)
-                ),
-                bottom=ft.BorderSide(
-                    1, ft.Colors.with_opacity(0.2, ft.Colors.ON_SURFACE)
-                )
-            ),
-            horizontal_grid_lines=ft.ChartGridLines(
-                interval=5, color=ft.Colors.with_opacity(0.2, ft.Colors.ON_SURFACE), width=1
-            ),
-            vertical_grid_lines=ft.ChartGridLines(
-                interval=1, color=ft.Colors.with_opacity(0.2, ft.Colors.ON_SURFACE), width=1
-            ),
-            left_axis=ft.ChartAxis(
-                labels=self.y_axis_labels,
-                labels_size=40,
-            ),
-            bottom_axis=ft.ChartAxis(
-                labels=self.x_axis_labels,
-                labels_size=32,
-            ),
-            tooltip_bgcolor=ft.Colors.with_opacity(0.8, ft.Colors.BLUE_GREY),
-            min_y=0,
-            max_y=50,
-            min_x=0,
-            max_x=9,
-            # animate=5000
-            # expand=True
-        )

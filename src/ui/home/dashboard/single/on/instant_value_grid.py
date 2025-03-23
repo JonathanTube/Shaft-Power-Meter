@@ -28,8 +28,9 @@ class InstantValueGrid(ft.Container):
         # create 1s interval to load data, use asyncio
         self._task = asyncio.create_task(self.__load_data())
 
-    def unmount(self):
-        self._task.cancel()
+    def will_unmount(self):
+        if self._task:
+            self._task.cancel()
 
     def __load_config(self):
         system_settings = SystemSettings.select().order_by(
@@ -50,32 +51,31 @@ class InstantValueGrid(ft.Container):
         while True:
             print("load data")
             data_log = DataLog.select().order_by(DataLog.id.desc()).first()
-            if data_log is None:
-                return
+            if data_log is not None:
+                power = UnitParser.parse_power(data_log.power)
+                self.power_value.value = power[0]
+                self.power_value.update()
+                self.power_unit.value = power[1]
+                self.power_unit.update()
 
-            power = UnitParser.parse_power(data_log.power)
-            self.power_value.value = power[0]
-            self.power_value.update()
-            self.power_unit.value = power[1]
-            self.power_unit.update()
+                speed = UnitParser.parse_speed(data_log.revolution)
+                self.speed_value.value = speed[0]
+                self.speed_value.update()
+                self.speed_unit.value = speed[1]
+                self.speed_unit.update()
 
-            speed = UnitParser.parse_speed(data_log.revolution)
-            self.speed_value.value = speed[0]
-            self.speed_value.update()
-            self.speed_unit.value = speed[1]
-            self.speed_unit.update()
+                torque = UnitParser.parse_torque(data_log.torque)
+                self.torque_value.value = torque[0]
+                self.torque_value.update()
+                self.torque_unit.value = torque[1]
+                self.torque_unit.update()
 
-            torque = UnitParser.parse_torque(data_log.torque)
-            self.torque_value.value = torque[0]
-            self.torque_value.update()
-            self.torque_unit.value = torque[1]
-            self.torque_unit.update()
-
-            thrust = UnitParser.parse_thrust(data_log.thrust)
-            self.thrust_value.value = thrust[0]
-            self.thrust_value.update()
-            self.thrust_unit.value = thrust[1]
-            self.thrust_unit.update()
+                if self.display_thrust:
+                    thrust = UnitParser.parse_thrust(data_log.thrust)
+                    self.thrust_value.value = thrust[0]
+                    self.thrust_value.update()
+                    self.thrust_unit.value = thrust[1]
+                    self.thrust_unit.update()
 
             await asyncio.sleep(1)
 

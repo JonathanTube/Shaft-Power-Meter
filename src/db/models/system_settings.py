@@ -3,11 +3,6 @@ from ..base import BaseModel, db
 
 
 class SystemSettings(BaseModel):
-
-    # running_mode = IntegerField(verbose_name="运行模式:0-Standalone 1-Master/Slave")
-
-    # master_slave = IntegerField(verbose_name="主/从 0-Master 1-Slave")
-
     display_thrust = BooleanField(verbose_name="是否显示推力", default=False)
 
     amount_of_propeller = IntegerField(

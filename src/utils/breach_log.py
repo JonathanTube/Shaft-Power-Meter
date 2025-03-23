@@ -29,6 +29,6 @@ class BreachLogger:
                 ended_position="2021-01-01 00:00:00",
                 note="test"
             )
-            print(f"Generated Breach data: {breach_data}")
+            # print(f"Generated Breach data: {breach_data}")
         except Exception as e:
             print(f"Error generating Breach data: {e}")
