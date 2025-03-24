@@ -26,7 +26,7 @@ class InstantValueGrid(ft.Container):
 
     def did_mount(self):
         # create 1s interval to load data, use asyncio
-        self._task = asyncio.create_task(self.__load_data())
+        self._task = self.page.run_task(self.__load_data)
 
     def will_unmount(self):
         if self._task:

@@ -1,6 +1,6 @@
 import flet as ft
 
-from ui.header.shapoli_button import ShaPoLiButton
+from ui.header.shapoli import ShaPoLi
 from ui.header.header_logo import HeaderLogo
 from ui.header.header_menu import HeaderMenu
 from ui.header.theme_button import ThemeButton
@@ -20,7 +20,7 @@ class Header(ft.AppBar):
                 margin=ft.margin.symmetric(horizontal=20)
             ),
             ft.VerticalDivider(width=1),
-            ShaPoLiButton(),
+            ShaPoLi(),
             ft.VerticalDivider(width=1),
             ThemeButton()
         ]

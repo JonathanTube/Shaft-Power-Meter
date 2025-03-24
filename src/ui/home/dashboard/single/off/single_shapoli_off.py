@@ -1,31 +1,31 @@
 import flet as ft
 
-from ui.common.meter_round import MeterRound
+from ui.home.dashboard.single.off.thrust_power import ThrustPower
+from ui.home.dashboard.single.power_chart import PowerChart
+from ui.home.dashboard.single.off.power_speed_torque import PowerSpeedTorque
+from ui.home.dashboard.single.on.eexi_limited_power import EEXILimitedPower
+from ui.home.dashboard.single.on.instant_value_grid import InstantValueGrid
 
 
-class SingleShaPoLiOff(ft.Container):
+class SingleShaPoLiOff(ft.Stack):
     def __init__(self):
         super().__init__()
-        self.content = self.__create()
-        self.padding = ft.padding.only(left=40)
 
-    def __create(self):
-        self.speed_meter = MeterRound(
-            heading="Speed", radius=100, value=80, max_value=100, limit_value=90, unit="rpm"
+    def __create_top(self):
+        self.top = PowerSpeedTorque()
+
+    def __create_bottom(self):
+        self.bottom = ft.Container(
+            content=PowerChart(),
+            expand=True
         )
-        self.power_meter = MeterRound(
-            heading="Power", radius=120, value=80, max_value=100, limit_value=90, unit="kW"
-        )
-        self.torque_meter = MeterRound(
-            heading="Torque", radius=100, value=80, max_value=100, limit_value=90, unit="kNm"
-        )
-        return ft.Row(
-            # expand=True,
-            # alignment=ft.MainAxisAlignment.CENTER,
-            # vertical_alignment=ft.CrossAxisAlignment.CENTER,
-            spacing=20,
-            controls=[
-                self.speed_meter,
-                self.power_meter,
-                self.torque_meter
-            ])
+
+    def build(self):
+        self.__create_top()
+        self.__create_bottom()
+
+        thrust_power = ThrustPower()
+
+        main_content = ft.Column(controls=[self.top, self.bottom])
+
+        self.controls = [main_content, thrust_power]

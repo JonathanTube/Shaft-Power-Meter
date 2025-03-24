@@ -6,47 +6,72 @@ hide_section = 90
 
 
 class MeterRound(ft.Container):
-    def __init__(self, heading: str, radius: int,
-                 value: float, max_value: float,
-                 limit_value: float, unit: str,
-                 shadow: bool = True):
+    def __init__(self, heading: str, radius: int, unit: str):
         super().__init__()
         self.heading = heading
-        self.max_value = max_value
-        self.limit_value = limit_value
-        self.value = value
         self.unit = unit
         self.max_radius = radius
         self.outer_radius = radius * 0.35
         self.outer_center_space_radius = radius - self.outer_radius
+        # set outline style
+        self.padding = ft.padding.only(
+            left=10, right=10, top=10, bottom=10
+        )
+        self.border_radius = ft.border_radius.all(10)
+        self.shadow = ft.BoxShadow(
+            spread_radius=2,
+            blur_radius=4,
+            color=ft.colors.with_opacity(0.15, ft.colors.INVERSE_SURFACE),
+            offset=ft.Offset(0, 1),
+            blur_style=ft.ShadowBlurStyle.OUTER
+        )
 
-        if shadow:
-            self.padding = ft.padding.only(
-                left=20, right=20, top=10, bottom=10
-            )
-            self.border_radius = ft.border_radius.all(10)
-            self.shadow = ft.BoxShadow(
-                spread_radius=2,
-                blur_radius=4,
-                color=ft.colors.with_opacity(0.15, ft.colors.INVERSE_SURFACE),
-                offset=ft.Offset(0, 1),
-                blur_style=ft.ShadowBlurStyle.OUTER
-            )
+    def set_data(self, value: int, unit: str, max_value: int, limit_value: int):
+        if max_value == 0:
+            return
 
-        self.content = self.__create()
+        # update green section
+        green_val = (360 - hide_section) * value / max_value
+        self.green_section.value = green_val
+        self.green_section.update()
+
+        # update grey section
+        grey_val = (360 - hide_section) - green_val
+        self.grey_section.value = grey_val
+        self.grey_section.update()
+
+        # update center text
+        self.center_text.value = value
+        self.center_text.update()
+
+        # update unit
+        self.center_unit.value = unit
+        self.center_unit.update()
+
+        # update warning line
+        rotate_start = math.pi * 3 / 4
+        rotate_propotion = limit_value / max_value
+        rotate_angle = rotate_start + (2 * rotate_start) * rotate_propotion
+        self.warning_line_rotate.angle = rotate_angle
+        self.warning_line.visible = limit_value > 0
+        self.warning_line.update()
 
     def __create_ring(self):
-        green_section = (360 - hide_section) * self.value / self.max_value
-        grey_section = (360 - hide_section) - green_section
+        self.green_section = ft.PieChartSection(
+            0, color=ft.Colors.GREEN, radius=self.outer_radius)
+
+        self.grey_section = ft.PieChartSection(
+            360 - hide_section, color=ft.Colors.GREY_200, radius=self.outer_radius)
+
+        placeholder_section = ft.PieChartSection(
+            hide_section, color=ft.Colors.SURFACE, radius=self.outer_radius)
+
         self.ring = ft.PieChart(
             sections_space=0,
             sections=[
-                ft.PieChartSection(
-                    green_section, color=ft.Colors.GREEN, radius=self.outer_radius),
-                ft.PieChartSection(
-                    grey_section, color=ft.Colors.GREY_200, radius=self.outer_radius),
-                ft.PieChartSection(
-                    hide_section, color=ft.Colors.SURFACE, radius=self.outer_radius)
+                self.green_section,
+                self.grey_section,
+                placeholder_section
             ],
             start_degree_offset=135,
             center_space_radius=self.outer_center_space_radius,
@@ -61,7 +86,7 @@ class MeterRound(ft.Container):
         unit_size = self.max_radius * 0.18
 
         self.center_text = ft.Text(
-            value=str(self.value), size=font_size, color=ft.Colors.INVERSE_SURFACE)
+            value="0", size=font_size, color=ft.Colors.INVERSE_SURFACE)
 
         self.center_unit = ft.Text(
             value=self.unit, size=unit_size, color=ft.Colors.INVERSE_SURFACE)
@@ -82,32 +107,40 @@ class MeterRound(ft.Container):
             top=top
         )
 
-    def __create(self):
-        rotate_start = math.pi * 3 / 4
-        rotate_propotion = self.limit_value / self.max_value
-        rotate_value = rotate_start + (2 * rotate_start) * rotate_propotion
-
-        rotating_line = ft.Container(
+    def __create_warning_line(self):
+        self.warning_line_rotate = ft.transform.Rotate(
+            angle=0,
+            alignment=ft.alignment.center_left
+        )
+        self.warning_line = ft.Container(
             width=self.max_radius,
-            height=self.max_radius * 0.05,
+            height=self.max_radius * 0.02,
             left=self.max_radius,
             top=self.max_radius,
-            bgcolor=ft.Colors.AMBER,
-            border_radius=5,
-            rotate=ft.transform.Rotate(
-                rotate_value, alignment=ft.alignment.center_left)
+            bgcolor=ft.Colors.RED,
+            visible=False,
+            rotate=self.warning_line_rotate
         )
 
+    def build(self):
+        self.__create_warning_line()
         self.__create_ring()
         self.__create_center()
 
-        main_content = ft.Stack(controls=[
-            self.ring,
-            rotating_line,
-            self.center
-        ],
+        main_content = ft.Stack(
+            controls=[
+                self.ring,
+                self.warning_line,
+                self.center
+            ],
             width=self.max_radius * 2,
             height=self.max_radius * 2
+        )
+
+        cutting_content = ft.Stack(
+            width=self.max_radius * 2,
+            height=self.max_radius * 2 * 0.85,
+            controls=[ft.Container(content=main_content, top=0)]
         )
 
         heading_content = ft.Text(
@@ -116,29 +149,10 @@ class MeterRound(ft.Container):
             weight=ft.FontWeight.W_600
         )
 
-        return ft.Column(
+        self.content = ft.Column(
             horizontal_alignment=ft.CrossAxisAlignment.CENTER,
             # expand=True,
             controls=[
                 heading_content,
-                main_content
+                cutting_content
             ])
-
-
-# def main(page: ft.Page):
-#     page.horizontal_alignment = ft.CrossAxisAlignment.CENTER
-#     page.vertical_alignment = ft.MainAxisAlignment.CENTER
-#     page.add(
-#         ft.Container(
-#             content=MeterRound(heading='Speed',
-#                                radius=120,
-#                                value=135.0,
-#                                max_value=270.0,
-#                                limit_value=250.0,
-#                                unit='rpm'
-#                                ).create()
-#         )
-#     )
-
-
-# ft.app(main)

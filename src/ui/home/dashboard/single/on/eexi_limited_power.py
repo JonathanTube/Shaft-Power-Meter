@@ -46,10 +46,11 @@ class EEXILimitedPower(ft.Card):
     def did_mount(self):
         self.__load_data()
         self.__set_meter_half_inner()
-        self._task = asyncio.create_task(self.__set_meter_half_outer())
+        self._task = self.page.run_task(self.__set_meter_half_outer)
 
     def will_unmount(self):
-        self._task.cancel()
+        if self._task:
+            self._task.cancel()
 
     def __load_data(self):
         propeller_settings = PropellerSetting.get_or_none()

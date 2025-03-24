@@ -2,7 +2,6 @@ import flet as ft
 
 from ui.home.dashboard.dual.dual_shapoli_off import DualShaPoLiOff
 from ui.home.dashboard.dual.dual_shapoli_on import DualShaPoLiOn
-from ui.home.dashboard.power_chart import PowerChart
 from ui.home.dashboard.single.off.single_shapoli_off import SingleShaPoLiOff
 from ui.home.dashboard.single.on.single_shapoli_on import SingleShaPoLiOn
 from db.models.system_settings import SystemSettings
@@ -23,13 +22,6 @@ class Dashboard(ft.Container):
             amount_of_power = self.system_settings.amount_of_propeller
 
         if amount_of_power == 1:
-            self.dashboard = SingleShaPoLiOn() if sha_po_li else SingleShaPoLiOff()
+            self.content = SingleShaPoLiOn() if sha_po_li else SingleShaPoLiOff()
         elif amount_of_power == 2:
-            self.dashboard = DualShaPoLiOn() if sha_po_li else DualShaPoLiOff()
-
-        self.content = ft.Column(
-            horizontal_alignment=ft.CrossAxisAlignment.CENTER,
-            expand=True,
-            spacing=10,
-            controls=[self.dashboard, PowerChart()]
-        )
+            self.content = DualShaPoLiOn() if sha_po_li else DualShaPoLiOff()
