@@ -28,7 +28,7 @@ class Dashboard(ft.Container):
             self.dashboard = DualShaPoLiOn() if sha_po_li else DualShaPoLiOff()
 
         self.content = ft.Column(
-            alignment=ft.MainAxisAlignment.CENTER,
+            horizontal_alignment=ft.CrossAxisAlignment.CENTER,
             expand=True,
             spacing=10,
             controls=[self.dashboard, PowerChart()]
