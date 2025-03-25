@@ -1,41 +1,72 @@
 import flet as ft
 
-from ui.home.dashboard.single.power_chart import PowerChart
-from ui.home.dashboard.single.on.eexi_limited_power import EEXILimitedPower
-from ui.home.dashboard.single.on.instant_value_grid import InstantValueGrid
+from ui.home.dashboard.single.single_power_chart import SinglePowerChart
+from ui.home.dashboard.eexi.eexi_limited_power import EEXILimitedPower
+from ui.home.dashboard.single.on.single_instant_grid import SingleInstantGrid
+from db.models.propeller_setting import PropellerSetting
+from db.models.system_settings import SystemSettings
+from db.models.data_log import DataLog
+import asyncio
 
 
 class SingleShaPoLiOn(ft.Container):
     def __init__(self):
         super().__init__()
-
-    def __create_top_left(self):
-        w = self.page.window.width
-        h = self.page.window.height
-        return EEXILimitedPower(w * 0.46, h * 0.4)
-
-    def __create_top_right(self):
-        w = self.page.window.width
-        h = self.page.window.height
-        return InstantValueGrid(w * 0.46, h * 0.4)
-
-    def __create_top(self):
-        self.top = ft.Row(
-            alignment=ft.MainAxisAlignment.CENTER,
-            controls=[self.__create_top_left(), self.__create_top_right()]
-        )
-
-    def __create_bottom(self):
-        self.bottom = ft.Container(
-            content=PowerChart(),
-            expand=True
-        )
+        self.__load_config()
 
     def build(self):
-        self.__create_top()
-        self.__create_bottom()
+        w = self.page.window.width * 0.5
+        h = self.page.window.height * 0.5
+
+        self.eexi_limited_power = EEXILimitedPower(w, h)
+        self.instant_value_grid = SingleInstantGrid(w, h)
 
         self.content = ft.Column(
-            controls=[self.top, self.bottom],
+            controls=[
+                ft.Row(
+                    expand=True,
+                    alignment=ft.MainAxisAlignment.CENTER,
+                    controls=[
+                        self.eexi_limited_power,
+                        self.instant_value_grid
+                    ]
+                ),
+                ft.Container(
+                    content=SinglePowerChart(),
+                    expand=True
+                )
+            ],
             expand=True
         )
+
+    def did_mount(self):
+        self.eexi_limited_power.set_config(
+            self.limited_power_normal,
+            self.limited_power_warning,
+            self.unlimited_power
+        )
+        self._task = self.page.run_task(self.__load_data)
+
+    def will_unmount(self):
+        if self._task:
+            self._task.cancel()
+
+    def __load_config(self):
+        propeller_settings = PropellerSetting.get_or_none()
+        if propeller_settings is None:
+            return
+
+        system_settings = SystemSettings.get_or_none()
+        if system_settings is None:
+            return
+
+        self.limited_power_normal = system_settings.eexi_limited_power * 0.9
+        self.limited_power_warning = system_settings.eexi_limited_power
+        self.unlimited_power = propeller_settings.shaft_power_of_mcr_operating_point
+
+    async def __load_data(self):
+        while True:
+            data_log = DataLog.select(DataLog.power).order_by(
+                DataLog.id.desc()).where(DataLog.name == "SPS1").first()
+            self.eexi_limited_power.set_value(data_log.power)
+            await asyncio.sleep(1)

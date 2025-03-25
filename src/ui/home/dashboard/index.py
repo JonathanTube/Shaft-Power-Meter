@@ -1,7 +1,7 @@
 import flet as ft
 
-from ui.home.dashboard.dual.dual_shapoli_off import DualShaPoLiOff
-from ui.home.dashboard.dual.dual_shapoli_on import DualShaPoLiOn
+from ui.home.dashboard.dual.off.dual_shapoli_off import DualShaPoLiOff
+from ui.home.dashboard.dual.on.dual_shapoli_on import DualShaPoLiOn
 from ui.home.dashboard.single.off.single_shapoli_off import SingleShaPoLiOff
 from ui.home.dashboard.single.on.single_shapoli_on import SingleShaPoLiOn
 from db.models.system_settings import SystemSettings
@@ -10,7 +10,7 @@ from db.models.system_settings import SystemSettings
 class Dashboard(ft.Container):
     def __init__(self):
         super().__init__()
-        self.padding = ft.padding.only(left=10, right=10, top=10, bottom=10)
+        self.padding = 10
         self.system_settings = SystemSettings.get_or_none()
 
     def build(self):
@@ -20,6 +20,8 @@ class Dashboard(ft.Container):
         else:
             sha_po_li = self.system_settings.sha_po_li
             amount_of_power = self.system_settings.amount_of_propeller
+
+        print('amount_of_power=', amount_of_power, 'sha_po_li=', sha_po_li)
 
         if amount_of_power == 1:
             self.content = SingleShaPoLiOn() if sha_po_li else SingleShaPoLiOff()

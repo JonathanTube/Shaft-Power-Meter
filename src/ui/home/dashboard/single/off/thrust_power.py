@@ -19,7 +19,12 @@ class ThrustPower(ft.Container):
 
     async def __load_data(self):
         while True:
-            data_log = DataLog.select().order_by(DataLog.id.desc()).first()
+            data_log = DataLog.select(
+                DataLog.thrust
+            ).where(
+                DataLog.name == "SPS1"
+            ).order_by(DataLog.id.desc()).first()
+
             if data_log:
                 thrust_and_unit = UnitParser.parse_power(data_log.thrust)
                 thrust = thrust_and_unit[0]

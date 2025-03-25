@@ -33,7 +33,7 @@ async def main(page: ft.Page):
     add_file_picker(page)
 
     # page.theme_mode = ft.ThemeMode.LIGHT
-    # page.window.maximized = True
+    page.window.maximized = False
     page.window.resizable = False
     page.window.width = 1024
     page.window.height = 768

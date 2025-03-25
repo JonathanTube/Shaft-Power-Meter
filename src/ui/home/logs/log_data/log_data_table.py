@@ -13,6 +13,7 @@ class LogDataTable(AbstractTable):
     def load_data(self):
         data = DataLog.select(
             DataLog.id,
+            DataLog.name,
             DataLog.utc_date,
             DataLog.utc_time,
             DataLog.revolution,
@@ -23,6 +24,7 @@ class LogDataTable(AbstractTable):
 
         return [[
                 item.id,
+                item.name,
                 item.utc_date,
                 item.utc_time,
                 item.revolution,
@@ -35,6 +37,7 @@ class LogDataTable(AbstractTable):
     def create_columns(self):
         return [
             "No.",
+            "Name",
             "UTC Date",
             "UTC Time",
             "Revolution(Rev/Min)",

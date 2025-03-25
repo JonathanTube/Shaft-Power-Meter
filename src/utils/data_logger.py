@@ -13,17 +13,19 @@ class DataLogger:
     async def start(self):
         self.is_running = True
         while self.is_running:
-            await self.generate_data()
+            await self.generate_data("SPS1")
+            await self.generate_data("SPS2")
             await asyncio.sleep(self.update_interval)
 
     def stop(self):
         self.is_running = False
 
-    async def generate_data(self):
+    async def generate_data(self, name):
         """Generate random data and save to database"""
         try:
             # Generate random data
-            data = DataLog.create(
+            DataLog.create(
+                name=name,
                 utc_date=datetime.now().date(),
                 utc_time=datetime.now().time(),
                 revolution=round(random.uniform(500, 1000), 2),  # Rev/Min

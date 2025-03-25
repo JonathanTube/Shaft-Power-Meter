@@ -197,6 +197,7 @@ class SystemConf(ft.Container):
         self.last_system_settings.save()
         self.last_ship_info.save()
         self.last_factor_conf.save()
+        e.page.session.get("sha_po_li").switch()
         Toast.show_success(e.page, message="保存成功")
 
     def __cancel_data(self, e):

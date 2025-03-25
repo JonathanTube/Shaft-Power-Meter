@@ -19,8 +19,8 @@ class Header(ft.AppBar):
                 content=HeaderMenu(content),
                 margin=ft.margin.symmetric(horizontal=20)
             ),
-            ft.VerticalDivider(width=1),
+            ft.VerticalDivider(width=.5, thickness=.5),
             ShaPoLi(),
-            ft.VerticalDivider(width=1),
+            ft.VerticalDivider(width=.5, thickness=.5),
             ThemeButton()
         ]

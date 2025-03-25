@@ -6,39 +6,42 @@ hide_section = 90
 
 
 class MeterRound(ft.Container):
-    def __init__(self, heading: str, radius: int, unit: str):
+    def __init__(self, heading: str, radius: int, unit: str, border: bool = True, color: str = ft.Colors.GREEN):
         super().__init__()
         self.heading = heading
         self.unit = unit
         self.max_radius = radius
         self.outer_radius = radius * 0.35
         self.outer_center_space_radius = radius - self.outer_radius
+
         # set outline style
-        self.padding = ft.padding.only(
-            left=10, right=10, top=10, bottom=10
-        )
-        self.border_radius = ft.border_radius.all(10)
-        self.shadow = ft.BoxShadow(
-            spread_radius=2,
-            blur_radius=4,
-            color=ft.colors.with_opacity(0.15, ft.colors.INVERSE_SURFACE),
-            offset=ft.Offset(0, 1),
-            blur_style=ft.ShadowBlurStyle.OUTER
-        )
+        self.color = color
+        if border:
+            self.padding = ft.padding.only(
+                left=10, right=10, top=10, bottom=10
+            )
+            self.border_radius = ft.border_radius.all(10)
+            self.shadow = ft.BoxShadow(
+                spread_radius=2,
+                blur_radius=4,
+                color=ft.colors.with_opacity(0.15, ft.colors.INVERSE_SURFACE),
+                offset=ft.Offset(0, 1),
+                blur_style=ft.ShadowBlurStyle.OUTER
+            )
 
     def set_data(self, value: int, unit: str, max_value: int, limit_value: int):
         if max_value == 0:
             return
 
-        # update green section
-        green_val = (360 - hide_section) * value / max_value
-        self.green_section.value = green_val
-        self.green_section.update()
+        # update active section
+        active_val = (360 - hide_section) * value / max_value
+        self.active_section.value = active_val
+        self.active_section.update()
 
-        # update grey section
-        grey_val = (360 - hide_section) - green_val
-        self.grey_section.value = grey_val
-        self.grey_section.update()
+        # update inactive section
+        inactive_val = (360 - hide_section) - active_val
+        self.inactive_section.value = inactive_val
+        self.inactive_section.update()
 
         # update center text
         self.center_text.value = value
@@ -57,10 +60,10 @@ class MeterRound(ft.Container):
         self.warning_line.update()
 
     def __create_ring(self):
-        self.green_section = ft.PieChartSection(
-            0, color=ft.Colors.GREEN, radius=self.outer_radius)
+        self.active_section = ft.PieChartSection(
+            0, color=self.color, radius=self.outer_radius)
 
-        self.grey_section = ft.PieChartSection(
+        self.inactive_section = ft.PieChartSection(
             360 - hide_section, color=ft.Colors.GREY_200, radius=self.outer_radius)
 
         placeholder_section = ft.PieChartSection(
@@ -69,8 +72,8 @@ class MeterRound(ft.Container):
         self.ring = ft.PieChart(
             sections_space=0,
             sections=[
-                self.green_section,
-                self.grey_section,
+                self.active_section,
+                self.inactive_section,
                 placeholder_section
             ],
             start_degree_offset=135,

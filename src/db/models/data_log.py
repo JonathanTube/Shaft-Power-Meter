@@ -1,8 +1,10 @@
-from peewee import FloatField, DateField, TimeField
+from peewee import FloatField, DateField, TimeField, CharField
 from ..base import BaseModel, db
 
 
 class DataLog(BaseModel):
+    name = CharField(verbose_name="名称:SPS1 or SPS2")
+
     utc_date = DateField(verbose_name="UTC日期")
 
     utc_time = TimeField(verbose_name="UTC时间")
