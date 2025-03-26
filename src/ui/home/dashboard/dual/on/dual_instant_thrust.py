@@ -41,40 +41,58 @@ class DualInstantThrust(ft.Container):
         self.content.update()
 
     def __create_thrust_sps1(self):
+        label = ft.Text(
+            value='SP1:',
+            width=40,
+            text_align=ft.TextAlign.END,
+            size=self.font_size_of_label,
+            weight=ft.FontWeight.W_600
+        )
         self.thrust_sps1_value = ft.Text(
             value='0',
             size=self.font_size_of_value,
+            width=100,
+            text_align=ft.TextAlign.END,
             weight=ft.FontWeight.W_500
         )
-        self.thrust_sps1_unit = ft.Text('kN', size=self.font_size_of_unit)
+        self.thrust_sps1_unit = ft.Text('kN', width=30,
+                                        text_align=ft.TextAlign.LEFT,
+                                        size=self.font_size_of_unit,
+                                        weight=ft.FontWeight.W_500
+                                        )
 
         self.thrust_sps1 = ft.Row(
             tight=True,
             controls=[
-                ft.Text(
-                    value='SP1:',
-                    size=self.font_size_of_label,
-                    weight=ft.FontWeight.W_600
-                ),
+                label,
                 self.thrust_sps1_value,
                 self.thrust_sps1_unit
             ])
 
     def __create_thrust_sps2(self):
+        label = ft.Text(
+            value='SP2:',
+            width=40,
+            text_align=ft.TextAlign.END,
+            size=self.font_size_of_label,
+            weight=ft.FontWeight.W_600
+        )
         self.thrust_sps2_value = ft.Text(
             value='0',
             size=self.font_size_of_value,
+            width=100,
+            text_align=ft.TextAlign.END,
             weight=ft.FontWeight.W_500
         )
-        self.thrust_sps2_unit = ft.Text('kN', size=self.font_size_of_unit)
+        self.thrust_sps2_unit = ft.Text('kN', width=30,
+                                        text_align=ft.TextAlign.LEFT,
+                                        size=self.font_size_of_unit,
+                                        weight=ft.FontWeight.W_500
+                                        )
         self.thrust_sps2 = ft.Row(
             tight=True,
             controls=[
-                ft.Text(
-                    value='SP2:',
-                    size=self.font_size_of_label,
-                    weight=ft.FontWeight.W_600
-                ),
+                label,
                 self.thrust_sps2_value,
                 self.thrust_sps2_unit
             ])

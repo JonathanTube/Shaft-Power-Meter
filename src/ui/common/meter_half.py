@@ -42,13 +42,15 @@ class MeterHalf(ft.Container):
             self.inner.update()
 
     def set_outer_value(self, active_value: int, inactive_value: int):
-        print(f"set_outer_value: {active_value}, {inactive_value}")
-        total = active_value + inactive_value
+        _active_value = round(active_value, 2)
+        _inactive_value = round(inactive_value, 2)
+        print(f"set_outer_value: {_active_value}, {_inactive_value}")
+        total = _active_value + _inactive_value
         if total > 0:
-            self.active_part.value = active_value / total * 180
-            self.inactive_part.value = inactive_value / total * 180
+            self.active_part.value = _active_value / total * 180
+            self.inactive_part.value = _inactive_value / total * 180
 
-            center_value = int(active_value / total * 100)
+            center_value = int(_active_value / total * 100)
             self.__set_center_value(center_value)
 
         # set outer color

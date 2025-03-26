@@ -1,9 +1,9 @@
 import flet as ft
 
-from ui.home.dashboard.dual.off.dual_shapoli_off import DualShaPoLiOff
+from ui.home.dashboard.dual.off.index import DualShaPoLiOff
 from ui.home.dashboard.dual.on.dual_shapoli_on import DualShaPoLiOn
-from ui.home.dashboard.single.off.single_shapoli_off import SingleShaPoLiOff
-from ui.home.dashboard.single.on.single_shapoli_on import SingleShaPoLiOn
+from ui.home.dashboard.single.off.index import SingleShaPoLiOff
+from ui.home.dashboard.single.on.index import SingleShaPoLiOn
 from db.models.system_settings import SystemSettings
 
 

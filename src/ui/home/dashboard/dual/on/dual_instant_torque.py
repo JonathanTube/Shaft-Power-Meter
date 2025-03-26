@@ -44,39 +44,57 @@ class DualInstantTorque(ft.Container):
         self.content.update()
 
     def __create_torque_sps1(self):
+        label = ft.Text(
+            value='SPS1:',
+            width=40,
+            text_align=ft.TextAlign.END,
+            size=self.font_size_of_label,
+            weight=ft.FontWeight.W_600
+        )
         self.torque_sps1_value = ft.Text(
             value='0',
             size=self.font_size_of_value,
+            width=100,
+            text_align=ft.TextAlign.END,
             weight=ft.FontWeight.W_500
         )
-        self.torque_sps1_unit = ft.Text('Nm', size=self.font_size_of_unit)
+        self.torque_sps1_unit = ft.Text('Nm', width=30,
+                                        text_align=ft.TextAlign.LEFT,
+                                        size=self.font_size_of_unit,
+                                        weight=ft.FontWeight.W_500
+                                        )
         self.torque_sps1 = ft.Row(
             tight=True,
             controls=[
-                ft.Text(
-                    value='SPS1:',
-                    size=self.font_size_of_label,
-                    weight=ft.FontWeight.W_600
-                ),
+                label,
                 self.torque_sps1_value,
                 self.torque_sps1_unit
             ])
 
     def __create_torque_sps2(self):
+        label = ft.Text(
+            value='SPS2:',
+            width=40,
+            text_align=ft.TextAlign.END,
+            size=self.font_size_of_label,
+            weight=ft.FontWeight.W_600
+        )
         self.torque_sps2_value = ft.Text(
             value='0',
             size=self.font_size_of_value,
+            width=100,
+            text_align=ft.TextAlign.END,
             weight=ft.FontWeight.W_500
         )
-        self.torque_sps2_unit = ft.Text('Nm', size=self.font_size_of_unit)
+        self.torque_sps2_unit = ft.Text('Nm', width=30,
+                                        text_align=ft.TextAlign.LEFT,
+                                        size=self.font_size_of_unit,
+                                        weight=ft.FontWeight.W_500
+                                        )
         self.torque_sps2 = ft.Row(
             tight=True,
             controls=[
-                ft.Text(
-                    value='SPS2:',
-                    size=self.font_size_of_label,
-                    weight=ft.FontWeight.W_600
-                ),
+                label,
                 self.torque_sps2_value,
                 self.torque_sps2_unit
             ])

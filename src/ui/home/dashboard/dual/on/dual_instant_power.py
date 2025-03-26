@@ -50,60 +50,87 @@ class DualInstantPower(ft.Container):
         self.content.update()
 
     def __create_power_sps1(self):
+        label = ft.Text(
+            value='SPS1:',
+            width=40,
+            text_align=ft.TextAlign.END,
+            size=self.font_size_of_label,
+            weight=ft.FontWeight.W_600
+        )
         self.power_sps1_value = ft.Text(
             value='0',
             size=self.font_size_of_value,
+            width=100,
+            text_align=ft.TextAlign.END,
             weight=ft.FontWeight.W_500
         )
-        self.power_sps1_unit = ft.Text('W', size=self.font_size_of_unit)
+        self.power_sps1_unit = ft.Text('W', width=30,
+                                       text_align=ft.TextAlign.LEFT,
+                                       size=self.font_size_of_unit,
+                                       weight=ft.FontWeight.W_500
+                                       )
 
         self.power_sps1 = ft.Row(
             tight=True,
             controls=[
-                ft.Text(
-                    value='SPS1:',
-                    size=self.font_size_of_label,
-                    weight=ft.FontWeight.W_600
-                ),
+                label,
                 self.power_sps1_value,
                 self.power_sps1_unit
             ])
 
     def __create_power_sps2(self):
+        label = ft.Text(
+            value='SPS2:',
+            width=40,
+            text_align=ft.TextAlign.END,
+            size=self.font_size_of_label,
+            weight=ft.FontWeight.W_600
+        )
         self.power_sps2_value = ft.Text(
             value='0',
             size=self.font_size_of_value,
+            width=100,
+            text_align=ft.TextAlign.END,
             weight=ft.FontWeight.W_500
         )
-        self.power_sps2_unit = ft.Text('W', size=self.font_size_of_unit)
+        self.power_sps2_unit = ft.Text('W', width=30,
+                                       text_align=ft.TextAlign.LEFT,
+                                       size=self.font_size_of_unit,
+                                       weight=ft.FontWeight.W_500
+                                       )
         self.power_sps2 = ft.Row(
             tight=True,
             controls=[
-                ft.Text(
-                    value='SPS2:',
-                    size=self.font_size_of_label,
-                    weight=ft.FontWeight.W_600
-                ),
+                label,
                 self.power_sps2_value,
                 self.power_sps2_unit
             ])
 
     def __create_power_total(self):
+        label = ft.Text(
+            value='Total:',
+            width=40,
+            text_align=ft.TextAlign.END,
+            size=self.font_size_of_label,
+            weight=ft.FontWeight.W_600
+        )
         self.power_total_value = ft.Text(
             value='0',
             size=self.font_size_of_value,
+            width=100,
+            text_align=ft.TextAlign.END,
             weight=ft.FontWeight.W_500
         )
-        self.power_total_unit = ft.Text('W', size=self.font_size_of_unit)
+        self.power_total_unit = ft.Text('W', width=30,
+                                        text_align=ft.TextAlign.LEFT,
+                                        size=self.font_size_of_unit,
+                                        weight=ft.FontWeight.W_500
+                                        )
 
         self.power_total = ft.Row(
             tight=True,
             controls=[
-                ft.Text(
-                    value='Total:',
-                    size=self.font_size_of_label,
-                    weight=ft.FontWeight.W_600
-                ),
+                label,
                 self.power_total_value,
                 self.power_total_unit
             ])

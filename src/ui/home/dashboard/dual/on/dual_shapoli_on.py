@@ -2,7 +2,7 @@ import asyncio
 import flet as ft
 
 from ui.home.dashboard.dual.on.dual_instant_grid import DualInstantGrid
-from ui.home.dashboard.dual.dual_power_chart import DualPowerChart
+from ui.home.dashboard.chart.dual_power_chart import DualPowerChart
 from db.models.data_log import DataLog
 from ui.home.dashboard.eexi.eexi_limited_power import EEXILimitedPower
 from db.models.propeller_setting import PropellerSetting
