@@ -3,12 +3,13 @@ import math
 import flet as ft
 
 
-
-
 class MeterRound(ft.Container):
     def __init__(self, heading: str, radius: int, unit: str, color: str = ft.Colors.GREEN):
         super().__init__()
         self.__hide_section = 90
+
+        self.max_value = 0
+
         self.heading = heading
         self.unit = unit
         self.max_radius = radius
@@ -32,6 +33,9 @@ class MeterRound(ft.Container):
         self.warning_line.update()
 
     def set_data(self, value: int, unit: str):
+        if self.max_value == 0:
+            return
+
         # update active section
         active_val = (360 - self.__hide_section) * value / self.max_value
         self.active_section.value = active_val

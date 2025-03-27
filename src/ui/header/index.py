@@ -10,10 +10,9 @@ class Header(ft.AppBar):
     def __init__(self, content: ft.Container):
         super().__init__()
         self.leading = HeaderLogo()
-        self.leading_width = 150
         self.title = ft.Text("Shaft Power Meter", weight=ft.FontWeight.W_800)
         self.center_title = False
-        self.bgcolor = ft.Colors.SURFACE_CONTAINER_HIGHEST
+        self.bgcolor = ft.Colors.ON_INVERSE_SURFACE
         self.actions = [
             ft.Container(
                 content=HeaderMenu(content),

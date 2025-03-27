@@ -1,4 +1,4 @@
-from peewee import FloatField, DateField, TimeField, CharField
+from peewee import IntegerField, DateField, TimeField, CharField
 from ..base import BaseModel, db
 
 
@@ -9,13 +9,13 @@ class DataLog(BaseModel):
 
     utc_time = TimeField(verbose_name="UTC时间")
 
-    revolution = FloatField(verbose_name="转速(Rev/Min)")
+    revolution = IntegerField(verbose_name="转速(Rev/Min)")
 
-    power = FloatField(verbose_name="功率(kW)")
+    power = IntegerField(verbose_name="功率(W)")
 
-    thrust = FloatField(verbose_name="推力(kN)")
+    thrust = IntegerField(verbose_name="推力(N)")
 
-    torque = FloatField(verbose_name="扭矩(kNm)")
+    torque = IntegerField(verbose_name="扭矩(Nm)")
 
     class Meta:
         table_name = 'data_log'

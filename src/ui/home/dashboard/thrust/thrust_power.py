@@ -3,10 +3,11 @@ from utils.unit_parser import UnitParser
 
 
 class ThrustPower(ft.Container):
-    def __init__(self):
+    def __init__(self, visible: bool = True):
         super().__init__()
         self.right = 10
         self.top = 10
+        self.visible = visible
 
     def build(self):
         self.thrust_value = ft.Text("0")

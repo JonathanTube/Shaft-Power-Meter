@@ -1,11 +1,13 @@
 import flet as ft
 from ui.common.meter_half import MeterHalf
+from ui.common.simple_card import SimpleCard
 
 
-class EEXILimitedPower(ft.Card):
+class EEXILimitedPower(ft.Container):
     def __init__(self, width: int, height: int):
         super().__init__()
-        self.margin = 0
+        self.expand = True
+
         self.container_width = width
         self.container_height = height
 
@@ -15,28 +17,12 @@ class EEXILimitedPower(ft.Card):
     def build(self):
         meter_radius = self.container_width * 0.4
         self.meter_half = MeterHalf(radius=meter_radius)
-        column = ft.Column(
-            expand=True,
-            spacing=self.container_height * 0.1,
-            horizontal_alignment=ft.CrossAxisAlignment.CENTER,
-            controls=[
-                ft.Text(
-                    'EEXI Limited Power(%)',
-                    weight=ft.FontWeight.BOLD,
-                    size=20
-                ),
-                self.meter_half
-            ])
-
-        container = ft.Container(
-            content=column,
-            alignment=ft.alignment.center,
-            padding=10,
-            width=self.container_width + 10,
-            height=self.container_height
+        self.content = SimpleCard(
+            title="EEXI Limited Power(%)",
+            body=self.meter_half,
+            text_center=True,
+            body_bottom_right=False
         )
-
-        self.content = container
 
     def set_config(self, normal: float, warning: float, unlimited: float):
         self.unlimited_power = normal

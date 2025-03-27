@@ -32,6 +32,8 @@ async def main(page: ft.Page):
     start_loggers()
     add_file_picker(page)
 
+    page.title = "Shaft Power Meter"
+    page.padding = 0
     # page.theme_mode = ft.ThemeMode.LIGHT
     page.window.maximized = False
     page.window.resizable = False
@@ -39,9 +41,10 @@ async def main(page: ft.Page):
     page.window.height = 768
     page.window.alignment = ft.alignment.center
     page.window.always_on_top = False
-    page.window.frameless = True
-    page.window.title_bar_hidden = True
-    page.padding = 0
+    # page.window.frameless = True
+    # page.window.title_bar_hidden = False
+    page.window.maximizable = False
+
     # page.window.prevent_close = True
 
     page_content = ft.Container(expand=True, content=Home(), padding=0)

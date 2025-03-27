@@ -4,18 +4,17 @@ from utils.unit_parser import UnitParser
 
 
 class PowerMeter(ft.Container):
-    def __init__(self, max: float, limit: float, radius: int = 130):
+    def __init__(self, radius: int = 130):
         super().__init__()
-        self.max = max
-        self.limit = limit
+        self.expand = False
         self.radius = radius
 
     def build(self):
         self.power = MeterRound(heading="Power", radius=self.radius, unit="W")
         self.content = self.power
 
-    def did_mount(self):
-        self.power.set_limitation(self.max, self.limit)
+    def set_limit(self, max: float, limit: float):
+        self.power.set_limitation(max, limit)
 
     def set_data(self, value: float):
         power_and_unit = UnitParser.parse_power(value)

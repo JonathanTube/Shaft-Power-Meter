@@ -1,0 +1,134 @@
+import asyncio
+import flet as ft
+
+from ui.home.dashboard.sps_dual.on.dual_instant_grid import DualInstantGrid
+from db.models.data_log import DataLog
+from ui.home.dashboard.eexi.eexi_limited_power import EEXILimitedPower
+from db.models.propeller_setting import PropellerSetting
+from db.models.system_settings import SystemSettings
+from ui.home.dashboard.chart.single_power_line import SinglePowerLine
+
+
+class DualShaPoLiOn(ft.Container):
+    def __init__(self):
+        super().__init__()
+        self.__load_config()
+
+    def build(self):
+        w = self.page.window.width * 0.5
+        h = self.page.window.height * 0.5
+
+        self.eexi_limited_power = EEXILimitedPower(w, h)
+
+        self.instant_grid = DualInstantGrid(self.display_thrust)
+
+        self.power_chart_sps1 = SinglePowerLine(
+            name="SPS1",
+            max_y=self.unlimited_power,
+            sha_po_li=True,
+            threshold=self.limited_power_warning
+        )
+
+        self.power_chart_sps2 = SinglePowerLine(
+            name="SPS2",
+            max_y=self.unlimited_power,
+            sha_po_li=True,
+            threshold=self.limited_power_warning
+        )
+
+        self.content = ft.Column(
+            expand=True,
+            controls=[
+                ft.Row(
+                    expand=True,
+                    controls=[
+                        self.eexi_limited_power,
+                        self.instant_grid
+                    ]),
+                ft.Row(
+                    expand=True,
+                    controls=[
+                        self.power_chart_sps1,
+                        self.power_chart_sps2
+                    ]
+                )
+            ]
+        )
+
+    async def __load_data(self):
+        while True:
+            sps1_data_logs = DataLog.select(
+                DataLog.utc_time,
+                DataLog.power,
+                DataLog.revolution,
+                DataLog.torque,
+                DataLog.thrust
+            ).where(
+                DataLog.name == "SPS1"
+            ).order_by(DataLog.id.desc()).limit(50)
+
+            sps2_data_logs = DataLog.select(
+                DataLog.utc_time,
+                DataLog.power,
+                DataLog.revolution,
+                DataLog.torque,
+                DataLog.thrust
+            ).where(
+                DataLog.name == "SPS2"
+            ).order_by(DataLog.id.desc()).limit(50)
+
+            self.instant_grid.set_power_values(
+                sps1_data_logs[0].power, sps2_data_logs[0].power
+            )
+
+            self.instant_grid.set_speed_values(
+                sps1_data_logs[0].revolution, sps2_data_logs[0].revolution
+            )
+
+            self.instant_grid.set_torque_values(
+                sps1_data_logs[0].torque, sps2_data_logs[0].torque
+            )
+
+            self.instant_grid.set_thrust_values(
+                sps1_data_logs[0].thrust, sps2_data_logs[0].thrust
+            )
+
+            self.eexi_limited_power.set_value(
+                sps1_data_logs[0].power + sps2_data_logs[0].power
+            )
+
+            self.power_chart_sps1.update(sps1_data_logs)
+            self.power_chart_sps2.update(sps2_data_logs)
+
+            await asyncio.sleep(1)
+
+    def __load_config(self):
+        self.display_thrust = False
+        self.limited_power_normal = 0
+        self.limited_power_warning = 0
+        self.unlimited_power = 0
+
+        propeller_settings = PropellerSetting.get_or_none()
+        if propeller_settings is None:
+            return
+
+        system_settings = SystemSettings.get_or_none()
+        if system_settings is None:
+            return
+
+        self.display_thrust = system_settings.display_thrust
+        self.limited_power_normal = system_settings.eexi_limited_power * 0.9
+        self.limited_power_warning = system_settings.eexi_limited_power
+        self.unlimited_power = propeller_settings.shaft_power_of_mcr_operating_point
+
+    def did_mount(self):
+        self.eexi_limited_power.set_config(
+            self.limited_power_normal * 2,
+            self.limited_power_warning * 2,
+            self.unlimited_power * 2
+        )
+        self._task = self.page.run_task(self.__load_data)
+
+    def will_unmount(self):
+        if self._task:
+            self._task.cancel()

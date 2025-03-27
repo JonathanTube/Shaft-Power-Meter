@@ -6,7 +6,7 @@ from ui.home.dashboard.index import Dashboard
 from ui.home.logs.index import Logs
 from ui.home.notice.index import Notice
 from ui.home.propeller_curve.index import CreatePropellerCurve
-from ui.home.trendview.index import createTrendView
+from ui.home.trendview.index import TrendView
 
 
 class Home(ft.Stack):
@@ -52,7 +52,7 @@ class Home(ft.Stack):
                         ft.Icon(name=ft.Icons.TRENDING_UP_OUTLINED),
                         ft.Text("TrendView")
                     ]),
-                    content=self.__create_tab_content(createTrendView())
+                    content=self.__create_tab_content(TrendView())
                 ),
                 ft.Tab(
                     tab_content=ft.Row(spacing=spacing, controls=[

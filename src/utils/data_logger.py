@@ -28,10 +28,10 @@ class DataLogger:
                 name=name,
                 utc_date=datetime.now().date(),
                 utc_time=datetime.now().time(),
-                revolution=round(random.uniform(500, 1000), 2),  # Rev/Min
-                power=round(random.uniform(500, 1000), 2),  # kW
-                thrust=round(random.uniform(500, 1000), 2),  # kN
-                torque=round(random.uniform(500, 1000), 2)  # kNm
+                revolution=random.randint(100, 500),  # rpm
+                power=random.randint(500, 1000),  # W
+                thrust=random.randint(500, 1000),  # N
+                torque=random.randint(500, 1000)  # Nm
             )
             # print(f"Generated data: {data}")
         except Exception as e:

@@ -4,23 +4,22 @@ from utils.unit_parser import UnitParser
 
 
 class SpeedMeter(ft.Container):
-    def __init__(self, max: float = 0, limit: float = 0, radius: int = 100):
+    def __init__(self, radius: int = 100):
         super().__init__()
-        self.max = max
-        self.limit = limit
+        self.expand = False
         self.radius = radius
 
     def build(self):
-        self.speed_meter = MeterRound(
+        self.speed = MeterRound(
             heading="Speed", radius=self.radius, unit="rpm"
         )
-        self.content = self.speed_meter
+        self.content = self.speed
 
-    def did_mount(self):
-        self.speed_meter.set_limitation(self.max, self.limit)
+    def set_limit(self, max: float, limit: float):
+        self.speed.set_limitation(max, limit)
 
     def set_data(self, value: int):
         speed_and_unit = UnitParser.parse_speed(value)
         speed = speed_and_unit[0]
         unit = speed_and_unit[1]
-        self.speed_meter.set_data(speed, unit)
+        self.speed.set_data(speed, unit)

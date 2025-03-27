@@ -13,7 +13,6 @@ class DateTimeRange(ft.Row):
             show_cursor=False,
             autofocus=False,
             read_only=True,
-            prefix_icon=ft.Icons.CALENDAR_TODAY_OUTLINED,
             enable_interactive_selection=False,
             on_click=lambda e: e.page.open(ft.DatePicker(on_change=self.__handle_start_date_change)))
 
@@ -24,7 +23,6 @@ class DateTimeRange(ft.Row):
             show_cursor=False,
             autofocus=False,
             read_only=True,
-            prefix_icon=ft.Icons.CALENDAR_TODAY_OUTLINED,
             enable_interactive_selection=False,
             on_click=lambda e: e.page.open(ft.DatePicker(on_change=self.__handle_end_date_change)))
 

@@ -4,7 +4,6 @@ import flet as ft
 
 
 class Toast:
-
     @staticmethod
     def show_success(page: ft.Page, message: str):
         Toast.show_toast(page, message, ft.Colors.GREEN_500, ft.Colors.WHITE)
