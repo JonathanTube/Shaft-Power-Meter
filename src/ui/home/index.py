@@ -5,7 +5,7 @@ from ui.home.counter.index import createCounter
 from ui.home.dashboard.index import Dashboard
 from ui.home.logs.index import Logs
 from ui.home.notice.index import Notice
-from ui.home.propeller_curve.index import CreatePropellerCurve
+from ui.home.propeller_curve.index import PropellerCurve
 from ui.home.trendview.index import TrendView
 
 
@@ -59,7 +59,7 @@ class Home(ft.Stack):
                         ft.Icon(name=ft.Icons.STACKED_LINE_CHART_OUTLINED),
                         ft.Text("Propeller Curve")
                     ]),
-                    content=self.__create_tab_content(CreatePropellerCurve())
+                    content=self.__create_tab_content(PropellerCurve())
                 ),
                 ft.Tab(
                     tab_content=ft.Row(spacing=spacing, controls=[

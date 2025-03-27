@@ -21,7 +21,7 @@ class Dashboard(ft.Container):
             sha_po_li = self.system_settings.sha_po_li
             amount_of_power = self.system_settings.amount_of_propeller
 
-        print('amount_of_power=', amount_of_power, 'sha_po_li=', sha_po_li)
+        # print('amount_of_power=', amount_of_power, 'sha_po_li=', sha_po_li)
 
         if amount_of_power == 1:
             self.content = SingleShaPoLiOn() if sha_po_li else SingleShaPoLiOff()

@@ -1,112 +1,25 @@
-import random
 import flet as ft
 
-
-def _get_y_axis_labels():
-    labels = []
-    for val in range(6):
-        actual_val = val * 10
-        labels.append(
-            ft.ChartAxisLabel(
-                value=actual_val,
-                label=ft.Text(
-                    f"{actual_val}kW",
-                    size=14,
-                    weight=ft.FontWeight.BOLD
-                )
-            )
-        )
-    return labels
+from ui.home.propeller_curve.propeller_curve_chart import PropellerCurveChart
+from ui.home.propeller_curve.propeller_curve_legend import PropellerCurveLegend
 
 
-def _get_x_axis_labels():
-    labels = []
-    for val in range(0, 10):
-        labels.append(
-            ft.ChartAxisLabel(
-                value=val,
-                label=ft.Container(
-                    ft.Text(
-                        val,
-                        size=16,
-                        weight=ft.FontWeight.BOLD,
-                        color=ft.Colors.with_opacity(
-                            0.5, ft.Colors.ON_SURFACE)
-                    ),
-                    margin=ft.margin.only(top=10)
-                )
-            )
-        )
-    return labels
+class PropellerCurve(ft.Container):
+    def __init__(self):
+        super().__init__()
+        self.expand = True
+        self.padding = 20
 
+    def build(self):
+        self.chart = PropellerCurveChart()
+        self.legend = PropellerCurveLegend()
+        self.content = ft.Stack(
+            alignment=ft.alignment.center,
+            controls=[
+                self.legend,
+                self.chart
+            ])
 
-def _get_data_serials():
-    all_points_1 = []
-
-    for x in range(0, 10):
-        y = random.randint(1, 4) * 10
-        # print(f'y={y}')
-        all_points_1.append(ft.LineChartDataPoint(x, y))
-
-    all_points_2 = []
-    for x in range(0, 10):
-        y = random.randint(1, 4) * 10
-        # print(f'y={y}')
-        all_points_2.append(ft.LineChartDataPoint(x, y))
-
-    data_serials = [
-        ft.LineChartData(
-            data_points=all_points_1,
-            stroke_width=8,
-            color=ft.Colors.LIGHT_GREEN,
-            curved=True,
-            stroke_cap_round=True
-        ),
-        ft.LineChartData(
-            data_points=all_points_2,
-            stroke_width=8,
-            color=ft.Colors.LIGHT_BLUE,
-            curved=True,
-            stroke_cap_round=True
-        )
-    ]
-    return data_serials
-
-
-def createLineChart():
-    return ft.LineChart(
-        data_series=_get_data_serials(),
-        border=ft.border.only(
-            left=ft.BorderSide(
-                1, ft.Colors.with_opacity(0.2, ft.Colors.ON_SURFACE)
-            ),
-            bottom=ft.BorderSide(
-                1, ft.Colors.with_opacity(0.2, ft.Colors.ON_SURFACE)
-            )
-        ),
-        horizontal_grid_lines=ft.ChartGridLines(
-            interval=5, color=ft.Colors.with_opacity(0.2, ft.Colors.ON_SURFACE), width=1
-        ),
-        vertical_grid_lines=ft.ChartGridLines(
-            interval=1, color=ft.Colors.with_opacity(0.2, ft.Colors.ON_SURFACE), width=1
-        ),
-        left_axis=ft.ChartAxis(
-            labels=_get_y_axis_labels(),
-            labels_size=40,
-        ),
-        bottom_axis=ft.ChartAxis(
-            labels=_get_x_axis_labels(),
-            labels_size=32,
-        ),
-        tooltip_bgcolor=ft.Colors.with_opacity(0.8, ft.Colors.BLUE_GREY),
-        min_y=0,
-        max_y=50,
-        min_x=0,
-        max_x=9,
-        # animate=5000
-        expand=True
-    )
-
-
-def CreatePropellerCurve():
-    return createLineChart()
+    def did_mount(self):
+        self.chart.set_normal_propeller_curve(
+            79.5, 50, 100, 100, 0.05, 105, 0.05)
