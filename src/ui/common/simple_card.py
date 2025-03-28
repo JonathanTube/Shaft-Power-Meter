@@ -47,3 +47,6 @@ class SimpleCard(ft.Container):
                 )
             ]
         )
+
+    def set_title(self, title: str):
+        self._title = title

@@ -21,3 +21,13 @@ class PowerMeter(ft.Container):
         power = power_and_unit[0]
         unit = power_and_unit[1]
         self.power.set_data(power, unit)
+
+    def set_language(self):
+        session = self.page.session
+        self.power.heading = session.get("lang.common.power")
+
+    def did_mount(self):
+        self.set_language()
+
+    def before_update(self):
+        self.set_language()

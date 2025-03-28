@@ -40,9 +40,8 @@ class DualInstantThrust(ft.Container):
         self.content.update()
 
     def __create_thrust_sps1(self):
-        label = ft.Text(
-            value='SP1:',
-            width=40,
+        self.sps1_label = ft.Text(
+            value='SP1',
             text_align=ft.TextAlign.RIGHT,
             size=self.font_size_of_label,
             weight=ft.FontWeight.W_600
@@ -63,15 +62,14 @@ class DualInstantThrust(ft.Container):
         self.thrust_sps1 = ft.Row(
             tight=True,
             controls=[
-                label,
+                self.sps1_label,
                 self.thrust_sps1_value,
                 self.thrust_sps1_unit
             ])
 
     def __create_thrust_sps2(self):
-        label = ft.Text(
-            value='SP2:',
-            width=40,
+        self.sps2_label = ft.Text(
+            value='SP2',
             text_align=ft.TextAlign.END,
             size=self.font_size_of_label,
             weight=ft.FontWeight.W_600
@@ -91,7 +89,18 @@ class DualInstantThrust(ft.Container):
         self.thrust_sps2 = ft.Row(
             tight=True,
             controls=[
-                label,
+                self.sps2_label,
                 self.thrust_sps2_value,
                 self.thrust_sps2_unit
             ])
+
+    def did_mount(self):
+        self.set_language()
+
+    def before_update(self):
+        self.set_language()
+
+    def set_language(self):
+        self.sps1_label.value = self.page.session.get("lang.common.sps1")
+        self.sps2_label.value = self.page.session.get("lang.common.sps2")
+        self.content.set_title(self.page.session.get("lang.common.thrust"))

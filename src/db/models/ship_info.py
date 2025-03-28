@@ -1,5 +1,5 @@
 from peewee import CharField
-from ..base import BaseModel, db
+from ..base import BaseModel
 
 
 class ShipInfo(BaseModel):

@@ -127,8 +127,17 @@ class DualShaPoLiOn(ft.Container):
             self.limited_power_warning * 2,
             self.unlimited_power * 2
         )
+        self.set_language()
         self._task = self.page.run_task(self.__load_data)
 
     def will_unmount(self):
         if self._task:
             self._task.cancel()
+
+    def before_update(self):
+        self.set_language()
+
+
+    def set_language(self):
+        self.power_chart_sps1.set_name(self.page.session.get("lang.common.sps1"))
+        self.power_chart_sps2.set_name(self.page.session.get("lang.common.sps2"))

@@ -105,7 +105,7 @@ def generate_data_list(max_y: int):
     data_list = []
     for i in range(10):
         data_list.append([f"{i:02d}:00", random.randint(1, max_y - 1)])
-    print(data_list)
+    # print(data_list)
     return data_list
 
 

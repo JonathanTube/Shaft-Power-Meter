@@ -5,7 +5,6 @@ from db.models.data_log import DataLog
 from db.models.limitations import Limitations
 from db.models.system_settings import SystemSettings
 from ui.home.dashboard.chart.dual_power_line import DualPowerLine
-from ui.home.dashboard.thrust.thrust_power import ThrustPower
 
 
 class DualShaPoLiOff(ft.Container):
@@ -19,23 +18,17 @@ class DualShaPoLiOff(ft.Container):
         self.sps1_meters = DualMeters(name="SPS1")
         self.sps2_meters = DualMeters(name="SPS2")
         self.dual_power_line = DualPowerLine(max_y=self.power_max)
-        self.thrust_power = ThrustPower(self.display_thrust)
 
-        self.content = ft.Stack(
+        self.content = ft.Column(
+            expand=True,
+            spacing=10,
             controls=[
-                ft.Column(
+                ft.Row(
                     expand=True,
                     spacing=10,
-                    controls=[
-                        ft.Row(
-                            expand=True,
-                            spacing=10,
-                            controls=[self.sps1_meters, self.sps2_meters]
-                        ),
-                        self.dual_power_line
-                    ]
+                    controls=[self.sps1_meters, self.sps2_meters]
                 ),
-                self.thrust_power
+                self.dual_power_line
             ]
         )
 
@@ -100,12 +93,18 @@ class DualShaPoLiOff(ft.Container):
             self.sps1_meters.set_power(sps1_data_log[0].power)
             self.sps1_meters.set_torque(sps1_data_log[0].torque)
             self.sps1_meters.set_speed(sps1_data_log[0].revolution)
+            self.sps1_meters.set_thrust(
+                self.display_thrust,
+                sps1_data_log[0].thrust
+            )
 
             self.sps2_meters.set_power(sps2_data_log[0].power)
             self.sps2_meters.set_torque(sps2_data_log[0].torque)
             self.sps2_meters.set_speed(sps2_data_log[0].revolution)
-
-            self.thrust_power.set_data(sps1_data_log[0].thrust)
+            self.sps2_meters.set_thrust(
+                self.display_thrust,
+                sps2_data_log[0].thrust
+            )
 
             self.dual_power_line.set_data(sps1_data_log, sps2_data_log)
 

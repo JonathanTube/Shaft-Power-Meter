@@ -1,6 +1,6 @@
 from peewee import DateField, TimeField, BooleanField, CharField
 
-from ..base import BaseModel, db
+from ..base import BaseModel
 
 
 class DateTimeConf(BaseModel):

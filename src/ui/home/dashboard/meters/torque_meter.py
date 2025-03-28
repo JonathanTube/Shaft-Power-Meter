@@ -23,3 +23,13 @@ class TorqueMeter(ft.Container):
         torque = torque_and_unit[0]
         unit = torque_and_unit[1]
         self.torque.set_data(torque, unit)
+
+    def set_language(self):
+        session = self.page.session
+        self.torque.heading = session.get("lang.common.torque")
+
+    def did_mount(self):
+        self.set_language()
+
+    def before_update(self):
+        self.set_language()

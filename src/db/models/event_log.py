@@ -1,5 +1,5 @@
 from peewee import CharField, TextField, ForeignKeyField, DateTimeField
-from ..base import BaseModel, db
+from ..base import BaseModel
 from .breach_reason import BreachReason
 
 

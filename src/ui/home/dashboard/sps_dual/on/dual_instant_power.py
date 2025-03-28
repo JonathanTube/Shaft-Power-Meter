@@ -48,9 +48,8 @@ class DualInstantPower(ft.Container):
         self.content.update()
 
     def __create_power_sps1(self):
-        label = ft.Text(
-            value='SPS1:',
-            width=40,
+        self.sps1_label = ft.Text(
+            value='SPS1',
             text_align=ft.TextAlign.RIGHT,
             size=self.font_size_of_label,
             weight=ft.FontWeight.W_600
@@ -71,15 +70,14 @@ class DualInstantPower(ft.Container):
         self.power_sps1 = ft.Row(
             tight=True,
             controls=[
-                label,
+                self.sps1_label,
                 self.power_sps1_value,
                 self.power_sps1_unit
             ])
 
     def __create_power_sps2(self):
-        label = ft.Text(
-            value='SPS2:',
-            width=40,
+        self.sps2_label = ft.Text(
+            value='SPS2',
             text_align=ft.TextAlign.END,
             size=self.font_size_of_label,
             weight=ft.FontWeight.W_600
@@ -99,15 +97,14 @@ class DualInstantPower(ft.Container):
         self.power_sps2 = ft.Row(
             tight=True,
             controls=[
-                label,
+                self.sps2_label,
                 self.power_sps2_value,
                 self.power_sps2_unit
             ])
 
     def __create_power_total(self):
-        label = ft.Text(
-            value='Total:',
-            width=40,
+        self.total_label = ft.Text(
+            value='Total',
             text_align=ft.TextAlign.END,
             size=self.font_size_of_label,
             weight=ft.FontWeight.W_600
@@ -128,7 +125,19 @@ class DualInstantPower(ft.Container):
         self.power_total = ft.Row(
             tight=True,
             controls=[
-                label,
+                self.total_label,
                 self.power_total_value,
                 self.power_total_unit
             ])
+
+    def did_mount(self):
+        self.set_language()
+
+    def before_update(self):
+        self.set_language()
+
+    def set_language(self):
+        self.sps1_label.value = self.page.session.get("lang.common.sps1")
+        self.sps2_label.value = self.page.session.get("lang.common.sps2")
+        self.total_label.value = self.page.session.get("lang.common.total")
+        self.content.set_title(self.page.session.get("lang.common.power"))

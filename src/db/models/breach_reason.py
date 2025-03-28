@@ -1,5 +1,5 @@
 from peewee import CharField, Check
-from ..base import BaseModel, db
+from ..base import BaseModel
 
 
 class BreachReason(BaseModel):

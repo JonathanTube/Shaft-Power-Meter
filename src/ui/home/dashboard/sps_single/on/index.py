@@ -54,6 +54,7 @@ class SingleShaPoLiOn(ft.Container):
             self.limited_power_warning,
             self.unlimited_power
         )
+        self.set_language()
         self._task = self.page.run_task(self.__load_data)
 
     def will_unmount(self):
@@ -97,3 +98,10 @@ class SingleShaPoLiOn(ft.Container):
                 self.power_line_chart.update(data_logs)
 
             await asyncio.sleep(1)
+
+    def set_language(self):
+        session = self.page.session
+        self.power_line_chart.set_name(session.get("lang.common.power"))
+
+    def before_update(self):
+        self.set_language()

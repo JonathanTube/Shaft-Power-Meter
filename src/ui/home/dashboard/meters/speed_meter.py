@@ -23,3 +23,14 @@ class SpeedMeter(ft.Container):
         speed = speed_and_unit[0]
         unit = speed_and_unit[1]
         self.speed.set_data(speed, unit)
+
+    def set_language(self):
+        session = self.page.session
+        self.speed.heading = session.get("lang.common.speed")
+
+    def did_mount(self):
+        self.set_language()
+
+    def before_update(self):
+        self.set_language()
+    

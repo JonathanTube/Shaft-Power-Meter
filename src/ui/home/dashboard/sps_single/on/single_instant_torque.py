@@ -17,7 +17,7 @@ class SingleInstantTorque(ft.Container):
             'Nm', size=18, width=40, text_align=ft.TextAlign.LEFT
         )
         self.content = SimpleCard(
-            title="Torque",     
+            title="Torque",
             body=ft.Row(
                 tight=True,
                 controls=[self.torque_value, self.torque_unit]
@@ -29,3 +29,13 @@ class SingleInstantTorque(ft.Container):
         self.torque_value.value = torque[0]
         self.torque_unit.value = torque[1]
         self.content.update()
+
+    def set_language(self):
+        session = self.page.session
+        self.content.set_title(session.get("lang.common.torque"))
+
+    def before_update(self):
+        self.set_language()
+
+    def did_mount(self):
+        self.set_language()

@@ -110,3 +110,6 @@ class SinglePowerLine(ft.Container):
             data_points.append(ft.LineChartDataPoint(index, self.threshold))
 
         return data_points
+
+    def set_name(self, name: str):
+        self.name = name

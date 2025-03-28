@@ -1,5 +1,5 @@
 from peewee import IntegerField, BooleanField, FloatField
-from ..base import BaseModel, db
+from ..base import BaseModel
 
 
 class SystemSettings(BaseModel):

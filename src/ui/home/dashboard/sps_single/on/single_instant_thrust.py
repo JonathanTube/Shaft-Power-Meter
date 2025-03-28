@@ -26,3 +26,13 @@ class SingleInstantThrust(ft.Container):
         self.thrust_value.value = thrust[0]
         self.thrust_unit.value = thrust[1]
         self.content.update()
+
+    def set_language(self):
+        session = self.page.session
+        self.content.set_title(session.get("lang.common.thrust"))
+
+    def before_update(self):
+        self.set_language()
+
+    def did_mount(self):
+        self.set_language()

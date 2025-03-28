@@ -1,5 +1,5 @@
 from peewee import FloatField
-from ..base import BaseModel, db
+from ..base import BaseModel
 
 
 class Limitations(BaseModel):

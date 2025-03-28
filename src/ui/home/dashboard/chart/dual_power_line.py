@@ -11,8 +11,8 @@ class DualPowerLine(ft.Container):
         self.max_y = max_y
         self.unit = ""
 
-        self.sps1_color = ft.Colors.ORANGE_600
-        self.sps2_color = ft.Colors.BLUE_600
+        self.sps1_color = ft.Colors.ORANGE
+        self.sps2_color = ft.Colors.BLUE
 
         self.expand = True
 
@@ -83,7 +83,17 @@ class DualPowerLine(ft.Container):
             data_series=[self.sps1_data_series, self.sps2_data_series]
         )
 
-        self.content = SimpleCard(title="Power", body=self.chart)
+        self.chart_title = ft.Text("Power", size=18, weight=ft.FontWeight.BOLD)
+        chart_top = ft.Row(
+            alignment=ft.MainAxisAlignment.CENTER,
+            spacing=10,
+            controls=[
+                self.chart_title,
+                ft.Text("SPS1", color=self.sps1_color),
+                ft.Text("SPS2", color=self.sps2_color)
+            ])
+        self.content = SimpleCard(body=ft.Column(
+            controls=[chart_top, self.chart]))
 
     def set_data(self, data_list_sps1: list[DataLog], data_list_sps2: list[DataLog]):
         self.__handle_bottom_axis(data_list_sps1)
@@ -119,3 +129,13 @@ class DualPowerLine(ft.Container):
             data_points.append(ft.LineChartDataPoint(index, item.power))
 
         self.sps2_data_series.data_points = data_points
+
+    def set_language(self):
+        session = self.page.session
+        self.chart_title.value = session.get("lang.common.power")
+
+    def did_mount(self):
+        self.set_language()
+
+    def before_update(self):
+        self.set_language()

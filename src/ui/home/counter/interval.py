@@ -1,11 +1,11 @@
 import flet as ft
 
-from ...common.custom_card import create_card
+from ui.common.custom_card import CustomCard
 from .display import createDisplay
 
 
 def createInterval(propellerName: str):
-    return create_card(
+    return CustomCard(
         heading=f"Interval({propellerName})" if propellerName else "Interval",
         expand=True,
         height=380,

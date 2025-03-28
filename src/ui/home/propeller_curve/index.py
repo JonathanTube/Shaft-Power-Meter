@@ -105,7 +105,7 @@ class PropellerCurve(ft.Container):
             overload_line_color=self.propeller_setting.line_color_of_overload_curve
         )
 
-        asyncio.create_task(self.__load_data())
+        self._task = self.page.run_task(self.__load_data)
 
     def will_unmount(self):
-        self.load_data_task.cancel()
+        self._task.cancel()

@@ -35,3 +35,14 @@ class EEXILimitedPower(ft.Container):
         active_value = power
         inactive_value = self.unlimited_power - power
         self.meter_half.set_outer_value(active_value, inactive_value)
+
+    def set_language(self):
+        session = self.page.session
+        title = session.get("lang.common.eexi_limited_power")
+        self.content.set_title(f'{title}(%)')
+
+    def before_update(self):
+        self.set_language()
+
+    def did_mount(self):
+        self.set_language()

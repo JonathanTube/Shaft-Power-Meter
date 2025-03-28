@@ -1,11 +1,11 @@
 import flet as ft
 
-from ...common.custom_card import create_card
+from ui.common.custom_card import CustomCard
 from .display import createDisplay
 
 
 def createTotal():
-    return create_card(
+    return CustomCard(
         heading="Total",
         expand=True,
         height=380,

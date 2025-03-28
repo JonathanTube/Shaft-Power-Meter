@@ -1,7 +1,7 @@
 import flet as ft
 
 from db.models.zero_cal_info import ZeroCalInfo
-from ui.common.custom_card import create_card
+from ui.common.custom_card import CustomCard
 from ui.common.toast import Toast
 
 
@@ -16,7 +16,8 @@ class ZeroCalHis:
                                      ZeroCalInfo.utc_date_time <= end_value)
                               .order_by(ZeroCalInfo.id.desc()).limit(10))
         else:
-            zero_cal_infos = (ZeroCalInfo.select().order_by(ZeroCalInfo.id.desc()))
+            zero_cal_infos = (
+                ZeroCalInfo.select().order_by(ZeroCalInfo.id.desc()))
 
         table_rows = []
         for item in zero_cal_infos:
@@ -61,9 +62,10 @@ class ZeroCalHis:
             label="End Date",
             on_click=lambda e: e.page.open(ft.DatePicker(on_change=self.__handle_end_date_change)))
 
-        self.query_button = ft.FilledButton("submit", width=120, height=40, on_click=self.__handle_submit)
+        self.query_button = ft.FilledButton(
+            "submit", width=120, height=40, on_click=self.__handle_submit)
 
-        self.search_card = create_card(
+        self.search_card = CustomCard(
             heading="Search",
             body=ft.Row(
                 controls=[
@@ -92,7 +94,7 @@ class ZeroCalHis:
             ],
             rows=self.table_rows)
 
-        self.table_card = create_card(
+        self.table_card = CustomCard(
             heading="History",
             expand=True,
             body=self.table)

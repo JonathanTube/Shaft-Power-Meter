@@ -6,7 +6,7 @@ from dateutil.relativedelta import relativedelta
 
 from db.models.zero_cal_info import ZeroCalInfo
 from db.models.zero_cal_record import ZeroCalRecord
-from ui.common.custom_card import create_card
+from ui.common.custom_card import CustomCard
 from ui.common.toast import Toast
 
 
@@ -56,7 +56,7 @@ class ZeroCalExecutor:
 
         self.recommend_next_performing_time = ft.Text(recommend_next_performing_time, size=14)
 
-        self.tips_card = create_card(
+        self.tips_card = CustomCard(
             heading="Tips",
             body=ft.ResponsiveRow(
                 controls=[
@@ -153,7 +153,7 @@ class ZeroCalExecutor:
         self.error_ratio_torque = ft.Text(f"{error_ratio_torque}%")
         self.error_ratio_thrust = ft.Text(f"{error_ratio_thrust}%")
 
-        self.instant_records = create_card(
+        self.instant_records = CustomCard(
             heading="Instant Records",
             height=440,
             body=ft.Column(
@@ -181,7 +181,7 @@ class ZeroCalExecutor:
         self.pie_chart_green = ft.PieChartSection(green_val, color=ft.Colors.GREEN)
         self.pie_chart_gray = ft.PieChartSection(90 - green_val, color=ft.Colors.GREY_200)
         self.pie_chart = ft.PieChart(col={"md": 6}, sections=[self.pie_chart_green, self.pie_chart_gray])
-        self.progress_card = create_card(
+        self.progress_card = CustomCard(
             heading="Progress",
             height=440,
             body=self.pie_chart

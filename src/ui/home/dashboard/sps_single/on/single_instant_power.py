@@ -32,3 +32,13 @@ class SingleInstantPower(ft.Container):
         self.power_value.value = power[0]
         self.power_unit.value = power[1]
         self.content.update()
+
+    def set_language(self):
+        session = self.page.session
+        self.content.set_title(session.get("lang.common.power"))
+
+    def before_update(self):
+        self.set_language()
+
+    def did_mount(self):
+        self.set_language()

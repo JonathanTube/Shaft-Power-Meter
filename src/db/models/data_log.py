@@ -1,5 +1,5 @@
 from peewee import IntegerField, DateField, TimeField, CharField
-from ..base import BaseModel, db
+from ..base import BaseModel
 
 
 class DataLog(BaseModel):

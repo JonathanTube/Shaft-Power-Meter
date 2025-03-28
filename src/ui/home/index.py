@@ -12,20 +12,56 @@ from ui.home.trendview.index import TrendView
 class Home(ft.Stack):
     def __init__(self):
         super().__init__()
-        tabs = self.__create_tabs()
-        notice = Notice().create()
-        self.controls = [tabs, notice]
 
-    def __create_tab_content(self, content):
-        return ft.Container(
-            content=content,
-            # padding=ft.padding.only(left=20, right=20, bottom=0, top=10),
-            expand=True
+    def build(self):
+        spacing = 2
+
+        self.notice = Notice().create()
+
+        self.dashboard = ft.Tab(
+            tab_content=ft.Row(spacing=spacing, controls=[
+                ft.Icon(name=ft.Icons.DASHBOARD_OUTLINED),
+                ft.Text("Dashboard")
+            ]),
+            content=Dashboard()
+        )
+        self.counter = ft.Tab(
+            tab_content=ft.Row(spacing=spacing, controls=[
+                ft.Icon(name=ft.Icons.TIMER_OUTLINED),
+                ft.Text("Counter")
+            ]),
+            content=createCounter(True)
+        )
+        self.trendview = ft.Tab(
+            tab_content=ft.Row(spacing=spacing, controls=[
+                ft.Icon(name=ft.Icons.TRENDING_UP_OUTLINED),
+                ft.Text("TrendView")
+            ]),
+            content=TrendView()
+        )
+        self.propeller_curve = ft.Tab(
+            tab_content=ft.Row(spacing=spacing, controls=[
+                ft.Icon(name=ft.Icons.STACKED_LINE_CHART_OUTLINED),
+                ft.Text("Propeller Curve")
+            ]),
+            content=PropellerCurve()
+        )
+        self.alarm = ft.Tab(
+            tab_content=ft.Row(spacing=spacing, controls=[
+                ft.Icon(name=ft.Icons.WARNING_OUTLINED),
+                ft.Text("Alarm")
+            ]),
+            content=createAlarm()
+        )
+        self.logs = ft.Tab(
+            tab_content=ft.Row(spacing=spacing, controls=[
+                ft.Icon(name=ft.Icons.HISTORY_OUTLINED),
+                ft.Text("Logs")
+            ]),
+            content=Logs()
         )
 
-    def __create_tabs(self):
-        spacing = 2
-        return ft.Tabs(
+        self.controls = [self.notice,  ft.Tabs(
             # padding=50,
             selected_index=0,
             animation_duration=300,
@@ -33,48 +69,29 @@ class Home(ft.Stack):
             label_color=ft.Colors.PRIMARY,  # 选中时文本颜色
             unselected_label_color=ft.Colors.GREY_600,  # 未选中时文本颜色
             tabs=[
-                ft.Tab(
-                    tab_content=ft.Row(spacing=spacing, controls=[
-                        ft.Icon(name=ft.Icons.DASHBOARD_OUTLINED),
-                        ft.Text("Dashboard")
-                    ]),
-                    content=self.__create_tab_content(Dashboard())
-                ),
-                ft.Tab(
-                    tab_content=ft.Row(spacing=spacing, controls=[
-                        ft.Icon(name=ft.Icons.TIMER_OUTLINED),
-                        ft.Text("Counter")
-                    ]),
-                    content=self.__create_tab_content(createCounter(True))
-                ),
-                ft.Tab(
-                    tab_content=ft.Row(spacing=spacing, controls=[
-                        ft.Icon(name=ft.Icons.TRENDING_UP_OUTLINED),
-                        ft.Text("TrendView")
-                    ]),
-                    content=self.__create_tab_content(TrendView())
-                ),
-                ft.Tab(
-                    tab_content=ft.Row(spacing=spacing, controls=[
-                        ft.Icon(name=ft.Icons.STACKED_LINE_CHART_OUTLINED),
-                        ft.Text("Propeller Curve")
-                    ]),
-                    content=self.__create_tab_content(PropellerCurve())
-                ),
-                ft.Tab(
-                    tab_content=ft.Row(spacing=spacing, controls=[
-                        ft.Icon(name=ft.Icons.ALARM_OUTLINED),
-                        ft.Text("Alarm")
-                    ]),
-                    content=self.__create_tab_content(createAlarm())
-                ),
-                ft.Tab(
-                    tab_content=ft.Row(spacing=spacing, controls=[
-                        ft.Icon(name=ft.Icons.SECURITY_OUTLINED),
-                        ft.Text("Logs")
-                    ]),
-                    content=self.__create_tab_content(Logs())
-                )
+                self.dashboard,
+                self.counter,
+                self.trendview,
+                self.propeller_curve,
+                self.alarm,
+                self.logs
             ],
             expand=True
-        )
+        )]
+
+    def __set_tab_text(self, tab: ft.Tab, code: str):
+        tab.tab_content.controls[1].value = self.page.session.get(code)
+
+    def did_mount(self):
+        self.set_language()
+
+    def before_update(self):
+        self.set_language()
+
+    def set_language(self):
+        self.__set_tab_text(self.dashboard, "lang.home.tab.dashboard")
+        self.__set_tab_text(self.counter, "lang.home.tab.counter")
+        self.__set_tab_text(self.trendview, "lang.home.tab.trendview")
+        self.__set_tab_text(self.propeller_curve, "lang.home.tab.propeller_curve")
+        self.__set_tab_text(self.alarm, "lang.home.tab.alarm")
+        self.__set_tab_text(self.logs, "lang.home.tab.logs")

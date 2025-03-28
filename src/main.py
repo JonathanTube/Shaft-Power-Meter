@@ -8,6 +8,28 @@ from utils.gps_logger import GpsLogger
 from utils.data_logger import DataLogger
 from db.data_init import DataInit
 from db.table_init import TableInit
+from db.models.preference import Preference
+from db.models.language import Language
+
+
+def get_theme_mode(preference: Preference):
+    if preference.theme == 0:
+        return ft.ThemeMode.SYSTEM
+    elif preference.theme == 1:
+        return ft.ThemeMode.LIGHT
+    elif preference.theme == 2:
+        return ft.ThemeMode.DARK
+
+
+def load_language(page: ft.Page, preference: Preference):
+    language = preference.language
+    language_items = Language.select()
+    if language == 0:
+        for item in language_items:
+            page.session.set(item.code, item.english)
+    elif language == 1:
+        for item in language_items:
+            page.session.set(item.code, item.chinese)
 
 
 def start_loggers():
@@ -27,14 +49,18 @@ def add_file_picker(page: ft.Page):
 
 
 async def main(page: ft.Page):
+    preference = Preference.get()
     TableInit.init()
     DataInit.init()
     start_loggers()
+
+    load_language(page, preference)
+
     add_file_picker(page)
 
-    page.title = "Shaft Power Meter"
+    page.title = page.session.get("lang.lang.app.name")
     page.padding = 0
-    # page.theme_mode = ft.ThemeMode.LIGHT
+    page.theme_mode = get_theme_mode(preference)
     page.window.maximized = False
     page.window.resizable = False
     page.window.width = 1024
@@ -47,10 +73,15 @@ async def main(page: ft.Page):
 
     # page.window.prevent_close = True
 
-    page_content = ft.Container(expand=True, content=Home(), padding=0)
+    main_content = ft.Container(
+        expand=True,
+        content=Home(),
+        padding=0
+    )
 
-    page.appbar = Header(page_content)
+    page.appbar = Header(main_content)
 
-    page.add(page_content)
+    page.add(main_content)
+
 
 ft.app(main)

@@ -1,20 +1,22 @@
 import flet as ft
 
 
-def create_card(heading: str, body: ft.Control, col=None, expand: bool = False, height: int = None):
-    if col is None:
-        col = {"md": 6}
+class CustomCard(ft.Card):
+    def __init__(self, heading: str, body: ft.Control, col={"md": 6}, expand: bool = False, height: int = None):
+        super().__init__()
+        self.heading = heading
+        self.body = body
 
-    return ft.Card(
-        col=col,
-        expand=expand,
-        height=height,
-        content=ft.Container(
-            # bgcolor="pink",
+        self.col = col
+        self.expand = expand
+        self.height = height
+
+    def build(self):
+        self.content = ft.Container(
             padding=ft.padding.symmetric(10, 10),
-            expand=expand,
+            expand=self.expand,
             content=ft.Column(
-                expand=expand,
+                expand=self.expand,
                 spacing=0,
                 controls=[
                     ft.Container(
@@ -25,13 +27,18 @@ def create_card(heading: str, body: ft.Control, col=None, expand: bool = False, 
                             controls=[
                                 ft.Icon(name=ft.Icons.CYCLONE),
                                 ft.Text(
-                                    heading, weight=ft.FontWeight.BOLD, size=16)
+                                    self.heading,
+                                    weight=ft.FontWeight.BOLD,
+                                    size=16
+                                )
                             ]
-                        )),
+                        )
+                    ),
                     ft.Container(
                         expand=False,
-                        # bgcolor=ft.Colors.BLUE,
                         padding=ft.padding.symmetric(0, 20),
-                        content=body
+                        content=self.body
                     )
-                ])))
+                ]
+            )
+        )

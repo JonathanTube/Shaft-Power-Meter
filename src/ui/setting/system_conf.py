@@ -3,16 +3,14 @@ import flet as ft
 from db.models.factor_conf import FactorConf
 from db.models.ship_info import ShipInfo
 from db.models.system_settings import SystemSettings
-from ui.common.custom_card import create_card
+from ui.common.custom_card import CustomCard
 from ui.common.toast import Toast
 
 
 class SystemConf(ft.Container):
     def __init__(self):
         super().__init__()
-        self.last_system_settings = SystemSettings.get()
-        self.last_ship_info = ShipInfo.get()
-        self.last_factor_conf = FactorConf.get()
+        self.__load_data()
 
     def build(self):
         self.__create_settings_card()
@@ -59,10 +57,12 @@ class SystemConf(ft.Container):
                 self.last_system_settings, 'sha_po_li', e.control.value)
         )
 
+        self.single_propeller = ft.Radio(value="1", label="Single")
+        self.twins_propeller = ft.Radio(value="2", label="Twins")
         self.amount_of_propeller_radios = ft.RadioGroup(
             content=ft.Row([
-                ft.Radio(value="1", label="Single"),
-                ft.Radio(value="2", label="Dual")
+                self.single_propeller,
+                self.twins_propeller
             ]),
             value=self.last_system_settings.amount_of_propeller,
             on_change=lambda e: setattr(
@@ -77,19 +77,20 @@ class SystemConf(ft.Container):
                 self.last_system_settings, 'eexi_limited_power', e.control.value)
         )
 
+        self.amount_of_propeller_label = ft.Text(
+            "Amount Of Propeller",
+            text_align=ft.TextAlign.RIGHT
+        )
+
         amount_of_propeller_row = ft.Row(
             col={"md": 6},
             controls=[
-                ft.Text(
-                    "Amount Of Propeller",
-                    width=140,
-                    text_align=ft.TextAlign.RIGHT
-                ),
+                self.amount_of_propeller_label,
                 self.amount_of_propeller_radios
             ]
         )
 
-        self.settings_card = create_card(
+        self.settings_card = CustomCard(
             'Settings',
             col={'xs': 12},
             expand=True,
@@ -100,8 +101,7 @@ class SystemConf(ft.Container):
                     self.sha_po_li,
                     self.eexi_limited_power
                 ]
-            )
-        )
+            ))
 
     def __create_ship_info_card(self):
         self.ship_type = ft.TextField(
@@ -129,7 +129,7 @@ class SystemConf(ft.Container):
                 self.last_ship_info, 'ship_size', e.control.value)
         )
 
-        self.ship_info_card = create_card(
+        self.ship_info_card = CustomCard(
             'Ship Info',
             ft.Column(
                 controls=[
@@ -179,7 +179,7 @@ class SystemConf(ft.Container):
                 self.last_factor_conf, 'poisson_ratio_mu', e.control.value)
         )
 
-        self.factor_conf_card = create_card(
+        self.factor_conf_card = CustomCard(
             'Factor Conf.',
             ft.Column(
                 controls=[
@@ -198,13 +198,10 @@ class SystemConf(ft.Container):
         self.last_ship_info.save()
         self.last_factor_conf.save()
         e.page.session.get("sha_po_li").switch()
-        Toast.show_success(e.page, message="保存成功")
+        Toast.show_success(e.page)
 
     def __cancel_data(self, e):
-        self.last_system_settings = SystemSettings.select().order_by(
-            SystemSettings.id.desc()).first()
-        self.last_ship_info = ShipInfo.select().order_by(ShipInfo.id.desc()).first()
-        self.last_factor_conf = FactorConf.select().order_by(FactorConf.id.desc()).first()
+        self.__load_data()
 
         self.display_thrust.value = self.last_system_settings.display_thrust
         self.sha_po_li.value = self.last_system_settings.sha_po_li
@@ -225,4 +222,44 @@ class SystemConf(ft.Container):
         self.poisson_ratio_mu.value = self.last_factor_conf.poisson_ratio_mu
         self.factor_conf_card.update()
 
-        Toast.show_success(e.page, message="已取消")
+        Toast.show_success(e.page)
+
+    def __load_data(self):
+        self.last_system_settings = SystemSettings.get()
+        self.last_ship_info = ShipInfo.get()
+        self.last_factor_conf = FactorConf.get()
+
+    def __set_language(self):
+        session = self.page.session
+        self.display_thrust.label = session.get("lang.setting.display_thrust")
+        self.amount_of_propeller_label.value = session.get(
+            "lang.setting.amount_of_propeller")
+        self.single_propeller.label = session.get(
+            "lang.setting.single_propeller")
+        self.twins_propeller.label = session.get(
+            "lang.setting.twins_propeller")
+        self.sha_po_li.label = session.get("lang.setting.enable_sha_po_li")
+        self.eexi_limited_power.label = session.get(
+            "lang.setting.eexi_limited_power")
+
+        self.ship_type.label = session.get("lang.setting.ship_type")
+        self.ship_name.label = session.get("lang.setting.ship_name")
+        self.imo_number.label = session.get("lang.setting.imo_number")
+        self.ship_size.label = session.get("lang.setting.ship_size")
+
+        self.shaft_outer_diameter.label = session.get(
+            "lang.setting.bearing_outer_diameter_D")
+        self.shaft_inner_diameter.label = session.get(
+            "lang.setting.bearing_inner_diameter_d")
+        self.sensitivity_factor_k.label = session.get(
+            "lang.setting.sensitivity_factor_k")
+        self.elastic_modulus_E.label = session.get(
+            "lang.setting.elastic_modulus_E")
+        self.poisson_ratio_mu.label = session.get(
+            "lang.setting.poisson_ratio_mu")
+
+    def before_update(self):
+        self.__set_language()
+
+    def did_mount(self):
+        self.__set_language()

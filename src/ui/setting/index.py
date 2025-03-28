@@ -13,12 +13,6 @@ from ui.setting.zero_cal import ZeroCal
 class Setting(ft.Container):
     def __init__(self):
         super().__init__()
-        self.right_content = ft.Container(
-            expand=True,
-            padding=ft.padding.only(left=5, right=5, top=5, bottom=5),
-            content=SystemConf()
-        )
-        self.content = self.__create()
 
     def __set_content(self, e):
         idx = e.control.selected_index
@@ -41,55 +35,70 @@ class Setting(ft.Container):
 
         self.right_content.update()
 
-    def __create(self):
+    def build(self):
+        self.right_content = ft.Container(
+            expand=True,
+            padding=ft.padding.only(left=5, right=5, top=5, bottom=5),
+            content=SystemConf()
+        )
+
+        self.system_conf = ft.NavigationRailDestination(
+            icon=ft.Icons.SETTINGS_OUTLINED,
+            selected_icon=ft.Icons.SETTINGS,
+            label="System Conf."
+        )
+        self.general = ft.NavigationRailDestination(
+            icon=ft.Icon(ft.Icons.TUNE_OUTLINED),
+            selected_icon=ft.Icon(ft.Icons.TUNE),
+            label="General",
+        )
+        self.propeller_setting = ft.NavigationRailDestination(
+            icon=ft.Icons.INSIGHTS_OUTLINED,
+            selected_icon=ft.Icon(ft.Icons.INSIGHTS),
+            label="Propeller Setting"
+        )
+        self.zero_cal = ft.NavigationRailDestination(
+            icon=ft.Icons.SWITCH_ACCESS_SHORTCUT_OUTLINED,
+            selected_icon=ft.Icon(ft.Icons.SWITCH_ACCESS_SHORTCUT),
+            label="Zero Cal."
+        )
+        self.io_conf = ft.NavigationRailDestination(
+            icon=ft.Icons.USB_OUTLINED,
+            selected_icon=ft.Icon(ft.Icons.USB),
+            label="I/O"
+        )
+        self.self_test = ft.NavigationRailDestination(
+            icon=ft.Icons.ASSIGNMENT_OUTLINED,
+            selected_icon=ft.Icon(ft.Icons.ASSIGNMENT),
+            label="Self-test"
+        )
+        self.permission_conf = ft.NavigationRailDestination(
+            icon=ft.Icons.MANAGE_ACCOUNTS_OUTLINED,
+            selected_icon=ft.Icon(ft.Icons.MANAGE_ACCOUNTS),
+            label="Permission Conf."
+        )
+        self.data_backup = ft.NavigationRailDestination(
+            icon=ft.Icons.BACKUP_OUTLINED,
+            selected_icon=ft.Icon(ft.Icons.BACKUP),
+            label="Data Backup"
+        )
+
         rail = ft.NavigationRail(
             selected_index=0,
             label_type=ft.NavigationRailLabelType.ALL,
             destinations=[
-                ft.NavigationRailDestination(
-                    icon=ft.Icons.SETTINGS_OUTLINED,
-                    selected_icon=ft.Icons.SETTINGS,
-                    label="System Conf."
-                ),
-                ft.NavigationRailDestination(
-                    icon=ft.Icon(ft.Icons.TUNE_OUTLINED),
-                    selected_icon=ft.Icon(ft.Icons.TUNE),
-                    label="General",
-                ),
-                ft.NavigationRailDestination(
-                    icon=ft.Icons.INSIGHTS_OUTLINED,
-                    selected_icon=ft.Icon(ft.Icons.INSIGHTS),
-                    label="Propeller Setting"
-                ),
-                ft.NavigationRailDestination(
-                    icon=ft.Icons.SWITCH_ACCESS_SHORTCUT_OUTLINED,
-                    selected_icon=ft.Icon(ft.Icons.SWITCH_ACCESS_SHORTCUT),
-                    label="Zero Cal."
-                ),
-                ft.NavigationRailDestination(
-                    icon=ft.Icons.USB_OUTLINED,
-                    selected_icon=ft.Icon(ft.Icons.USB),
-                    label="I/O"
-                ),
-                ft.NavigationRailDestination(
-                    icon=ft.Icons.ASSIGNMENT_OUTLINED,
-                    selected_icon=ft.Icon(ft.Icons.ASSIGNMENT),
-                    label="Self-test"
-                ),
-                ft.NavigationRailDestination(
-                    icon=ft.Icons.MANAGE_ACCOUNTS_OUTLINED,
-                    selected_icon=ft.Icon(ft.Icons.MANAGE_ACCOUNTS),
-                    label="Permission Conf."
-                ),
-                ft.NavigationRailDestination(
-                    icon=ft.Icons.BACKUP_OUTLINED,
-                    selected_icon=ft.Icon(ft.Icons.BACKUP),
-                    label="Data Dumping"
-                )
+                self.system_conf,
+                self.general,
+                self.propeller_setting,
+                self.zero_cal,
+                self.io_conf,
+                self.self_test,
+                self.permission_conf,
+                self.data_backup
             ],
             on_change=self.__set_content
         )
-        return ft.Row(
+        self.content = ft.Row(
             spacing=0,
             controls=[
                 rail,
@@ -98,3 +107,22 @@ class Setting(ft.Container):
             ],
             expand=True
         )
+
+    def __set_language(self):
+        session = self.page.session
+        self.system_conf.label = session.get("lang.setting.system_conf.title")
+        self.general.label = session.get("lang.setting.general.title")
+        self.propeller_setting.label = session.get(
+            "lang.setting.propeller_setting.title")
+        self.zero_cal.label = session.get("lang.setting.zero_cal.title")
+        self.io_conf.label = session.get("lang.setting.io_conf.title")
+        self.self_test.label = session.get("lang.setting.self_test.title")
+        self.permission_conf.label = session.get(
+            "lang.setting.permission_conf.title")
+        self.data_backup.label = session.get("lang.setting.data_backup.title")
+
+    def before_update(self):
+        self.__set_language()
+
+    def did_mount(self):
+        self.__set_language()

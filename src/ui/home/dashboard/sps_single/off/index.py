@@ -15,7 +15,7 @@ class SingleShaPoLiOff(ft.Stack):
         self.__load_settings()
 
     def build(self):
-        self.thrust_power = ThrustPower(self.display_thrust)
+        self.thrust_power = ThrustPower()
 
         self.single_meters = SingleMeters()
 
@@ -44,7 +44,7 @@ class SingleShaPoLiOff(ft.Stack):
         self.single_meters.set_speed_limit(
             self.speed_max, self.speed_warning
         )
-
+        self.set_language()
         self._task = self.page.run_task(self.__load_data)
 
     def will_unmount(self):
@@ -60,20 +60,18 @@ class SingleShaPoLiOff(ft.Stack):
         self.torque_warning = 0
         self.display_thrust = False
 
-        system_settings = SystemSettings.get_or_none()
-        if system_settings:
-            self.display_thrust = system_settings.display_thrust
+        system_settings = SystemSettings.get()
+        self.display_thrust = system_settings.display_thrust
 
-        limitations = Limitations.get_or_none()
-        if limitations:
-            self.speed_max = limitations.speed_max
-            self.speed_warning = limitations.speed_warning
+        limitations = Limitations.get()
+        self.speed_max = limitations.speed_max
+        self.speed_warning = limitations.speed_warning
 
-            self.power_max = limitations.power_max
-            self.power_warning = limitations.power_warning
+        self.power_max = limitations.power_max
+        self.power_warning = limitations.power_warning
 
-            self.torque_max = limitations.torque_max
-            self.torque_warning = limitations.torque_warning
+        self.torque_max = limitations.torque_max
+        self.torque_warning = limitations.torque_warning
 
     async def __load_data(self):
         while True:
@@ -90,7 +88,16 @@ class SingleShaPoLiOff(ft.Stack):
                 self.single_meters.set_data(
                     data_logs[0].revolution, data_logs[0].power, data_logs[0].torque
                 )
-                self.thrust_power.set_data(data_logs[0].thrust)
+                self.thrust_power.set_data(
+                    self.display_thrust, data_logs[0].thrust)
                 self.power_line_chart.update(data_logs)
 
             await asyncio.sleep(1)
+
+    def set_language(self):
+        session = self.page.session
+        self.power_line_chart.set_name(session.get("lang.common.power"))
+
+    def before_update(self):
+        self.set_language()
+

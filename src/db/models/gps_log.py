@@ -1,5 +1,5 @@
 from peewee import CharField, TimeField, DateField
-from ..base import BaseModel, db
+from ..base import BaseModel
 
 
 class GpsLog(BaseModel):

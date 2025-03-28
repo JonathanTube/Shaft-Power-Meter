@@ -2,7 +2,7 @@ from peewee import CharField, FloatField, ForeignKeyField, DateTimeField
 
 from db.models.breach_reason import BreachReason
 from db.models.report_info import ReportInfo
-from ..base import BaseModel, db
+from ..base import BaseModel
 
 
 class ReportDetail(BaseModel):

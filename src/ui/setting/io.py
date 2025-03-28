@@ -1,7 +1,7 @@
 import flet as ft
 
 from db.models.io_conf import IOConf
-from ui.common.custom_card import create_card
+from ui.common.custom_card import CustomCard
 from ui.common.toast import Toast
 
 
@@ -10,22 +10,22 @@ class IO:
         self.__load_data()
 
     def __load_data(self):
-        self.last_io_conf = IOConf.select().order_by(IOConf.id.desc()).first()
-        if self.last_io_conf is None:
-            self.last_io_conf = IOConf.create(plc_ip='192.168.1.101', plc_port=502)
+        self.last_io_conf = IOConf.get()
 
     def __create_plc_conf(self):
         self.plc_ip = ft.TextField(
             label="IP Address", value=self.last_io_conf.plc_ip, col={'md': 6},
-            on_change=lambda e: setattr(self.last_io_conf, 'plc_ip', e.control.value)
+            on_change=lambda e: setattr(
+                self.last_io_conf, 'plc_ip', e.control.value)
         )
 
         self.plc_port = ft.TextField(
             label="Port", value=self.last_io_conf.plc_port, col={'md': 6},
-            on_change=lambda e: setattr(self.last_io_conf, 'plc_port', e.control.value)
+            on_change=lambda e: setattr(
+                self.last_io_conf, 'plc_port', e.control.value)
         )
 
-        self.plc_conf = create_card(
+        self.plc_conf = CustomCard(
             'PLC Conf.',
             body=ft.ResponsiveRow(controls=[
                 self.plc_ip,
@@ -65,7 +65,7 @@ class IO:
             value=self.last_io_conf.output_sum_power,
             on_change=lambda e: setattr(self.last_io_conf, 'output_sum_power', e.control.value))
 
-        self.output_conf = create_card(
+        self.output_conf = CustomCard(
             'Output Conf.',
             body=ft.ResponsiveRow(controls=[
                 self.check_torque,
@@ -80,7 +80,7 @@ class IO:
 
     def __save_data(self, e):
         self.last_io_conf.save()
-        Toast.show_success(e.page, message="保存成功")
+        Toast.show_success(e.page)
 
     def __cancel_data(self, e):
         self.__load_data()
@@ -91,7 +91,7 @@ class IO:
         self.plc_port.value = self.last_io_conf.plc_port
         self.plc_port.update()
 
-        Toast.show_success(e.page, message="取消成功")
+        Toast.show_success(e.page)
 
     def create(self):
         self.__create_plc_conf()
@@ -106,8 +106,10 @@ class IO:
                     ft.Row(
                         alignment=ft.MainAxisAlignment.CENTER,
                         controls=[
-                            ft.FilledButton(text="Save", width=120, height=40, on_click=self.__save_data),
-                            ft.OutlinedButton(text="Cancel", width=120, height=40, on_click=self.__cancel_data)
+                            ft.FilledButton(
+                                text="Save", width=120, height=40, on_click=self.__save_data),
+                            ft.OutlinedButton(
+                                text="Cancel", width=120, height=40, on_click=self.__cancel_data)
                         ])
                 ])
             ]
