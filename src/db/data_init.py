@@ -1,3 +1,4 @@
+from db.models.propeller_setting import PropellerSetting
 from db.models.system_settings import SystemSettings
 from db.models.ship_info import ShipInfo
 from db.models.factor_conf import FactorConf
@@ -12,6 +13,7 @@ class DataInit:
         DataInit.__init_ship_info()
         DataInit.__init_factor_conf()
         DataInit.__init_breach_reason()
+        DataInit.__init_propeller_setting()
 
     def __init_system_settings():
         if SystemSettings.select().count() == 0:
@@ -62,3 +64,33 @@ class DataInit:
                 {"report_name": "Test Report 9"},
                 {"report_name": "Test Report 10"}
             ]).execute()
+
+    def __init_propeller_setting():
+        if PropellerSetting.select().count() == 0:
+            PropellerSetting.create(
+                rpm_of_mcr_operating_point=1000.0,
+                shaft_power_of_mcr_operating_point=1000.0,
+
+                rpm_left_of_normal_propeller_curve=79.5,
+                bhp_left_of_normal_propeller_curve=50.0,
+                rpm_right_of_normal_propeller_curve=100,
+                bhp_right_of_normal_propeller_curve=100,
+                line_color_of_normal_propeller_curve="blue",
+
+                value_of_light_propeller_curve=5.0,
+                line_color_of_light_propeller_curve="blue",
+
+                value_of_speed_limit_curve=105.0,
+                line_color_of_speed_limit_curve="red",
+
+                rpm_left_of_torque_load_limit_curve=70.9,
+                bhp_left_of_torque_load_limit_curve=51.9,
+                rpm_right_of_torque_load_limit_curve=97.0,
+                bhp_right_of_torque_load_limit_curve=97.5,
+                line_color_of_torque_load_limit_curve="green",
+
+                value_of_overload_curve=5.0,
+                line_color_of_overload_curve="red",
+
+                alarm_enabled_of_overload_curve=False
+            )

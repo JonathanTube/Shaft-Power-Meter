@@ -51,22 +51,18 @@ class PropellerCurveChart(ft.Container):
                 labels_interval=10
             ),
             data_series=[
-                # MCR 100% Point
-                ft.LineChartData(
-                    data_points=[
-                        ft.LineChartDataPoint(100, 100)
-                    ],
-                    point=ft.ChartCirclePoint(
-                        color=ft.Colors.RED,
-                        radius=6,
-                        stroke_color=ft.Colors.RED,
-                        stroke_width=1
-                    )
-                ),
                 # Normal Propeller Curve
                 ft.LineChartData(
                     color=ft.Colors.BLUE,
                     data_points=[]
+                ),
+                # Normal Propeller Curve star points
+                ft.LineChartData(
+                    data_points=[],
+                    point=ft.ChartCirclePoint(
+                        color=ft.Colors.RED,
+                        radius=3
+                    )
                 ),
                 # Light Propeller Curve
                 ft.LineChartData(
@@ -96,35 +92,42 @@ class PropellerCurveChart(ft.Container):
                 ),
                 # sps1
                 ft.LineChartData(
-                    data_points=[
-                        ft.LineChartDataPoint(80, 80)
-                    ],
+                    data_points=[],
                     point=ft.ChartCirclePoint(
-                        color=ft.Colors.BLUE,
-                        radius=6,
-                        stroke_color=ft.Colors.BLUE,
-                        stroke_width=1
+                        color=ft.Colors.ORANGE,
+                        radius=5
                     )
                 ),
                 # sps2
                 ft.LineChartData(
+                    data_points=[],
+                    point=ft.ChartCirclePoint(
+                        color=ft.Colors.LIME,
+                        radius=5
+                    )
+                ),
+                # MCR 100% Point
+                ft.LineChartData(
                     data_points=[
-                        ft.LineChartDataPoint(90, 90)
+                        ft.LineChartDataPoint(100, 100)
                     ],
                     point=ft.ChartCirclePoint(
-                        color=ft.Colors.GREEN,
-                        radius=6,
-                        stroke_color=ft.Colors.GREEN,
+                        color=ft.Colors.RED,
+                        radius=8,
+                        stroke_color=ft.Colors.RED,
                         stroke_width=1
                     )
-                )
+                ),
             ]
         )
 
         self.content = self.chart
 
-    def get_points(self, rpm_left, power_left, rpm_right, power_right, count=100):
-        k = power_left / rpm_left**3
+    def get_points(self, rpm_right, power_right, count=100):
+        if power_right == 0:
+            return [], []
+
+        k = power_right / rpm_right**3
 
         rpm = np.linspace(start=0, stop=rpm_right, num=count)
         # print('rpm=', rpm)
@@ -134,45 +137,81 @@ class PropellerCurveChart(ft.Container):
 
         return rpm, power
 
-    def set_normal_propeller_curve(self, rpm_left, power_left,
-                                   rpm_right, power_right,
-                                   light_propeller_curve_below_radio: float, speed_limit_curve_ratio_of_rpm_of_mcr: float, overload_curve_ratio_of_rpm_of_mcr: float):
+    def update_static_data(self, normal_rpm_left: float, normal_power_left: float,
+                           normal_rpm_right: float, normal_power_right: float,
+                           normal_line_color: str,
+                           light_propeller: float, light_propeller_line_color: str,
+                           speed_limit: float, speed_limit_line_color: str,
+                           torque_load_limit_rpm_left: float, torque_load_limit_power_left: float,
+                           torque_load_limit_rpm_right: float, torque_load_limit_power_right: float,
+                           torque_load_limit_line_color: str,
+                           overload: float, overload_line_color: str):
+
         rpm_points, power_points = self.get_points(
-            rpm_left, power_left, rpm_right, power_right)
+            normal_rpm_right, normal_power_right
+        )
+        if len(rpm_points) == 0 or len(power_points) == 0:
+            return
 
         # normal propeller curve
-        self.chart.data_series[1].data_points = [
+        self.chart.data_series[0].data_points = [
             *[ft.LineChartDataPoint(x, y)
               for x, y in zip(rpm_points, power_points)],
             ft.LineChartDataPoint(105, 100)
         ]
+        self.chart.data_series[0].color = normal_line_color
+
+        # normal propeller curve key points
+        self.chart.data_series[1].data_points = [
+            ft.LineChartDataPoint(normal_rpm_left, normal_power_left)
+            # ft.LineChartDataPoint(normal_rpm_right, normal_power_right)
+        ]
 
         # light propeller curve
         self.chart.data_series[2].data_points = [
-            ft.LineChartDataPoint(x, y * (1 - light_propeller_curve_below_radio)) for x, y in zip(rpm_points, power_points)
+            ft.LineChartDataPoint(x, y * (100 - light_propeller)/100) for x, y in zip(rpm_points, power_points)
         ]
+        self.chart.data_series[2].color = light_propeller_line_color
 
         # speed limit curve
         self.chart.data_series[3].data_points = [
-            ft.LineChartDataPoint(speed_limit_curve_ratio_of_rpm_of_mcr, 0)
+            ft.LineChartDataPoint(speed_limit, 0)
         ]
+        self.chart.data_series[3].color = speed_limit_line_color
 
         # torque/load limit curve
         self.chart.data_series[4].data_points = [
-            ft.LineChartDataPoint(10, 20),
-            ft.LineChartDataPoint(20, 30),
-            ft.LineChartDataPoint(30, 40),
-            ft.LineChartDataPoint(40, 50),
-            ft.LineChartDataPoint(50, 60),
+            ft.LineChartDataPoint(
+                torque_load_limit_rpm_left,
+                torque_load_limit_power_left
+            ),
+            ft.LineChartDataPoint(
+                torque_load_limit_rpm_right,
+                torque_load_limit_power_right
+            )
         ]
+        self.chart.data_series[4].color = torque_load_limit_line_color
+
         # overload curve
-        data_series_5 = (ft.LineChartDataPoint(x, y * (1 + overload_curve_ratio_of_rpm_of_mcr))
+        data_series_5 = (ft.LineChartDataPoint(x, y * (100 + overload)/100)
                          for x, y in zip(rpm_points, power_points))
-        last_power = power_points[-1] * \
-            (1 + overload_curve_ratio_of_rpm_of_mcr)
+        last_power = power_points[-1] * (100 + overload)/100
         self.chart.data_series[5].data_points = [
             *data_series_5,
             ft.LineChartDataPoint(
-                speed_limit_curve_ratio_of_rpm_of_mcr, last_power)
+                speed_limit, last_power)
         ]
+        self.chart.data_series[5].color = overload_line_color
         self.chart.update()
+
+    def update_dynamic_data_sps1(self, sps1_speed: float, sps1_power: float):
+        self.chart.data_series[6].data_points = [
+            ft.LineChartDataPoint(sps1_speed, sps1_power)
+        ]
+        self.chart.data_series[6].update()
+
+    def update_dynamic_data_sps2(self, sps2_speed: float, sps2_power: float):
+        self.chart.data_series[7].data_points = [
+            ft.LineChartDataPoint(sps2_speed, sps2_power)
+        ]
+        self.chart.data_series[7].update()
