@@ -6,6 +6,7 @@ class CustomCard(ft.Card):
         super().__init__()
         self.heading = heading
         self.body = body
+        self.margin = 0
 
         self.col = col
         self.expand = expand
@@ -42,3 +43,6 @@ class CustomCard(ft.Card):
                 ]
             )
         )
+
+    def set_title(self, title: str):
+        self.heading = title

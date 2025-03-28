@@ -10,28 +10,44 @@ from ui.common.custom_card import CustomCard
 from ui.common.toast import Toast
 
 
-class General:
+class General(ft.Container):
     def __init__(self):
+        super().__init__()
+        self.expand = True
+        self.alignment = ft.MainAxisAlignment.START
+
         self.last_preference = Preference.get()
         self.last_limitations = Limitations.get()
         self.last_date_time_conf = DateTimeConf.get()
 
     def __create_preference_card(self):
+        self.theme_label = ft.Text("Theme")
+        self.theme_system = ft.Radio(value=0, label="System")
+        self.theme_light = ft.Radio(value=1, label="Light")
+        self.theme_dark = ft.Radio(value=2, label="Dark")
+
+        self.language_label = ft.Text("Language")
+        self.system_unit_label = ft.Text("System Unit")
+        self.data_refresh_interval_label = ft.Text("Data Refresh Interval")
+
         self.theme = ft.RadioGroup(
             content=ft.Row([
-                ft.Radio(value=0, label="Auto"),
-                ft.Radio(value=1, label="Light"),
-                ft.Radio(value=2, label="Dark")
+                self.theme_system,
+                self.theme_light,
+                self.theme_dark
             ]),
             value=self.last_preference.theme,
             on_change=lambda e: setattr(
                 self.last_preference, 'theme', e.control.value)
         )
 
+        self.system_unit_si = ft.Radio(value="0", label="SI")
+        self.system_unit_metric = ft.Radio(value="1", label="Metric")
+
         self.system_unit = ft.RadioGroup(
             content=ft.Row([
-                ft.Radio(value="0", label="SI"),
-                ft.Radio(value="1", label="Metric")
+                self.system_unit_si,
+                self.system_unit_metric
             ]),
             value=self.last_preference.system_unit,
             on_change=lambda e: setattr(
@@ -49,7 +65,7 @@ class General:
         )
 
         self.data_refresh_interval = ft.TextField(
-            label="Data Refresh Interval",
+            label=self.data_refresh_interval_label,
             suffix_text="seconds",
             value=self.last_preference.data_refresh_interval,
             col={"md": 6},
@@ -57,20 +73,21 @@ class General:
 
         self.preference_card = CustomCard(
             'Preference',
-            ft.ResponsiveRow(controls=[
-                ft.Row(
-                    controls=[ft.Text("Theme"), self.theme],
-                    col={"md": 6}
-                ),
-                ft.Row(
-                    controls=[ft.Text("Language"), self.language],
-                    col={"md": 6}),
-                ft.Row(
-                    controls=[ft.Text("System Units"), self.system_unit],
-                    col={"md": 6}
-                ),
-                self.data_refresh_interval
-            ]),
+            ft.ResponsiveRow(
+                controls=[
+                    ft.Row(
+                        controls=[self.theme_label, self.theme],
+                        col={"md": 6}
+                    ),
+                    ft.Row(
+                        controls=[self.language_label, self.language],
+                        col={"md": 6}),
+                    ft.Row(
+                        controls=[self.system_unit_label, self.system_unit],
+                        col={"md": 6}
+                    ),
+                    self.data_refresh_interval
+                ]),
             col={"xs": 12})
 
     def __create_max_limitations_card(self):
@@ -176,7 +193,7 @@ class General:
         )
 
         self.date_time_card = CustomCard(
-            'Date And Time',
+            'UTC Date Time Conf.',
             ft.ResponsiveRow(
                 controls=[
                     self.utc_date,
@@ -241,14 +258,26 @@ class General:
         self.date_time_format.value = self.last_date_time_conf.date_time_format
         self.sync_with_gps.value = self.last_date_time_conf.sync_with_gps
         self.date_time_card.update()
-        Toast.show_success(e.page, message="已取消")
+        Toast.show_success(e.page)
 
-    def create(self):
-        self.__create_preference_card(),
-        self.__create_max_limitations_card(),
-        self.__create_warning_limitations_card(),
-        self.__create_date_time_card(),
-        return ft.Column(
+    def build(self):
+        self.__create_preference_card()
+        self.__create_max_limitations_card()
+        self.__create_warning_limitations_card()
+        self.__create_date_time_card()
+
+        self.save_button = ft.FilledButton(
+            text="Save",
+            width=120, height=40,
+            on_click=self.__save_data
+        )
+        self.cancel_button = ft.OutlinedButton(
+            text="Cancel",
+            width=120, height=40,
+            on_click=self.__cancel_data
+        )
+
+        self.content = ft.Column(
             expand=True,
             controls=[
                 ft.ResponsiveRow(
@@ -260,10 +289,61 @@ class General:
                         ft.Row(
                             alignment=ft.MainAxisAlignment.CENTER,
                             controls=[
-                                ft.FilledButton(
-                                    text="Save", width=120, height=40, on_click=self.__save_data),
-                                ft.OutlinedButton(
-                                    text="Cancel", width=120, height=40, on_click=self.__cancel_data)
+                                self.save_button,
+                                self.cancel_button
                             ])
-                    ])
-            ])
+                    ]
+                )
+            ]
+        )
+
+    def before_update(self):
+        self.__set_language()
+
+    def did_mount(self):
+        self.__set_language()
+
+    def __set_language(self):
+        session = self.page.session
+
+        self.preference_card.set_title(session.get("lang.setting.preference"))
+        self.theme_label.value = session.get("lang.setting.theme")
+
+        self.theme_system.label = session.get("lang.setting.theme.system")
+        self.theme_light.label = session.get("lang.setting.theme.light")
+        self.theme_dark.label = session.get("lang.setting.theme.dark")
+
+        self.language_label.value = session.get("lang.setting.language")
+        self.system_unit_label.value = session.get("lang.setting.unit")
+        self.system_unit_label.value = session.get("lang.setting.unit")
+        self.system_unit_si.label = session.get("lang.setting.unit.si")
+        self.system_unit_metric.label = session.get("lang.setting.unit.metric")
+
+        self.data_refresh_interval_label.value = session.get(
+            "lang.setting.data_refresh_interval")
+
+        self.max_limitations_card.set_title(
+            session.get("lang.setting.maximum_limitations"))
+
+        self.warning_limitations_card.set_title(
+            session.get("lang.setting.warning_limitations"))
+
+        self.date_time_card.set_title(
+            session.get("lang.setting.utc_date_time_conf"))
+
+        self.utc_date.label = session.get("lang.setting.date")
+        self.utc_time.label = session.get("lang.setting.time")
+        self.date_time_format.label = session.get(
+            "lang.setting.date_time_format")
+        self.sync_with_gps.label = session.get("lang.setting.sync_with_gps")
+
+        self.speed_max.label = session.get("lang.common.speed")
+        self.torque_max.label = session.get("lang.common.torque")
+        self.power_max.label = session.get("lang.common.power")
+
+        self.speed_warning.label = session.get("lang.common.speed")
+        self.torque_warning.label = session.get("lang.common.torque")
+        self.power_warning.label = session.get("lang.common.power")
+
+        self.save_button.text = session.get("lang.button.save")
+        self.cancel_button.text = session.get("lang.button.cancel")

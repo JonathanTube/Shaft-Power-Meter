@@ -136,6 +136,18 @@ class DataInit:
                 },
 
                 {
+                    "code": "lang.button.save",
+                    "chinese": "保存",
+                    "english": "Save"
+                },
+
+                {
+                    "code": "lang.button.cancel",
+                    "chinese": "取消",
+                    "english": "Cancel"
+                },
+
+                {
                     "code": "lang.common.power",
                     "chinese": "功率",
                     "english": "Power"
@@ -157,6 +169,18 @@ class DataInit:
                     "code": "lang.common.thrust",
                     "chinese": "推力",
                     "english": "Thrust"
+                },
+
+                {
+                    "code": "lang.common.average_power",
+                    "chinese": "平均功率",
+                    "english": "Average Power"
+                },
+
+                {
+                    "code": "lang.common.sum_power",
+                    "chinese": "总功率",
+                    "english": "Sum Power"
                 },
 
                 {
@@ -192,8 +216,6 @@ class DataInit:
                     "chinese": "EEXI 限制功率",
                     "english": "EEXI Limited Power"
                 },
-
-
 
                 {
                     "code": "lang.header.home",
@@ -404,5 +426,198 @@ class DataInit:
                     "code": "lang.setting.poisson_ratio_mu",
                     "chinese": "泊松比",
                     "english": "Poisson Ratio"
+                },
+
+
+
+                {
+                    "code": "lang.setting.preference",
+                    "chinese": "偏好设置",
+                    "english": "Preference"
+                },
+
+                {
+                    "code": "lang.setting.theme",
+                    "chinese": "主题",
+                    "english": "Theme"
+                },
+                {
+                    "code": "lang.setting.theme.system",
+                    "chinese": "系统",
+                    "english": "System"
+                },
+
+                {
+                    "code": "lang.setting.theme.light",
+                    "chinese": "浅色",
+                    "english": "Light"
+                },
+
+                {
+                    "code": "lang.setting.theme.dark",
+                    "chinese": "深色",
+                    "english": "Dark"
+                },
+
+                {
+                    "code": "lang.setting.unit",
+                    "chinese": "单位",
+                    "english": "Unit"
+                },
+
+                {
+                    "code": "lang.setting.unit.metric",
+                    "chinese": "公制",
+                    "english": "Metric"
+                },
+
+                {
+                    "code": "lang.setting.unit.si",
+                    "chinese": "国际单位制",
+                    "english": "SI"
+                },
+
+                {
+                    "code": "lang.setting.language",
+                    "chinese": "语言",
+                    "english": "Language"
+                },
+
+                {
+                    "code": "lang.setting.data_refresh_interval",
+                    "chinese": "数据刷新间隔",
+                    "english": "Data Refresh Interval"
+                },
+
+                {
+                    "code": "lang.setting.maximum_limitations",
+                    "chinese": "最大限制",
+                    "english": "Maximum Limitations"
+                },
+
+                {
+                    "code": "lang.setting.warning_limitations",
+                    "chinese": "警告限制",
+                    "english": "Warning Limitations"
+                },
+
+                {
+                    "code": "lang.setting.utc_date_time_conf",
+                    "chinese": "UTC 日期时间配置",
+                    "english": "UTC Date Time Conf."
+                },
+
+                {
+                    "code": "lang.setting.date",
+                    "chinese": "日期",
+                    "english": "Date"
+                },
+
+                {
+                    "code": "lang.setting.time",
+                    "chinese": "时间",
+                    "english": "Time"
+                },
+
+                {
+                    "code": "lang.setting.date_time_format",
+                    "chinese": "日期时间格式",
+                    "english": "Date Time Format"
+                },
+
+                {
+                    "code": "lang.setting.sync_with_gps",
+                    "chinese": "与GPS同步",
+                    "english": "Sync with GPS"
+                },
+
+                {
+                    "code": "lang.setting.mcr_operating_point",
+                    "chinese": "MCR 运行点",
+                    "english": "MCR Operating Point"
+                },
+
+                {
+                    "code": "lang.setting.normal_propeller_curve",
+                    "chinese": "正常螺旋桨曲线",
+                    "english": "Normal Propeller Curve"
+                },
+
+                {
+                    "code": "lang.setting.rpm_left",
+                    "chinese": "左转速",
+                    "english": "RPM Left"
+                },
+
+                {
+                    "code": "lang.setting.rpm_right",
+                    "chinese": "右转速",
+                    "english": "RPM Right"
+                },
+
+                {
+                    "code": "lang.setting.power_left",
+                    "chinese": "左功率",
+                    "english": "Power Left"
+                },
+
+                {
+                    "code": "lang.setting.power_right",
+                    "chinese": "右功率",
+                    "english": "Power Right"
+                },
+
+                {
+                    "code": "lang.setting.light_propeller_curve",
+                    "chinese": "轻载螺旋桨曲线",
+                    "english": "Light Propeller Curve"
+                },
+
+                {
+                    "code": "lang.setting.torque_load_limit_curve",
+                    "chinese": "扭矩负载限制曲线",
+                    "english": "Torque Load Limit Curve"
+                },
+
+                {
+                    "code": "lang.setting.overload_curve",
+                    "chinese": "过载曲线",
+                    "english": "Overload Curve"
+                },
+
+                {
+                    "code": "lang.setting.speed_limit_curve",
+                    "chinese": "速度限制曲线",
+                    "english": "Speed Limit Curve"
+                },
+
+                {
+                    "code": "lang.setting.enable_overload_alarm",
+                    "chinese": "启用过载报警",
+                    "english": "Enable Overload Alarm"
+                },
+
+                {
+                    "code": "lang.setting.plc_conf",
+                    "chinese": "PLC 配置",
+                    "english": "PLC Conf."
+                },
+
+                {
+                    "code": "lang.setting.plc_ip",
+                    "chinese": "PLC IP",
+                    "english": "PLC IP"
+                },
+
+                {
+                    "code": "lang.setting.plc_port",
+                    "chinese": "PLC 端口",
+                    "english": "PLC Port"
+                },
+
+                {
+                    "code": "lang.setting.output_conf",
+                    "chinese": "输出配置",
+                    "english": "Output Conf."
                 }
             ]).execute()

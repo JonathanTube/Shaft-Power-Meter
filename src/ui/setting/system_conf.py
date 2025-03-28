@@ -16,25 +16,35 @@ class SystemConf(ft.Container):
         self.__create_settings_card()
         self.__create_ship_info_card()
         self.__create_factor_conf_card()
+
+        self.save_button = ft.FilledButton(
+            text="Save",
+            width=120,
+            height=40,
+            on_click=self.__save_data
+        )
+        self.cancel_button = ft.OutlinedButton(
+            text="Cancel",
+            width=120,
+            height=40,
+            on_click=self.__cancel_data
+        )
+
         self.content = ft.Column(
             expand=True,
             controls=[
                 ft.ResponsiveRow(
-                    # expand=True,
                     alignment=ft.MainAxisAlignment.START,
                     controls=[
                         self.settings_card,
                         self.ship_info_card,
                         self.factor_conf_card,
                         ft.Row(
-                            # expand=True,
                             col={'xs': 12},
                             alignment=ft.MainAxisAlignment.CENTER,
                             controls=[
-                                ft.FilledButton(
-                                    text="Save", width=120, height=40, on_click=self.__save_data),
-                                ft.OutlinedButton(
-                                    text="Cancel", width=120, height=40, on_click=self.__cancel_data)
+                                self.save_button,
+                                self.cancel_button
                             ])
                     ]
                 )
@@ -257,6 +267,14 @@ class SystemConf(ft.Container):
             "lang.setting.elastic_modulus_E")
         self.poisson_ratio_mu.label = session.get(
             "lang.setting.poisson_ratio_mu")
+
+        self.settings_card.set_title(session.get("lang.setting.setting"))
+        self.ship_info_card.set_title(session.get("lang.setting.ship_info"))
+        self.factor_conf_card.set_title(
+            session.get("lang.setting.factor_conf"))
+
+        self.save_button.text = session.get("lang.button.save")
+        self.cancel_button.text = session.get("lang.button.cancel")
 
     def before_update(self):
         self.__set_language()

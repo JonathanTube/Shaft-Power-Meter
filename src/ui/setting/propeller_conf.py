@@ -6,8 +6,13 @@ from ui.common.custom_card import CustomCard
 from ui.common.toast import Toast
 
 
-class PropellerConf:
+class PropellerConf(ft.Column):
     def __init__(self):
+        super().__init__()
+        self.expand = True
+        self.alignment = ft.MainAxisAlignment.START
+        # 这里有bug，如果添加了，外部页面就会居中
+        self.scroll = ft.ScrollMode.ADAPTIVE
         self.last_propeller_setting = PropellerSetting.get()
 
     def __create_mcr_operating_point(self):
@@ -87,10 +92,13 @@ class PropellerConf:
 
     def __create_light_propeller_curve(self):
         self.light_propeller_curve = ft.TextField(
-            label="Light", suffix_text="[% below (1)]",
+            suffix_text="[% below (1)]",
             value=self.last_propeller_setting.value_of_light_propeller_curve,
             on_change=lambda e: setattr(
-                self.last_propeller_setting, 'value_of_light_propeller_curve', e.control.value)
+                self.last_propeller_setting,
+                'value_of_light_propeller_curve',
+                e.control.value
+            )
         )
         self.line_color_of_light_propeller_curve = ColorDialog(
             on_change=lambda color: setattr(
@@ -108,10 +116,13 @@ class PropellerConf:
 
     def __create_speed_limit_curve(self):
         self.speed_limit_curve = ft.TextField(
-            label="Limit", suffix_text="[% MCR rpm]",
+            suffix_text="[% MCR rpm]",
             value=self.last_propeller_setting.value_of_speed_limit_curve,
             on_change=lambda e: setattr(
-                self.last_propeller_setting, 'value_of_speed_limit_curve', e.control.value)
+                self.last_propeller_setting,
+                'value_of_speed_limit_curve',
+                e.control.value
+            )
         )
         self.line_color_of_speed_limit_curve = ColorDialog(
             on_change=lambda color: setattr(
@@ -171,7 +182,7 @@ class PropellerConf:
 
     def __create_overload_curve(self):
         self.overload_curve = ft.TextField(
-            label="Overload", suffix_text="[% above (4)]", col={"md": 6},
+            suffix_text="[% above (4)]", col={"md": 6},
             value=self.last_propeller_setting.value_of_overload_curve,
             on_change=lambda e: setattr(
                 self.last_propeller_setting, 'value_of_overload_curve', e.control.value)
@@ -245,43 +256,96 @@ class PropellerConf:
             self.last_propeller_setting.line_color_of_overload_curve)
         self.overload_alarm.value = self.last_propeller_setting.alarm_enabled_of_overload_curve
         self.overload_curve_card.update()
-        Toast.show_success(e.page, message="已取消")
+        Toast.show_success(e.page)
 
-    def create(self):
-        self.__create_mcr_operating_point(),
-        self.__create_normal_propeller_curve(),
-        self.__create_torque_load_limit_curve(),
-        self.__create_light_propeller_curve(),
-        self.__create_speed_limit_curve(),
-        self.__create_overload_curve(),
-        return ft.Column(
-            expand=True,
-            alignment=ft.MainAxisAlignment.START,
-            # 这里有bug，如果添加了，外部页面就会居中
-            scroll=ft.ScrollMode.ADAPTIVE,
-            controls=[
-                ft.ResponsiveRow(
-                    expand=True,
-                    controls=[
-                        self.mcr_operating_point_card,
-                        self.normal_propeller_curve_card,
-                        self.torque_load_limit_curve_card,
-                        self.light_propeller_curve_card,
-                        self.speed_limit_curve_card,
-                        self.overload_curve_card,
-                        ft.Row(
-                            alignment=ft.MainAxisAlignment.CENTER,
-                            controls=[
-                                ft.FilledButton(
-                                    text="Save",
-                                    width=120,
-                                    height=40,
-                                    on_click=lambda e: self.__save_data(e)),
+    def build(self):
+        self.__create_mcr_operating_point()
+        self.__create_normal_propeller_curve()
+        self.__create_torque_load_limit_curve()
+        self.__create_light_propeller_curve()
+        self.__create_speed_limit_curve()
+        self.__create_overload_curve()
 
-                                ft.OutlinedButton(
-                                    text="Cancel",
-                                    width=120,
-                                    height=40,
-                                    on_click=lambda e: self.__cancel_data(e))
-                            ])
-                    ])])
+        self.save_button = ft.FilledButton(
+            text="Save",
+            width=120,
+            height=40,
+            on_click=lambda e: self.__save_data(e)
+        )
+
+        self.cancel_button = ft.OutlinedButton(
+            text="Cancel",
+            width=120,
+            height=40,
+            on_click=lambda e: self.__cancel_data(e)
+        )
+
+        self.controls = [
+            ft.ResponsiveRow(
+                alignment=ft.MainAxisAlignment.START,
+                controls=[
+                    self.mcr_operating_point_card,
+                    self.normal_propeller_curve_card,
+                    self.torque_load_limit_curve_card,
+                    self.light_propeller_curve_card,
+                    self.speed_limit_curve_card,
+                    self.overload_curve_card,
+                    ft.Row(
+                        alignment=ft.MainAxisAlignment.CENTER,
+                        controls=[
+                            self.save_button,
+                            self.cancel_button
+                        ]
+                    )
+                ]
+            )
+        ]
+
+    def __set_language(self):
+        session = self.page.session
+
+        self.mcr_operating_point_card.set_title(
+            session.get("lang.setting.mcr_operating_point"))
+        self.rpm_of_mcr_operating_point.label = session.get("lang.common.rpm")
+        self.shaft_power_of_mcr_operating_point.label = session.get(
+            "lang.common.power")
+
+        self.normal_propeller_curve_card.set_title(
+            session.get("lang.setting.normal_propeller_curve"))
+        self.rpm_left_of_normal_propeller_curve.label = session.get(
+            "lang.setting.rpm_left")
+        self.bhp_left_of_normal_propeller_curve.label = session.get(
+            "lang.setting.power_left")
+        self.rpm_right_of_normal_propeller_curve.label = session.get(
+            "lang.setting.rpm_right")
+        self.bhp_right_of_normal_propeller_curve.label = session.get(
+            "lang.setting.power_right")
+
+        self.torque_load_limit_curve_card.set_title(
+            session.get("lang.setting.torque_load_limit_curve"))
+        self.rpm_left_of_torque_load_limit_curve.label = session.get(
+            "lang.setting.rpm_left")
+        self.bhp_left_of_torque_load_limit_curve.label = session.get(
+            "lang.setting.power_left")
+        self.rpm_right_of_torque_load_limit_curve.label = session.get(
+            "lang.setting.rpm_right")
+        self.bhp_right_of_torque_load_limit_curve.label = session.get(
+            "lang.setting.power_right")
+
+        self.light_propeller_curve_card.set_title(
+            session.get("lang.setting.light_propeller_curve"))
+        self.speed_limit_curve_card.set_title(
+            session.get("lang.setting.speed_limit_curve"))
+        self.overload_curve_card.set_title(
+            session.get("lang.setting.overload_curve"))
+        self.overload_alarm.label = session.get(
+            "lang.setting.enable_overload_alarm")
+
+        self.save_button.text = session.get("lang.button.save")
+        self.cancel_button.text = session.get("lang.button.cancel")
+
+    def before_update(self):
+        self.__set_language()
+
+    def did_mount(self):
+        self.__set_language()

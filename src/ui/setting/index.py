@@ -19,13 +19,13 @@ class Setting(ft.Container):
         if idx == 0:
             self.right_content.content = SystemConf()
         elif idx == 1:
-            self.right_content.content = General().create()
+            self.right_content.content = General()
         elif idx == 2:
-            self.right_content.content = PropellerConf().create()
+            self.right_content.content = PropellerConf()
         elif idx == 3:
             self.right_content.content = ZeroCal.create()
         elif idx == 4:
-            self.right_content.content = IO().create()
+            self.right_content.content = IO()
         elif idx == 5:
             self.right_content.content = createSelfTest()
         elif idx == 6:
@@ -38,7 +38,7 @@ class Setting(ft.Container):
     def build(self):
         self.right_content = ft.Container(
             expand=True,
-            padding=ft.padding.only(left=5, right=5, top=5, bottom=5),
+            padding=10,
             content=SystemConf()
         )
 
