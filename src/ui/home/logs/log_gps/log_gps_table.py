@@ -19,14 +19,25 @@ class LogGpsTable(AbstractTable):
             GpsLog.latitude
         ).order_by(GpsLog.id.desc()).paginate(self.current_page, self.page_size)
 
-        return [[
+        return [
+            [
                 item.id,
-                item.utc_date,
-                item.utc_time,
-                item.longitude,
-                item.latitude
-                ] for item in data]
+                f'{item.utc_date} {item.utc_time}',
+                f'{item.longitude} {item.latitude}'
+            ] for item in data
+        ]
 
     @override
     def create_columns(self):
-        return ["No.", "UTC Date", "UTC Time", "Longitude", "Latitude"]
+        return self.get_columns()
+
+    def get_columns(self):
+        session = self.page.session
+        return [
+            session.get("lang.common.no"),
+            session.get("lang.common.utc_date_time"),
+            session.get("lang.common.location")
+        ]
+
+    def before_update(self):
+        self.update_columns(self.get_columns())

@@ -9,14 +9,10 @@ class Pagination(ft.Container):
         self.total_pages = 0
         self.current_page = 1
         self.total_items = 0
-
+        
         self.on_change = on_change
 
-        self.padding = ft.padding.only(bottom=10)
-
-        self.content = self.__create()
-
-    def __create(self):
+    def build(self):
         self.page_number = ft.Text(
             value=f"Page {self.current_page} of {self.total_pages}"
         )
@@ -36,7 +32,7 @@ class Pagination(ft.Container):
             icon=ft.icons.LAST_PAGE,
             on_click=self.on_last_page_click
         )
-        return ft.Row(
+        self.content = ft.Row(
             alignment=ft.MainAxisAlignment.CENTER,
             controls=[
                 self.first_page_button,

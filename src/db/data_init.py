@@ -18,6 +18,7 @@ class DataInit:
         DataInit.__init_breach_reason()
         DataInit.__init_propeller_setting()
         DataInit.__init_language()
+        DataInit.init_report_info_for_test()
 
     def __init_system_settings():
         if SystemSettings.select().count() == 0:
@@ -66,7 +67,8 @@ class DataInit:
                 {"report_name": "Test Report 7"},
                 {"report_name": "Test Report 8"},
                 {"report_name": "Test Report 9"},
-                {"report_name": "Test Report 10"}
+                {"report_name": "Test Report 10"},
+                {"report_name": "Test Report 11"}
             ]).execute()
 
     def __init_propeller_setting():
@@ -148,6 +150,24 @@ class DataInit:
                 },
 
                 {
+                    "code": "lang.button.reset",
+                    "chinese": "重置",
+                    "english": "Reset"
+                },
+
+                {
+                    "code": "lang.button.search",
+                    "chinese": "搜索",
+                    "english": "Search"
+                },
+                
+                {
+                    "code": "lang.common.operation",
+                    "chinese": "操作",
+                    "english": "Operation"
+                },
+
+                {
                     "code": "lang.common.power",
                     "chinese": "功率",
                     "english": "Power"
@@ -215,6 +235,78 @@ class DataInit:
                     "code": "lang.common.eexi_limited_power",
                     "chinese": "EEXI 限制功率",
                     "english": "EEXI Limited Power"
+                },
+
+                {
+                    "code": "lang.common.start_date",
+                    "chinese": "开始日期",
+                    "english": "Start Date"
+                },
+
+                {
+                    "code": "lang.common.end_date",
+                    "chinese": "结束日期",
+                    "english": "End Date"
+                },
+
+                {
+                    "code": "lang.common.created_at",
+                    "chinese": "创建时间",
+                    "english": "Created At"
+                },
+
+                {
+                    "code": "lang.common.updated_at",
+                    "chinese": "更新时间",
+                    "english": "Updated At"
+                },
+
+                {
+                    "code": "lang.common.propeller_name",
+                    "chinese": "螺旋桨名称",
+                    "english": "Propeller Name"
+                },
+
+                {
+                    "code": "lang.common.no",
+                    "chinese": "序号",
+                    "english": "No."
+                },
+
+                {
+                    "code": "lang.common.utc_date_time",
+                    "chinese": "UTC 日期时间",
+                    "english": "UTC Date Time"
+                },
+
+                {
+                    "code": "lang.common.location",
+                    "chinese": "位置",
+                    "english": "Location"
+                },
+
+                {
+                    "code": "lang.common.breach_reason",
+                    "chinese": "突破原因",
+                    "english": "Breach Reason"
+                },
+
+                {
+                    "code": "lang.common.start_position",
+                    "chinese": "开始位置",
+                    "english": "Start Position"
+                },
+
+                {
+                    "code": "lang.common.end_position",
+                    "chinese": "结束位置",
+                    "english": "End Position"
+                },
+
+                {
+                    "code": "lang.common.note",
+                    "chinese": "备注",
+                    "english": "Note"
                 },
 
                 {
@@ -619,5 +711,29 @@ class DataInit:
                     "code": "lang.setting.output_conf",
                     "chinese": "输出配置",
                     "english": "Output Conf."
+                },
+
+                {
+                    "code": "lang.log.breach_log",
+                    "chinese": "功率突破日志",
+                    "english": "Breach Log"
+                },
+
+                {
+                    "code": "lang.log.data_log",
+                    "chinese": "数据日志",
+                    "english": "Data Log"
+                },
+
+                {
+                    "code": "lang.log.gps_log",
+                    "chinese": "GPS 日志",
+                    "english": "GPS Log"
+                },
+
+                {
+                    "code": "lang.report.report_name",
+                    "chinese": "报告名称",
+                    "english": "Report Name"
                 }
             ]).execute()

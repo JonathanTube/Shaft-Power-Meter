@@ -25,8 +25,7 @@ class LogDataTable(AbstractTable):
         return [[
                 item.id,
                 item.name,
-                item.utc_date,
-                item.utc_time,
+                f'{item.utc_date} {item.utc_time}',
                 item.revolution,
                 item.thrust,
                 item.torque,
@@ -35,13 +34,19 @@ class LogDataTable(AbstractTable):
 
     @override
     def create_columns(self):
+        return self.get_columns()
+
+    def get_columns(self):
+        session = self.page.session
         return [
-            "No.",
-            "Name",
-            "UTC Date",
-            "UTC Time",
-            "Revolution(Rev/Min)",
-            "Thrust(kN)",
-            "Torque(kNm)",
-            "Power(kW)"
+            session.get("lang.common.no"),
+            session.get("lang.common.propeller_name"),
+            session.get("lang.common.utc_date_time"),
+            session.get("lang.common.speed"),
+            session.get("lang.common.thrust"),
+            session.get("lang.common.torque"),
+            session.get("lang.common.power")
         ]
+
+    def before_update(self):
+        self.update_columns(self.get_columns())

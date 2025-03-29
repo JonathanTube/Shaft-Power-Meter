@@ -5,9 +5,11 @@ from ui.common.pagination import Pagination
 
 
 @final
-class AbstractTable(ft.Card):
+class AbstractTable(ft.Container):
     def __init__(self, page_size: int):
         super().__init__()
+        self.expand = True
+        self.margin = 0
         self.current_page = 1
         self.page_size = page_size
 
@@ -15,49 +17,45 @@ class AbstractTable(ft.Card):
 
         self.pg = Pagination(self.page_size, self.__on_page_change)
 
-        self.content = self.__create()
-        self.expand = True
-
     def __on_page_change(self, current_page: int, page_size: int):
         self.current_page = current_page
         self.page_size = page_size
         self.__create_table_rows()
 
-    def __create(self):
+    def build(self):
         self.__create_table()
 
         col = ft.Column(
-            controls=[self.data_table, self.pg],
+            controls=[self.data_table],
             expand=True,
-            scroll=ft.ScrollMode.AUTO,
-            alignment=ft.MainAxisAlignment.CENTER)
+            scroll=ft.ScrollMode.AUTO
+        )
 
-        return ft.Container(
-            content=col,
+        row = ft.Row(
+            controls=[col],
+            scroll=ft.ScrollMode.AUTO,
+            alignment=ft.MainAxisAlignment.START,
+            vertical_alignment=ft.CrossAxisAlignment.START,
+            expand=True
+        )
+
+        self.content = ft.Column(
             expand=True,
-            padding=10
+            controls=[
+                row,
+                self.pg
+            ]
         )
 
     def __create_table(self):
-        columns = self.create_columns()
-        if self.has_operations():
-            columns.append("Operations")
-
-        wrapped_columns = [ft.DataColumn(ft.Text(column))
-                           for column in columns]
-
-        b_size = 0.5
-        b_color = ft.colors.INVERSE_SURFACE
-
         self.data_table = ft.DataTable(
             expand=True,
-            heading_row_height=50,
-            border_radius=10,
-            border=ft.border.all(b_size, b_color),
-            vertical_lines=ft.BorderSide(b_size, b_color),
-            horizontal_lines=ft.BorderSide(b_size, b_color),
-            width=4096,
-            columns=wrapped_columns,
+            heading_row_height=40,
+            heading_row_color=ft.colors.SURFACE_CONTAINER_HIGHEST,
+            data_row_min_height=30,
+            # vertical_lines=ft.BorderSide(0.5, ft.colors.INVERSE_SURFACE),
+            # horizontal_lines=ft.BorderSide(0.5, ft.colors.INVERSE_SURFACE),
+            columns=[ft.DataColumn(ft.Text("No Data"))],
             rows=[])
 
     def __create_cells(self, items):
@@ -69,17 +67,28 @@ class AbstractTable(ft.Card):
 
         return cells
 
+    def __create_table_columns(self):
+        columns = self.create_columns()
+        if self.has_operations():
+            session = self.page.session
+            columns.append(session.get("lang.common.operation"))
+
+        wrapped_columns = [ft.DataColumn(ft.Text(column))
+                           for column in columns]
+        self.data_table.columns = wrapped_columns
+
     def __create_table_rows(self):
         data = self.load_data()
         rows = []
         for items in data:
             rows.append(ft.DataRow(cells=self.__create_cells(items)))
         self.data_table.rows = rows
-        self.data_table.update()
 
     def did_mount(self):
+        self.__create_table_columns()
         self.__create_table_rows()
         total = self.load_total()
+        self.data_table.update()
         self.pg.update_pagination(total)
 
     def search(self, **kwargs):
@@ -107,3 +116,7 @@ class AbstractTable(ft.Card):
     @abstractmethod
     def create_operations(self, _id: int):
         pass
+
+    def update_columns(self, columns: list[str]):
+        self.data_table.columns = [ft.DataColumn(ft.Text(column))
+                                   for column in columns]

@@ -31,14 +31,21 @@ class LogEventTable(AbstractTable):
                 item.note
                 ] for item in data]
 
+    def get_columns(self):
+        session = self.page.session
+        return [
+            session.get("lang.common.no"),
+            session.get("lang.common.breach_reason"),
+            session.get("lang.common.start_date"),
+            session.get("lang.common.start_position"),
+            session.get("lang.common.end_date"),
+            session.get("lang.common.end_position"),
+            session.get("lang.common.note")
+        ]
+
     @override
     def create_columns(self):
-        return [
-            "No.",
-            "Breach Reason",
-            "Started At",
-            "Started Position",
-            "Ended At",
-            "Ended Position",
-            "Note"
-        ]
+        return self.get_columns()
+
+    def before_update(self):
+        self.update_columns(self.get_columns())

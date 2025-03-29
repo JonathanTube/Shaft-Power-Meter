@@ -5,24 +5,20 @@ import flet as ft
 class DateTimeRange(ft.Row):
     def __init__(self):
         super().__init__()
-        self.width = 400
+        # self.width = 400
         self.start_date = ft.TextField(
             expand=True,
             label="Start Date",
-            hint_text="Select Start Date",
-            show_cursor=False,
-            autofocus=False,
-            read_only=True,
+            size_constraints=ft.BoxConstraints(max_width=200, max_height=40),
+            can_request_focus=False,
             enable_interactive_selection=False,
             on_click=lambda e: e.page.open(ft.DatePicker(on_change=self.__handle_start_date_change)))
 
         self.end_date = ft.TextField(
             expand=True,
             label="End Date",
-            hint_text="Select End Date",
-            show_cursor=False,
-            autofocus=False,
-            read_only=True,
+            size_constraints=ft.BoxConstraints(max_width=200, max_height=40),
+            can_request_focus=False,
             enable_interactive_selection=False,
             on_click=lambda e: e.page.open(ft.DatePicker(on_change=self.__handle_end_date_change)))
 
@@ -41,3 +37,14 @@ class DateTimeRange(ft.Row):
 
     def get_date_range(self):
         return self.start_date.value, self.end_date.value
+
+    def set_language(self):
+        session = self.page.session
+        self.start_date.label = session.get("lang.common.start_date")
+        self.end_date.label = session.get("lang.common.end_date")
+
+    def before_update(self):
+        self.set_language()
+
+    def did_mount(self):
+        self.set_language()

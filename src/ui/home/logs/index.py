@@ -6,12 +6,8 @@ from ui.home.logs.logs_event.log_event_list import LogEventList
 
 
 class Logs(ft.Container):
-    def __init__(self):
-        super().__init__()
-        self.content = self.__create()
-
-    def __create(self):
-        return ft.Tabs(
+    def build(self):
+        self.content = ft.Tabs(
             selected_index=0,
             tabs=[
                 ft.Tab(text="Breach Log", content=LogEventList()),
@@ -20,3 +16,15 @@ class Logs(ft.Container):
             ],
             expand=True
         )
+
+    def set_language(self):
+        session = self.page.session
+        self.content.tabs[0].text = session.get("lang.log.breach_log")
+        self.content.tabs[1].text = session.get("lang.log.data_log")
+        self.content.tabs[2].text = session.get("lang.log.gps_log")
+
+    def before_update(self):
+        self.set_language()
+
+    def did_mount(self):
+        self.set_language()

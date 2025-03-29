@@ -24,7 +24,7 @@ class ReportInfoTable(AbstractTable):
 
     @override
     def load_data(self):
-        query = ReportInfo.select(
+        data = ReportInfo.select(
             ReportInfo.id,
             ReportInfo.report_name,
             ReportInfo.created_at
@@ -34,18 +34,24 @@ class ReportInfoTable(AbstractTable):
         start_date = self.kwargs.get('start_date')
         end_date = self.kwargs.get('end_date')
 
-        if start_date and end_date:
-            query = query.where(
+        data = []
+        if start_date is not None and end_date is not None:
+            data = ReportInfo.select(
+                ReportInfo.id,
+                ReportInfo.report_name,
+                ReportInfo.created_at
+            ).where(
                 ReportInfo.created_at.between(start_date, end_date)
-            )
+            ).order_by(ReportInfo.id.desc()).paginate(self.current_page, self.page_size)
 
-        data = query.execute()
+        else:
+            data = ReportInfo.select(
+                ReportInfo.id,
+                ReportInfo.report_name,
+                ReportInfo.created_at
+            ).order_by(ReportInfo.id.desc()).paginate(self.current_page, self.page_size)
 
         return [[item.id, item.report_name, item.created_at] for item in data]
-
-    @override
-    def create_columns(self):
-        return ["No.", "Report Name", "Create At"]
 
     @override
     def has_operations(self):
@@ -83,3 +89,18 @@ class ReportInfoTable(AbstractTable):
         if e.path:
             ReportInfoExporter().generate_pdf(e.path)
             Toast.show_success(e.page, "export success")
+
+    @override
+    def create_columns(self):
+        return self.__get_language()
+
+    def __get_language(self):
+        session = self.page.session
+        return [
+            session.get("lang.common.no"),
+            session.get("lang.report.report_name"),
+            session.get("lang.common.created_at")
+        ]
+
+    def before_update(self):
+        self.update_columns(self.__get_language())
