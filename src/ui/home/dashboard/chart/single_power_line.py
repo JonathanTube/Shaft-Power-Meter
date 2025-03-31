@@ -1,5 +1,4 @@
 import flet as ft
-import numpy as np
 
 from db.models.data_log import DataLog
 from ui.common.simple_card import SimpleCard

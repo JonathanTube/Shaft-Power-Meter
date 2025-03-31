@@ -1,6 +1,5 @@
 import math
 import flet as ft
-import numpy as np
 
 
 class PropellerCurveChart(ft.Container):
