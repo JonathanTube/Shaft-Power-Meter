@@ -1,4 +1,5 @@
 import flet as ft
+from db.models.preference import Preference
 from ui.home.dashboard.sps_dual.off.dual_meters import DualMeters
 import asyncio
 from db.models.data_log import DataLog
@@ -56,21 +57,22 @@ class DualShaPoLiOff(ft.Container):
         self.torque_warning = 0
         self.display_thrust = False
 
-        limitations = Limitations.get_or_none()
+        limitations = Limitations.get()
 
-        if limitations:
-            self.speed_max = limitations.speed_max
-            self.speed_warning = limitations.speed_warning
+        self.speed_max = limitations.speed_max
+        self.speed_warning = limitations.speed_warning
 
-            self.power_max = limitations.power_max
-            self.power_warning = limitations.power_warning
+        self.power_max = limitations.power_max
+        self.power_warning = limitations.power_warning
 
-            self.torque_max = limitations.torque_max
-            self.torque_warning = limitations.torque_warning
+        self.torque_max = limitations.torque_max
+        self.torque_warning = limitations.torque_warning
 
-        system_settings = SystemSettings.get_or_none()
-        if system_settings:
-            self.display_thrust = system_settings.display_thrust
+        system_settings = SystemSettings.get()
+        self.display_thrust = system_settings.display_thrust
+
+        preference = Preference.get()
+        self.data_refresh_interval = preference.data_refresh_interval
 
     async def __load_data(self):
         while True:
@@ -108,4 +110,4 @@ class DualShaPoLiOff(ft.Container):
 
             self.dual_power_line.set_data(sps1_data_log, sps2_data_log)
 
-            await asyncio.sleep(1)
+            await asyncio.sleep(self.data_refresh_interval)

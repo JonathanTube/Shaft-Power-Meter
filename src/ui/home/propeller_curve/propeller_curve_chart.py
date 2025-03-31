@@ -123,19 +123,25 @@ class PropellerCurveChart(ft.Container):
 
         self.content = self.chart
 
-    def get_points(self, rpm_right, power_right, count=100):
-        if power_right == 0:
-            return [], []
+    def get_points(self, rpm_left, power_left, rpm_right, power_right, count=100):
+        rpm = np.linspace(start=rpm_left, stop=rpm_right, num=count)
 
-        k = power_right / rpm_right**3
+        # 如果左端点为0，0
+        if rpm_left == 0 and power_left == 0:
+            if power_right == 0:
+                return [], []
+            # 计算系数
+            k = power_right / rpm_right**3
+            # print('rpm=', rpm)
+            power = k * rpm**3
+            # 最后一位向上取整
+            power[-1] = math.ceil(power[-1])
 
-        rpm = np.linspace(start=0, stop=rpm_right, num=count)
-        # print('rpm=', rpm)
-        power = k * rpm**3
-        # 最后一位向上取整
-        power[-1] = math.ceil(power[-1])
-
-        return rpm, power
+            return rpm, power
+        else:
+            diff = (rpm - rpm_left) / (rpm_right - rpm_left)
+            power = power_left + diff ** 3 * (power_right - power_left)
+            return rpm, power
 
     def update_static_data(self, normal_rpm_left: float, normal_power_left: float,
                            normal_rpm_right: float, normal_power_right: float,
@@ -147,8 +153,12 @@ class PropellerCurveChart(ft.Container):
                            torque_load_limit_line_color: str,
                            overload: float, overload_line_color: str):
 
+        # 设置最小值, 如果左端点是0，就从0开始，否则从左端点*0.8开始
+        self.chart.min_x = 0 if normal_rpm_left == 0 else normal_rpm_left * 0.8
+        self.chart.min_y = 0 if normal_power_left == 0 else normal_power_left * 0.8
+
         rpm_points, power_points = self.get_points(
-            normal_rpm_right, normal_power_right
+            normal_rpm_left, normal_power_left, normal_rpm_right, normal_power_right
         )
         if len(rpm_points) == 0 or len(power_points) == 0:
             return
@@ -161,7 +171,7 @@ class PropellerCurveChart(ft.Container):
         ]
         self.chart.data_series[0].color = normal_line_color
 
-        # normal propeller curve key points
+        # normal propeller curve key points for check
         self.chart.data_series[1].data_points = [
             ft.LineChartDataPoint(normal_rpm_left, normal_power_left)
             # ft.LineChartDataPoint(normal_rpm_right, normal_power_right)

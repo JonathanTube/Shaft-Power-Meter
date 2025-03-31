@@ -1,13 +1,13 @@
-from peewee import CharField, FloatField, BooleanField, Check
+from peewee import CharField, FloatField, BooleanField, Check, IntegerField
 from ..base import BaseModel
 
 
 class PropellerSetting(BaseModel):
     # MCR operation point
-    rpm_of_mcr_operating_point = FloatField(
+    rpm_of_mcr_operating_point = IntegerField(
         constraints=[Check('rpm_of_mcr_operating_point >= 0')])
 
-    shaft_power_of_mcr_operating_point = FloatField(
+    shaft_power_of_mcr_operating_point = IntegerField(
         constraints=[Check('shaft_power_of_mcr_operating_point >= 0')])
 
     # Normal propeller curve

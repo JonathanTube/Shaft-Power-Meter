@@ -6,6 +6,7 @@ from ui.home.dashboard.sps_single.on.single_instant_grid import SingleInstantGri
 from db.models.propeller_setting import PropellerSetting
 from db.models.system_settings import SystemSettings
 from db.models.data_log import DataLog
+from db.models.preference import Preference
 import asyncio
 
 
@@ -67,15 +68,16 @@ class SingleShaPoLiOn(ft.Container):
         self.limited_power_warning = 0
         self.unlimited_power = 0
 
-        propeller_settings = PropellerSetting.get_or_none()
-        if propeller_settings is not None:
-            self.unlimited_power = propeller_settings.shaft_power_of_mcr_operating_point
+        propeller_settings = PropellerSetting.get()
+        self.unlimited_power = propeller_settings.shaft_power_of_mcr_operating_point
 
-        system_settings = SystemSettings.get_or_none()
-        if system_settings is not None:
-            self.limited_power_normal = system_settings.eexi_limited_power * 0.9
-            self.limited_power_warning = system_settings.eexi_limited_power
-            self.display_thrust = system_settings.display_thrust
+        system_settings = SystemSettings.get()
+        self.limited_power_normal = system_settings.eexi_limited_power * 0.9
+        self.limited_power_warning = system_settings.eexi_limited_power
+        self.display_thrust = system_settings.display_thrust
+
+        preference = Preference.get()
+        self.data_refresh_interval = preference.data_refresh_interval
 
     async def __load_data(self):
         while True:
@@ -97,7 +99,7 @@ class SingleShaPoLiOn(ft.Container):
                 )
                 self.power_line_chart.update(data_logs)
 
-            await asyncio.sleep(1)
+            await asyncio.sleep(self.data_refresh_interval)
 
     def set_language(self):
         session = self.page.session

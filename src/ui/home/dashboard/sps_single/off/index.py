@@ -2,6 +2,7 @@ import flet as ft
 from db.models.data_log import DataLog
 import asyncio
 from db.models.limitations import Limitations
+from db.models.preference import Preference
 from ui.home.dashboard.sps_single.off.single_meters import SingleMeters
 from ui.home.dashboard.chart.single_power_line import SinglePowerLine
 from ui.home.dashboard.thrust.thrust_power import ThrustPower
@@ -73,6 +74,9 @@ class SingleShaPoLiOff(ft.Stack):
         self.torque_max = limitations.torque_max
         self.torque_warning = limitations.torque_warning
 
+        preference = Preference.get()
+        self.data_refresh_interval = preference.data_refresh_interval
+
     async def __load_data(self):
         while True:
             data_logs = DataLog.select(
@@ -92,7 +96,7 @@ class SingleShaPoLiOff(ft.Stack):
                     self.display_thrust, data_logs[0].thrust)
                 self.power_line_chart.update(data_logs)
 
-            await asyncio.sleep(1)
+            await asyncio.sleep(self.data_refresh_interval)
 
     def set_language(self):
         session = self.page.session

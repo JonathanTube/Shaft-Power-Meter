@@ -7,7 +7,7 @@ from ui.home.dashboard.eexi.eexi_limited_power import EEXILimitedPower
 from db.models.propeller_setting import PropellerSetting
 from db.models.system_settings import SystemSettings
 from ui.home.dashboard.chart.single_power_line import SinglePowerLine
-
+from db.models.preference import Preference
 
 class DualShaPoLiOn(ft.Container):
     def __init__(self):
@@ -100,7 +100,7 @@ class DualShaPoLiOn(ft.Container):
             self.power_chart_sps1.update(sps1_data_logs)
             self.power_chart_sps2.update(sps2_data_logs)
 
-            await asyncio.sleep(1)
+            await asyncio.sleep(self.data_refresh_interval)
 
     def __load_config(self):
         self.display_thrust = False
@@ -108,18 +108,16 @@ class DualShaPoLiOn(ft.Container):
         self.limited_power_warning = 0
         self.unlimited_power = 0
 
-        propeller_settings = PropellerSetting.get_or_none()
-        if propeller_settings is None:
-            return
-
-        system_settings = SystemSettings.get_or_none()
-        if system_settings is None:
-            return
+        propeller_settings = PropellerSetting.get()
+        system_settings = SystemSettings.get()
 
         self.display_thrust = system_settings.display_thrust
         self.limited_power_normal = system_settings.eexi_limited_power * 0.9
         self.limited_power_warning = system_settings.eexi_limited_power
         self.unlimited_power = propeller_settings.shaft_power_of_mcr_operating_point
+
+        preference = Preference.get()
+        self.data_refresh_interval = preference.data_refresh_interval
 
     def did_mount(self):
         self.eexi_limited_power.set_config(

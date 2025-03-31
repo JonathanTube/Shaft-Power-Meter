@@ -64,6 +64,9 @@ class PropellerCurve(ft.Container):
                     self.propeller_setting.shaft_power_of_mcr_operating_point
                 ) * 100
 
+                # print('sps1_speed=', sps1_speed)
+                # print('sps1_power=', sps1_power)
+
                 self.chart.update_dynamic_data_sps1(sps1_speed, sps1_power)
 
             if data_log_sps2:

@@ -3,12 +3,19 @@ import random
 from datetime import datetime
 
 from db.models.data_log import DataLog
+from db.models.propeller_setting import PropellerSetting
 
 
 class DataLogger:
     def __init__(self):
         self.is_running = False
         self.update_interval = 1.0  # seconds
+        self.get_data()
+
+    def get_data(self):
+        propeller_setting = PropellerSetting.get()
+        self.max_speed = propeller_setting.rpm_of_mcr_operating_point
+        self.max_power = propeller_setting.shaft_power_of_mcr_operating_point
 
     async def start(self):
         self.is_running = True
@@ -28,8 +35,16 @@ class DataLogger:
                 name=name,
                 utc_date=datetime.now().date(),
                 utc_time=datetime.now().time(),
-                revolution=random.randint(100, 500),  # rpm
-                power=random.randint(500, 1000),  # W
+                # rpm
+                revolution=random.randint(
+                    int(self.max_speed * 0.7),
+                    self.max_speed
+                ),
+                # W
+                power=random.randint(
+                    int(self.max_power * 0.7),
+                    self.max_power
+                ),
                 thrust=random.randint(500, 1000),  # N
                 torque=random.randint(500, 1000)  # Nm
             )
