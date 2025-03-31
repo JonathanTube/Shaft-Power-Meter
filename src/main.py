@@ -32,6 +32,10 @@ def load_language(page: ft.Page, preference: Preference):
             page.session.set(item.code, item.chinese)
 
 
+def set_system_unit(page: ft.Page, preference: Preference):
+    page.session.set('system_unit', preference.system_unit)
+
+
 def start_loggers():
     gps_logger = GpsLogger()
     data_logger = DataLogger()
@@ -55,6 +59,7 @@ async def main(page: ft.Page):
     start_loggers()
 
     load_language(page, preference)
+    set_system_unit(page, preference)
 
     add_file_picker(page)
 

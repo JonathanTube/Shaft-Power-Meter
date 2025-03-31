@@ -52,12 +52,12 @@ class SingleInstantGrid(ft.Container):
         self.thrust_card.visible = False
         self.thrust_card.update()
 
-    def set_limit(self, limited_power: float, unlimited_power: float):
-        self.power_limited_card.set_value(limited_power)
-        self.power_unlimited_card.set_value(unlimited_power)
+    def set_limit(self, limited_power: float, unlimited_power: float, unit: int):
+        self.power_limited_card.set_value(limited_power, unit)
+        self.power_unlimited_card.set_value(unlimited_power, unit)
 
-    def set_data(self, power: float, thrust: float, torque: float, speed: float):
-        self.power_card.set_value(power)
-        self.thrust_card.set_value(thrust)
-        self.torque_card.set_value(torque)
+    def set_data(self, power: float, thrust: float, torque: float, speed: float, unit: int):
+        self.power_card.set_value(power, unit)
+        self.thrust_card.set_value(thrust, unit)
+        self.torque_card.set_value(torque, unit)
         self.speed_card.set_value(speed)

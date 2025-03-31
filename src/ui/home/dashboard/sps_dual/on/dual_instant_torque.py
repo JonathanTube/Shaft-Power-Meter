@@ -30,9 +30,9 @@ class DualInstantTorque(ft.Container):
 
         self.content = SimpleCard(title="Torque", body=content)
 
-    def set_data(self, torque_sps1_value: str, torque_sps2_value: str):
-        torque_sps1 = UnitParser.parse_torque(torque_sps1_value)
-        torque_sps2 = UnitParser.parse_torque(torque_sps2_value)
+    def set_data(self, torque_sps1_value: str, torque_sps2_value: str, unit: int):
+        torque_sps1 = UnitParser.parse_torque(torque_sps1_value, unit)
+        torque_sps2 = UnitParser.parse_torque(torque_sps2_value, unit)
 
         self.torque_sps1_value.value = torque_sps1[0]
         self.torque_sps1_unit.value = torque_sps1[1]
@@ -56,7 +56,7 @@ class DualInstantTorque(ft.Container):
             text_align=ft.TextAlign.RIGHT,
             weight=ft.FontWeight.W_500
         )
-        self.torque_sps1_unit = ft.Text('Nm', width=30,
+        self.torque_sps1_unit = ft.Text('Nm', width=40,
                                         text_align=ft.TextAlign.LEFT,
                                         size=self.font_size_of_unit,
                                         weight=ft.FontWeight.W_500
@@ -83,7 +83,7 @@ class DualInstantTorque(ft.Container):
             text_align=ft.TextAlign.END,
             weight=ft.FontWeight.W_500
         )
-        self.torque_sps2_unit = ft.Text('Nm', width=30,
+        self.torque_sps2_unit = ft.Text('Nm', width=40,
                                         text_align=ft.TextAlign.LEFT,
                                         size=self.font_size_of_unit,
                                         weight=ft.FontWeight.W_500

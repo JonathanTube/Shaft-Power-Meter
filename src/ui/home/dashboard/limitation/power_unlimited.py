@@ -28,8 +28,8 @@ class PowerUnlimited(ft.Card):
                 ]
             ))
 
-    def set_value(self, value: float):
-        unlimited_power = UnitParser.parse_power(value)
+    def set_value(self, value: float, unit: int):
+        unlimited_power = UnitParser.parse_power(value, unit)
         self.unlimited_power_value.value = unlimited_power[0]
         self.unlimited_power_unit.value = unlimited_power[1]
         self.content.update()

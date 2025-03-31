@@ -38,14 +38,14 @@ class DualInstantGrid(ft.Container):
             controls=controls
         )
 
-    def set_power_values(self, power_sps1_value: float, power_sps2_value: float):
-        self.dual_instant_power.set_data(power_sps1_value, power_sps2_value)
+    def set_power_values(self, power_sps1_value: float, power_sps2_value: float, unit: int):
+        self.dual_instant_power.set_data(power_sps1_value, power_sps2_value, unit)
 
     def set_speed_values(self, speed_sps1_value: float, speed_sps2_value: float):
         self.dual_instant_speed.set_data(speed_sps1_value, speed_sps2_value)
 
-    def set_torque_values(self, torque_sps1_value: float, torque_sps2_value: float):
-        self.dual_instant_torque.set_data(torque_sps1_value, torque_sps2_value)
+    def set_torque_values(self, torque_sps1_value: float, torque_sps2_value: float, unit: int):
+        self.dual_instant_torque.set_data(torque_sps1_value, torque_sps2_value, unit)
 
-    def set_thrust_values(self, thrust_sps1_value: float, thrust_sps2_value: float):
-        self.dual_instant_thrust.set_data(thrust_sps1_value, thrust_sps2_value)
+    def set_thrust_values(self, thrust_sps1_value: float, thrust_sps2_value: float, unit: int):
+        self.dual_instant_thrust.set_data(thrust_sps1_value, thrust_sps2_value, unit)

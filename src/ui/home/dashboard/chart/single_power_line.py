@@ -2,19 +2,24 @@ import flet as ft
 
 from db.models.data_log import DataLog
 from ui.common.simple_card import SimpleCard
+from utils.unit_parser import UnitParser
 
 
 class SinglePowerLine(ft.Container):
-    def __init__(self, name: str = "Power", max_y: int = 0, sha_po_li: bool = False, threshold: float = 0):
+    def __init__(self, name: str = "Power", max_y: int = 0, sha_po_li: bool = False, threshold: float = 0, unit: int = 0):
         super().__init__()
 
         self.expand = True
 
+        self.unit = unit
+
         self.name = name
-        self.max_y = max_y
+        _power_and_unit = UnitParser.parse_power(max_y, unit)
+        self.max_y = _power_and_unit[0]
+        self.unit_name = _power_and_unit[1]
 
         self.sha_po_li = sha_po_li
-        self.threshold = threshold
+        self.threshold = UnitParser.parse_power(threshold, unit)[0]
 
         self.data_list = []
 
@@ -99,7 +104,8 @@ class SinglePowerLine(ft.Container):
     def __handle_data_line(self, data_list: list[DataLog]):
         data_points = []
         for index, item in enumerate(data_list):
-            data_points.append(ft.LineChartDataPoint(index, item.power))
+            _power = UnitParser.parse_power(item.power, self.unit)
+            data_points.append(ft.LineChartDataPoint(index, _power[0]))
 
         self.data_line.data_points = data_points
 
@@ -111,4 +117,4 @@ class SinglePowerLine(ft.Container):
         return data_points
 
     def set_name(self, name: str):
-        self.name = name
+        self.name = f"{name} ({self.unit_name})"

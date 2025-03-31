@@ -2,13 +2,15 @@ import flet as ft
 
 from db.models.data_log import DataLog
 from ui.common.simple_card import SimpleCard
+from utils.unit_parser import UnitParser
 
 
 class DualPowerLine(ft.Container):
-    def __init__(self, max_y: int = 0):
+    def __init__(self, max_y: int = 0, unit: int = 0):
         super().__init__()
-        self.max_y = max_y
-        self.unit = ""
+
+        self.max_y = UnitParser.parse_power(max_y, unit)[0]
+        self.unit = unit
 
         self.sps1_color = ft.Colors.ORANGE
         self.sps2_color = ft.Colors.BLUE
@@ -77,6 +79,7 @@ class DualPowerLine(ft.Container):
                 ft.ChartAxisLabel(value=0),
                 ft.ChartAxisLabel(value=self.max_y)
             ]),
+            right_axis=ft.ChartAxis(labels_size=50),
             bottom_axis=ft.ChartAxis(
                 labels_size=30, labels=[], visible=False, labels_interval=10),
             data_series=[self.sps1_data_series, self.sps2_data_series]
@@ -91,8 +94,9 @@ class DualPowerLine(ft.Container):
                 ft.Text("SPS1", color=self.sps1_color),
                 ft.Text("SPS2", color=self.sps2_color)
             ])
-        self.content = SimpleCard(body=ft.Column(
-            controls=[chart_top, self.chart]))
+        self.content = SimpleCard(
+            body=ft.Column(controls=[chart_top, self.chart])
+        )
 
     def set_data(self, data_list_sps1: list[DataLog], data_list_sps2: list[DataLog]):
         self.__handle_bottom_axis(data_list_sps1)
@@ -118,14 +122,16 @@ class DualPowerLine(ft.Container):
     def __handle_data_line_sps1(self, data_list: list[DataLog]):
         data_points = []
         for index, item in enumerate(data_list):
-            data_points.append(ft.LineChartDataPoint(index, item.power))
+            _power = UnitParser.parse_power(item.power, self.unit)
+            data_points.append(ft.LineChartDataPoint(index, _power[0]))
 
         self.sps1_data_series.data_points = data_points
 
     def __handle_data_line_sps2(self, data_list: list[DataLog]):
         data_points = []
         for index, item in enumerate(data_list):
-            data_points.append(ft.LineChartDataPoint(index, item.power))
+            _power = UnitParser.parse_power(item.power, self.unit)
+            data_points.append(ft.LineChartDataPoint(index, _power[0]))
 
         self.sps2_data_series.data_points = data_points
 

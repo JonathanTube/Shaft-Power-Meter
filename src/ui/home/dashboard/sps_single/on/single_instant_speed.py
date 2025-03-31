@@ -12,7 +12,7 @@ class SingleInstantSpeed(ft.Container):
         self.speed_value = ft.Text(
             '0', size=18, width=80, text_align=ft.TextAlign.RIGHT)
         self.speed_unit = ft.Text(
-            'RPM', size=18, width=40, text_align=ft.TextAlign.LEFT)
+            'RPM', size=18, width=50, text_align=ft.TextAlign.LEFT)
         self.content = SimpleCard(
             title="Speed",
             body=ft.Row(

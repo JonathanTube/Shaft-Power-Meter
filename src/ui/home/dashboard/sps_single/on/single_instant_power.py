@@ -15,7 +15,7 @@ class SingleInstantPower(ft.Container):
             text_align=ft.TextAlign.RIGHT
         )
         self.power_unit = ft.Text(
-            value='W', size=18, width=40,
+            value='W', size=18, width=50,
             text_align=ft.TextAlign.LEFT
         )
 
@@ -27,8 +27,8 @@ class SingleInstantPower(ft.Container):
             )
         )
 
-    def set_value(self, value: float):
-        power = UnitParser.parse_power(value)
+    def set_value(self, value: float, unit: int):
+        power = UnitParser.parse_power(value, unit)
         self.power_value.value = power[0]
         self.power_unit.value = power[1]
         self.content.update()

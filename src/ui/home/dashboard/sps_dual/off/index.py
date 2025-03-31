@@ -18,7 +18,7 @@ class DualShaPoLiOff(ft.Container):
     def build(self):
         self.sps1_meters = DualMeters(name="SPS1")
         self.sps2_meters = DualMeters(name="SPS2")
-        self.dual_power_line = DualPowerLine(max_y=self.power_max)
+        self.dual_power_line = DualPowerLine(max_y=self.power_max, unit=self.system_unit)
 
         self.content = ft.Column(
             expand=True,
@@ -34,12 +34,12 @@ class DualShaPoLiOff(ft.Container):
         )
 
     def did_mount(self):
-        self.sps1_meters.set_power_limit(self.power_max, self.power_warning)
-        self.sps1_meters.set_torque_limit(self.torque_max, self.torque_warning)
+        self.sps1_meters.set_power_limit(self.power_max, self.power_warning, self.system_unit)
+        self.sps1_meters.set_torque_limit(self.torque_max, self.torque_warning, self.system_unit)
         self.sps1_meters.set_speed_limit(self.speed_max, self.speed_warning)
 
-        self.sps2_meters.set_power_limit(self.power_max, self.power_warning)
-        self.sps2_meters.set_torque_limit(self.torque_max, self.torque_warning)
+        self.sps2_meters.set_power_limit(self.power_max, self.power_warning, self.system_unit)
+        self.sps2_meters.set_torque_limit(self.torque_max, self.torque_warning, self.system_unit)
         self.sps2_meters.set_speed_limit(self.speed_max, self.speed_warning)
 
         self._task = self.page.run_task(self.__load_data)
@@ -73,6 +73,7 @@ class DualShaPoLiOff(ft.Container):
 
         preference = Preference.get()
         self.data_refresh_interval = preference.data_refresh_interval
+        self.system_unit = preference.system_unit
 
     async def __load_data(self):
         while True:
@@ -92,20 +93,22 @@ class DualShaPoLiOff(ft.Container):
                 DataLog.thrust
             ).where(DataLog.name == 'SPS2').order_by(DataLog.id.desc()).limit(100)
 
-            self.sps1_meters.set_power(sps1_data_log[0].power)
-            self.sps1_meters.set_torque(sps1_data_log[0].torque)
+            self.sps1_meters.set_power(sps1_data_log[0].power, self.system_unit)
+            self.sps1_meters.set_torque(sps1_data_log[0].torque, self.system_unit)
             self.sps1_meters.set_speed(sps1_data_log[0].revolution)
             self.sps1_meters.set_thrust(
                 self.display_thrust,
-                sps1_data_log[0].thrust
+                sps1_data_log[0].thrust,
+                self.system_unit
             )
 
-            self.sps2_meters.set_power(sps2_data_log[0].power)
-            self.sps2_meters.set_torque(sps2_data_log[0].torque)
+            self.sps2_meters.set_power(sps2_data_log[0].power, self.system_unit)
+            self.sps2_meters.set_torque(sps2_data_log[0].torque, self.system_unit)
             self.sps2_meters.set_speed(sps2_data_log[0].revolution)
             self.sps2_meters.set_thrust(
                 self.display_thrust,
-                sps2_data_log[0].thrust
+                sps2_data_log[0].thrust,
+                self.system_unit
             )
 
             self.dual_power_line.set_data(sps1_data_log, sps2_data_log)

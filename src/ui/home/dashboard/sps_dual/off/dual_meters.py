@@ -60,26 +60,26 @@ class DualMeters(ft.Container):
             ]
         )
 
-    def set_power_limit(self, power_max: float, power_warning: float):
-        self.power_meter.set_limit(power_max, power_warning)
+    def set_power_limit(self, power_max: float, power_warning: float, unit: int):
+        self.power_meter.set_limit(power_max, power_warning, unit)
 
-    def set_torque_limit(self, torque_max: float, torque_warning: float):
-        self.torque_meter.set_limit(torque_max, torque_warning)
+    def set_torque_limit(self, torque_max: float, torque_warning: float, unit: int):
+        self.torque_meter.set_limit(torque_max, torque_warning, unit)
 
     def set_speed_limit(self, speed_max: float, speed_warning: float):
         self.speed_meter.set_limit(speed_max, speed_warning)
 
-    def set_power(self, power: float):
-        self.power_meter.set_data(power)
+    def set_power(self, power: float, unit: int):
+        self.power_meter.set_data(power, unit)
 
-    def set_torque(self, torque: float):
-        self.torque_meter.set_data(torque)
+    def set_torque(self, torque: float, unit: int):
+        self.torque_meter.set_data(torque, unit)
 
     def set_speed(self, speed: float):
         self.speed_meter.set_data(speed)
 
-    def set_thrust(self, visible: bool, thrust: float):
-        self.thrust_meter.set_data(visible, thrust)
+    def set_thrust(self, visible: bool, thrust: float, unit: int):
+        self.thrust_meter.set_data(visible, thrust, unit)
 
     def did_mount(self):
         self.set_language()

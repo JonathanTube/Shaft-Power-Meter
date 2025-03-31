@@ -21,10 +21,10 @@ class ThrustPower(ft.Container):
             expand=True
         )
 
-    def set_data(self, visible: bool, value: float):
+    def set_data(self, visible: bool, value: float, unit: int):
         self.content.visible = visible
         if visible:
-            thrust_and_unit = UnitParser.parse_power(value)
+            thrust_and_unit = UnitParser.parse_power(value, unit)
             self.thrust_value.value = thrust_and_unit[0]
             self.thrust_unit.value = thrust_and_unit[1]
         self.content.update()

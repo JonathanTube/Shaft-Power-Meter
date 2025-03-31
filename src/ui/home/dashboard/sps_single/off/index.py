@@ -20,7 +20,7 @@ class SingleShaPoLiOff(ft.Stack):
 
         self.single_meters = SingleMeters()
 
-        self.power_line_chart = SinglePowerLine(max_y=self.speed_max)
+        self.power_line_chart = SinglePowerLine(max_y=self.speed_max, unit=self.system_unit)
 
         self.controls = [
             self.thrust_power,
@@ -37,10 +37,10 @@ class SingleShaPoLiOff(ft.Stack):
 
     def did_mount(self):
         self.single_meters.set_power_limit(
-            self.power_max, self.power_warning
+            self.power_max, self.power_warning, self.system_unit
         )
         self.single_meters.set_torque_limit(
-            self.torque_max, self.torque_warning
+            self.torque_max, self.torque_warning, self.system_unit
         )
         self.single_meters.set_speed_limit(
             self.speed_max, self.speed_warning
@@ -76,6 +76,7 @@ class SingleShaPoLiOff(ft.Stack):
 
         preference = Preference.get()
         self.data_refresh_interval = preference.data_refresh_interval
+        self.system_unit = preference.system_unit
 
     async def __load_data(self):
         while True:
@@ -90,10 +91,9 @@ class SingleShaPoLiOff(ft.Stack):
 
             if len(data_logs) > 0:
                 self.single_meters.set_data(
-                    data_logs[0].revolution, data_logs[0].power, data_logs[0].torque
+                    data_logs[0].revolution, data_logs[0].power, data_logs[0].torque, self.system_unit
                 )
-                self.thrust_power.set_data(
-                    self.display_thrust, data_logs[0].thrust)
+                self.thrust_power.set_data(self.display_thrust, data_logs[0].thrust, self.system_unit)
                 self.power_line_chart.update(data_logs)
 
             await asyncio.sleep(self.data_refresh_interval)

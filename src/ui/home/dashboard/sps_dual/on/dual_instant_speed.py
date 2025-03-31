@@ -53,7 +53,7 @@ class DualInstantSpeed(ft.Container):
             text_align=ft.TextAlign.RIGHT,
             weight=ft.FontWeight.W_500
         )
-        self.speed_sps1_unit = ft.Text('rpm', width=30,
+        self.speed_sps1_unit = ft.Text('rpm', width=40,
                                        text_align=ft.TextAlign.LEFT,
                                        size=self.font_size_of_unit,
                                        weight=ft.FontWeight.W_500
@@ -80,7 +80,7 @@ class DualInstantSpeed(ft.Container):
             text_align=ft.TextAlign.END,
             weight=ft.FontWeight.W_500
         )
-        self.speed_sps2_unit = ft.Text('rpm', width=30,
+        self.speed_sps2_unit = ft.Text('rpm', width=40,
                                        text_align=ft.TextAlign.LEFT,
                                        size=self.font_size_of_unit,
                                        weight=ft.FontWeight.W_500

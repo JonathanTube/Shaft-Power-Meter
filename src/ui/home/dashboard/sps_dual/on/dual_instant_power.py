@@ -30,11 +30,11 @@ class DualInstantPower(ft.Container):
         )
         self.content = SimpleCard(title="Power", body=content)
 
-    def set_data(self, power_sps1_value: float, power_sps2_value: float):
-        power_sps1 = UnitParser.parse_power(power_sps1_value)
-        power_sps2 = UnitParser.parse_power(power_sps2_value)
+    def set_data(self, power_sps1_value: float, power_sps2_value: float, unit: int):
+        power_sps1 = UnitParser.parse_power(power_sps1_value, unit)
+        power_sps2 = UnitParser.parse_power(power_sps2_value, unit)
         power_total = UnitParser.parse_power(
-            power_sps1_value + power_sps2_value)
+            power_sps1_value + power_sps2_value, unit)
 
         self.power_sps1_value.value = power_sps1[0]
         self.power_sps1_unit.value = power_sps1[1]
@@ -61,7 +61,7 @@ class DualInstantPower(ft.Container):
             text_align=ft.TextAlign.RIGHT,
             weight=ft.FontWeight.W_500
         )
-        self.power_sps1_unit = ft.Text('W', width=30,
+        self.power_sps1_unit = ft.Text('W', width=40,
                                        text_align=ft.TextAlign.LEFT,
                                        size=self.font_size_of_unit,
                                        weight=ft.FontWeight.W_500
@@ -89,7 +89,7 @@ class DualInstantPower(ft.Container):
             text_align=ft.TextAlign.END,
             weight=ft.FontWeight.W_500
         )
-        self.power_sps2_unit = ft.Text('W', width=30,
+        self.power_sps2_unit = ft.Text('W', width=40,
                                        text_align=ft.TextAlign.LEFT,
                                        size=self.font_size_of_unit,
                                        weight=ft.FontWeight.W_500
@@ -116,7 +116,7 @@ class DualInstantPower(ft.Container):
             text_align=ft.TextAlign.END,
             weight=ft.FontWeight.W_500
         )
-        self.power_total_unit = ft.Text('W', width=30,
+        self.power_total_unit = ft.Text('W', width=40,
                                         text_align=ft.TextAlign.LEFT,
                                         size=self.font_size_of_unit,
                                         weight=ft.FontWeight.W_500

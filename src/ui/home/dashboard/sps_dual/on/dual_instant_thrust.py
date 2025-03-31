@@ -27,9 +27,9 @@ class DualInstantThrust(ft.Container):
 
         self.content = SimpleCard(title="Thrust", body=content)
 
-    def set_data(self, thrust_sps1_value: float, thrust_sps2_value: float):
-        thrust_sps1 = UnitParser.parse_thrust(thrust_sps1_value)
-        thrust_sps2 = UnitParser.parse_thrust(thrust_sps2_value)
+    def set_data(self, thrust_sps1_value: float, thrust_sps2_value: float, unit: int):
+        thrust_sps1 = UnitParser.parse_thrust(thrust_sps1_value, unit)
+        thrust_sps2 = UnitParser.parse_thrust(thrust_sps2_value, unit)
 
         self.thrust_sps1_value.value = thrust_sps1[0]
         self.thrust_sps1_unit.value = thrust_sps1[1]
@@ -53,7 +53,7 @@ class DualInstantThrust(ft.Container):
             text_align=ft.TextAlign.RIGHT,
             weight=ft.FontWeight.W_500
         )
-        self.thrust_sps1_unit = ft.Text('kN', width=30,
+        self.thrust_sps1_unit = ft.Text('kN', width=40,
                                         text_align=ft.TextAlign.LEFT,
                                         size=self.font_size_of_unit,
                                         weight=ft.FontWeight.W_500
@@ -81,7 +81,7 @@ class DualInstantThrust(ft.Container):
             text_align=ft.TextAlign.END,
             weight=ft.FontWeight.W_500
         )
-        self.thrust_sps2_unit = ft.Text('kN', width=30,
+        self.thrust_sps2_unit = ft.Text('kN', width=40,
                                         text_align=ft.TextAlign.LEFT,
                                         size=self.font_size_of_unit,
                                         weight=ft.FontWeight.W_500

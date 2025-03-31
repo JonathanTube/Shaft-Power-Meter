@@ -26,8 +26,8 @@ class PowerLimited(ft.Card):
                 ]
             ))
 
-    def set_value(self, value: float):
-        limited_power = UnitParser.parse_power(value)
+    def set_value(self, value: float, unit: int):
+        limited_power = UnitParser.parse_power(value, unit)
         self.limited_power_value.value = limited_power[0]
         self.limited_power_unit.value = limited_power[1]
         self.content.update()

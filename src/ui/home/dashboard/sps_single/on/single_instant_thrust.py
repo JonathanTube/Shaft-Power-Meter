@@ -12,7 +12,7 @@ class SingleInstantThrust(ft.Container):
         self.thrust_value = ft.Text(
             '0', size=18, width=80, text_align=ft.TextAlign.RIGHT)
         self.thrust_unit = ft.Text(
-            'N', size=18, width=40, text_align=ft.TextAlign.LEFT)
+            'N', size=18, width=50, text_align=ft.TextAlign.LEFT)
         self.content = SimpleCard(
             title="Thrust",
             body=ft.Row(
@@ -21,8 +21,8 @@ class SingleInstantThrust(ft.Container):
             )
         )
 
-    def set_value(self, value: float):
-        thrust = UnitParser.parse_thrust(value)
+    def set_value(self, value: float, unit: int):
+        thrust = UnitParser.parse_thrust(value, unit)
         self.thrust_value.value = thrust[0]
         self.thrust_unit.value = thrust[1]
         self.content.update()

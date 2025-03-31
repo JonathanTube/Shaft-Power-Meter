@@ -15,14 +15,14 @@ class TorqueMeter(ft.Container):
         )
         self.content = self.torque
 
-    def set_limit(self, max: float, limit: float):
-        self.torque.set_limitation(max, limit)
+    def set_limit(self, max: float, limit: float, unit: int):
+        _max = UnitParser.parse_torque(max, unit)
+        _limit = UnitParser.parse_torque(limit, unit)
+        self.torque.set_limitation(_max[0], _limit[0])
 
-    def set_data(self, value: float):
-        torque_and_unit = UnitParser.parse_torque(value)
-        torque = torque_and_unit[0]
-        unit = torque_and_unit[1]
-        self.torque.set_data(torque, unit)
+    def set_data(self, value: float, unit: int):
+        torque_and_unit = UnitParser.parse_torque(value, unit)
+        self.torque.set_data(torque_and_unit[0], torque_and_unit[1])
 
     def set_language(self):
         session = self.page.session

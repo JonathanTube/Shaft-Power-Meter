@@ -9,6 +9,7 @@ from db.models.system_settings import SystemSettings
 from ui.home.dashboard.chart.single_power_line import SinglePowerLine
 from db.models.preference import Preference
 
+
 class DualShaPoLiOn(ft.Container):
     def __init__(self):
         super().__init__()
@@ -26,14 +27,16 @@ class DualShaPoLiOn(ft.Container):
             name="SPS1",
             max_y=self.unlimited_power,
             sha_po_li=True,
-            threshold=self.limited_power_warning
+            threshold=self.limited_power_warning,
+            unit=self.system_unit
         )
 
         self.power_chart_sps2 = SinglePowerLine(
             name="SPS2",
             max_y=self.unlimited_power,
             sha_po_li=True,
-            threshold=self.limited_power_warning
+            threshold=self.limited_power_warning,
+            unit=self.system_unit
         )
 
         self.content = ft.Column(
@@ -78,7 +81,7 @@ class DualShaPoLiOn(ft.Container):
             ).order_by(DataLog.id.desc()).limit(50)
 
             self.instant_grid.set_power_values(
-                sps1_data_logs[0].power, sps2_data_logs[0].power
+                sps1_data_logs[0].power, sps2_data_logs[0].power, self.system_unit
             )
 
             self.instant_grid.set_speed_values(
@@ -86,11 +89,11 @@ class DualShaPoLiOn(ft.Container):
             )
 
             self.instant_grid.set_torque_values(
-                sps1_data_logs[0].torque, sps2_data_logs[0].torque
+                sps1_data_logs[0].torque, sps2_data_logs[0].torque, self.system_unit
             )
 
             self.instant_grid.set_thrust_values(
-                sps1_data_logs[0].thrust, sps2_data_logs[0].thrust
+                sps1_data_logs[0].thrust, sps2_data_logs[0].thrust, self.system_unit
             )
 
             self.eexi_limited_power.set_value(
@@ -118,6 +121,7 @@ class DualShaPoLiOn(ft.Container):
 
         preference = Preference.get()
         self.data_refresh_interval = preference.data_refresh_interval
+        self.system_unit = preference.system_unit
 
     def did_mount(self):
         self.eexi_limited_power.set_config(
@@ -135,7 +139,8 @@ class DualShaPoLiOn(ft.Container):
     def before_update(self):
         self.set_language()
 
-
     def set_language(self):
-        self.power_chart_sps1.set_name(self.page.session.get("lang.common.sps1"))
-        self.power_chart_sps2.set_name(self.page.session.get("lang.common.sps2"))
+        self.power_chart_sps1.set_name(
+            self.page.session.get("lang.common.sps1"))
+        self.power_chart_sps2.set_name(
+            self.page.session.get("lang.common.sps2"))

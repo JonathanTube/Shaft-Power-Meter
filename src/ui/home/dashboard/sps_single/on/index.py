@@ -25,7 +25,8 @@ class SingleShaPoLiOn(ft.Container):
         self.power_line_chart = SinglePowerLine(
             max_y=self.unlimited_power,
             sha_po_li=True,
-            threshold=self.limited_power_warning
+            threshold=self.limited_power_warning,
+            unit=self.system_unit
         )
         self.content = ft.Column(
             controls=[
@@ -53,7 +54,8 @@ class SingleShaPoLiOn(ft.Container):
         )
         self.instant_value_grid.set_limit(
             self.limited_power_warning,
-            self.unlimited_power
+            self.unlimited_power,
+            self.system_unit
         )
         self.set_language()
         self._task = self.page.run_task(self.__load_data)
@@ -67,6 +69,7 @@ class SingleShaPoLiOn(ft.Container):
         self.limited_power_normal = 0
         self.limited_power_warning = 0
         self.unlimited_power = 0
+        self.system_unit = 0
 
         propeller_settings = PropellerSetting.get()
         self.unlimited_power = propeller_settings.shaft_power_of_mcr_operating_point
@@ -78,6 +81,7 @@ class SingleShaPoLiOn(ft.Container):
 
         preference = Preference.get()
         self.data_refresh_interval = preference.data_refresh_interval
+        self.system_unit = preference.system_unit
 
     async def __load_data(self):
         while True:
@@ -95,7 +99,8 @@ class SingleShaPoLiOn(ft.Container):
                     data_logs[0].power,
                     data_logs[0].thrust,
                     data_logs[0].torque,
-                    data_logs[0].revolution
+                    data_logs[0].revolution,
+                    self.system_unit
                 )
                 self.power_line_chart.update(data_logs)
 

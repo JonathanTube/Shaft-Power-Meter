@@ -14,7 +14,7 @@ class SingleInstantTorque(ft.Container):
         )
 
         self.torque_unit = ft.Text(
-            'Nm', size=18, width=40, text_align=ft.TextAlign.LEFT
+            'Nm', size=18, width=50, text_align=ft.TextAlign.LEFT
         )
         self.content = SimpleCard(
             title="Torque",
@@ -24,8 +24,8 @@ class SingleInstantTorque(ft.Container):
             )
         )
 
-    def set_value(self, value: float):
-        torque = UnitParser.parse_torque(value)
+    def set_value(self, value: float, unit: int):
+        torque = UnitParser.parse_torque(value, unit)
         self.torque_value.value = torque[0]
         self.torque_unit.value = torque[1]
         self.content.update()
