@@ -1,9 +1,11 @@
 import flet as ft
 
+from db.models.preference import Preference
 from db.models.propeller_setting import PropellerSetting
 from ui.common.color_picker import ColorDialog
 from ui.common.custom_card import CustomCard
 from ui.common.toast import Toast
+from utils.unit_converter import UnitConverter
 
 
 class PropellerConf(ft.Column):
@@ -13,7 +15,16 @@ class PropellerConf(ft.Column):
         self.alignment = ft.MainAxisAlignment.START
         # 这里有bug，如果添加了，外部页面就会居中
         self.scroll = ft.ScrollMode.ADAPTIVE
+
+        self.system_unit = Preference.get().system_unit
         self.last_propeller_setting = PropellerSetting.get()
+
+    def __get_shaft_power(self) -> tuple[float, str]:
+        _shaft_power = self.last_propeller_setting.shaft_power_of_mcr_operating_point
+        if self.system_unit == 0:
+            return (_shaft_power / 1000, "kW")
+        else:
+            return (UnitConverter.w_to_hp(_shaft_power), "hp")
 
     def __create_mcr_operating_point(self):
         self.rpm_of_mcr_operating_point = ft.TextField(
@@ -25,11 +36,12 @@ class PropellerConf(ft.Column):
                 self.last_propeller_setting, 'rpm_of_mcr_operating_point', e.control.value)
         )
 
+        shaft_power_value, shaft_power_unit = self.__get_shaft_power()
         self.shaft_power_of_mcr_operating_point = ft.TextField(
             label="Shaft Power",
-            suffix_text='[kW]',
             col={"md": 6},
-            value=self.last_propeller_setting.shaft_power_of_mcr_operating_point,
+            value=shaft_power_value,
+            suffix_text=shaft_power_unit,
             on_change=lambda e: setattr(
                 self.last_propeller_setting, 'shaft_power_of_mcr_operating_point', e.control.value)
         )
@@ -214,6 +226,12 @@ class PropellerConf(ft.Column):
             col={"md": 6})
 
     def __save_data(self, e):
+        _shaft_power = float(self.shaft_power_of_mcr_operating_point.value)
+        if self.system_unit == 0:
+            self.last_propeller_setting.shaft_power_of_mcr_operating_point = _shaft_power * 1000
+        else:
+            self.last_propeller_setting.shaft_power_of_mcr_operating_point = UnitConverter.hp_to_w(
+                _shaft_power)
         self.last_propeller_setting.save()
         Toast.show_success(e.page)
 
@@ -222,7 +240,9 @@ class PropellerConf(ft.Column):
             PropellerSetting.id.desc()).first()
 
         self.rpm_of_mcr_operating_point.value = self.last_propeller_setting.rpm_of_mcr_operating_point
-        self.shaft_power_of_mcr_operating_point.value = self.last_propeller_setting.shaft_power_of_mcr_operating_point
+        shaft_power_value, shaft_power_unit = self.__get_shaft_power()
+        self.shaft_power_of_mcr_operating_point.value = shaft_power_value
+        self.shaft_power_of_mcr_operating_point.suffix_text = shaft_power_unit
         self.mcr_operating_point_card.update()
 
         self.rpm_left_of_normal_propeller_curve.value = self.last_propeller_setting.rpm_left_of_normal_propeller_curve

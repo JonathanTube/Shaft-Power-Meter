@@ -1,9 +1,17 @@
+import math
+
+
 class UnitConverter:
     # https://www.unitconverters.net/power/watts-to-hp.htm
     @staticmethod
     def w_to_hp(value):
         # 1 W = 0.0013596216 hp
-        return value * 0.0013596216
+        return round(value * 0.0013596216, 2)
+
+    @staticmethod
+    def hp_to_w(value):
+        # 1 hp = 735.4987593 W
+        return math.ceil(value * 735.4987593)
 
     # https://www.unitconverters.net/torque/newton-meter-to-gram-force-meter.htm
     # gfm = gram-force meter

@@ -1,15 +1,19 @@
 import flet as ft
 
 from db.models.factor_conf import FactorConf
+from db.models.preference import Preference
+from db.models.propeller_setting import PropellerSetting
 from db.models.ship_info import ShipInfo
 from db.models.system_settings import SystemSettings
 from ui.common.custom_card import CustomCard
 from ui.common.toast import Toast
+from utils.unit_converter import UnitConverter
 
 
 class SystemConf(ft.Container):
     def __init__(self):
         super().__init__()
+        self.__load_config()
         self.__load_data()
 
     def build(self):
@@ -50,6 +54,13 @@ class SystemConf(ft.Container):
                 )
             ])
 
+    def __get_eexi_limited_power(self) -> tuple[float, str]:
+        _eexi_limited_power = self.last_system_settings.eexi_limited_power
+        if self.system_unit == 0:
+            return (_eexi_limited_power / 1000, "kW")
+        else:
+            return (UnitConverter.w_to_hp(_eexi_limited_power), "hp")
+
     def __create_settings_card(self):
         self.display_thrust = ft.Switch(
             col={"md": 6}, label="Display Thrust",
@@ -79,10 +90,12 @@ class SystemConf(ft.Container):
                 self.last_system_settings, 'amount_of_propeller', e.control.value)
         )
 
+        eexi_limited_power_value, eexi_limited_power_unit = self.__get_eexi_limited_power()
         self.eexi_limited_power = ft.TextField(
             col={"md": 6},
             label="EEXI Limited Power",
-            value=self.last_system_settings.eexi_limited_power,
+            value=eexi_limited_power_value,
+            suffix_text=eexi_limited_power_unit,
             on_change=lambda e: setattr(
                 self.last_system_settings, 'eexi_limited_power', e.control.value)
         )
@@ -204,6 +217,20 @@ class SystemConf(ft.Container):
         )
 
     def __save_data(self, e):
+        _power = float(self.last_system_settings.eexi_limited_power)
+        # 如果系统单位是SI(kW)，则将eexi_limited_power转换为w
+        if self.system_unit == 0:
+            self.last_system_settings.eexi_limited_power = _power * 1000
+        else:
+            self.last_system_settings.eexi_limited_power = UnitConverter.hp_to_w(
+                _power)
+
+        if self.last_system_settings.eexi_limited_power > self.last_propeller_setting.shaft_power_of_mcr_operating_point:
+            Toast.show_error(
+                e.page, "EEXI Limited Power must be less than Shaft Power of MCR Operating Point"
+            )
+            return
+
         self.last_system_settings.save()
         self.last_ship_info.save()
         self.last_factor_conf.save()
@@ -216,7 +243,9 @@ class SystemConf(ft.Container):
         self.display_thrust.value = self.last_system_settings.display_thrust
         self.sha_po_li.value = self.last_system_settings.sha_po_li
         self.amount_of_propeller_radios.value = self.last_system_settings.amount_of_propeller
-        self.eexi_limited_power.value = self.last_system_settings.eexi_limited_power
+        eexi_limited_power_value, eexi_limited_power_unit = self.__get_eexi_limited_power()
+        self.eexi_limited_power.value = eexi_limited_power_value
+        self.eexi_limited_power.suffix_text = eexi_limited_power_unit
         self.settings_card.update()
 
         self.ship_type.value = self.last_ship_info.ship_type
@@ -234,8 +263,12 @@ class SystemConf(ft.Container):
 
         Toast.show_success(e.page)
 
+    def __load_config(self):
+        self.system_unit = Preference.get().system_unit
+
     def __load_data(self):
         self.last_system_settings = SystemSettings.get()
+        self.last_propeller_setting = PropellerSetting.get()
         self.last_ship_info = ShipInfo.get()
         self.last_factor_conf = FactorConf.get()
 
