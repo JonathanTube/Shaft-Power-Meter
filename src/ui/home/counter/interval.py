@@ -1,27 +1,36 @@
 import flet as ft
 
 from ui.common.custom_card import CustomCard
-from .display import createDisplay
+from .display import CounterDisplay
 
 
-def createInterval(propellerName: str):
-    return CustomCard(
-        heading=f"Interval({propellerName})" if propellerName else "Interval",
-        expand=True,
-        height=380,
-        body=ft.Column(
-            horizontal_alignment=ft.CrossAxisAlignment.CENTER,
-            controls=[
-                createDisplay(11, 22, 33, 44),
+class CounterInterval(ft.Container):
+    def __init__(self, title: str = ""):
+        super().__init__()
+        self.title = title
+        self.expand = True
 
-                ft.Text("00:20:12 left", weight=ft.FontWeight.BOLD,
-                        bgcolor=ft.Colors.GREEN_200),
+    def build(self):
+        display = CounterDisplay()
 
-                ft.TextField(
-                    label="Interval Setting",
-                    suffix_text="h",
-                    prefix_icon=ft.Icons.PUNCH_CLOCK_OUTLINED
-                ),
+        left_time = ft.Text(
+            "00:20:12 left", weight=ft.FontWeight.BOLD, bgcolor=ft.Colors.GREEN_200)
 
-                ft.Text("running 0.5h starting at 08:04")
-            ]))
+        hour_interval = ft.TextField(
+            label="Interval Setting",
+            suffix_text="h",
+            prefix_icon=ft.Icons.PUNCH_CLOCK_OUTLINED
+        )
+
+        started_at = ft.Text("running 0.5h starting at 08:04")
+
+        self.content = CustomCard(
+            heading=self.title,
+            body=ft.Column(
+                horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+                controls=[
+                    display,
+                    left_time,
+                    hour_interval,
+                    started_at
+                ]))

@@ -1,7 +1,7 @@
 import flet as ft
 
 from ui.home.alarm.index import createAlarm
-from ui.home.counter.index import createCounter
+from ui.home.counter.index import Counter
 from ui.home.dashboard.index import Dashboard
 from ui.home.logs.index import Logs
 from ui.home.notice.index import Notice
@@ -30,7 +30,7 @@ class Home(ft.Stack):
                 ft.Icon(name=ft.Icons.TIMER_OUTLINED),
                 ft.Text("Counter")
             ]),
-            content=createCounter(True)
+            content=Counter(True)
         )
         self.trendview = ft.Tab(
             tab_content=ft.Row(spacing=spacing, controls=[

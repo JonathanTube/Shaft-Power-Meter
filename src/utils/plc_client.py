@@ -1,42 +1,27 @@
-import snap7
-from snap7.util import get_real
-from snap7.exceptions import Snap7Exception
+from pymodbus.client import ModbusTcpClient
+
+# 连接配置（需替换实际参数）
+PLC_IP = "192.168.1.100"      # 控制器IP
+PORT = 502                    # Modbus默认端口
+UNIT_ID = 1                   # 设备单元号
+
+client = ModbusTcpClient(PLC_IP, port=PORT)
 
 
-class PLCClient:
-    def __init__(self, plc_ip, rack, slot):
-        self.plc_ip = plc_ip
-        self.rack = rack
-        self.slot = slot
-        self.plc = snap7.client.Client()
+# 写入数字量输出（线圈）
+def write_coil(address, value):
+    response = client.write_coil(address, value, slave=UNIT_ID)
+    return not response.isError()
 
-    def connect(self):
-        try:
-            self.plc.connect(self.plc_ip, self.rack, self.slot)
-            if not self.plc.get_connected():
-                print("Failed to connect to the PLC.")
-                return False
-            return True
-        except Snap7Exception as e:
-            print(f"Error connecting to PLC: {e}")
-            return False
+# 读取保持寄存器（模拟量）
 
-    def disconnect(self):
-        self.plc.disconnect()
 
-    def read_data(self, db_number, start, size):
-        try:
-            data = self.plc.read_area(
-                snap7.types.Areas.DB, db_number, start, size)
-            return data
-        except Snap7Exception as e:
-            print(f"Error reading data from PLC: {e}")
-            return None
+def read_register(address, count=1):
+    response = client.read_holding_registers(address, count, slave=UNIT_ID)
+    return response.registers if not response.isError() else None
 
-    def parse_data(self, data):
-        # Example of parsing data
-        # Assuming torque is a real number at offset 0
-        torque = get_real(data, 0)
-        # Assuming thrust is a real number at offset 4
-        thrust = get_real(data, 4)
-        return torque, thrust
+
+# 示例：控制DO1输出
+write_coil(0x0000, True)      # 地址参考设备手册[4](@ref)
+# 示例：读取AI1模拟量
+print(read_register(0x4000))  # 地址参考设备手册[4](@ref)

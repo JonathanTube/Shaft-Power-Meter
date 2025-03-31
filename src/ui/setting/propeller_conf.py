@@ -26,6 +26,14 @@ class PropellerConf(ft.Column):
         else:
             return (UnitConverter.w_to_hp(_shaft_power), "hp")
 
+    def __set_shaft_power(self, e):
+        _shaft_power = float(e.control.value)
+        if self.system_unit == 0:
+            self.last_propeller_setting.shaft_power_of_mcr_operating_point = _shaft_power * 1000
+        else:
+            self.last_propeller_setting.shaft_power_of_mcr_operating_point = UnitConverter.hp_to_w(
+                _shaft_power)
+
     def __create_mcr_operating_point(self):
         self.rpm_of_mcr_operating_point = ft.TextField(
             label="RPM",
@@ -42,8 +50,7 @@ class PropellerConf(ft.Column):
             col={"md": 6},
             value=shaft_power_value,
             suffix_text=shaft_power_unit,
-            on_change=lambda e: setattr(
-                self.last_propeller_setting, 'shaft_power_of_mcr_operating_point', e.control.value)
+            on_change=self.__set_shaft_power
         )
 
         self.mcr_operating_point_card = CustomCard(
@@ -226,12 +233,6 @@ class PropellerConf(ft.Column):
             col={"md": 6})
 
     def __save_data(self, e):
-        _shaft_power = float(self.shaft_power_of_mcr_operating_point.value)
-        if self.system_unit == 0:
-            self.last_propeller_setting.shaft_power_of_mcr_operating_point = _shaft_power * 1000
-        else:
-            self.last_propeller_setting.shaft_power_of_mcr_operating_point = UnitConverter.hp_to_w(
-                _shaft_power)
         self.last_propeller_setting.save()
         Toast.show_success(e.page)
 

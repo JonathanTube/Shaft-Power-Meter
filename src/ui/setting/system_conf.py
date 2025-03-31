@@ -61,6 +61,14 @@ class SystemConf(ft.Container):
         else:
             return (UnitConverter.w_to_hp(_eexi_limited_power), "hp")
 
+    def __set_eexi_limited_power(self, e):
+        _eexi_limited_power = float(e.control.value)
+        if self.system_unit == 0:
+            self.last_system_settings.eexi_limited_power = _eexi_limited_power * 1000
+        else:
+            self.last_system_settings.eexi_limited_power = UnitConverter.hp_to_w(
+                _eexi_limited_power)
+
     def __create_settings_card(self):
         self.display_thrust = ft.Switch(
             col={"md": 6}, label="Display Thrust",
@@ -96,8 +104,7 @@ class SystemConf(ft.Container):
             label="EEXI Limited Power",
             value=eexi_limited_power_value,
             suffix_text=eexi_limited_power_unit,
-            on_change=lambda e: setattr(
-                self.last_system_settings, 'eexi_limited_power', e.control.value)
+            on_change=self.__set_eexi_limited_power
         )
 
         self.amount_of_propeller_label = ft.Text(
@@ -217,15 +224,7 @@ class SystemConf(ft.Container):
         )
 
     def __save_data(self, e):
-        _power = float(self.last_system_settings.eexi_limited_power)
-        # 如果系统单位是SI(kW)，则将eexi_limited_power转换为w
-        if self.system_unit == 0:
-            self.last_system_settings.eexi_limited_power = _power * 1000
-        else:
-            self.last_system_settings.eexi_limited_power = UnitConverter.hp_to_w(
-                _power)
-
-        if self.last_system_settings.eexi_limited_power > self.last_propeller_setting.shaft_power_of_mcr_operating_point:
+        if float(self.last_system_settings.eexi_limited_power) > float(self.last_propeller_setting.shaft_power_of_mcr_operating_point):
             Toast.show_error(
                 e.page, "EEXI Limited Power must be less than Shaft Power of MCR Operating Point"
             )
