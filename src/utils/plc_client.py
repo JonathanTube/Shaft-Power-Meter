@@ -1,27 +1,43 @@
 from pymodbus.client import ModbusTcpClient
 
-# 连接配置（需替换实际参数）
-PLC_IP = "192.168.1.100"      # 控制器IP
-PORT = 502                    # Modbus默认端口
-UNIT_ID = 1                   # 设备单元号
+# 初始化 Modbus 连接
+client = ModbusTcpClient(host='192.168.1.2', port=502)  # 替换为实际 PLC IP
+UNIT_ID = 1  # 根据 PLC 配置的从机地址
 
-client = ModbusTcpClient(PLC_IP, port=PORT)
+def read_register(dec_address, count=1):
+    try:
+        # 确保地址为整数
+        address = int(dec_address)
+        # 提交请求（适配新版本 pymodbus）
+        response = client.read_holding_registers(
+            address=address,
+            count=count,
+            slave=UNIT_ID  # 关键字参数
+        )
+        # 错误检查
+        if response.isError():
+            print(f"Modbus Error: {response}")
+            return None
+        return response.registers
+    except Exception as e:
+        print(f"Runtime Error: {e}")
+        return None
 
+def write_register(dec_address, value):
+    try:
+        address = int(dec_address)
+        response = client.write_register(address, value, slave=UNIT_ID)
+        return not response.isError()
+    except Exception as e:
+        print(f"Runtime Error: {e}")
+        return False
 
-# 写入数字量输出（线圈）
-def write_coil(address, value):
-    response = client.write_coil(address, value, slave=UNIT_ID)
-    return not response.isError()
+# 调用函数读取地址 12288
+result = read_register(12288)
+if result is not None:
+    print(f"Read value: {result}")
 
-# 读取保持寄存器（模拟量）
+write_register(12290, 11)
+write_register(12291, 12)
 
-
-def read_register(address, count=1):
-    response = client.read_holding_registers(address, count, slave=UNIT_ID)
-    return response.registers if not response.isError() else None
-
-
-# 示例：控制DO1输出
-write_coil(0x0000, True)      # 地址参考设备手册[4](@ref)
-# 示例：读取AI1模拟量
-print(read_register(0x4000))  # 地址参考设备手册[4](@ref)
+client.close()  # 关闭连接
