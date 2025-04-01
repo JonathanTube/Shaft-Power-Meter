@@ -4,6 +4,7 @@ import flet as ft
 class MeterHalf(ft.Container):
     def __init__(self, radius: int):
         super().__init__()
+        self.expand = True
         self.max_radius = radius
         self.outer_radius = radius * 0.35
         self.outer_center_space_radius = radius - self.outer_radius

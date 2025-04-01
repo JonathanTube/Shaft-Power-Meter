@@ -4,7 +4,7 @@ import flet as ft
 class CounterDisplay(ft.Container):
     def __init__(self):
         super().__init__()
-        self.expand = True
+        # self.bgcolor = "yellow"
 
     def __create_label(self, text: str = ""):
         return ft.Text(
@@ -25,8 +25,8 @@ class CounterDisplay(ft.Container):
         )
 
     def __create_sum_power(self):
-        self.sum_power_label = self.__create_label('Sum Power')
         self.sum_power_value = self.__create_value()
+        self.sum_power_label = self.__create_label('Sum Power')
         self.sum_power_unit = self.__create_unit('kWh')
 
         self.sum_power = ft.Row(
@@ -86,13 +86,18 @@ class CounterDisplay(ft.Container):
         )
 
     def build(self):
+        self.__create_sum_power(),
+        self.__create_average_power(),
+        self.__create_speed(),
+        self.__create_average_speed()
         self.content = ft.Column(
-            expand=True,
+            spacing=5,
             controls=[
-                self.__create_sum_power(),
-                # self.__create_average_power(),
-                # self.__create_speed(),
-                # self.__create_average_speed()
+                self.sum_power,
+                self.average_power,
+                self.speed,
+                self.average_speed,
+                ft.Divider(height=1)
             ]
         )
 
