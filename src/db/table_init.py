@@ -23,7 +23,7 @@ class TableInit:
     @staticmethod
     def init():
         # db.drop_tables([DataLog, BreachLog], safe=False)
-        db.drop_tables([Language], safe=False)
+        db.drop_tables([Language, IOConf], safe=False)
         db.create_tables([
             BreachReason,
             CounterLog,

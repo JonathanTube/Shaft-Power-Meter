@@ -1,3 +1,4 @@
+from db.models.io_conf import IOConf
 from db.models.language import Language
 from db.models.propeller_setting import PropellerSetting
 from db.models.system_settings import SystemSettings
@@ -19,6 +20,7 @@ class DataInit:
         DataInit.__init_propeller_setting()
         DataInit.__init_language()
         DataInit.init_report_info_for_test()
+        DataInit.__init_io_conf()
 
     def __init_system_settings():
         if SystemSettings.select().count() == 0:
@@ -110,6 +112,17 @@ class DataInit:
                 data_refresh_interval=5
             )
 
+    def __init_io_conf():
+        if IOConf.select().count() == 0:
+            IOConf.create(
+                plc_ip='192.168.1.2',
+                plc_port=502,
+                gps_ip='127.0.0.1',
+                gps_port=0,
+                modbus_ip='127.0.0.1',
+                modbus_port=0
+            )
+
     def __init_language():
         if Language.select().count() == 0:
             Language.insert_many([
@@ -160,7 +173,7 @@ class DataInit:
                     "chinese": "搜索",
                     "english": "Search"
                 },
-                
+
                 {
                     "code": "lang.common.operation",
                     "chinese": "操作",
@@ -695,22 +708,128 @@ class DataInit:
                     "english": "PLC Conf."
                 },
 
+
                 {
-                    "code": "lang.setting.plc_ip",
-                    "chinese": "PLC IP",
-                    "english": "PLC IP"
+                    "code": "lang.setting.check_plc_connection",
+                    "chinese": "检查PLC连接",
+                    "english": "Check PLC Connection"
                 },
 
                 {
-                    "code": "lang.setting.plc_port",
-                    "chinese": "PLC 端口",
-                    "english": "PLC Port"
+                    "code": "lang.setting.check_gps_connection",
+                    "chinese": "检查GPS连接",
+                    "english": "Check GPS Connection"
+                },
+
+                {
+                    "code": "lang.setting.check_modbus_connection",
+                    "chinese": "检查Modbus连接",
+                    "english": "Check Modbus Connection"
+                },
+
+                {
+                    "code": "lang.setting.4_20_ma_power_min",
+                    "chinese": "4-20mA 功率最小值",
+                    "english": "4-20mA Power Min"
+                },
+
+
+                {
+                    "code": "lang.setting.4_20_ma_power_max",
+                    "chinese": "4-20mA 功率最大值",
+                    "english": "4-20mA Power Max"
+                },
+
+                {
+                    "code": "lang.setting.4_20_ma_power_offset",
+                    "chinese": "4-20mA 功率偏移",
+                    "english": "4-20mA Power Offset"
+                },
+
+                {
+                    "code": "lang.setting.4_20_ma_torque_min",
+                    "chinese": "4-20mA 扭矩最小值   ",
+                    "english": "4-20mA Torque Min"
+                },
+
+                {
+                    "code": "lang.setting.4_20_ma_torque_max",
+                    "chinese": "4-20mA 扭矩最大值",
+                    "english": "4-20mA Torque Max"
+                },
+
+                {
+                    "code": "lang.setting.4_20_ma_torque_offset",
+                    "chinese": "4-20mA 扭矩偏移",
+                    "english": "4-20mA Torque Offset"
+                },
+
+                {
+                    "code": "lang.setting.4_20_ma_thrust_min",
+                    "chinese": "4-20mA 推力最小值",
+                    "english": "4-20mA Thrust Min"
+                },
+
+
+                {
+                    "code": "lang.setting.4_20_ma_thrust_max",
+                    "chinese": "4-20mA 推力最大值",
+                    "english": "4-20mA Thrust Max"
+                },
+
+                {
+                    "code": "lang.setting.4_20_ma_thrust_offset",
+                    "chinese": "4-20mA 推力偏移",
+                    "english": "4-20mA Thrust Offset"
+                },
+
+                {
+                    "code": "lang.setting.4_20_ma_speed_min",
+                    "chinese": "4-20mA 速度最小值",
+                    "english": "4-20mA Speed Min"
+                },
+
+                {
+                    "code": "lang.setting.4_20_ma_speed_max",
+                    "chinese": "4-20mA 速度最大值",
+                    "english": "4-20mA Speed Max"
+                },
+
+                {
+                    "code": "lang.setting.4_20_ma_speed_offset",
+                    "chinese": "4-20mA 速度偏移",
+                    "english": "4-20mA Speed Offset"
+                },
+
+
+                {
+                    "code": "lang.setting.ip",
+                    "chinese": "IP 地址",
+                    "english": "IP Address"
+                },
+
+                {
+                    "code": "lang.setting.port",
+                    "chinese": "端口",
+                    "english": "Port"
                 },
 
                 {
                     "code": "lang.setting.output_conf",
                     "chinese": "输出配置",
                     "english": "Output Conf."
+                },
+
+                {
+                    "code": "lang.setting.gps_conf",
+                    "chinese": "GPS 配置",
+                    "english": "GPS Conf."
+                },
+
+                {
+                    "code": "lang.setting.modbus_conf",
+                    "chinese": "Modbus 配置",
+                    "english": "Modbus Conf."
                 },
 
                 {

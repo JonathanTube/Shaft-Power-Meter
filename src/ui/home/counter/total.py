@@ -1,14 +1,12 @@
 import flet as ft
 
-from ui.common.custom_card import CustomCard
+from ui.common.simple_card import SimpleCard
 from .display import CounterDisplay
 
 
 class CounterTotal(ft.Container):
-    def __init__(self, title: str = None):
+    def __init__(self):
         super().__init__()
-        self.title = title
-
         self.expand = True
 
     def build(self):
@@ -16,11 +14,11 @@ class CounterTotal(ft.Container):
         time_elapsed = ft.Text("00 d 23:10:01 h measured")
         started_at = ft.Text("started at 18/07/2014 06:56:19")
 
-        self.content = CustomCard(
-            heading=self.title,
-            expand=True,
+        self.content = SimpleCard(
+            title="Total",
+            expand=False,
             body=ft.Column(
-                expand=True,
+                spacing=5,
                 horizontal_alignment=ft.CrossAxisAlignment.CENTER,
                 controls=[
                     display,

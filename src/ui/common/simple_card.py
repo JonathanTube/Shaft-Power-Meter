@@ -31,7 +31,7 @@ class SimpleCard(ft.Container):
             content=ft.Text(
                 value=self._title,
                 weight=ft.FontWeight.W_500,
-                size=18
+                size=14
             )
         )
 
