@@ -1,4 +1,3 @@
-from typing import override
 import flet as ft
 
 from ui.common.abstract_table import AbstractTable
@@ -9,7 +8,7 @@ from ui.report.report_info_exporter import ReportInfoExporter
 
 
 class ReportInfoTable(AbstractTable):
-    @override
+
     def load_total(self):
         # get start_date and end_date from kwargs
         start_date = self.kwargs.get('start_date')
@@ -22,7 +21,6 @@ class ReportInfoTable(AbstractTable):
 
         return ReportInfo.select().count()
 
-    @override
     def load_data(self):
         data = ReportInfo.select(
             ReportInfo.id,
@@ -53,11 +51,9 @@ class ReportInfoTable(AbstractTable):
 
         return [[item.id, item.report_name, item.created_at] for item in data]
 
-    @override
     def has_operations(self):
         return True
 
-    @override
     def create_operations(self, _id: int):
         return ft.Row(
             controls=[
@@ -90,7 +86,6 @@ class ReportInfoTable(AbstractTable):
             ReportInfoExporter().generate_pdf(e.path)
             Toast.show_success(e.page, "export success")
 
-    @override
     def create_columns(self):
         return self.__get_language()
 

@@ -161,6 +161,14 @@ class General(ft.Container):
             self.last_date_time_conf.sync_with_gps = value
 
     def __create_date_time_card(self):
+        self.utc_date_time = ft.TextField(
+            label="UTC Date Time",
+            value=self.last_date_time_conf.utc_date_time,
+            input_filter=ft.InputFilter(
+                regex_string=r"^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$"
+            )
+        )
+
         self.utc_date = ft.TextField(
             label="Date",
             col={"md": 6},
@@ -196,6 +204,7 @@ class General(ft.Container):
             'UTC Date Time Conf.',
             ft.ResponsiveRow(
                 controls=[
+                    # self.utc_date_time,
                     self.utc_date,
                     self.utc_time,
                     self.date_time_format,

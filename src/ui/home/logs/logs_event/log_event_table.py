@@ -1,15 +1,11 @@
-from typing import override
-
 from db.models.event_log import EventLog
 from ui.common.abstract_table import AbstractTable
 
 
 class LogEventTable(AbstractTable):
-    @override
     def load_total(self):
         return EventLog.select().count()
 
-    @override
     def load_data(self):
         data = EventLog.select(
             EventLog.id,
@@ -43,7 +39,6 @@ class LogEventTable(AbstractTable):
             session.get("lang.common.note")
         ]
 
-    @override
     def create_columns(self):
         return self.get_columns()
 

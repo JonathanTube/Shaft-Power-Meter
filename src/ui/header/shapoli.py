@@ -3,6 +3,10 @@ from db.models.system_settings import SystemSettings
 
 
 class ShaPoLi(ft.Container):
+    def __init__(self):
+        super().__init__()
+        self.padding = ft.padding.only(right=10)
+
     def switch(self):
         system_settings = SystemSettings.get_or_none()
         if system_settings is None:

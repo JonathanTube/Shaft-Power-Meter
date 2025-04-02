@@ -3,6 +3,7 @@ import asyncio
 
 from ui.header.index import Header
 from ui.home.index import Home
+from utils.utc_timer import UtcTimer
 from utils.breach_log import BreachLogger
 from utils.gps_logger import GpsLogger
 from utils.data_logger import DataLogger
@@ -12,17 +13,18 @@ from db.models.preference import Preference
 from db.models.language import Language
 
 
-def get_theme_mode(preference: Preference):
-    if preference.theme == 0:
+def get_theme_mode():
+    theme = Preference.get().theme
+    if theme == 0:
         return ft.ThemeMode.SYSTEM
-    elif preference.theme == 1:
+    elif theme == 1:
         return ft.ThemeMode.LIGHT
-    elif preference.theme == 2:
+    elif theme == 2:
         return ft.ThemeMode.DARK
 
 
-def load_language(page: ft.Page, preference: Preference):
-    language = preference.language
+def load_language(page: ft.Page):
+    language = Preference.get().language
     language_items = Language.select()
     if language == 0:
         for item in language_items:
@@ -32,8 +34,9 @@ def load_language(page: ft.Page, preference: Preference):
             page.session.set(item.code, item.chinese)
 
 
-def set_system_unit(page: ft.Page, preference: Preference):
-    page.session.set('system_unit', preference.system_unit)
+def set_system_unit(page: ft.Page):
+    system_unit = Preference.get().system_unit
+    page.session.set('system_unit', system_unit)
 
 
 def start_loggers():
@@ -46,6 +49,10 @@ def start_loggers():
     asyncio.create_task(breach_logger.start())
 
 
+def start_utc_time():
+    asyncio.create_task(UtcTimer().start())
+
+
 def add_file_picker(page: ft.Page):
     file_picker = ft.FilePicker()
     page.overlay.append(file_picker)
@@ -53,19 +60,19 @@ def add_file_picker(page: ft.Page):
 
 
 async def main(page: ft.Page):
-    preference = Preference.get()
     TableInit.init()
     DataInit.init()
     start_loggers()
+    start_utc_time()
 
-    load_language(page, preference)
-    set_system_unit(page, preference)
+    load_language(page)
+    set_system_unit(page)
 
     add_file_picker(page)
 
     page.title = page.session.get("lang.lang.app.name")
     page.padding = 0
-    page.theme_mode = get_theme_mode(preference)
+    page.theme_mode = get_theme_mode()
     page.window.maximized = False
     page.window.resizable = False
     page.window.width = 1024

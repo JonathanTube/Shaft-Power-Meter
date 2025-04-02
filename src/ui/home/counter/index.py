@@ -24,7 +24,7 @@ class Counter(ft.Container):
                         controls=[
                             CounterInterval(),
                             CounterManually(),
-                            CounterTotal()
+                            CounterTotal('SPS1')
                         ]),
                     ft.Text('SPS2', weight=ft.FontWeight.BOLD, size=16),
                     ft.Row(
@@ -32,7 +32,7 @@ class Counter(ft.Container):
                         controls=[
                             CounterInterval(),
                             CounterManually(),
-                            CounterTotal()
+                            CounterTotal('SPS2')
                         ])
                 ]
             )
@@ -42,5 +42,5 @@ class Counter(ft.Container):
                 controls=[
                     CounterInterval(),
                     CounterManually(),
-                    CounterTotal()
+                    CounterTotal('SPS1')
                 ])

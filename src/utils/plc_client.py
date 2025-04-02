@@ -1,43 +1,50 @@
 from pymodbus.client import ModbusTcpClient
+from db.models.io_conf import IOConf
 
-# 初始化 Modbus 连接
-client = ModbusTcpClient(host='192.168.1.2', port=502)  # 替换为实际 PLC IP
-UNIT_ID = 1  # 根据 PLC 配置的从机地址
 
-def read_register(dec_address, count=1):
-    try:
-        # 确保地址为整数
-        address = int(dec_address)
-        # 提交请求（适配新版本 pymodbus）
-        response = client.read_holding_registers(
-            address=address,
-            count=count,
-            slave=UNIT_ID  # 关键字参数
-        )
-        # 错误检查
-        if response.isError():
-            print(f"Modbus Error: {response}")
+class PlcClient:
+    def __init__(self):
+        io_conf = IOConf.get()
+        host = io_conf.plc_host
+        port = io_conf.plc_port
+
+        self.client = ModbusTcpClient(host=host, port=port)
+
+    def read_register(self, dec_address):
+        try:
+            address = int(dec_address)
+            resp = self.client.read_holding_registers(address)
+            if resp.isError():
+                print(f"Modbus Error: {resp}")
+                return None
+            return resp.registers
+        except Exception as e:
+            print(f"Runtime Error: {e}")
             return None
-        return response.registers
-    except Exception as e:
-        print(f"Runtime Error: {e}")
-        return None
 
-def write_register(dec_address, value):
-    try:
-        address = int(dec_address)
-        response = client.write_register(address, value, slave=UNIT_ID)
-        return not response.isError()
-    except Exception as e:
-        print(f"Runtime Error: {e}")
-        return False
+    def write_register(self, dec_address, value):
+        try:
+            address = int(dec_address)
+            resp = self.client.write_register(address, value)
+            return not resp.isError()
+        except Exception as e:
+            print(f"Runtime Error: {e}")
+            return False
+
+    def close(self):
+        if self.client and self.client.is_socket_open():
+            try:
+                self.client.close()
+            except Exception as e:
+                print(f"Runtime Error: {e}")
+
 
 # 调用函数读取地址 12288
-result = read_register(12288)
-if result is not None:
-    print(f"Read value: {result}")
+# result = PlcClient.read_register(12288)
+# if result is not None:
+#     print(f"Read value: {result}")
 
-write_register(12290, 11)
-write_register(12291, 12)
+# PlcClient.write_register(12290, 11)
+# PlcClient.write_register(12291, 12)
 
-client.close()  # 关闭连接
+# PlcClient.client.close()

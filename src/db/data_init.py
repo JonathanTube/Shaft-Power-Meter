@@ -1,3 +1,5 @@
+from datetime import datetime, timezone
+
 from db.models.io_conf import IOConf
 from db.models.language import Language
 from db.models.propeller_setting import PropellerSetting
@@ -7,6 +9,8 @@ from db.models.factor_conf import FactorConf
 from db.models.breach_reason import BreachReason
 from db.models.report_info import ReportInfo
 from db.models.preference import Preference
+from db.models.date_time_conf import DateTimeConf
+from db.models.limitations import Limitations
 
 
 class DataInit:
@@ -19,8 +23,21 @@ class DataInit:
         DataInit.__init_breach_reason()
         DataInit.__init_propeller_setting()
         DataInit.__init_language()
-        DataInit.init_report_info_for_test()
         DataInit.__init_io_conf()
+        DataInit.__init_date_time_conf()
+        DataInit.__init_limitations()
+        DataInit.init_report_info_for_test()
+
+    def __init_limitations():
+        if Limitations.select().count() == 0:
+            Limitations.create(
+                speed_max=0,
+                torque_max=0,
+                power_max=0,
+                speed_warning=0,
+                torque_warning=0,
+                power_warning=0
+            )
 
     def __init_system_settings():
         if SystemSettings.select().count() == 0:
@@ -29,6 +46,15 @@ class DataInit:
                 amount_of_propeller=1,
                 eexi_limited_power=0,
                 sha_po_li=False
+            )
+
+    def __init_date_time_conf():
+        if DateTimeConf.select().count() == 0:
+            DateTimeConf.create(
+                sync_with_gps=False,
+                date_time_format="YYYY-MM-dd HH:mm:ss",
+                utc_date_time=datetime.now(
+                    timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
             )
 
     def __init_ship_info():

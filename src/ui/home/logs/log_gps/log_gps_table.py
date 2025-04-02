@@ -1,15 +1,13 @@
-from typing import override
-
 from db.models.gps_log import GpsLog
 from ui.common.abstract_table import AbstractTable
 
 
 class LogGpsTable(AbstractTable):
-    @override
+
     def load_total(self):
         return GpsLog.select().count()
 
-    @override
+
     def load_data(self):
         data = GpsLog.select(
             GpsLog.id,
@@ -27,7 +25,6 @@ class LogGpsTable(AbstractTable):
             ] for item in data
         ]
 
-    @override
     def create_columns(self):
         return self.get_columns()
 

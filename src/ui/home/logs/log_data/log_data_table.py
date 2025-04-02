@@ -1,15 +1,12 @@
-from typing import override
-
 from db.models.data_log import DataLog
 from ui.common.abstract_table import AbstractTable
 
 
 class LogDataTable(AbstractTable):
-    @override
+
     def load_total(self):
         return DataLog.select().count()
 
-    @override
     def load_data(self):
         data = DataLog.select(
             DataLog.id,
@@ -32,7 +29,6 @@ class LogDataTable(AbstractTable):
                 item.power
                 ] for item in data]
 
-    @override
     def create_columns(self):
         return self.get_columns()
 
