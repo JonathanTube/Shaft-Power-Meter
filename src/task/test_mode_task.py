@@ -4,12 +4,10 @@ import logging
 
 from db.models.data_log import DataLog
 from db.models.system_settings import SystemSettings
-from utils.formula_cal import FormulaCalculator
 from common.global_data import gdata
 from db.models.alarm_log import AlarmLog
 from db.models.event_log import EventLog
 from db.models.report_info import ReportInfo
-from common.control_manager import ControlManager
 from utils.data_saver import DataSaver
 from db.models.preference import Preference
 
