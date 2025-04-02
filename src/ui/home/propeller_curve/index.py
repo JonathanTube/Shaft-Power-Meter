@@ -45,18 +45,18 @@ class PropellerCurve(ft.Container):
 
         while True:
             data_log_sps1 = DataLog.select(
-                DataLog.revolution,
+                DataLog.speed,
                 DataLog.power
             ).where(DataLog.name == 'SPS1').order_by(DataLog.id.desc()).first()
 
             data_log_sps2 = DataLog.select(
-                DataLog.revolution,
+                DataLog.speed,
                 DataLog.power
             ).where(DataLog.name == 'SPS2').order_by(DataLog.id.desc()).first()
 
             if data_log_sps1:
                 sps1_speed = (
-                    data_log_sps1.revolution / self.propeller_setting.rpm_of_mcr_operating_point
+                    data_log_sps1.speed / self.propeller_setting.rpm_of_mcr_operating_point
                 ) * 100
 
                 sps1_power = (
@@ -71,7 +71,7 @@ class PropellerCurve(ft.Container):
 
             if data_log_sps2:
                 sps2_speed = (
-                    data_log_sps2.revolution /
+                    data_log_sps2.speed /
                     self.propeller_setting.rpm_of_mcr_operating_point
                 ) * 100
 

@@ -13,7 +13,7 @@ class LogDataTable(AbstractTable):
             DataLog.name,
             DataLog.utc_date,
             DataLog.utc_time,
-            DataLog.revolution,
+            DataLog.speed,
             DataLog.thrust,
             DataLog.torque,
             DataLog.power
@@ -23,7 +23,7 @@ class LogDataTable(AbstractTable):
                 item.id,
                 item.name,
                 f'{item.utc_date} {item.utc_time}',
-                item.revolution,
+                item.speed,
                 item.thrust,
                 item.torque,
                 item.power

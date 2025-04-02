@@ -89,7 +89,7 @@ class SingleShaPoLiOn(ft.Container):
                 DataLog.power,
                 DataLog.thrust,
                 DataLog.torque,
-                DataLog.revolution,
+                DataLog.speed,
                 DataLog.utc_time
             ).order_by(DataLog.id.desc()).where(DataLog.name == "SPS1").limit(100)
             # print(f'data_logs={data_logs}')
@@ -99,7 +99,7 @@ class SingleShaPoLiOn(ft.Container):
                     data_logs[0].power,
                     data_logs[0].thrust,
                     data_logs[0].torque,
-                    data_logs[0].revolution,
+                    data_logs[0].speed,
                     self.system_unit
                 )
                 self.power_line_chart.update(data_logs)

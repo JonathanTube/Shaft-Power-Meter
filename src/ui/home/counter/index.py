@@ -22,16 +22,16 @@ class Counter(ft.Container):
                     ft.Row(
                         expand=True,
                         controls=[
-                            CounterInterval(),
-                            CounterManually(),
+                            CounterInterval('SPS1'),
+                            CounterManually('SPS1'),
                             CounterTotal('SPS1')
                         ]),
                     ft.Text('SPS2', weight=ft.FontWeight.BOLD, size=16),
                     ft.Row(
                         expand=True,
                         controls=[
-                            CounterInterval(),
-                            CounterManually(),
+                            CounterInterval('SPS2'),
+                            CounterManually('SPS2'),
                             CounterTotal('SPS2')
                         ])
                 ]
@@ -40,7 +40,7 @@ class Counter(ft.Container):
             self.content = ft.Row(
                 scroll=ft.ScrollMode.ADAPTIVE,
                 controls=[
-                    CounterInterval(),
-                    CounterManually(),
+                    CounterInterval('SPS1'),
+                    CounterManually('SPS1'),
                     CounterTotal('SPS1')
                 ])

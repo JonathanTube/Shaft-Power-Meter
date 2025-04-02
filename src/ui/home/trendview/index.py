@@ -26,7 +26,7 @@ class TrendView(ft.Container):
     def __on_search(self, start_date: str, end_date: str):
         data_logs = DataLog.select(
             DataLog.power,
-            DataLog.revolution,
+            DataLog.speed,
             DataLog.utc_time,
             DataLog.utc_date
         ).where(

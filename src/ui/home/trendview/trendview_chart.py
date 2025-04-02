@@ -29,7 +29,7 @@ class TrendViewChart(ft.Container):
         power_data = []
 
         for data in data_list:
-            rpm_data.append(data.revolution)
+            rpm_data.append(data.speed)
             power_data.append(data.power)
             date_times.append(
                 datetime.strptime(

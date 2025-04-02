@@ -63,7 +63,7 @@ class DualShaPoLiOn(ft.Container):
             sps1_data_logs = DataLog.select(
                 DataLog.utc_time,
                 DataLog.power,
-                DataLog.revolution,
+                DataLog.speed,
                 DataLog.torque,
                 DataLog.thrust
             ).where(
@@ -73,7 +73,7 @@ class DualShaPoLiOn(ft.Container):
             sps2_data_logs = DataLog.select(
                 DataLog.utc_time,
                 DataLog.power,
-                DataLog.revolution,
+                DataLog.speed,
                 DataLog.torque,
                 DataLog.thrust
             ).where(
@@ -85,7 +85,7 @@ class DualShaPoLiOn(ft.Container):
             )
 
             self.instant_grid.set_speed_values(
-                sps1_data_logs[0].revolution, sps2_data_logs[0].revolution
+                sps1_data_logs[0].speed, sps2_data_logs[0].speed
             )
 
             self.instant_grid.set_torque_values(

@@ -82,7 +82,7 @@ class SingleShaPoLiOff(ft.Stack):
         while True:
             data_logs = DataLog.select(
                 DataLog.utc_time,
-                DataLog.revolution,
+                DataLog.speed,
                 DataLog.power,
                 DataLog.torque,
                 DataLog.thrust
@@ -91,7 +91,7 @@ class SingleShaPoLiOff(ft.Stack):
 
             if len(data_logs) > 0:
                 self.single_meters.set_data(
-                    data_logs[0].revolution, data_logs[0].power, data_logs[0].torque, self.system_unit
+                    data_logs[0].speed, data_logs[0].power, data_logs[0].torque, self.system_unit
                 )
                 self.thrust_power.set_data(self.display_thrust, data_logs[0].thrust, self.system_unit)
                 self.power_line_chart.update(data_logs)

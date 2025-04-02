@@ -1,17 +1,20 @@
 import flet as ft
 
+from utils.unit_parser import UnitParser
+
 
 class CounterDisplay(ft.Container):
     def __init__(self):
         super().__init__()
+        self.expand = True
         # self.bgcolor = "yellow"
 
     def __create_label(self, text: str = ""):
         return ft.Text(
-            value=text,
+            value=f"{text}:",
             size=14,
             text_align=ft.TextAlign.RIGHT,
-            width=140
+            width=180
         )
 
     def __create_value(self):
@@ -57,15 +60,17 @@ class CounterDisplay(ft.Container):
             ]
         )
 
-    def __create_speed(self):
-        self.speed_label = self.__create_label('Speed')
-        self.speed_value = self.__create_value()
+    def __create_number_of_revolutions(self):
+        self.number_of_revolutions_label = self.__create_label(
+            'Number of Revolutions')
+        self.number_of_revolutions_value = self.__create_value()
 
-        self.speed = ft.Row(
+        self.number_of_revolutions = ft.Row(
             alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
             controls=[
-                self.speed_label,
-                ft.Row(controls=[self.speed_value])
+                self.number_of_revolutions_label,
+                ft.Row(controls=[self.number_of_revolutions_value]),
+                ft.Text("")
             ]
         )
 
@@ -88,21 +93,36 @@ class CounterDisplay(ft.Container):
     def build(self):
         self.__create_sum_power(),
         self.__create_average_power(),
-        self.__create_speed(),
+        self.__create_number_of_revolutions(),
         self.__create_average_speed()
         self.content = ft.Column(
-            spacing=5,
+            expand=True,
             controls=[
                 self.sum_power,
                 self.average_power,
-                self.speed,
-                self.average_speed,
-                ft.Divider(height=1)
+                self.number_of_revolutions,
+                self.average_speed
             ]
         )
 
-    def set_data(self, sum_power: float, average_power: float, speed: int, average_speed: int):
-        self.sum_power_value.value = sum_power
-        self.average_power_value.value = average_power
-        self.speed_value.value = speed
-        self.average_speed_value.value = average_speed
+    def set_sum_power(self, sum_power: float, system_unit: int):
+        value_and_unit = UnitParser.parse_energy(sum_power, system_unit)
+        self.sum_power_value.value = value_and_unit[0]
+        self.sum_power_unit.value = value_and_unit[1]
+        self.sum_power.update()
+
+    def set_average_power(self, average_power: float, system_unit: int):
+        value_and_unit = UnitParser.parse_power(average_power, system_unit)
+        self.average_power_value.value = value_and_unit[0]
+        self.average_power_unit.value = value_and_unit[1]
+        self.average_power.update()
+
+    def set_average_speed(self, average_speed: int):
+        value_and_unit = UnitParser.parse_speed(average_speed)
+        self.average_speed_value.value = value_and_unit[0]
+        self.average_speed_unit.value = value_and_unit[1]
+        self.average_speed.update()
+
+    def set_number_of_revolutions(self, number_of_revolutions: int):
+        self.number_of_revolutions_value.value = number_of_revolutions
+        self.number_of_revolutions.update()

@@ -79,7 +79,7 @@ class DualShaPoLiOff(ft.Container):
         while True:
             sps1_data_log = DataLog.select(
                 DataLog.utc_time,
-                DataLog.revolution,
+                DataLog.speed,
                 DataLog.power,
                 DataLog.torque,
                 DataLog.thrust
@@ -87,7 +87,7 @@ class DualShaPoLiOff(ft.Container):
 
             sps2_data_log = DataLog.select(
                 DataLog.utc_time,
-                DataLog.revolution,
+                DataLog.speed,
                 DataLog.power,
                 DataLog.torque,
                 DataLog.thrust
@@ -95,7 +95,7 @@ class DualShaPoLiOff(ft.Container):
 
             self.sps1_meters.set_power(sps1_data_log[0].power, self.system_unit)
             self.sps1_meters.set_torque(sps1_data_log[0].torque, self.system_unit)
-            self.sps1_meters.set_speed(sps1_data_log[0].revolution)
+            self.sps1_meters.set_speed(sps1_data_log[0].speed)
             self.sps1_meters.set_thrust(
                 self.display_thrust,
                 sps1_data_log[0].thrust,
@@ -104,7 +104,7 @@ class DualShaPoLiOff(ft.Container):
 
             self.sps2_meters.set_power(sps2_data_log[0].power, self.system_unit)
             self.sps2_meters.set_torque(sps2_data_log[0].torque, self.system_unit)
-            self.sps2_meters.set_speed(sps2_data_log[0].revolution)
+            self.sps2_meters.set_speed(sps2_data_log[0].speed)
             self.sps2_meters.set_thrust(
                 self.display_thrust,
                 sps2_data_log[0].thrust,

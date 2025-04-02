@@ -36,7 +36,7 @@ class DataLogger:
                 utc_date=datetime.now().date(),
                 utc_time=datetime.now().time(),
                 # rpm
-                revolution=random.randint(
+                speed=random.randint(
                     int(self.max_speed * 0.7),
                     self.max_speed
                 ),

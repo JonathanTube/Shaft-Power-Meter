@@ -9,7 +9,7 @@ class DataLog(BaseModel):
 
     utc_time = TimeField(verbose_name="UTC时间")
 
-    revolution = IntegerField(verbose_name="转速(Rev/Min)")
+    speed = IntegerField(verbose_name="转速(RPM)")
 
     power = IntegerField(verbose_name="功率(W)")
 
