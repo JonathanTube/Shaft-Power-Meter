@@ -53,6 +53,6 @@ class Counter(ft.Container):
                             CounterTotal('SPS1')
                         ]
                     ),
-                    ft.Text('',expand=True)
+                    ft.Text('', expand=True)
                 ]
             )

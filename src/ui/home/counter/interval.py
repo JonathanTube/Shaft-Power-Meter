@@ -11,7 +11,15 @@ class CounterInterval(ft.Container):
     def __init__(self, name: Literal['SPS1', 'SPS2']):
         super().__init__()
         self.expand = True
+        self.border_radius = ft.border_radius.all(10)
+        self.padding = 10
+        self.border = ft.border.all(
+            width=0.5,
+            color=ft.colors.with_opacity(0.15, ft.colors.INVERSE_SURFACE)
+        )
+
         self.name = name
+        self._task = None
         self.__load_config()
 
     def __load_config(self):
@@ -46,7 +54,8 @@ class CounterInterval(ft.Container):
             height=40,
             text_size=14,
             input_filter=ft.InputFilter(
-                regex_string=r'^[0-9]+(\.[0-9]+)?$'
+                # float number or int number or empty like ""
+                regex_string=r'^(?:\d+\.?\d*|\.\d+)$|^$'
             ),
             value=hours,
             border_color=ft.colors.ON_SURFACE,
@@ -54,17 +63,30 @@ class CounterInterval(ft.Container):
             on_change=lambda e: self.on_hours_change(e)
         )
 
-        self.content = SimpleCard(
-            title="Interval",
-            expand=False,
-            body=ft.Column(
-                expand=True,
-                horizontal_alignment=ft.CrossAxisAlignment.CENTER,
-                spacing=20,
-                controls=[
-                    self.display,
-                    self.hours_field
-                ]))
+        self.status_container = ft.Container(
+            content=ft.Text(value='Running', size=14),
+            alignment=ft.alignment.center,
+            bgcolor=ft.colors.GREEN_500,
+            border_radius=ft.border_radius.all(40),
+            padding=ft.padding.only(top=0, bottom=4, left=10, right=10)
+        )
+
+        self.title = ft.Text('Interval', weight=ft.FontWeight.BOLD, size=16)
+
+        self.content = ft.Column(
+            expand=True,
+            horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+            spacing=20,
+            controls=[
+                ft.Row(
+                    alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
+                    controls=[
+                        self.title,
+                        self.status_container
+                    ]),
+                self.display,
+                self.hours_field
+            ])
 
     async def __refresh_data(self):
         while True:

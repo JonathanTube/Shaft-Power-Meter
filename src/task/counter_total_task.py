@@ -46,7 +46,7 @@ class CounterTotalTask:
     def __handle_result(self, name: Literal['SPS1', 'SPS2'], start_time: datetime, end_time: datetime, average_power: float, max_rounds: int, min_rounds: int):
         hours = (end_time - start_time).total_seconds() / 3600
 
-        total_energy = average_power * hours / 1000  # kWh
+        total_energy = (average_power * hours) / 1000  # kWh
 
         total_rounds = max_rounds - min_rounds
 
@@ -54,9 +54,17 @@ class CounterTotalTask:
         if hours > 0:
             average_speed = round(total_rounds / (hours * 60), 1)
 
+        time_elapsed = end_time - start_time
+        days = time_elapsed.days
+        hours = time_elapsed.seconds // 3600
+        minutes = (time_elapsed.seconds % 3600) // 60
+        seconds = time_elapsed.seconds % 60
+
         self.page.session.set(f'counter_total_{name}', {
             'total_energy': total_energy,
             'average_power': average_power,
             'total_rounds': total_rounds,
-            'average_speed': average_speed
+            'average_speed': average_speed,
+            'time_elapsed': f'{days:02d} d {hours:02d}:{minutes:02d}:{seconds:02d} h measured',
+            'started_at': f'started at {start_time.strftime("%d/%m/%Y %H:%M:%S")}'
         })

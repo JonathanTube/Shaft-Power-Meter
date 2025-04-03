@@ -8,13 +8,12 @@ class CounterDisplay(ft.Container):
         super().__init__()
         self.expand = True
         # self.bgcolor = "yellow"
+        self.padding = ft.padding.symmetric(horizontal=20)
 
     def __create_label(self, text: str = ""):
         return ft.Text(
             value=f"{text}:",
-            size=14,
-            text_align=ft.TextAlign.RIGHT,
-            width=180
+            text_align=ft.TextAlign.RIGHT
         )
 
     def __create_value(self):
@@ -23,8 +22,7 @@ class CounterDisplay(ft.Container):
     def __create_unit(self, text: str):
         return ft.Text(
             value=text,
-            size=12,
-            width=40
+            width=30
         )
 
     def __create_total_energy(self):
@@ -35,8 +33,14 @@ class CounterDisplay(ft.Container):
         self.total_energy = ft.Row(
             alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
             controls=[
-                self.total_energy_label,
                 ft.Row(
+                    controls=[
+                        ft.Icon(ft.icons.ENERGY_SAVINGS_LEAF_OUTLINED, size=16),
+                        self.total_energy_label
+                    ]
+                ),
+                ft.Row(
+                    alignment=ft.MainAxisAlignment.END,
                     controls=[
                         self.total_energy_value,
                         self.total_energy_unit
@@ -52,7 +56,12 @@ class CounterDisplay(ft.Container):
         self.average_power = ft.Row(
             alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
             controls=[
-                self.average_power_label,
+                ft.Row(
+                    controls=[
+                        ft.Icon(ft.icons.ELECTRIC_BOLT_OUTLINED, size=16),
+                        self.average_power_label
+                    ]
+                ),
                 ft.Row(controls=[
                     self.average_power_value,
                     self.average_power_unit]
@@ -68,7 +77,12 @@ class CounterDisplay(ft.Container):
         self.total_rounds = ft.Row(
             alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
             controls=[
-                self.total_rounds_label,
+                ft.Row(
+                    controls=[
+                        ft.Icon(ft.icons.CYCLONE_OUTLINED, size=16),
+                        self.total_rounds_label
+                    ]
+                ),
                 ft.Row(
                     controls=[
                         self.total_rounds_value,
@@ -86,7 +100,12 @@ class CounterDisplay(ft.Container):
         self.average_speed = ft.Row(
             alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
             controls=[
-                self.average_speed_label,
+                ft.Row(
+                    controls=[
+                        ft.Icon(ft.icons.SPEED_OUTLINED, size=16),
+                        self.average_speed_label
+                    ]
+                ),
                 ft.Row(controls=[
                     self.average_speed_value,
                     self.average_speed_unit

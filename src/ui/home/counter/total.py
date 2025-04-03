@@ -10,25 +10,46 @@ class CounterTotal(ft.Container):
     def __init__(self, name: Literal['SPS1', 'SPS2']):
         super().__init__()
         self.expand = True
+        self.border_radius = ft.border_radius.all(10)
+        self.padding = 10
+        self.border = ft.border.all(
+            width=0.5,
+            color=ft.colors.with_opacity(0.15, ft.colors.INVERSE_SURFACE)
+        )
+
         self.name = name
+
+        self._task = None
+
         self.system_unit = Preference.get().system_unit
 
     def build(self):
         self.display = CounterDisplay()
-        time_elapsed = ft.Text("00 d 23:10:01 h measured")
-        started_at = ft.Text("started at 18/07/2014 06:56:19")
+        self.time_elapsed = ft.Text("")
+        self.started_at = ft.Text("")
 
-        self.content = SimpleCard(
-            title="Total",
-            expand=False,
-            body=ft.Column(
-                spacing=5,
-                horizontal_alignment=ft.CrossAxisAlignment.CENTER,
-                controls=[
-                    self.display,
-                    time_elapsed,
-                    started_at
-                ]))
+        self.title = ft.Text('Total', weight=ft.FontWeight.BOLD, size=16)
+
+        self.status_container = ft.Container(
+            content=ft.Text(value='Running', size=14),
+            alignment=ft.alignment.center,
+            bgcolor=ft.colors.GREEN_500,
+            border_radius=ft.border_radius.all(40),
+            padding=ft.padding.only(top=0, bottom=4, left=10, right=10)
+        )
+
+        self.content = ft.Column(
+            horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+            controls=[
+                ft.Row(alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
+                       controls=[
+                           self.title,
+                           self.status_container
+                       ]),
+                self.display,
+                self.time_elapsed,
+                self.started_at
+            ])
 
     async def __refresh_data(self):
         while True:
@@ -38,6 +59,15 @@ class CounterTotal(ft.Container):
                 total_energy = result['total_energy']
                 total_rounds = result['total_rounds']
                 average_speed = result['average_speed']
+
+                self.time_elapsed.value = result['time_elapsed']
+                self.time_elapsed.visible = True
+                self.time_elapsed.update()
+
+                self.started_at.value = result['started_at']
+                self.started_at.visible = True
+                self.started_at.update()
+
                 self.display.set_average_power(average_power, self.system_unit)
                 self.display.set_total_energy(total_energy, self.system_unit)
                 self.display.set_total_rounds(total_rounds)

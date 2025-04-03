@@ -35,6 +35,8 @@ class CounterIntervalTask:
             fn.COALESCE(fn.AVG(DataLog.power), 0).alias('average_power'),
             fn.COALESCE(fn.MIN(DataLog.rounds), 0).alias('min_rounds'),
             fn.COALESCE(fn.MAX(DataLog.rounds), 0).alias('max_rounds'),
+            fn.COALESCE(fn.MIN(DataLog.created_at), 0).alias('start_time'),
+            fn.COALESCE(fn.MAX(DataLog.created_at), 0).alias('end_time')
         ).where(
             DataLog.name == name,
             DataLog.created_at >= start_time,
@@ -45,13 +47,23 @@ class CounterIntervalTask:
         max_rounds = data_log['max_rounds']
         min_rounds = data_log['min_rounds']
 
-        self.__handle_result(name, start_time, end_time,
-                             average_power, max_rounds, min_rounds)
+        format_str = '%Y-%m-%d %H:%M:%S.%f'
+        actual_start_time = datetime.strptime(data_log['start_time'], format_str)
+        actual_end_time = datetime.strptime(data_log['end_time'], format_str)
+
+        self.__handle_result(
+            name,
+            actual_start_time,
+            actual_end_time,
+            average_power,
+            max_rounds,
+            min_rounds
+        )
 
     def __handle_result(self, name: Literal['SPS1', 'SPS2'], start_time: datetime, end_time: datetime, average_power: float, max_rounds: int, min_rounds: int):
         hours = (end_time - start_time).total_seconds() / 3600
 
-        total_energy = average_power * hours / 1000  # kWh
+        total_energy = (average_power * hours) / 1000  # kWh
 
         total_rounds = max_rounds - min_rounds
 
