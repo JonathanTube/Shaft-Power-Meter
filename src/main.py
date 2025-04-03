@@ -11,6 +11,9 @@ from db.data_init import DataInit
 from db.table_init import TableInit
 from db.models.preference import Preference
 from db.models.language import Language
+from task.counter_total_task import CounterTotalTask
+from task.counter_interval_task import CounterIntervalTask
+from task.counter_manually_task import CounterManuallyTask
 
 
 def get_theme_mode():
@@ -49,6 +52,17 @@ def start_loggers():
     asyncio.create_task(breach_logger.start())
 
 
+def start_tasks(page: ft.Page):
+    counter_total_task = CounterTotalTask(page)
+    asyncio.create_task(counter_total_task.start())
+
+    counter_manually_task = CounterManuallyTask(page)
+    asyncio.create_task(counter_manually_task.start())
+
+    counter_interval_task = CounterIntervalTask(page)
+    asyncio.create_task(counter_interval_task.start())
+
+
 def start_utc_time():
     asyncio.create_task(UtcTimer().start())
 
@@ -64,6 +78,7 @@ async def main(page: ft.Page):
     DataInit.init()
     start_loggers()
     start_utc_time()
+    start_tasks(page)
 
     load_language(page)
     set_system_unit(page)

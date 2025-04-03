@@ -1,22 +1,28 @@
 import flet as ft
 
-
+from db.models.system_settings import SystemSettings
+from ui.home.dashboard.sps_single.off.index import SingleShaPoLiOff
+from ui.home.dashboard.sps_single.on.index import SingleShaPoLiOn
 from .manually import CounterManually
 from .interval import CounterInterval
 from .total import CounterTotal
 
 
 class Counter(ft.Container):
-    def __init__(self, dual: bool = False):
+    def __init__(self):
         super().__init__()
-        self.dual = dual
         self.padding = 10
         self.expand = True
+
+        self.__load_config()
+
+    def __load_config(self):
+        system_settings: SystemSettings = SystemSettings.get_or_none()
+        self.dual = system_settings.amount_of_propeller == 2
 
     def build(self):
         if self.dual:
             self.content = ft.Column(
-                expand=True,
                 controls=[
                     ft.Text('SPS1', weight=ft.FontWeight.BOLD, size=16),
                     ft.Row(
@@ -37,10 +43,16 @@ class Counter(ft.Container):
                 ]
             )
         else:
-            self.content = ft.Row(
-                scroll=ft.ScrollMode.ADAPTIVE,
+            self.content = ft.Column(
                 controls=[
-                    CounterInterval('SPS1'),
-                    CounterManually('SPS1'),
-                    CounterTotal('SPS1')
-                ])
+                    ft.Row(
+                        expand=True,
+                        controls=[
+                            CounterInterval('SPS1'),
+                            CounterManually('SPS1'),
+                            CounterTotal('SPS1')
+                        ]
+                    ),
+                    ft.Text('',expand=True)
+                ]
+            )

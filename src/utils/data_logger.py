@@ -46,7 +46,8 @@ class DataLogger:
                     self.max_power
                 ),
                 thrust=random.randint(500, 1000),  # N
-                torque=random.randint(500, 1000)  # Nm
+                torque=random.randint(500, 1000),  # Nm
+                rounds=int(datetime.now().timestamp()),
             )
             # print(f"Generated data: {data}")
         except Exception as e:

@@ -17,5 +17,7 @@ class DataLog(BaseModel):
 
     torque = IntegerField(verbose_name="扭矩(Nm)")
 
+    rounds = IntegerField(verbose_name="圈数")
+
     class Meta:
         table_name = 'data_log'

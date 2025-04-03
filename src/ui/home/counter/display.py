@@ -27,19 +27,19 @@ class CounterDisplay(ft.Container):
             width=40
         )
 
-    def __create_sum_power(self):
-        self.sum_power_value = self.__create_value()
-        self.sum_power_label = self.__create_label('Sum Power')
-        self.sum_power_unit = self.__create_unit('kWh')
+    def __create_total_energy(self):
+        self.total_energy_value = self.__create_value()
+        self.total_energy_label = self.__create_label('Total Energy')
+        self.total_energy_unit = self.__create_unit('kWh')
 
-        self.sum_power = ft.Row(
+        self.total_energy = ft.Row(
             alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
             controls=[
-                self.sum_power_label,
+                self.total_energy_label,
                 ft.Row(
                     controls=[
-                        self.sum_power_value,
-                        self.sum_power_unit
+                        self.total_energy_value,
+                        self.total_energy_unit
                     ])
             ]
         )
@@ -47,7 +47,7 @@ class CounterDisplay(ft.Container):
     def __create_average_power(self):
         self.average_power_label = self.__create_label('Average Power')
         self.average_power_value = self.__create_value()
-        self.average_power_unit = self.__create_unit('kWh')
+        self.average_power_unit = self.__create_unit('W')
 
         self.average_power = ft.Row(
             alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
@@ -60,17 +60,21 @@ class CounterDisplay(ft.Container):
             ]
         )
 
-    def __create_number_of_revolutions(self):
-        self.number_of_revolutions_label = self.__create_label(
-            'Number of Revolutions')
-        self.number_of_revolutions_value = self.__create_value()
+    def __create_total_rounds(self):
+        self.total_rounds_label = self.__create_label(
+            'Total Rounds')
+        self.total_rounds_value = self.__create_value()
 
-        self.number_of_revolutions = ft.Row(
+        self.total_rounds = ft.Row(
             alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
             controls=[
-                self.number_of_revolutions_label,
-                ft.Row(controls=[self.number_of_revolutions_value]),
-                ft.Text("")
+                self.total_rounds_label,
+                ft.Row(
+                    controls=[
+                        self.total_rounds_value,
+                        self.__create_unit("")
+                    ]
+                )
             ]
         )
 
@@ -91,25 +95,25 @@ class CounterDisplay(ft.Container):
         )
 
     def build(self):
-        self.__create_sum_power(),
-        self.__create_average_power(),
-        self.__create_number_of_revolutions(),
+        self.__create_total_energy()
+        self.__create_average_power()
+        self.__create_total_rounds()
         self.__create_average_speed()
         self.content = ft.Column(
             expand=True,
             controls=[
-                self.sum_power,
+                self.total_energy,
                 self.average_power,
-                self.number_of_revolutions,
+                self.total_rounds,
                 self.average_speed
             ]
         )
 
-    def set_sum_power(self, sum_power: float, system_unit: int):
-        value_and_unit = UnitParser.parse_energy(sum_power, system_unit)
-        self.sum_power_value.value = value_and_unit[0]
-        self.sum_power_unit.value = value_and_unit[1]
-        self.sum_power.update()
+    def set_total_energy(self, total_energy: float, system_unit: int):
+        value_and_unit = UnitParser.parse_energy(total_energy, system_unit)
+        self.total_energy_value.value = value_and_unit[0]
+        self.total_energy_unit.value = value_and_unit[1]
+        self.total_energy.update()
 
     def set_average_power(self, average_power: float, system_unit: int):
         value_and_unit = UnitParser.parse_power(average_power, system_unit)
@@ -123,6 +127,6 @@ class CounterDisplay(ft.Container):
         self.average_speed_unit.value = value_and_unit[1]
         self.average_speed.update()
 
-    def set_number_of_revolutions(self, number_of_revolutions: int):
-        self.number_of_revolutions_value.value = number_of_revolutions
-        self.number_of_revolutions.update()
+    def set_total_rounds(self, total_rounds: int):
+        self.total_rounds_value.value = total_rounds
+        self.total_rounds.update()

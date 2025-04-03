@@ -30,7 +30,7 @@ class Home(ft.Stack):
                 ft.Icon(name=ft.Icons.TIMER_OUTLINED),
                 ft.Text("Counter")
             ]),
-            content=Counter(True)
+            content=Counter()
         )
         self.trendview = ft.Tab(
             tab_content=ft.Row(spacing=spacing, controls=[
@@ -92,6 +92,7 @@ class Home(ft.Stack):
         self.__set_tab_text(self.dashboard, "lang.home.tab.dashboard")
         self.__set_tab_text(self.counter, "lang.home.tab.counter")
         self.__set_tab_text(self.trendview, "lang.home.tab.trendview")
-        self.__set_tab_text(self.propeller_curve, "lang.home.tab.propeller_curve")
+        self.__set_tab_text(self.propeller_curve,
+                            "lang.home.tab.propeller_curve")
         self.__set_tab_text(self.alarm, "lang.home.tab.alarm")
         self.__set_tab_text(self.logs, "lang.home.tab.logs")

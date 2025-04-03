@@ -11,7 +11,7 @@ class UtcTimer:
         while True:
             # get utc time from local time of host machine
             self.utc_time = datetime.now(timezone.utc)
-            print(self.utc_time)
+            # print(self.utc_time)
             await asyncio.sleep(1)
 
     def get_utc_time(self):
