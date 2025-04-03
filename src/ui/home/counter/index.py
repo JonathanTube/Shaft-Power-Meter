@@ -1,8 +1,6 @@
 import flet as ft
 
 from db.models.system_settings import SystemSettings
-from ui.home.dashboard.sps_single.off.index import SingleShaPoLiOff
-from ui.home.dashboard.sps_single.on.index import SingleShaPoLiOn
 from .manually import CounterManually
 from .interval import CounterInterval
 from .total import CounterTotal

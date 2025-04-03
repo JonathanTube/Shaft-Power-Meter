@@ -2,7 +2,6 @@ import asyncio
 from typing import Literal
 import flet as ft
 from db.models.preference import Preference
-from ui.common.simple_card import SimpleCard
 from .display import CounterDisplay
 
 

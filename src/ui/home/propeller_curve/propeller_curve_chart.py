@@ -123,7 +123,7 @@ class PropellerCurveChart(ft.Container):
 
         self.content = self.chart
 
-    def get_points(self, rpm_left, power_left, rpm_right, power_right, count=100):
+    def get_points(self, rpm_left, power_left, rpm_right, power_right, count=100, pow: int = 3):
         rpm = np.linspace(start=rpm_left, stop=rpm_right, num=count)
 
         # 如果左端点为0，0
@@ -131,16 +131,16 @@ class PropellerCurveChart(ft.Container):
             if power_right == 0:
                 return [], []
             # 计算系数
-            k = power_right / rpm_right**3
+            k = power_right / rpm_right**pow
             # print('rpm=', rpm)
-            power = k * rpm**3
+            power = k * rpm**pow
             # 最后一位向上取整
             power[-1] = math.ceil(power[-1])
 
             return rpm, power
         else:
             diff = (rpm - rpm_left) / (rpm_right - rpm_left)
-            power = power_left + diff ** 3 * (power_right - power_left)
+            power = power_left + diff ** pow * (power_right - power_left)
             return rpm, power
 
     def update_static_data(self, normal_rpm_left: float, normal_power_left: float,
@@ -157,16 +157,20 @@ class PropellerCurveChart(ft.Container):
         self.chart.min_x = 0 if normal_rpm_left == 0 else normal_rpm_left * 0.8
         self.chart.min_y = 0 if normal_power_left == 0 else normal_power_left * 0.8
 
-        rpm_points, power_points = self.get_points(
-            normal_rpm_left, normal_power_left, normal_rpm_right, normal_power_right
+        rpm_points_normal_propeller_curve, power_points_normal_propeller_curve = self.get_points(
+            normal_rpm_left,
+            normal_power_left,
+            normal_rpm_right,
+            normal_power_right,
+            pow=3
         )
-        if len(rpm_points) == 0 or len(power_points) == 0:
+        if len(rpm_points_normal_propeller_curve) == 0 or len(power_points_normal_propeller_curve) == 0:
             return
 
         # normal propeller curve
         self.chart.data_series[0].data_points = [
             *[ft.LineChartDataPoint(x, y)
-              for x, y in zip(rpm_points, power_points)],
+              for x, y in zip(rpm_points_normal_propeller_curve, power_points_normal_propeller_curve)],
             ft.LineChartDataPoint(105, 100)
         ]
         self.chart.data_series[0].color = normal_line_color
@@ -179,7 +183,7 @@ class PropellerCurveChart(ft.Container):
 
         # light propeller curve
         self.chart.data_series[2].data_points = [
-            ft.LineChartDataPoint(x, y * (100 - light_propeller)/100) for x, y in zip(rpm_points, power_points)
+            ft.LineChartDataPoint(x, y * (100 - light_propeller)/100) for x, y in zip(rpm_points_normal_propeller_curve, power_points_normal_propeller_curve)
         ]
         self.chart.data_series[2].color = light_propeller_line_color
 
@@ -190,22 +194,24 @@ class PropellerCurveChart(ft.Container):
         self.chart.data_series[3].color = speed_limit_line_color
 
         # torque/load limit curve
+        rpm_points_torque_load_limit_curve, power_points_torque_load_limit_curve = self.get_points(
+            torque_load_limit_rpm_left,
+            torque_load_limit_power_left,
+            torque_load_limit_rpm_right,
+            torque_load_limit_power_right,
+            pow=2
+        )
         self.chart.data_series[4].data_points = [
-            ft.LineChartDataPoint(
-                torque_load_limit_rpm_left,
-                torque_load_limit_power_left
-            ),
-            ft.LineChartDataPoint(
-                torque_load_limit_rpm_right,
-                torque_load_limit_power_right
-            )
+            *[ft.LineChartDataPoint(x, y)
+              for x, y in zip(rpm_points_torque_load_limit_curve, power_points_torque_load_limit_curve)]
         ]
         self.chart.data_series[4].color = torque_load_limit_line_color
 
         # overload curve
         data_series_5 = (ft.LineChartDataPoint(x, y * (100 + overload)/100)
-                         for x, y in zip(rpm_points, power_points))
-        last_power = power_points[-1] * (100 + overload)/100
+                         for x, y in zip(rpm_points_normal_propeller_curve, power_points_normal_propeller_curve))
+        last_power = power_points_normal_propeller_curve[-1] * (
+            100 + overload)/100
         self.chart.data_series[5].data_points = [
             *data_series_5,
             ft.LineChartDataPoint(
