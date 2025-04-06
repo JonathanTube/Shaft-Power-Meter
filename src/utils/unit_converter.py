@@ -4,32 +4,26 @@ import math
 class UnitConverter:
     # https://www.unitconverters.net/power/watts-to-hp.htm
     @staticmethod
-    def w_to_hp(value):
-        # 1 W = 0.0013596216 hp
+    def w_to_shp(value):
+        # 1 W = 0.0013596216 sHp
         return round(value * 0.0013596216, 2)
 
     @staticmethod
-    def hp_to_w(value):
-        # 1 hp = 735.4987593 W
+    def shp_to_w(value):
+        # 1 sHp = 735.4987593 W
         return math.ceil(value * 735.4987593)
 
-    # https://www.unitconverters.net/torque/newton-meter-to-gram-force-meter.htm
-    # gfm = gram-force meter
     @staticmethod
-    def nm_to_gfm(value):
-        # 1 Nm = 101.9716213 gfm
-        return value * 101.9716213
+    def nm_to_tm(value):
+        # 1 Nm = 0.0001019716213 Tm
+        return value * 0.0001019716213
 
-    # https://www.unitconverters.net/force/newton-to-gram-force.htm
-    # gf = gram-force
     @staticmethod
-    def n_to_gf(value):
-        # 1 N = 101.9716213 gf
-        return value * 101.9716213
+    def n_to_t(value):
+        # 1 N = 0.0001019716213 T
+        return value * 0.0001019716213
 
-    # https://www.unitconverters.net/energy/kilowatt-hour-to-horsepower-metric-hour.htm
-    # hph = horsepower metric hour
     @staticmethod
-    def kwh_to_hph(value):
-        # 1 kWh = 1.3596216173 hph
-        return value * 1.3596216173
+    def kwh_to_shph(value):
+        # 1 kWh =  1.3410220896 sHp·h
+        return value * 1.3410220896

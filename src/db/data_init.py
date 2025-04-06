@@ -433,6 +433,12 @@ class DataInit:
                 },
 
                 {
+                    "code": "lang.setting.language_conf.title",
+                    "chinese": "语言配置",
+                    "english": "Language Conf."
+                },
+
+                {
                     "code": "lang.setting.self_test.title",
                     "chinese": "自检",
                     "english": "Self Test"

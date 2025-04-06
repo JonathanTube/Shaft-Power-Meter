@@ -241,7 +241,7 @@ class General(ft.Container):
             for item in language_items:
                 page.session.set(item.code, item.chinese)
 
-    def __cancel_data(self, e):
+    def __reset_data(self, e):
         self.last_preference = Preference.select().order_by(Preference.id.desc()).first()
         self.last_limitations = Limitations.select().order_by(Limitations.id.desc()).first()
         self.last_date_time_conf = DateTimeConf.select().order_by(
@@ -280,10 +280,10 @@ class General(ft.Container):
             width=120, height=40,
             on_click=self.__save_data
         )
-        self.cancel_button = ft.OutlinedButton(
-            text="Cancel",
+        self.reset_button = ft.OutlinedButton(
+            text="Reset",
             width=120, height=40,
-            on_click=self.__cancel_data
+            on_click=self.__reset_data
         )
 
         self.content = ft.Column(
@@ -299,7 +299,7 @@ class General(ft.Container):
                             alignment=ft.MainAxisAlignment.CENTER,
                             controls=[
                                 self.save_button,
-                                self.cancel_button
+                                self.reset_button
                             ])
                     ]
                 )
@@ -355,4 +355,4 @@ class General(ft.Container):
         self.power_warning.label = session.get("lang.common.power")
 
         self.save_button.text = session.get("lang.button.save")
-        self.cancel_button.text = session.get("lang.button.cancel")
+        self.reset_button.text = session.get("lang.button.reset")

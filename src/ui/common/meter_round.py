@@ -33,6 +33,10 @@ class MeterRound(ft.Container):
         self.warning_line.update()
 
     def set_data(self, value: int, unit: str):
+        # update unit
+        self.center_unit.value = unit
+        self.center_unit.update()
+
         if self.max_value == 0:
             return
 
@@ -49,10 +53,6 @@ class MeterRound(ft.Container):
         # update center text
         self.center_text.value = value
         self.center_text.update()
-
-        # update unit
-        self.center_unit.value = unit
-        self.center_unit.update()
 
     def __create_ring(self):
         self.active_section = ft.PieChartSection(

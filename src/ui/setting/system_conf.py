@@ -27,11 +27,11 @@ class SystemConf(ft.Container):
             height=40,
             on_click=self.__save_data
         )
-        self.cancel_button = ft.OutlinedButton(
-            text="Cancel",
+        self.reset_button = ft.OutlinedButton(
+            text="Reset",
             width=120,
             height=40,
-            on_click=self.__cancel_data
+            on_click=self.__reset_data
         )
 
         self.content = ft.Column(
@@ -48,7 +48,7 @@ class SystemConf(ft.Container):
                             alignment=ft.MainAxisAlignment.CENTER,
                             controls=[
                                 self.save_button,
-                                self.cancel_button
+                                self.reset_button
                             ])
                     ]
                 )
@@ -59,14 +59,14 @@ class SystemConf(ft.Container):
         if self.system_unit == 0:
             return (_eexi_limited_power / 1000, "kW")
         else:
-            return (UnitConverter.w_to_hp(_eexi_limited_power), "hp")
+            return (UnitConverter.w_to_shp(_eexi_limited_power), "hp")
 
     def __set_eexi_limited_power(self, e):
         _eexi_limited_power = float(e.control.value)
         if self.system_unit == 0:
             self.last_system_settings.eexi_limited_power = _eexi_limited_power * 1000
         else:
-            self.last_system_settings.eexi_limited_power = UnitConverter.hp_to_w(
+            self.last_system_settings.eexi_limited_power = UnitConverter.shp_to_w(
                 _eexi_limited_power)
 
     def __create_settings_card(self):
@@ -236,7 +236,7 @@ class SystemConf(ft.Container):
         e.page.session.get("sha_po_li").switch()
         Toast.show_success(e.page)
 
-    def __cancel_data(self, e):
+    def __reset_data(self, e):
         self.__load_data()
 
         self.display_thrust.value = self.last_system_settings.display_thrust
@@ -306,7 +306,7 @@ class SystemConf(ft.Container):
             session.get("lang.setting.factor_conf"))
 
         self.save_button.text = session.get("lang.button.save")
-        self.cancel_button.text = session.get("lang.button.cancel")
+        self.reset_button.text = session.get("lang.button.reset")
 
     def before_update(self):
         self.__set_language()

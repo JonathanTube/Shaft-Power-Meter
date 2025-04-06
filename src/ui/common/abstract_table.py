@@ -4,7 +4,6 @@ import flet as ft
 from ui.common.pagination import Pagination
 
 
-@final
 class AbstractTable(ft.Container):
     def __init__(self, page_size: int):
         super().__init__()

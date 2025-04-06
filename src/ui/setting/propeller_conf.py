@@ -24,14 +24,14 @@ class PropellerConf(ft.Column):
         if self.system_unit == 0:
             return (_shaft_power / 1000, "kW")
         else:
-            return (UnitConverter.w_to_hp(_shaft_power), "hp")
+            return (UnitConverter.w_to_shp(_shaft_power), "hp")
 
     def __set_shaft_power(self, e):
         _shaft_power = float(e.control.value)
         if self.system_unit == 0:
             self.last_propeller_setting.shaft_power_of_mcr_operating_point = _shaft_power * 1000
         else:
-            self.last_propeller_setting.shaft_power_of_mcr_operating_point = UnitConverter.hp_to_w(
+            self.last_propeller_setting.shaft_power_of_mcr_operating_point = UnitConverter.shp_to_w(
                 _shaft_power)
 
     def __create_mcr_operating_point(self):
@@ -236,7 +236,7 @@ class PropellerConf(ft.Column):
         self.last_propeller_setting.save()
         Toast.show_success(e.page)
 
-    def __cancel_data(self, e):
+    def __reset_data(self, e):
         self.last_propeller_setting = PropellerSetting.select().order_by(
             PropellerSetting.id.desc()).first()
 
@@ -294,11 +294,11 @@ class PropellerConf(ft.Column):
             on_click=lambda e: self.__save_data(e)
         )
 
-        self.cancel_button = ft.OutlinedButton(
-            text="Cancel",
+        self.reset_button = ft.OutlinedButton(
+            text="Reset",
             width=120,
             height=40,
-            on_click=lambda e: self.__cancel_data(e)
+            on_click=lambda e: self.__reset_data(e)
         )
 
         self.controls = [
@@ -315,7 +315,7 @@ class PropellerConf(ft.Column):
                         alignment=ft.MainAxisAlignment.CENTER,
                         controls=[
                             self.save_button,
-                            self.cancel_button
+                            self.reset_button
                         ]
                     )
                 ]
@@ -363,7 +363,7 @@ class PropellerConf(ft.Column):
             "lang.setting.enable_overload_alarm")
 
         self.save_button.text = session.get("lang.button.save")
-        self.cancel_button.text = session.get("lang.button.cancel")
+        self.reset_button.text = session.get("lang.button.reset")
 
     def before_update(self):
         self.__set_language()

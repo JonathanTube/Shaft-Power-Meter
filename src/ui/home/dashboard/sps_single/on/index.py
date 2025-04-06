@@ -103,6 +103,10 @@ class SingleShaPoLiOn(ft.Container):
                     self.system_unit
                 )
                 self.power_line_chart.update(data_logs)
+            else:
+                self.eexi_limited_power.set_value(0)
+                self.instant_value_grid.set_data(0, 0, 0, 0, self.system_unit)
+                self.power_line_chart.update([])
 
             await asyncio.sleep(self.data_refresh_interval)
 

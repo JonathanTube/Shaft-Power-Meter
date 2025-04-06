@@ -80,24 +80,37 @@ class DualShaPoLiOn(ft.Container):
                 DataLog.name == "SPS2"
             ).order_by(DataLog.id.desc()).limit(50)
 
-            self.instant_grid.set_power_values(
-                sps1_data_logs[0].power, sps2_data_logs[0].power, self.system_unit
-            )
+            sps1_power = sps1_data_logs[0].power if len(
+                sps1_data_logs) > 0 else 0
+            sps2_power = sps2_data_logs[0].power if len(
+                sps2_data_logs) > 0 else 0
+            sps1_speed = sps1_data_logs[0].speed if len(
+                sps1_data_logs) > 0 else 0
+            sps2_speed = sps2_data_logs[0].speed if len(
+                sps2_data_logs) > 0 else 0
+            sps1_torque = sps1_data_logs[0].torque if len(
+                sps1_data_logs) > 0 else 0
+            sps2_torque = sps2_data_logs[0].torque if len(
+                sps2_data_logs) > 0 else 0
+            sps1_thrust = sps1_data_logs[0].thrust if len(
+                sps1_data_logs) > 0 else 0
+            sps2_thrust = sps2_data_logs[0].thrust if len(
+                sps2_data_logs) > 0 else 0
 
-            self.instant_grid.set_speed_values(
-                sps1_data_logs[0].speed, sps2_data_logs[0].speed
-            )
+            self.instant_grid.set_power_values(sps1_power, sps2_power, self.system_unit)
+
+            self.instant_grid.set_speed_values(sps1_speed, sps2_speed)
 
             self.instant_grid.set_torque_values(
-                sps1_data_logs[0].torque, sps2_data_logs[0].torque, self.system_unit
+                sps1_torque, sps2_torque, self.system_unit
             )
 
             self.instant_grid.set_thrust_values(
-                sps1_data_logs[0].thrust, sps2_data_logs[0].thrust, self.system_unit
+                sps1_thrust, sps2_thrust, self.system_unit
             )
 
             self.eexi_limited_power.set_value(
-                sps1_data_logs[0].power + sps2_data_logs[0].power
+                sps1_power + sps2_power
             )
 
             self.power_chart_sps1.update(sps1_data_logs)

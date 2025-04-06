@@ -95,6 +95,10 @@ class SingleShaPoLiOff(ft.Stack):
                 )
                 self.thrust_power.set_data(self.display_thrust, data_logs[0].thrust, self.system_unit)
                 self.power_line_chart.update(data_logs)
+            else:
+                self.single_meters.set_data(0, 0, 0, self.system_unit)
+                self.thrust_power.set_data(self.display_thrust, 0, self.system_unit)
+                self.power_line_chart.update([])
 
             await asyncio.sleep(self.data_refresh_interval)
 
