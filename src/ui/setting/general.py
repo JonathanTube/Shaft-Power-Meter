@@ -233,9 +233,9 @@ class General(ft.Container):
 
         new_date = self.last_date_time_conf.utc_date
         new_time = self.last_date_time_conf.utc_time
-        new_utc_date_time = datetime.strptime(
-            f"{new_date} {new_time}", '%Y-%m-%d %H:%M:%S'
-        )
+        new_date_time = f"{new_date} {new_time}"
+        dt_format = '%Y-%m-%d %H:%M:%S.%f'
+        new_utc_date_time = datetime.strptime(new_date_time, dt_format)
         self.page.session.set('utc_date_time', new_utc_date_time)
 
         self.last_date_time_conf.save()

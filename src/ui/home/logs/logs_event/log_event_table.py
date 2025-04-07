@@ -34,7 +34,7 @@ class LogEventTable(AbstractTable):
 
         return [[
                 item.id,
-                item.breach_reason.reason,
+                item.breach_reason.reason if item.breach_reason else "",
                 item.started_at,
                 item.started_position,
                 item.ended_at,

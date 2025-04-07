@@ -5,7 +5,7 @@ from .breach_reason import BreachReason
 
 class EventLog(BaseModel):
     breach_reason = ForeignKeyField(
-        BreachReason, index=True, backref="BreachLog", verbose_name="功率突破原因"
+        BreachReason, null=True, index=True, backref="BreachLog", verbose_name="功率突破原因"
     )
 
     started_at = DateTimeField(null=False, verbose_name="功率突破发生时间")
