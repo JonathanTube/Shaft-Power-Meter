@@ -21,11 +21,11 @@ class DualPowerLine(ft.Container):
         color = ft.Colors.WHITE if e.data == "true" else ft.Colors.INVERSE_SURFACE
         visible = e.data == "true"
 
-        if name == "SPS1":
+        if name == "sps1":
             self.sps1_data_series.visible = visible
             self.menu_sps1.label.color = color
             self.menu_sps1.check_color = color
-        elif name == "SPS2":
+        elif name == "sps2":
             self.sps2_data_series.visible = visible
             self.menu_sps2.label.color = color
             self.menu_sps2.check_color = color
@@ -34,18 +34,18 @@ class DualPowerLine(ft.Container):
 
     def __create_menus(self):
         self.menu_sps1 = ft.Chip(
-            label=ft.Text("SPS1", color=ft.Colors.WHITE),
+            label=ft.Text("sps1", color=ft.Colors.WHITE),
             selected_color=self.sps1_color,
             selected=True,
             check_color=ft.Colors.WHITE,
-            on_select=lambda e: self.__on_select(e, "SPS1")
+            on_select=lambda e: self.__on_select(e, "sps1")
         )
         self.menu_sps2 = ft.Chip(
-            label=ft.Text("SPS2", color=ft.Colors.WHITE),
+            label=ft.Text("sps2", color=ft.Colors.WHITE),
             selected_color=self.sps2_color,
             selected=True,
             check_color=ft.Colors.WHITE,
-            on_select=lambda e: self.__on_select(e, "SPS2")
+            on_select=lambda e: self.__on_select(e, "sps2")
         )
         self.menus = ft.Row(
             alignment=ft.MainAxisAlignment.END,
@@ -91,8 +91,8 @@ class DualPowerLine(ft.Container):
             spacing=10,
             controls=[
                 self.chart_title,
-                ft.Text("SPS1", color=self.sps1_color),
-                ft.Text("SPS2", color=self.sps2_color)
+                ft.Text("sps1", color=self.sps1_color),
+                ft.Text("sps2", color=self.sps2_color)
             ])
         self.content = SimpleCard(
             body=ft.Column(controls=[chart_top, self.chart])
@@ -110,7 +110,7 @@ class DualPowerLine(ft.Container):
             label = ft.ChartAxisLabel(
                 value=index,
                 label=ft.Container(
-                    content=ft.Text(value=item.utc_time.strftime('%H:%M:%S')),
+                    content=ft.Text(value=item.utc_date_time.strftime('%H:%M:%S')),
                     padding=ft.padding.only(top=10)
                 )
             )

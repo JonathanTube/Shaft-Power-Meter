@@ -5,24 +5,38 @@ from ui.common.abstract_table import AbstractTable
 class LogDataTable(AbstractTable):
 
     def load_total(self):
-        return DataLog.select().count()
+        start_date = self.kwargs.get('start_date')
+        end_date = self.kwargs.get('end_date')
+        sql = DataLog.select()
+        if start_date and end_date:
+            sql = sql.where(DataLog.utc_date_time >= start_date,
+                            DataLog.utc_date_time <= end_date)
+
+        return sql.count()
 
     def load_data(self):
-        data = DataLog.select(
+        sql = DataLog.select(
             DataLog.id,
             DataLog.name,
-            DataLog.utc_date,
-            DataLog.utc_time,
+            DataLog.utc_date_time,
             DataLog.speed,
             DataLog.thrust,
             DataLog.torque,
             DataLog.power
-        ).order_by(DataLog.id.desc()).paginate(self.current_page, self.page_size)
+        )
+        start_date = self.kwargs.get('start_date')
+        end_date = self.kwargs.get('end_date')
+        if start_date and end_date:
+            sql = sql.where(DataLog.utc_date_time >= start_date,
+                            DataLog.utc_date_time <= end_date)
+
+        data = sql.order_by(DataLog.id.desc()).paginate(
+            self.current_page, self.page_size)
 
         return [[
                 item.id,
                 item.name,
-                f'{item.utc_date} {item.utc_time}',
+                item.utc_date_time,
                 item.speed,
                 item.thrust,
                 item.torque,

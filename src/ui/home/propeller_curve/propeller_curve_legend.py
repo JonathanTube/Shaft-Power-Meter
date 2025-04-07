@@ -108,7 +108,7 @@ class PropellerCurveLegend(ft.Container):
                             bgcolor=ft.colors.ORANGE,
                             margin=ft.margin.symmetric(horizontal=6)
                         ),
-                        ft.Text("SPS1", color=ft.colors.ORANGE)
+                        ft.Text("sps1", color=ft.colors.ORANGE)
                     ]
                 ),
                 ft.Row(
@@ -122,7 +122,7 @@ class PropellerCurveLegend(ft.Container):
                             bgcolor=ft.colors.LIME,
                             margin=ft.margin.symmetric(horizontal=6)
                         ),
-                        ft.Text("SPS2", color=ft.colors.LIME)
+                        ft.Text("sps2", color=ft.colors.LIME)
                     ]
                 )
             ]

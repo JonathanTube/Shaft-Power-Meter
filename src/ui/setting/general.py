@@ -1,7 +1,6 @@
-import datetime
-
 import flet as ft
-
+import asyncio
+from datetime import datetime
 from db.models.date_time_conf import DateTimeConf
 from db.models.language import Language
 from db.models.limitations import Limitations
@@ -13,6 +12,8 @@ from ui.common.toast import Toast
 class General(ft.Container):
     def __init__(self):
         super().__init__()
+        self._task = None
+
         self.expand = True
         self.alignment = ft.MainAxisAlignment.START
 
@@ -143,12 +144,18 @@ class General(ft.Container):
             ]))
 
     def __handle_date_change(self, e):
+        if self._task:
+            self._task.cancel()
+
         utc_date = e.control.value.strftime('%Y-%m-%d')
         self.utc_date.value = utc_date
         self.utc_date.update()
         self.last_date_time_conf.utc_date = utc_date
 
     def __handle_time_change(self, e):
+        if self._task:
+            self._task.cancel()
+
         utc_time = e.control.value.strftime('%H:%M:%S')
         self.utc_time.value = utc_time
         self.utc_time.update()
@@ -161,25 +168,32 @@ class General(ft.Container):
             self.last_date_time_conf.sync_with_gps = value
 
     def __create_date_time_card(self):
-        self.utc_date_time = ft.TextField(
-            label="UTC Date Time",
-            value=self.last_date_time_conf.utc_date_time,
-            input_filter=ft.InputFilter(
-                regex_string=r"^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$"
-            )
-        )
-
+        current_date_time = self.page.session.get('utc_date_time')
         self.utc_date = ft.TextField(
             label="Date",
             col={"md": 6},
-            value=self.last_date_time_conf.utc_date,
-            on_click=lambda e: e.page.open(ft.DatePicker(on_change=self.__handle_date_change)))
+            can_request_focus=False,
+            value=current_date_time.date(),
+            on_click=lambda e: e.page.open(
+                ft.DatePicker(
+                    on_change=self.__handle_date_change,
+                    current_date=current_date_time
+                )
+            )
+        )
 
         self.utc_time = ft.TextField(
             label="Time",
             col={"md": 6},
-            value=self.last_date_time_conf.utc_time,
-            on_click=lambda e: e.page.open(ft.TimePicker(on_change=self.__handle_time_change)))
+            can_request_focus=False,
+            value=current_date_time.time(),
+            on_click=lambda e: e.page.open(
+                ft.TimePicker(
+                    on_change=self.__handle_time_change,
+                    value=current_date_time.time()
+                )
+            )
+        )
 
         self.date_time_format = ft.Dropdown(
             label="Date Time Format", col={"md": 6},
@@ -204,7 +218,6 @@ class General(ft.Container):
             'UTC Date Time Conf.',
             ft.ResponsiveRow(
                 controls=[
-                    # self.utc_date_time,
                     self.utc_date,
                     self.utc_time,
                     self.date_time_format,
@@ -217,10 +230,19 @@ class General(ft.Container):
     def __save_data(self, e):
         self.last_preference.save()
         self.last_limitations.save()
+
+        new_date = self.last_date_time_conf.utc_date
+        new_time = self.last_date_time_conf.utc_time
+        new_utc_date_time = datetime.strptime(
+            f"{new_date} {new_time}", '%Y-%m-%d %H:%M:%S'
+        )
+        self.page.session.set('utc_date_time', new_utc_date_time)
+
         self.last_date_time_conf.save()
         Toast.show_success(e.page)
         self.__refresh_language(e.page)
         self.__change_theme(e.page)
+        self.__start_refresh_utc_date_time()
         e.page.update()
 
     def __change_theme(self, page: ft.Page):
@@ -242,10 +264,9 @@ class General(ft.Container):
                 page.session.set(item.code, item.chinese)
 
     def __reset_data(self, e):
-        self.last_preference = Preference.select().order_by(Preference.id.desc()).first()
-        self.last_limitations = Limitations.select().order_by(Limitations.id.desc()).first()
-        self.last_date_time_conf = DateTimeConf.select().order_by(
-            DateTimeConf.id.desc()).first()
+        self.last_preference = Preference.get()
+        self.last_limitations = Limitations.get()
+        self.last_date_time_conf = DateTimeConf.get()
 
         self.system_unit.value = self.last_preference.system_unit
         self.language.value = self.last_preference.language
@@ -311,6 +332,23 @@ class General(ft.Container):
 
     def did_mount(self):
         self.__set_language()
+        self.__start_refresh_utc_date_time()
+
+    def __start_refresh_utc_date_time(self):
+        self._task = self.page.run_task(self.__refresh_utc_date_time)
+
+    async def __refresh_utc_date_time(self):
+        while True:
+            utc_date_time = self.page.session.get("utc_date_time")
+            self.utc_date.value = utc_date_time.date()
+            self.utc_date.update()
+            self.utc_time.value = utc_date_time.time()
+            self.utc_time.update()
+            await asyncio.sleep(1)
+
+    def will_unmount(self):
+        if self._task:
+            self._task.cancel()
 
     def __set_language(self):
         session = self.page.session

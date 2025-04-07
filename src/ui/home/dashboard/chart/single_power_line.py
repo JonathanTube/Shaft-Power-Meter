@@ -92,7 +92,7 @@ class SinglePowerLine(ft.Container):
             label = ft.ChartAxisLabel(
                 value=index,
                 label=ft.Container(
-                    content=ft.Text(value=item.utc_time.strftime('%H:%M:%S')),
+                    content=ft.Text(value=item.utc_date_time.strftime('%H:%M:%S')),
                     padding=ft.padding.only(top=10)
                 )
             )

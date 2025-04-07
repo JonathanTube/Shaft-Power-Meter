@@ -22,21 +22,21 @@ class Counter(ft.Container):
         if self.dual:
             self.content = ft.Column(
                 controls=[
-                    ft.Text('SPS1', weight=ft.FontWeight.BOLD, size=16),
+                    ft.Text('sps1', weight=ft.FontWeight.BOLD, size=16),
                     ft.Row(
                         expand=True,
                         controls=[
-                            CounterInterval('SPS1'),
-                            CounterManually('SPS1'),
-                            CounterTotal('SPS1')
+                            CounterInterval('sps1'),
+                            CounterManually('sps1'),
+                            CounterTotal('sps1')
                         ]),
-                    ft.Text('SPS2', weight=ft.FontWeight.BOLD, size=16),
+                    ft.Text('sps2', weight=ft.FontWeight.BOLD, size=16),
                     ft.Row(
                         expand=True,
                         controls=[
-                            CounterInterval('SPS2'),
-                            CounterManually('SPS2'),
-                            CounterTotal('SPS2')
+                            CounterInterval('sps2'),
+                            CounterManually('sps2'),
+                            CounterTotal('sps2')
                         ])
                 ]
             )
@@ -46,9 +46,9 @@ class Counter(ft.Container):
                     ft.Row(
                         expand=True,
                         controls=[
-                            CounterInterval('SPS1'),
-                            CounterManually('SPS1'),
-                            CounterTotal('SPS1')
+                            CounterInterval('sps1'),
+                            CounterManually('sps1'),
+                            CounterTotal('sps1')
                         ]
                     ),
                     ft.Text('', expand=True)

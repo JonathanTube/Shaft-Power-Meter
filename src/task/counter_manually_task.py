@@ -16,13 +16,13 @@ class CounterManuallyTask:
         preference: Preference = Preference.get()
         system_settings: SystemSettings = SystemSettings.get()
         while True:
-            self.__calculate_by_range('SPS1')
+            self.__calculate_by_range('sps1')
             if system_settings.amount_of_propeller == 2:
-                self.__calculate_by_range('SPS2')
+                self.__calculate_by_range('sps2')
 
             await asyncio.sleep(preference.data_refresh_interval)
 
-    def __calculate_by_range(self, name: Literal['SPS1', 'SPS2']):
+    def __calculate_by_range(self, name: Literal['sps1', 'sps2']):
         start_time_name = f'counter_manually_start_time_{name}'
         start_time = self.page.session.get(start_time_name)
         if start_time is None:
@@ -45,7 +45,7 @@ class CounterManuallyTask:
 
         return self.__handle_result(name, start_time, end_time, average_power, max_rounds, min_rounds)
 
-    def __handle_result(self, name: Literal['SPS1', 'SPS2'], start_time: datetime, end_time: datetime, average_power: float, max_rounds: int, min_rounds: int):
+    def __handle_result(self, name: Literal['sps1', 'sps2'], start_time: datetime, end_time: datetime, average_power: float, max_rounds: int, min_rounds: int):
         hours = (end_time - start_time).total_seconds() / 3600
 
         total_energy = average_power * hours / 1000  # kWh

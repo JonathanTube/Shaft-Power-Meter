@@ -4,8 +4,6 @@ from ..base import BaseModel
 
 
 class DateTimeConf(BaseModel):
-    utc_date_time = DateTimeField(verbose_name="utc-日期时间", null=True)
-
     utc_date = DateField(verbose_name="utc-日期", null=True)
 
     utc_time = TimeField(verbose_name="utc-时间", null=True)

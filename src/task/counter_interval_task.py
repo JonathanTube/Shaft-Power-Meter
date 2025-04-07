@@ -23,14 +23,14 @@ class CounterIntervalTask:
                 start_time = datetime.now() - timedelta(hours=hours)
                 end_time = datetime.now()
 
-                self.__calculate_by_range('SPS1', start_time, end_time)
+                self.__calculate_by_range('sps1', start_time, end_time)
                 # print(system_settings.amount_of_propeller)
                 if system_settings.amount_of_propeller == 2:
-                    self.__calculate_by_range('SPS2', start_time, end_time)
+                    self.__calculate_by_range('sps2', start_time, end_time)
 
             await asyncio.sleep(preference.data_refresh_interval)
 
-    def __calculate_by_range(self, name: Literal['SPS1', 'SPS2'], start_time: datetime, end_time: datetime):
+    def __calculate_by_range(self, name: Literal['sps1', 'sps2'], start_time: datetime, end_time: datetime):
         data_log = DataLog.select(
             fn.COALESCE(fn.AVG(DataLog.power), 0).alias('average_power'),
             fn.COALESCE(fn.MIN(DataLog.rounds), 0).alias('min_rounds'),
@@ -60,7 +60,7 @@ class CounterIntervalTask:
             min_rounds
         )
 
-    def __handle_result(self, name: Literal['SPS1', 'SPS2'], start_time: datetime, end_time: datetime, average_power: float, max_rounds: int, min_rounds: int):
+    def __handle_result(self, name: Literal['sps1', 'sps2'], start_time: datetime, end_time: datetime, average_power: float, max_rounds: int, min_rounds: int):
         hours = (end_time - start_time).total_seconds() / 3600
 
         total_energy = (average_power * hours) / 1000  # kWh

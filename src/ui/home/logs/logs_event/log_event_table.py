@@ -4,10 +4,19 @@ from ui.common.abstract_table import AbstractTable
 
 class LogEventTable(AbstractTable):
     def load_total(self):
-        return EventLog.select().count()
+        start_date = self.kwargs.get('start_date')
+        end_date = self.kwargs.get('end_date')
+        sql = EventLog.select()
+        if start_date and end_date:
+            sql = sql.where(EventLog.started_at >= start_date,
+                            EventLog.started_at <= end_date)
+
+        return sql.count()
 
     def load_data(self):
-        data = EventLog.select(
+        start_date = self.kwargs.get('start_date')
+        end_date = self.kwargs.get('end_date')
+        sql = EventLog.select(
             EventLog.id,
             EventLog.breach_reason,
             EventLog.started_at,
@@ -15,7 +24,13 @@ class LogEventTable(AbstractTable):
             EventLog.ended_at,
             EventLog.ended_position,
             EventLog.note
-        ).order_by(EventLog.id.desc()).paginate(self.current_page, self.page_size)
+        )
+        if start_date and end_date:
+            sql = sql.where(EventLog.started_at >= start_date,
+                            EventLog.started_at <= end_date)
+
+        data = sql.order_by(EventLog.id.desc()).paginate(
+            self.current_page, self.page_size)
 
         return [[
                 item.id,

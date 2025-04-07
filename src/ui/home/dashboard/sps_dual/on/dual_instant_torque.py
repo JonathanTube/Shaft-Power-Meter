@@ -44,7 +44,7 @@ class DualInstantTorque(ft.Container):
 
     def __create_torque_sps1(self):
         self.sps1_label = ft.Text(
-            value='SPS1',
+            value='sps1',
             text_align=ft.TextAlign.RIGHT,
             size=self.font_size_of_label,
             weight=ft.FontWeight.W_600
@@ -71,7 +71,7 @@ class DualInstantTorque(ft.Container):
 
     def __create_torque_sps2(self):
         self.sps2_label = ft.Text(
-            value='SPS2',
+            value='sps2',
             text_align=ft.TextAlign.END,
             size=self.font_size_of_label,
             weight=ft.FontWeight.W_600

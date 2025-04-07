@@ -6,7 +6,7 @@ from .display import CounterDisplay
 
 
 class CounterTotal(ft.Container):
-    def __init__(self, name: Literal['SPS1', 'SPS2']):
+    def __init__(self, name: Literal['sps1', 'sps2']):
         super().__init__()
         self.expand = True
         self.border_radius = ft.border_radius.all(10)

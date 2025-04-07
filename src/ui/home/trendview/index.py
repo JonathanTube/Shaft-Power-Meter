@@ -30,7 +30,7 @@ class TrendView(ft.Container):
             DataLog.utc_time,
             DataLog.utc_date
         ).where(
-            DataLog.name == "SPS1"
+            DataLog.name == "sps1"
         ).where(
             DataLog.utc_date >= start_date,
             DataLog.utc_date <= end_date

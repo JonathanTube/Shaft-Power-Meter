@@ -13,7 +13,8 @@ class Notice:
         return ft.Container(
             top=8, right=20,
             content=ft.Row(controls=[
-                ft.FilledButton('Override', bgcolor=ft.Colors.RED, color=ft.Colors.WHITE),
+                ft.FilledButton('Override', bgcolor=ft.Colors.RED,
+                                color=ft.Colors.WHITE),
                 ft.Text('UNREPORTED EEXI BREACHES', badge=self.badge)
             ])
         )

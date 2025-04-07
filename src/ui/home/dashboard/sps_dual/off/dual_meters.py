@@ -8,7 +8,7 @@ from ui.home.dashboard.thrust.thrust_power import ThrustPower
 
 
 class DualMeters(ft.Container):
-    def __init__(self, name: str = 'SPS1'):
+    def __init__(self, name: str = 'sps1'):
         super().__init__()
         self.expand = True
         self.name = name
@@ -60,11 +60,11 @@ class DualMeters(ft.Container):
             ]
         )
 
-    def set_power_limit(self, power_max: float, power_warning: float, unit: int):
-        self.power_meter.set_limit(power_max, power_warning, unit)
+    def set_power_limit(self, power_max: float, power_warning: float):
+        self.power_meter.set_limit(power_max, power_warning)
 
-    def set_torque_limit(self, torque_max: float, torque_warning: float, unit: int):
-        self.torque_meter.set_limit(torque_max, torque_warning, unit)
+    def set_torque_limit(self, torque_max: float, torque_warning: float):
+        self.torque_meter.set_limit(torque_max, torque_warning)
 
     def set_speed_limit(self, speed_max: float, speed_warning: float):
         self.speed_meter.set_limit(speed_max, speed_warning)
@@ -89,7 +89,7 @@ class DualMeters(ft.Container):
 
     def set_language(self):
         session = self.page.session
-        if self.name == "SPS1":
+        if self.name == "sps1":
             self.title.value = session.get("lang.common.sps1")
-        elif self.name == "SPS2":
+        elif self.name == "sps2":
             self.title.value = session.get("lang.common.sps2")

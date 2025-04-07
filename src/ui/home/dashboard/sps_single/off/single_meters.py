@@ -39,11 +39,11 @@ class SingleMeters(ft.Container):
             ]
         )
 
-    def set_power_limit(self, power_max: float, power_warning: float, unit: int):
-        self.power_meter.set_limit(power_max, power_warning, unit)
+    def set_power_limit(self, power_max: float, power_warning: float):
+        self.power_meter.set_limit(power_max, power_warning)
 
-    def set_torque_limit(self, torque_max: float, torque_warning: float, unit: int):
-        self.torque_meter.set_limit(torque_max, torque_warning, unit)
+    def set_torque_limit(self, torque_max: float, torque_warning: float):
+        self.torque_meter.set_limit(torque_max, torque_warning)
 
     def set_speed_limit(self, speed_max: float, speed_warning: float):
         self.speed_meter.set_limit(speed_max, speed_warning)

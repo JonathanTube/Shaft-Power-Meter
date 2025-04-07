@@ -8,7 +8,6 @@ from ui.setting.propeller_conf import PropellerConf
 from ui.setting.self_test import createSelfTest
 from ui.setting.system_conf import SystemConf
 from ui.setting.zero_cal import ZeroCal
-from ui.setting.language_conf import LanguageConf
 
 class Setting(ft.Container):
     def __init__(self):
@@ -27,12 +26,10 @@ class Setting(ft.Container):
         elif idx == 4:
             self.right_content.content = IO()
         elif idx == 5:
-            self.right_content.content = LanguageConf()
-        elif idx == 6:
             self.right_content.content = createSelfTest()
-        elif idx == 7:
+        elif idx == 6:
             self.right_content.content = create_authority()
-        elif idx == 8:
+        elif idx == 7:
             self.right_content.content = create_data_dumping()
 
         self.right_content.update()
@@ -68,11 +65,6 @@ class Setting(ft.Container):
             icon=ft.Icons.USB_OUTLINED,
             selected_icon=ft.Icon(ft.Icons.USB),
             label="I/O"
-        )
-        self.language_conf = ft.NavigationRailDestination(
-            icon=ft.Icons.LANGUAGE_OUTLINED,
-            selected_icon=ft.Icon(ft.Icons.LANGUAGE),
-            label="Language Conf."
         )
         self.self_test = ft.NavigationRailDestination(
             icon=ft.Icons.ASSIGNMENT_OUTLINED,
@@ -123,7 +115,6 @@ class Setting(ft.Container):
             "lang.setting.propeller_setting.title")
         self.zero_cal.label = session.get("lang.setting.zero_cal.title")
         self.io_conf.label = session.get("lang.setting.io_conf.title")
-        self.language_conf.label = session.get("lang.setting.language_conf.title")
         self.self_test.label = session.get("lang.setting.self_test.title")
         self.permission_conf.label = session.get(
             "lang.setting.permission_conf.title")

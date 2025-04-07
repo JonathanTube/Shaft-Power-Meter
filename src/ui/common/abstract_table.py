@@ -82,6 +82,7 @@ class AbstractTable(ft.Container):
         for items in data:
             rows.append(ft.DataRow(cells=self.__create_cells(items)))
         self.data_table.rows = rows
+        self.data_table.update()
 
     def did_mount(self):
         self.__create_table_columns()

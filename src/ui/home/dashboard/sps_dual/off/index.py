@@ -16,8 +16,8 @@ class DualShaPoLiOff(ft.Container):
         self.__load_settings()
 
     def build(self):
-        self.sps1_meters = DualMeters(name="SPS1")
-        self.sps2_meters = DualMeters(name="SPS2")
+        self.sps1_meters = DualMeters(name="sps1")
+        self.sps2_meters = DualMeters(name="sps2")
         self.dual_power_line = DualPowerLine(
             max_y=self.power_max, unit=self.system_unit)
 
@@ -35,16 +35,12 @@ class DualShaPoLiOff(ft.Container):
         )
 
     def did_mount(self):
-        self.sps1_meters.set_power_limit(
-            self.power_max, self.power_warning, self.system_unit)
-        self.sps1_meters.set_torque_limit(
-            self.torque_max, self.torque_warning, self.system_unit)
+        self.sps1_meters.set_power_limit(self.power_max, self.power_warning)
+        self.sps1_meters.set_torque_limit(self.torque_max, self.torque_warning)
         self.sps1_meters.set_speed_limit(self.speed_max, self.speed_warning)
 
-        self.sps2_meters.set_power_limit(
-            self.power_max, self.power_warning, self.system_unit)
-        self.sps2_meters.set_torque_limit(
-            self.torque_max, self.torque_warning, self.system_unit)
+        self.sps2_meters.set_power_limit(self.power_max, self.power_warning)
+        self.sps2_meters.set_torque_limit(self.torque_max, self.torque_warning)
         self.sps2_meters.set_speed_limit(self.speed_max, self.speed_warning)
 
         self._task = self.page.run_task(self.__load_data)
@@ -82,58 +78,47 @@ class DualShaPoLiOff(ft.Container):
 
     async def __load_data(self):
         while True:
+            sps1_power = self.__get_session('sps1_instant_power')
+            sps1_torque = self.__get_session('sps1_instant_torque')
+            sps1_speed = self.__get_session('sps1_instant_speed')
+            sps1_thrust = self.__get_session('sps1_instant_thrust')
+            unit = self.system_unit
+            display_thrust = self.display_thrust
+
+            self.sps1_meters.set_power(sps1_power, unit)
+            self.sps1_meters.set_torque(sps1_torque, unit)
+            self.sps1_meters.set_speed(sps1_speed)
+            self.sps1_meters.set_thrust(display_thrust, sps1_thrust, unit)
+
+            sps2_power = self.__get_session('sps2_instant_power')
+            sps2_torque = self.__get_session('sps2_instant_torque')
+            sps2_speed = self.__get_session('sps2_instant_speed')
+            sps2_thrust = self.__get_session('sps2_instant_thrust')
+
+            self.sps2_meters.set_power(sps2_power, unit)
+            self.sps2_meters.set_torque(sps2_torque, unit)
+            self.sps2_meters.set_speed(sps2_speed)
+            self.sps2_meters.set_thrust(display_thrust, sps2_thrust, unit)
+
             sps1_data_log = DataLog.select(
-                DataLog.utc_time,
+                DataLog.utc_date_time,
                 DataLog.speed,
                 DataLog.power,
                 DataLog.torque,
                 DataLog.thrust
-            ).where(DataLog.name == 'SPS1').order_by(DataLog.id.desc()).limit(100)
+            ).where(DataLog.name == 'sps1').order_by(DataLog.id.desc()).limit(100)
 
             sps2_data_log = DataLog.select(
-                DataLog.utc_time,
+                DataLog.utc_date_time,
                 DataLog.speed,
                 DataLog.power,
                 DataLog.torque,
                 DataLog.thrust
-            ).where(DataLog.name == 'SPS2').order_by(DataLog.id.desc()).limit(100)
-
-            if len(sps1_data_log) > 0:
-                self.sps1_meters.set_power(
-                    sps1_data_log[0].power, self.system_unit)
-                self.sps1_meters.set_torque(
-                    sps1_data_log[0].torque, self.system_unit)
-                self.sps1_meters.set_speed(sps1_data_log[0].speed)
-                self.sps1_meters.set_thrust(
-                    self.display_thrust,
-                    sps1_data_log[0].thrust,
-                    self.system_unit
-                )
-            else:
-                self.sps1_meters.set_power(0, self.system_unit)
-                self.sps1_meters.set_torque(0, self.system_unit)
-                self.sps1_meters.set_speed(0)
-                self.sps1_meters.set_thrust(
-                    self.display_thrust, 0, self.system_unit)
-
-            if len(sps2_data_log) > 0:
-                self.sps2_meters.set_power(
-                    sps2_data_log[0].power, self.system_unit)
-                self.sps2_meters.set_torque(
-                    sps2_data_log[0].torque, self.system_unit)
-                self.sps2_meters.set_speed(sps2_data_log[0].speed)
-                self.sps2_meters.set_thrust(
-                    self.display_thrust,
-                    sps2_data_log[0].thrust,
-                    self.system_unit
-                )
-            else:
-                self.sps2_meters.set_power(0, self.system_unit)
-                self.sps2_meters.set_torque(0, self.system_unit)
-                self.sps2_meters.set_speed(0)
-                self.sps2_meters.set_thrust(
-                    self.display_thrust, 0, self.system_unit)
+            ).where(DataLog.name == 'sps2').order_by(DataLog.id.desc()).limit(100)
 
             self.dual_power_line.set_data(sps1_data_log, sps2_data_log)
 
             await asyncio.sleep(self.data_refresh_interval)
+
+    def __get_session(self, key: str):
+        return self.page.session.get(key)

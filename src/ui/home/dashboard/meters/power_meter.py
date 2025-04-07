@@ -13,10 +13,8 @@ class PowerMeter(ft.Container):
         self.power = MeterRound(heading="Power", radius=self.radius, unit="W")
         self.content = self.power
 
-    def set_limit(self, max: float, limit: float, unit: int):
-        _max = UnitParser.parse_power(max, unit)
-        _limit = UnitParser.parse_power(limit, unit)
-        self.power.set_limitation(_max[0], _limit[0])
+    def set_limit(self, max: float, limit: float):
+        self.power.set_limitation(max, limit)
 
     def set_data(self, value: float, unit: int):
         power_and_unit = UnitParser.parse_power(value, unit)

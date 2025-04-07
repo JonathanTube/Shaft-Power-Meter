@@ -3,10 +3,10 @@ import asyncio
 
 from ui.header.index import Header
 from ui.home.index import Home
-from utils.utc_timer import UtcTimer
-from utils.breach_log import BreachLogger
-from utils.gps_logger import GpsLogger
-from utils.data_logger import DataLogger
+from task.utc_timer_task import UtcTimer
+from task.breach_log_task import BreachLogTask
+from task.gps_log_task import GpsLogTask
+from task.data_log_task import DataLogTask
 from db.data_init import DataInit
 from db.table_init import TableInit
 from db.models.preference import Preference
@@ -42,29 +42,16 @@ def set_system_unit(page: ft.Page):
     page.session.set('system_unit', system_unit)
 
 
-def start_loggers():
-    gps_logger = GpsLogger()
-    data_logger = DataLogger()
-    breach_logger = BreachLogger()
-
-    asyncio.create_task(gps_logger.start())
-    asyncio.create_task(data_logger.start())
-    asyncio.create_task(breach_logger.start())
-
-
 def start_tasks(page: ft.Page):
-    counter_total_task = CounterTotalTask(page)
-    asyncio.create_task(counter_total_task.start())
+    asyncio.create_task(UtcTimer(page).start())
 
-    counter_manually_task = CounterManuallyTask(page)
-    asyncio.create_task(counter_manually_task.start())
+    asyncio.create_task(CounterTotalTask(page).start())
+    asyncio.create_task(CounterManuallyTask(page).start())
+    asyncio.create_task(CounterIntervalTask(page).start())
 
-    counter_interval_task = CounterIntervalTask(page)
-    asyncio.create_task(counter_interval_task.start())
-
-
-def start_utc_time():
-    asyncio.create_task(UtcTimer().start())
+    asyncio.create_task(BreachLogTask(page).start())
+    asyncio.create_task(GpsLogTask(page).start())
+    asyncio.create_task(DataLogTask(page).start())
 
 
 def add_file_picker(page: ft.Page):
@@ -76,8 +63,6 @@ def add_file_picker(page: ft.Page):
 async def main(page: ft.Page):
     TableInit.init()
     DataInit.init()
-    start_loggers()
-    start_utc_time()
     start_tasks(page)
 
     load_language(page)

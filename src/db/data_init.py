@@ -31,12 +31,12 @@ class DataInit:
     def __init_limitations():
         if Limitations.select().count() == 0:
             Limitations.create(
-                speed_max=0,
-                torque_max=0,
-                power_max=0,
-                speed_warning=0,
-                torque_warning=0,
-                power_warning=0
+                speed_max=1000,
+                torque_max=1000,
+                power_max=1000,
+                speed_warning=900,
+                torque_warning=900,
+                power_warning=900
             )
 
     def __init_system_settings():
@@ -44,7 +44,7 @@ class DataInit:
             SystemSettings.create(
                 display_thrust=False,
                 amount_of_propeller=1,
-                eexi_limited_power=0,
+                eexi_limited_power=900,
                 sha_po_li=False
             )
 
@@ -245,13 +245,13 @@ class DataInit:
                 {
                     "code": "lang.common.sps1",
                     "chinese": "螺旋桨1",
-                    "english": "SPS1"
+                    "english": "sps1"
                 },
 
                 {
                     "code": "lang.common.sps2",
                     "chinese": "螺旋桨2",
-                    "english": "SPS2"
+                    "english": "sps2"
                 },
 
                 {
@@ -436,6 +436,24 @@ class DataInit:
                     "code": "lang.setting.language_conf.title",
                     "chinese": "语言配置",
                     "english": "Language Conf."
+                },
+
+                {
+                    "code": "lang.setting.language_conf.code",
+                    "chinese": "代码",
+                    "english": "Code"
+                },
+
+                {
+                    "code": "lang.setting.language_conf.chinese",
+                    "chinese": "中文",
+                    "english": "Chinese"
+                },
+
+                {
+                    "code": "lang.setting.language_conf.english",
+                    "chinese": "英文",
+                    "english": "English"
                 },
 
                 {

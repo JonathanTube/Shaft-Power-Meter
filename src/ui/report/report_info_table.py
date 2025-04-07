@@ -10,44 +10,33 @@ from ui.report.report_info_exporter import ReportInfoExporter
 class ReportInfoTable(AbstractTable):
 
     def load_total(self):
-        # get start_date and end_date from kwargs
         start_date = self.kwargs.get('start_date')
         end_date = self.kwargs.get('end_date')
 
+        sql = ReportInfo.select()
         if start_date and end_date:
-            return ReportInfo.select().where(
-                ReportInfo.created_at.between(start_date, end_date)
-            ).count()
-
-        return ReportInfo.select().count()
+            sql = sql.where(
+                ReportInfo.created_at >= start_date,
+                ReportInfo.created_at <= end_date
+            )
+        return sql.count()
 
     def load_data(self):
-        data = ReportInfo.select(
+        sql = ReportInfo.select(
             ReportInfo.id,
             ReportInfo.report_name,
             ReportInfo.created_at
-        ).order_by(ReportInfo.id.desc()).paginate(self.current_page, self.page_size)
-
-        # get start_date and end_date from kwargs
+        )
         start_date = self.kwargs.get('start_date')
         end_date = self.kwargs.get('end_date')
+        if start_date and end_date:
+            sql = sql.where(
+                ReportInfo.created_at >= start_date,
+                ReportInfo.created_at <= end_date
+            )
 
-        data = []
-        if start_date is not None and end_date is not None:
-            data = ReportInfo.select(
-                ReportInfo.id,
-                ReportInfo.report_name,
-                ReportInfo.created_at
-            ).where(
-                ReportInfo.created_at.between(start_date, end_date)
-            ).order_by(ReportInfo.id.desc()).paginate(self.current_page, self.page_size)
-
-        else:
-            data = ReportInfo.select(
-                ReportInfo.id,
-                ReportInfo.report_name,
-                ReportInfo.created_at
-            ).order_by(ReportInfo.id.desc()).paginate(self.current_page, self.page_size)
+        data = sql.order_by(ReportInfo.id.desc()).paginate(
+            self.current_page, self.page_size)
 
         return [[item.id, item.report_name, item.created_at] for item in data]
 

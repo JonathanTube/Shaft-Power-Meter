@@ -47,12 +47,12 @@ class PropellerCurve(ft.Container):
             data_log_sps1 = DataLog.select(
                 DataLog.speed,
                 DataLog.power
-            ).where(DataLog.name == 'SPS1').order_by(DataLog.id.desc()).first()
+            ).where(DataLog.name == 'sps1').order_by(DataLog.id.desc()).first()
 
             data_log_sps2 = DataLog.select(
                 DataLog.speed,
                 DataLog.power
-            ).where(DataLog.name == 'SPS2').order_by(DataLog.id.desc()).first()
+            ).where(DataLog.name == 'sps2').order_by(DataLog.id.desc()).first()
 
             if data_log_sps1:
                 sps1_speed = (

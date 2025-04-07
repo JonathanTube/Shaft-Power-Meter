@@ -26,7 +26,9 @@ class DatetimeSearch(ft.Container):
     def __handle_search(self, e):
         start_date, end_date = self.date_time_range.get_date_range()
         if start_date == "" or end_date == "":
+            self.on_search(None, None)
             return
+
         if start_date:
             start_date = f"{start_date} 00:00:00"
         if end_date:

@@ -1,6 +1,6 @@
 import flet as ft
-from db.models.data_log import DataLog
 import asyncio
+from db.models.data_log import DataLog
 from db.models.limitations import Limitations
 from db.models.preference import Preference
 from ui.home.dashboard.sps_single.off.single_meters import SingleMeters
@@ -20,7 +20,8 @@ class SingleShaPoLiOff(ft.Stack):
 
         self.single_meters = SingleMeters()
 
-        self.power_line_chart = SinglePowerLine(max_y=self.speed_max, unit=self.system_unit)
+        self.power_line_chart = SinglePowerLine(
+            max_y=self.speed_max, unit=self.system_unit)
 
         self.controls = [
             self.thrust_power,
@@ -36,15 +37,11 @@ class SingleShaPoLiOff(ft.Stack):
         ]
 
     def did_mount(self):
-        self.single_meters.set_power_limit(
-            self.power_max, self.power_warning, self.system_unit
-        )
+        self.single_meters.set_power_limit(self.power_max, self.power_warning)
         self.single_meters.set_torque_limit(
-            self.torque_max, self.torque_warning, self.system_unit
-        )
-        self.single_meters.set_speed_limit(
-            self.speed_max, self.speed_warning
-        )
+            self.torque_max, self.torque_warning)
+        self.single_meters.set_speed_limit(self.speed_max, self.speed_warning
+                                           )
         self.set_language()
         self._task = self.page.run_task(self.__load_data)
 
@@ -80,25 +77,25 @@ class SingleShaPoLiOff(ft.Stack):
 
     async def __load_data(self):
         while True:
+            speed = self.__get_session('sps1_instant_speed')
+            power = self.__get_session('sps1_instant_power')
+            torque = self.__get_session('sps1_instant_torque')
+            thrust = self.__get_session('sps1_instant_thrust')
+            system_unit = self.system_unit
+            display_thrust = self.display_thrust
+
+            self.single_meters.set_data(speed, power, torque, system_unit)
+            self.thrust_power.set_data(display_thrust, thrust, system_unit)
+
             data_logs = DataLog.select(
-                DataLog.utc_time,
+                DataLog.utc_date_time,
                 DataLog.speed,
                 DataLog.power,
                 DataLog.torque,
                 DataLog.thrust
             ).where(
-                DataLog.name == "SPS1").order_by(DataLog.id.desc()).limit(100)
-
-            if len(data_logs) > 0:
-                self.single_meters.set_data(
-                    data_logs[0].speed, data_logs[0].power, data_logs[0].torque, self.system_unit
-                )
-                self.thrust_power.set_data(self.display_thrust, data_logs[0].thrust, self.system_unit)
-                self.power_line_chart.update(data_logs)
-            else:
-                self.single_meters.set_data(0, 0, 0, self.system_unit)
-                self.thrust_power.set_data(self.display_thrust, 0, self.system_unit)
-                self.power_line_chart.update([])
+                DataLog.name == "sps1").order_by(DataLog.id.desc()).limit(100)
+            self.power_line_chart.update(data_logs)
 
             await asyncio.sleep(self.data_refresh_interval)
 
@@ -109,3 +106,5 @@ class SingleShaPoLiOff(ft.Stack):
     def before_update(self):
         self.set_language()
 
+    def __get_session(self, key: str):
+        return self.page.session.get(key)

@@ -85,28 +85,24 @@ class SingleShaPoLiOn(ft.Container):
 
     async def __load_data(self):
         while True:
+            power = self.__get_session('sps1_instant_power')
+            thrust = self.__get_session('sps1_instant_thrust')
+            torque = self.__get_session('sps1_instant_torque')
+            speed = self.__get_session('sps1_instant_speed')
+            unit = self.system_unit
+
+            self.eexi_limited_power.set_value(power)
+            self.instant_value_grid.set_data(power, thrust, torque, speed, unit)
+
             data_logs = DataLog.select(
                 DataLog.power,
                 DataLog.thrust,
                 DataLog.torque,
                 DataLog.speed,
-                DataLog.utc_time
-            ).order_by(DataLog.id.desc()).where(DataLog.name == "SPS1").limit(100)
-            # print(f'data_logs={data_logs}')
-            if len(data_logs) > 0:
-                self.eexi_limited_power.set_value(data_logs[0].power)
-                self.instant_value_grid.set_data(
-                    data_logs[0].power,
-                    data_logs[0].thrust,
-                    data_logs[0].torque,
-                    data_logs[0].speed,
-                    self.system_unit
-                )
-                self.power_line_chart.update(data_logs)
-            else:
-                self.eexi_limited_power.set_value(0)
-                self.instant_value_grid.set_data(0, 0, 0, 0, self.system_unit)
-                self.power_line_chart.update([])
+                DataLog.utc_date_time
+            ).order_by(DataLog.id.desc()).where(DataLog.name == "sps1").limit(100)
+
+            self.power_line_chart.update(data_logs)
 
             await asyncio.sleep(self.data_refresh_interval)
 
@@ -116,3 +112,6 @@ class SingleShaPoLiOn(ft.Container):
 
     def before_update(self):
         self.set_language()
+
+    def __get_session(self, key: str):
+        return self.page.session.get(key)
