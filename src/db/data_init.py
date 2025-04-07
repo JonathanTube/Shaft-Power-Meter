@@ -883,9 +883,9 @@ class DataInit:
                 },
 
                 {
-                    "code": "lang.log.breach_log",
-                    "chinese": "功率突破日志",
-                    "english": "Breach Log"
+                    "code": "lang.log.event_log",
+                    "chinese": "事件日志",
+                    "english": "Event Log"
                 },
 
                 {

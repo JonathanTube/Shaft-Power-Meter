@@ -10,7 +10,7 @@ class Logs(ft.Container):
         self.content = ft.Tabs(
             selected_index=0,
             tabs=[
-                ft.Tab(text="Breach Log", content=LogEventList()),
+                ft.Tab(text="Event Log", content=LogEventList()),
                 ft.Tab(text="Data Log", content=LogDataList()),
                 ft.Tab(text="GPS Log", content=LogGpsList())
             ],
@@ -19,7 +19,7 @@ class Logs(ft.Container):
 
     def set_language(self):
         session = self.page.session
-        self.content.tabs[0].text = session.get("lang.log.breach_log")
+        self.content.tabs[0].text = session.get("lang.log.event_log")
         self.content.tabs[1].text = session.get("lang.log.data_log")
         self.content.tabs[2].text = session.get("lang.log.gps_log")
 
