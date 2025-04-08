@@ -1,5 +1,8 @@
+import flet as ft
+
 from db.models.event_log import EventLog
 from ui.common.abstract_table import AbstractTable
+from ui.home.logs.logs_event.log_event_form import LogEventForm
 
 
 class LogEventTable(AbstractTable):
@@ -56,6 +59,33 @@ class LogEventTable(AbstractTable):
 
     def create_columns(self):
         return self.get_columns()
+
+    def has_operations(self):
+        return True
+
+    def create_operations(self, items: list):
+        show_reason = items[1] is None or items[1].strip() == ""
+        show_note = items[6] is not None and items[6].strip() != ""
+        return ft.Row(controls=[
+            ft.IconButton(
+                icon=ft.icons.WARNING,
+                icon_color=ft.colors.RED,
+                icon_size=20,
+                visible=show_reason,
+                on_click=lambda e: self.page.open(
+                    LogEventForm(items[0], self.__update_table)
+                )
+            ),
+            ft.IconButton(
+                icon=ft.icons.NOTE,
+                icon_color=ft.colors.GREEN,
+                icon_size=20,
+                visible=show_note
+            )
+        ])
+
+    def __update_table(self):
+        self.search(**self.kwargs)
 
     def before_update(self):
         self.update_columns(self.get_columns())

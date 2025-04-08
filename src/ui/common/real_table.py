@@ -35,12 +35,12 @@ class RealTable(AbstractTable):
     def has_operations(self):
         return True
 
-    def create_operations(self, _id: int):
+    def create_operations(self, items: list):
         return ft.Row([
             ft.IconButton(
-                ft.icons.EDIT, on_click=lambda e: self.edit_report(_id)),
+                ft.icons.EDIT, on_click=lambda e: self.edit_report(items[0])),
             ft.IconButton(ft.icons.DELETE,
-                          on_click=lambda e: self.delete_report(_id))
+                          on_click=lambda e: self.delete_report(items[0]))
         ])
 
 

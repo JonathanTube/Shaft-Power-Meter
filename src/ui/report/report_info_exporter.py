@@ -7,7 +7,7 @@ class ReportInfoExporter(FPDF):
         self.per_cell_width = 47.5
         self.add_page()
 
-    def generate_pdf(self, path):
+    def generate_pdf(self, path, id: int):
         self.__handle_report_title()
 
         self.__handle_basic_info()
@@ -70,7 +70,7 @@ class ReportInfoExporter(FPDF):
                    "Speed(rpm)", "Torque(kNm)", "Power(kW)", "Total Power(kW)"]
 
         self.set_font("Arial", 'B', 10)
-        
+
         # 绘制表头
         for i, header in enumerate(headers):
             self.cell(col_widths[i], 10, header, border=1)

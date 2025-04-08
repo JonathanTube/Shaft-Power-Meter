@@ -2,6 +2,7 @@ import flet as ft
 import asyncio
 from db.models.event_log import EventLog
 from db.models.system_settings import SystemSettings
+from db.models.report_info import ReportInfo
 
 
 class BreachLogTask:
@@ -29,7 +30,8 @@ class BreachLogTask:
 
             # 功率突破EEXI限制
             instant_power = sps1_instant_power + sps2_instant_power
-            print(f"instant_power: {instant_power}, eexi_limited_power: {eexi_limited_power}")
+            print(
+                f"instant_power: {instant_power}, eexi_limited_power: {eexi_limited_power}")
             if instant_power > eexi_limited_power:
                 self.__handle_breach_event()
             else:
@@ -51,6 +53,8 @@ class BreachLogTask:
             started_position = self.__get_instant_gps_location()
             event_log = EventLog.create(started_at=start_time,
                                         started_position=started_position)
+            ReportInfo.create(
+                event_log=event_log, report_name=f"Compliance Report #{event_log.id}")
             self.__set_session(self.key_event_log_id, event_log.id)
 
     def __handle_recovery_event(self):

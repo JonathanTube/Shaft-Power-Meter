@@ -43,36 +43,35 @@ class ReportInfoTable(AbstractTable):
     def has_operations(self):
         return True
 
-    def create_operations(self, _id: int):
+    def create_operations(self, items: list):
         return ft.Row(
             controls=[
                 ft.TextButton(
                     icon=ft.Icons.VISIBILITY_OUTLINED,
                     text="View",
-                    on_click=lambda e: self.__view_report(e, _id)
+                    on_click=lambda e: self.__view_report(e, items[0])
                 ),
                 ft.TextButton(
                     icon=ft.Icons.DOWNLOAD_OUTLINED,
                     text="Export",
-                    on_click=lambda e: self.__export_report(e, _id)
+                    on_click=lambda e: self.__export_report(e, items[0])
                 )
             ])
 
-    def __view_report(self, e, _id: str):
-        e.page.open(ReportInfoDialog(_id))
+    def __view_report(self, e, id: int):
+        e.page.open(ReportInfoDialog(id))
 
-    def __export_report(self, e, _id):
-        self.id = _id
+    def __export_report(self, e, id: int):
         file_picker = e.page.session.get('file_picker_for_pdf_export')
         file_picker.save_file(
             file_name="report.pdf",
             allowed_extensions=["pdf"]
         )
-        file_picker.on_result = self.__on_result
+        file_picker.on_result = lambda e: self.__on_result(e, id)
 
-    def __on_result(self, e: ft.FilePickerResultEvent):
+    def __on_result(self, e: ft.FilePickerResultEvent, id: int):
         if e.path:
-            ReportInfoExporter().generate_pdf(e.path)
+            ReportInfoExporter().generate_pdf(e.path, id)
             Toast.show_success(e.page, "export success")
 
     def create_columns(self):

@@ -1,6 +1,6 @@
 import flet as ft
 
-from ui.home.alarm.index import createAlarm
+from ui.home.alarm.alarm_list import AlarmList
 from ui.home.counter.index import Counter
 from ui.home.dashboard.index import Dashboard
 from ui.home.logs.index import Logs
@@ -51,7 +51,7 @@ class Home(ft.Stack):
                 ft.Icon(name=ft.Icons.WARNING_OUTLINED),
                 ft.Text("Alarm")
             ]),
-            content=createAlarm()
+            content=AlarmList()   
         )
         self.logs = ft.Tab(
             tab_content=ft.Row(spacing=spacing, controls=[
@@ -92,7 +92,6 @@ class Home(ft.Stack):
         self.__set_tab_text(self.dashboard, "lang.home.tab.dashboard")
         self.__set_tab_text(self.counter, "lang.home.tab.counter")
         self.__set_tab_text(self.trendview, "lang.home.tab.trendview")
-        self.__set_tab_text(self.propeller_curve,
-                            "lang.home.tab.propeller_curve")
+        self.__set_tab_text(self.propeller_curve,"lang.home.tab.propeller_curve")
         self.__set_tab_text(self.alarm, "lang.home.tab.alarm")
         self.__set_tab_text(self.logs, "lang.home.tab.logs")

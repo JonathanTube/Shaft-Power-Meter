@@ -1,13 +1,8 @@
 from pymodbus.client import ModbusTcpClient
-from db.models.io_conf import IOConf
 
 
 class PlcClient:
-    def __init__(self):
-        io_conf = IOConf.get()
-        host = io_conf.plc_host
-        port = io_conf.plc_port
-
+    def __init__(self, host: str, port: int):
         self.client = ModbusTcpClient(host=host, port=port)
 
     def read_register(self, dec_address):
@@ -40,9 +35,9 @@ class PlcClient:
 
 
 # 调用函数读取地址 12288
-# result = PlcClient.read_register(12288)
-# if result is not None:
-#     print(f"Read value: {result}")
+result = PlcClient(host='192.168.1.100', port=502).read_register(412298)
+if result is not None:
+    print(f"Read value: {result}")
 
 # PlcClient.write_register(12290, 11)
 # PlcClient.write_register(12291, 12)

@@ -26,7 +26,6 @@ class DataInit:
         DataInit.__init_io_conf()
         DataInit.__init_date_time_conf()
         DataInit.__init_limitations()
-        DataInit.init_report_info_for_test()
 
     def __init_limitations():
         if Limitations.select().count() == 0:
@@ -81,22 +80,6 @@ class DataInit:
                 {"reason": "avoidance of porates"},
                 {"reason": "engine maintenance"},
                 {"reason": "description of other reasons"}
-            ]).execute()
-
-    def init_report_info_for_test():
-        if ReportInfo.select().count() == 0:
-            ReportInfo.insert_many([
-                {"report_name": "Test Report 1"},
-                {"report_name": "Test Report 2"},
-                {"report_name": "Test Report 3"},
-                {"report_name": "Test Report 4"},
-                {"report_name": "Test Report 5"},
-                {"report_name": "Test Report 6"},
-                {"report_name": "Test Report 7"},
-                {"report_name": "Test Report 8"},
-                {"report_name": "Test Report 9"},
-                {"report_name": "Test Report 10"},
-                {"report_name": "Test Report 11"}
             ]).execute()
 
     def __init_propeller_setting():
@@ -347,7 +330,16 @@ class DataInit:
                     "chinese": "备注",
                     "english": "Note"
                 },
-
+                {
+                    "code": "lang.common.event_name",
+                    "chinese": "事件名称",
+                    "english": "Event Name"
+                },
+                {
+                    "code": "lang.common.acknowledge_time",
+                    "chinese": "确认时间",
+                    "english": "Acknowledge Time"
+                },
                 {
                     "code": "lang.header.home",
                     "chinese": "主页",

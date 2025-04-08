@@ -27,12 +27,12 @@ class AbstractTable(ft.Container):
         col = ft.Column(
             controls=[self.data_table],
             expand=True,
-            scroll=ft.ScrollMode.AUTO
+            scroll=ft.ScrollMode.ADAPTIVE
         )
 
         row = ft.Row(
             controls=[col],
-            scroll=ft.ScrollMode.AUTO,
+            scroll=ft.ScrollMode.ADAPTIVE,
             alignment=ft.MainAxisAlignment.START,
             vertical_alignment=ft.CrossAxisAlignment.START,
             expand=True
@@ -40,6 +40,7 @@ class AbstractTable(ft.Container):
 
         self.content = ft.Column(
             expand=True,
+            spacing=0,
             controls=[
                 row,
                 self.pg
@@ -57,12 +58,12 @@ class AbstractTable(ft.Container):
             columns=[ft.DataColumn(ft.Text("No Data"))],
             rows=[])
 
-    def __create_cells(self, items):
+    def __create_cells(self, items: list):
         cells = []
         for item in items:
             cells.append(ft.DataCell(ft.Text(item)))
         if self.has_operations():
-            cells.append(ft.DataCell(self.create_operations(items[0])))
+            cells.append(ft.DataCell(self.create_operations(items)))
 
         return cells
 
@@ -114,9 +115,14 @@ class AbstractTable(ft.Container):
         return False
 
     @abstractmethod
-    def create_operations(self, _id: int):
+    def create_operations(self, items: list):
         pass
 
     def update_columns(self, columns: list[str]):
-        self.data_table.columns = [ft.DataColumn(ft.Text(column))
-                                   for column in columns]
+        wrapped_columns = [ft.DataColumn(ft.Text(column))
+                           for column in columns]
+        if self.has_operations():
+            session = self.page.session
+            wrapped_columns.append(ft.DataColumn(
+                ft.Text(session.get("lang.common.operation"))))
+        self.data_table.columns = wrapped_columns

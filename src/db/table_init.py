@@ -15,13 +15,14 @@ from db.models.system_settings import SystemSettings
 from db.models.zero_cal_info import ZeroCalInfo
 from db.models.zero_cal_record import ZeroCalRecord
 from db.models.language import Language
+from db.models.alarm_log import AlarmLog
 from db.base import db
 
 
 class TableInit:
     @staticmethod
     def init():
-        # db.drop_tables([DataLog, BreachLog], safe=False)
+        # db.drop_tables([ReportInfo], safe=False)
         db.drop_tables([Language], safe=False)
         db.create_tables([
             BreachReason,
@@ -40,5 +41,6 @@ class TableInit:
             SystemSettings,
             ZeroCalInfo,
             ZeroCalRecord,
-            Language
+            Language,
+            AlarmLog
         ], safe=True)

@@ -1,4 +1,8 @@
 import flet as ft
+from db.models.report_info import ReportInfo
+from db.models.ship_info import ShipInfo
+from db.models.propeller_setting import PropellerSetting
+from db.models.system_settings import SystemSettings
 
 
 class ReportInfoDialog(ft.AlertDialog):
@@ -26,7 +30,14 @@ class ReportInfoDialog(ft.AlertDialog):
         self.adaptive_height = True
         self.content_padding = 20
         self.shape = ft.RoundedRectangleBorder(radius=10)
-        self.content = self.__create()
+        self.__load_data()
+
+    def __load_data(self):
+        self.ship_info = ShipInfo.get()
+        self.propeller_setting = PropellerSetting.get()
+        self.system_settings = SystemSettings.get()
+        self.report_info = ReportInfo.get()
+        self.event_log = self.report_info.event_log
 
     def __create_label(self, text):
         return ft.Text(text, col=4, text_align=ft.TextAlign.LEFT, weight=ft.FontWeight.W_500)
@@ -49,22 +60,23 @@ class ReportInfoDialog(ft.AlertDialog):
             width=self.content_width,
             controls=[
                 self.__create_label("Ship Type:"),
-                self.__create_value("XXXXXXXXX"),
+                self.__create_value(self.ship_info.ship_type),
 
                 self.__create_label("Ship Size(DWT):"),
-                self.__create_value("XXXXXXXXX"),
+                self.__create_value(self.ship_info.ship_size),
 
                 self.__create_label("IMO Number:"),
-                self.__create_value("XXXXXXXXX"),
+                self.__create_value(self.ship_info.imo_number),
 
                 self.__create_label("Ship Name:"),
-                self.__create_value("XXXXXXXXX"),
+                self.__create_value(self.ship_info.ship_name),
 
                 self.__create_label("Un-limited Power:"),
-                self.__create_value("XXXXXXXXX"),
+                self.__create_value(
+                    self.propeller_setting.shaft_power_of_mcr_operating_point),
 
                 self.__create_label("Limited Power:"),
-                self.__create_value("XXXXXXXXX")
+                self.__create_value(self.system_settings.eexi_limited_power)
             ]
         )
         self.basic_info_container = self.__create_container(basic_info)
@@ -168,12 +180,12 @@ class ReportInfoDialog(ft.AlertDialog):
         )
         self.data_log_container = self.__create_container(data_log)
 
-    def __create(self):
+    def build(self):
         self.__create_basic_info()
         self.__create_event_log()
         self.__create_data_log()
 
-        return ft.Column(
+        self.content = ft.Column(
             expand=True,
             controls=[
                 self.basic_info_container,
