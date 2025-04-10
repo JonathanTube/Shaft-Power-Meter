@@ -12,7 +12,7 @@ class IO(ft.Container):
         # ip v4 regex
         self.ipv4_regex = r'^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$'
         # number regex
-        self.reg_digital = r'^[0-9]+(\.[0-9]+)?$'
+        self.reg_digital = r'^(\d+\.?\d*|)$'  # 允许整数、小数或空字符串
         self.last_io_conf = IOConf.get()
 
     def check_ip_port(self, ip: str, port: int, timeout: float = 2.0):

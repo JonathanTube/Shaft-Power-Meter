@@ -14,11 +14,15 @@ class BreachLogTask:
         self.recovery_times = 0
         # 功率必须突破EEXI持续超过60s后，才算突破
         self.checking_continuous_interval = 60
-        eexi_limited_power = SystemSettings.get().eexi_limited_power
-        self.__set_session("eexi_limited_power", eexi_limited_power)
+        self.system_settings = SystemSettings.get()
+        self.eexi_limited_power = self.system_settings.eexi_limited_power
+        self.__set_session("eexi_limited_power", self.eexi_limited_power)
 
     async def start(self):
         while True:
+            if self.system_settings.sha_po_li == False:
+                break
+
             sps1_instant_power = self.__get_session("sps1_instant_power")
             sps2_instant_power = self.__get_session("sps2_instant_power")
             eexi_limited_power = self.__get_session("eexi_limited_power")
@@ -30,8 +34,8 @@ class BreachLogTask:
 
             # 功率突破EEXI限制
             instant_power = sps1_instant_power + sps2_instant_power
-            print(
-                f"instant_power: {instant_power}, eexi_limited_power: {eexi_limited_power}")
+            # print(
+            #     f"instant_power: {instant_power}, eexi_limited_power: {eexi_limited_power}")
             if instant_power > eexi_limited_power:
                 self.__handle_breach_event()
             else:
@@ -58,7 +62,7 @@ class BreachLogTask:
             self.__set_session(self.key_event_log_id, event_log.id)
 
     def __handle_recovery_event(self):
-        print(f"recovery_times: {self.recovery_times}")
+        # print(f"recovery_times: {self.recovery_times}")
         if self.breach_times < self.checking_continuous_interval:
             self.__reset_all()
             return

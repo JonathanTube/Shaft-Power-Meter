@@ -12,16 +12,41 @@ from db.models.system_settings import SystemSettings
 class SingleShaPoLiOff(ft.Stack):
     def __init__(self):
         super().__init__()
-
         self.__load_settings()
+
+    def __load_settings(self):
+        self.speed_max = 0
+        self.speed_warning = 0
+        self.power_max = 0
+        self.power_warning = 0
+        self.torque_max = 0
+        self.torque_warning = 0
+        self.display_thrust = False
+
+        system_settings = SystemSettings.get()
+        self.display_thrust = system_settings.display_thrust
+
+        limitations = Limitations.get()
+
+        self.speed_max = limitations.speed_max
+        self.speed_warning = limitations.speed_warning
+
+        self.power_max = limitations.power_max
+        self.power_warning = limitations.power_warning
+
+        self.torque_max = limitations.torque_max
+        self.torque_warning = limitations.torque_warning
+
+        preference = Preference.get()
+        self.data_refresh_interval = preference.data_refresh_interval
+        self.system_unit = preference.system_unit
 
     def build(self):
         self.thrust_power = ThrustPower()
 
         self.single_meters = SingleMeters()
 
-        self.power_line_chart = SinglePowerLine(
-            max_y=self.speed_max, unit=self.system_unit)
+        self.power_line_chart = SinglePowerLine(max_y=self.power_max, unit=self.system_unit)
 
         self.controls = [
             self.thrust_power,
@@ -40,40 +65,13 @@ class SingleShaPoLiOff(ft.Stack):
         self.single_meters.set_power_limit(self.power_max, self.power_warning)
         self.single_meters.set_torque_limit(
             self.torque_max, self.torque_warning)
-        self.single_meters.set_speed_limit(self.speed_max, self.speed_warning
-                                           )
+        self.single_meters.set_speed_limit(self.speed_max, self.speed_warning)
         self.set_language()
         self._task = self.page.run_task(self.__load_data)
 
     def will_unmount(self):
         if self._task:
             self._task.cancel()
-
-    def __load_settings(self):
-        self.speed_max = 0
-        self.speed_warning = 0
-        self.power_max = 0
-        self.power_warning = 0
-        self.torque_max = 0
-        self.torque_warning = 0
-        self.display_thrust = False
-
-        system_settings = SystemSettings.get()
-        self.display_thrust = system_settings.display_thrust
-
-        limitations = Limitations.get()
-        self.speed_max = limitations.speed_max
-        self.speed_warning = limitations.speed_warning
-
-        self.power_max = limitations.power_max
-        self.power_warning = limitations.power_warning
-
-        self.torque_max = limitations.torque_max
-        self.torque_warning = limitations.torque_warning
-
-        preference = Preference.get()
-        self.data_refresh_interval = preference.data_refresh_interval
-        self.system_unit = preference.system_unit
 
     async def __load_data(self):
         while True:

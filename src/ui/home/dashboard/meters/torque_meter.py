@@ -20,7 +20,7 @@ class TorqueMeter(ft.Container):
 
     def set_data(self, value: float, unit: int):
         torque_and_unit = UnitParser.parse_torque(value, unit)
-        self.torque.set_data(torque_and_unit[0], torque_and_unit[1])
+        self.torque.set_data(value, torque_and_unit[0], torque_and_unit[1])
 
     def set_language(self):
         session = self.page.session

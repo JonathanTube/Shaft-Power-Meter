@@ -23,10 +23,15 @@ class UtcTimer:
         while True:
             utc_date_time = self.__get_utc_date_time()
             utc_date_time += timedelta(seconds=1)
-            self.date_time_conf.utc_date = utc_date_time.date()
-            self.date_time_conf.utc_time = utc_date_time.time()
-            self.date_time_conf.save()
-            print('utc_date_time=', utc_date_time)
+            DateTimeConf.update(
+                utc_date=utc_date_time.date(),
+                utc_time=utc_date_time.time(),
+                system_date=datetime.now().date(),
+                system_time=datetime.now().time()
+            ).where(
+                DateTimeConf.id == self.date_time_conf.id
+            ).execute()
+            # print('utc_date_time=', utc_date_time)
             # 更新时间
             self.__set_utc_date_time(utc_date_time)
             await asyncio.sleep(1)

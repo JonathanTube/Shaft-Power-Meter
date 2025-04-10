@@ -19,10 +19,7 @@ class SpeedMeter(ft.Container):
         self.speed.set_limitation(max, limit)
 
     def set_data(self, value: int):
-        speed_and_unit = UnitParser.parse_speed(value)
-        speed = speed_and_unit[0]
-        unit = speed_and_unit[1]
-        self.speed.set_data(speed, unit)
+        self.speed.set_data(value, value, "rpm")
 
     def set_language(self):
         session = self.page.session
@@ -33,4 +30,3 @@ class SpeedMeter(ft.Container):
 
     def before_update(self):
         self.set_language()
-    

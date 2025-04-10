@@ -32,16 +32,19 @@ class MeterRound(ft.Container):
         self.warning_line.visible = limit_value > 0
         self.warning_line.update()
 
-    def set_data(self, value: int, unit: str):
-        # update unit
-        self.center_unit.value = unit
-        self.center_unit.update()
-
+    def set_data(self, actual_value: int, display_value: int, display_unit: str):
         if self.max_value == 0:
             return
-
+        # update unit
+        self.center_unit.value = display_unit
+        self.center_unit.update()
+        
         # update active section
-        active_val = (360 - self.__hide_section) * value / self.max_value
+        active_val = (360 - self.__hide_section) * actual_value / self.max_value
+        # 如果value大于max_value，则active_val为360 - self.__hide_section
+        if actual_value > self.max_value:
+            active_val = 360 - self.__hide_section
+
         self.active_section.value = active_val
         self.active_section.update()
 
@@ -51,7 +54,7 @@ class MeterRound(ft.Container):
         self.inactive_section.update()
 
         # update center text
-        self.center_text.value = value
+        self.center_text.value = display_value
         self.center_text.update()
 
     def __create_ring(self):

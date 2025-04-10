@@ -50,6 +50,8 @@ class SinglePowerLine(ft.Container):
             width=.5, color=ft.colors.with_opacity(0.15, ft.colors.INVERSE_SURFACE)
         )
         self.chart = ft.LineChart(
+            min_y=0,
+            max_y=int(self.max_y * 1.1),
             expand=True,
             border=ft.Border(left=border, bottom=border),
             left_axis=ft.ChartAxis(

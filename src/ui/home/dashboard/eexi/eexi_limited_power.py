@@ -25,7 +25,7 @@ class EEXILimitedPower(ft.Container):
         )
 
     def set_config(self, normal: float, warning: float, unlimited: float):
-        self.unlimited_power = normal
+        self.unlimited_power = unlimited
         green = normal
         orange = warning - normal
         red = unlimited - warning
@@ -33,7 +33,9 @@ class EEXILimitedPower(ft.Container):
 
     def set_value(self, power: float):
         active_value = power
+        # print(f"unlimited_power: {self.unlimited_power}")
         inactive_value = self.unlimited_power - power
+        # print(f"active_value: {active_value}, inactive_value: {inactive_value}")
         self.meter_half.set_outer_value(active_value, inactive_value)
 
     def set_language(self):

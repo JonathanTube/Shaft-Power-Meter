@@ -5,9 +5,9 @@ from ui.setting.data_dumping import create_data_dumping
 from ui.setting.general import General
 from ui.setting.io import IO
 from ui.setting.propeller_conf import PropellerConf
-from ui.setting.self_test import createSelfTest
 from ui.setting.system_conf import SystemConf
 from ui.setting.zero_cal import ZeroCal
+from ui.setting.self_test import SelfTest
 
 class Setting(ft.Container):
     def __init__(self):
@@ -26,7 +26,7 @@ class Setting(ft.Container):
         elif idx == 4:
             self.right_content.content = IO()
         elif idx == 5:
-            self.right_content.content = createSelfTest()
+            self.right_content.content = SelfTest()
         elif idx == 6:
             self.right_content.content = create_authority()
         elif idx == 7:

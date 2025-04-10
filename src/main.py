@@ -5,8 +5,10 @@ from ui.header.index import Header
 from ui.home.index import Home
 from task.utc_timer_task import UtcTimer
 from task.breach_log_task import BreachLogTask
-from task.gps_log_task import GpsLogTask
-from task.data_log_task import DataLogTask
+from task.gps_read_task import GpsReadTask
+from task.plc_read_task import PlcReadTask
+from task.modbus_read_task import ModbusReadTask
+from task.data_save_task import DataSaveTask
 from db.data_init import DataInit
 from db.table_init import TableInit
 from db.models.preference import Preference
@@ -49,9 +51,12 @@ def start_tasks(page: ft.Page):
     asyncio.create_task(CounterManuallyTask(page).start())
     asyncio.create_task(CounterIntervalTask(page).start())
 
+    asyncio.create_task(GpsReadTask(page).start())
+    asyncio.create_task(PlcReadTask(page).start())
+    asyncio.create_task(ModbusReadTask(page).start())
+    asyncio.create_task(DataSaveTask(page).start())
+    
     asyncio.create_task(BreachLogTask(page).start())
-    asyncio.create_task(GpsLogTask(page).start())
-    asyncio.create_task(DataLogTask(page).start())
 
 
 def add_file_picker(page: ft.Page):
