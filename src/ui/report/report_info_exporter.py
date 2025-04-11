@@ -1,4 +1,11 @@
 from fpdf import FPDF
+from db.models.report_info import ReportInfo
+from db.models.ship_info import ShipInfo
+from db.models.propeller_setting import PropellerSetting
+from db.models.system_settings import SystemSettings
+from db.models.preference import Preference
+from db.models.report_detail import ReportDetail
+from utils.unit_parser import UnitParser
 
 
 class ReportInfoExporter(FPDF):
@@ -7,7 +14,19 @@ class ReportInfoExporter(FPDF):
         self.per_cell_width = 47.5
         self.add_page()
 
+    def __load_data(self, id: int):
+        self.ship_info = ShipInfo.get()
+        self.propeller_setting = PropellerSetting.get()
+        self.preference = Preference.get()
+        self.system_settings = SystemSettings.get()
+        self.report_info = ReportInfo.get_by_id(id)
+        self.event_log = self.report_info.event_log
+        self.report_details = ReportDetail.select().where(
+            ReportDetail.report_info == self.report_info.id).order_by(ReportDetail.id.asc())
+
     def generate_pdf(self, path, id: int):
+        self.__load_data(id)
+
         self.__handle_report_title()
 
         self.__handle_basic_info()
@@ -31,21 +50,23 @@ class ReportInfoExporter(FPDF):
 
     def __handle_basic_info(self):
         self.__insert_label("Ship Name", w=self.per_cell_width)
-        self.__insert_value("Chemical Tanker", w=self.per_cell_width)
+        self.__insert_value(self.ship_info.ship_name, w=self.per_cell_width)
         self.__insert_label("IMO Number", w=self.per_cell_width)
-        self.__insert_value("IMO9856724", w=self.per_cell_width)
+        self.__insert_value(self.ship_info.imo_number, w=self.per_cell_width)
         self.ln()
 
         self.__insert_label("Ship Size(DWT)", w=self.per_cell_width)
-        self.__insert_value("50,000 MT", w=self.per_cell_width)
+        self.__insert_value(self.ship_info.ship_size, w=self.per_cell_width)
         self.__insert_label("Ship Name", w=self.per_cell_width)
-        self.__insert_value("Blue Ocean", w=self.per_cell_width)
+        self.__insert_value(self.ship_info.ship_name, w=self.per_cell_width)
         self.ln()
 
         self.__insert_label("Un-limited Power", w=self.per_cell_width)
-        self.__insert_value("15,000 kW", w=self.per_cell_width)
+        self.__insert_value(
+            f"{self.propeller_setting.shaft_power_of_mcr_operating_point} kW", w=self.per_cell_width)
         self.__insert_label("Limited Power", w=self.per_cell_width)
-        self.__insert_value("12,000 kW", w=self.per_cell_width)
+        self.__insert_value(
+            f"{self.system_settings.eexi_limited_power} kW", w=self.per_cell_width)
         self.ln()
 
         self.__insert_horizontal_line()
@@ -66,8 +87,7 @@ class ReportInfoExporter(FPDF):
         self.set_text_color(51, 51, 51)
         # 表头
         col_widths = [15, 35, 35, 35, 35, 35]
-        headers = ["No.", "Date/Time",
-                   "Speed(rpm)", "Torque(kNm)", "Power(kW)", "Total Power(kW)"]
+        headers = ["No.", "Date/Time", "Speed", "Torque", "Power", "Total Power"]
 
         self.set_font("Arial", 'B', 10)
 
@@ -76,16 +96,25 @@ class ReportInfoExporter(FPDF):
             self.cell(col_widths[i], 10, header, border=1)
         self.ln()
 
-        # 表格数据
-        data = [
-            ("1", "2025-03-20 14:30", "85", "1200", "4500", "15000"),
-            ("2", "2025-03-20 15:00", "82", "1150", "4300", "14800"),
-            ("3", "2025-03-20 15:30", "80", "1100", "4100", "14600")
-        ]
-
         self.set_font("Arial", '', 10)
         self.set_text_color(66, 66, 66)
-        for row in data:
+
+        rows = []
+        for report_detail in self.report_details:
+            if report_detail.utc_date_time:
+                utc_date_time = report_detail.utc_date_time.strftime("%Y-%m-%d %H:%M:%S")
+            else:
+                utc_date_time = "N/A"
+            rows.append([
+                str(report_detail.id),
+                utc_date_time,
+                str(report_detail.speed),
+                str(report_detail.torque),
+                str(report_detail.power),
+                str(report_detail.total_power)
+            ])
+
+        for row in rows:
             for i, item in enumerate(row):
                 self.cell(col_widths[i], 10, item, border=1)
             self.ln()
@@ -93,29 +122,49 @@ class ReportInfoExporter(FPDF):
     def __handle_event_log_start(self):
         label_width = self.per_cell_width * 2
         value_width = self.per_cell_width * 2
+        
         self.__insert_label("Date/Time of Power Reserve Breach", w=label_width)
-        self.__insert_value("2025-03-20 14:30 UTC", w=value_width)
+        if self.event_log.started_at:
+            self.__insert_value(self.event_log.started_at.strftime("%Y-%m-%d %H:%M:%S"), w=value_width)
+        else:
+            self.__insert_value("N/A", w=value_width)
+
         self.ln()
 
-        self.__insert_label(
-            "Ship position of power reserve breach", w=label_width)
-        self.__insert_value("35°12'N 139°46'E", w=value_width)
+        self.__insert_label("Ship position of power reserve breach", w=label_width)
+        if self.event_log.started_position:
+            self.__insert_value(self.event_log.started_position, w=value_width)
+        else:
+            self.__insert_value("N/A", w=value_width)
         self.ln()
 
         self.__insert_label("Beaufort number", w=label_width)
-        self.__insert_value("6", w=value_width)
+        if self.event_log.beaufort_number:
+            self.__insert_value(self.event_log.beaufort_number, w=value_width)
+        else:
+            self.__insert_value("N/A", w=value_width)
         self.ln()
 
         self.__insert_label("Wave height", w=label_width)
-        self.__insert_value("4.2 m", w=value_width)
+        if self.event_log.wave_height:
+            self.__insert_value(self.event_log.wave_height, w=value_width)
+        else:
+            self.__insert_value("N/A", w=value_width)
         self.ln()
 
         self.__insert_label("Ice condition", w=label_width)
-        self.__insert_value("None", w=value_width)
+        if self.event_log.ice_condition:
+            self.__insert_value(self.event_log.ice_condition, w=value_width)
+        else:
+            self.__insert_value("N/A", w=value_width)
         self.ln()
 
         self.__insert_label("Reason for reserve usage", w=label_width)
-        self.__insert_value("Storm avoidance", w=value_width)
+        if self.event_log.breach_reason:
+            self.__insert_value(
+                self.event_log.breach_reason.reason, w=value_width)
+        else:
+            self.__insert_value("N/A", w=value_width)
         self.ln()
 
         self.__insert_horizontal_line()
@@ -125,28 +174,48 @@ class ReportInfoExporter(FPDF):
         value_width = self.per_cell_width * 2
         self.__insert_label(
             "Date/Time when returning to limited power", w=label_width)
-        self.__insert_value("2025-03-20 16:45 UTC", w=value_width)
+        if self.event_log.ended_at:
+            self.__insert_value(self.event_log.ended_at.strftime(
+                "%Y-%m-%d %H:%M:%S"), w=value_width)
+        else:
+            self.__insert_value("N/A", w=value_width)
         self.ln()
 
         self.__insert_label(
             "Ship position when returning to limited power", w=label_width)
-        self.__insert_value("36°05'N 140°12'E", w=value_width)
+        if self.event_log.ended_position:
+            self.__insert_value(self.event_log.ended_position, w=value_width)
+        else:
+            self.__insert_value("N/A", w=value_width)
         self.ln()
 
         self.__insert_label("Beaufort number", w=label_width)
-        self.__insert_value("4", w=value_width)
+        if self.event_log.beaufort_number:
+            self.__insert_value(self.event_log.beaufort_number, w=value_width)
+        else:
+            self.__insert_value("N/A", w=value_width)
         self.ln()
 
         self.__insert_label("Wave height", w=label_width)
-        self.__insert_value("2.1 m", w=value_width)
+        if self.event_log.wave_height:
+            self.__insert_value(self.event_log.wave_height, w=value_width)
+        else:
+            self.__insert_value("N/A", w=value_width)
         self.ln()
 
         self.__insert_label("Ice condition", w=label_width)
-        self.__insert_value("None", w=value_width)
+        if self.event_log.ice_condition:
+            self.__insert_value(self.event_log.ice_condition, w=value_width)
+        else:
+            self.__insert_value("N/A", w=value_width)
         self.ln()
 
         self.__insert_label("Reason for reserve usage", w=label_width)
-        self.__insert_value("Storm avoidance", w=value_width)
+        if self.event_log.breach_reason:
+            self.__insert_value(
+                self.event_log.breach_reason.reason, w=value_width)
+        else:
+            self.__insert_value("N/A", w=value_width)
         self.ln()
 
         self.__insert_horizontal_line()

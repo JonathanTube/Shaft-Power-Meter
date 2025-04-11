@@ -1,10 +1,10 @@
 import flet as ft
 
 from ui.common.datetime_search import DatetimeSearch
-from ui.home.logs.logs_event.log_event_table import LogEventTable
+from ui.home.event.event_table import EventTable
 
 
-class LogEventList(ft.Container):
+class EventList(ft.Container):
     def __init__(self):
         super().__init__()
         self.expand = True
@@ -12,8 +12,8 @@ class LogEventList(ft.Container):
         self.content = self.__create()
 
     def __create(self):
-        search = DatetimeSearch(self.__on_search)
-        self.table = LogEventTable(10)
+        search = DatetimeSearch(self.on_search)
+        self.table = EventTable(10)
 
         return ft.Column(
             expand=True,
@@ -24,5 +24,6 @@ class LogEventList(ft.Container):
             ]
         )
 
-    def __on_search(self, start_date: str, end_date: str):
+    def on_search(self, start_date: str, end_date: str):
         self.table.search(start_date=start_date, end_date=end_date)
+

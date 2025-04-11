@@ -27,13 +27,12 @@ class TrendView(ft.Container):
         data_logs = DataLog.select(
             DataLog.power,
             DataLog.speed,
-            DataLog.utc_time,
-            DataLog.utc_date
+            DataLog.utc_date_time
         ).where(
             DataLog.name == "sps1"
         ).where(
-            DataLog.utc_date >= start_date,
-            DataLog.utc_date <= end_date
+            DataLog.utc_date_time >= start_date,
+            DataLog.utc_date_time <= end_date
         ).order_by(DataLog.id.desc())
 
-        self.trend_view_chart.update_chart(data_logs)       
+        self.trend_view_chart.update_chart(data_logs)

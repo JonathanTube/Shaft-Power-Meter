@@ -235,7 +235,6 @@ class SystemConf(ft.Container):
                               self.last_system_settings.eexi_limited_power)
         self.last_ship_info.save()
         self.last_factor_conf.save()
-        e.page.session.get("sha_po_li").switch()
         Toast.show_success(e.page)
 
     def __reset_data(self, e):

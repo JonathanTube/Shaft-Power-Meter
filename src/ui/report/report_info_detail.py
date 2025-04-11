@@ -3,13 +3,16 @@ from db.models.report_info import ReportInfo
 from db.models.ship_info import ShipInfo
 from db.models.propeller_setting import PropellerSetting
 from db.models.system_settings import SystemSettings
+from db.models.preference import Preference
+from db.models.report_detail import ReportDetail
+from utils.unit_parser import UnitParser
 
 
 class ReportInfoDialog(ft.AlertDialog):
     def __init__(self, id):
         super().__init__()
         self.id = id
-        self.content_width = 750
+        self.content_width = 1000
 
         self.expand = True
         self.modal = False
@@ -35,15 +38,18 @@ class ReportInfoDialog(ft.AlertDialog):
     def __load_data(self):
         self.ship_info = ShipInfo.get()
         self.propeller_setting = PropellerSetting.get()
+        self.preference = Preference.get()
         self.system_settings = SystemSettings.get()
-        self.report_info = ReportInfo.get()
+        self.report_info = ReportInfo.get_by_id(self.id)
         self.event_log = self.report_info.event_log
+        self.report_details = ReportDetail.select().where(
+            ReportDetail.report_info == self.report_info.id).order_by(ReportDetail.id.asc())
 
-    def __create_label(self, text):
-        return ft.Text(text, col=4, text_align=ft.TextAlign.LEFT, weight=ft.FontWeight.W_500)
+    def __create_label(self, text, col=4):
+        return ft.Text(text, col=col, text_align=ft.TextAlign.LEFT, weight=ft.FontWeight.W_500)
 
-    def __create_value(self, text):
-        return ft.Text(text, col=2, text_align=ft.TextAlign.LEFT)
+    def __create_value(self, text, col=2):
+        return ft.Text(text, col=col, text_align=ft.TextAlign.LEFT)
 
     def __create_container(self, content):
         return ft.Container(
@@ -55,6 +61,14 @@ class ReportInfoDialog(ft.AlertDialog):
         )
 
     def __create_basic_info(self):
+        unlimited_power = self.propeller_setting.shaft_power_of_mcr_operating_point
+        limited_power = self.system_settings.eexi_limited_power
+        system_unit = self.preference.system_unit
+        unlimited_power_value, unlimited_power_unit = UnitParser.parse_power(
+            unlimited_power, system_unit)
+        limited_power_value, limited_power_unit = UnitParser.parse_power(
+            limited_power, system_unit)
+
         basic_info = ft.ResponsiveRow(
             expand=True,
             width=self.content_width,
@@ -73,63 +87,78 @@ class ReportInfoDialog(ft.AlertDialog):
 
                 self.__create_label("Un-limited Power:"),
                 self.__create_value(
-                    self.propeller_setting.shaft_power_of_mcr_operating_point),
+                    f"{unlimited_power_value} {unlimited_power_unit}"),
 
                 self.__create_label("Limited Power:"),
-                self.__create_value(self.system_settings.eexi_limited_power)
+                self.__create_value(
+                    f"{limited_power_value} {limited_power_unit}")
             ]
         )
         self.basic_info_container = self.__create_container(basic_info)
 
     def __create_event_start_log(self):
+        if self.event_log.breach_reason:
+            reason = self.event_log.breach_reason.reason
+        else:
+            reason = "N/A"
+
         self.event_start_log = ft.ResponsiveRow(
             expand=True,
             width=self.content_width,
             controls=[
-                self.__create_label("Date/Time of Power Reserve Breach:"),
-                self.__create_value("XXXXXXXXX"),
+                self.__create_label(
+                    "Date/Time of Power Reserve Breach:", col=6),
+                self.__create_value(self.event_log.started_at, col=6),
 
-                self.__create_label("Ship position of power reserve breach:"),
-                self.__create_value("XXXXXXXXX"),
+                self.__create_label(
+                    "Ship position of power reserve breach:", col=6),
+                self.__create_value(self.event_log.started_position, col=6),
 
-                self.__create_label("Beaufort number:"),
-                self.__create_value("XXXXXXXXX"),
+                self.__create_label("Beaufort number:", col=6),
+                self.__create_value(self.event_log.beaufort_number, col=6),
 
-                self.__create_label("Wave height:"),
-                self.__create_value("XXXXXXXXX"),
+                self.__create_label("Wave height:", col=6),
+                self.__create_value(self.event_log.wave_height, col=6),
 
-                self.__create_label("Ice condition:"),
-                self.__create_value("XXXXXXXXX"),
+                self.__create_label("Ice condition:", col=6),
+                self.__create_value(self.event_log.ice_condition, col=6),
 
-                self.__create_label("Reason for using the power reserve:"),
-                self.__create_value("XXXXXXXXX")
+                self.__create_label(
+                    "Reason for using the power reserve:", col=6),
+                self.__create_value(reason, col=6)
             ]
         )
 
     def __create_event_end_log(self):
+        if self.event_log.breach_reason:
+            reason = self.event_log.breach_reason.reason
+        else:
+            reason = "N/A"
+
         self.event_end_log = ft.ResponsiveRow(
             expand=True,
             width=self.content_width,
             controls=[
                 self.__create_label(
-                    "Date/Time when returning to limited power:"),
-                self.__create_value("XXXXXXXXX"),
+                    "Date/Time when returning to limited power:", col=6),
+                self.__create_value(self.event_log.ended_at, col=6),
 
                 self.__create_label(
-                    "Ship position when returning to limited power:"),
-                self.__create_value("XXXXXXXXX"),
+                    "Ship position when returning to limited power:", col=6),
+                self.__create_value(self.event_log.ended_position, col=6),
 
-                self.__create_label("Beaufort number:"),
-                self.__create_value("XXXXXXXXX"),
+                self.__create_label("Beaufort number:", col=6),
+                self.__create_value(self.event_log.beaufort_number, col=6),
 
-                self.__create_label("Wave height:"),
-                self.__create_value("XXXXXXXXX"),
+                self.__create_label("Wave height:", col=6),
+                self.__create_value(self.event_log.wave_height, col=6),
 
-                self.__create_label("Ice condition:"),
-                self.__create_value("XXXXXXXXX"),
+                self.__create_label("Ice condition:", col=6),
+                self.__create_value(self.event_log.ice_condition, col=6),
 
-                self.__create_label("Reason for using the power reserve:"),
-                self.__create_value("XXXXXXXXX")
+                self.__create_label(
+                    "Reason for using the power reserve:", col=6),
+                self.__create_value(reason, col=6)
             ]
         )
 
@@ -148,6 +177,7 @@ class ReportInfoDialog(ft.AlertDialog):
             controls=[
                 title,
                 self.event_start_log,
+                ft.Divider(height=0.5),
                 self.event_end_log
             ]
         )
@@ -160,23 +190,47 @@ class ReportInfoDialog(ft.AlertDialog):
                         text_align=ft.TextAlign.CENTER,
                         size=16,
                         weight=ft.FontWeight.W_500)
+
+        rows = []
+        for index, report_detail in enumerate(self.report_details):
+            utc_date_time = report_detail.utc_date_time.strftime("%Y-%m-%d %H:%M:%S")
+            system_unit = self.preference.system_unit
+            speed_value, speed_unit = UnitParser.parse_speed(report_detail.speed)
+            torque_value, torque_unit = UnitParser.parse_torque(report_detail.torque, system_unit)
+            power_value, power_unit = UnitParser.parse_power(report_detail.power, system_unit)
+            total_power_value, total_power_unit = UnitParser.parse_energy(report_detail.total_power, system_unit)
+
+            rows.append(ft.DataRow(
+                cells=[
+                    ft.DataCell(ft.Text(index + 1)),
+                    ft.DataCell(ft.Text(utc_date_time)),
+                    ft.DataCell(ft.Text(f"{speed_value} {speed_unit}")),
+                    ft.DataCell(ft.Text(f"{torque_value} {torque_unit}")),
+                    ft.DataCell(ft.Text(f"{power_value} {power_unit}")),
+                    ft.DataCell(ft.Text(f"{total_power_value} {total_power_unit}"))
+                ]
+            ))
+
         table = ft.DataTable(
             width=self.content_width,
             columns=[
                 ft.DataColumn(ft.Text("No.")),
                 ft.DataColumn(ft.Text("Date/Time")),
-                ft.DataColumn(ft.Text("Speed(rpm)")),
-                ft.DataColumn(ft.Text("Torque(kNm)")),
-                ft.DataColumn(ft.Text("Power(kW)")),
-                ft.DataColumn(ft.Text("Total Power(kW)"))
+                ft.DataColumn(ft.Text(f"Speed")),
+                ft.DataColumn(ft.Text(f"Torque")),
+                ft.DataColumn(ft.Text(f"Power")),
+                ft.DataColumn(ft.Text(f"Total Power"))
             ],
-            rows=[]
+            rows=rows
         )
         data_log = ft.Column(
             expand=True,
             spacing=20,
             horizontal_alignment=ft.CrossAxisAlignment.CENTER,
-            controls=[title, table]
+            controls=[
+                title,
+                table
+            ]
         )
         self.data_log_container = self.__create_container(data_log)
 

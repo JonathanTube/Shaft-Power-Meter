@@ -2,10 +2,10 @@ import flet as ft
 
 from db.models.event_log import EventLog
 from ui.common.abstract_table import AbstractTable
-from ui.home.logs.logs_event.log_event_form import LogEventForm
+from ui.home.event.event_form import EventForm
 
 
-class LogEventTable(AbstractTable):
+class EventTable(AbstractTable):
     def load_total(self):
         start_date = self.kwargs.get('start_date')
         end_date = self.kwargs.get('end_date')
@@ -73,7 +73,7 @@ class LogEventTable(AbstractTable):
                 icon_size=20,
                 visible=show_reason,
                 on_click=lambda e: self.page.open(
-                    LogEventForm(items[0], self.__update_table)
+                    EventForm(items[0], self.__update_table)
                 )
             ),
             ft.IconButton(

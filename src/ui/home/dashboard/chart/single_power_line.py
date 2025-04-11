@@ -49,12 +49,24 @@ class SinglePowerLine(ft.Container):
         border = ft.BorderSide(
             width=.5, color=ft.colors.with_opacity(0.15, ft.colors.INVERSE_SURFACE)
         )
+        max_y = int(self.max_y * 1.1)
         self.chart = ft.LineChart(
             min_y=0,
-            max_y=int(self.max_y * 1.1),
+            max_y=max_y,
+            tooltip_fit_inside_horizontally=True,
+            tooltip_fit_inside_vertically=True,
+            vertical_grid_lines=ft.ChartGridLines(
+                color=ft.colors.with_opacity(0.15, ft.colors.INVERSE_SURFACE),
+                width=.5
+            ),
+            horizontal_grid_lines=ft.ChartGridLines(
+                color=ft.colors.with_opacity(0.15, ft.colors.INVERSE_SURFACE),
+                width=.5
+            ),
             expand=True,
             border=ft.Border(left=border, bottom=border),
             left_axis=ft.ChartAxis(
+                labels_interval=max_y / 5,
                 labels_size=50,
                 labels=[
                     ft.ChartAxisLabel(value=0),
@@ -62,8 +74,7 @@ class SinglePowerLine(ft.Container):
                 ]),
             bottom_axis=ft.ChartAxis(
                 labels_size=30,
-                visible=False,
-                labels_interval=10
+                visible=False
             ),
             data_series=[
                 self.threshold_filled,
@@ -94,13 +105,15 @@ class SinglePowerLine(ft.Container):
             label = ft.ChartAxisLabel(
                 value=index,
                 label=ft.Container(
-                    content=ft.Text(value=item.utc_date_time.strftime('%H:%M:%S')),
+                    content=ft.Text(
+                        value=item.utc_date_time.strftime('%H:%M:%S')),
                     padding=ft.padding.only(top=10)
                 )
             )
             labels.append(label)
         # print(f'labels={labels}')
         self.chart.bottom_axis.labels = labels
+        self.chart.bottom_axis.labels_interval = len(labels) / 10
         self.chart.bottom_axis.visible = len(labels) > 0
 
     def __handle_data_line(self, data_list: list[DataLog]):

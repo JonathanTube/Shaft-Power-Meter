@@ -5,7 +5,7 @@ from db.models.event_log import EventLog
 from typing import Callable
 
 
-class LogEventForm(ft.AlertDialog):
+class EventForm(ft.AlertDialog):
     def __init__(self, event_id: int, callback: Callable):
         super().__init__()
         self.event_id = event_id

@@ -392,7 +392,11 @@ class DataInit:
                     "chinese": "日志",
                     "english": "Logs"
                 },
-
+                {
+                    "code": "lang.home.tab.event",
+                    "chinese": "事件",
+                    "english": "Event"
+                },
 
                 {
                     "code": "lang.setting.system_conf.title",
