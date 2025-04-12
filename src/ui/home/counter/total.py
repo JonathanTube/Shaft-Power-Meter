@@ -27,10 +27,17 @@ class CounterTotal(ft.Container):
         self.time_elapsed = ft.Text("")
         self.started_at = ft.Text("")
 
-        self.title = ft.Text('Total', weight=ft.FontWeight.BOLD, size=16)
+        self.title = ft.Text(
+            self.page.session.get('lang.counter.total'),
+            weight=ft.FontWeight.BOLD,
+            size=16
+        )
 
         self.status_container = ft.Container(
-            content=ft.Text(value='Running', size=14),
+            content=ft.Text(
+                value=self.page.session.get('lang.counter.running'),
+                size=12
+            ),
             alignment=ft.alignment.center,
             bgcolor=ft.colors.GREEN_500,
             border_radius=ft.border_radius.all(40),
@@ -59,11 +66,11 @@ class CounterTotal(ft.Container):
                 total_rounds = result['total_rounds']
                 average_speed = result['average_speed']
 
-                self.time_elapsed.value = result['time_elapsed']
+                self.time_elapsed.value = f'{result["time_elapsed"]} {self.page.session.get("lang.counter.measured")}'
                 self.time_elapsed.visible = True
                 self.time_elapsed.update()
 
-                self.started_at.value = result['started_at']
+                self.started_at.value = f'{self.page.session.get("lang.counter.started_at")} {result["started_at"]}'
                 self.started_at.visible = True
                 self.started_at.update()
 

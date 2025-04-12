@@ -1,13 +1,14 @@
 import math
 import numpy as np
 import flet as ft
-
+from db.models.system_settings import SystemSettings
 
 class PropellerCurveChart(ft.Container):
     def __init__(self):
         super().__init__()
         self.expand = True
         self.padding = ft.padding.only(right=5)
+        self.system_setting = SystemSettings.get()
 
     def build(self):
         border = ft.BorderSide(width=.5, color=ft.Colors.with_opacity(
@@ -32,7 +33,7 @@ class PropellerCurveChart(ft.Container):
                              right=border, top=border),
             left_axis=ft.ChartAxis(
                 labels_size=40,
-                title=ft.Text("Engine shaft power, % of A"),
+                title=ft.Text(f"{self.page.session.get('lang.propeller_curve.engine_shaft_power')}, % of A"),
                 title_size=30,
                 labels=[
                     ft.ChartAxisLabel(value=0),
@@ -42,7 +43,7 @@ class PropellerCurveChart(ft.Container):
             ),
             bottom_axis=ft.ChartAxis(
                 labels_size=40,
-                title=ft.Text("Engine speed, % of A"),
+                title=ft.Text(f"{self.page.session.get('lang.propeller_curve.engine_speed')}, % of A"),
                 title_size=30,
                 labels=[
                     ft.ChartAxisLabel(value=0),
@@ -101,6 +102,7 @@ class PropellerCurveChart(ft.Container):
                 # sps2
                 ft.LineChartData(
                     data_points=[],
+                    visible=self.system_setting.amount_of_propeller == 2,
                     point=ft.ChartCirclePoint(
                         color=ft.Colors.LIME,
                         radius=5

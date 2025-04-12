@@ -27,7 +27,9 @@ class CounterDisplay(ft.Container):
 
     def __create_total_energy(self):
         self.total_energy_value = self.__create_value()
-        self.total_energy_label = self.__create_label('Total Energy')
+        self.total_energy_label = self.__create_label(
+            self.page.session.get('lang.counter.total_energy')
+        )
         self.total_energy_unit = self.__create_unit('kWh')
 
         self.total_energy = ft.Row(
@@ -49,7 +51,9 @@ class CounterDisplay(ft.Container):
         )
 
     def __create_average_power(self):
-        self.average_power_label = self.__create_label('Average Power')
+        self.average_power_label = self.__create_label(
+            self.page.session.get('lang.counter.average_power')
+        )
         self.average_power_value = self.__create_value()
         self.average_power_unit = self.__create_unit('W')
 
@@ -70,7 +74,9 @@ class CounterDisplay(ft.Container):
         )
 
     def __create_total_rounds(self):
-        self.total_rounds_label = self.__create_label('Total Rounds')
+        self.total_rounds_label = self.__create_label(
+            self.page.session.get('lang.counter.total_rounds')
+        )
         self.total_rounds_value = self.__create_value()
 
         self.total_rounds = ft.Row(
@@ -92,7 +98,9 @@ class CounterDisplay(ft.Container):
         )
 
     def __create_average_speed(self):
-        self.average_speed_label = self.__create_label('Average Speed')
+        self.average_speed_label = self.__create_label(
+            self.page.session.get('lang.counter.average_speed')
+        )
         self.average_speed_value = self.__create_value()
         self.average_speed_unit = self.__create_unit('rpm')
 

@@ -21,6 +21,17 @@ class TrendViewChart(ft.Container):
         date_times, rpm_data, power_data = self.__get_data(data_list)
         self.ax_rpm.plot(date_times, rpm_data, color='red')
         self.ax_power.plot(date_times, power_data, color='blue')
+
+        # if len(data_list) > 0:
+        #     min_date_time = min(
+        #         data_list, key=lambda x: x.utc_date_time).utc_date_time
+        #     max_date_time = max(
+        #         data_list, key=lambda x: x.utc_date_time).utc_date_time
+
+        #     days_diff = (max_date_time - min_date_time).days
+
+        #     self.ax_rpm.xaxis.set_major_locator(plt.matplotlib.dates.DayLocator(interval=int(7)))
+
         self.chart.update()
 
     def __get_data(self, data_list: list[DataLog]):
@@ -31,11 +42,7 @@ class TrendViewChart(ft.Container):
         for data in data_list:
             rpm_data.append(data.speed)
             power_data.append(data.power)
-            date_times.append(
-                datetime.strptime(
-                    f"{data.utc_date} {data.utc_time}", "%Y-%m-%d %H:%M:%S.%f"
-                )
-            )
+            date_times.append(data.utc_date_time)
 
         return (date_times, rpm_data, power_data)
 
@@ -55,9 +62,9 @@ class TrendViewChart(ft.Container):
         #         interval=math.ceil(5))
         # )
 
-        self.ax_rpm.xaxis.set_major_formatter(
-            plt.matplotlib.dates.DateFormatter('%y-%m-%d %H:%M')
-        )
+        # self.ax_rpm.xaxis.set_major_formatter(
+        #     plt.matplotlib.dates.DateFormatter('%m-%d %H:%M')
+        # )
 
         self.ax_rpm.set_ylabel('rpm', color='red', fontsize=20)
         self.ax_rpm.plot([], [], color='red')

@@ -2,7 +2,7 @@ import asyncio
 import flet as ft
 
 from db.models.propeller_setting import PropellerSetting
-from db.models.data_log import DataLog
+from db.models.system_settings import SystemSettings
 from ui.home.propeller_curve.propeller_curve_chart import PropellerCurveChart
 from ui.home.propeller_curve.propeller_curve_legend import PropellerCurveLegend
 
@@ -12,8 +12,6 @@ class PropellerCurve(ft.Container):
         super().__init__()
         self.expand = True
         self.padding = 20
-
-        self.propeller_setting = None
 
         self.__load_config()
 
@@ -34,8 +32,8 @@ class PropellerCurve(ft.Container):
             ])
 
     def __load_config(self):
-        self.propeller_setting = PropellerSetting.select().order_by(
-            PropellerSetting.id.desc()).first()
+        self.propeller_setting = PropellerSetting.get()
+        self.system_setting = SystemSettings.get() 
 
     async def __load_data(self):
         if self.propeller_setting.shaft_power_of_mcr_operating_point == 0:
@@ -44,45 +42,35 @@ class PropellerCurve(ft.Container):
             return
 
         while True:
-            data_log_sps1 = DataLog.select(
-                DataLog.speed,
-                DataLog.power
-            ).where(DataLog.name == 'sps1').order_by(DataLog.id.desc()).first()
+            sps1_instant_power = self.page.session.get('sps1_instant_power')
+            sps1_instant_speed = self.page.session.get('sps1_instant_speed')
 
-            data_log_sps2 = DataLog.select(
-                DataLog.speed,
-                DataLog.power
-            ).where(DataLog.name == 'sps2').order_by(DataLog.id.desc()).first()
+            sps1_speed = (
+                sps1_instant_speed / self.propeller_setting.rpm_of_mcr_operating_point
+            ) * 100
 
-            if data_log_sps1:
-                sps1_speed = (
-                    data_log_sps1.speed / self.propeller_setting.rpm_of_mcr_operating_point
-                ) * 100
+            sps1_power = (
+                sps1_instant_power /
+                self.propeller_setting.shaft_power_of_mcr_operating_point
+            ) * 100
 
-                sps1_power = (
-                    data_log_sps1.power /
-                    self.propeller_setting.shaft_power_of_mcr_operating_point
-                ) * 100
+            # print('sps1_speed=', sps1_speed)
+            # print('sps1_power=', sps1_power)
 
-                # print('sps1_speed=', sps1_speed)
-                # print('sps1_power=', sps1_power)
+            self.chart.update_dynamic_data_sps1(sps1_speed, sps1_power)
 
-                self.chart.update_dynamic_data_sps1(sps1_speed, sps1_power)
 
-            if data_log_sps2:
-                sps2_speed = (
-                    data_log_sps2.speed /
-                    self.propeller_setting.rpm_of_mcr_operating_point
-                ) * 100
+            if self.system_setting.amount_of_propeller == 2:
+                sps2_instant_power = self.page.session.get('sps2_instant_power')
+                sps2_instant_speed = self.page.session.get('sps2_instant_speed')
 
-                sps2_power = (
-                    data_log_sps2.power /
-                    self.propeller_setting.shaft_power_of_mcr_operating_point
-                ) * 100
+                sps2_speed = (sps2_instant_speed /self.propeller_setting.rpm_of_mcr_operating_point) * 100
+
+                sps2_power = (sps2_instant_power /self.propeller_setting.shaft_power_of_mcr_operating_point) * 100
 
                 self.chart.update_dynamic_data_sps2(sps2_speed, sps2_power)
 
-                await asyncio.sleep(1)
+            await asyncio.sleep(1)
 
     def did_mount(self):
         self.chart.update_static_data(

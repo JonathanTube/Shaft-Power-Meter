@@ -67,6 +67,6 @@ class CounterManuallyTask:
             'average_power': average_power,
             'total_rounds': total_rounds,
             'average_speed': average_speed,
-            'time_elapsed': f'{days:02d} d {hours:02d}:{minutes:02d}:{seconds:02d} h measured',
-            'started_at': f'started at {start_time.strftime("%d/%m/%Y %H:%M:%S")}'
+            'time_elapsed': f'{days:02d} d {hours:02d}:{minutes:02d}:{seconds:02d} h',
+            'started_at': start_time.strftime("%Y-%m-%d %H:%M:%S")
         })

@@ -26,18 +26,17 @@ class CounterInterval(ft.Container):
 
     def on_hours_change(self, e):
         if not e.control.value:
-            Toast.show_error(e.page, "Interval cannot be empty")
+            Toast.show_error(e.page, self.page.session.get('lang.counter.interval_cannot_be_empty'))
             return
 
         _hours = float(e.control.value)
 
         if _hours <= 0:
-            Toast.show_error(e.page, "Interval must be greater than 0")
+            Toast.show_error(e.page, self.page.session.get('lang.counter.interval_must_be_greater_than_0'))
             return
 
         self.page.session.set('counter_interval_hours', _hours)
-        Toast.show_success(
-            e.page, f"Interval has been set to {_hours} hours")
+        Toast.show_success(e.page, self.page.session.get('lang.counter.interval_has_been_changed'))
 
     def build(self):
         self.display = CounterDisplay()
@@ -47,8 +46,8 @@ class CounterInterval(ft.Container):
             self.page.session.set('counter_interval_hours', hours)
 
         self.hours_field = ft.TextField(
-            label="Interval Setting",
-            suffix_text="Hours",
+            label=self.page.session.get('lang.counter.interval_setting'),
+            suffix_text=self.page.session.get('lang.counter.hours'),
             width=220,
             height=40,
             text_size=14,
@@ -63,19 +62,25 @@ class CounterInterval(ft.Container):
         )
 
         self.status_container = ft.Container(
-            content=ft.Text(value='Running', size=14),
+            content=ft.Text(
+                value=self.page.session.get('lang.counter.running'),
+                size=12
+            ),
             alignment=ft.alignment.center,
             bgcolor=ft.colors.GREEN_500,
             border_radius=ft.border_radius.all(40),
             padding=ft.padding.only(top=0, bottom=4, left=10, right=10)
         )
 
-        self.title = ft.Text('Interval', weight=ft.FontWeight.BOLD, size=16)
+        self.title = ft.Text(
+            self.page.session.get('lang.counter.interval'),
+            weight=ft.FontWeight.BOLD,
+            size=16
+        )
 
         self.content = ft.Column(
             expand=True,
             horizontal_alignment=ft.CrossAxisAlignment.CENTER,
-            spacing=20,
             controls=[
                 ft.Row(
                     alignment=ft.MainAxisAlignment.SPACE_BETWEEN,

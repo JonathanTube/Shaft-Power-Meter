@@ -1,5 +1,6 @@
 import flet as ft
 
+from db.models.system_settings import SystemSettings
 
 class PropellerCurveLegend(ft.Container):
     def __init__(self, normal_propeller_color: str, light_propeller_color: str,
@@ -18,6 +19,10 @@ class PropellerCurveLegend(ft.Container):
         self.speed_limit_color = speed_limit_color
         self.torque_load_limit_color = torque_load_limit_color
         self.overload_color = overload_color
+        self.__load_config()
+
+    def __load_config(self):
+        self.system_setting = SystemSettings.get()
 
     def build(self):
         self.content = ft.Column(
@@ -34,7 +39,7 @@ class PropellerCurveLegend(ft.Container):
                             border_radius=10,
                             margin=ft.margin.symmetric(horizontal=6)
                         ),
-                        ft.Text("MCR Operating Point", color=ft.colors.RED)
+                        ft.Text(self.page.session.get('lang.propeller_curve.mcr_operating_point'), color=ft.colors.RED)
                     ]
                 ),
 
@@ -47,8 +52,7 @@ class PropellerCurveLegend(ft.Container):
                             height=2,
                             bgcolor=self.normal_propeller_color
                         ),
-                        ft.Text("Normal Propeller Curve",
-                                color=self.normal_propeller_color)
+                        ft.Text(self.page.session.get('lang.propeller_curve.normal_propeller_curve'), color=self.normal_propeller_color)
                     ]
                 ),
                 ft.Row(
@@ -59,8 +63,7 @@ class PropellerCurveLegend(ft.Container):
                             weight=ft.FontWeight.BOLD,
                             color=self.light_propeller_color
                         ),
-                        ft.Text("Light Propeller Curve",
-                                color=self.light_propeller_color)
+                        ft.Text(self.page.session.get('lang.propeller_curve.light_propeller_curve'), color=self.light_propeller_color)
                     ]
                 ),
                 ft.Row(
@@ -71,8 +74,7 @@ class PropellerCurveLegend(ft.Container):
                             weight=ft.FontWeight.BOLD,
                             color=self.speed_limit_color
                         ),
-                        ft.Text("Speed Limit Curve",
-                                color=self.speed_limit_color)
+                        ft.Text(self.page.session.get('lang.propeller_curve.speed_limit_curve'), color=self.speed_limit_color)
                     ]
                 ),
                 ft.Row(
@@ -84,8 +86,7 @@ class PropellerCurveLegend(ft.Container):
                             height=2,
                             bgcolor=self.torque_load_limit_color
                         ),
-                        ft.Text("Torque/Load Limit Curve",
-                                color=self.torque_load_limit_color)
+                        ft.Text(self.page.session.get('lang.propeller_curve.torque_load_limit_curve'), color=self.torque_load_limit_color)
                     ]
                 ),
                 ft.Row(
@@ -94,7 +95,7 @@ class PropellerCurveLegend(ft.Container):
                         ft.Text(value="----",
                                 weight=ft.FontWeight.BOLD,
                                 color=self.overload_color),
-                        ft.Text("Overload Curve", color=self.overload_color)
+                        ft.Text(self.page.session.get('lang.propeller_curve.overload_curve'), color=self.overload_color)
                     ]
                 ),
                 ft.Row(
@@ -108,11 +109,12 @@ class PropellerCurveLegend(ft.Container):
                             bgcolor=ft.colors.ORANGE,
                             margin=ft.margin.symmetric(horizontal=6)
                         ),
-                        ft.Text("sps1", color=ft.colors.ORANGE)
+                        ft.Text('sps1', color=ft.colors.ORANGE)
                     ]
                 ),
                 ft.Row(
                     expand=False,
+                    visible=self.system_setting.amount_of_propeller == 2,
                     controls=[
                         ft.Container(
                             expand=False,
@@ -122,7 +124,7 @@ class PropellerCurveLegend(ft.Container):
                             bgcolor=ft.colors.LIME,
                             margin=ft.margin.symmetric(horizontal=6)
                         ),
-                        ft.Text("sps2", color=ft.colors.LIME)
+                        ft.Text('sps2', color=ft.colors.LIME)
                     ]
                 )
             ]

@@ -919,5 +919,175 @@ class DataInit:
                     "code": "lang.report.report_name",
                     "chinese": "报告名称",
                     "english": "Report Name"
+                },
+                {
+                    "code": "lang.counter.interval",
+                    "chinese": "间隔",
+                    "english": "Interval"
+                },
+                {
+                    "code": "lang.counter.manually",
+                    "chinese": "手动",
+                    "english": "Manually"
+                },
+                {
+                    "code": "lang.counter.total",
+                    "chinese": "总计",
+                    "english": "Total"
+                },
+                {
+                    "code": "lang.counter.running",
+                    "chinese": "运行中",
+                    "english": "Running"
+                },
+                {
+                    "code": "lang.counter.reset",
+                    "chinese": "重置",
+                    "english": "Reset"
+                },
+                {
+                    "code": "lang.counter.stopped",
+                    "chinese": "已停止",
+                    "english": "Stopped"
+                },
+                {
+                    "code": "lang.counter.start",
+                    "chinese": "启动",
+                    "english": "Start"
+                },
+                {
+                    "code": "lang.counter.stop",
+                    "chinese": "停止",
+                    "english": "Stop"
+                },
+                {
+                    "code": "lang.counter.resume",
+                    "chinese": "恢复",
+                    "english": "Resume"
+                },
+                {
+                    "code": "lang.counter.total_energy",
+                    "chinese": "总耗量",
+                    "english": "Total Energy"
+                },
+                {
+                    "code": "lang.counter.average_power",
+                    "chinese": "平均功率",
+                    "english": "Average Power"
+                },
+                {
+                    "code": "lang.counter.total_rounds",
+                    "chinese": "总圈数",
+                    "english": "Total Rounds"
+                },
+                {
+                    "code": "lang.counter.average_speed",
+                    "chinese": "平均速度",
+                    "english": "Average Speed"
+                },
+                {
+                    "code": "lang.counter.interval_setting",
+                    "chinese": "间隔设置",
+                    "english": "Interval Setting"
+                },
+                {
+                    "code": "lang.counter.hours",
+                    "chinese": "小时",
+                    "english": "Hours"
+                },
+                {
+                    "code": "lang.counter.started_at",
+                    "chinese": "开始于",
+                    "english": "Started At"
+                },
+                {
+                    "code": "lang.counter.stopped_at",
+                    "chinese": "停止于",
+                    "english": "Stopped At"
+                },
+                {
+                    "code": "lang.counter.measured",
+                    "chinese": "已测量",
+                    "english": "Measured"
+                },
+                {
+                    "code": "lang.counter.please_confirm",
+                    "chinese": "请确认",
+                    "english": "Please Confirm"
+                },
+                {
+                    "code": "lang.counter.do_you_really_want_to_reset_counter",
+                    "chinese": "你确定要重置计数器吗？",
+                    "english": "Do you really want to reset the counter?"
+                },
+                {
+                    "code": "lang.counter.yes",
+                    "chinese": "是",
+                    "english": "Yes"
+                },
+                {
+                    "code": "lang.counter.no",
+                    "chinese": "否",
+                    "english": "No"
+                },
+                {
+                    "code": "lang.counter.interval_has_been_changed",
+                    "chinese": "间隔已更改",
+                    "english": "Interval has been changed"
+                },
+                {
+                    "code": "lang.counter.interval_cannot_be_empty",
+                    "chinese": "间隔不能为空",
+                    "english": "Interval cannot be empty"
+                },
+                {
+                    "code": "lang.counter.interval_must_be_greater_than_0",
+                    "chinese": "间隔必须大于0",
+                    "english": "Interval must be greater than 0"
+                },
+                {
+                    "code": "lang.trendview.cannot_search_more_than_30_days",
+                    "chinese": "不能搜索超过30天",
+                    "english": "Cannot search more than 30 days"
+                },
+                {
+                    "code":"lang.propeller_curve.mcr_operating_point",
+                    "chinese":"MCR 操作点",
+                    "english":"MCR Operating Point"
+                },
+                {
+                    "code":"lang.propeller_curve.normal_propeller_curve",
+                    "chinese":"正常螺旋桨曲线",
+                    "english":"Normal Propeller Curve"
+                },
+                {
+                    "code":"lang.propeller_curve.light_propeller_curve",
+                    "chinese":"轻载螺旋桨曲线",
+                    "english":"Light Propeller Curve"
+                },
+                {
+                    "code":"lang.propeller_curve.speed_limit_curve",
+                    "chinese":"速度限制曲线",
+                    "english":"Speed Limit Curve"
+                },
+                {
+                    "code":"lang.propeller_curve.torque_load_limit_curve",
+                    "chinese":"扭矩负载限制曲线",
+                    "english":"Torque Load Limit Curve"
+                },
+                {
+                    "code":"lang.propeller_curve.overload_curve",
+                    "chinese":"过载曲线",
+                    "english":"Overload Curve"
+                },
+                {
+                    "code":"lang.propeller_curve.engine_speed",
+                    "chinese":"发动机转速",
+                    "english":"Engine Speed"
+                },
+                {
+                    "code":"lang.propeller_curve.engine_shaft_power",
+                    "chinese":"发动机轴功率",
+                    "english":"Engine Shaft Power"
                 }
             ]).execute()
