@@ -135,7 +135,7 @@ async def main(page: ft.Page):
 
     def on_breach_alarm_occured(topic, occured):
         if occured:
-            override_button.icon = ft.icons.NOTIFICATIONS_ON_OUTLINED
+            override_button.icon = ft.Icons.NOTIFICATIONS_ON_OUTLINED
             override_button.bgcolor = ft.Colors.RED
             override_button.visible = True
             override_button.disabled = False

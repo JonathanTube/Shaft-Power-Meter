@@ -7,18 +7,24 @@ class SelfTest(ft.Tabs):
 
     def build(self):
         self.plc_log = ft.ListView(
+            padding=10,
             auto_scroll=True,
             height=500,
+            spacing=5,
             expand=True
         )
         self.modbus_log = ft.ListView(
+            padding=10,
             auto_scroll=True,
             height=500,
+            spacing=5,
             expand=True
         )
         self.gps_log = ft.ListView(
+            padding=10,
             auto_scroll=True,
             height=500,
+            spacing=5,
             expand=True
         )
         self.tabs = [

@@ -4,11 +4,10 @@ import flet as ft
 from utils.unit_parser import UnitParser
 
 
-class PowerUnlimited(ft.Card):
+class PowerUnlimited(ft.Container):
     def __init__(self):
         super().__init__()
         self.expand = True
-        self.margin = 0
 
     def build(self):
         self.title = ft.Text("Un-limited Power", weight=ft.FontWeight.W_600)
@@ -16,6 +15,11 @@ class PowerUnlimited(ft.Card):
         self.unlimited_power_unit = ft.Text('W')
 
         self.content = ft.Container(
+            border=ft.border.all(
+                width=0.5,
+                color=ft.colors.with_opacity(0.15, ft.colors.INVERSE_SURFACE)
+            ),
+            border_radius=10,
             padding=ft.padding.all(10),
             content=ft.Row(
                 alignment=ft.MainAxisAlignment.SPACE_BETWEEN,

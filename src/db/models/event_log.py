@@ -8,9 +8,9 @@ class EventLog(BaseModel):
         BreachReason, null=True, index=True, backref="EventLog", verbose_name="功率突破原因"
     )
 
-    started_at = DateTimeField(null=False, verbose_name="功率突破发生时间")
+    started_at = DateTimeField(null=True, verbose_name="功率突破发生时间")
 
-    started_position = CharField(verbose_name="发生功率突破时的船舶位置")
+    started_position = CharField(null=True, verbose_name="发生功率突破时的船舶位置")
 
     ended_at = DateTimeField(null=True, verbose_name="功率突破结束时间")
 
@@ -25,4 +25,4 @@ class EventLog(BaseModel):
     ice_condition = TextField(null=True, verbose_name="冰况")
 
     class Meta:
-        table_name = 'breach_log'
+        table_name = 'event_log'

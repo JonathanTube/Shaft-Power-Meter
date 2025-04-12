@@ -2,11 +2,10 @@ import flet as ft
 from utils.unit_parser import UnitParser
 
 
-class PowerLimited(ft.Card):
+class PowerLimited(ft.Container):
     def __init__(self):
         super().__init__()
         self.expand = True
-        self.margin = 0
 
     def build(self):
         self.title = ft.Text("Limited Power", weight=ft.FontWeight.W_600)
@@ -15,6 +14,11 @@ class PowerLimited(ft.Card):
 
         self.content = ft.Container(
             padding=ft.padding.all(10),
+            border=ft.border.all(
+                width=0.5,
+                color=ft.colors.with_opacity(0.15, ft.colors.INVERSE_SURFACE)
+            ),
+            border_radius=10,
             content=ft.Row(
                 alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
                 controls=[

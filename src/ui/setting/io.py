@@ -1,5 +1,6 @@
 import socket
 import flet as ft
+from pymodbus.client import ModbusTcpClient
 
 from db.models.io_conf import IOConf
 from ui.common.custom_card import CustomCard
@@ -288,8 +289,33 @@ class IO(ft.Container):
         )
 
     def __save_data(self, e):
-        self.last_io_conf.save()
-        Toast.show_success(e.page)
+        plc_client = None
+        try:
+            plc_client = ModbusTcpClient(host=self.last_io_conf.plc_ip, port=self.last_io_conf.plc_port)
+            plc_client.connect()
+            plc_client.write_register(12298, int(self.last_io_conf.power_range_min))
+            plc_client.write_register(12299, int(self.last_io_conf.power_range_max))
+            plc_client.write_register(12300, int(self.last_io_conf.power_range_offset))
+
+            plc_client.write_register(12308, int(self.last_io_conf.torque_range_min))
+            plc_client.write_register(12309, int(self.last_io_conf.torque_range_max))
+            plc_client.write_register(12310, int(self.last_io_conf.torque_range_offset))
+            
+            plc_client.write_register(12318, int(self.last_io_conf.thrust_range_min))
+            plc_client.write_register(12319, int(self.last_io_conf.thrust_range_max))
+            plc_client.write_register(12320, int(self.last_io_conf.thrust_range_offset))
+
+            plc_client.write_register(12328, int(self.last_io_conf.speed_range_min))
+            plc_client.write_register(12329, int(self.last_io_conf.speed_range_max))
+            plc_client.write_register(12330, int(self.last_io_conf.speed_range_offset))
+            self.last_io_conf.save()
+            Toast.show_success(e.page)
+        except Exception as err:
+            Toast.show_error(e.page, "save limitation to PLC failed")
+            print(err)
+        finally:
+            if plc_client:
+                plc_client.close()
 
     def __reset_data(self, e):
         self.last_io_conf = IOConf.get()

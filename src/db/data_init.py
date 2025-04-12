@@ -258,7 +258,11 @@ class DataInit:
                     "chinese": "EEXI 限制功率",
                     "english": "EEXI Limited Power"
                 },
-
+                {
+                    "code": "lang.common.power_unlimited_mode",
+                    "chinese": "功率无限制模式",
+                    "english": "Power Un-limited Mode"
+                },
                 {
                     "code": "lang.common.start_date",
                     "chinese": "开始日期",

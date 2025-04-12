@@ -26,7 +26,6 @@ class SingleInstantGrid(ft.Container):
             expand=True,
             controls=[
                 ft.Row(
-                    expand=False,
                     controls=[
                         self.power_limited_card,
                         self.power_unlimited_card
