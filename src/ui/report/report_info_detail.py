@@ -9,9 +9,10 @@ from utils.unit_parser import UnitParser
 
 
 class ReportInfoDialog(ft.AlertDialog):
-    def __init__(self, id):
+    def __init__(self, id, report_name):
         super().__init__()
         self.id = id
+        self.report_name = report_name
         self.content_width = 1000
 
         self.expand = True
@@ -20,7 +21,7 @@ class ReportInfoDialog(ft.AlertDialog):
         self.title = ft.Row(
             controls=[
                 ft.Text(""),
-                ft.Text("Compliance Reporting", expand=True,
+                ft.Text(report_name, expand=True,
                         text_align=ft.TextAlign.CENTER),
                 ft.IconButton(
                     icon=ft.icons.CLOSE_OUTLINED,
@@ -64,10 +65,8 @@ class ReportInfoDialog(ft.AlertDialog):
         unlimited_power = self.propeller_setting.shaft_power_of_mcr_operating_point
         limited_power = self.system_settings.eexi_limited_power
         system_unit = self.preference.system_unit
-        unlimited_power_value, unlimited_power_unit = UnitParser.parse_power(
-            unlimited_power, system_unit)
-        limited_power_value, limited_power_unit = UnitParser.parse_power(
-            limited_power, system_unit)
+        unlimited_power_value, unlimited_power_unit = UnitParser.parse_power(unlimited_power, system_unit, shrink=False)
+        limited_power_value, limited_power_unit = UnitParser.parse_power(limited_power, system_unit, shrink=False)
 
         basic_info = ft.ResponsiveRow(
             expand=True,
@@ -97,6 +96,31 @@ class ReportInfoDialog(ft.AlertDialog):
         self.basic_info_container = self.__create_container(basic_info)
 
     def __create_event_start_log(self):
+        if self.event_log.started_at:
+            started_at = self.event_log.started_at.strftime("%Y-%m-%d %H:%M:%S")
+        else:
+            started_at = "N/A"
+
+        if self.event_log.started_position:
+            started_position = self.event_log.started_position
+        else:
+            started_position = "N/A"
+
+        if self.event_log.beaufort_number:
+            beaufort_number = self.event_log.beaufort_number    
+        else:
+            beaufort_number = "N/A"
+
+        if self.event_log.wave_height:
+            wave_height = self.event_log.wave_height
+        else:
+            wave_height = "N/A"
+
+        if self.event_log.ice_condition:
+            ice_condition = self.event_log.ice_condition
+        else:
+            ice_condition = "N/A"
+
         if self.event_log.breach_reason:
             reason = self.event_log.breach_reason.reason
         else:
@@ -106,30 +130,52 @@ class ReportInfoDialog(ft.AlertDialog):
             expand=True,
             width=self.content_width,
             controls=[
-                self.__create_label(
-                    "Date/Time of Power Reserve Breach:", col=6),
-                self.__create_value(self.event_log.started_at, col=6),
+                self.__create_label("Date/Time of Power Reserve Breach:", col=6),
+                self.__create_value(started_at, col=6),
 
-                self.__create_label(
-                    "Ship position of power reserve breach:", col=6),
-                self.__create_value(self.event_log.started_position, col=6),
+                self.__create_label("Ship position of power reserve breach:", col=6),
+                self.__create_value(started_position, col=6),
 
                 self.__create_label("Beaufort number:", col=6),
-                self.__create_value(self.event_log.beaufort_number, col=6),
+                self.__create_value(beaufort_number, col=6),
 
                 self.__create_label("Wave height:", col=6),
-                self.__create_value(self.event_log.wave_height, col=6),
+                self.__create_value(wave_height, col=6),
 
                 self.__create_label("Ice condition:", col=6),
-                self.__create_value(self.event_log.ice_condition, col=6),
+                self.__create_value(ice_condition, col=6),
 
-                self.__create_label(
-                    "Reason for using the power reserve:", col=6),
+                self.__create_label("Reason for using the power reserve:", col=6),
                 self.__create_value(reason, col=6)
             ]
         )
 
     def __create_event_end_log(self):
+        if self.event_log.ended_at:
+            ended_at = self.event_log.ended_at.strftime("%Y-%m-%d %H:%M:%S")
+        else:
+            ended_at = "N/A"
+
+        if self.event_log.ended_position:
+            ended_position = self.event_log.ended_position
+        else:
+            ended_position = "N/A"
+
+        if self.event_log.beaufort_number:
+            beaufort_number = self.event_log.beaufort_number
+        else:
+            beaufort_number = "N/A"
+
+        if self.event_log.wave_height:
+            wave_height = self.event_log.wave_height    
+        else:
+            wave_height = "N/A"
+
+        if self.event_log.ice_condition:
+            ice_condition = self.event_log.ice_condition
+        else:
+            ice_condition = "N/A"   
+
         if self.event_log.breach_reason:
             reason = self.event_log.breach_reason.reason
         else:
@@ -139,25 +185,23 @@ class ReportInfoDialog(ft.AlertDialog):
             expand=True,
             width=self.content_width,
             controls=[
-                self.__create_label(
-                    "Date/Time when returning to limited power:", col=6),
-                self.__create_value(self.event_log.ended_at, col=6),
+                self.__create_label("Date/Time when returning to limited power:", col=6),
+                self.__create_value(ended_at, col=6),
 
                 self.__create_label(
                     "Ship position when returning to limited power:", col=6),
-                self.__create_value(self.event_log.ended_position, col=6),
+                self.__create_value(ended_position, col=6),
 
                 self.__create_label("Beaufort number:", col=6),
-                self.__create_value(self.event_log.beaufort_number, col=6),
+                self.__create_value(beaufort_number, col=6),
 
                 self.__create_label("Wave height:", col=6),
-                self.__create_value(self.event_log.wave_height, col=6),
+                self.__create_value(wave_height, col=6),
 
                 self.__create_label("Ice condition:", col=6),
-                self.__create_value(self.event_log.ice_condition, col=6),
+                self.__create_value(ice_condition, col=6),
 
-                self.__create_label(
-                    "Reason for using the power reserve:", col=6),
+                self.__create_label("Reason for using the power reserve:", col=6),
                 self.__create_value(reason, col=6)
             ]
         )
@@ -195,19 +239,18 @@ class ReportInfoDialog(ft.AlertDialog):
         for index, report_detail in enumerate(self.report_details):
             utc_date_time = report_detail.utc_date_time.strftime("%Y-%m-%d %H:%M:%S")
             system_unit = self.preference.system_unit
-            speed_value, speed_unit = UnitParser.parse_speed(report_detail.speed)
-            torque_value, torque_unit = UnitParser.parse_torque(report_detail.torque, system_unit)
-            power_value, power_unit = UnitParser.parse_power(report_detail.power, system_unit)
-            total_power_value, total_power_unit = UnitParser.parse_energy(report_detail.total_power, system_unit)
+            torque_value, _ = UnitParser.parse_torque(report_detail.torque, system_unit, shrink=False)
+            power_value, _ = UnitParser.parse_power(report_detail.power, system_unit, shrink=False)
+            energy_value, _ = UnitParser.parse_energy(report_detail.total_power, system_unit)
 
             rows.append(ft.DataRow(
                 cells=[
                     ft.DataCell(ft.Text(index + 1)),
                     ft.DataCell(ft.Text(utc_date_time)),
-                    ft.DataCell(ft.Text(f"{speed_value} {speed_unit}")),
-                    ft.DataCell(ft.Text(f"{torque_value} {torque_unit}")),
-                    ft.DataCell(ft.Text(f"{power_value} {power_unit}")),
-                    ft.DataCell(ft.Text(f"{total_power_value} {total_power_unit}"))
+                    ft.DataCell(ft.Text(f"{report_detail.speed}")),
+                    ft.DataCell(ft.Text(f"{torque_value}")),
+                    ft.DataCell(ft.Text(f"{power_value}")),
+                    ft.DataCell(ft.Text(f"{energy_value}"))
                 ]
             ))
 
@@ -216,10 +259,10 @@ class ReportInfoDialog(ft.AlertDialog):
             columns=[
                 ft.DataColumn(ft.Text("No.")),
                 ft.DataColumn(ft.Text("Date/Time")),
-                ft.DataColumn(ft.Text(f"Speed")),
-                ft.DataColumn(ft.Text(f"Torque")),
-                ft.DataColumn(ft.Text(f"Power")),
-                ft.DataColumn(ft.Text(f"Total Power"))
+                ft.DataColumn(ft.Text(f"Speed(rpm)")),
+                ft.DataColumn(ft.Text(f"Torque(kNm)") if system_unit == 0 else ft.Text(f"Torque(Tm)")),
+                ft.DataColumn(ft.Text(f"Power(kW)") if system_unit == 0 else ft.Text(f"Power(SHp)")),
+                ft.DataColumn(ft.Text(f"Total Power(kWh)") if system_unit == 0 else ft.Text(f"Total Power(SHph)"))
             ],
             rows=rows
         )

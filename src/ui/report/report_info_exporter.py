@@ -61,12 +61,16 @@ class ReportInfoExporter(FPDF):
         self.__insert_value(self.ship_info.ship_name, w=self.per_cell_width)
         self.ln()
 
+        system_unit = self.preference.system_unit
         self.__insert_label("Un-limited Power", w=self.per_cell_width)
-        self.__insert_value(
-            f"{self.propeller_setting.shaft_power_of_mcr_operating_point} kW", w=self.per_cell_width)
+        unlimited_power = self.propeller_setting.shaft_power_of_mcr_operating_point
+        unlimited_power, unlimited_unit = UnitParser.parse_power(unlimited_power, system_unit, shrink=False)
+        self.__insert_value(f"{unlimited_power} {unlimited_unit}", w=self.per_cell_width)
+
         self.__insert_label("Limited Power", w=self.per_cell_width)
-        self.__insert_value(
-            f"{self.system_settings.eexi_limited_power} kW", w=self.per_cell_width)
+        limited_power = self.system_settings.eexi_limited_power
+        limited_power, limited_unit = UnitParser.parse_power(limited_power, system_unit, shrink=False)   
+        self.__insert_value(f"{limited_power} {limited_unit}", w=self.per_cell_width)
         self.ln()
 
         self.__insert_horizontal_line()
@@ -87,7 +91,18 @@ class ReportInfoExporter(FPDF):
         self.set_text_color(51, 51, 51)
         # 表头
         col_widths = [15, 35, 35, 35, 35, 35]
+
+        system_unit = self.preference.system_unit
+
         headers = ["No.", "Date/Time", "Speed", "Torque", "Power", "Total Power"]
+        if system_unit == 0:
+            headers[3] = "Torque(Nm)"
+            headers[4] = "Power(W)"
+            headers[5] = "Total Power(Wh)"
+        else:
+            headers[3] = "Torque(Tm)"
+            headers[4] = "Power(SHp)"
+            headers[5] = "Total Power(SHph)"
 
         self.set_font("Arial", 'B', 10)
 
@@ -99,19 +114,27 @@ class ReportInfoExporter(FPDF):
         self.set_font("Arial", '', 10)
         self.set_text_color(66, 66, 66)
 
+
+
         rows = []
         for report_detail in self.report_details:
             if report_detail.utc_date_time:
                 utc_date_time = report_detail.utc_date_time.strftime("%Y-%m-%d %H:%M:%S")
             else:
                 utc_date_time = "N/A"
+
+            torque, _ = UnitParser.parse_torque(report_detail.torque, system_unit, shrink=False)
+            power, _ = UnitParser.parse_power(report_detail.power, system_unit, shrink=False)
+            energy, _ = UnitParser.parse_energy(report_detail.total_power, system_unit)
+
+            
             rows.append([
                 str(report_detail.id),
                 utc_date_time,
-                str(report_detail.speed),
-                str(report_detail.torque),
-                str(report_detail.power),
-                str(report_detail.total_power)
+                f"{report_detail.speed}",
+                f"{torque}",
+                f"{power}",
+                f"{energy}"
             ])
 
         for row in rows:

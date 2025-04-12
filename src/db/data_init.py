@@ -340,6 +340,19 @@ class DataInit:
                     "chinese": "确认时间",
                     "english": "Acknowledge Time"
                 },
+
+                {
+                    "code": "lang.common.view",
+                    "chinese": "查看",
+                    "english": "View"
+                },
+
+                {
+                    "code": "lang.common.export",
+                    "chinese": "导出",
+                    "english": "Export"
+                },
+
                 {
                     "code": "lang.header.home",
                     "chinese": "主页",
@@ -656,6 +669,12 @@ class DataInit:
                     "code": "lang.setting.utc_date_time_conf",
                     "chinese": "UTC 日期时间配置",
                     "english": "UTC Date Time Conf."
+                },
+
+                {
+                    "code": "lang.setting.current_utc_date_time",
+                    "chinese": "当前UTC日期时间",
+                    "english": "Current UTC Date Time"
                 },
 
                 {

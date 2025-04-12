@@ -64,14 +64,14 @@ class Pagination(ft.Container):
         self.total_pages = (self.total_items +
                             self.page_size - 1) // self.page_size
 
-        self.page_number.value = f"Page {self.current_page} of {self.total_pages}"
+        self.page_number.value = f"{self.current_page} of {self.total_pages}"
         self.visible = total_items > self.page_size
 
         self.update_page_buttons()
 
     def update_page_buttons(self):
         self.on_change(self.current_page, self.page_size)
-        self.page_number.value = f"Page {self.current_page} of {self.total_pages}"
+        self.page_number.value = f"{self.current_page} of {self.total_pages}"
 
         if self.current_page <= 1:
             self.first_page_button.disabled = True

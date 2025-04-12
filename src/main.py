@@ -1,3 +1,5 @@
+import os
+from pathlib import Path
 import flet as ft
 import asyncio
 
@@ -55,7 +57,7 @@ def start_tasks(page: ft.Page):
     asyncio.create_task(PlcReadTask(page).start())
     asyncio.create_task(ModbusReadTask(page).start())
     asyncio.create_task(DataSaveTask(page).start())
-    
+
     asyncio.create_task(BreachLogTask(page).start())
 
 
@@ -63,6 +65,38 @@ def add_file_picker(page: ft.Page):
     file_picker = ft.FilePicker()
     page.overlay.append(file_picker)
     page.session.set('file_picker_for_pdf_export', file_picker)
+
+
+def create_audio_alarm(page: ft.Page):
+    # create audio alarm
+    audit_src = os.path.join(Path(__file__).parent, "assets", "alarm.mp3")
+    print(audit_src)
+    audio_alarm = ft.Audio(src=audit_src, autoplay=False,
+                           release_mode=ft.audio.ReleaseMode.LOOP)
+    page.overlay.append(audio_alarm)
+    return audio_alarm
+
+
+def create_override_button(audio_alarm: ft.Audio):
+    def on_override_button_click(e):
+        audio_alarm.pause()
+        override_button.icon = ft.Icons.NOTIFICATIONS_OFF_OUTLINED
+        override_button.disabled = True
+        override_button.bgcolor = ft.Colors.RED_400
+        override_button.update()
+
+    override_button = ft.FilledButton(
+        top=8,
+        right=20,
+        text="Override",
+        icon=ft.Icons.NOTIFICATIONS_ON_OUTLINED,
+        icon_color=ft.Colors.WHITE,
+        bgcolor=ft.Colors.RED,
+        color=ft.Colors.WHITE,
+        visible=False,
+        on_click=on_override_button_click
+    )
+    return override_button
 
 
 async def main(page: ft.Page):
@@ -90,15 +124,27 @@ async def main(page: ft.Page):
 
     # page.window.prevent_close = True
 
-    main_content = ft.Container(
-        expand=True,
-        content=Home(),
-        padding=0
-    )
+    main_content = ft.Container(expand=True, content=Home(), padding=0)
 
     page.appbar = Header(main_content)
 
-    page.add(main_content)
+    audio_alarm = create_audio_alarm(page)
+    override_button = create_override_button(audio_alarm)
 
+    main_stack = ft.Stack([main_content, override_button], expand=True)
+
+    def on_breach_alarm_occured(topic, occured):
+        if occured:
+            override_button.icon = ft.icons.NOTIFICATIONS_ON_OUTLINED
+            override_button.bgcolor = ft.Colors.RED
+            override_button.visible = True
+            override_button.disabled = False
+            audio_alarm.play()
+        else:
+            override_button.visible = False
+            audio_alarm.pause()
+        override_button.update()
+    page.pubsub.subscribe_topic("breach_alarm_occured", on_breach_alarm_occured)
+    page.add(main_stack)
 
 ft.app(main)

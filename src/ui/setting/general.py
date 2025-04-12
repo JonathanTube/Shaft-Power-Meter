@@ -431,22 +431,19 @@ class General(ft.Container):
         self.system_unit_si.label = session.get("lang.setting.unit.si")
         self.system_unit_metric.label = session.get("lang.setting.unit.metric")
 
-        self.data_refresh_interval_label.value = session.get(
-            "lang.setting.data_refresh_interval")
+        self.data_refresh_interval_label.value = session.get("lang.setting.data_refresh_interval")
 
-        self.max_limitations_card.set_title(
-            session.get("lang.setting.maximum_limitations"))
+        self.max_limitations_card.set_title(session.get("lang.setting.maximum_limitations"))
 
-        self.warning_limitations_card.set_title(
-            session.get("lang.setting.warning_limitations"))
+        self.warning_limitations_card.set_title(session.get("lang.setting.warning_limitations"))
 
-        self.date_time_card.set_title(
-            session.get("lang.setting.utc_date_time_conf"))
+        self.date_time_card.set_title(session.get("lang.setting.utc_date_time_conf"))
 
+
+        self.utc_date_time.label = session.get("lang.setting.current_utc_date_time")
         self.utc_date.label = session.get("lang.setting.date")
         self.utc_time.label = session.get("lang.setting.time")
-        self.date_time_format.label = session.get(
-            "lang.setting.date_time_format")
+        self.date_time_format.label = session.get("lang.setting.date_time_format")
         self.sync_with_gps.label = session.get("lang.setting.sync_with_gps")
 
         self.speed_max.label = session.get("lang.common.speed")

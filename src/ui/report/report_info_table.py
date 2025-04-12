@@ -44,27 +44,31 @@ class ReportInfoTable(AbstractTable):
         return True
 
     def create_operations(self, items: list):
-        return ft.Row(
-            controls=[
-                ft.TextButton(
+        view_button = ft.TextButton(
                     icon=ft.Icons.VISIBILITY_OUTLINED,
                     text="View",
-                    on_click=lambda e: self.__view_report(e, items[0])
-                ),
-                ft.TextButton(
+                    on_click=lambda e: self.__view_report(e, items[0],items[1])
+                )
+         
+        export_button = ft.TextButton(
                     icon=ft.Icons.DOWNLOAD_OUTLINED,
                     text="Export",
-                    on_click=lambda e: self.__export_report(e, items[0])
-                )
-            ])
+                    on_click=lambda e: self.__export_report(e, items[0],items[1])
+                )   
 
-    def __view_report(self, e, id: int):
-        e.page.open(ReportInfoDialog(id))
+        session = self.page.session
+        view_button.text = session.get("lang.common.view")
+        export_button.text = session.get("lang.common.export")
 
-    def __export_report(self, e, id: int):
+        return ft.Row(controls=[view_button, export_button])
+
+    def __view_report(self, e, id: int, report_name: str):
+        e.page.open(ReportInfoDialog(id, report_name))
+
+    def __export_report(self, e, id: int, report_name: str):
         file_picker = e.page.session.get('file_picker_for_pdf_export')
         file_picker.save_file(
-            file_name="report.pdf",
+            file_name=f"{report_name}.pdf",
             allowed_extensions=["pdf"]
         )
         file_picker.on_result = lambda e: self.__on_result(e, id)

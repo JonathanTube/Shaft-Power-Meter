@@ -70,8 +70,7 @@ class CounterDisplay(ft.Container):
         )
 
     def __create_total_rounds(self):
-        self.total_rounds_label = self.__create_label(
-            'Total Rounds')
+        self.total_rounds_label = self.__create_label('Total Rounds')
         self.total_rounds_value = self.__create_value()
 
         self.total_rounds = ft.Row(
