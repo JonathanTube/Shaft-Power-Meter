@@ -16,26 +16,26 @@ class IO(ft.Container):
         self.reg_digital = r'^(\d+\.?\d*|)$'  # 允许整数、小数或空字符串
         self.last_io_conf = IOConf.get()
 
-    def check_ip_port(self, ip: str, port: int, timeout: float = 2.0):
-        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        sock.settimeout(timeout)
-        try:
-            result = sock.connect_ex((ip, port))
-            if result == 0:
-                Toast.show_success(self.page, "连接成功")
-            else:
-                Toast.show_error(self.page, "连接失败")
-        except socket.timeout:
-            Toast.show_error(self.page, "连接超时")
-        except socket.error as e:
-            Toast.show_error(self.page, "连接错误")
-        finally:
-            sock.close()
+    # def check_ip_port(self, ip: str, port: int, timeout: float = 2.0):
+    #     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    #     sock.settimeout(timeout)
+    #     try:
+    #         result = sock.connect_ex((ip, port))
+    #         if result == 0:
+    #             Toast.show_success(self.page, "连接成功")
+    #         else:
+    #             Toast.show_error(self.page, "连接失败")
+    #     except socket.timeout:
+    #         Toast.show_error(self.page, "连接超时")
+    #     except socket.error as e:
+    #         Toast.show_error(self.page, "连接错误")
+    #     finally:
+    #         sock.close()
 
     def __create_plc_conf(self):
         self.plc_ip = ft.TextField(
             label="IP", value=self.last_io_conf.plc_ip, col={'md': 4},
-            input_filter=ft.InputFilter(regex_string=self.ipv4_regex),
+            # input_filter=ft.InputFilter(regex_string=self.ipv4_regex),
             keyboard_type=ft.KeyboardType.NUMBER,
             size_constraints=ft.BoxConstraints(max_height=40),
             text_size=14,
@@ -54,14 +54,14 @@ class IO(ft.Container):
                 self.last_io_conf, 'plc_port', e.control.value)
         )
 
-        self.plc_conn_check = ft.OutlinedButton(
-            text="Check PLC Connection",
-            expand=False,
-            height=40,
-            col={'md': 4},
-            on_click=lambda e: self.check_ip_port(
-                self.last_io_conf.plc_ip, self.last_io_conf.plc_port)
-        )
+        # self.plc_conn_check = ft.OutlinedButton(
+        #     text="Check PLC Connection",
+        #     expand=False,
+        #     height=40,
+        #     col={'md': 4},
+        #     on_click=lambda e: self.check_ip_port(
+        #         self.last_io_conf.plc_ip, self.last_io_conf.plc_port)
+        # )
 
         self.power_range_min = ft.TextField(
             label="4-20MA Power Min",
@@ -216,7 +216,7 @@ class IO(ft.Container):
             body=ft.ResponsiveRow(controls=[
                 self.plc_ip,
                 self.plc_port,
-                self.plc_conn_check,
+                # self.plc_conn_check,
 
                 self.power_range_min,
                 self.power_range_max,
@@ -291,6 +291,7 @@ class IO(ft.Container):
     def __save_data(self, e):
         plc_client = None
         try:
+            self.last_io_conf.save()
             plc_client = ModbusTcpClient(host=self.last_io_conf.plc_ip, port=self.last_io_conf.plc_port)
             plc_client.connect()
             plc_client.write_register(12298, int(self.last_io_conf.power_range_min))
@@ -308,7 +309,6 @@ class IO(ft.Container):
             plc_client.write_register(12328, int(self.last_io_conf.speed_range_min))
             plc_client.write_register(12329, int(self.last_io_conf.speed_range_max))
             plc_client.write_register(12330, int(self.last_io_conf.speed_range_offset))
-            self.last_io_conf.save()
             Toast.show_success(e.page)
         except Exception as err:
             Toast.show_error(e.page, "save limitation to PLC failed")
@@ -359,7 +359,7 @@ class IO(ft.Container):
     def __create_gps_conf(self):
         self.gps_ip = ft.TextField(
             label="IP", value=self.last_io_conf.gps_ip, col={'md': 4},
-            input_filter=ft.InputFilter(regex_string=self.ipv4_regex),
+            # input_filter=ft.InputFilter(regex_string=self.ipv4_regex),
             keyboard_type=ft.KeyboardType.NUMBER,
             size_constraints=ft.BoxConstraints(max_height=40),
             text_size=14,
@@ -378,20 +378,20 @@ class IO(ft.Container):
                 self.last_io_conf, 'gps_port', e.control.value)
         )
 
-        self.gps_conn_check = ft.OutlinedButton(
-            text="Check GPS Connection",
-            expand=False,
-            height=40,
-            col={'md': 4},
-            on_click=lambda e: self.check_ip_port(
-                self.last_io_conf.gps_ip, self.last_io_conf.gps_port)
-        )
+        # self.gps_conn_check = ft.OutlinedButton(
+        #     text="Check GPS Connection",
+        #     expand=False,
+        #     height=40,
+        #     col={'md': 4},
+        #     on_click=lambda e: self.check_ip_port(
+        #         self.last_io_conf.gps_ip, self.last_io_conf.gps_port)
+        # )
         self.gps_conf = CustomCard(
             'GPS Conf.',
             body=ft.ResponsiveRow(controls=[
                 self.gps_ip,
-                self.gps_port,
-                self.gps_conn_check,
+                self.gps_port
+                # self.gps_conn_check,
             ]),
             col={"md": 12}
         )
@@ -399,7 +399,7 @@ class IO(ft.Container):
     def __create_modbus_conf(self):
         self.modbus_ip = ft.TextField(
             label="IP", value=self.last_io_conf.modbus_ip, col={'md': 4},
-            input_filter=ft.InputFilter(regex_string=self.ipv4_regex),
+            # input_filter=ft.InputFilter(regex_string=self.ipv4_regex),
             size_constraints=ft.BoxConstraints(max_height=40),
             text_size=14,
             on_change=lambda e: setattr(
@@ -414,20 +414,20 @@ class IO(ft.Container):
             on_change=lambda e: setattr(
                 self.last_io_conf, 'modbus_port', e.control.value)
         )
-        self.modbus_conn_check = ft.OutlinedButton(
-            text="Check Modbus Connection",
-            expand=False,
-            height=40,
-            col={'md': 4},
-            on_click=lambda e: self.check_ip_port(
-                self.last_io_conf.modbus_ip, self.last_io_conf.modbus_port)
-        )
+        # self.modbus_conn_check = ft.OutlinedButton(
+        #     text="Check Modbus Connection",
+        #     expand=False,
+        #     height=40,
+        #     col={'md': 4},
+        #     on_click=lambda e: self.check_ip_port(
+        #         self.last_io_conf.modbus_ip, self.last_io_conf.modbus_port)
+        # )
         self.modbus_conf = CustomCard(
             'Modbus Conf.',
             body=ft.ResponsiveRow(controls=[
                 self.modbus_ip,
-                self.modbus_port,
-                self.modbus_conn_check,
+                self.modbus_port
+                # self.modbus_conn_check,
             ]),
             col={"md": 12}
         )
@@ -470,7 +470,7 @@ class IO(ft.Container):
         self.plc_conf.set_title(session.get("lang.setting.plc_conf"))
         self.plc_ip.label = session.get("lang.setting.ip")
         self.plc_port.label = session.get("lang.setting.port")
-        self.plc_conn_check.text = session.get("lang.setting.check_plc_connection")
+        # self.plc_conn_check.text = session.get("lang.setting.check_plc_connection")
 
         self.power_range_min.label = session.get("lang.setting.4_20_ma_power_min")
         self.power_range_max.label = session.get("lang.setting.4_20_ma_power_max")
@@ -499,12 +499,12 @@ class IO(ft.Container):
         self.gps_conf.set_title(session.get("lang.setting.gps_conf"))
         self.gps_ip.label = session.get("lang.setting.ip")
         self.gps_port.label = session.get("lang.setting.port")
-        self.gps_conn_check.text = session.get("lang.setting.check_gps_connection") 
+        # self.gps_conn_check.text = session.get("lang.setting.check_gps_connection") 
 
         self.modbus_conf.set_title(session.get("lang.setting.modbus_conf"))
         self.modbus_ip.label = session.get("lang.setting.ip")
         self.modbus_port.label = session.get("lang.setting.port")
-        self.modbus_conn_check.text = session.get("lang.setting.check_modbus_connection")
+        # self.modbus_conn_check.text = session.get("lang.setting.check_modbus_connection")
 
         self.save_button.text = session.get("lang.button.save")
         self.reset_button.text = session.get("lang.button.reset")

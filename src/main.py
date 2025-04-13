@@ -112,15 +112,16 @@ async def main(page: ft.Page):
     page.title = page.session.get("lang.lang.app.name")
     page.padding = 0
     page.theme_mode = get_theme_mode()
-    page.window.maximized = False
-    page.window.resizable = False
-    page.window.width = 1024
-    page.window.height = 768
+    page.window.full_screen = True
+    # page.window.maximized = True
+    # page.window.resizable = False
+    # page.window.width = 1024
+    # page.window.height = 768
     page.window.alignment = ft.alignment.center
-    page.window.always_on_top = False
+    # page.window.always_on_top = False
     # page.window.frameless = True
     # page.window.title_bar_hidden = False
-    page.window.maximizable = False
+    # page.window.maximizable = False
 
     # page.window.prevent_close = True
 

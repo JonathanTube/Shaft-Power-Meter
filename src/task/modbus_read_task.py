@@ -4,7 +4,7 @@ from datetime import datetime
 import flet as ft
 from pymodbus.client.tcp import AsyncModbusTcpClient
 from pymodbus.exceptions import ConnectionException
-
+from db.models.io_conf import IOConf
 
 class ModbusReadTask:
     def __init__(self, page: ft.Page):
@@ -54,8 +54,9 @@ class ModbusReadTask:
 
     async def __connect(self):
         try:
+            self.io_conf = IOConf.get()
             self.modbus_client = AsyncModbusTcpClient(
-                host="127.0.0.1", port=503)
+                host=self.io_conf.modbus_ip, port=self.io_conf.modbus_port)
             is_connected = await self.modbus_client.connect()
             self.__send_msg(f"connected to Modbus: {is_connected}")
         except Exception as e:

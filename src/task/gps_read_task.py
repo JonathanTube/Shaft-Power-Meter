@@ -3,6 +3,7 @@ import flet as ft
 from db.models.gps_log import GpsLog
 import asyncio
 import random
+from db.models.io_conf import IOConf
 
 
 class GpsReadTask:
@@ -16,6 +17,7 @@ class GpsReadTask:
         self.retry_backoff = 2  # 退避系数
 
     async def start(self):
+        self.io_conf = IOConf.get()
         while True:
             try:
                 # 建立连接
@@ -42,7 +44,7 @@ class GpsReadTask:
                     f"try to connect...({self.retries+1} times)")
 
                 self.reader, self.writer = await asyncio.wait_for(
-                    asyncio.open_connection("127.0.0.1", 9527),
+                    asyncio.open_connection(self.io_conf.gps_ip, self.io_conf.gps_port),
                     timeout=5
                 )
                 self.__send_message("connect success")
