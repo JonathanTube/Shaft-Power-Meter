@@ -18,6 +18,7 @@ from db.models.language import Language
 from task.counter_total_task import CounterTotalTask
 from task.counter_interval_task import CounterIntervalTask
 from task.counter_manually_task import CounterManuallyTask
+from task.test_mode_task import TestModeTask
 
 
 def get_theme_mode():
@@ -112,11 +113,11 @@ async def main(page: ft.Page):
     page.title = page.session.get("lang.lang.app.name")
     page.padding = 0
     page.theme_mode = get_theme_mode()
-    page.window.full_screen = True
+    # page.window.full_screen = True
     # page.window.maximized = True
     # page.window.resizable = False
-    # page.window.width = 1024
-    # page.window.height = 768
+    page.window.width = 1024
+    page.window.height = 768
     page.window.alignment = ft.alignment.center
     # page.window.always_on_top = False
     # page.window.frameless = True
@@ -124,10 +125,11 @@ async def main(page: ft.Page):
     # page.window.maximizable = False
 
     # page.window.prevent_close = True
+    page.theme = ft.Theme(scrollbar_theme=ft.ScrollbarTheme(thickness=20))
 
     main_content = ft.Container(expand=True, content=Home(), padding=0)
 
-    page.appbar = Header(main_content)
+    page.appbar = Header(main_content, TestModeTask(page))
 
     audio_alarm = create_audio_alarm(page)
     override_button = create_override_button(audio_alarm)
@@ -145,7 +147,8 @@ async def main(page: ft.Page):
             override_button.visible = False
             audio_alarm.pause()
         override_button.update()
-    page.pubsub.subscribe_topic("breach_alarm_occured", on_breach_alarm_occured)
+    page.pubsub.subscribe_topic(
+        "breach_alarm_occured", on_breach_alarm_occured)
     page.add(main_stack)
 
 ft.app(main)

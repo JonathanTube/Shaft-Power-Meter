@@ -1,17 +1,18 @@
 import flet as ft
 
 from ui.setting.authority import create_authority
-from ui.setting.data_dumping import create_data_dumping
 from ui.setting.general import General
 from ui.setting.io import IO
 from ui.setting.propeller_conf import PropellerConf
 from ui.setting.system_conf import SystemConf
+from ui.setting.test_mode import TestMode
 from ui.setting.zero_cal import ZeroCal
 from ui.setting.self_test import SelfTest
-
+from task.test_mode_task import TestModeTask
 class Setting(ft.Container):
-    def __init__(self):
+    def __init__(self, test_mode_task: TestModeTask):
         super().__init__()
+        self.test_mode_task = test_mode_task
 
     def __set_content(self, e):
         idx = e.control.selected_index
@@ -30,7 +31,7 @@ class Setting(ft.Container):
         elif idx == 6:
             self.right_content.content = create_authority()
         elif idx == 7:
-            self.right_content.content = create_data_dumping()
+            self.right_content.content = TestMode(self.test_mode_task)
 
         self.right_content.update()
 
@@ -76,12 +77,11 @@ class Setting(ft.Container):
             selected_icon=ft.Icon(ft.Icons.MANAGE_ACCOUNTS),
             label="Permission Conf."
         )
-        self.data_backup = ft.NavigationRailDestination(
-            icon=ft.Icons.BACKUP_OUTLINED,
-            selected_icon=ft.Icon(ft.Icons.BACKUP),
-            label="Data Backup"
+        self.test_mode = ft.NavigationRailDestination(
+            icon=ft.Icons.OUTLINED_FLAG,
+            selected_icon=ft.Icon(ft.Icons.FLAG),
+            label="Test Mode"
         )
-
         rail = ft.NavigationRail(
             selected_index=0,
             label_type=ft.NavigationRailLabelType.ALL,
@@ -93,7 +93,7 @@ class Setting(ft.Container):
                 self.io_conf,
                 self.self_test,
                 self.permission_conf,
-                self.data_backup
+                self.test_mode
             ],
             on_change=self.__set_content
         )
@@ -111,14 +111,12 @@ class Setting(ft.Container):
         session = self.page.session
         self.system_conf.label = session.get("lang.setting.system_conf.title")
         self.general.label = session.get("lang.setting.general.title")
-        self.propeller_setting.label = session.get(
-            "lang.setting.propeller_setting.title")
+        self.propeller_setting.label = session.get("lang.setting.propeller_setting.title")
         self.zero_cal.label = session.get("lang.setting.zero_cal.title")
         self.io_conf.label = session.get("lang.setting.io_conf.title")
         self.self_test.label = session.get("lang.setting.self_test.title")
-        self.permission_conf.label = session.get(
-            "lang.setting.permission_conf.title")
-        self.data_backup.label = session.get("lang.setting.data_backup.title")
+        self.permission_conf.label = session.get("lang.setting.permission_conf.title")
+        self.test_mode.label = session.get("lang.setting.test_mode.title")
 
     def before_update(self):
         self.__set_language()

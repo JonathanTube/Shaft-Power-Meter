@@ -6,14 +6,14 @@ from ui.header.theme_button import ThemeButton
 from ui.home.index import Home
 from ui.report.report_info_list import ReportInfoList
 from ui.setting.index import Setting
-
+from task.test_mode_task import TestModeTask
 
 class Header(ft.AppBar):
-    def __init__(self, main_content: ft.Container):
+    def __init__(self, main_content: ft.Container, test_mode_task: TestModeTask):
         super().__init__()
+        self.test_mode_task = test_mode_task
         self.leading = HeaderLogo()
-        self.title = ft.Text(value="Shaft Power Meter",
-                             weight=ft.FontWeight.W_800)
+        self.title = ft.Text(value="Shaft Power Meter", weight=ft.FontWeight.W_800)
         self.center_title = False
         self.bgcolor = ft.Colors.ON_INVERSE_SURFACE
 
@@ -82,7 +82,7 @@ class Header(ft.AppBar):
             self.__set_active(self.report)
             self.__set_inactive(self.setting)
         else:
-            self.main_content.content = Setting()
+            self.main_content.content = Setting(self.test_mode_task)
             self.__set_inactive(self.home)
             self.__set_inactive(self.report)
             self.__set_active(self.setting)

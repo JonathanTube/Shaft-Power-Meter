@@ -8,13 +8,11 @@ from ui.common.toast import Toast
 from utils.unit_converter import UnitConverter
 
 
-class PropellerConf(ft.Column):
+class PropellerConf(ft.Container):
     def __init__(self):
         super().__init__()
         self.expand = True
-        self.alignment = ft.MainAxisAlignment.START
-        # 这里有bug，如果添加了，外部页面就会居中
-        self.scroll = ft.ScrollMode.ADAPTIVE
+        self.alignment = ft.alignment.top_left
 
         self.system_unit = Preference.get().system_unit
         self.last_propeller_setting = PropellerSetting.get()
@@ -301,26 +299,28 @@ class PropellerConf(ft.Column):
             on_click=lambda e: self.__reset_data(e)
         )
 
-        self.controls = [
-            ft.ResponsiveRow(
-                alignment=ft.MainAxisAlignment.START,
-                controls=[
-                    self.mcr_operating_point_card,
-                    self.normal_propeller_curve_card,
-                    self.torque_load_limit_curve_card,
-                    self.light_propeller_curve_card,
-                    self.speed_limit_curve_card,
-                    self.overload_curve_card,
-                    ft.Row(
-                        alignment=ft.MainAxisAlignment.CENTER,
-                        controls=[
-                            self.save_button,
-                            self.reset_button
-                        ]
-                    )
-                ]
-            )
-        ]
+        self.content = ft.Column(
+            scroll=ft.ScrollMode.ADAPTIVE,
+            controls=[
+                ft.ResponsiveRow(
+                    controls=[
+                        self.mcr_operating_point_card,
+                        self.normal_propeller_curve_card,
+                        self.torque_load_limit_curve_card,
+                        self.light_propeller_curve_card,
+                        self.speed_limit_curve_card,
+                        self.overload_curve_card,
+                        ft.Row(
+                            alignment=ft.MainAxisAlignment.CENTER,
+                            controls=[
+                                self.save_button,
+                                self.reset_button
+                            ]
+                        )
+                    ]
+                )
+            ]
+        )
 
     def __set_language(self):
         session = self.page.session

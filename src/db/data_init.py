@@ -482,9 +482,9 @@ class DataInit:
                 },
 
                 {
-                    "code": "lang.setting.data_backup.title",
-                    "chinese": "数据备份",
-                    "english": "Data Backup"
+                    "code": "lang.setting.test_mode.title",
+                    "chinese": "测试模式",
+                    "english": "Test Mode"
                 },
 
 

@@ -34,6 +34,8 @@ class CounterTotalTask:
         ).dicts().get()
 
         str_format = '%Y-%m-%d %H:%M:%S.%f'
+        # print(f'data_log.start_time: {data_log["start_time"]}')
+        # print(f'data_log.end_time: {data_log["end_time"]}')
         start_time = datetime.strptime(data_log['start_time'], str_format)
         end_time = datetime.strptime(data_log['end_time'], str_format)
         average_power = data_log['average_power']
