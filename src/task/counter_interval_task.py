@@ -47,6 +47,9 @@ class CounterIntervalTask:
         max_rounds = data_log['max_rounds']
         min_rounds = data_log['min_rounds']
 
+        if data_log['start_time'] is None or data_log['end_time'] is None:
+            return
+        
         format_str = '%Y-%m-%d %H:%M:%S.%f'
         actual_start_time = datetime.strptime(data_log['start_time'], format_str)
         actual_end_time = datetime.strptime(data_log['end_time'], format_str)

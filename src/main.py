@@ -3,6 +3,7 @@ from pathlib import Path
 import flet as ft
 import asyncio
 
+from ui.common.fullscreen_alert import FullscreenAlert
 from ui.header.index import Header
 from ui.home.index import Home
 from task.utc_timer_task import UtcTimer
@@ -143,12 +144,20 @@ async def main(page: ft.Page):
             override_button.visible = True
             override_button.disabled = False
             audio_alarm.play()
+            print("insert-1")
+            main_stack.controls.insert(0, FullscreenAlert())
+            main_stack.update()
+            print("insert-2")
         else:
             override_button.visible = False
             audio_alarm.pause()
+            main_stack.controls.remove(main_stack.controls[0])
+            main_stack.update()
         override_button.update()
+
     page.pubsub.subscribe_topic(
         "breach_alarm_occured", on_breach_alarm_occured)
+
     page.add(main_stack)
 
 ft.app(main)

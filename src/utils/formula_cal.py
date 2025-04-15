@@ -80,7 +80,7 @@ class FormulaCalculator:
         float: The calculated power (in W).
         """
         power = (2 * math.pi * rpm * torque) / 60
-        return power
+        return round(power, 2)
 
     @staticmethod
     def calculate_average_power_kw(sum_of_power, hours):

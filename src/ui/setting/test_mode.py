@@ -11,7 +11,7 @@ class TestMode(ft.Container):
         super().__init__()
         self.test_mode_task = test_mode_task
         self.alignment = ft.alignment.top_left
-        self.running = False
+        self.running = self.test_mode_task.is_running
 
     def create_abort_dlg(self):
         self.dlg_abort_modal = ft.AlertDialog(
@@ -48,7 +48,7 @@ class TestMode(ft.Container):
             col={"sm": 12, "md": 6},
             label="Min Torque",
             suffix_text="Nm",
-            value=0
+            value=800
         )
 
         self.max_torque = ft.TextField(
@@ -62,7 +62,7 @@ class TestMode(ft.Container):
             col={"sm": 12, "md": 6},
             label="Min Speed",
             suffix_text="RPM",
-            value=0
+            value=800
         )
 
         self.max_speed = ft.TextField(
@@ -76,7 +76,7 @@ class TestMode(ft.Container):
             col={"sm": 12, "md": 6},
             label="Min Thrust",
             suffix_text="N",
-            value=0
+            value=800
         )
 
         self.max_thrust = ft.TextField(
@@ -89,7 +89,7 @@ class TestMode(ft.Container):
         self.min_revolution = ft.TextField(
             col={"sm": 12, "md": 6},
             label="Min Revolution",
-            value=0
+            value=800
         )
 
         self.max_revolution = ft.TextField(
@@ -100,25 +100,26 @@ class TestMode(ft.Container):
 
         self.time_interval = ft.TextField(
             col={"sm": 12, "md": 6},
-            label="Generate Data Time Interval",
+            label="Stimulating Interval",
             suffix_text="seconds",
             value=1
         )
 
         self.start_button = ft.FilledButton(
-            width=150,
+            width=120,
+            height=40,
             text="Start",
-            col={"sm": 12, "md": 6},
             bgcolor=ft.Colors.GREEN,
+            visible=not self.running,
             on_click=lambda e: e.page.open(self.dlg_start_modal)
         )
 
         self.abort_button = ft.FilledButton(
-            width=150,
+            width=120,
+            height=40,
             text="Abort",
-            col={"sm": 12, "md": 6},
             bgcolor=ft.Colors.RED,
-            visible=False,
+            visible=self.running,
             on_click=lambda e: e.page.open(self.dlg_abort_modal)
         )
 
@@ -131,24 +132,23 @@ class TestMode(ft.Container):
             self.max_thrust,
             self.min_revolution,
             self.max_revolution,
-            self.time_interval,
-            ft.Row(
-                col={"sm": 12, "md": 12},
-                alignment=ft.MainAxisAlignment.CENTER,
-                controls=[self.start_button, self.abort_button]
-            )
+            self.time_interval
         ])
 
         self.instant_data_card = ft.ResponsiveRow(
             alignment=ft.alignment.center,
             controls=[
-                ft.Text(value=f"Torque:", weight=ft.FontWeight.BOLD, col={"sm": 12, "md": 6}),
+                ft.Text(value=f"Torque:", weight=ft.FontWeight.BOLD,
+                        col={"sm": 12, "md": 6}),
                 ft.Text(value=f"0", col={"sm": 12, "md": 6}),
-                ft.Text(value=f"Speed:", weight=ft.FontWeight.BOLD, col={"sm": 12, "md": 6}),
+                ft.Text(value=f"Speed:", weight=ft.FontWeight.BOLD,
+                        col={"sm": 12, "md": 6}),
                 ft.Text(value=f"0", col={"sm": 12, "md": 6}),
-                ft.Text(value=f"Thrust:", weight=ft.FontWeight.BOLD, col={"sm": 12, "md": 6}),
+                ft.Text(value=f"Thrust:", weight=ft.FontWeight.BOLD,
+                        col={"sm": 12, "md": 6}),
                 ft.Text(value=f"0", col={"sm": 12, "md": 6}),
-                ft.Text(value=f"Revolution:", weight=ft.FontWeight.BOLD, col={"sm": 12, "md": 6}),
+                ft.Text(value=f"Revolution:", weight=ft.FontWeight.BOLD,
+                        col={"sm": 12, "md": 6}),
                 ft.Text(value=f"0", col={"sm": 12, "md": 6})
             ]
         )
@@ -162,6 +162,10 @@ class TestMode(ft.Container):
                 CustomCard(
                     'Instant Data',
                     self.instant_data_card
+                ),
+                ft.Row(
+                    alignment=ft.MainAxisAlignment.CENTER,
+                    controls=[self.start_button, self.abort_button]
                 )
             ]
         )
@@ -206,7 +210,7 @@ class TestMode(ft.Container):
         Toast.show_success(self.page)
 
     def did_mount(self):
-        self.task =self.page.run_task(self.refresh_current_range_card)
+        self.task = self.page.run_task(self.refresh_current_range_card)
 
     async def refresh_current_range_card(self):
         while True:

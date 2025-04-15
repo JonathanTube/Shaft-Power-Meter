@@ -55,14 +55,14 @@ class SinglePowerLine(ft.Container):
             max_y=max_y,
             tooltip_fit_inside_horizontally=True,
             tooltip_fit_inside_vertically=True,
-            vertical_grid_lines=ft.ChartGridLines(
-                color=ft.colors.with_opacity(0.15, ft.colors.INVERSE_SURFACE),
-                width=.5
-            ),
-            horizontal_grid_lines=ft.ChartGridLines(
-                color=ft.colors.with_opacity(0.15, ft.colors.INVERSE_SURFACE),
-                width=.5
-            ),
+            # vertical_grid_lines=ft.ChartGridLines(
+            #     color=ft.colors.with_opacity(0.15, ft.colors.INVERSE_SURFACE),
+            #     width=.5
+            # ),
+            # horizontal_grid_lines=ft.ChartGridLines(
+            #     color=ft.colors.with_opacity(0.15, ft.colors.INVERSE_SURFACE),
+            #     width=.5
+            # ),
             expand=True,
             border=ft.Border(left=border, bottom=border),
             left_axis=ft.ChartAxis(

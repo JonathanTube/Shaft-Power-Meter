@@ -22,17 +22,17 @@ class EEXILimitedPower(ft.Container):
         meter_radius = self.container_width * 0.4
         self.meter_half = MeterHalf(radius=meter_radius)
         self.title = ft.Text("EEXI Limited Power(%)", size=16, weight=ft.FontWeight.W_600)
-        self.unlimited_mode = ft.Text("Power Un-limited Mode", weight=ft.FontWeight.W_400,color=ft.Colors.GREEN)
-
+        self.unlimited_mode = ft.Text("Power Un-limited Mode", weight=ft.FontWeight.W_400)
         self.unlimited_mode_icon = ft.Icon(ft.icons.INFO_OUTLINED, color=ft.Colors.GREEN, size=18)
 
-        unlimited_mode_row = ft.Row(
+        self.unlimited_mode_row = ft.Row(
             vertical_alignment=ft.CrossAxisAlignment.CENTER,
+            visible=False,
             controls=[self.unlimited_mode, self.unlimited_mode_icon]
         )
 
         row = ft.Row(alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
-                     controls=[self.title, unlimited_mode_row])
+                     controls=[self.title, self.unlimited_mode_row])
 
         self.content = ft.Container(
             border=ft.border.all(
@@ -86,15 +86,17 @@ class EEXILimitedPower(ft.Container):
             # print(f"eexi_limited_power: {self.eexi_limited_power}")
 
             if instant_power <= self.eexi_limited_power * 0.9:
-                self.unlimited_mode_icon.color = ft.Colors.GREEN
-                self.unlimited_mode.color = ft.Colors.GREEN
+                self.unlimited_mode_icon.visible = False
             elif instant_power <= self.eexi_limited_power:
                 self.unlimited_mode_icon.color = ft.Colors.ORANGE
                 self.unlimited_mode.color = ft.Colors.ORANGE
+                self.unlimited_mode_icon.visible = True
             else:
-                print("power breach")
+                # print("power breach")
                 self.unlimited_mode_icon.color = ft.Colors.RED
                 self.unlimited_mode.color = ft.Colors.RED
+                self.unlimited_mode_icon.visible = True
+
             self.unlimited_mode_icon.update()
             self.unlimited_mode.update()
             await asyncio.sleep(1)
