@@ -27,15 +27,14 @@ class CounterTotalTask:
             fn.COALESCE(fn.AVG(DataLog.power), 0).alias('average_power'),
             fn.COALESCE(fn.MIN(DataLog.rounds), 0).alias('min_rounds'),
             fn.COALESCE(fn.MAX(DataLog.rounds), 0).alias('max_rounds'),
-            fn.COALESCE(fn.MIN(DataLog.created_at), 0).alias('start_time'),
-            fn.COALESCE(fn.MAX(DataLog.created_at), 0).alias('end_time')
+            fn.COALESCE(fn.MIN(DataLog.utc_date_time), None).alias('start_time'),
+            fn.COALESCE(fn.MAX(DataLog.utc_date_time), None).alias('end_time')
         ).where(
             DataLog.name == name
         ).dicts().get()
-
-        str_format = '%Y-%m-%d %H:%M:%S.%f'
-        # print(f'data_log.start_time: {data_log["start_time"]}')
-        # print(f'data_log.end_time: {data_log["end_time"]}')
+        if data_log['start_time'] is None or data_log['end_time'] is None:
+            return
+        str_format = '%Y-%m-%d %H:%M:%S'
         start_time = datetime.strptime(data_log['start_time'], str_format)
         end_time = datetime.strptime(data_log['end_time'], str_format)
         average_power = data_log['average_power']

@@ -6,6 +6,7 @@ class FullscreenAlert(ft.Container):
     def __init__(self):
         super().__init__()
         self.expand = True
+        self.task = None
 
     def build_blur_border(self):
         return ft.BoxShadow(
@@ -63,6 +64,9 @@ class FullscreenAlert(ft.Container):
             self.update()
 
     def will_mount(self):
+        self.cancel_task()
+
+    def cancel_task(self):
         if self.task:
             self.task.cancel()
 

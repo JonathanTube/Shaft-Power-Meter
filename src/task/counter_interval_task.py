@@ -35,12 +35,12 @@ class CounterIntervalTask:
             fn.COALESCE(fn.AVG(DataLog.power), 0).alias('average_power'),
             fn.COALESCE(fn.MIN(DataLog.rounds), 0).alias('min_rounds'),
             fn.COALESCE(fn.MAX(DataLog.rounds), 0).alias('max_rounds'),
-            fn.COALESCE(fn.MIN(DataLog.created_at), 0).alias('start_time'),
-            fn.COALESCE(fn.MAX(DataLog.created_at), 0).alias('end_time')
+            fn.COALESCE(fn.MIN(DataLog.utc_date_time), None).alias('start_time'),
+            fn.COALESCE(fn.MAX(DataLog.utc_date_time), None).alias('end_time')
         ).where(
             DataLog.name == name,
-            DataLog.created_at >= start_time,
-            DataLog.created_at <= end_time
+            DataLog.utc_date_time >= start_time,
+            DataLog.utc_date_time <= end_time
         ).dicts().get()
 
         average_power = data_log['average_power']
@@ -49,8 +49,8 @@ class CounterIntervalTask:
 
         if data_log['start_time'] is None or data_log['end_time'] is None:
             return
-        
-        format_str = '%Y-%m-%d %H:%M:%S.%f'
+        print(f'data_log: {data_log}')
+        format_str = '%Y-%m-%d %H:%M:%S'
         actual_start_time = datetime.strptime(data_log['start_time'], format_str)
         actual_end_time = datetime.strptime(data_log['end_time'], format_str)
 

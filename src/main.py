@@ -151,7 +151,9 @@ async def main(page: ft.Page):
         else:
             override_button.visible = False
             audio_alarm.pause()
-            main_stack.controls.remove(main_stack.controls[0])
+            fullscreen_alert: FullscreenAlert = main_stack.controls[0]
+            fullscreen_alert.cancel_task()
+            main_stack.controls.remove(fullscreen_alert)
             main_stack.update()
         override_button.update()
 

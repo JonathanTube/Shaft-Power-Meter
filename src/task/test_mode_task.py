@@ -2,6 +2,7 @@ import asyncio
 import random
 
 from db.models.data_log import DataLog
+from db.models.system_settings import SystemSettings
 from utils.formula_cal import FormulaCalculator
 
 class TestModeTask:
@@ -17,7 +18,6 @@ class TestModeTask:
         self.max_revolution = 0
         self.time_interval = 0
         self.is_running = False
-
 
     def set_torque_range(self, min_torque, max_torque):
         self.min_torque = min_torque
@@ -39,6 +39,7 @@ class TestModeTask:
         self.time_interval = time_interval
 
     async def start(self):
+        self.system_settings = SystemSettings.get()
         self.is_running = True
         # start a thread to generate random data every time_interval seconds
         return asyncio.create_task(self.generate_random_data())
@@ -57,14 +58,16 @@ class TestModeTask:
             # start to generate random data in range of min and max
             # print(f'generate_random_data')
             await self.save_generated_data('sps1')
-            await self.save_generated_data('sps2')
+            if self.system_settings.amount_of_propeller == 2:
+                await self.save_generated_data('sps2')
             await asyncio.sleep(self.time_interval)
 
-    async def save_generated_data(self,name):
-        instant_torque = random.randint(self.min_torque, self.max_torque)
-        instant_speed = random.randint(self.min_speed, self.max_speed)
-        instant_thrust = random.randint(self.min_thrust, self.max_thrust)
-        instant_revolution = random.randint(self.min_revolution, self.max_revolution)
+    async def save_generated_data(self, name):
+        instant_torque = int(random.uniform(self.min_torque, self.max_torque))
+        instant_speed = int(random.uniform(self.min_speed, self.max_speed))
+        instant_thrust = int(random.uniform(self.min_thrust, self.max_thrust))
+        instant_revolution = int(random.uniform(self.min_revolution, self.max_revolution))
+        print(f'instant_torque={instant_torque}, instant_speed={instant_speed}, instant_thrust={instant_thrust}, instant_revolution={instant_revolution}')
         instant_power = FormulaCalculator.calculate_instant_power(instant_torque, instant_speed)
         utc_date_time = self.page.session.get('utc_date_time')
         

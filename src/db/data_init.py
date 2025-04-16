@@ -11,6 +11,7 @@ from db.models.report_info import ReportInfo
 from db.models.preference import Preference
 from db.models.date_time_conf import DateTimeConf
 from db.models.limitations import Limitations
+from db.models.test_mode_conf import TestModeConf
 
 
 class DataInit:
@@ -26,6 +27,7 @@ class DataInit:
         DataInit.__init_io_conf()
         DataInit.__init_date_time_conf()
         DataInit.__init_limitations()
+        DataInit.__init_test_mode_conf()
 
     def __init_limitations():
         if Limitations.select().count() == 0:
@@ -132,6 +134,20 @@ class DataInit:
                 modbus_port=0
             )
 
+    def __init_test_mode_conf():
+        if TestModeConf.select().count() == 0:
+            TestModeConf.create(
+                min_torque=1000,
+                max_torque=2000,
+                min_speed=1001,
+                max_speed=2002,
+                min_thrust=1002,
+                max_thrust=2002,
+                min_revolution=1000,
+                max_revolution=2000,
+                time_interval=1
+            )
+
     def __init_language():
         if Language.select().count() == 0:
             Language.insert_many([
@@ -158,11 +174,23 @@ class DataInit:
                     "chinese": "操作发生错误",
                     "english": "Operation Error"
                 },
-
+    
                 {
                     "code": "lang.button.save",
                     "chinese": "保存",
                     "english": "Save"
+                },
+
+                {
+                    "code": "lang.button.start",
+                    "chinese": "开始",
+                    "english": "Start"
+                },
+
+                {
+                    "code": "lang.button.stop",
+                    "chinese": "停止",
+                    "english": "Stop"
                 },
 
                 {
@@ -487,6 +515,72 @@ class DataInit:
                     "english": "Test Mode"
                 },
 
+                {
+                    "code": "lang.setting.test_mode.customize_data_range",
+                    "chinese": "自定义数据范围",
+                    "english": "Customize Data Range"
+                },
+
+                {
+                    "code": "lang.setting.test_mode.instant_mock_data",
+                    "chinese": "瞬时模拟数据",
+                    "english": "Instant Mock Data"
+                },
+
+                {
+                    "code": "lang.setting.test_mode.min_torque",
+                    "chinese": "最小扭矩",
+                    "english": "Min Torque"
+                },
+
+                {
+                    "code": "lang.setting.test_mode.max_torque",
+                    "chinese": "最大扭矩",
+                    "english": "Max Torque"
+                },
+
+                {
+                    "code": "lang.setting.test_mode.min_speed",
+                    "chinese": "最小转速",
+                    "english": "Min Speed"
+                },
+
+                {
+                    "code": "lang.setting.test_mode.max_speed",
+                    "chinese": "最大转速",
+                    "english": "Max Speed"
+                },
+
+                {
+                    "code": "lang.setting.test_mode.min_thrust",
+                    "chinese": "最小推力",
+                    "english": "Min Thrust"
+                },
+
+                {
+                    "code": "lang.setting.test_mode.max_thrust",
+                    "chinese": "最大推力",
+                    "english": "Max Thrust"
+                },
+
+                {
+                    "code": "lang.setting.test_mode.min_revolution",
+                    "chinese": "最小圈数",
+                    "english": "Min Revolution"
+                },
+
+                {
+                    "code": "lang.setting.test_mode.max_revolution",
+                    "chinese": "最大圈数",
+                    "english": "Max Revolution"
+                },
+
+ 
+                {
+                    "code": "lang.setting.test_mode.data_generation_interval",
+                    "chinese": "数据生成间隔",
+                    "english": "Data Generation Interval"
+                },
 
                 {
                     "code": "lang.setting.setting",

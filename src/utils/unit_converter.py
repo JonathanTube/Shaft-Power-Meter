@@ -39,6 +39,11 @@ class UnitConverter:
         return round(value * 0.0001019716213, 1)
 
     @staticmethod
+    def t_to_n(value: float):
+        # 1 T = 9,806.649999 N
+        return round(value * 9806.649999, 1)
+
+    @staticmethod
     def kwh_to_shph(value: float):
         # 1 kWh =  1.3410220896 sHp·h
         return round(value * 1.3410220896, 1)

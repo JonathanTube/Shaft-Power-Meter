@@ -319,7 +319,7 @@ class General(ft.Container):
         Toast.show_success(e.page)
         self.__refresh_language(e.page)
         self.__change_theme(e.page)
-        e.page.update()
+        self.update()
 
     def __change_theme(self, page: ft.Page):
         if self.last_preference.theme == '1':

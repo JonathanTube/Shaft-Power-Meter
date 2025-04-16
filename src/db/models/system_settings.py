@@ -5,8 +5,7 @@ from ..base import BaseModel
 class SystemSettings(BaseModel):
     display_thrust = BooleanField(verbose_name="是否显示推力", default=False)
 
-    amount_of_propeller = IntegerField(
-        verbose_name="螺旋桨数量 1-单桨 2-双桨", default=1)
+    amount_of_propeller = IntegerField(verbose_name="螺旋桨数量 1-单桨 2-双桨", default=1)
 
     sha_po_li = BooleanField(verbose_name="是否开启ShaPoLi功能", default=False)
 
