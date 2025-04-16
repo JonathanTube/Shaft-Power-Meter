@@ -55,7 +55,7 @@ class SystemConf(ft.Container):
             ])
 
     def __get_eexi_limited_power(self) -> tuple[float, str]:
-        _eexi_limited_power = self.last_system_settings.eexi_limited_power
+        _eexi_limited_power = self.system_settings.eexi_limited_power
         if self.system_unit == 0:
             return (_eexi_limited_power / 1000, "kW")
         else:
@@ -64,26 +64,26 @@ class SystemConf(ft.Container):
     def __set_eexi_limited_power(self, e):
         _eexi_limited_power = float(e.control.value)
         if self.system_unit == 0:
-            self.last_system_settings.eexi_limited_power = _eexi_limited_power * 1000
+            self.system_settings.eexi_limited_power = _eexi_limited_power * 1000
         else:
-            self.last_system_settings.eexi_limited_power = UnitConverter.shp_to_w(
+            self.system_settings.eexi_limited_power = UnitConverter.shp_to_w(
                 _eexi_limited_power)
 
     def __create_settings_card(self):
         self.display_thrust = ft.Switch(
             col={"md": 6}, label="Display Thrust",
             label_position=ft.LabelPosition.LEFT,
-            value=self.last_system_settings.display_thrust,
+            value=self.system_settings.display_thrust,
             on_change=lambda e: setattr(
-                self.last_system_settings, 'display_thrust', e.control.value)
+                self.system_settings, 'display_thrust', e.control.value)
         )
 
         self.sha_po_li = ft.Switch(
             col={"md": 6}, label="ShaPoLi",
             label_position=ft.LabelPosition.LEFT,
-            value=self.last_system_settings.sha_po_li,
+            value=self.system_settings.sha_po_li,
             on_change=lambda e: setattr(
-                self.last_system_settings, 'sha_po_li', e.control.value)
+                self.system_settings, 'sha_po_li', e.control.value)
         )
 
         self.single_propeller = ft.Radio(value="1", label="Single")
@@ -93,9 +93,9 @@ class SystemConf(ft.Container):
                 self.single_propeller,
                 self.twins_propeller
             ]),
-            value=self.last_system_settings.amount_of_propeller,
+            value=self.system_settings.amount_of_propeller,
             on_change=lambda e: setattr(
-                self.last_system_settings, 'amount_of_propeller', e.control.value)
+                self.system_settings, 'amount_of_propeller', e.control.value)
         )
 
         eexi_limited_power_value, eexi_limited_power_unit = self.__get_eexi_limited_power()
@@ -104,6 +104,7 @@ class SystemConf(ft.Container):
             label="EEXI Limited Power",
             value=eexi_limited_power_value,
             suffix_text=eexi_limited_power_unit,
+            visible=self.system_settings.sha_po_li,
             on_change=self.__set_eexi_limited_power
         )
 
@@ -136,27 +137,27 @@ class SystemConf(ft.Container):
     def __create_ship_info_card(self):
         self.ship_type = ft.TextField(
             label="Ship Type",
-            value=self.last_ship_info.ship_type,
+            value=self.ship_info.ship_type,
             on_change=lambda e: setattr(
-                self.last_ship_info, 'ship_type', e.control.value)
+                self.ship_info, 'ship_type', e.control.value)
         )
         self.ship_name = ft.TextField(
             label="Ship Name",
-            value=self.last_ship_info.ship_name,
+            value=self.ship_info.ship_name,
             on_change=lambda e: setattr(
-                self.last_ship_info, 'ship_name', e.control.value)
+                self.ship_info, 'ship_name', e.control.value)
         )
         self.imo_number = ft.TextField(
             label="IMO Number",
-            value=self.last_ship_info.imo_number,
+            value=self.ship_info.imo_number,
             on_change=lambda e: setattr(
-                self.last_ship_info, 'imo_number', e.control.value)
+                self.ship_info, 'imo_number', e.control.value)
         )
         self.ship_size = ft.TextField(
             label="Ship Size",
-            value=self.last_ship_info.ship_size,
+            value=self.ship_info.ship_size,
             on_change=lambda e: setattr(
-                self.last_ship_info, 'ship_size', e.control.value)
+                self.ship_info, 'ship_size', e.control.value)
         )
 
         self.ship_info_card = CustomCard(
@@ -174,39 +175,39 @@ class SystemConf(ft.Container):
     def __create_factor_conf_card(self):
         self.shaft_outer_diameter = ft.TextField(
             label="Shaft Outer Diameter(D)", suffix_text="mm",
-            value=self.last_factor_conf.bearing_outer_diameter_D,
+            value=self.factor_conf.bearing_outer_diameter_D,
             on_change=lambda e: setattr(
-                self.last_factor_conf, 'bearing_outer_diameter_D', e.control.value)
+                self.factor_conf, 'bearing_outer_diameter_D', e.control.value)
         )
 
         self.shaft_inner_diameter = ft.TextField(
             label="Shaft Inner Diameter(d)",
             suffix_text="mm",
-            value=self.last_factor_conf.bearing_inner_diameter_d,
+            value=self.factor_conf.bearing_inner_diameter_d,
             on_change=lambda e: setattr(
-                self.last_factor_conf, 'bearing_inner_diameter_d', e.control.value)
+                self.factor_conf, 'bearing_inner_diameter_d', e.control.value)
         )
 
         self.sensitivity_factor_k = ft.TextField(
             label="Sensitivity Factor(k)",
-            value=self.last_factor_conf.sensitivity_factor_k,
+            value=self.factor_conf.sensitivity_factor_k,
             on_change=lambda e: setattr(
-                self.last_factor_conf, 'sensitivity_factor_k', e.control.value)
+                self.factor_conf, 'sensitivity_factor_k', e.control.value)
         )
 
         self.elastic_modulus_E = ft.TextField(
             label="Elastic Modulus(E)",
-            value=self.last_factor_conf.elastic_modulus_E,
+            value=self.factor_conf.elastic_modulus_E,
             suffix_text="Gpa",
             on_change=lambda e: setattr(
-                self.last_factor_conf, 'elastic_modulus_E', e.control.value)
+                self.factor_conf, 'elastic_modulus_E', e.control.value)
         )
 
         self.poisson_ratio_mu = ft.TextField(
             label="Poisson's Ratio(μ)",
-            value=self.last_factor_conf.poisson_ratio_mu,
+            value=self.factor_conf.poisson_ratio_mu,
             on_change=lambda e: setattr(
-                self.last_factor_conf, 'poisson_ratio_mu', e.control.value)
+                self.factor_conf, 'poisson_ratio_mu', e.control.value)
         )
 
         self.factor_conf_card = CustomCard(
@@ -224,41 +225,48 @@ class SystemConf(ft.Container):
         )
 
     def __save_data(self, e):
-        if float(self.last_system_settings.eexi_limited_power) > float(self.last_propeller_setting.shaft_power_of_mcr_operating_point):
+        if float(self.system_settings.eexi_limited_power) > float(self.propeller_setting.shaft_power_of_mcr_operating_point):
             Toast.show_error(
                 e.page, "EEXI Limited Power must be less than Shaft Power of MCR Operating Point"
             )
             return
 
-        self.last_system_settings.save()
-        self.page.session.set("eexi_limited_power",
-                              self.last_system_settings.eexi_limited_power)
-        self.last_ship_info.save()
-        self.last_factor_conf.save()
+        self.system_settings.save()
+        print(self.system_settings.sha_po_li)
+        if self.system_settings.sha_po_li:
+            self.eexi_limited_power.visible = True
+            self.page.session.set("eexi_limited_power", self.system_settings.eexi_limited_power)
+        else:
+            self.eexi_limited_power.visible = False
+            self.page.session.set("eexi_limited_power", None)
+
+        self.ship_info.save()
+        self.factor_conf.save()
+        self.page.pubsub.send_all_on_topic("shapoli_conf_updated", None)
         Toast.show_success(e.page)
 
     def __reset_data(self, e):
         self.__load_data()
 
-        self.display_thrust.value = self.last_system_settings.display_thrust
-        self.sha_po_li.value = self.last_system_settings.sha_po_li
-        self.amount_of_propeller_radios.value = self.last_system_settings.amount_of_propeller
+        self.display_thrust.value = self.system_settings.display_thrust
+        self.sha_po_li.value = self.system_settings.sha_po_li
+        self.amount_of_propeller_radios.value = self.system_settings.amount_of_propeller
         eexi_limited_power_value, eexi_limited_power_unit = self.__get_eexi_limited_power()
         self.eexi_limited_power.value = eexi_limited_power_value
         self.eexi_limited_power.suffix_text = eexi_limited_power_unit
         self.settings_card.update()
 
-        self.ship_type.value = self.last_ship_info.ship_type
-        self.ship_name.value = self.last_ship_info.ship_name
-        self.imo_number.value = self.last_ship_info.imo_number
-        self.ship_size.value = self.last_ship_info.ship_size
+        self.ship_type.value = self.ship_info.ship_type
+        self.ship_name.value = self.ship_info.ship_name
+        self.imo_number.value = self.ship_info.imo_number
+        self.ship_size.value = self.ship_info.ship_size
         self.ship_info_card.update()
 
-        self.shaft_outer_diameter.value = self.last_factor_conf.bearing_outer_diameter_D
-        self.shaft_inner_diameter.value = self.last_factor_conf.bearing_inner_diameter_d
-        self.sensitivity_factor_k.value = self.last_factor_conf.sensitivity_factor_k
-        self.elastic_modulus_E.value = self.last_factor_conf.elastic_modulus_E
-        self.poisson_ratio_mu.value = self.last_factor_conf.poisson_ratio_mu
+        self.shaft_outer_diameter.value = self.factor_conf.bearing_outer_diameter_D
+        self.shaft_inner_diameter.value = self.factor_conf.bearing_inner_diameter_d
+        self.sensitivity_factor_k.value = self.factor_conf.sensitivity_factor_k
+        self.elastic_modulus_E.value = self.factor_conf.elastic_modulus_E
+        self.poisson_ratio_mu.value = self.factor_conf.poisson_ratio_mu
         self.factor_conf_card.update()
 
         Toast.show_success(e.page)
@@ -267,10 +275,10 @@ class SystemConf(ft.Container):
         self.system_unit = Preference.get().system_unit
 
     def __load_data(self):
-        self.last_system_settings = SystemSettings.get()
-        self.last_propeller_setting = PropellerSetting.get()
-        self.last_ship_info = ShipInfo.get()
-        self.last_factor_conf = FactorConf.get()
+        self.system_settings = SystemSettings.get()
+        self.propeller_setting = PropellerSetting.get()
+        self.ship_info = ShipInfo.get()
+        self.factor_conf = FactorConf.get()
 
     def __set_language(self):
         session = self.page.session

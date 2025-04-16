@@ -7,18 +7,23 @@ from ui.home.index import Home
 from ui.report.report_info_list import ReportInfoList
 from ui.setting.index import Setting
 from task.test_mode_task import TestModeTask
+from db.models.system_settings import SystemSettings
+
 
 class Header(ft.AppBar):
     def __init__(self, main_content: ft.Container, test_mode_task: TestModeTask):
         super().__init__()
         self.test_mode_task = test_mode_task
         self.leading = HeaderLogo()
-        self.title = ft.Text(value="Shaft Power Meter", weight=ft.FontWeight.W_800)
+        self.title = ft.Text(value="Shaft Power Meter",
+                             weight=ft.FontWeight.W_800)
         self.center_title = False
         self.bgcolor = ft.Colors.ON_INVERSE_SURFACE
 
         self.active_name = "HOME"
         self.main_content = main_content
+
+        self.system_settings = SystemSettings.get()
 
     def build(self):
         self.home = ft.ElevatedButton(
@@ -91,8 +96,15 @@ class Header(ft.AppBar):
 
         self.main_content.update()
 
+    def on_system_settings_updated(self, topic, message):
+        self.system_settings = SystemSettings.get()
+        self.report.visible = self.system_settings.sha_po_li
+        self.report.update()
+
     def did_mount(self):
         self.set_language()
+        self.page.pubsub.subscribe_topic(
+            "shapoli_conf_updated", self.on_system_settings_updated)
 
     def before_update(self):
         self.set_language()

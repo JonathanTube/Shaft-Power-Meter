@@ -8,11 +8,12 @@ from ui.home.trendview.index import TrendView
 from ui.home.event.event_list import EventList
 from db.models.event_log import EventLog
 from db.models.alarm_log import AlarmLog
-
+from db.models.system_settings import SystemSettings
 
 class Home(ft.Container):
     def __init__(self):
         super().__init__()
+        self.system_settings = SystemSettings.get()
 
     def build(self):
         spacing = 2
@@ -57,7 +58,8 @@ class Home(ft.Container):
                 ft.Icon(name=ft.Icons.EVENT_OUTLINED),
                 ft.Text("Event")
             ]),
-            content=EventList()
+            content=EventList(),
+            visible=self.system_settings.sha_po_li
         )
         self.logs = ft.Tab(
             tab_content=ft.Row(spacing=spacing, controls=[
