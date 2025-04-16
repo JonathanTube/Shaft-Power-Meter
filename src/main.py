@@ -1,5 +1,7 @@
+import ctypes
 import os
 from pathlib import Path
+import sys
 import flet as ft
 import asyncio
 
@@ -100,6 +102,15 @@ def create_override_button(audio_alarm: ft.Audio):
     )
     return override_button
 
+def check_single_instance(mutex_name: str = "shaft-power-meter"):
+    # 创建互斥锁
+    mutex = ctypes.windll.kernel32.CreateMutexW(None, False, mutex_name)
+    last_error = ctypes.windll.kernel32.GetLastError()
+
+    # 如果检测到已有实例，退出程序
+    if last_error == 183:  # ERROR_ALREADY_EXISTS
+        ctypes.windll.user32.MessageBoxW(0, "程序已在运行中！", "提示", 0x40)
+        sys.exit(0)
 
 async def main(page: ft.Page):
     TableInit.init()
@@ -116,9 +127,9 @@ async def main(page: ft.Page):
     page.theme_mode = get_theme_mode()
     # page.window.full_screen = True
     # page.window.maximized = True
-    # page.window.resizable = False
+    page.window.resizable = False
     page.window.width = 1024
-    page.window.height = 768
+    page.window.height = 600
     page.window.alignment = ft.alignment.center
     # page.window.always_on_top = False
     # page.window.frameless = True
@@ -162,4 +173,6 @@ async def main(page: ft.Page):
 
     page.add(main_stack)
 
-ft.app(main)
+if __name__ == "__main__":
+    check_single_instance()
+    ft.app(target=main)

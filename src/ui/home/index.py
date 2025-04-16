@@ -20,35 +20,35 @@ class Home(ft.Container):
         self.dashboard = ft.Tab(
             tab_content=ft.Row(spacing=spacing, controls=[
                 ft.Icon(name=ft.Icons.DASHBOARD_OUTLINED),
-                ft.Text("Dashboard")
+                ft.Text(self.page.session.get("lang.home.tab.dashboard"))
             ]),
             content=Dashboard()
         )
         self.counter = ft.Tab(
             tab_content=ft.Row(spacing=spacing, controls=[
                 ft.Icon(name=ft.Icons.TIMER_OUTLINED),
-                ft.Text("Counter")
+                ft.Text(self.page.session.get("lang.home.tab.counter"))
             ]),
             content=Counter()
         )
         self.trendview = ft.Tab(
             tab_content=ft.Row(spacing=spacing, controls=[
                 ft.Icon(name=ft.Icons.TRENDING_UP_OUTLINED),
-                ft.Text("TrendView")
+                ft.Text(self.page.session.get("lang.home.tab.trendview"))
             ]),
             content=TrendView()
         )
         self.propeller_curve = ft.Tab(
             tab_content=ft.Row(spacing=spacing, controls=[
                 ft.Icon(name=ft.Icons.STACKED_LINE_CHART_OUTLINED),
-                ft.Text("Propeller Curve")
+                ft.Text(self.page.session.get("lang.home.tab.propeller_curve"))
             ]),
             content=PropellerCurve()
         )
         self.alarm = ft.Tab(
             tab_content=ft.Row(spacing=spacing, controls=[
                 ft.Icon(name=ft.Icons.WARNING_OUTLINED),
-                ft.Text("Alarm")
+                ft.Text(self.page.session.get("lang.home.tab.alarm"))
             ]),
             content=AlarmList()
         )
@@ -56,7 +56,7 @@ class Home(ft.Container):
         self.event = ft.Tab(
             tab_content=ft.Row(spacing=spacing, controls=[
                 ft.Icon(name=ft.Icons.EVENT_OUTLINED),
-                ft.Text("Event")
+                ft.Text(self.page.session.get("lang.home.tab.event"))
             ]),
             content=EventList(),
             visible=self.system_settings.sha_po_li
@@ -64,7 +64,7 @@ class Home(ft.Container):
         self.logs = ft.Tab(
             tab_content=ft.Row(spacing=spacing, controls=[
                 ft.Icon(name=ft.Icons.HISTORY_OUTLINED),
-                ft.Text("Logs")
+                ft.Text(self.page.session.get("lang.home.tab.logs"))
             ]),
             content=Logs()
         )
@@ -130,22 +130,8 @@ class Home(ft.Container):
 
     def did_mount(self):
         self.page.pubsub.subscribe_topic("breach_event_occured", self.on_breach_event_occured)
-        self.set_language()
         self.__update_event_badge()
         self.__update_alarm_badge()
 
     def will_unmount(self):
         self.page.pubsub.unsubscribe_topic("breach_event_occured")
-
-    def before_update(self):
-        self.set_language()
-
-    def set_language(self):
-        self.__set_tab_text(self.dashboard, "lang.home.tab.dashboard")
-        self.__set_tab_text(self.counter, "lang.home.tab.counter")
-        self.__set_tab_text(self.trendview, "lang.home.tab.trendview")
-        self.__set_tab_text(self.propeller_curve,
-                            "lang.home.tab.propeller_curve")
-        self.__set_tab_text(self.alarm, "lang.home.tab.alarm")
-        self.__set_tab_text(self.event, "lang.home.tab.event")
-        self.__set_tab_text(self.logs, "lang.home.tab.logs")

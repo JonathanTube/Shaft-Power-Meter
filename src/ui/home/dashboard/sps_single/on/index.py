@@ -23,6 +23,7 @@ class SingleShaPoLiOn(ft.Container):
         self.instant_value_grid = SingleInstantGrid(w, h)
 
         self.power_line_chart = SinglePowerLine(
+            name=self.page.session.get("lang.common.power"),
             max_y=self.unlimited_power,
             sha_po_li=True,
             threshold=self.limited_power_warning,
@@ -57,7 +58,6 @@ class SingleShaPoLiOn(ft.Container):
             self.unlimited_power,
             self.system_unit
         )
-        self.set_language()
         self._task = self.page.run_task(self.__load_data)
 
     def will_unmount(self):
@@ -85,10 +85,10 @@ class SingleShaPoLiOn(ft.Container):
 
     async def __load_data(self):
         while True:
-            power = self.__get_session('sps1_instant_power')
-            thrust = self.__get_session('sps1_instant_thrust')
-            torque = self.__get_session('sps1_instant_torque')
-            speed = self.__get_session('sps1_instant_speed')
+            power = self.page.session.get('sps1_instant_power')
+            thrust = self.page.session.get('sps1_instant_thrust')
+            torque = self.page.session.get('sps1_instant_torque')
+            speed = self.page.session.get('sps1_instant_speed')
             unit = self.system_unit
 
             self.eexi_limited_power.set_value(power)
@@ -105,13 +105,3 @@ class SingleShaPoLiOn(ft.Container):
             self.power_line_chart.update(data_logs)
 
             await asyncio.sleep(self.data_refresh_interval)
-
-    def set_language(self):
-        session = self.page.session
-        self.power_line_chart.set_name(session.get("lang.common.power"))
-
-    def before_update(self):
-        self.set_language()
-
-    def __get_session(self, key: str):
-        return self.page.session.get(key)

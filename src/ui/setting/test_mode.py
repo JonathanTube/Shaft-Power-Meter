@@ -1,4 +1,5 @@
 import asyncio
+import os
 import flet as ft
 
 from db.models.system_settings import SystemSettings
@@ -73,11 +74,13 @@ class TestMode(ft.Container):
         self.create_stop_dlg()
         self.create_start_dlg()
 
-        min_torque_value, min_torque_unit = self.get_torque_and_unit(self.test_mode_conf.min_torque)
+        min_torque_value, min_torque_unit = self.get_torque_and_unit(
+            self.test_mode_conf.min_torque)
         self.min_torque = ft.TextField(
             col={"sm": 12, "md": 6},
             label=self.page.session.get('lang.setting.test_mode.min_torque'),
             suffix_text=min_torque_unit,
+            on_click=lambda e: os.system('osk'),
             value=min_torque_value
         )
 
@@ -87,6 +90,7 @@ class TestMode(ft.Container):
             col={"sm": 12, "md": 6},
             label=self.page.session.get('lang.setting.test_mode.max_torque'),
             suffix_text=max_torque_unit,
+            on_click=lambda e: os.system('osk'),
             value=max_torque_value
         )
 
@@ -94,6 +98,7 @@ class TestMode(ft.Container):
             col={"sm": 12, "md": 6},
             label=self.page.session.get('lang.setting.test_mode.min_speed'),
             suffix_text='rpm',
+            on_click=lambda e: os.system('osk'),
             value=self.test_mode_conf.min_speed
         )
 
@@ -101,6 +106,7 @@ class TestMode(ft.Container):
             col={"sm": 12, "md": 6},
             label=self.page.session.get('lang.setting.test_mode.max_speed'),
             suffix_text='rpm',
+            on_click=lambda e: os.system('osk'),
             value=self.test_mode_conf.max_speed
         )
 
@@ -110,6 +116,7 @@ class TestMode(ft.Container):
             col={"sm": 12, "md": 6},
             label=self.page.session.get('lang.setting.test_mode.min_thrust'),
             suffix_text=min_thrust_unit,
+            on_click=lambda e: os.system('osk'),
             value=min_thrust_value
         )
 
@@ -119,25 +126,32 @@ class TestMode(ft.Container):
             col={"sm": 12, "md": 6},
             label=self.page.session.get('lang.setting.test_mode.max_thrust'),
             suffix_text=max_thrust_unit,
+            on_click=lambda e: os.system('osk'),
             value=max_thrust_value
         )
 
         self.min_revolution = ft.TextField(
             col={"sm": 12, "md": 6},
-            label=self.page.session.get('lang.setting.test_mode.min_revolution'),
+            label=self.page.session.get(
+                'lang.setting.test_mode.min_revolution'),
+            on_click=lambda e: os.system('osk'),
             value=self.test_mode_conf.min_revolution
         )
 
         self.max_revolution = ft.TextField(
             col={"sm": 12, "md": 6},
-            label=self.page.session.get('lang.setting.test_mode.max_revolution'),
+            label=self.page.session.get(
+                'lang.setting.test_mode.max_revolution'),
+            on_click=lambda e: os.system('osk'),
             value=self.test_mode_conf.max_revolution
         )
 
         self.time_interval = ft.TextField(
             col={"sm": 12, "md": 6},
-            label=self.page.session.get('lang.setting.test_mode.data_generation_interval'),
+            label=self.page.session.get(
+                'lang.setting.test_mode.data_generation_interval'),
             suffix_text="seconds",
+            on_click=lambda e: os.system('osk'),
             value=self.test_mode_conf.time_interval
         )
 
@@ -183,13 +197,17 @@ class TestMode(ft.Container):
         self.sps1_instant_data_card = ft.ResponsiveRow(
             alignment=ft.alignment.center,
             controls=[
-                self.get_uniform_text(self.page.session.get('lang.common.torque')),
+                self.get_uniform_text(
+                    self.page.session.get('lang.common.torque')),
                 self.get_uniform_text("0"),
-                self.get_uniform_text(self.page.session.get('lang.common.speed')),
+                self.get_uniform_text(
+                    self.page.session.get('lang.common.speed')),
                 self.get_uniform_text("0"),
-                self.get_uniform_text(self.page.session.get('lang.common.thrust')),
+                self.get_uniform_text(
+                    self.page.session.get('lang.common.thrust')),
                 self.get_uniform_text("0"),
-                self.get_uniform_text(self.page.session.get('lang.common.revolution')),
+                self.get_uniform_text(
+                    self.page.session.get('lang.common.revolution')),
                 self.get_uniform_text("0")
             ]
         )
@@ -202,13 +220,17 @@ class TestMode(ft.Container):
             self.sps2_instant_data_card = ft.ResponsiveRow(
                 alignment=ft.alignment.center,
                 controls=[
-                    self.get_uniform_text(self.page.session.get('lang.common.torque')),
+                    self.get_uniform_text(
+                        self.page.session.get('lang.common.torque')),
                     self.get_uniform_text("0"),
-                    self.get_uniform_text(self.page.session.get('lang.common.speed')),
+                    self.get_uniform_text(
+                        self.page.session.get('lang.common.speed')),
                     self.get_uniform_text("0"),
-                    self.get_uniform_text(self.page.session.get('lang.common.thrust')),  
+                    self.get_uniform_text(
+                        self.page.session.get('lang.common.thrust')),
                     self.get_uniform_text("0"),
-                    self.get_uniform_text(self.page.session.get('lang.common.revolution')),
+                    self.get_uniform_text(
+                        self.page.session.get('lang.common.revolution')),
                     self.get_uniform_text("0")
                 ]
             )
@@ -229,7 +251,8 @@ class TestMode(ft.Container):
         self.content = ft.Column(
             controls=[
                 CustomCard(
-                    self.page.session.get('lang.setting.test_mode.customize_data_range'),
+                    self.page.session.get(
+                        'lang.setting.test_mode.customize_data_range'),
                     self.range_card
                 ),
                 self.instant_data_cards,
@@ -350,11 +373,14 @@ class TestMode(ft.Container):
                 sps1_torque = self.page.session.get('sps1_instant_torque')
                 sps1_speed = self.page.session.get('sps1_instant_speed')
                 sps1_thrust = self.page.session.get('sps1_instant_thrust')
-                sps1_revolution = self.page.session.get('sps1_instant_revolution')
-                sps1_torque_value, sps1_torque_unit = UnitParser.parse_torque(sps1_torque, system_unit)
+                sps1_revolution = self.page.session.get(
+                    'sps1_instant_revolution')
+                sps1_torque_value, sps1_torque_unit = UnitParser.parse_torque(
+                    sps1_torque, system_unit)
                 self.sps1_instant_data_card.controls[1].value = f'{sps1_torque_value} {sps1_torque_unit}'
                 self.sps1_instant_data_card.controls[3].value = f'{sps1_speed} rpm'
-                sps1_thrust_value, sps1_thrust_unit = UnitParser.parse_thrust(sps1_thrust, system_unit)
+                sps1_thrust_value, sps1_thrust_unit = UnitParser.parse_thrust(
+                    sps1_thrust, system_unit)
                 self.sps1_instant_data_card.controls[5].value = f'{sps1_thrust_value} {sps1_thrust_unit}'
                 self.sps1_instant_data_card.controls[7].value = sps1_revolution
                 self.sps1_instant_data_card.update()
@@ -363,12 +389,17 @@ class TestMode(ft.Container):
                     sps2_torque = self.page.session.get('sps2_instant_torque')
                     sps2_speed = self.page.session.get('sps2_instant_speed')
                     sps2_thrust = self.page.session.get('sps2_instant_thrust')
-                    sps2_revolution = self.page.session.get('sps2_instant_revolution')
-                    sps2_torque_value, sps2_torque_unit = UnitParser.parse_torque(sps2_torque, system_unit)
-                    self.sps2_instant_data_card.controls[1].value = f'{sps2_torque_value} {sps2_torque_unit}'
+                    sps2_revolution = self.page.session.get(
+                        'sps2_instant_revolution')
+                    sps2_torque_value, sps2_torque_unit = UnitParser.parse_torque(
+                        sps2_torque, system_unit)
+                    self.sps2_instant_data_card.controls[
+                        1].value = f'{sps2_torque_value} {sps2_torque_unit}'
                     self.sps2_instant_data_card.controls[3].value = f'{sps2_speed} rpm'
-                    sps2_thrust_value, sps2_thrust_unit = UnitParser.parse_thrust(sps2_thrust, system_unit)
-                    self.sps2_instant_data_card.controls[5].value = f'{sps2_thrust_value} {sps2_thrust_unit}'
+                    sps2_thrust_value, sps2_thrust_unit = UnitParser.parse_thrust(
+                        sps2_thrust, system_unit)
+                    self.sps2_instant_data_card.controls[
+                        5].value = f'{sps2_thrust_value} {sps2_thrust_unit}'
                     self.sps2_instant_data_card.controls[7].value = sps2_revolution
                     self.sps2_instant_data_card.update()
 

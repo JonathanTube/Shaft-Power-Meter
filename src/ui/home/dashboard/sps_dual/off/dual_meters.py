@@ -21,6 +21,11 @@ class DualMeters(ft.Container):
         self.torque_meter = TorqueMeter(radius=75)
         self.thrust_meter = ThrustPower()
 
+        if self.name == "sps1":
+            self.title.value = self.page.session.get("lang.common.sps1")
+        elif self.name == "sps2":
+            self.title.value = self.page.session.get("lang.common.sps2")
+
         self.title = ft.Text(
             value=self.name,
             size=18,
@@ -80,16 +85,3 @@ class DualMeters(ft.Container):
 
     def set_thrust(self, visible: bool, thrust: float, unit: int):
         self.thrust_meter.set_data(visible, thrust, unit)
-
-    def did_mount(self):
-        self.set_language()
-
-    def before_update(self):
-        self.set_language()
-
-    def set_language(self):
-        session = self.page.session
-        if self.name == "sps1":
-            self.title.value = session.get("lang.common.sps1")
-        elif self.name == "sps2":
-            self.title.value = session.get("lang.common.sps2")

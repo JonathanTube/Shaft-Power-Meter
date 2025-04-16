@@ -25,7 +25,7 @@ class DualInstantSpeed(ft.Container):
             controls=[self.speed_sps1, self.speed_sps2]
         )
 
-        self.content = SimpleCard(title="Speed", body=content)
+        self.content = SimpleCard(title=self.page.session.get("lang.common.speed"), body=content)
 
     def set_data(self, speed_sps1_value: int, speed_sps2_value: int):
         speed_sps1 = UnitParser.parse_speed(speed_sps1_value)
@@ -41,7 +41,7 @@ class DualInstantSpeed(ft.Container):
 
     def __create_speed_sps1(self):
         self.sps1_label = ft.Text(
-            value='sps1',
+            value=self.page.session.get("lang.common.sps1"),
             text_align=ft.TextAlign.RIGHT,
             size=self.font_size_of_label,
             weight=ft.FontWeight.W_600
@@ -53,7 +53,7 @@ class DualInstantSpeed(ft.Container):
             text_align=ft.TextAlign.RIGHT,
             weight=ft.FontWeight.W_500
         )
-        self.speed_sps1_unit = ft.Text('rpm', width=40,
+        self.speed_sps1_unit = ft.Text(self.page.session.get("lang.common.rpm"), width=40,
                                        text_align=ft.TextAlign.LEFT,
                                        size=self.font_size_of_unit,
                                        weight=ft.FontWeight.W_500
@@ -68,7 +68,7 @@ class DualInstantSpeed(ft.Container):
 
     def __create_speed_sps2(self):
         self.sps2_label = ft.Text(
-            value='sps2',
+            value=self.page.session.get("lang.common.sps2"),
             text_align=ft.TextAlign.END,
             size=self.font_size_of_label,
             weight=ft.FontWeight.W_600
@@ -80,7 +80,7 @@ class DualInstantSpeed(ft.Container):
             text_align=ft.TextAlign.END,
             weight=ft.FontWeight.W_500
         )
-        self.speed_sps2_unit = ft.Text('rpm', width=40,
+        self.speed_sps2_unit = ft.Text(self.page.session.get("lang.common.rpm"), width=40,
                                        text_align=ft.TextAlign.LEFT,
                                        size=self.font_size_of_unit,
                                        weight=ft.FontWeight.W_500
@@ -93,14 +93,3 @@ class DualInstantSpeed(ft.Container):
                 self.speed_sps2_unit
             ]
         )
-
-    def did_mount(self):
-        self.set_language()
-
-    def before_update(self):
-        self.set_language()
-
-    def set_language(self):
-        self.sps1_label.value = self.page.session.get("lang.common.sps1")
-        self.sps2_label.value = self.page.session.get("lang.common.sps2")
-        self.content.set_title(self.page.session.get("lang.common.speed"))

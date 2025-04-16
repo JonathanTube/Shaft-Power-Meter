@@ -85,7 +85,7 @@ class DualPowerLine(ft.Container):
             data_series=[self.sps1_data_series, self.sps2_data_series]
         )
 
-        self.chart_title = ft.Text("Power", size=18, weight=ft.FontWeight.BOLD)
+        self.chart_title = ft.Text(self.page.session.get("lang.common.power"), size=18, weight=ft.FontWeight.BOLD)
         chart_top = ft.Row(
             alignment=ft.MainAxisAlignment.CENTER,
             spacing=10,
@@ -134,13 +134,3 @@ class DualPowerLine(ft.Container):
             data_points.append(ft.LineChartDataPoint(index, _power[0]))
 
         self.sps2_data_series.data_points = data_points
-
-    def set_language(self):
-        session = self.page.session
-        self.chart_title.value = session.get("lang.common.power")
-
-    def did_mount(self):
-        self.set_language()
-
-    def before_update(self):
-        self.set_language()

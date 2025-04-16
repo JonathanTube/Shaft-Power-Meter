@@ -315,29 +315,26 @@ class General(ft.Container):
         new_utc_date_time = datetime.strptime(new_date_time, dt_format)
         self.page.session.set('utc_date_time', new_utc_date_time)
 
-
         Toast.show_success(e.page)
-        self.__refresh_language(e.page)
-        self.__change_theme(e.page)
+        self.__refresh_language()
+        self.__change_theme()
         self.update()
 
-    def __change_theme(self, page: ft.Page):
+    def __change_theme(self):
         if self.last_preference.theme == '1':
-            page.theme_mode = ft.ThemeMode.LIGHT
+            self.page.theme_mode = ft.ThemeMode.LIGHT
         elif self.last_preference.theme == '2':
-            page.theme_mode = ft.ThemeMode.DARK
+            self.page.theme_mode = ft.ThemeMode.DARK
         else:
-            page.theme_mode = ft.ThemeMode.SYSTEM
+            self.page.theme_mode = ft.ThemeMode.SYSTEM
+            
 
-    def __refresh_language(self, page: ft.Page):
+    def __refresh_language(self):
+        lang = Preference.get().language
         language_items = Language.select()
-
-        if Preference.get().language == 0:
-            for item in language_items:
-                page.session.set(item.code, item.english)
-        else:
-            for item in language_items:
-                page.session.set(item.code, item.chinese)
+        for item in language_items:
+            self.page.session.set(
+                item.code, item.english if lang == 0 else item.chinese)
 
     def __reset_data(self, e):
         self.last_preference = Preference.get()
@@ -377,6 +374,7 @@ class General(ft.Container):
         )
 
         self.content = ft.Column(
+            scroll=ft.ScrollMode.ADAPTIVE,
             expand=True,
             controls=[
                 ft.ResponsiveRow(
@@ -431,19 +429,24 @@ class General(ft.Container):
         self.system_unit_si.label = session.get("lang.setting.unit.si")
         self.system_unit_metric.label = session.get("lang.setting.unit.metric")
 
-        self.data_refresh_interval_label.value = session.get("lang.setting.data_refresh_interval")
+        self.data_refresh_interval_label.value = session.get(
+            "lang.setting.data_refresh_interval")
 
-        self.max_limitations_card.set_title(session.get("lang.setting.maximum_limitations"))
+        self.max_limitations_card.set_title(
+            session.get("lang.setting.maximum_limitations"))
 
-        self.warning_limitations_card.set_title(session.get("lang.setting.warning_limitations"))
+        self.warning_limitations_card.set_title(
+            session.get("lang.setting.warning_limitations"))
 
-        self.date_time_card.set_title(session.get("lang.setting.utc_date_time_conf"))
+        self.date_time_card.set_title(
+            session.get("lang.setting.utc_date_time_conf"))
 
-
-        self.utc_date_time.label = session.get("lang.setting.current_utc_date_time")
+        self.utc_date_time.label = session.get(
+            "lang.setting.current_utc_date_time")
         self.utc_date.label = session.get("lang.setting.date")
         self.utc_time.label = session.get("lang.setting.time")
-        self.date_time_format.label = session.get("lang.setting.date_time_format")
+        self.date_time_format.label = session.get(
+            "lang.setting.date_time_format")
         self.sync_with_gps.label = session.get("lang.setting.sync_with_gps")
 
         self.speed_max.label = session.get("lang.common.speed")

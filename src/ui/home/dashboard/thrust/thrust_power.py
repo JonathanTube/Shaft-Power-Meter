@@ -9,7 +9,7 @@ class ThrustPower(ft.Container):
         self.top = 10
 
     def build(self):
-        self.title = ft.Text("Thrust Power", weight=ft.FontWeight.W_500)
+        self.title = ft.Text(self.page.session.get("lang.common.thrust"), weight=ft.FontWeight.W_500)    
         self.thrust_value = ft.Text("0")
         self.thrust_unit = ft.Text("W")
         self.content = ft.Column(
@@ -28,13 +28,3 @@ class ThrustPower(ft.Container):
             self.thrust_value.value = thrust_and_unit[0]
             self.thrust_unit.value = thrust_and_unit[1]
         self.content.update()
-
-    def set_language(self):
-        session = self.page.session
-        self.title.value = session.get("lang.common.thrust")
-
-    def did_mount(self):
-        self.set_language()
-
-    def before_update(self):
-        self.set_language()

@@ -4,14 +4,14 @@ from utils.unit_parser import UnitParser
 
 
 class SpeedMeter(ft.Container):
-    def __init__(self, radius: int = 100):
+    def __init__(self):
         super().__init__()
         self.expand = False
-        self.radius = radius
 
     def build(self):
+        self.radius = self.page.window.height * 0.14
         self.speed = MeterRound(
-            heading="Speed", radius=self.radius, unit="rpm"
+            heading=self.page.session.get("lang.common.speed"), radius=self.radius, unit="rpm"
         )
         self.content = self.speed
 
@@ -20,13 +20,3 @@ class SpeedMeter(ft.Container):
 
     def set_data(self, value: int):
         self.speed.set_data(value, value, "rpm")
-
-    def set_language(self):
-        session = self.page.session
-        self.speed.heading = session.get("lang.common.speed")
-
-    def did_mount(self):
-        self.set_language()
-
-    def before_update(self):
-        self.set_language()

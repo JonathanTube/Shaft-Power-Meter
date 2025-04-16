@@ -4,14 +4,14 @@ from utils.unit_parser import UnitParser
 
 
 class TorqueMeter(ft.Container):
-    def __init__(self, radius: int = 100):
+    def __init__(self):
         super().__init__()
         self.expand = False
-        self.radius = radius
 
     def build(self):
+        self.radius = self.page.window.height * 0.14
         self.torque = MeterRound(
-            heading="Torque", radius=self.radius, unit="Nm"
+            heading=self.page.session.get("lang.common.torque"), radius=self.radius, unit="Nm"
         )
         self.content = self.torque
 
@@ -21,13 +21,3 @@ class TorqueMeter(ft.Container):
     def set_data(self, value: float, unit: int):
         torque_and_unit = UnitParser.parse_torque(value, unit)
         self.torque.set_data(value, torque_and_unit[0], torque_and_unit[1])
-
-    def set_language(self):
-        session = self.page.session
-        self.torque.heading = session.get("lang.common.torque")
-
-    def did_mount(self):
-        self.set_language()
-
-    def before_update(self):
-        self.set_language()

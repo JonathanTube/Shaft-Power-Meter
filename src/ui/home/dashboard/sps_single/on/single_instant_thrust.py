@@ -14,7 +14,7 @@ class SingleInstantThrust(ft.Container):
         self.thrust_unit = ft.Text(
             'N', size=18, width=50, text_align=ft.TextAlign.LEFT)
         self.content = SimpleCard(
-            title="Thrust",
+            title=self.page.session.get("lang.common.thrust"),
             body=ft.Row(
                 tight=True,
                 controls=[self.thrust_value, self.thrust_unit]
@@ -26,13 +26,3 @@ class SingleInstantThrust(ft.Container):
         self.thrust_value.value = thrust[0]
         self.thrust_unit.value = thrust[1]
         self.content.update()
-
-    def set_language(self):
-        session = self.page.session
-        self.content.set_title(session.get("lang.common.thrust"))
-
-    def before_update(self):
-        self.set_language()
-
-    def did_mount(self):
-        self.set_language()

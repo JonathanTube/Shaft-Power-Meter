@@ -46,7 +46,7 @@ class SingleShaPoLiOff(ft.Stack):
 
         self.single_meters = SingleMeters()
 
-        self.power_line_chart = SinglePowerLine(max_y=self.power_max, unit=self.system_unit)
+        self.power_line_chart = SinglePowerLine(name=self.page.session.get("lang.common.power"), max_y=self.power_max, unit=self.system_unit)
 
         self.controls = [
             self.thrust_power,
@@ -96,13 +96,3 @@ class SingleShaPoLiOff(ft.Stack):
             self.power_line_chart.update(data_logs)
 
             await asyncio.sleep(self.data_refresh_interval)
-
-    def set_language(self):
-        session = self.page.session
-        self.power_line_chart.set_name(session.get("lang.common.power"))
-
-    def before_update(self):
-        self.set_language()
-
-    def __get_session(self, key: str):
-        return self.page.session.get(key)

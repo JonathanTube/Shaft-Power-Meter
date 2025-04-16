@@ -28,7 +28,7 @@ class DualInstantPower(ft.Container):
                 self.power_sps2
             ]
         )
-        self.content = SimpleCard(title="Power", body=content)
+        self.content = SimpleCard(title=self.page.session.get("lang.common.power"), body=content)  
 
     def set_data(self, power_sps1_value: float, power_sps2_value: float, unit: int):
         power_sps1 = UnitParser.parse_power(power_sps1_value, unit)
@@ -49,7 +49,7 @@ class DualInstantPower(ft.Container):
 
     def __create_power_sps1(self):
         self.sps1_label = ft.Text(
-            value='sps1',
+            value=self.page.session.get("lang.common.sps1"),
             text_align=ft.TextAlign.RIGHT,
             size=self.font_size_of_label,
             weight=ft.FontWeight.W_600
@@ -77,7 +77,7 @@ class DualInstantPower(ft.Container):
 
     def __create_power_sps2(self):
         self.sps2_label = ft.Text(
-            value='sps2',
+            value=self.page.session.get("lang.common.sps2"),
             text_align=ft.TextAlign.END,
             size=self.font_size_of_label,
             weight=ft.FontWeight.W_600
@@ -104,7 +104,7 @@ class DualInstantPower(ft.Container):
 
     def __create_power_total(self):
         self.total_label = ft.Text(
-            value='Total',
+            value=self.page.session.get("lang.common.total"),
             text_align=ft.TextAlign.END,
             size=self.font_size_of_label,
             weight=ft.FontWeight.W_600
@@ -129,15 +129,3 @@ class DualInstantPower(ft.Container):
                 self.power_total_value,
                 self.power_total_unit
             ])
-
-    def did_mount(self):
-        self.set_language()
-
-    def before_update(self):
-        self.set_language()
-
-    def set_language(self):
-        self.sps1_label.value = self.page.session.get("lang.common.sps1")
-        self.sps2_label.value = self.page.session.get("lang.common.sps2")
-        self.total_label.value = self.page.session.get("lang.common.total")
-        self.content.set_title(self.page.session.get("lang.common.power"))

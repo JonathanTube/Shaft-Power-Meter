@@ -21,8 +21,8 @@ class EEXILimitedPower(ft.Container):
     def build(self):
         meter_radius = self.container_width * 0.4
         self.meter_half = MeterHalf(radius=meter_radius)
-        self.title = ft.Text("EEXI Limited Power(%)", size=16, weight=ft.FontWeight.W_600)
-        self.unlimited_mode = ft.Text("Power Un-limited Mode", weight=ft.FontWeight.W_400)
+        self.title = ft.Text(f"{self.page.session.get('lang.common.eexi_limited_power')}(%)", size=16, weight=ft.FontWeight.W_600)
+        self.unlimited_mode = ft.Text(f"{self.page.session.get('lang.common.power_unlimited_mode')}:", weight=ft.FontWeight.W_400)
         self.unlimited_mode_icon = ft.Icon(ft.icons.INFO_OUTLINED, color=ft.Colors.GREEN, size=18)
 
         self.unlimited_mode_row = ft.Row(
@@ -62,18 +62,7 @@ class EEXILimitedPower(ft.Container):
         # print(f"active_value: {active_value}, inactive_value: {inactive_value}")
         self.meter_half.set_outer_value(active_value, inactive_value)
 
-    def set_language(self):
-        session = self.page.session
-        title = session.get("lang.common.eexi_limited_power")
-        self.title.value = f'{title}(%)'
-        unlimited_mode = session.get("lang.common.power_unlimited_mode")
-        self.unlimited_mode.value = f'{unlimited_mode}:'
-
-    def before_update(self):
-        self.set_language()
-
     def did_mount(self):
-        self.set_language()
         self._task = self.page.run_task(self.__update_mode)
 
     async def __update_mode(self):

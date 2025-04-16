@@ -14,7 +14,7 @@ class SingleInstantSpeed(ft.Container):
         self.speed_unit = ft.Text(
             'RPM', size=18, width=50, text_align=ft.TextAlign.LEFT)
         self.content = SimpleCard(
-            title="Speed",
+            title=self.page.session.get("lang.common.speed"),
             body=ft.Row(
                 tight=True,
                 controls=[self.speed_value, self.speed_unit]
@@ -27,13 +27,3 @@ class SingleInstantSpeed(ft.Container):
         self.speed_value.update()
         self.speed_unit.value = speed[1]
         self.speed_unit.update()
-
-    def set_language(self):
-        session = self.page.session
-        self.content.set_title(session.get("lang.common.speed"))
-
-    def before_update(self):
-        self.set_language()
-
-    def did_mount(self):
-        self.set_language()

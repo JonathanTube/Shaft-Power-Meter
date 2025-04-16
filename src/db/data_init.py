@@ -1074,9 +1074,9 @@ class DataInit:
                     "english": "Average Power"
                 },
                 {
-                    "code": "lang.counter.total_rounds",
+                    "code": "lang.counter.revolution",
                     "chinese": "总圈数",
-                    "english": "Total Rounds"
+                    "english": "Revolution"
                 },
                 {
                     "code": "lang.counter.average_speed",

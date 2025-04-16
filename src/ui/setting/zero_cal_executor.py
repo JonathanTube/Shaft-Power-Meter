@@ -23,7 +23,6 @@ class ZeroCalExecutor:
 
         self.__create_tips_card()
         self.__create_instant_records()
-        self.__create_progress_card()
 
     def __load_data(self):
         # 查询最近一次[接受]的调零记录
@@ -56,9 +55,7 @@ class ZeroCalExecutor:
 
         self.recommend_next_performing_time = ft.Text(recommend_next_performing_time, size=14)
 
-        self.tips_card = CustomCard(
-            heading="Tips",
-            body=ft.ResponsiveRow(
+        self.tips_card = ft.ResponsiveRow(
                 controls=[
                     self.state_info,
                     ft.Row(
@@ -75,7 +72,6 @@ class ZeroCalExecutor:
                         ])
                 ]
             )
-        )
 
     def __get_table_rows(self):
         rows = []
@@ -136,7 +132,7 @@ class ZeroCalExecutor:
 
         self.table = ft.DataTable(
             col={"xs": 12},
-            height=300,
+            height=160,
             heading_row_height=35,
             data_row_min_height=30,
             data_row_max_height=30,
@@ -155,7 +151,6 @@ class ZeroCalExecutor:
 
         self.instant_records = CustomCard(
             heading="Instant Records",
-            height=440,
             body=ft.Column(
                 expand=True,
                 controls=[
@@ -175,17 +170,6 @@ class ZeroCalExecutor:
                             ft.Row(controls=[ft.Text("Thrust Error Ratio:"), self.error_ratio_thrust])
                         ])
                 ]))
-
-    def __create_progress_card(self):
-        green_val = len(self.latest_zero_cal.records) * 10 if self.latest_zero_cal is not None else 0
-        self.pie_chart_green = ft.PieChartSection(green_val, color=ft.Colors.GREEN)
-        self.pie_chart_gray = ft.PieChartSection(90 - green_val, color=ft.Colors.GREY_200)
-        self.pie_chart = ft.PieChart(col={"md": 6}, sections=[self.pie_chart_green, self.pie_chart_gray])
-        self.progress_card = CustomCard(
-            heading="Progress",
-            height=440,
-            body=self.pie_chart
-        )
 
     def __on_start(self, e):
         ZeroCalInfo.create(utc_date_time=datetime.now(), state=0)
@@ -339,10 +323,7 @@ class ZeroCalExecutor:
         return ft.Column(
             controls=[
                 self.tips_card,
-                ft.ResponsiveRow(controls=[
-                    self.instant_records,
-                    self.progress_card
-                ]),
+                self.instant_records,
                 ft.Row(
                     alignment=ft.MainAxisAlignment.CENTER,
                     controls=[

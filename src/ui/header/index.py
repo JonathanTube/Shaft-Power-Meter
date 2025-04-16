@@ -15,8 +15,7 @@ class Header(ft.AppBar):
         super().__init__()
         self.test_mode_task = test_mode_task
         self.leading = HeaderLogo()
-        self.title = ft.Text(value="Shaft Power Meter",
-                             weight=ft.FontWeight.W_800)
+
         self.center_title = False
         self.bgcolor = ft.Colors.ON_INVERSE_SURFACE
 
@@ -26,8 +25,9 @@ class Header(ft.AppBar):
         self.system_settings = SystemSettings.get()
 
     def build(self):
+        self.title = ft.Text(value=self.page.session.get("lang.common.app_name"), weight=ft.FontWeight.W_800)
         self.home = ft.ElevatedButton(
-            text="HOME",
+            text=self.page.session.get("lang.header.home"),
             icon=ft.Icons.HOME_OUTLINED,
             icon_color=ft.Colors.WHITE,
             color=ft.Colors.WHITE,
@@ -35,7 +35,7 @@ class Header(ft.AppBar):
             on_click=lambda e: self.on_click("HOME"))
 
         self.report = ft.ElevatedButton(
-            text="REPORT",
+            text=self.page.session.get("lang.header.report"),
             icon=ft.Icons.PICTURE_AS_PDF_OUTLINED,
             icon_color=ft.Colors.GREY_800,
             color=ft.Colors.GREY_800,
@@ -43,19 +43,20 @@ class Header(ft.AppBar):
             on_click=lambda e: self.on_click("REPORT"))
 
         self.setting = ft.ElevatedButton(
-            text="SETTING",
+            text=self.page.session.get("lang.header.setting"),
             icon=ft.Icons.SETTINGS_OUTLINED,
             icon_color=ft.Colors.GREY_800,
             color=ft.Colors.GREY_800,
             bgcolor=ft.Colors.LIGHT_BLUE_100,
             on_click=lambda e: self.on_click("SETTING"))
 
+        self.shapoli = ShaPoLi()
         self.actions = [
             ft.Container(
                 content=ft.Row([self.home, self.report, self.setting]),
                 margin=ft.margin.symmetric(horizontal=20)
             ),
-            ShaPoLi(),
+            self.shapoli,
             ft.VerticalDivider(width=.5, thickness=.5),
             ThemeButton()
         ]
@@ -95,22 +96,3 @@ class Header(ft.AppBar):
         self.active_name = name
 
         self.main_content.update()
-
-    def on_system_settings_updated(self, topic, message):
-        self.system_settings = SystemSettings.get()
-        self.report.visible = self.system_settings.sha_po_li
-        self.report.update()
-
-    def did_mount(self):
-        self.set_language()
-        self.page.pubsub.subscribe_topic(
-            "shapoli_conf_updated", self.on_system_settings_updated)
-
-    def before_update(self):
-        self.set_language()
-
-    def set_language(self):
-        self.title.value = self.page.session.get("lang.lang.app.name")
-        self.home.text = self.page.session.get("lang.header.home")
-        self.report.text = self.page.session.get("lang.header.report")
-        self.setting.text = self.page.session.get("lang.header.setting")

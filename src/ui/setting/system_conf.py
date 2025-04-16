@@ -1,3 +1,5 @@
+import subprocess
+import sys
 import flet as ft
 
 from db.models.factor_conf import FactorConf
@@ -35,6 +37,7 @@ class SystemConf(ft.Container):
         )
 
         self.content = ft.Column(
+            scroll=ft.ScrollMode.ADAPTIVE,
             expand=True,
             controls=[
                 ft.ResponsiveRow(
@@ -225,25 +228,36 @@ class SystemConf(ft.Container):
         )
 
     def __save_data(self, e):
-        if float(self.system_settings.eexi_limited_power) > float(self.propeller_setting.shaft_power_of_mcr_operating_point):
-            Toast.show_error(
-                e.page, "EEXI Limited Power must be less than Shaft Power of MCR Operating Point"
-            )
-            return
-
         self.system_settings.save()
-        print(self.system_settings.sha_po_li)
+
         if self.system_settings.sha_po_li:
             self.eexi_limited_power.visible = True
-            self.page.session.set("eexi_limited_power", self.system_settings.eexi_limited_power)
+            self.page.session.set(
+                "eexi_limited_power",
+                self.system_settings.eexi_limited_power
+            )
         else:
             self.eexi_limited_power.visible = False
             self.page.session.set("eexi_limited_power", None)
 
         self.ship_info.save()
         self.factor_conf.save()
-        self.page.pubsub.send_all_on_topic("shapoli_conf_updated", None)
-        Toast.show_success(e.page)
+
+        dlg = ft.AlertDialog(
+            title=ft.Text("Success"),
+            content=ft.Text("Data saved successfully"),
+            actions=[ft.TextButton("OK", on_click=self.on_restart_app)]
+        )
+        self.page.open(dlg)
+
+    async def restart_app(self):
+        exe = sys.executable
+        args = [exe] + sys.argv
+        subprocess.Popen(args)
+        sys.exit(0)
+
+    def on_restart_app(self, e):
+        self.page.run_task(self.restart_app)
 
     def __reset_data(self, e):
         self.__load_data()
