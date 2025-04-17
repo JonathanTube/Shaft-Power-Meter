@@ -46,42 +46,42 @@ class Setting(ft.Container):
         self.system_conf = ft.NavigationRailDestination(
             icon=ft.Icons.SETTINGS_OUTLINED,
             selected_icon=ft.Icons.SETTINGS,
-            label="System Conf."
+            label=self.page.session.get("lang.setting.system_conf.title")
         )
         self.general = ft.NavigationRailDestination(
             icon=ft.Icon(ft.Icons.TUNE_OUTLINED),
             selected_icon=ft.Icon(ft.Icons.TUNE),
-            label="General",
+            label=self.page.session.get("lang.setting.general.title")
         )
         self.propeller_setting = ft.NavigationRailDestination(
             icon=ft.Icons.INSIGHTS_OUTLINED,
             selected_icon=ft.Icon(ft.Icons.INSIGHTS),
-            label="Propeller Setting"
+            label=self.page.session.get("lang.setting.propeller_setting.title")
         )
         self.zero_cal = ft.NavigationRailDestination(
             icon=ft.Icons.SWITCH_ACCESS_SHORTCUT_OUTLINED,
             selected_icon=ft.Icon(ft.Icons.SWITCH_ACCESS_SHORTCUT),
-            label="Zero Cal."
+            label=self.page.session.get("lang.setting.zero_cal.title")
         )
         self.io_conf = ft.NavigationRailDestination(
             icon=ft.Icons.USB_OUTLINED,
             selected_icon=ft.Icon(ft.Icons.USB),
-            label="I/O"
+            label=self.page.session.get("lang.setting.io_conf.title")
         )
         self.self_test = ft.NavigationRailDestination(
             icon=ft.Icons.ASSIGNMENT_OUTLINED,
             selected_icon=ft.Icon(ft.Icons.ASSIGNMENT),
-            label="Self-test"
+            label=self.page.session.get("lang.setting.self_test.title")
         )
         self.permission_conf = ft.NavigationRailDestination(
             icon=ft.Icons.MANAGE_ACCOUNTS_OUTLINED,
             selected_icon=ft.Icon(ft.Icons.MANAGE_ACCOUNTS),
-            label="Permission Conf."
+            label=self.page.session.get("lang.setting.permission_conf.title")
         )
         self.test_mode = ft.NavigationRailDestination(
             icon=ft.Icons.OUTLINED_FLAG,
             selected_icon=ft.Icon(ft.Icons.FLAG),
-            label="Test Mode"
+            label=self.page.session.get("lang.setting.test_mode.title")
         )
         rail = ft.NavigationRail(
             selected_index=0,
@@ -107,20 +107,3 @@ class Setting(ft.Container):
             ],
             expand=True
         )
-
-    def __set_language(self):
-        session = self.page.session
-        self.system_conf.label = session.get("lang.setting.system_conf.title")
-        self.general.label = session.get("lang.setting.general.title")
-        self.propeller_setting.label = session.get("lang.setting.propeller_setting.title")
-        self.zero_cal.label = session.get("lang.setting.zero_cal.title")
-        self.io_conf.label = session.get("lang.setting.io_conf.title")
-        self.self_test.label = session.get("lang.setting.self_test.title")
-        self.permission_conf.label = session.get("lang.setting.permission_conf.title")
-        self.test_mode.label = session.get("lang.setting.test_mode.title")
-
-    def before_update(self):
-        self.__set_language()
-
-    def did_mount(self):
-        self.__set_language()

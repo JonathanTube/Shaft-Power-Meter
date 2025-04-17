@@ -26,14 +26,14 @@ class General(ft.Container):
         self.last_date_time_conf = DateTimeConf.get()
 
     def __create_preference_card(self):
-        self.theme_label = ft.Text("Theme")
-        self.theme_system = ft.Radio(value=0, label="System")
-        self.theme_light = ft.Radio(value=1, label="Light")
-        self.theme_dark = ft.Radio(value=2, label="Dark")
+        self.theme_label = ft.Text(self.page.session.get("lang.setting.theme"))
+        self.theme_system = ft.Radio(value=0, label=self.page.session.get("lang.setting.theme.system"))
+        self.theme_light = ft.Radio(value=1, label=self.page.session.get("lang.setting.theme.light"))
+        self.theme_dark = ft.Radio(value=2, label=self.page.session.get("lang.setting.theme.dark"))
 
-        self.language_label = ft.Text("Language")
-        self.system_unit_label = ft.Text("System Unit")
-        self.data_refresh_interval_label = ft.Text("Data Refresh Interval")
+        self.language_label = ft.Text(self.page.session.get("lang.setting.language"))
+        self.system_unit_label = ft.Text(self.page.session.get("lang.setting.unit"))
+        self.data_refresh_interval_label = ft.Text(self.page.session.get("lang.setting.data_refresh_interval"))
 
         self.theme = ft.RadioGroup(
             content=ft.Row(
@@ -41,8 +41,8 @@ class General(ft.Container):
             value=self.last_preference.theme
         )
 
-        self.system_unit_si = ft.Radio(value="0", label="SI")
-        self.system_unit_metric = ft.Radio(value="1", label="Metric")
+        self.system_unit_si = ft.Radio(value="0", label=self.page.session.get("lang.setting.unit.si"))
+        self.system_unit_metric = ft.Radio(value="1", label=self.page.session.get("lang.setting.unit.metric"))
 
         self.system_unit = ft.RadioGroup(
             content=ft.Row([
@@ -69,7 +69,7 @@ class General(ft.Container):
         )
 
         self.preference_card = CustomCard(
-            'Preference',
+            self.page.session.get("lang.setting.preference"),
             ft.ResponsiveRow(
                 controls=[
                     ft.Row(
@@ -92,22 +92,22 @@ class General(ft.Container):
 
     def __create_max_limitations_card(self):
         self.speed_max = ft.TextField(
-            suffix_text="rpm", label="Speed", value=self.last_limitations.speed_max,
+            suffix_text="rpm", label=self.page.session.get("lang.common.speed"), value=self.last_limitations.speed_max,
             input_filter=ft.InputFilter(regex_string=reg_digital)
         )
 
         self.torque_max = ft.TextField(
-            suffix_text="kNm", label="Torque", value=self.last_limitations.torque_max,
+            suffix_text="kNm", label=self.page.session.get("lang.common.torque"), value=self.last_limitations.torque_max,
             input_filter=ft.InputFilter(regex_string=reg_digital)
         )
 
         self.power_max = ft.TextField(
-            suffix_text="kW", label="Power", value=self.last_limitations.power_max,
+            suffix_text="kW", label=self.page.session.get("lang.common.power"), value=self.last_limitations.power_max,
             input_filter=ft.InputFilter(regex_string=reg_digital)
         )
 
         self.max_limitations_card = CustomCard(
-            'Maximum Limitations',
+            self.page.session.get("lang.setting.maximum_limitations"),
             ft.Column(controls=[
                 self.speed_max,
                 self.torque_max,
@@ -116,22 +116,22 @@ class General(ft.Container):
 
     def __create_warning_limitations_card(self):
         self.torque_warning = ft.TextField(
-            suffix_text="kNm", label="Torque", value=self.last_limitations.torque_warning,
+            suffix_text="kNm", label=self.page.session.get("lang.common.torque"), value=self.last_limitations.torque_warning,
             input_filter=ft.InputFilter(regex_string=reg_digital)
         )
 
         self.speed_warning = ft.TextField(
-            suffix_text="rpm", label="Speed", value=self.last_limitations.speed_warning,
+            suffix_text="rpm", label=self.page.session.get("lang.common.speed"), value=self.last_limitations.speed_warning,
             input_filter=ft.InputFilter(regex_string=reg_digital)
         )
 
         self.power_warning = ft.TextField(
-            suffix_text="kW", label="Power", value=self.last_limitations.power_warning,
+            suffix_text="kW", label=self.page.session.get("lang.common.power"), value=self.last_limitations.power_warning,
             input_filter=ft.InputFilter(regex_string=reg_digital)
         )
 
         self.warning_limitations_card = CustomCard(
-            'Warning Limitations',
+            self.page.session.get("lang.setting.warning_limitations"),
             ft.Column(controls=[
                 self.speed_warning,
                 self.torque_warning,
@@ -188,7 +188,7 @@ class General(ft.Container):
     def __create_date_time_card(self):
         utc_date_time = self.page.session.get('utc_date_time')
         self.utc_date_time = ft.TextField(
-            label="Current UTC Date Time",
+            label=self.page.session.get("lang.setting.current_utc_date_time"),
             col={"md": 12},
             read_only=True,
             can_request_focus=False,
@@ -196,7 +196,7 @@ class General(ft.Container):
         )
 
         self.utc_date = ft.TextField(
-            label="Date",
+            label=self.page.session.get("lang.setting.date"),
             col={"md": 6},
             can_request_focus=False,
             value=self.last_date_time_conf.utc_date,
@@ -209,7 +209,7 @@ class General(ft.Container):
         )
 
         self.utc_time = ft.TextField(
-            label="Time",
+            label=self.page.session.get("lang.setting.time"),
             col={"md": 6},
             can_request_focus=False,
             value=self.last_date_time_conf.utc_time.strftime('%H:%M'),
@@ -221,7 +221,7 @@ class General(ft.Container):
         )
 
         self.date_time_format = ft.Dropdown(
-            label="Date Time Format", col={"md": 6},
+            label=self.page.session.get("lang.setting.date_time_format"), col={"md": 6},
             value=self.last_date_time_conf.date_time_format,
             options=[ft.DropdownOption(key="YYYY-MM-dd HH:mm:ss"),
                      ft.DropdownOption(key="YYYY/MM/dd HH:mm:ss"),
@@ -230,13 +230,13 @@ class General(ft.Container):
         )
 
         self.sync_with_gps = ft.Switch(
-            label='Sync With GPS',
+            label=self.page.session.get("lang.setting.sync_with_gps"),
             col={"md": 6},
             value=self.last_date_time_conf.sync_with_gps
         )
 
         self.date_time_card = CustomCard(
-            'UTC Date Time Conf.',
+            self.page.session.get("lang.setting.utc_date_time_conf"),
             ft.ResponsiveRow(
                 controls=[
                     self.utc_date_time,
@@ -363,12 +363,12 @@ class General(ft.Container):
         self.__create_date_time_card()
 
         self.save_button = ft.FilledButton(
-            text="Save",
+            self.page.session.get("lang.button.save"),
             width=120, height=40,
             on_click=self.__save_data
         )
         self.reset_button = ft.OutlinedButton(
-            text="Reset",
+            self.page.session.get("lang.button.reset"),
             width=120, height=40,
             on_click=self.__reset_data
         )
@@ -394,11 +394,7 @@ class General(ft.Container):
             ]
         )
 
-    def before_update(self):
-        self.__set_language()
-
     def did_mount(self):
-        self.__set_language()
         self.__update_limitations()
         self._task = self.page.run_task(self.__refresh_utc_date_time)
 
@@ -412,50 +408,3 @@ class General(ft.Container):
     def will_unmount(self):
         if self._task:
             self._task.cancel()
-
-    def __set_language(self):
-        session = self.page.session
-
-        self.preference_card.set_title(session.get("lang.setting.preference"))
-        self.theme_label.value = session.get("lang.setting.theme")
-
-        self.theme_system.label = session.get("lang.setting.theme.system")
-        self.theme_light.label = session.get("lang.setting.theme.light")
-        self.theme_dark.label = session.get("lang.setting.theme.dark")
-
-        self.language_label.value = session.get("lang.setting.language")
-        self.system_unit_label.value = session.get("lang.setting.unit")
-        self.system_unit_label.value = session.get("lang.setting.unit")
-        self.system_unit_si.label = session.get("lang.setting.unit.si")
-        self.system_unit_metric.label = session.get("lang.setting.unit.metric")
-
-        self.data_refresh_interval_label.value = session.get(
-            "lang.setting.data_refresh_interval")
-
-        self.max_limitations_card.set_title(
-            session.get("lang.setting.maximum_limitations"))
-
-        self.warning_limitations_card.set_title(
-            session.get("lang.setting.warning_limitations"))
-
-        self.date_time_card.set_title(
-            session.get("lang.setting.utc_date_time_conf"))
-
-        self.utc_date_time.label = session.get(
-            "lang.setting.current_utc_date_time")
-        self.utc_date.label = session.get("lang.setting.date")
-        self.utc_time.label = session.get("lang.setting.time")
-        self.date_time_format.label = session.get(
-            "lang.setting.date_time_format")
-        self.sync_with_gps.label = session.get("lang.setting.sync_with_gps")
-
-        self.speed_max.label = session.get("lang.common.speed")
-        self.torque_max.label = session.get("lang.common.torque")
-        self.power_max.label = session.get("lang.common.power")
-
-        self.speed_warning.label = session.get("lang.common.speed")
-        self.torque_warning.label = session.get("lang.common.torque")
-        self.power_warning.label = session.get("lang.common.power")
-
-        self.save_button.text = session.get("lang.button.save")
-        self.reset_button.text = session.get("lang.button.reset")

@@ -11,5 +11,7 @@ class SystemSettings(BaseModel):
 
     eexi_limited_power = IntegerField(null=True, verbose_name="EEXI 限制最大功率")
 
+    eexi_breach_checking_duration = IntegerField(null=True, verbose_name="EEXI 超限检查时长")
+
     class Meta:
         table_name = 'system_settings'

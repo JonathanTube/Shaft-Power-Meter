@@ -18,7 +18,7 @@ class IO(ft.Container):
 
     def __create_plc_conf(self):
         self.plc_ip = ft.TextField(
-            label="IP", value=self.last_io_conf.plc_ip, col={'md': 4},
+            label=self.page.session.get("lang.setting.ip"), value=self.last_io_conf.plc_ip, col={'md': 4},
             # input_filter=ft.InputFilter(regex_string=self.ipv4_regex),
             keyboard_type=ft.KeyboardType.NUMBER,
             size_constraints=ft.BoxConstraints(max_height=40),
@@ -28,7 +28,7 @@ class IO(ft.Container):
         )
 
         self.plc_port = ft.TextField(
-            label="Port", value=self.last_io_conf.plc_port, col={'md': 4},
+            label=self.page.session.get("lang.setting.port"), value=self.last_io_conf.plc_port, col={'md': 4},
             input_filter=ft.NumbersOnlyInputFilter(),
             keyboard_type=ft.KeyboardType.NUMBER,
             max_length=5,
@@ -39,7 +39,7 @@ class IO(ft.Container):
         )
 
         self.power_range_min = ft.TextField(
-            label="4-20MA Power Min",
+            label=self.page.session.get("lang.setting.4_20_ma_power_min"),
             value=self.last_io_conf.power_range_min,
             suffix_text='kW',
             col={'md': 4},
@@ -51,7 +51,7 @@ class IO(ft.Container):
                 self.last_io_conf, 'power_range_min', e.control.value)
         )
         self.power_range_max = ft.TextField(
-            label="4-20MA Power Max",
+            label=self.page.session.get("lang.setting.4_20_ma_power_max"),
             value=self.last_io_conf.power_range_max,
             suffix_text='kW',
             col={'md': 4},
@@ -63,7 +63,7 @@ class IO(ft.Container):
                 self.last_io_conf, 'power_range_max', e.control.value)
         )
         self.power_range_offset = ft.TextField(
-            label="4-20MA Power Offset",
+            label=self.page.session.get("lang.setting.4_20_ma_power_offset"),
             value=self.last_io_conf.power_range_offset,
             suffix_text='kW',
             col={'md': 4},
@@ -76,7 +76,7 @@ class IO(ft.Container):
         )
 
         self.torque_range_min = ft.TextField(
-            label="4-20MA Torque Min",
+            label=self.page.session.get("lang.setting.4_20_ma_torque_min"),
             value=self.last_io_conf.torque_range_min,
             suffix_text='kNm',
             col={'md': 4},
@@ -88,7 +88,7 @@ class IO(ft.Container):
                 self.last_io_conf, 'torque_range_min', e.control.value)
         )
         self.torque_range_max = ft.TextField(
-            label="4-20MA Torque Max",
+            label=self.page.session.get("lang.setting.4_20_ma_torque_max"),
             value=self.last_io_conf.torque_range_max,
             suffix_text='kNm',
             col={'md': 4},
@@ -100,7 +100,7 @@ class IO(ft.Container):
                 self.last_io_conf, 'torque_range_max', e.control.value)
         )
         self.torque_range_offset = ft.TextField(
-            label="4-20MA Torque Offset",
+            label=self.page.session.get("lang.setting.4_20_ma_torque_offset"),
             value=self.last_io_conf.torque_range_offset,
             suffix_text='kNm',
             col={'md': 4},
@@ -113,7 +113,7 @@ class IO(ft.Container):
         )
 
         self.thrust_range_min = ft.TextField(
-            label="4-20MA Thrust Min",
+            label=self.page.session.get("lang.setting.4_20_ma_thrust_min"),
             value=self.last_io_conf.thrust_range_min,
             suffix_text='kN',
             col={'md': 4},
@@ -125,7 +125,7 @@ class IO(ft.Container):
                 self.last_io_conf, 'thrust_range_min', e.control.value)
         )
         self.thrust_range_max = ft.TextField(
-            label="4-20MA Thrust Max",
+            label=self.page.session.get("lang.setting.4_20_ma_thrust_max"),
             value=self.last_io_conf.thrust_range_max,
             suffix_text='kN',
             col={'md': 4},
@@ -137,7 +137,7 @@ class IO(ft.Container):
                 self.last_io_conf, 'thrust_range_max', e.control.value)
         )
         self.thrust_range_offset = ft.TextField(
-            label="4-20MA Thrust Offset",
+            label=self.page.session.get("lang.setting.4_20_ma_thrust_offset"),
             value=self.last_io_conf.thrust_range_offset,
             suffix_text='kN',
             col={'md': 4},
@@ -150,7 +150,7 @@ class IO(ft.Container):
         )
 
         self.speed_range_min = ft.TextField(
-            label="4-20MA Speed Min",
+            label=self.page.session.get("lang.setting.4_20_ma_speed_min"),
             value=self.last_io_conf.speed_range_min,
             suffix_text='rpm',
             col={'md': 4},
@@ -162,7 +162,7 @@ class IO(ft.Container):
                 self.last_io_conf, 'speed_range_min', e.control.value)
         )
         self.speed_range_max = ft.TextField(
-            label="4-20MA Speed Max",
+            label=self.page.session.get("lang.setting.4_20_ma_speed_max"),
             value=self.last_io_conf.speed_range_max,
             suffix_text='rpm',
             col={'md': 4},
@@ -174,7 +174,7 @@ class IO(ft.Container):
                 self.last_io_conf, 'speed_range_max', e.control.value)
         )
         self.speed_range_offset = ft.TextField(
-            label="4-20MA Speed Offset",
+            label=self.page.session.get("lang.setting.4_20_ma_speed_offset"),
             value=self.last_io_conf.speed_range_offset,
             suffix_text='rpm',
             col={'md': 4},
@@ -187,7 +187,7 @@ class IO(ft.Container):
         )
 
         self.plc_conf = CustomCard(
-            'PLC Conf.',
+            self.page.session.get("lang.setting.plc_conf"),    
             body=ft.ResponsiveRow(controls=[
                 self.plc_ip,
                 self.plc_port,
@@ -214,43 +214,43 @@ class IO(ft.Container):
 
     def __create_output_conf(self):
         self.check_torque = ft.Checkbox(
-            label="Torque(kNm)",
+            label=self.page.session.get("lang.common.torque"),
             col={'md': 2},
             value=self.last_io_conf.output_torque,
             on_change=lambda e: setattr(self.last_io_conf, 'output_torque', e.control.value))
 
         self.check_thrust = ft.Checkbox(
-            label="Thrust(kN)",
+            label=self.page.session.get("lang.common.thrust"),
             col={'md': 2},
             value=self.last_io_conf.output_thrust,
             on_change=lambda e: setattr(self.last_io_conf, 'output_thrust', e.control.value))
 
         self.check_power = ft.Checkbox(
-            label="Power(kw)",
+            label=self.page.session.get("lang.common.power"),
             col={'md': 2},
             value=self.last_io_conf.output_power,
             on_change=lambda e: setattr(self.last_io_conf, 'output_power', e.control.value))
 
         self.check_speed = ft.Checkbox(
-            label="Speed(rpm)",
+            label=self.page.session.get("lang.common.speed"),
             col={'md': 2},
             value=self.last_io_conf.output_speed,
             on_change=lambda e: setattr(self.last_io_conf, 'output_speed', e.control.value))
 
         self.check_avg_power = ft.Checkbox(
-            label="Average Power(kw)",
+            label=self.page.session.get("lang.common.average_power"),
             col={'md': 2},
             value=self.last_io_conf.output_avg_power,
             on_change=lambda e: setattr(self.last_io_conf, 'output_avg_power', e.control.value))
 
         self.check_sum_power = ft.Checkbox(
-            label="Sum Of Power(kwh)",
+            label=self.page.session.get("lang.common.sum_power"),
             col={'md': 2},
             value=self.last_io_conf.output_sum_power,
             on_change=lambda e: setattr(self.last_io_conf, 'output_sum_power', e.control.value))
 
         self.output_conf = CustomCard(
-            'Output Conf.',
+            self.page.session.get("lang.setting.output_conf"),
             body=ft.ResponsiveRow(
                 controls=[
                     self.check_torque,
@@ -333,7 +333,7 @@ class IO(ft.Container):
 
     def __create_gps_conf(self):
         self.gps_ip = ft.TextField(
-            label="IP", value=self.last_io_conf.gps_ip, col={'md': 4},
+            label=self.page.session.get("lang.setting.ip"), value=self.last_io_conf.gps_ip, col={'md': 4},
             # input_filter=ft.InputFilter(regex_string=self.ipv4_regex),
             keyboard_type=ft.KeyboardType.NUMBER,
             size_constraints=ft.BoxConstraints(max_height=40),
@@ -343,7 +343,7 @@ class IO(ft.Container):
         )
 
         self.gps_port = ft.TextField(
-            label="Port", value=self.last_io_conf.gps_port, col={'md': 4},
+            label=self.page.session.get("lang.setting.port"), value=self.last_io_conf.gps_port, col={'md': 4},
             input_filter=ft.NumbersOnlyInputFilter(),
             keyboard_type=ft.KeyboardType.NUMBER,
             max_length=5,
@@ -362,7 +362,7 @@ class IO(ft.Container):
         #         self.last_io_conf.gps_ip, self.last_io_conf.gps_port)
         # )
         self.gps_conf = CustomCard(
-            'GPS Conf.',
+            self.page.session.get("lang.setting.gps_conf"),
             body=ft.ResponsiveRow(controls=[
                 self.gps_ip,
                 self.gps_port
@@ -373,7 +373,7 @@ class IO(ft.Container):
 
     def __create_modbus_conf(self):
         self.modbus_ip = ft.TextField(
-            label="IP", value=self.last_io_conf.modbus_ip, col={'md': 4},
+            label=self.page.session.get("lang.setting.ip"), value=self.last_io_conf.modbus_ip, col={'md': 4},
             # input_filter=ft.InputFilter(regex_string=self.ipv4_regex),
             size_constraints=ft.BoxConstraints(max_height=40),
             text_size=14,
@@ -381,7 +381,7 @@ class IO(ft.Container):
                 self.last_io_conf, 'modbus_ip', e.control.value)
         )
         self.modbus_port = ft.TextField(
-            label="Port", value=self.last_io_conf.modbus_port, col={'md': 4},
+            label=self.page.session.get("lang.setting.port"), value=self.last_io_conf.modbus_port, col={'md': 4},
             input_filter=ft.NumbersOnlyInputFilter(),
             max_length=5,
             size_constraints=ft.BoxConstraints(max_height=40),
@@ -398,7 +398,7 @@ class IO(ft.Container):
         #         self.last_io_conf.modbus_ip, self.last_io_conf.modbus_port)
         # )
         self.modbus_conf = CustomCard(
-            'Modbus Conf.',
+            self.page.session.get("lang.setting.modbus_conf"),
             body=ft.ResponsiveRow(controls=[
                 self.modbus_ip,
                 self.modbus_port
@@ -414,9 +414,9 @@ class IO(ft.Container):
         self.__create_modbus_conf()
 
         self.save_button = ft.FilledButton(
-            text="Save", width=120, height=40, on_click=self.__save_data)
+            self.page.session.get("lang.button.save"), width=120, height=40, on_click=self.__save_data)
         self.reset_button = ft.OutlinedButton(
-            text="Reset", width=120, height=40, on_click=self.__reset_data)
+            self.page.session.get("lang.button.reset"), width=120, height=40, on_click=self.__reset_data)
 
         self.content = ft.Column(
             scroll=ft.ScrollMode.ADAPTIVE,
@@ -439,53 +439,3 @@ class IO(ft.Container):
                 )
             ]
         )
-
-    def __set_language(self):
-        session = self.page.session
-        self.plc_conf.set_title(session.get("lang.setting.plc_conf"))
-        self.plc_ip.label = session.get("lang.setting.ip")
-        self.plc_port.label = session.get("lang.setting.port")
-        # self.plc_conn_check.text = session.get("lang.setting.check_plc_connection")
-
-        self.power_range_min.label = session.get("lang.setting.4_20_ma_power_min")
-        self.power_range_max.label = session.get("lang.setting.4_20_ma_power_max")
-        self.power_range_offset.label = session.get("lang.setting.4_20_ma_power_offset")
-
-        self.torque_range_min.label = session.get("lang.setting.4_20_ma_torque_min")
-        self.torque_range_max.label = session.get("lang.setting.4_20_ma_torque_max")
-        self.torque_range_offset.label = session.get("lang.setting.4_20_ma_torque_offset")
-
-        self.thrust_range_min.label = session.get("lang.setting.4_20_ma_thrust_min")
-        self.thrust_range_max.label = session.get("lang.setting.4_20_ma_thrust_max")
-        self.thrust_range_offset.label = session.get("lang.setting.4_20_ma_thrust_offset")
-
-        self.speed_range_min.label = session.get("lang.setting.4_20_ma_speed_min")
-        self.speed_range_max.label = session.get("lang.setting.4_20_ma_speed_max")
-        self.speed_range_offset.label = session.get("lang.setting.4_20_ma_speed_offset")
-
-        self.output_conf.set_title(session.get("lang.setting.output_conf"))
-        self.check_torque.label = session.get("lang.common.torque")
-        self.check_thrust.label = session.get("lang.common.thrust")
-        self.check_power.label = session.get("lang.common.power")
-        self.check_speed.label = session.get("lang.common.speed")
-        self.check_avg_power.label = session.get("lang.common.average_power")
-        self.check_sum_power.label = session.get("lang.common.sum_power")
-
-        self.gps_conf.set_title(session.get("lang.setting.gps_conf"))
-        self.gps_ip.label = session.get("lang.setting.ip")
-        self.gps_port.label = session.get("lang.setting.port")
-        # self.gps_conn_check.text = session.get("lang.setting.check_gps_connection") 
-
-        self.modbus_conf.set_title(session.get("lang.setting.modbus_conf"))
-        self.modbus_ip.label = session.get("lang.setting.ip")
-        self.modbus_port.label = session.get("lang.setting.port")
-        # self.modbus_conn_check.text = session.get("lang.setting.check_modbus_connection")
-
-        self.save_button.text = session.get("lang.button.save")
-        self.reset_button.text = session.get("lang.button.reset")
-
-    def before_update(self):
-        self.__set_language()
-
-    def did_mount(self):
-        self.__set_language()

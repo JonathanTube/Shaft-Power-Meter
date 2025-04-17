@@ -24,13 +24,13 @@ class SystemConf(ft.Container):
         self.__create_factor_conf_card()
 
         self.save_button = ft.FilledButton(
-            text="Save",
+            self.page.session.get("lang.button.save"),
             width=120,
             height=40,
             on_click=self.__save_data
         )
         self.reset_button = ft.OutlinedButton(
-            text="Reset",
+            self.page.session.get("lang.button.reset"),
             width=120,
             height=40,
             on_click=self.__reset_data
@@ -74,7 +74,7 @@ class SystemConf(ft.Container):
 
     def __create_settings_card(self):
         self.display_thrust = ft.Switch(
-            col={"md": 6}, label="Display Thrust",
+            col={"md": 6}, label=self.page.session.get("lang.setting.display_thrust"), 
             label_position=ft.LabelPosition.LEFT,
             value=self.system_settings.display_thrust,
             on_change=lambda e: setattr(
@@ -82,15 +82,15 @@ class SystemConf(ft.Container):
         )
 
         self.sha_po_li = ft.Switch(
-            col={"md": 6}, label="ShaPoLi",
+            col={"md": 6}, label=self.page.session.get("lang.setting.enable_sha_po_li"),
             label_position=ft.LabelPosition.LEFT,
             value=self.system_settings.sha_po_li,
             on_change=lambda e: setattr(
                 self.system_settings, 'sha_po_li', e.control.value)
         )
 
-        self.single_propeller = ft.Radio(value="1", label="Single")
-        self.twins_propeller = ft.Radio(value="2", label="Twins")
+        self.single_propeller = ft.Radio(value="1", label=self.page.session.get("lang.setting.single_propeller"))
+        self.twins_propeller = ft.Radio(value="2", label=self.page.session.get("lang.setting.twins_propeller"))
         self.amount_of_propeller_radios = ft.RadioGroup(
             content=ft.Row([
                 self.single_propeller,
@@ -104,15 +104,23 @@ class SystemConf(ft.Container):
         eexi_limited_power_value, eexi_limited_power_unit = self.__get_eexi_limited_power()
         self.eexi_limited_power = ft.TextField(
             col={"md": 6},
-            label="EEXI Limited Power",
+            label=self.page.session.get("lang.setting.eexi_limited_power"),
             value=eexi_limited_power_value,
             suffix_text=eexi_limited_power_unit,
             visible=self.system_settings.sha_po_li,
             on_change=self.__set_eexi_limited_power
         )
 
+        self.eexi_breach_checking_duration = ft.TextField(
+            col={"md": 6},
+            label=self.page.session.get("lang.setting.eexi_breach_checking_duration"),
+            value=self.system_settings.eexi_breach_checking_duration,
+            suffix_text="seconds",
+            on_change=lambda e: setattr(self.system_settings, 'eexi_breach_checking_duration', int(e.control.value))
+        )
+
         self.amount_of_propeller_label = ft.Text(
-            "Amount Of Propeller",
+            self.page.session.get("lang.setting.amount_of_propeller"),
             text_align=ft.TextAlign.RIGHT
         )
 
@@ -125,7 +133,7 @@ class SystemConf(ft.Container):
         )
 
         self.settings_card = CustomCard(
-            'Settings',
+            self.page.session.get("lang.setting.setting"),
             col={'xs': 12},
             expand=True,
             body=ft.ResponsiveRow(
@@ -139,32 +147,32 @@ class SystemConf(ft.Container):
 
     def __create_ship_info_card(self):
         self.ship_type = ft.TextField(
-            label="Ship Type",
+            label=self.page.session.get("lang.setting.ship_type"),
             value=self.ship_info.ship_type,
             on_change=lambda e: setattr(
                 self.ship_info, 'ship_type', e.control.value)
         )
         self.ship_name = ft.TextField(
-            label="Ship Name",
+            label=self.page.session.get("lang.setting.ship_name"),
             value=self.ship_info.ship_name,
             on_change=lambda e: setattr(
                 self.ship_info, 'ship_name', e.control.value)
         )
         self.imo_number = ft.TextField(
-            label="IMO Number",
+            label=self.page.session.get("lang.setting.imo_number"),
             value=self.ship_info.imo_number,
             on_change=lambda e: setattr(
                 self.ship_info, 'imo_number', e.control.value)
         )
         self.ship_size = ft.TextField(
-            label="Ship Size",
+            label=self.page.session.get("lang.setting.ship_size"),
             value=self.ship_info.ship_size,
             on_change=lambda e: setattr(
                 self.ship_info, 'ship_size', e.control.value)
         )
 
         self.ship_info_card = CustomCard(
-            'Ship Info',
+            self.page.session.get("lang.setting.ship_info"),
             ft.Column(
                 controls=[
                     self.ship_type,
@@ -177,14 +185,14 @@ class SystemConf(ft.Container):
 
     def __create_factor_conf_card(self):
         self.shaft_outer_diameter = ft.TextField(
-            label="Shaft Outer Diameter(D)", suffix_text="mm",
+            label=self.page.session.get("lang.setting.shaft_outer_diameter_D"), suffix_text="mm",
             value=self.factor_conf.bearing_outer_diameter_D,
             on_change=lambda e: setattr(
                 self.factor_conf, 'bearing_outer_diameter_D', e.control.value)
         )
 
         self.shaft_inner_diameter = ft.TextField(
-            label="Shaft Inner Diameter(d)",
+            label=self.page.session.get("lang.setting.shaft_inner_diameter_d"),
             suffix_text="mm",
             value=self.factor_conf.bearing_inner_diameter_d,
             on_change=lambda e: setattr(
@@ -192,14 +200,14 @@ class SystemConf(ft.Container):
         )
 
         self.sensitivity_factor_k = ft.TextField(
-            label="Sensitivity Factor(k)",
+            label=self.page.session.get("lang.setting.sensitivity_factor_k"),
             value=self.factor_conf.sensitivity_factor_k,
             on_change=lambda e: setattr(
                 self.factor_conf, 'sensitivity_factor_k', e.control.value)
         )
 
         self.elastic_modulus_E = ft.TextField(
-            label="Elastic Modulus(E)",
+            label=self.page.session.get("lang.setting.elastic_modulus_E"),
             value=self.factor_conf.elastic_modulus_E,
             suffix_text="Gpa",
             on_change=lambda e: setattr(
@@ -207,14 +215,14 @@ class SystemConf(ft.Container):
         )
 
         self.poisson_ratio_mu = ft.TextField(
-            label="Poisson's Ratio(μ)",
+            label=self.page.session.get("lang.setting.poisson_ratio_mu"),
             value=self.factor_conf.poisson_ratio_mu,
             on_change=lambda e: setattr(
                 self.factor_conf, 'poisson_ratio_mu', e.control.value)
         )
 
         self.factor_conf_card = CustomCard(
-            'Factor Conf.',
+            self.page.session.get("lang.setting.factor_conf"),
             ft.Column(
                 controls=[
                     self.shaft_outer_diameter,
@@ -293,46 +301,3 @@ class SystemConf(ft.Container):
         self.propeller_setting = PropellerSetting.get()
         self.ship_info = ShipInfo.get()
         self.factor_conf = FactorConf.get()
-
-    def __set_language(self):
-        session = self.page.session
-        self.display_thrust.label = session.get("lang.setting.display_thrust")
-        self.amount_of_propeller_label.value = session.get(
-            "lang.setting.amount_of_propeller")
-        self.single_propeller.label = session.get(
-            "lang.setting.single_propeller")
-        self.twins_propeller.label = session.get(
-            "lang.setting.twins_propeller")
-        self.sha_po_li.label = session.get("lang.setting.enable_sha_po_li")
-        self.eexi_limited_power.label = session.get(
-            "lang.setting.eexi_limited_power")
-
-        self.ship_type.label = session.get("lang.setting.ship_type")
-        self.ship_name.label = session.get("lang.setting.ship_name")
-        self.imo_number.label = session.get("lang.setting.imo_number")
-        self.ship_size.label = session.get("lang.setting.ship_size")
-
-        self.shaft_outer_diameter.label = session.get(
-            "lang.setting.bearing_outer_diameter_D")
-        self.shaft_inner_diameter.label = session.get(
-            "lang.setting.bearing_inner_diameter_d")
-        self.sensitivity_factor_k.label = session.get(
-            "lang.setting.sensitivity_factor_k")
-        self.elastic_modulus_E.label = session.get(
-            "lang.setting.elastic_modulus_E")
-        self.poisson_ratio_mu.label = session.get(
-            "lang.setting.poisson_ratio_mu")
-
-        self.settings_card.set_title(session.get("lang.setting.setting"))
-        self.ship_info_card.set_title(session.get("lang.setting.ship_info"))
-        self.factor_conf_card.set_title(
-            session.get("lang.setting.factor_conf"))
-
-        self.save_button.text = session.get("lang.button.save")
-        self.reset_button.text = session.get("lang.button.reset")
-
-    def before_update(self):
-        self.__set_language()
-
-    def did_mount(self):
-        self.__set_language()

@@ -34,7 +34,7 @@ class PropellerConf(ft.Container):
 
     def __create_mcr_operating_point(self):
         self.rpm_of_mcr_operating_point = ft.TextField(
-            label="RPM",
+            label=self.page.session.get("lang.common.rpm"),
             suffix_text='[1/min]',
             col={"md": 6},
             value=self.last_propeller_setting.rpm_of_mcr_operating_point,
@@ -44,7 +44,7 @@ class PropellerConf(ft.Container):
 
         shaft_power_value, shaft_power_unit = self.__get_shaft_power()
         self.shaft_power_of_mcr_operating_point = ft.TextField(
-            label="Shaft Power",
+            label=self.page.session.get("lang.common.power"),
             col={"md": 6},
             value=shaft_power_value,
             suffix_text=shaft_power_unit,
@@ -52,7 +52,7 @@ class PropellerConf(ft.Container):
         )
 
         self.mcr_operating_point_card = CustomCard(
-            'MCR Operating Point',
+            self.page.session.get("lang.setting.mcr_operating_point"),
             ft.ResponsiveRow(
                 spacing=20,
                 alignment=ft.MainAxisAlignment.START,
@@ -66,25 +66,25 @@ class PropellerConf(ft.Container):
 
     def __create_normal_propeller_curve(self):
         self.rpm_left_of_normal_propeller_curve = ft.TextField(
-            label="RPM Left", suffix_text='[%]',
+            label=self.page.session.get("lang.setting.rpm_left"), suffix_text='[%]',
             value=self.last_propeller_setting.rpm_left_of_normal_propeller_curve,
             on_change=lambda e: setattr(
                 self.last_propeller_setting, 'rpm_left_of_normal_propeller_curve', e.control.value)
         )
         self.bhp_left_of_normal_propeller_curve = ft.TextField(
-            label="BHP Left", suffix_text='[%]',
+            label=self.page.session.get("lang.setting.power_left"), suffix_text='[%]',
             value=self.last_propeller_setting.bhp_left_of_normal_propeller_curve,
             on_change=lambda e: setattr(
                 self.last_propeller_setting, 'bhp_left_of_normal_propeller_curve', e.control.value)
         )
         self.rpm_right_of_normal_propeller_curve = ft.TextField(
-            label="RPM Right", suffix_text='[%]',
+            label=self.page.session.get("lang.setting.rpm_right"), suffix_text='[%]',
             value=self.last_propeller_setting.rpm_right_of_normal_propeller_curve,
             on_change=lambda e: setattr(
                 self.last_propeller_setting, 'rpm_right_of_normal_propeller_curve', e.control.value)
         )
         self.bhp_right_of_normal_propeller_curve = ft.TextField(
-            label="BHP Right", suffix_text='[%]',
+            label=self.page.session.get("lang.setting.power_right"), suffix_text='[%]',
             value=self.last_propeller_setting.bhp_right_of_normal_propeller_curve,
             on_change=lambda e: setattr(
                 self.last_propeller_setting, 'bhp_right_of_normal_propeller_curve', e.control.value)
@@ -97,7 +97,7 @@ class PropellerConf(ft.Container):
             self.last_propeller_setting.line_color_of_normal_propeller_curve)
 
         self.normal_propeller_curve_card = CustomCard(
-            'Normal Propeller Curve (1)',
+            self.page.session.get("lang.setting.normal_propeller_curve"),
             ft.Column(controls=[
                 self.rpm_left_of_normal_propeller_curve,
                 self.bhp_left_of_normal_propeller_curve,
@@ -156,25 +156,25 @@ class PropellerConf(ft.Container):
 
     def __create_torque_load_limit_curve(self):
         self.rpm_left_of_torque_load_limit_curve = ft.TextField(
-            label="RPM Left", suffix_text='[%]',
+            label=self.page.session.get("lang.setting.rpm_left"), suffix_text='[%]',
             value=self.last_propeller_setting.rpm_left_of_torque_load_limit_curve,
             on_change=lambda e: setattr(
                 self.last_propeller_setting, 'rpm_left_of_torque_load_limit_curve', e.control.value)
         )
         self.bhp_left_of_torque_load_limit_curve = ft.TextField(
-            label="BHP Left", suffix_text='[%]',
+            label=self.page.session.get("lang.setting.power_left"), suffix_text='[%]',
             value=self.last_propeller_setting.bhp_left_of_torque_load_limit_curve,
             on_change=lambda e: setattr(self.last_propeller_setting, 'bhp_left_of_torque_load_limit_curve',
                                         e.control.value)
         )
         self.rpm_right_of_torque_load_limit_curve = ft.TextField(
-            label="RPM Right", suffix_text='[%]',
+            label=self.page.session.get("lang.setting.rpm_right"), suffix_text='[%]',
             value=self.last_propeller_setting.rpm_right_of_torque_load_limit_curve,
             on_change=lambda e: setattr(self.last_propeller_setting, 'rpm_right_of_torque_load_limit_curve',
                                         e.control.value)
         )
         self.bhp_right_of_torque_load_limit_curve = ft.TextField(
-            label="BHP Right", suffix_text='[%]',
+            label=self.page.session.get("lang.setting.power_right"), suffix_text='[%]',
             value=self.last_propeller_setting.bhp_right_of_torque_load_limit_curve,
             on_change=lambda e: setattr(self.last_propeller_setting, 'bhp_right_of_torque_load_limit_curve',
                                         e.control.value)
@@ -187,7 +187,7 @@ class PropellerConf(ft.Container):
             self.last_propeller_setting.line_color_of_torque_load_limit_curve)
 
         self.torque_load_limit_curve_card = CustomCard(
-            'Torque/Load Limit Curve (4)',
+            self.page.session.get("lang.setting.torque_load_limit_curve"),
             ft.Column(controls=[
                 self.rpm_left_of_torque_load_limit_curve,
                 self.bhp_left_of_torque_load_limit_curve,
@@ -206,7 +206,7 @@ class PropellerConf(ft.Container):
         )
 
         self.overload_alarm = ft.Switch(
-            label="Overload Alarm", label_position=ft.LabelPosition.LEFT, col={"md": 6},
+            label=self.page.session.get("lang.setting.overload_alarm"), label_position=ft.LabelPosition.LEFT, col={"md": 6},
             value=self.last_propeller_setting.alarm_enabled_of_overload_curve,
             on_change=lambda e: setattr(
                 self.last_propeller_setting, 'alarm_enabled_of_overload_curve', e.control.value)
@@ -220,7 +220,7 @@ class PropellerConf(ft.Container):
             self.last_propeller_setting.line_color_of_overload_curve)
 
         self.overload_curve_card = CustomCard(
-            'Overload Curve (5)',
+            self.page.session.get("lang.setting.overload_curve"),
             ft.Column(
                 controls=[
                     self.overload_curve,
@@ -286,14 +286,14 @@ class PropellerConf(ft.Container):
         self.__create_overload_curve()
 
         self.save_button = ft.FilledButton(
-            text="Save",
+            self.page.session.get("lang.button.save"),
             width=120,
             height=40,
             on_click=lambda e: self.__save_data(e)
         )
 
         self.reset_button = ft.OutlinedButton(
-            text="Reset",
+            self.page.session.get("lang.button.reset"),
             width=120,
             height=40,
             on_click=lambda e: self.__reset_data(e)
@@ -321,52 +321,3 @@ class PropellerConf(ft.Container):
                 )
             ]
         )
-
-    def __set_language(self):
-        session = self.page.session
-
-        self.mcr_operating_point_card.set_title(
-            session.get("lang.setting.mcr_operating_point"))
-        self.rpm_of_mcr_operating_point.label = session.get("lang.common.rpm")
-        self.shaft_power_of_mcr_operating_point.label = session.get(
-            "lang.common.power")
-
-        self.normal_propeller_curve_card.set_title(
-            session.get("lang.setting.normal_propeller_curve"))
-        self.rpm_left_of_normal_propeller_curve.label = session.get(
-            "lang.setting.rpm_left")
-        self.bhp_left_of_normal_propeller_curve.label = session.get(
-            "lang.setting.power_left")
-        self.rpm_right_of_normal_propeller_curve.label = session.get(
-            "lang.setting.rpm_right")
-        self.bhp_right_of_normal_propeller_curve.label = session.get(
-            "lang.setting.power_right")
-
-        self.torque_load_limit_curve_card.set_title(
-            session.get("lang.setting.torque_load_limit_curve"))
-        self.rpm_left_of_torque_load_limit_curve.label = session.get(
-            "lang.setting.rpm_left")
-        self.bhp_left_of_torque_load_limit_curve.label = session.get(
-            "lang.setting.power_left")
-        self.rpm_right_of_torque_load_limit_curve.label = session.get(
-            "lang.setting.rpm_right")
-        self.bhp_right_of_torque_load_limit_curve.label = session.get(
-            "lang.setting.power_right")
-
-        self.light_propeller_curve_card.set_title(
-            session.get("lang.setting.light_propeller_curve"))
-        self.speed_limit_curve_card.set_title(
-            session.get("lang.setting.speed_limit_curve"))
-        self.overload_curve_card.set_title(
-            session.get("lang.setting.overload_curve"))
-        self.overload_alarm.label = session.get(
-            "lang.setting.enable_overload_alarm")
-
-        self.save_button.text = session.get("lang.button.save")
-        self.reset_button.text = session.get("lang.button.reset")
-
-    def before_update(self):
-        self.__set_language()
-
-    def did_mount(self):
-        self.__set_language()

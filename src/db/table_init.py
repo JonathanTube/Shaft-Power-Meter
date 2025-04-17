@@ -22,7 +22,7 @@ from db.base import db
 class TableInit:
     @staticmethod
     def init():
-        # db.drop_tables([Limitations, PropellerSetting, SystemSettings, EventLog, ReportDetail, ReportInfo, TestModeConf], safe=False)
+        db.drop_tables([Limitations, PropellerSetting, SystemSettings, EventLog, ReportDetail, ReportInfo, TestModeConf], safe=False)
         db.drop_tables([Language], safe=False)
         db.create_tables([
             BreachReason,
