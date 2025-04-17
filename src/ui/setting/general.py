@@ -19,7 +19,6 @@ class General(ft.Container):
         self._task = None
 
         self.expand = True
-        self.alignment = ft.MainAxisAlignment.START
 
         self.last_preference = Preference.get()
         self.last_limitations = Limitations.get()
@@ -389,9 +388,10 @@ class General(ft.Container):
 
     async def __refresh_utc_date_time(self):
         while True:
-            utc_date_time = self.page.session.get("utc_date_time")
-            self.utc_date_time.value = utc_date_time.strftime('%Y-%m-%d %H:%M')
-            self.utc_date_time.update()
+            if self.utc_date_time:
+                utc_date_time = self.page.session.get("utc_date_time")
+                self.utc_date_time.value = utc_date_time.strftime('%Y-%m-%d %H:%M')
+                self.utc_date_time.update()
             await asyncio.sleep(1)
 
     def will_unmount(self):

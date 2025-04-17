@@ -14,12 +14,13 @@ class BreachLogTask:
         self.event_log_id = None
         self.breach_times = 0
         self.recovery_times = 0
-        # 功率必须突破EEXI持续超过60s后，才算突破
-        self.checking_continuous_interval = 3
         self.report_info = None
+        self.checking_continuous_interval = 60
 
     async def start(self):
         system_settings = SystemSettings.get()
+        # 功率必须突破EEXI持续超过60s后，才算突破
+        self.checking_continuous_interval = system_settings.eexi_breach_checking_duration
         eexi_limited_power = system_settings.eexi_limited_power
         while True:
             if system_settings.sha_po_li == False:

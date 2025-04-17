@@ -45,8 +45,9 @@ class DataInit:
             SystemSettings.create(
                 display_thrust=False,
                 amount_of_propeller=1,
+                sha_po_li=True,
                 eexi_limited_power=180000,
-                sha_po_li=True
+                eexi_breach_checking_duration=60
             )
 
     def __init_date_time_conf():
@@ -671,6 +672,12 @@ class DataInit:
                     "english": "EEXI Limited Power"
                 },
 
+                {
+                    "code": "lang.setting.eexi_breach_checking_duration",
+                    "chinese": "EEXI 超限检查周期",
+                    "english": "EEXI Breach Checking Duration"
+                },
+                
                 {
                     "code": "lang.setting.ship_info",
                     "chinese": "船体信息",
