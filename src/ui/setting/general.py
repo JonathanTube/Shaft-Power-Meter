@@ -341,19 +341,8 @@ class General(ft.Container):
         self.last_limitations = Limitations.get()
         self.last_date_time_conf = DateTimeConf.get()
 
-        self.system_unit.value = self.last_preference.system_unit
-        self.language.value = self.last_preference.language
-        self.data_refresh_interval.value = self.last_preference.data_refresh_interval
-        self.preference_card.update()
-
-        self.__update_limitations()
-
-        self.utc_date.value = self.last_date_time_conf.utc_date
-        self.utc_time.value = self.last_date_time_conf.utc_time.strftime(
-            '%H:%M')
-        self.date_time_format.value = self.last_date_time_conf.date_time_format
-        self.sync_with_gps.value = self.last_date_time_conf.sync_with_gps
-        self.date_time_card.update()
+        self.content.clean()
+        self.build()
         Toast.show_success(e.page)
 
     def build(self):

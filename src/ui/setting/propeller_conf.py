@@ -15,10 +15,10 @@ class PropellerConf(ft.Container):
         self.alignment = ft.alignment.top_left
 
         self.system_unit = Preference.get().system_unit
-        self.last_propeller_setting = PropellerSetting.get()
+        self.propeller_setting = PropellerSetting.get()
 
     def __get_shaft_power(self) -> tuple[float, str]:
-        _shaft_power = self.last_propeller_setting.shaft_power_of_mcr_operating_point
+        _shaft_power = self.propeller_setting.shaft_power_of_mcr_operating_point
         if self.system_unit == 0:
             return (_shaft_power / 1000, "kW")
         else:
@@ -27,19 +27,19 @@ class PropellerConf(ft.Container):
     def __set_shaft_power(self, e):
         _shaft_power = float(e.control.value)
         if self.system_unit == 0:
-            self.last_propeller_setting.shaft_power_of_mcr_operating_point = _shaft_power * 1000
+            self.propeller_setting.shaft_power_of_mcr_operating_point = _shaft_power * 1000
         else:
-            self.last_propeller_setting.shaft_power_of_mcr_operating_point = UnitConverter.shp_to_w(
+            self.propeller_setting.shaft_power_of_mcr_operating_point = UnitConverter.shp_to_w(
                 _shaft_power)
 
     def __create_mcr_operating_point(self):
         self.rpm_of_mcr_operating_point = ft.TextField(
-            label=self.page.session.get("lang.common.rpm"),
-            suffix_text='[1/min]',
+            label=self.page.session.get("lang.common.speed"),
+            suffix_text='rpm',
             col={"md": 6},
-            value=self.last_propeller_setting.rpm_of_mcr_operating_point,
+            value=self.propeller_setting.rpm_of_mcr_operating_point,
             on_change=lambda e: setattr(
-                self.last_propeller_setting, 'rpm_of_mcr_operating_point', e.control.value)
+                self.propeller_setting, 'rpm_of_mcr_operating_point', e.control.value)
         )
 
         shaft_power_value, shaft_power_unit = self.__get_shaft_power()
@@ -67,34 +67,32 @@ class PropellerConf(ft.Container):
     def __create_normal_propeller_curve(self):
         self.rpm_left_of_normal_propeller_curve = ft.TextField(
             label=self.page.session.get("lang.setting.rpm_left"), suffix_text='[%]',
-            value=self.last_propeller_setting.rpm_left_of_normal_propeller_curve,
+            value=self.propeller_setting.rpm_left_of_normal_propeller_curve,
             on_change=lambda e: setattr(
-                self.last_propeller_setting, 'rpm_left_of_normal_propeller_curve', e.control.value)
+                self.propeller_setting, 'rpm_left_of_normal_propeller_curve', e.control.value)
         )
         self.bhp_left_of_normal_propeller_curve = ft.TextField(
             label=self.page.session.get("lang.setting.power_left"), suffix_text='[%]',
-            value=self.last_propeller_setting.bhp_left_of_normal_propeller_curve,
+            value=self.propeller_setting.bhp_left_of_normal_propeller_curve,
             on_change=lambda e: setattr(
-                self.last_propeller_setting, 'bhp_left_of_normal_propeller_curve', e.control.value)
+                self.propeller_setting, 'bhp_left_of_normal_propeller_curve', e.control.value)
         )
         self.rpm_right_of_normal_propeller_curve = ft.TextField(
             label=self.page.session.get("lang.setting.rpm_right"), suffix_text='[%]',
-            value=self.last_propeller_setting.rpm_right_of_normal_propeller_curve,
+            value=self.propeller_setting.rpm_right_of_normal_propeller_curve,
             on_change=lambda e: setattr(
-                self.last_propeller_setting, 'rpm_right_of_normal_propeller_curve', e.control.value)
+                self.propeller_setting, 'rpm_right_of_normal_propeller_curve', e.control.value)
         )
         self.bhp_right_of_normal_propeller_curve = ft.TextField(
             label=self.page.session.get("lang.setting.power_right"), suffix_text='[%]',
-            value=self.last_propeller_setting.bhp_right_of_normal_propeller_curve,
+            value=self.propeller_setting.bhp_right_of_normal_propeller_curve,
             on_change=lambda e: setattr(
-                self.last_propeller_setting, 'bhp_right_of_normal_propeller_curve', e.control.value)
+                self.propeller_setting, 'bhp_right_of_normal_propeller_curve', e.control.value)
         )
         self.line_color_of_normal_propeller_curve = ColorDialog(
-            on_change=lambda color: setattr(
-                self.last_propeller_setting, 'line_color_of_normal_propeller_curve', color)
+            color=self.propeller_setting.line_color_of_normal_propeller_curve,
+            on_change=lambda color: setattr(self.propeller_setting, 'line_color_of_normal_propeller_curve', color)
         )
-        self.line_color_of_normal_propeller_curve.set_color(
-            self.last_propeller_setting.line_color_of_normal_propeller_curve)
 
         self.normal_propeller_curve_card = CustomCard(
             self.page.session.get("lang.setting.normal_propeller_curve"),
@@ -103,88 +101,84 @@ class PropellerConf(ft.Container):
                 self.bhp_left_of_normal_propeller_curve,
                 self.rpm_right_of_normal_propeller_curve,
                 self.bhp_right_of_normal_propeller_curve,
-                self.line_color_of_normal_propeller_curve.create()
+                self.line_color_of_normal_propeller_curve
             ])
         )
 
     def __create_light_propeller_curve(self):
         self.light_propeller_curve = ft.TextField(
             suffix_text="[% below (1)]",
-            value=self.last_propeller_setting.value_of_light_propeller_curve,
+            value=self.propeller_setting.value_of_light_propeller_curve,
             on_change=lambda e: setattr(
-                self.last_propeller_setting,
+                self.propeller_setting,
                 'value_of_light_propeller_curve',
                 e.control.value
             )
         )
         self.line_color_of_light_propeller_curve = ColorDialog(
+            color=self.propeller_setting.line_color_of_light_propeller_curve,
             on_change=lambda color: setattr(
-                self.last_propeller_setting, 'line_color_of_light_propeller_curve', color)
-        )
-        self.line_color_of_light_propeller_curve.set_color(
-            self.last_propeller_setting.line_color_of_light_propeller_curve
+                self.propeller_setting, 'line_color_of_light_propeller_curve', color)
         )
 
         self.light_propeller_curve_card = CustomCard(
-            'Light Propeller Curve (2)',
+            self.page.session.get("lang.setting.light_propeller_curve"),
             ft.Column(controls=[self.light_propeller_curve,
-                      self.line_color_of_light_propeller_curve.create()])
+                      self.line_color_of_light_propeller_curve])
         )
 
     def __create_speed_limit_curve(self):
         self.speed_limit_curve = ft.TextField(
             suffix_text="[% MCR rpm]",
-            value=self.last_propeller_setting.value_of_speed_limit_curve,
+            value=self.propeller_setting.value_of_speed_limit_curve,
             on_change=lambda e: setattr(
-                self.last_propeller_setting,
+                self.propeller_setting,
                 'value_of_speed_limit_curve',
                 e.control.value
             )
         )
         self.line_color_of_speed_limit_curve = ColorDialog(
+            color=self.propeller_setting.line_color_of_speed_limit_curve,
             on_change=lambda color: setattr(
-                self.last_propeller_setting, 'line_color_of_speed_limit_curve', color)
+                self.propeller_setting, 'line_color_of_speed_limit_curve', color)
         )
-        self.line_color_of_speed_limit_curve.set_color(
-            self.last_propeller_setting.line_color_of_speed_limit_curve)
 
         self.speed_limit_curve_card = CustomCard(
-            'Speed Limit Curve (3)',
+            self.page.session.get("lang.setting.speed_limit_curve"),
             ft.Column(controls=[self.speed_limit_curve,
-                      self.line_color_of_speed_limit_curve.create()])
+                      self.line_color_of_speed_limit_curve])
         )
 
     def __create_torque_load_limit_curve(self):
         self.rpm_left_of_torque_load_limit_curve = ft.TextField(
             label=self.page.session.get("lang.setting.rpm_left"), suffix_text='[%]',
-            value=self.last_propeller_setting.rpm_left_of_torque_load_limit_curve,
+            value=self.propeller_setting.rpm_left_of_torque_load_limit_curve,
             on_change=lambda e: setattr(
-                self.last_propeller_setting, 'rpm_left_of_torque_load_limit_curve', e.control.value)
+                self.propeller_setting, 'rpm_left_of_torque_load_limit_curve', e.control.value)
         )
         self.bhp_left_of_torque_load_limit_curve = ft.TextField(
             label=self.page.session.get("lang.setting.power_left"), suffix_text='[%]',
-            value=self.last_propeller_setting.bhp_left_of_torque_load_limit_curve,
-            on_change=lambda e: setattr(self.last_propeller_setting, 'bhp_left_of_torque_load_limit_curve',
+            value=self.propeller_setting.bhp_left_of_torque_load_limit_curve,
+            on_change=lambda e: setattr(self.propeller_setting, 'bhp_left_of_torque_load_limit_curve',
                                         e.control.value)
         )
         self.rpm_right_of_torque_load_limit_curve = ft.TextField(
             label=self.page.session.get("lang.setting.rpm_right"), suffix_text='[%]',
-            value=self.last_propeller_setting.rpm_right_of_torque_load_limit_curve,
-            on_change=lambda e: setattr(self.last_propeller_setting, 'rpm_right_of_torque_load_limit_curve',
+            value=self.propeller_setting.rpm_right_of_torque_load_limit_curve,
+            on_change=lambda e: setattr(self.propeller_setting, 'rpm_right_of_torque_load_limit_curve',
                                         e.control.value)
         )
         self.bhp_right_of_torque_load_limit_curve = ft.TextField(
             label=self.page.session.get("lang.setting.power_right"), suffix_text='[%]',
-            value=self.last_propeller_setting.bhp_right_of_torque_load_limit_curve,
-            on_change=lambda e: setattr(self.last_propeller_setting, 'bhp_right_of_torque_load_limit_curve',
+            value=self.propeller_setting.bhp_right_of_torque_load_limit_curve,
+            on_change=lambda e: setattr(self.propeller_setting, 'bhp_right_of_torque_load_limit_curve',
                                         e.control.value)
         )
         self.line_color_of_torque_load_limit_curve = ColorDialog(
+            color=self.propeller_setting.line_color_of_torque_load_limit_curve,
             on_change=lambda color: setattr(
-                self.last_propeller_setting, 'line_color_of_torque_load_limit_curve', color)
+                self.propeller_setting, 'line_color_of_torque_load_limit_curve', color)
         )
-        self.line_color_of_torque_load_limit_curve.set_color(
-            self.last_propeller_setting.line_color_of_torque_load_limit_curve)
 
         self.torque_load_limit_curve_card = CustomCard(
             self.page.session.get("lang.setting.torque_load_limit_curve"),
@@ -193,31 +187,29 @@ class PropellerConf(ft.Container):
                 self.bhp_left_of_torque_load_limit_curve,
                 self.rpm_right_of_torque_load_limit_curve,
                 self.bhp_right_of_torque_load_limit_curve,
-                self.line_color_of_torque_load_limit_curve.create()
+                self.line_color_of_torque_load_limit_curve
             ])
         )
 
     def __create_overload_curve(self):
         self.overload_curve = ft.TextField(
             suffix_text="[% above (4)]", col={"md": 6},
-            value=self.last_propeller_setting.value_of_overload_curve,
+            value=self.propeller_setting.value_of_overload_curve,
             on_change=lambda e: setattr(
-                self.last_propeller_setting, 'value_of_overload_curve', e.control.value)
+                self.propeller_setting, 'value_of_overload_curve', e.control.value)
         )
 
         self.overload_alarm = ft.Switch(
-            label=self.page.session.get("lang.setting.overload_alarm"), label_position=ft.LabelPosition.LEFT, col={"md": 6},
-            value=self.last_propeller_setting.alarm_enabled_of_overload_curve,
+            label=self.page.session.get("lang.setting.enable_overload_alarm"), label_position=ft.LabelPosition.LEFT, col={"md": 6},
+            value=self.propeller_setting.alarm_enabled_of_overload_curve,
             on_change=lambda e: setattr(
-                self.last_propeller_setting, 'alarm_enabled_of_overload_curve', e.control.value)
+                self.propeller_setting, 'alarm_enabled_of_overload_curve', e.control.value)
         )
 
         self.line_color_of_overload_curve = ColorDialog(
-            on_change=lambda color: setattr(
-                self.last_propeller_setting, 'line_color_of_overload_curve', color)
+            color=self.propeller_setting.line_color_of_overload_curve,
+            on_change=lambda color: setattr(self.propeller_setting, 'line_color_of_overload_curve', color)
         )
-        self.line_color_of_overload_curve.set_color(
-            self.last_propeller_setting.line_color_of_overload_curve)
 
         self.overload_curve_card = CustomCard(
             self.page.session.get("lang.setting.overload_curve"),
@@ -225,56 +217,19 @@ class PropellerConf(ft.Container):
                 controls=[
                     self.overload_curve,
                     self.overload_alarm,
-                    self.line_color_of_overload_curve.create()
+                    self.line_color_of_overload_curve
                 ]
             ),
             col={"md": 6})
 
     def __save_data(self, e):
-        self.last_propeller_setting.save()
+        self.propeller_setting.save()
         Toast.show_success(e.page)
 
     def __reset_data(self, e):
-        self.last_propeller_setting = PropellerSetting.select().order_by(
-            PropellerSetting.id.desc()).first()
-
-        self.rpm_of_mcr_operating_point.value = self.last_propeller_setting.rpm_of_mcr_operating_point
-        shaft_power_value, shaft_power_unit = self.__get_shaft_power()
-        self.shaft_power_of_mcr_operating_point.value = shaft_power_value
-        self.shaft_power_of_mcr_operating_point.suffix_text = shaft_power_unit
-        self.mcr_operating_point_card.update()
-
-        self.rpm_left_of_normal_propeller_curve.value = self.last_propeller_setting.rpm_left_of_normal_propeller_curve
-        self.bhp_left_of_normal_propeller_curve.value = self.last_propeller_setting.bhp_left_of_normal_propeller_curve
-        self.rpm_right_of_normal_propeller_curve.value = self.last_propeller_setting.rpm_right_of_normal_propeller_curve
-        self.bhp_right_of_normal_propeller_curve.value = self.last_propeller_setting.bhp_right_of_normal_propeller_curve
-        self.line_color_of_normal_propeller_curve.set_color(
-            self.last_propeller_setting.line_color_of_normal_propeller_curve)
-        self.normal_propeller_curve_card.update()
-
-        self.rpm_left_of_torque_load_limit_curve.value = self.last_propeller_setting.rpm_left_of_torque_load_limit_curve
-        self.bhp_left_of_torque_load_limit_curve.value = self.last_propeller_setting.bhp_left_of_torque_load_limit_curve
-        self.rpm_right_of_torque_load_limit_curve.value = self.last_propeller_setting.rpm_right_of_torque_load_limit_curve
-        self.bhp_right_of_torque_load_limit_curve.value = self.last_propeller_setting.bhp_right_of_torque_load_limit_curve
-        self.line_color_of_torque_load_limit_curve.set_color(
-            self.last_propeller_setting.line_color_of_torque_load_limit_curve)
-        self.torque_load_limit_curve_card.update()
-
-        self.light_propeller_curve.value = self.last_propeller_setting.value_of_light_propeller_curve
-        self.line_color_of_light_propeller_curve.set_color(
-            self.last_propeller_setting.line_color_of_light_propeller_curve)
-        self.light_propeller_curve_card.update()
-
-        self.speed_limit_curve.value = self.last_propeller_setting.value_of_speed_limit_curve
-        self.line_color_of_speed_limit_curve.set_color(
-            self.last_propeller_setting.line_color_of_speed_limit_curve)
-        self.speed_limit_curve_card.update()
-
-        self.overload_curve.value = self.last_propeller_setting.value_of_overload_curve
-        self.line_color_of_overload_curve.set_color(
-            self.last_propeller_setting.line_color_of_overload_curve)
-        self.overload_alarm.value = self.last_propeller_setting.alarm_enabled_of_overload_curve
-        self.overload_curve_card.update()
+        self.propeller_setting = PropellerSetting.get()
+        self.content.clean()
+        self.build()
         Toast.show_success(e.page)
 
     def build(self):

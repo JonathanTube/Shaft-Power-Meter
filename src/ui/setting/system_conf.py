@@ -269,28 +269,8 @@ class SystemConf(ft.Container):
 
     def __reset_data(self, e):
         self.__load_data()
-
-        self.display_thrust.value = self.system_settings.display_thrust
-        self.sha_po_li.value = self.system_settings.sha_po_li
-        self.amount_of_propeller_radios.value = self.system_settings.amount_of_propeller
-        eexi_limited_power_value, eexi_limited_power_unit = self.__get_eexi_limited_power()
-        self.eexi_limited_power.value = eexi_limited_power_value
-        self.eexi_limited_power.suffix_text = eexi_limited_power_unit
-        self.settings_card.update()
-
-        self.ship_type.value = self.ship_info.ship_type
-        self.ship_name.value = self.ship_info.ship_name
-        self.imo_number.value = self.ship_info.imo_number
-        self.ship_size.value = self.ship_info.ship_size
-        self.ship_info_card.update()
-
-        self.shaft_outer_diameter.value = self.factor_conf.bearing_outer_diameter_D
-        self.shaft_inner_diameter.value = self.factor_conf.bearing_inner_diameter_d
-        self.sensitivity_factor_k.value = self.factor_conf.sensitivity_factor_k
-        self.elastic_modulus_E.value = self.factor_conf.elastic_modulus_E
-        self.poisson_ratio_mu.value = self.factor_conf.poisson_ratio_mu
-        self.factor_conf_card.update()
-
+        self.content.clean()
+        self.build()
         Toast.show_success(e.page)
 
     def __load_config(self):

@@ -129,7 +129,7 @@ async def main(page: ft.Page):
     # page.window.maximized = True
     page.window.resizable = False
     page.window.width = 1024
-    page.window.height = 600
+    page.window.height = 768
     page.window.alignment = ft.alignment.center
     # page.window.always_on_top = False
     # page.window.frameless = True

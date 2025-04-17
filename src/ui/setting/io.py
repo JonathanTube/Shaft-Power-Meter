@@ -294,41 +294,8 @@ class IO(ft.Container):
 
     def __reset_data(self, e):
         self.last_io_conf = IOConf.get()
-
-        self.plc_ip.value = self.last_io_conf.plc_ip
-        self.plc_port.value = self.last_io_conf.plc_port
-
-        self.check_torque.value = self.last_io_conf.output_torque
-        self.check_thrust.value = self.last_io_conf.output_thrust
-        self.check_power.value = self.last_io_conf.output_power
-        self.check_speed.value = self.last_io_conf.output_speed
-        self.check_avg_power.value = self.last_io_conf.output_avg_power
-        self.check_sum_power.value = self.last_io_conf.output_sum_power
-
-        self.speed_range_min.value = self.last_io_conf.speed_range_min
-        self.speed_range_max.value = self.last_io_conf.speed_range_max
-        self.speed_range_offset.value = self.last_io_conf.speed_range_offset
-
-        self.torque_range_min.value = self.last_io_conf.torque_range_min
-        self.torque_range_max.value = self.last_io_conf.torque_range_max
-        self.torque_range_offset.value = self.last_io_conf.torque_range_offset
-
-        self.thrust_range_min.value = self.last_io_conf.thrust_range_min
-        self.thrust_range_max.value = self.last_io_conf.thrust_range_max
-        self.thrust_range_offset.value = self.last_io_conf.thrust_range_offset
-
-        self.power_range_min.value = self.last_io_conf.power_range_min
-        self.power_range_max.value = self.last_io_conf.power_range_max
-        self.power_range_offset.value = self.last_io_conf.power_range_offset
-
-        self.gps_ip.value = self.last_io_conf.gps_ip
-        self.gps_port.value = self.last_io_conf.gps_port
-
-        self.modbus_ip.value = self.last_io_conf.modbus_ip
-        self.modbus_port.value = self.last_io_conf.modbus_port
-
-        self.update()
-
+        self.content.clean()
+        self.build()
         Toast.show_success(e.page)
 
     def __create_gps_conf(self):

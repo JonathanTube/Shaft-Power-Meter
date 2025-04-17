@@ -94,22 +94,27 @@ class DataInit:
                 bhp_left_of_normal_propeller_curve=50.0,
                 rpm_right_of_normal_propeller_curve=100,
                 bhp_right_of_normal_propeller_curve=100,
-                line_color_of_normal_propeller_curve="blue",
+                # hex blue color
+                line_color_of_normal_propeller_curve="#0000ff",
 
                 value_of_light_propeller_curve=5.0,
-                line_color_of_light_propeller_curve="blue",
+                # hex blue color
+                line_color_of_light_propeller_curve="#0000ff",
 
                 value_of_speed_limit_curve=105.0,
-                line_color_of_speed_limit_curve="red",
+                # hex red color
+                line_color_of_speed_limit_curve="#ff0000",
 
                 rpm_left_of_torque_load_limit_curve=70.9,
                 bhp_left_of_torque_load_limit_curve=51.9,
                 rpm_right_of_torque_load_limit_curve=97.0,
                 bhp_right_of_torque_load_limit_curve=97.5,
-                line_color_of_torque_load_limit_curve="green",
+                # hex green color
+                line_color_of_torque_load_limit_curve="#00ff00",
 
                 value_of_overload_curve=5.0,
-                line_color_of_overload_curve="red",
+                # hex red color
+                line_color_of_overload_curve="#ff0000",
 
                 alarm_enabled_of_overload_curve=False
             )
@@ -849,8 +854,8 @@ class DataInit:
 
                 {
                     "code": "lang.setting.normal_propeller_curve",
-                    "chinese": "正常螺旋桨曲线",
-                    "english": "Normal Propeller Curve"
+                    "chinese": "正常螺旋桨曲线 (1)",
+                    "english": "Normal Propeller Curve (1)"
                 },
 
                 {
@@ -879,26 +884,26 @@ class DataInit:
 
                 {
                     "code": "lang.setting.light_propeller_curve",
-                    "chinese": "轻载螺旋桨曲线",
-                    "english": "Light Propeller Curve"
+                    "chinese": "轻载螺旋桨曲线 (2)",
+                    "english": "Light Propeller Curve (2)"
                 },
 
                 {
                     "code": "lang.setting.torque_load_limit_curve",
-                    "chinese": "扭矩负载限制曲线",
-                    "english": "Torque Load Limit Curve"
+                    "chinese": "扭矩负载限制曲线 (4)",
+                    "english": "Torque Load Limit Curve (4)"
                 },
 
                 {
                     "code": "lang.setting.overload_curve",
-                    "chinese": "过载曲线",
-                    "english": "Overload Curve"
+                    "chinese": "过载曲线 (5)",
+                    "english": "Overload Curve (5)"
                 },
 
                 {
                     "code": "lang.setting.speed_limit_curve",
-                    "chinese": "速度限制曲线",
-                    "english": "Speed Limit Curve"
+                    "chinese": "速度限制曲线 (3)",
+                    "english": "Speed Limit Curve (3)"
                 },
 
                 {
