@@ -109,7 +109,7 @@ def check_single_instance(mutex_name: str = "shaft-power-meter"):
 
     # 如果检测到已有实例，退出程序
     if last_error == 183:  # ERROR_ALREADY_EXISTS
-        ctypes.windll.user32.MessageBoxW(0, "程序已在运行中！", "提示", 0x40)
+        ctypes.windll.user32.MessageBoxW(0, "The Software is already running!", "Notice", 0x40)
         sys.exit(0)
 
 async def main(page: ft.Page):

@@ -6,20 +6,17 @@ import flet as ft
 class Toast:
     @staticmethod
     def show_success(page: ft.Page, message: str = None):
-        msg = message if message is not None else page.session.get(
-            "lang.toast.success")
+        msg = message if message is not None else page.session.get("lang.toast.success")
         Toast.show_toast(page, msg, ft.Colors.GREEN_500, ft.Colors.WHITE)
 
     @staticmethod
     def show_warning(page: ft.Page, message: str = None):
-        msg = message if message is not None else page.session.get(
-            "lang.toast.warning")
+        msg = message if message is not None else page.session.get("lang.toast.warning")
         Toast.show_toast(page, msg, ft.Colors.ORANGE_500, ft.Colors.WHITE)
 
     @staticmethod
     def show_error(page: ft.Page, message: str = None):
-        msg = message if message is not None else page.session.get(
-            "lang.toast.error")
+        msg = message if message is not None else page.session.get("lang.toast.error")
         Toast.show_toast(page, msg, ft.Colors.RED_500, ft.Colors.WHITE)
 
     @staticmethod

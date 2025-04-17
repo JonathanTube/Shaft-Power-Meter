@@ -244,9 +244,9 @@ class SystemConf(ft.Container):
         self.factor_conf.save()
 
         dlg = ft.AlertDialog(
-            title=ft.Text("Success"),
-            content=ft.Text("Data saved successfully"),
-            actions=[ft.TextButton("OK", on_click=self.on_restart_app)]
+            title=ft.Text(self.page.session.get("lang.setting.test_mode.please_confirm")),    
+            content=ft.Text(self.page.session.get("lang.setting.test_mode.system_restart_after_change")),
+            actions=[ft.TextButton(self.page.session.get("lang.button.confirm"), on_click=self.on_restart_app)]
         )
         self.page.open(dlg)
 

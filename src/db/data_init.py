@@ -212,6 +212,12 @@ class DataInit:
                 },
 
                 {
+                    "code": "lang.button.confirm",
+                    "chinese": "确认",
+                    "english": "Confirm"
+                },
+
+                {
                     "code": "lang.common.operation",
                     "chinese": "操作",
                     "english": "Operation"
@@ -270,6 +276,7 @@ class DataInit:
                     "chinese": "总计",
                     "english": "Total"
                 },
+
                 {
                     "code": "lang.common.limited_power",
                     "chinese": "限制功率",
@@ -384,6 +391,7 @@ class DataInit:
                     "chinese": "导出",
                     "english": "Export"
                 },
+                
 
                 {
                     "code": "lang.header.home",
@@ -467,6 +475,28 @@ class DataInit:
                     "english": "Zero Cal."
                 },
 
+                {
+                    "code": "lang.setting.zero_cal.submitted",
+                    "chinese": "已提交",
+                    "english": "Submitted"
+                },
+
+                {
+                    "code": "lang.setting.zero_cal.started",
+                    "chinese": "已开始",
+                    "english": "Started"
+                },
+
+                {
+                    "code": "lang.setting.zero_cal.aborted",
+                    "chinese": "已中止",
+                    "english": "Aborted"
+                },
+                {
+                    "code": "lang.setting.zero_cal.accepted",
+                    "chinese": "已接受",
+                    "english": "Accepted"
+                },
                 {
                     "code": "lang.setting.io_conf.title",
                     "chinese": "IO 配置",
@@ -580,6 +610,18 @@ class DataInit:
                     "code": "lang.setting.test_mode.data_generation_interval",
                     "chinese": "数据生成间隔",
                     "english": "Data Generation Interval"
+                },
+
+                {
+                    "code": "lang.setting.test_mode.please_confirm",
+                    "chinese": "请确认",
+                    "english": "Please Confirm"
+                },
+
+                {
+                    "code": "lang.setting.test_mode.system_restart_after_change",
+                    "chinese": "修改系统配置后,软件需要重启才能生效",        
+                    "english": "This software need to be restarted after you changed the system settings."
                 },
 
                 {
@@ -871,6 +913,12 @@ class DataInit:
                     "english": "PLC Conf."
                 },
 
+                {
+                    "code": "lang.setting.save_limitations_to_plc_failed",
+                    "chinese": "保存上下限到PLC失败",
+                    "english": "Save Limitations to PLC Failed"
+                },
+
 
                 {
                     "code": "lang.setting.check_plc_connection",
@@ -1017,6 +1065,12 @@ class DataInit:
                     "code": "lang.report.report_name",
                     "chinese": "报告名称",
                     "english": "Report Name"
+                },
+
+                {
+                    "code": "lang.report.export_success",
+                    "chinese": "导出成功",
+                    "english": "Export Success"
                 },
                 {
                     "code": "lang.counter.interval",

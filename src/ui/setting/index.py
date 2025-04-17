@@ -38,6 +38,7 @@ class Setting(ft.Container):
     def build(self):
         self.right_content = ft.Container(
             expand=True,
+            alignment=ft.alignment.top_left,
             padding=10,
             content=SystemConf()
         )

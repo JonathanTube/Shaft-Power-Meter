@@ -51,7 +51,7 @@ class ZeroCalHis:
         self.__load_data()
         self.table.rows = self.table_rows
         self.table.update()
-        Toast.show_success(e.page, message="Submitted")
+        Toast.show_success(e.page, self.page.session.get("lang.setting.zero_cal.submitted"))
 
     def __create_search_card(self):
         self.start_date = ft.TextField(

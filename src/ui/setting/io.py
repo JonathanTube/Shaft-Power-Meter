@@ -16,22 +16,6 @@ class IO(ft.Container):
         self.reg_digital = r'^(\d+\.?\d*|)$'  # 允许整数、小数或空字符串
         self.last_io_conf = IOConf.get()
 
-    # def check_ip_port(self, ip: str, port: int, timeout: float = 2.0):
-    #     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    #     sock.settimeout(timeout)
-    #     try:
-    #         result = sock.connect_ex((ip, port))
-    #         if result == 0:
-    #             Toast.show_success(self.page, "连接成功")
-    #         else:
-    #             Toast.show_error(self.page, "连接失败")
-    #     except socket.timeout:
-    #         Toast.show_error(self.page, "连接超时")
-    #     except socket.error as e:
-    #         Toast.show_error(self.page, "连接错误")
-    #     finally:
-    #         sock.close()
-
     def __create_plc_conf(self):
         self.plc_ip = ft.TextField(
             label="IP", value=self.last_io_conf.plc_ip, col={'md': 4},
@@ -53,15 +37,6 @@ class IO(ft.Container):
             on_change=lambda e: setattr(
                 self.last_io_conf, 'plc_port', e.control.value)
         )
-
-        # self.plc_conn_check = ft.OutlinedButton(
-        #     text="Check PLC Connection",
-        #     expand=False,
-        #     height=40,
-        #     col={'md': 4},
-        #     on_click=lambda e: self.check_ip_port(
-        #         self.last_io_conf.plc_ip, self.last_io_conf.plc_port)
-        # )
 
         self.power_range_min = ft.TextField(
             label="4-20MA Power Min",
@@ -311,7 +286,7 @@ class IO(ft.Container):
             plc_client.write_register(12330, int(self.last_io_conf.speed_range_offset))
             Toast.show_success(e.page)
         except Exception as err:
-            Toast.show_error(e.page, "save limitation to PLC failed")
+            Toast.show_error(e.page, "lang.setting.save_limitations_to_plc_failed")
             print(err)
         finally:
             if plc_client:

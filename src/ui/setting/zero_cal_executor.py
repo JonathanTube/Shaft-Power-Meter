@@ -174,7 +174,7 @@ class ZeroCalExecutor:
     def __on_start(self, e):
         ZeroCalInfo.create(utc_date_time=datetime.now(), state=0)
         self.__load_data()
-        Toast.show_success(e.page, message="zero cal. started")
+        Toast.show_success(e.page, message="lang.setting.zero_cal.started")
         # 控制Tips过程label显示
         self.state_info.visible = True
         self.state_info.update()
@@ -235,7 +235,7 @@ class ZeroCalExecutor:
         print(query.sql())
 
         self.__reset_to_start()
-        Toast.show_success(e.page, message="zero cal. accepted")
+        Toast.show_success(e.page, message="lang.setting.zero_cal.accepted")
 
     def __on_abort(self, e):
         query = ZeroCalInfo.update(state=2).where(ZeroCalInfo.id == self.latest_zero_cal.id)
@@ -243,7 +243,7 @@ class ZeroCalExecutor:
         print(query.sql())
 
         self.__reset_to_start()
-        Toast.show_success(e.page, message="zero cal. aborted")
+        Toast.show_success(e.page, message="lang.setting.zero_cal.aborted")
 
     def __on_stimulate(self, e):
         # 如果主记录为空，说明还没开始，跳过
@@ -298,7 +298,7 @@ class ZeroCalExecutor:
         self.pie_chart_gray.value -= 10
         self.pie_chart_gray.update()
 
-        Toast.show_success(e.page, message="fake data has been recorded")
+        Toast.show_success(e.page)
 
     def create(self):
         if self.latest_zero_cal is None:

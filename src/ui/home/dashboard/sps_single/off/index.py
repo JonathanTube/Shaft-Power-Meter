@@ -66,7 +66,6 @@ class SingleShaPoLiOff(ft.Stack):
         self.single_meters.set_torque_limit(
             self.torque_max, self.torque_warning)
         self.single_meters.set_speed_limit(self.speed_max, self.speed_warning)
-        self.set_language()
         self._task = self.page.run_task(self.__load_data)
 
     def will_unmount(self):
@@ -75,10 +74,10 @@ class SingleShaPoLiOff(ft.Stack):
 
     async def __load_data(self):
         while True:
-            speed = self.__get_session('sps1_instant_speed')
-            power = self.__get_session('sps1_instant_power')
-            torque = self.__get_session('sps1_instant_torque')
-            thrust = self.__get_session('sps1_instant_thrust')
+            speed = self.page.session.get('sps1_instant_speed')
+            power = self.page.session.get('sps1_instant_power')
+            torque = self.page.session.get('sps1_instant_torque')
+            thrust = self.page.session.get('sps1_instant_thrust')
             system_unit = self.system_unit
             display_thrust = self.display_thrust
 

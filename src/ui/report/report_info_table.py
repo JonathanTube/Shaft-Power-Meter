@@ -76,7 +76,7 @@ class ReportInfoTable(AbstractTable):
     def __on_result(self, e: ft.FilePickerResultEvent, id: int):
         if e.path:
             ReportInfoExporter().generate_pdf(e.path, id)
-            Toast.show_success(e.page, "export success")
+            Toast.show_success(e.page, self.page.session.get("lang.report.export_success"))
 
     def create_columns(self):
         return self.__get_language()
