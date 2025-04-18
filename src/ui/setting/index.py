@@ -1,6 +1,5 @@
 import flet as ft
 
-from ui.setting.authority import create_authority
 from ui.setting.general import General
 from ui.setting.io import IO
 from ui.setting.propeller_conf import PropellerConf
@@ -9,6 +8,9 @@ from ui.setting.test_mode import TestMode
 from ui.setting.zero_cal import ZeroCal
 from ui.setting.self_test import SelfTest
 from task.test_mode_task import TestModeTask
+from ui.setting.permission.index import Permission
+
+
 class Setting(ft.Container):
     def __init__(self, test_mode_task: TestModeTask):
         super().__init__()
@@ -29,7 +31,7 @@ class Setting(ft.Container):
         elif idx == 5:
             self.right_content.content = SelfTest()
         elif idx == 6:
-            self.right_content.content = create_authority()
+            self.right_content.content = Permission()
         elif idx == 7:
             self.right_content.content = TestMode(self.test_mode_task)
 

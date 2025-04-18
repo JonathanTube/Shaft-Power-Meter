@@ -5,6 +5,7 @@ from db.models.propeller_setting import PropellerSetting
 from db.models.system_settings import SystemSettings
 from ui.home.propeller_curve.propeller_curve_chart import PropellerCurveChart
 from ui.home.propeller_curve.propeller_curve_legend import PropellerCurveLegend
+from common.global_data import gdata
 
 
 class PropellerCurve(ft.Container):
@@ -33,7 +34,7 @@ class PropellerCurve(ft.Container):
 
     def __load_config(self):
         self.propeller_setting = PropellerSetting.get()
-        self.system_setting = SystemSettings.get() 
+        self.system_setting = SystemSettings.get()
 
     async def __load_data(self):
         if self.propeller_setting.shaft_power_of_mcr_operating_point == 0:
@@ -42,8 +43,8 @@ class PropellerCurve(ft.Container):
             return
 
         while True:
-            sps1_instant_power = self.page.session.get('sps1_instant_power')
-            sps1_instant_speed = self.page.session.get('sps1_instant_speed')
+            sps1_instant_power = gdata.sps1_power
+            sps1_instant_speed = gdata.sps1_speed
 
             sps1_speed = (
                 sps1_instant_speed / self.propeller_setting.rpm_of_mcr_operating_point
@@ -59,14 +60,14 @@ class PropellerCurve(ft.Container):
 
             self.chart.update_dynamic_data_sps1(sps1_speed, sps1_power)
 
-
             if self.system_setting.amount_of_propeller == 2:
-                sps2_instant_power = self.page.session.get('sps2_instant_power')
-                sps2_instant_speed = self.page.session.get('sps2_instant_speed')
+                sps2_speed = (
+                    gdata.sps2_speed / self.propeller_setting.rpm_of_mcr_operating_point
+                ) * 100
 
-                sps2_speed = (sps2_instant_speed /self.propeller_setting.rpm_of_mcr_operating_point) * 100
-
-                sps2_power = (sps2_instant_power /self.propeller_setting.shaft_power_of_mcr_operating_point) * 100
+                sps2_power = (
+                    gdata.sps2_power / self.propeller_setting.shaft_power_of_mcr_operating_point
+                ) * 100
 
                 self.chart.update_dynamic_data_sps2(sps2_speed, sps2_power)
 

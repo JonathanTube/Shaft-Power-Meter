@@ -2,6 +2,7 @@ import flet as ft
 import asyncio
 from ui.common.meter_half import MeterHalf
 from db.models.system_settings import SystemSettings
+from common.global_data import gdata
 
 
 class EEXILimitedPower(ft.Container):
@@ -21,9 +22,12 @@ class EEXILimitedPower(ft.Container):
     def build(self):
         meter_radius = self.container_width * 0.4
         self.meter_half = MeterHalf(radius=meter_radius)
-        self.title = ft.Text(f"{self.page.session.get('lang.common.eexi_limited_power')}(%)", size=16, weight=ft.FontWeight.W_600)
-        self.unlimited_mode = ft.Text(f"{self.page.session.get('lang.common.power_unlimited_mode')}:", weight=ft.FontWeight.W_400)
-        self.unlimited_mode_icon = ft.Icon(ft.icons.INFO_OUTLINED, color=ft.Colors.GREEN, size=18)
+        self.title = ft.Text(
+            f"{self.page.session.get('lang.common.eexi_limited_power')}(%)", size=16, weight=ft.FontWeight.W_600)
+        self.unlimited_mode = ft.Text(
+            f"{self.page.session.get('lang.common.power_unlimited_mode')}:", weight=ft.FontWeight.W_400)
+        self.unlimited_mode_icon = ft.Icon(
+            ft.icons.INFO_OUTLINED, color=ft.Colors.GREEN, size=18)
 
         self.unlimited_mode_row = ft.Row(
             vertical_alignment=ft.CrossAxisAlignment.CENTER,
@@ -67,8 +71,8 @@ class EEXILimitedPower(ft.Container):
 
     async def __update_mode(self):
         while True:
-            sps1_instant_power = self.page.session.get("sps1_instant_power")
-            sps2_instant_power = self.page.session.get("sps2_instant_power")
+            sps1_instant_power = gdata.sps1_power
+            sps2_instant_power = gdata.sps2_power
             instant_power = sps1_instant_power + sps2_instant_power
 
             # print(f"instant_power: {instant_power}")
@@ -89,7 +93,7 @@ class EEXILimitedPower(ft.Container):
             self.unlimited_mode_icon.update()
             self.unlimited_mode.update()
             await asyncio.sleep(1)
-            
+
     def will_unmount(self):
         if self._task:
             self._task.cancel()

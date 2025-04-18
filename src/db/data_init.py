@@ -11,6 +11,7 @@ from db.models.preference import Preference
 from db.models.date_time_conf import DateTimeConf
 from db.models.limitations import Limitations
 from db.models.test_mode_conf import TestModeConf
+from db.models.user import User
 
 
 class DataInit:
@@ -27,6 +28,7 @@ class DataInit:
         DataInit.__init_date_time_conf()
         DataInit.__init_limitations()
         DataInit.__init_test_mode_conf()
+        DataInit.__init_user()
 
     def __init_limitations():
         if Limitations.select().count() == 0:
@@ -152,7 +154,13 @@ class DataInit:
                 max_revolution=2000,
                 time_interval=1
             )
-
+    def __init_user():
+        if User.select().count() == 0:
+            User.create(
+                user_name="admin",
+                user_pwd="123456",
+                user_role="admin"
+            )
     def __init_language():
         if Language.select().count() == 0:
             Language.insert_many([
@@ -220,6 +228,16 @@ class DataInit:
                     "code": "lang.button.confirm",
                     "chinese": "确认",
                     "english": "Confirm"
+                },
+                {
+                    "code": "lang.button.edit",
+                    "chinese": "编辑",
+                    "english": "Edit"
+                },
+                {
+                    "code": "lang.button.delete",
+                    "chinese": "删除",
+                    "english": "Delete"
                 },
                 {
                     "code": "lang.common.app_name",
@@ -1281,5 +1299,25 @@ class DataInit:
                     "code": "lang.alarm.unknown",
                     "chinese": "未知",
                     "english": "Unknown"
+                },
+                {
+                    "code": "lang.permission.user_name",
+                    "chinese": "用户名",
+                    "english": "User Name"
+                },
+                {
+                    "code": "lang.permission.user_pwd",
+                    "chinese": "密码",
+                    "english": "Password"
+                },
+                {
+                    "code": "lang.permission.user_role",
+                    "chinese": "角色",
+                    "english": "Role"
+                },
+                {
+                    "code": "lang.permission.edit_user",
+                    "chinese": "编辑用户",
+                    "english": "Edit User"
                 }
             ]).execute()

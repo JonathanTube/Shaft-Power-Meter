@@ -8,6 +8,9 @@ from ui.report.report_info_exporter import ReportInfoExporter
 
 
 class ReportInfoTable(AbstractTable):
+    def __init__(self, page_size: int = 10):
+        super().__init__(page_size)
+        self.width = 1000
 
     def load_total(self):
         start_date = self.kwargs.get('start_date')

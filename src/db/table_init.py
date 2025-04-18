@@ -17,6 +17,7 @@ from db.models.zero_cal_record import ZeroCalRecord
 from db.models.language import Language
 from db.models.alarm_log import AlarmLog
 from db.models.test_mode_conf import TestModeConf
+from db.models.user import User
 from db.base import db
 
 class TableInit:
@@ -45,5 +46,6 @@ class TableInit:
             ZeroCalRecord,
             Language,
             AlarmLog,
-            TestModeConf
+            TestModeConf,
+            User
         ], safe=True)

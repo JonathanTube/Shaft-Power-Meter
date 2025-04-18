@@ -5,12 +5,13 @@ from ui.common.pagination import Pagination
 
 
 class AbstractTable(ft.Container):
-    def __init__(self, page_size: int):
+    def __init__(self, page_size: int = 10, table_width: int = None):
         super().__init__()
         self.expand = True
         self.margin = 0
         self.current_page = 1
         self.page_size = page_size
+        self.table_width = table_width
 
         self.kwargs = {}  # 其他传入的参数
 
@@ -22,7 +23,7 @@ class AbstractTable(ft.Container):
         self.__create_table_rows()
 
     def build(self):
-        self.default_width = self.page.window.width - 35
+        self.default_width = self.page.window.width - 35 if self.table_width is None else self.table_width
         self.__create_table()
 
         col = ft.Column(

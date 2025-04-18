@@ -3,21 +3,12 @@ import flet as ft
 from db.models.data_log import DataLog
 from utils.formula_cal import FormulaCalculator
 from task.utc_timer_task import utc_timer
+from common.global_data import gdata
+
 
 class DataSaveTask:
     def __init__(self, page: ft.Page):
         self.page = page
-        self.__set_session('sps1_instant_power', 0)
-        self.__set_session('sps1_instant_speed', 0)
-        self.__set_session('sps1_instant_thrust', 0)
-        self.__set_session('sps1_instant_torque', 0)
-        self.__set_session('sps1_instant_rounds', 0)
-
-        self.__set_session('sps2_instant_power', 0)
-        self.__set_session('sps2_instant_speed', 0)
-        self.__set_session('sps2_instant_thrust', 0)
-        self.__set_session('sps2_instant_torque', 0)
-        self.__set_session('sps2_instant_rounds', 0)
 
     async def start(self):
         while True:
@@ -26,14 +17,22 @@ class DataSaveTask:
 
     async def save_data(self, name: str):
         utc_date_time = utc_timer.get_utc_date_time()
-        speed = self.__get_session(f'{name}_instant_speed')
+        if name == 'sps1':
+            speed = gdata.sps1_speed
+            thrust = gdata.sps1_thrust
+            torque = gdata.sps1_torque
+            rounds = gdata.sps1_rounds
+            power = FormulaCalculator.calculate_instant_power(torque, speed)
+            gdata.sps1_power = power
+        else:
+            speed = gdata.sps2_speed
+            thrust = gdata.sps2_thrust
+            torque = gdata.sps2_torque
+            rounds = gdata.sps2_rounds
+            power = FormulaCalculator.calculate_instant_power(torque, speed)
+            gdata.sps2_power = power
 
-        thrust = self.__get_session(f'{name}_instant_thrust')
-        torque = self.__get_session(f'{name}_instant_torque')
-        rounds = self.__get_session(f'{name}_instant_rounds')
 
-        power = FormulaCalculator.calculate_instant_power(torque, speed)
-        self.__set_session(f'{name}_instant_power', power)
 
         try:
             DataLog.create(
@@ -47,9 +46,3 @@ class DataSaveTask:
             )
         except Exception as e:
             print(f"Error generating data: {e}")
-
-    def __get_session(self, key: str):
-        return self.page.session.get(key)
-
-    def __set_session(self, key: str, value: any):
-        self.page.session.set(key, value)

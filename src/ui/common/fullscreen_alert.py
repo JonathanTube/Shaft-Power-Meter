@@ -6,6 +6,7 @@ class FullscreenAlert(ft.Container):
     def __init__(self):
         super().__init__()
         self.expand = True
+        self.visible = False
         self.task = None
 
     def build_blur_border(self):

@@ -51,8 +51,8 @@ class ModbusReadTask:
         except Exception as e:
             self.__send_msg(f"Error getting data: {e}")
         finally:
-            self.__set_session('sps1_instant_thrust', thrust)
-            self.__set_session('sps1_instant_torque', torque)
+            gdata.sps1_thrust = thrust
+            gdata.sps1_torque = torque
 
     async def __connect(self):
         try:

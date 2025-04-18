@@ -7,6 +7,7 @@ from ui.home.dashboard.sps_single.off.single_meters import SingleMeters
 from ui.home.dashboard.chart.single_power_line import SinglePowerLine
 from ui.home.dashboard.thrust.thrust_power import ThrustPower
 from db.models.system_settings import SystemSettings
+from common.global_data import gdata
 
 
 class SingleShaPoLiOff(ft.Stack):
@@ -46,7 +47,8 @@ class SingleShaPoLiOff(ft.Stack):
 
         self.single_meters = SingleMeters()
 
-        self.power_line_chart = SinglePowerLine(name=self.page.session.get("lang.common.power"), max_y=self.power_max, unit=self.system_unit)
+        self.power_line_chart = SinglePowerLine(name=self.page.session.get(
+            "lang.common.power"), max_y=self.power_max, unit=self.system_unit)
 
         self.controls = [
             self.thrust_power,
@@ -74,10 +76,11 @@ class SingleShaPoLiOff(ft.Stack):
 
     async def __load_data(self):
         while True:
-            speed = self.page.session.get('sps1_instant_speed')
-            power = self.page.session.get('sps1_instant_power')
-            torque = self.page.session.get('sps1_instant_torque')
-            thrust = self.page.session.get('sps1_instant_thrust')
+            speed = gdata.sps1_speed
+            power = gdata.sps1_power
+            torque = gdata.sps1_torque
+            thrust = gdata.sps1_thrust
+
             system_unit = self.system_unit
             display_thrust = self.display_thrust
 

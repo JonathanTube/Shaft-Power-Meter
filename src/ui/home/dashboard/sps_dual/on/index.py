@@ -2,13 +2,13 @@ import asyncio
 import flet as ft
 
 from ui.home.dashboard.sps_dual.on.dual_instant_grid import DualInstantGrid
-from db.models.data_log import DataLog
 from ui.home.dashboard.eexi.eexi_limited_power import EEXILimitedPower
+from db.models.data_log import DataLog
 from db.models.propeller_setting import PropellerSetting
 from db.models.system_settings import SystemSettings
 from ui.home.dashboard.chart.single_power_line import SinglePowerLine
 from db.models.preference import Preference
-
+from common.global_data import gdata
 
 class DualShaPoLiOn(ft.Container):
     def __init__(self):
@@ -60,17 +60,17 @@ class DualShaPoLiOn(ft.Container):
 
     async def __load_data(self):
         while True:
-            sps1_power = self.__get_session('sps1_instant_power')
-            sps2_power = self.__get_session('sps2_instant_power')
+            sps1_power = gdata.sps1_power
+            sps2_power = gdata.sps2_power
 
-            sps1_speed = self.__get_session('sps1_instant_speed')
-            sps2_speed = self.__get_session('sps2_instant_speed')
+            sps1_speed = gdata.sps1_speed
+            sps2_speed = gdata.sps2_speed
 
-            sps1_torque = self.__get_session('sps1_instant_torque')
-            sps2_torque = self.__get_session('sps2_instant_torque')
+            sps1_torque = gdata.sps1_torque
+            sps2_torque = gdata.sps2_torque
 
-            sps1_thrust = self.__get_session('sps1_instant_thrust')
-            sps2_thrust = self.__get_session('sps2_instant_thrust')
+            sps1_thrust = gdata.sps1_thrust
+            sps2_thrust = gdata.sps2_thrust
 
             unit = self.system_unit
 

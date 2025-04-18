@@ -10,6 +10,7 @@ from db.models.test_mode_conf import TestModeConf
 from task.test_mode_task import TestModeTask
 from ui.common.custom_card import CustomCard
 from ui.common.toast import Toast
+from common.global_data import gdata
 
 
 class TestMode(ft.Container):
@@ -148,8 +149,7 @@ class TestMode(ft.Container):
 
         self.time_interval = ft.TextField(
             col={"sm": 12, "md": 6},
-            label=self.page.session.get(
-                'lang.setting.test_mode.data_generation_interval'),
+            label=self.page.session.get('lang.setting.test_mode.data_generation_interval'),
             suffix_text="seconds",
             on_click=lambda e: os.system('osk'),
             value=self.test_mode_conf.time_interval
@@ -370,27 +370,23 @@ class TestMode(ft.Container):
         system_unit = self.preference.system_unit
         while True:
             if self.running:
-                sps1_torque = self.page.session.get('sps1_instant_torque')
-                sps1_speed = self.page.session.get('sps1_instant_speed')
-                sps1_thrust = self.page.session.get('sps1_instant_thrust')
-                sps1_revolution = self.page.session.get(
-                    'sps1_instant_revolution')
-                sps1_torque_value, sps1_torque_unit = UnitParser.parse_torque(
-                    sps1_torque, system_unit)
+                sps1_torque = gdata.sps1_torque
+                sps1_speed = gdata.sps1_speed
+                sps1_thrust = gdata.sps1_thrust
+                sps1_revolution = gdata.sps1_rounds
+                sps1_torque_value, sps1_torque_unit = UnitParser.parse_torque(sps1_torque, system_unit)
                 self.sps1_instant_data_card.controls[1].value = f'{sps1_torque_value} {sps1_torque_unit}'
                 self.sps1_instant_data_card.controls[3].value = f'{sps1_speed} rpm'
-                sps1_thrust_value, sps1_thrust_unit = UnitParser.parse_thrust(
-                    sps1_thrust, system_unit)
+                sps1_thrust_value, sps1_thrust_unit = UnitParser.parse_thrust(sps1_thrust, system_unit)
                 self.sps1_instant_data_card.controls[5].value = f'{sps1_thrust_value} {sps1_thrust_unit}'
                 self.sps1_instant_data_card.controls[7].value = sps1_revolution
                 self.sps1_instant_data_card.update()
 
                 if self.system_settings.amount_of_propeller == 2:
-                    sps2_torque = self.page.session.get('sps2_instant_torque')
-                    sps2_speed = self.page.session.get('sps2_instant_speed')
-                    sps2_thrust = self.page.session.get('sps2_instant_thrust')
-                    sps2_revolution = self.page.session.get(
-                        'sps2_instant_revolution')
+                    sps2_torque = gdata.sps2_torque
+                    sps2_speed = gdata.sps2_speed
+                    sps2_thrust = gdata.sps2_thrust
+                    sps2_revolution = gdata.sps2_rounds
                     sps2_torque_value, sps2_torque_unit = UnitParser.parse_torque(
                         sps2_torque, system_unit)
                     self.sps2_instant_data_card.controls[

@@ -6,7 +6,7 @@ from db.models.data_log import DataLog
 from db.models.limitations import Limitations
 from db.models.system_settings import SystemSettings
 from ui.home.dashboard.chart.dual_power_line import DualPowerLine
-
+from common.global_data import gdata
 
 class DualShaPoLiOff(ft.Container):
     def __init__(self):
@@ -78,10 +78,11 @@ class DualShaPoLiOff(ft.Container):
 
     async def __load_data(self):
         while True:
-            sps1_power = self.__get_session('sps1_instant_power')
-            sps1_torque = self.__get_session('sps1_instant_torque')
-            sps1_speed = self.__get_session('sps1_instant_speed')
-            sps1_thrust = self.__get_session('sps1_instant_thrust')
+            sps1_speed = gdata.sps1_speed
+            sps1_power = gdata.sps1_power
+            sps1_torque = gdata.sps1_torque
+            sps1_thrust = gdata.sps1_thrust
+           
             unit = self.system_unit
             display_thrust = self.display_thrust
 
@@ -90,10 +91,10 @@ class DualShaPoLiOff(ft.Container):
             self.sps1_meters.set_speed(sps1_speed)
             self.sps1_meters.set_thrust(display_thrust, sps1_thrust, unit)
 
-            sps2_power = self.__get_session('sps2_instant_power')
-            sps2_torque = self.__get_session('sps2_instant_torque')
-            sps2_speed = self.__get_session('sps2_instant_speed')
-            sps2_thrust = self.__get_session('sps2_instant_thrust')
+            sps2_speed = gdata.sps1_speed
+            sps2_power = gdata.sps1_power
+            sps2_torque = gdata.sps1_torque
+            sps2_thrust = gdata.sps1_thrust
 
             self.sps2_meters.set_power(sps2_power, unit)
             self.sps2_meters.set_torque(sps2_torque, unit)

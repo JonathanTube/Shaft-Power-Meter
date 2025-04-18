@@ -5,6 +5,11 @@ from db.models.data_log import DataLog
 from db.models.system_settings import SystemSettings
 from utils.formula_cal import FormulaCalculator
 from task.utc_timer_task import utc_timer
+from common.global_data import gdata
+from db.models.alarm_log import AlarmLog
+from db.models.event_log import EventLog
+from db.models.report_info import ReportInfo
+
 
 class TestModeTask:
     def __init__(self, page):
@@ -48,11 +53,28 @@ class TestModeTask:
     def stop(self):
         try:
             DataLog.truncate_table()
+            AlarmLog.truncate_table()
+            EventLog.truncate_table()
+            ReportInfo.truncate_table()
+            gdata.sps1_speed = 0
+            gdata.sps1_power = 0
+            gdata.sps1_torque = 0
+            gdata.sps1_thrust = 0
+            gdata.sps1_rounds = 0
+
+            gdata.sps2_speed = 0
+            gdata.sps2_power = 0
+            gdata.sps2_torque = 0
+            gdata.sps2_thrust = 0
+            gdata.sps2_rounds = 0
+
+            gdata.breach_eexi_occured = False
+            gdata.alarm_occured = False
+            gdata.power_overload_occured = False
         except Exception as e:
             print(f'Error truncating DataLog table: {e}')
         self.is_running = False
-    
-        
+
     async def generate_random_data(self):
         print(f'self.is_running={self.is_running}')
         while self.is_running:
@@ -67,11 +89,13 @@ class TestModeTask:
         instant_torque = int(random.uniform(self.min_torque, self.max_torque))
         instant_speed = int(random.uniform(self.min_speed, self.max_speed))
         instant_thrust = int(random.uniform(self.min_thrust, self.max_thrust))
-        instant_revolution = int(random.uniform(self.min_revolution, self.max_revolution))
+        instant_revolution = int(random.uniform(
+            self.min_revolution, self.max_revolution))
         # print(f'instant_torque={instant_torque}, instant_speed={instant_speed}, instant_thrust={instant_thrust}, instant_revolution={instant_revolution}')
-        instant_power = FormulaCalculator.calculate_instant_power(instant_torque, instant_speed)
+        instant_power = FormulaCalculator.calculate_instant_power(
+            instant_torque, instant_speed)
         utc_date_time = utc_timer.get_utc_date_time()
-        
+
         DataLog.create(
             name=name,
             utc_date_time=utc_date_time,
@@ -81,8 +105,15 @@ class TestModeTask:
             rounds=instant_revolution,
             power=instant_power
         )
-        self.page.session.set(f'{name}_instant_torque', instant_torque)
-        self.page.session.set(f'{name}_instant_speed', instant_speed)
-        self.page.session.set(f'{name}_instant_thrust', instant_thrust)
-        self.page.session.set(f'{name}_instant_revolution', instant_revolution)
-        self.page.session.set(f'{name}_instant_power', instant_power)
+        if name == 'sps1':
+            gdata.sps1_torque = instant_torque
+            gdata.sps1_speed = instant_speed
+            gdata.sps1_thrust = instant_thrust
+            gdata.sps1_power = instant_power
+            gdata.sps1_rounds = instant_revolution
+        else:
+            gdata.sps2_torque = instant_torque
+            gdata.sps2_speed = instant_speed
+            gdata.sps2_thrust = instant_thrust
+            gdata.sps2_power = instant_power
+            gdata.sps2_rounds = instant_revolution

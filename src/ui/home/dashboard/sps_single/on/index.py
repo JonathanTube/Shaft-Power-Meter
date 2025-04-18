@@ -7,6 +7,7 @@ from db.models.propeller_setting import PropellerSetting
 from db.models.system_settings import SystemSettings
 from db.models.data_log import DataLog
 from db.models.preference import Preference
+from common.global_data import gdata
 import asyncio
 
 
@@ -85,13 +86,14 @@ class SingleShaPoLiOn(ft.Container):
 
     async def __load_data(self):
         while True:
-            power = self.page.session.get('sps1_instant_power')
-            thrust = self.page.session.get('sps1_instant_thrust')
-            torque = self.page.session.get('sps1_instant_torque')
-            speed = self.page.session.get('sps1_instant_speed')
+            speed = gdata.sps1_speed
+            power = gdata.sps1_power
+            torque = gdata.sps1_torque
+            thrust = gdata.sps1_thrust
             unit = self.system_unit
 
             self.eexi_limited_power.set_value(power)
+            print(speed,power,torque,thrust,unit)
             self.instant_value_grid.set_data(power, thrust, torque, speed, unit)
 
             data_logs = DataLog.select(

@@ -86,18 +86,18 @@ class PlcSyncTask:
         self.__send_msg(
             f"[{msg_range_power}] , [{msg_range_torque}] , [{msg_range_thrust}] , [{msg_range_speed}] , [{msg_instant_values}]")
 
-        self.__set_session('sps1_instant_speed', speed)
-        self.__set_session('sps1_instant_rounds', rounds)
+        gdata.sps1_speed = speed
+        gdata.sps1_rounds = rounds
 
     async def __write_data(self):
         # 写入功率
-        power = int(self.page.session.get('sps1_instant_power')/1000)
+        power = int(gdata.sps1_power/1000)
         self.plc_client.write_register(12301, power)
         # 写入扭矩
-        torque = int(self.page.session.get('sps1_instant_torque')/1000)
+        torque = int(gdata.sps1_torque/1000)
         self.plc_client.write_register(12302, torque)
         # 写入推力
-        thrust = int(self.page.session.get('sps1_instant_thrust')/1000)
+        thrust = int(gdata.sps1_thrust/1000)
         self.plc_client.write_register(12303, thrust)
 
     async def __connect(self):

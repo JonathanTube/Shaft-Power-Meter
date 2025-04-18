@@ -13,7 +13,6 @@ class BreachLogTask:
     def __init__(self, page: ft.Page):
         self.page = page
         self.start_time = None
-        self.event_log_id = None
         self.breach_times = 0
         self.recovery_times = 0
         self.report_info = None
@@ -28,8 +27,8 @@ class BreachLogTask:
             if system_settings.sha_po_li == False:
                 break
 
-            sps1_instant_power = self.__get_session("sps1_instant_power") or 0
-            sps2_instant_power = self.__get_session("sps2_instant_power") or 0
+            sps1_instant_power = gdata.sps1_power
+            sps2_instant_power = gdata.sps2_power
 
             if sps1_instant_power is None or sps2_instant_power is None or eexi_limited_power is None:
                 await asyncio.sleep(1)
@@ -61,7 +60,6 @@ class BreachLogTask:
 
             self.report_info = ReportInfo.create(
                 event_log=event_log, report_name=f"Compliance Report #{event_log.id}")
-            self.event_log_id = event_log.id
             gdata.breach_eexi_occured = True
             gdata.alarm_occured = True
             gdata.power_overload_occured = True
@@ -74,9 +72,9 @@ class BreachLogTask:
             return
 
         utc_date_time = self.__get_utc_date_time()
-        speed = self.__get_session("sps1_instant_speed") or 0
-        torque = self.__get_session("sps1_instant_torque") or 0
-        power = self.__get_session("sps1_instant_power") or 0
+        speed = gdata.sps1_speed
+        torque = gdata.sps1_torque
+        power = gdata.sps1_power
         total_power = FormulaCalculator.calculate_energy_kwh(power)
 
         ReportDetail.create(
@@ -89,8 +87,6 @@ class BreachLogTask:
         )
 
     def __handle_recovery_event(self):
-        if self.event_log_id is None:
-            return
         # print(f"recovery_times: {self.recovery_times}")
         if self.breach_times < self.checking_continuous_interval:
             self.__reset_all()
@@ -98,12 +94,16 @@ class BreachLogTask:
 
         self.recovery_times += 1
         if self.recovery_times == self.checking_continuous_interval:
-            # print("self.event_log_id=", self.event_log_id)
-            event_log = EventLog.get(self.event_log_id)
-            event_log.ended_at = self.__get_utc_date_time()
-            event_log.ended_position = self.__get_instant_gps_location()
-            event_log.save()
-            self.__reset_all()
+            event_log: EventLog = EventLog.select().where(
+                EventLog.ended_at == None
+            ).order_by(EventLog.id.asc()).first()
+            
+            if event_log is not None:
+                event_log.ended_at = self.__get_utc_date_time()
+                event_log.ended_position = self.__get_instant_gps_location()
+                event_log.save()
+                self.__reset_all()
+
             gdata.breach_eexi_occured = False
             gdata.alarm_occured = False
             gdata.power_overload_occured = False
@@ -115,7 +115,6 @@ class BreachLogTask:
         self.breach_times = 0
         self.recovery_times = 0
         self.start_time = None
-        self.event_log_id = None
         self.report_info = None
 
     def __get_utc_date_time(self):
