@@ -1,5 +1,4 @@
-
-from const.alarm_type import AlarmType
+from common.const_alarm_type import AlarmType
 from ui.common.abstract_table import AbstractTable
 from db.models.alarm_log import AlarmLog
 

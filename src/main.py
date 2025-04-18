@@ -1,12 +1,8 @@
 import ctypes
-import os
-from pathlib import Path
 import sys
 import flet as ft
 import asyncio
-
-from const.alarm_type import AlarmType
-from const.pubsub_topic import PubSubTopic
+from common.const_alarm_type import AlarmType
 from db.models.date_time_conf import DateTimeConf
 from db.models.alarm_log import AlarmLog
 from ui.common.fullscreen_alert import FullscreenAlert
@@ -25,7 +21,9 @@ from task.counter_total_task import CounterTotalTask
 from task.counter_interval_task import CounterIntervalTask
 from task.counter_manually_task import CounterManuallyTask
 from task.test_mode_task import TestModeTask
+from ui.common.audio_alarm import AudioAlarm
 from task.utc_timer_task import utc_timer
+from common.global_data import gdata
 
 
 def get_theme_mode():
@@ -73,38 +71,6 @@ def add_file_picker(page: ft.Page):
     page.session.set('file_picker_for_pdf_export', file_picker)
 
 
-def create_audio_alarm(page: ft.Page):
-    # create audio alarm
-    audit_src = os.path.join(Path(__file__).parent, "assets", "alarm.mp3")
-    print(audit_src)
-    audio_alarm = ft.Audio(src=audit_src, autoplay=False,
-                           release_mode=ft.audio.ReleaseMode.LOOP)
-    page.overlay.append(audio_alarm)
-    return audio_alarm
-
-
-def create_override_button(audio_alarm: ft.Audio):
-    def on_override_button_click(e):
-        audio_alarm.pause()
-        override_button.icon = ft.Icons.NOTIFICATIONS_OFF_OUTLINED
-        override_button.disabled = True
-        override_button.bgcolor = ft.Colors.RED_400
-        override_button.update()
-
-    override_button = ft.FilledButton(
-        top=8,
-        right=20,
-        text="Override",
-        icon=ft.Icons.NOTIFICATIONS_ON_OUTLINED,
-        icon_color=ft.Colors.WHITE,
-        bgcolor=ft.Colors.RED,
-        color=ft.Colors.WHITE,
-        visible=False,
-        on_click=on_override_button_click
-    )
-    return override_button
-
-
 def check_single_instance(mutex_name: str = "shaft-power-meter"):
     # 创建互斥锁
     mutex = ctypes.windll.kernel32.CreateMutexW(None, False, mutex_name)
@@ -117,7 +83,7 @@ def check_single_instance(mutex_name: str = "shaft-power-meter"):
         sys.exit(0)
 
 
-async def handle_unexpected_exit(page: ft.Page):
+async def handle_unexpected_exit():
     await asyncio.sleep(5)
     date_time_conf: DateTimeConf = DateTimeConf.get()
     # if the time diff is more than 5 seconds, send the alarm
@@ -126,7 +92,18 @@ async def handle_unexpected_exit(page: ft.Page):
             utc_date_time=utc_timer.get_utc_date_time(),
             alarm_type=AlarmType.APP_UNEXPECTED_EXIT
         )
-        page.pubsub.send_all_on_topic(PubSubTopic.ALARM_OCCURED, True)
+        gdata.alarm_occured = True
+
+
+async def on_breach_alarm_occured(fullscreen_alert: FullscreenAlert, audio_alarm: AudioAlarm):
+    while True:
+        if gdata.breach_eexi_occured:
+            audio_alarm.play()
+            fullscreen_alert.start()
+        else:
+            audio_alarm.stop()
+            fullscreen_alert.stop()
+        await asyncio.sleep(1)
 
 
 async def main(page: ft.Page):
@@ -134,7 +111,7 @@ async def main(page: ft.Page):
     DataInit.init()
     start_tasks(page)
 
-    asyncio.create_task(handle_unexpected_exit(page))
+    asyncio.create_task(handle_unexpected_exit())
 
     load_language(page)
     set_system_unit(page)
@@ -162,35 +139,15 @@ async def main(page: ft.Page):
 
     page.appbar = Header(main_content, TestModeTask(page))
 
-    audio_alarm = create_audio_alarm(page)
-    override_button = create_override_button(audio_alarm)
+    fullscreen_alert = FullscreenAlert()
+    audio_alarm = AudioAlarm()
 
-    main_stack = ft.Stack([main_content, override_button], expand=True)
-
-    def on_breach_alarm_occured(topic, occured):
-        if occured:
-            override_button.icon = ft.Icons.NOTIFICATIONS_ON_OUTLINED
-            override_button.bgcolor = ft.Colors.RED
-            override_button.visible = True
-            override_button.disabled = False
-            audio_alarm.play()
-            print("insert-1")
-            main_stack.controls.insert(0, FullscreenAlert())
-            main_stack.update()
-            print("insert-2")
-        else:
-            override_button.visible = False
-            audio_alarm.pause()
-            fullscreen_alert: FullscreenAlert = main_stack.controls[0]
-            fullscreen_alert.cancel_task()
-            main_stack.controls.remove(fullscreen_alert)
-            main_stack.update()
-        override_button.update()
-
-    page.pubsub.subscribe_topic(
-        "breach_alarm_occured", on_breach_alarm_occured)
+    main_stack = ft.Stack(
+        [fullscreen_alert, main_content, audio_alarm], expand=True)
 
     page.add(main_stack)
+
+    asyncio.create_task(on_breach_alarm_occured(fullscreen_alert, audio_alarm))
 
 if __name__ == "__main__":
     check_single_instance()

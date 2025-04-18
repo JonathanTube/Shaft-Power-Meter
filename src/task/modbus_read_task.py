@@ -3,12 +3,13 @@ import asyncio
 import flet as ft
 from pymodbus.client.tcp import AsyncModbusTcpClient
 from pymodbus.exceptions import ConnectionException
-from const.alarm_type import AlarmType
+from common.const_alarm_type import AlarmType
+from common.const_pubsub_topic import PubSubTopic
 from db.models.alarm_log import AlarmLog
 from db.models.io_conf import IOConf
 from db.models.preference import Preference
-from const.pubsub_topic import PubSubTopic
 from task.utc_timer_task import utc_timer
+from common.global_data import gdata
 
 
 class ModbusReadTask:
@@ -82,8 +83,7 @@ class ModbusReadTask:
                 utc_date_time=utc_timer.get_utc_date_time(),
                 alarm_type=AlarmType.MODBUS_DISCONNECTED,
             )
-            pubsub = self.page.pubsub
-            pubsub.send_all_on_topic(PubSubTopic.ALARM_OCCURED, True)
+            gdata.alarm_occured = True
 
     def __set_session(self, key: str, value: any):
         self.page.session.set(key, value)

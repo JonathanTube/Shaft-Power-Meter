@@ -1,5 +1,5 @@
+import asyncio
 import flet as ft
-from const.pubsub_topic import PubSubTopic
 from ui.home.alarm.alarm_list import AlarmList
 from ui.home.counter.index import Counter
 from ui.home.dashboard.index import Dashboard
@@ -10,6 +10,7 @@ from ui.home.event.event_list import EventList
 from db.models.event_log import EventLog
 from db.models.alarm_log import AlarmLog
 from db.models.system_settings import SystemSettings
+from common.global_data import gdata
 
 
 class Home(ft.Container):
@@ -26,6 +27,12 @@ class Home(ft.Container):
         self.active_button_style = ft.ButtonStyle(
             shape=ft.RoundedRectangleBorder(radius=ft.border_radius.all(0)),
             color=ft.Colors.PRIMARY,
+        )
+
+        self.power_overloaded_button_style = ft.ButtonStyle(
+            shape=ft.RoundedRectangleBorder(radius=ft.border_radius.all(0)),
+            bgcolor=ft.Colors.RED,
+            color=ft.Colors.WHITE,
         )
 
     def build(self):
@@ -142,7 +149,7 @@ class Home(ft.Container):
 
         self.update()
 
-    def __update_event_badge(self):
+    def update_event_badge(self):
         count = EventLog.select().where(EventLog.breach_reason == None).count()
         if count > 0:
             self.event.badge = ft.Badge(
@@ -155,7 +162,7 @@ class Home(ft.Container):
             self.event.badge = None
         self.event.update()
 
-    def __update_alarm_badge(self):
+    def update_alarm_badge(self):
         count = AlarmLog.select().count()
         if count > 0:
             self.alarm.badge = ft.Badge(
@@ -168,30 +175,36 @@ class Home(ft.Container):
             self.alarm.badge = None
         self.alarm.update()
 
-    def on_breach_eexi(self, topic: str, occured: bool):
-        self.__update_event_badge()
+    async def toggle_alarm_bgcolor(self):
+        while True:
+            if self.alarm.style == self.default_button_style:
+                self.alarm.style = self.power_overloaded_button_style
+            else:
+                self.alarm.style = self.default_button_style
+            self.alarm.update()
+            await asyncio.sleep(1)
 
-    def on_alarm_occured(self, topic: str, occured: bool):
-        if self.current_index == 4:
-            alarm_list: AlarmList = self.main_container.content
-            alarm_list.table.search(start_date=None, end_date=None)
+    async def update_all(self):
+        while True:
+            if gdata.breach_eexi_occured:
+                self.update_event_badge()
 
-        self.__update_alarm_badge()
+            if gdata.alarm_occured:
+                self.update_alarm_badge()
+                if self.current_index == 4:
+                    alarm_list: AlarmList = self.main_container.content
+                    alarm_list.table.search(start_date=None, end_date=None)
+
+            if gdata.power_overload_occured:
+                self.toggle_alarm_bgcolor()
+
+            await asyncio.sleep(5)
 
     def did_mount(self):
-        pubsub = self.page.pubsub
-        pubsub.subscribe_topic(
-            PubSubTopic.EEXI_BREACH_OCCURED,
-            self.on_breach_eexi
-        )
-        pubsub.subscribe_topic(
-            PubSubTopic.ALARM_OCCURED,
-            self.on_alarm_occured
-        )
-        self.__update_event_badge()
-        self.__update_alarm_badge()
+        self.update_event_badge()
+        self.update_alarm_badge()
+        self.task = self.page.run_task(self.update_all)
 
     def will_unmount(self):
-        pubsub = self.page.pubsub
-        pubsub.unsubscribe_topic(PubSubTopic.EEXI_BREACH_OCCURED)
-        pubsub.unsubscribe_topic(PubSubTopic.ALARM_OCCURED)
+        if self.task:
+            self.task.cancel()

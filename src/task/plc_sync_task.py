@@ -1,13 +1,12 @@
 import asyncio
-from peewee import fn
 import flet as ft
 from pymodbus.client.tcp import AsyncModbusTcpClient
 from pymodbus.exceptions import ConnectionException
-
-from const.alarm_type import AlarmType
-from const.pubsub_topic import PubSubTopic
+from common.const_alarm_type import AlarmType
+from common.const_pubsub_topic import PubSubTopic
 from db.models.io_conf import IOConf
 from db.models.alarm_log import AlarmLog
+from common.global_data import gdata
 from task.utc_timer_task import utc_timer
 
 
@@ -135,5 +134,4 @@ class PlcSyncTask:
                 utc_date_time=utc_timer.get_utc_date_time(),
                 alarm_type=AlarmType.PLC_DISCONNECTED,
             )
-            pubsub = self.page.pubsub
-            pubsub.send_all_on_topic(PubSubTopic.ALARM_OCCURED, True)
+            gdata.alarm_occured = True

@@ -1,11 +1,12 @@
 import flet as ft
 import asyncio
-from const.pubsub_topic import PubSubTopic
+from common.global_data import gdata
 from db.models.event_log import EventLog
 from db.models.system_settings import SystemSettings
 from db.models.report_info import ReportInfo
 from db.models.report_detail import ReportDetail
 from utils.formula_cal import FormulaCalculator
+from task.utc_timer_task import utc_timer
 
 
 class BreachLogTask:
@@ -36,6 +37,8 @@ class BreachLogTask:
 
             # 功率突破EEXI限制
             instant_power = sps1_instant_power + sps2_instant_power
+            # print("instant_power=", instant_power)
+            # print("eexi_limited_power=", eexi_limited_power)
             if instant_power > eexi_limited_power:
                 self.__handle_breach_event()
             else:
@@ -53,12 +56,15 @@ class BreachLogTask:
         # 连续突破60s，则记录突破事件
         if self.breach_times == self.checking_continuous_interval:
             started_position = self.__get_instant_gps_location()
-            event_log = EventLog.create(
+            event_log: EventLog = EventLog.create(
                 started_at=self.start_time, started_position=started_position)
-            self.report_info = ReportInfo.create(event_log=event_log,
-                                                 report_name=f"Compliance Report #{event_log.id}")
+
+            self.report_info = ReportInfo.create(
+                event_log=event_log, report_name=f"Compliance Report #{event_log.id}")
             self.event_log_id = event_log.id
-            self.page.pubsub.send_all_on_topic(PubSubTopic.EEXI_BREACH_OCCURED, True)       
+            gdata.breach_eexi_occured = True
+            gdata.alarm_occured = True
+            gdata.power_overload_occured = True
 
         if self.breach_times > self.checking_continuous_interval:
             self.__record_report_detail()
@@ -83,6 +89,8 @@ class BreachLogTask:
         )
 
     def __handle_recovery_event(self):
+        if self.event_log_id is None:
+            return
         # print(f"recovery_times: {self.recovery_times}")
         if self.breach_times < self.checking_continuous_interval:
             self.__reset_all()
@@ -90,12 +98,15 @@ class BreachLogTask:
 
         self.recovery_times += 1
         if self.recovery_times == self.checking_continuous_interval:
+            # print("self.event_log_id=", self.event_log_id)
             event_log = EventLog.get(self.event_log_id)
             event_log.ended_at = self.__get_utc_date_time()
             event_log.ended_position = self.__get_instant_gps_location()
             event_log.save()
             self.__reset_all()
-            self.page.pubsub.send_all_on_topic(PubSubTopic.EEXI_BREACH_OCCURED, False)
+            gdata.breach_eexi_occured = False
+            gdata.alarm_occured = False
+            gdata.power_overload_occured = False
 
         if self.recovery_times <= self.checking_continuous_interval:
             self.__record_report_detail()
@@ -108,7 +119,7 @@ class BreachLogTask:
         self.report_info = None
 
     def __get_utc_date_time(self):
-        return self.__get_session("utc_date_time")
+        return utc_timer.get_utc_date_time()
 
     def __get_instant_gps_location(self):
         return self.__get_session("instant_gps_location")

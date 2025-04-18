@@ -68,7 +68,7 @@ class TestModeTask:
         instant_speed = int(random.uniform(self.min_speed, self.max_speed))
         instant_thrust = int(random.uniform(self.min_thrust, self.max_thrust))
         instant_revolution = int(random.uniform(self.min_revolution, self.max_revolution))
-        print(f'instant_torque={instant_torque}, instant_speed={instant_speed}, instant_thrust={instant_thrust}, instant_revolution={instant_revolution}')
+        # print(f'instant_torque={instant_torque}, instant_speed={instant_speed}, instant_thrust={instant_thrust}, instant_revolution={instant_revolution}')
         instant_power = FormulaCalculator.calculate_instant_power(instant_torque, instant_speed)
         utc_date_time = utc_timer.get_utc_date_time()
         

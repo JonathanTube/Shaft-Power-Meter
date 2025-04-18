@@ -1,13 +1,14 @@
 import pynmea2
 import flet as ft
-from const.alarm_type import AlarmType
+from common.const_alarm_type import AlarmType
+from common.const_pubsub_topic import PubSubTopic
 from db.models.alarm_log import AlarmLog
 from db.models.gps_log import GpsLog
 import asyncio
 import random
 from db.models.io_conf import IOConf
-from const.pubsub_topic import PubSubTopic
 from task.utc_timer_task import utc_timer
+from common.global_data import gdata
 
 
 class GpsReadTask:
@@ -71,8 +72,7 @@ class GpsReadTask:
                 utc_date_time=utc_timer.get_utc_date_time(),
                 alarm_type=AlarmType.GPS_DISCONNECTED,
             )
-            pubsub = self.page.pubsub
-            pubsub.send_all_on_topic(PubSubTopic.ALARM_OCCURED, True)
+            gdata.alarm_occured = True
 
     async def receive_data(self):
         while not self.reader.at_eof():

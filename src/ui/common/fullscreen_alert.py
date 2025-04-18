@@ -52,25 +52,22 @@ class FullscreenAlert(ft.Container):
             ]
         )
 
-    def did_mount(self):
+    def start(self):
         self.task = self.page.run_task(self.blink)
+        self.visible = True
+        self.update()
+
+    def stop(self):
+        if self.task:
+            self.task.cancel()
+        self.visible = False
+        self.update()
+
 
     async def blink(self):
         while True:
-            print("blink")
-            print(self.visible)
+            # print("blink")
+            # print(self.visible)
             await asyncio.sleep(1)
             self.visible = not self.visible
             self.update()
-
-    def will_mount(self):
-        self.cancel_task()
-
-    def cancel_task(self):
-        if self.task:
-            self.task.cancel()
-
-# async def main(page: ft.Page):
-#     page.add(FullscreenAlert())
-
-# ft.app(main)
