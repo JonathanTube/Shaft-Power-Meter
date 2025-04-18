@@ -21,9 +21,9 @@ class General(ft.Container):
 
         self.expand = True
 
-        self.last_preference = Preference.get()
-        self.last_limitations = Limitations.get()
-        self.last_date_time_conf = DateTimeConf.get()
+        self.preference: Preference = Preference.get()
+        self.limitations: Limitations = Limitations.get()
+        self.date_time_conf: DateTimeConf = DateTimeConf.get()
 
     def __create_preference_card(self):
         self.theme_label = ft.Text(self.page.session.get("lang.setting.theme"))
@@ -38,7 +38,7 @@ class General(ft.Container):
         self.theme = ft.RadioGroup(
             content=ft.Row(
                 [self.theme_system, self.theme_light, self.theme_dark]),
-            value=self.last_preference.theme
+            value=self.preference.theme
         )
 
         self.system_unit_si = ft.Radio(value="0", label=self.page.session.get("lang.setting.unit.si"))
@@ -49,7 +49,7 @@ class General(ft.Container):
                 self.system_unit_si,
                 self.system_unit_metric
             ]),
-            value=self.last_preference.system_unit,
+            value=self.preference.system_unit,
             on_change=lambda e: self.__handle_system_unit_change(e)
         )
 
@@ -58,13 +58,13 @@ class General(ft.Container):
                 ft.Radio(value="0", label="English"),
                 ft.Radio(value="1", label="中文")
             ]),
-            value=self.last_preference.language
+            value=self.preference.language
         )
 
         self.data_refresh_interval = ft.TextField(
             label=self.data_refresh_interval_label,
             suffix_text="seconds",
-            value=self.last_preference.data_refresh_interval,
+            value=self.preference.data_refresh_interval,
             col={"md": 6}
         )
 
@@ -92,17 +92,17 @@ class General(ft.Container):
 
     def __create_max_limitations_card(self):
         self.speed_max = ft.TextField(
-            suffix_text="rpm", label=self.page.session.get("lang.common.speed"), value=self.last_limitations.speed_max,
+            suffix_text="rpm", label=self.page.session.get("lang.common.speed"), value=self.limitations.speed_max,
             input_filter=ft.InputFilter(regex_string=reg_digital)
         )
 
         self.torque_max = ft.TextField(
-            suffix_text="kNm", label=self.page.session.get("lang.common.torque"), value=self.last_limitations.torque_max,
+            suffix_text="kNm", label=self.page.session.get("lang.common.torque"), value=self.limitations.torque_max,
             input_filter=ft.InputFilter(regex_string=reg_digital)
         )
 
         self.power_max = ft.TextField(
-            suffix_text="kW", label=self.page.session.get("lang.common.power"), value=self.last_limitations.power_max,
+            suffix_text="kW", label=self.page.session.get("lang.common.power"), value=self.limitations.power_max,
             input_filter=ft.InputFilter(regex_string=reg_digital)
         )
 
@@ -116,17 +116,17 @@ class General(ft.Container):
 
     def __create_warning_limitations_card(self):
         self.torque_warning = ft.TextField(
-            suffix_text="kNm", label=self.page.session.get("lang.common.torque"), value=self.last_limitations.torque_warning,
+            suffix_text="kNm", label=self.page.session.get("lang.common.torque"), value=self.limitations.torque_warning,
             input_filter=ft.InputFilter(regex_string=reg_digital)
         )
 
         self.speed_warning = ft.TextField(
-            suffix_text="rpm", label=self.page.session.get("lang.common.speed"), value=self.last_limitations.speed_warning,
+            suffix_text="rpm", label=self.page.session.get("lang.common.speed"), value=self.limitations.speed_warning,
             input_filter=ft.InputFilter(regex_string=reg_digital)
         )
 
         self.power_warning = ft.TextField(
-            suffix_text="kW", label=self.page.session.get("lang.common.power"), value=self.last_limitations.power_warning,
+            suffix_text="kW", label=self.page.session.get("lang.common.power"), value=self.limitations.power_warning,
             input_filter=ft.InputFilter(regex_string=reg_digital)
         )
 
@@ -141,11 +141,11 @@ class General(ft.Container):
     def __update_limitations(self):
         system_unit = int(self.system_unit.value)
 
-        torque_limit = self.last_limitations.torque_max
-        power_limit = self.last_limitations.power_max
+        torque_limit = self.limitations.torque_max
+        power_limit = self.limitations.power_max
 
-        torque_warning = self.last_limitations.torque_warning
-        power_warning = self.last_limitations.power_warning
+        torque_warning = self.limitations.torque_warning
+        power_warning = self.limitations.power_warning
         if system_unit == 0:
             self.torque_max.suffix_text = "kNm"
             self.torque_max.value = round(torque_limit / 1000, 1)
@@ -199,11 +199,11 @@ class General(ft.Container):
             label=self.page.session.get("lang.setting.date"),
             col={"md": 6},
             can_request_focus=False,
-            value=self.last_date_time_conf.utc_date,
+            value=self.date_time_conf.utc_date_time.strftime('%Y-%m-%d'),
             on_click=lambda e: e.page.open(
                 ft.DatePicker(
                     on_change=self.__handle_date_change,
-                    current_date=self.last_date_time_conf.utc_date
+                    current_date=self.date_time_conf.utc_date_time.date()
                 )
             )
         )
@@ -212,7 +212,7 @@ class General(ft.Container):
             label=self.page.session.get("lang.setting.time"),
             col={"md": 6},
             can_request_focus=False,
-            value=self.last_date_time_conf.utc_time.strftime('%H:%M'),
+            value=self.date_time_conf.utc_date_time.strftime('%H:%M'),
             on_click=lambda e: e.page.open(
                 ft.TimePicker(
                     on_change=self.__handle_time_change
@@ -222,7 +222,7 @@ class General(ft.Container):
 
         self.date_time_format = ft.Dropdown(
             label=self.page.session.get("lang.setting.date_time_format"), col={"md": 6},
-            value=self.last_date_time_conf.date_time_format,
+            value=self.date_time_conf.date_time_format,
             options=[ft.DropdownOption(key="YYYY-MM-dd HH:mm:ss"),
                      ft.DropdownOption(key="YYYY/MM/dd HH:mm:ss"),
                      ft.DropdownOption(key="dd/MM/YYYY HH:mm:ss"),
@@ -232,7 +232,7 @@ class General(ft.Container):
         self.sync_with_gps = ft.Switch(
             label=self.page.session.get("lang.setting.sync_with_gps"),
             col={"md": 6},
-            value=self.last_date_time_conf.sync_with_gps
+            value=self.date_time_conf.sync_with_gps
         )
 
         self.date_time_card = CustomCard(
@@ -251,63 +251,63 @@ class General(ft.Container):
 
     def __save_data(self, e):
         # save preference
-        self.last_preference.theme = self.theme.value
-        self.last_preference.system_unit = int(self.system_unit.value)
-        self.last_preference.language = int(self.language.value)
-        self.last_preference.data_refresh_interval = int(
+        self.preference.theme = self.theme.value
+        self.preference.system_unit = int(self.system_unit.value)
+        self.preference.language = int(self.language.value)
+        self.preference.data_refresh_interval = int(
             self.data_refresh_interval.value)
-        self.last_preference.save()
+        self.preference.save()
 
         # save limitations
         max_speed = float(self.speed_max.value or 0)
-        self.last_limitations.speed_max = max_speed
+        self.limitations.speed_max = max_speed
         max_torque = float(self.torque_max.value or 0)
-        self.last_limitations.torque_max = max_torque
+        self.limitations.torque_max = max_torque
         max_power = float(self.power_max.value or 0)
-        self.last_limitations.power_max = max_power
+        self.limitations.power_max = max_power
 
         warning_speed = float(self.speed_warning.value or 0)
-        self.last_limitations.speed_warning = warning_speed
+        self.limitations.speed_warning = warning_speed
         warning_torque = float(self.torque_warning.value or 0)
-        self.last_limitations.torque_warning = warning_torque
+        self.limitations.torque_warning = warning_torque
         warning_power = float(self.power_warning.value or 0)
-        self.last_limitations.power_warning = warning_power
+        self.limitations.power_warning = warning_power
 
-        if self.last_preference.system_unit == 0:
+        if self.preference.system_unit == 0:
             # kNm to Nm
-            self.last_limitations.torque_max = UnitConverter.knm_to_nm(
+            self.limitations.torque_max = UnitConverter.knm_to_nm(
                 max_torque)
-            self.last_limitations.torque_warning = UnitConverter.knm_to_nm(
+            self.limitations.torque_warning = UnitConverter.knm_to_nm(
                 warning_torque)
             # kw to w
-            self.last_limitations.power_max = UnitConverter.kw_to_w(max_power)
-            self.last_limitations.power_warning = UnitConverter.kw_to_w(
+            self.limitations.power_max = UnitConverter.kw_to_w(max_power)
+            self.limitations.power_warning = UnitConverter.kw_to_w(
                 warning_power)
-        elif self.last_preference.system_unit == 1:
+        elif self.preference.system_unit == 1:
             # Tm to Nm
-            self.last_limitations.torque_max = UnitConverter.tm_to_nm(
+            self.limitations.torque_max = UnitConverter.tm_to_nm(
                 max_torque)
-            self.last_limitations.torque_warning = UnitConverter.tm_to_nm(
+            self.limitations.torque_warning = UnitConverter.tm_to_nm(
                 warning_torque)
             # shp to w
-            self.last_limitations.power_max = UnitConverter.shp_to_w(max_power)
-            self.last_limitations.power_warning = UnitConverter.shp_to_w(
+            self.limitations.power_max = UnitConverter.shp_to_w(max_power)
+            self.limitations.power_warning = UnitConverter.shp_to_w(
                 warning_power)
-        self.last_limitations.save()
+        self.limitations.save()
 
         # save date time conf
         new_date = self.utc_date.value
-        self.last_date_time_conf.utc_date = new_date
+        self.date_time_conf.utc_date = new_date
 
         new_time = self.utc_time.value
-        self.last_date_time_conf.utc_time = new_time
+        self.date_time_conf.utc_time = new_time
 
-        self.last_date_time_conf.system_date = datetime.now().date()
-        self.last_date_time_conf.system_time = datetime.now().time()
+        self.date_time_conf.system_date = datetime.now().date()
+        self.date_time_conf.system_time = datetime.now().time()
 
-        self.last_date_time_conf.date_time_format = self.date_time_format.value
-        self.last_date_time_conf.sync_with_gps = self.sync_with_gps.value
-        self.last_date_time_conf.save()
+        self.date_time_conf.date_time_format = self.date_time_format.value
+        self.date_time_conf.sync_with_gps = self.sync_with_gps.value
+        self.date_time_conf.save()
 
         # set session
         new_date_time = f"{new_date} {new_time}:00"
@@ -321,9 +321,9 @@ class General(ft.Container):
         self.update()
 
     def __change_theme(self):
-        if self.last_preference.theme == '1':
+        if self.preference.theme == '1':
             self.page.theme_mode = ft.ThemeMode.LIGHT
-        elif self.last_preference.theme == '2':
+        elif self.preference.theme == '2':
             self.page.theme_mode = ft.ThemeMode.DARK
         else:
             self.page.theme_mode = ft.ThemeMode.SYSTEM
@@ -337,9 +337,9 @@ class General(ft.Container):
                 item.code, item.english if lang == 0 else item.chinese)
 
     def __reset_data(self, e):
-        self.last_preference = Preference.get()
-        self.last_limitations = Limitations.get()
-        self.last_date_time_conf = DateTimeConf.get()
+        self.preference = Preference.get()
+        self.limitations = Limitations.get()
+        self.date_time_conf = DateTimeConf.get()
 
         self.content.clean()
         self.build()
@@ -390,7 +390,7 @@ class General(ft.Container):
     async def __refresh_utc_date_time(self):
         while True:
             if self.utc_date_time:
-                utc_date_time = self.page.session.get("utc_date_time")
+                utc_date_time = utc_timer.get_utc_date_time()   
                 self.utc_date_time.value = utc_date_time.strftime('%Y-%m-%d %H:%M')
                 self.utc_date_time.update()
             await asyncio.sleep(1)

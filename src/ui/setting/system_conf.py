@@ -74,7 +74,7 @@ class SystemConf(ft.Container):
 
     def __create_settings_card(self):
         self.display_thrust = ft.Switch(
-            col={"md": 4}, label=self.page.session.get("lang.setting.display_thrust"), 
+            col={"md": 3}, label=self.page.session.get("lang.setting.display_thrust"), 
             label_position=ft.LabelPosition.LEFT,
             value=self.system_settings.display_thrust,
             on_change=lambda e: setattr(
@@ -82,7 +82,7 @@ class SystemConf(ft.Container):
         )
 
         self.sha_po_li = ft.Switch(
-            col={"md": 4}, label=self.page.session.get("lang.setting.enable_sha_po_li"),
+            col={"md": 3}, label=self.page.session.get("lang.setting.enable_sha_po_li"),
             label_position=ft.LabelPosition.LEFT,
             value=self.system_settings.sha_po_li,
             on_change=lambda e: setattr(
@@ -126,7 +126,7 @@ class SystemConf(ft.Container):
         )
 
         amount_of_propeller_row = ft.Row(
-            col={"md": 4},
+            col={"md": 6},
             controls=[
                 self.amount_of_propeller_label,
                 self.amount_of_propeller_radios
