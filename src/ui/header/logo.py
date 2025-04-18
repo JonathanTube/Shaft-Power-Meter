@@ -13,7 +13,5 @@ class HeaderLogo(ft.Container):
 
     def build(self):
         self.content = ft.Image(
-            src=self.src,
-            width=50,
-            height=50
+            src=self.src
         )

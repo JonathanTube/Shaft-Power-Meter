@@ -1,10 +1,15 @@
 import asyncio
-from datetime import datetime
 
 import flet as ft
 from pymodbus.client.tcp import AsyncModbusTcpClient
 from pymodbus.exceptions import ConnectionException
+from const.alarm_type import AlarmType
+from db.models.alarm_log import AlarmLog
 from db.models.io_conf import IOConf
+from db.models.preference import Preference
+from const.pubsub_topic import PubSubTopic
+from task.utc_timer_task import utc_timer
+
 
 class ModbusReadTask:
     def __init__(self, page: ft.Page):
@@ -12,11 +17,11 @@ class ModbusReadTask:
         self.modbus_client = None
 
     async def start(self):
+        preference: Preference = Preference.get()
         await self.__connect()
         while True:
             await self.__read_sps1_data()
-            await self.__read_sps2_data()
-            await asyncio.sleep(1)
+            await asyncio.sleep(preference.data_refresh_interval)
 
     async def __read_sps1_data(self):
         thrust = 0
@@ -43,27 +48,46 @@ class ModbusReadTask:
             self.__send_msg(f"Connection error: {e}")
             await self.__connect()
         except Exception as e:
-            print(f"Error getting data: {e}")
             self.__send_msg(f"Error getting data: {e}")
         finally:
             self.__set_session('sps1_instant_thrust', thrust)
             self.__set_session('sps1_instant_torque', torque)
 
-    async def __read_sps2_data(self):
-        pass
-
     async def __connect(self):
         try:
             self.io_conf = IOConf.get()
-            self.modbus_client = AsyncModbusTcpClient(
-                host=self.io_conf.modbus_ip, port=self.io_conf.modbus_port)
+            if self.modbus_client is None:
+                self.modbus_client = AsyncModbusTcpClient(
+                    host=self.io_conf.modbus_ip,
+                    port=self.io_conf.modbus_port,
+                    timeout=10,
+                    retries=3
+                )
             is_connected = await self.modbus_client.connect()
             self.__send_msg(f"connected to Modbus: {is_connected}")
+            if not is_connected:
+                self.__create_alarm_log()
         except Exception as e:
+            self.__create_alarm_log()
             self.__send_msg(f"Error connecting to Modbus: {e}")
+
+    def __create_alarm_log(self):
+        cnt: int = AlarmLog.select().where(
+            (AlarmLog.alarm_type == AlarmType.MODBUS_DISCONNECTED) & (
+                AlarmLog.acknowledge_time == None)
+        ).count()
+
+        if cnt == 0:
+            AlarmLog.create(
+                utc_date_time=utc_timer.get_utc_date_time(),
+                alarm_type=AlarmType.MODBUS_DISCONNECTED,
+            )
+            pubsub = self.page.pubsub
+            pubsub.send_all_on_topic(PubSubTopic.ALARM_OCCURED, True)
 
     def __set_session(self, key: str, value: any):
         self.page.session.set(key, value)
 
     def __send_msg(self, message: str):
-        self.page.pubsub.send_all_on_topic('modbus_log', message)
+        self.page.pubsub.send_all_on_topic(
+            PubSubTopic.TRACE_MODBUS_LOG, message)

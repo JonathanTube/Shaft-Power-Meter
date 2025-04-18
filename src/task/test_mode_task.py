@@ -4,6 +4,7 @@ import random
 from db.models.data_log import DataLog
 from db.models.system_settings import SystemSettings
 from utils.formula_cal import FormulaCalculator
+from task.utc_timer_task import utc_timer
 
 class TestModeTask:
     def __init__(self, page):
@@ -69,7 +70,7 @@ class TestModeTask:
         instant_revolution = int(random.uniform(self.min_revolution, self.max_revolution))
         print(f'instant_torque={instant_torque}, instant_speed={instant_speed}, instant_thrust={instant_thrust}, instant_revolution={instant_revolution}')
         instant_power = FormulaCalculator.calculate_instant_power(instant_torque, instant_speed)
-        utc_date_time = self.page.session.get('utc_date_time')
+        utc_date_time = utc_timer.get_utc_date_time()
         
         DataLog.create(
             name=name,

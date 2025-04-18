@@ -5,13 +5,16 @@ import sys
 import flet as ft
 import asyncio
 
+from const.alarm_type import AlarmType
+from const.pubsub_topic import PubSubTopic
+from db.models.date_time_conf import DateTimeConf
+from db.models.alarm_log import AlarmLog
 from ui.common.fullscreen_alert import FullscreenAlert
 from ui.header.index import Header
 from ui.home.index import Home
-from task.utc_timer_task import UtcTimer
 from task.breach_log_task import BreachLogTask
 from task.gps_read_task import GpsReadTask
-from task.plc_read_task import PlcReadTask
+from task.plc_sync_task import PlcSyncTask
 from task.modbus_read_task import ModbusReadTask
 from task.data_save_task import DataSaveTask
 from db.data_init import DataInit
@@ -22,6 +25,7 @@ from task.counter_total_task import CounterTotalTask
 from task.counter_interval_task import CounterIntervalTask
 from task.counter_manually_task import CounterManuallyTask
 from task.test_mode_task import TestModeTask
+from task.utc_timer_task import utc_timer
 
 
 def get_theme_mode():
@@ -51,17 +55,15 @@ def set_system_unit(page: ft.Page):
 
 
 def start_tasks(page: ft.Page):
-    asyncio.create_task(UtcTimer(page).start())
-
+    asyncio.create_task(utc_timer.start())
     asyncio.create_task(CounterTotalTask(page).start())
     asyncio.create_task(CounterManuallyTask(page).start())
     asyncio.create_task(CounterIntervalTask(page).start())
 
-    asyncio.create_task(GpsReadTask(page).start())
-    asyncio.create_task(PlcReadTask(page).start())
+    asyncio.create_task(PlcSyncTask(page).start())
     asyncio.create_task(ModbusReadTask(page).start())
     asyncio.create_task(DataSaveTask(page).start())
-
+    asyncio.create_task(GpsReadTask(page).start())
     asyncio.create_task(BreachLogTask(page).start())
 
 
@@ -102,6 +104,7 @@ def create_override_button(audio_alarm: ft.Audio):
     )
     return override_button
 
+
 def check_single_instance(mutex_name: str = "shaft-power-meter"):
     # 创建互斥锁
     mutex = ctypes.windll.kernel32.CreateMutexW(None, False, mutex_name)
@@ -109,13 +112,29 @@ def check_single_instance(mutex_name: str = "shaft-power-meter"):
 
     # 如果检测到已有实例，退出程序
     if last_error == 183:  # ERROR_ALREADY_EXISTS
-        ctypes.windll.user32.MessageBoxW(0, "The Software is already running!", "Notice", 0x40)
+        ctypes.windll.user32.MessageBoxW(
+            0, "The Software is already running!", "Notice", 0x40)
         sys.exit(0)
+
+
+async def handle_unexpected_exit(page: ft.Page):
+    await asyncio.sleep(5)
+    date_time_conf: DateTimeConf = DateTimeConf.get()
+    # if the time diff is more than 5 seconds, send the alarm
+    if abs((date_time_conf.system_date_time - utc_timer.get_utc_date_time()).total_seconds()) > 5:
+        AlarmLog.create(
+            utc_date_time=utc_timer.get_utc_date_time(),
+            alarm_type=AlarmType.APP_UNEXPECTED_EXIT
+        )
+        page.pubsub.send_all_on_topic(PubSubTopic.ALARM_OCCURED, True)
+
 
 async def main(page: ft.Page):
     TableInit.init()
     DataInit.init()
     start_tasks(page)
+
+    asyncio.create_task(handle_unexpected_exit(page))
 
     load_language(page)
     set_system_unit(page)

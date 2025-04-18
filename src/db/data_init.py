@@ -7,7 +7,6 @@ from db.models.system_settings import SystemSettings
 from db.models.ship_info import ShipInfo
 from db.models.factor_conf import FactorConf
 from db.models.breach_reason import BreachReason
-from db.models.report_info import ReportInfo
 from db.models.preference import Preference
 from db.models.date_time_conf import DateTimeConf
 from db.models.limitations import Limitations
@@ -53,10 +52,10 @@ class DataInit:
     def __init_date_time_conf():
         if DateTimeConf.select().count() == 0:
             DateTimeConf.create(
+                utc_date_time=datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S"),
+                system_date_time=datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
                 sync_with_gps=False,
                 date_time_format="YYYY-MM-dd HH:mm:ss",
-                utc_date_time=datetime.now(
-                    timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
             )
 
     def __init_ship_info():
@@ -180,7 +179,7 @@ class DataInit:
                     "chinese": "操作发生错误",
                     "english": "Operation Error"
                 },
-    
+
                 {
                     "code": "lang.button.save",
                     "chinese": "保存",
@@ -222,7 +221,11 @@ class DataInit:
                     "chinese": "确认",
                     "english": "Confirm"
                 },
-
+                {
+                    "code": "lang.common.app_name",
+                    "chinese": "轴功率仪表",
+                    "english": "Shaft Power Meter"
+                },
                 {
                     "code": "lang.common.operation",
                     "chinese": "操作",
@@ -397,7 +400,7 @@ class DataInit:
                     "chinese": "导出",
                     "english": "Export"
                 },
-                
+
 
                 {
                     "code": "lang.header.home",
@@ -611,7 +614,7 @@ class DataInit:
                     "english": "Max Revolution"
                 },
 
- 
+
                 {
                     "code": "lang.setting.test_mode.data_generation_interval",
                     "chinese": "数据生成间隔",
@@ -626,7 +629,7 @@ class DataInit:
 
                 {
                     "code": "lang.setting.test_mode.system_restart_after_change",
-                    "chinese": "修改系统配置后,软件需要重启才能生效",        
+                    "chinese": "修改系统配置后,软件需要重启才能生效",
                     "english": "This software need to be restarted after you changed the system settings."
                 },
 
@@ -677,7 +680,7 @@ class DataInit:
                     "chinese": "EEXI 超限检查周期",
                     "english": "EEXI Breach Checking Duration"
                 },
-                
+
                 {
                     "code": "lang.setting.ship_info",
                     "chinese": "船体信息",
@@ -1215,43 +1218,68 @@ class DataInit:
                     "english": "Cannot search more than 30 days"
                 },
                 {
-                    "code":"lang.propeller_curve.mcr_operating_point",
-                    "chinese":"MCR 操作点",
-                    "english":"MCR Operating Point"
+                    "code": "lang.propeller_curve.mcr_operating_point",
+                    "chinese": "MCR 操作点",
+                    "english": "MCR Operating Point"
                 },
                 {
-                    "code":"lang.propeller_curve.normal_propeller_curve",
-                    "chinese":"正常螺旋桨曲线",
-                    "english":"Normal Propeller Curve"
+                    "code": "lang.propeller_curve.normal_propeller_curve",
+                    "chinese": "正常螺旋桨曲线",
+                    "english": "Normal Propeller Curve"
                 },
                 {
-                    "code":"lang.propeller_curve.light_propeller_curve",
-                    "chinese":"轻载螺旋桨曲线",
-                    "english":"Light Propeller Curve"
+                    "code": "lang.propeller_curve.light_propeller_curve",
+                    "chinese": "轻载螺旋桨曲线",
+                    "english": "Light Propeller Curve"
                 },
                 {
-                    "code":"lang.propeller_curve.speed_limit_curve",
-                    "chinese":"速度限制曲线",
-                    "english":"Speed Limit Curve"
+                    "code": "lang.propeller_curve.speed_limit_curve",
+                    "chinese": "速度限制曲线",
+                    "english": "Speed Limit Curve"
                 },
                 {
-                    "code":"lang.propeller_curve.torque_load_limit_curve",
-                    "chinese":"扭矩负载限制曲线",
-                    "english":"Torque Load Limit Curve"
+                    "code": "lang.propeller_curve.torque_load_limit_curve",
+                    "chinese": "扭矩负载限制曲线",
+                    "english": "Torque Load Limit Curve"
                 },
                 {
-                    "code":"lang.propeller_curve.overload_curve",
-                    "chinese":"过载曲线",
-                    "english":"Overload Curve"
+                    "code": "lang.propeller_curve.overload_curve",
+                    "chinese": "过载曲线",
+                    "english": "Overload Curve"
                 },
                 {
-                    "code":"lang.propeller_curve.engine_speed",
-                    "chinese":"发动机转速",
-                    "english":"Engine Speed"
+                    "code": "lang.propeller_curve.engine_speed",
+                    "chinese": "发动机转速",
+                    "english": "Engine Speed"
                 },
                 {
-                    "code":"lang.propeller_curve.engine_shaft_power",
-                    "chinese":"发动机轴功率",
-                    "english":"Engine Shaft Power"
+                    "code": "lang.propeller_curve.engine_shaft_power",
+                    "chinese": "发动机轴功率",
+                    "english": "Engine Shaft Power"
+                },
+                {
+                    "code": "lang.alarm.plc_disconnected",
+                    "chinese": "PLC 断开",
+                    "english": "PLC Disconnected"
+                },
+                {
+                    "code": "lang.alarm.gps_disconnected",
+                    "chinese": "GPS 断开",
+                    "english": "GPS Disconnected"
+                },
+                {
+                    "code": "lang.alarm.modbus_disconnected",
+                    "chinese": "Modbus 断开",
+                    "english": "Modbus Disconnected"
+                },
+                {
+                    "code": "lang.alarm.app_unexpected_exit",
+                    "chinese": "应用意外退出",
+                    "english": "App Unexpected Exit"
+                },
+                {
+                    "code": "lang.alarm.unknown",
+                    "chinese": "未知",
+                    "english": "Unknown"
                 }
             ]).execute()

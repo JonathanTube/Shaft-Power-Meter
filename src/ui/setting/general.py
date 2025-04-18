@@ -8,6 +8,7 @@ from db.models.preference import Preference
 from ui.common.custom_card import CustomCard
 from ui.common.toast import Toast
 from utils.unit_converter import UnitConverter
+from task.utc_timer_task import utc_timer
 
 
 reg_digital = r'^(\d+\.?\d*|)$'  # 允许整数、小数或空字符串
@@ -185,7 +186,7 @@ class General(ft.Container):
         self.utc_time.update()
 
     def __create_date_time_card(self):
-        utc_date_time = self.page.session.get('utc_date_time')
+        utc_date_time = utc_timer.get_utc_date_time()
         self.utc_date_time = ft.TextField(
             label=self.page.session.get("lang.setting.current_utc_date_time"),
             col={"md": 12},
@@ -309,10 +310,10 @@ class General(ft.Container):
         self.last_date_time_conf.save()
 
         # set session
-        new_date_time = f"{new_date} {new_time}"
-        dt_format = '%Y-%m-%d %H:%M'
+        new_date_time = f"{new_date} {new_time}:00"
+        dt_format = '%Y-%m-%d %H:%M:%S'
         new_utc_date_time = datetime.strptime(new_date_time, dt_format)
-        self.page.session.set('utc_date_time', new_utc_date_time)
+        utc_timer.set_utc_date_time(new_utc_date_time)
 
         Toast.show_success(e.page)
         self.__refresh_language()

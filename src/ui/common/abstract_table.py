@@ -22,6 +22,7 @@ class AbstractTable(ft.Container):
         self.__create_table_rows()
 
     def build(self):
+        self.default_width = self.page.window.width - 35
         self.__create_table()
 
         col = ft.Column(
@@ -49,6 +50,7 @@ class AbstractTable(ft.Container):
 
     def __create_table(self):
         self.data_table = ft.DataTable(
+            width=self.default_width,
             expand=True,
             heading_row_height=40,
             heading_row_color=ft.colors.SURFACE_CONTAINER_HIGHEST,

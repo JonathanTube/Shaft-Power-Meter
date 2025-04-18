@@ -13,6 +13,7 @@ from db.models.system_settings import SystemSettings
 class Header(ft.AppBar):
     def __init__(self, main_content: ft.Container, test_mode_task: TestModeTask):
         super().__init__()
+        self.toolbar_height = 40
         self.test_mode_task = test_mode_task
         self.leading = HeaderLogo()
 

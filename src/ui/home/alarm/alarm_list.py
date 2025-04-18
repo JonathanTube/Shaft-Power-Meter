@@ -9,13 +9,12 @@ class AlarmList(ft.Container):
         super().__init__()
         self.expand = True
         self.padding = 10
-        self.content = self.__create()
 
-    def __create(self):
+    def build(self):
         search = DatetimeSearch(self.__on_search)
         self.table = AlarmTable(10)
 
-        return ft.Column(
+        self.content = ft.Column(
             expand=True,
             spacing=5,
             controls=[

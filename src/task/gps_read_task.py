@@ -1,9 +1,13 @@
 import pynmea2
 import flet as ft
+from const.alarm_type import AlarmType
+from db.models.alarm_log import AlarmLog
 from db.models.gps_log import GpsLog
 import asyncio
 import random
 from db.models.io_conf import IOConf
+from const.pubsub_topic import PubSubTopic
+from task.utc_timer_task import utc_timer
 
 
 class GpsReadTask:
@@ -19,9 +23,9 @@ class GpsReadTask:
     async def start(self):
         self.io_conf = IOConf.get()
         while True:
+            # 建立连接
+            await self.connect()
             try:
-                # 建立连接
-                await self.connect()
                 # 数据接收循环
                 await self.receive_data()
             except (ConnectionRefusedError, ConnectionResetError) as e:
@@ -44,7 +48,8 @@ class GpsReadTask:
                     f"try to connect...({self.retries+1} times)")
 
                 self.reader, self.writer = await asyncio.wait_for(
-                    asyncio.open_connection(self.io_conf.gps_ip, self.io_conf.gps_port),
+                    asyncio.open_connection(
+                        self.io_conf.gps_ip, self.io_conf.gps_port),
                     timeout=5
                 )
                 self.__send_message("connect success")
@@ -52,7 +57,22 @@ class GpsReadTask:
             except Exception as e:
                 self.__send_message(f"connect failed: {str(e)}")
                 self.retries += 1
+                self.__create_alarm_log()
                 await asyncio.sleep(delay)
+
+    def __create_alarm_log(self):
+        cnt: int = AlarmLog.select().where(
+            (AlarmLog.alarm_type == AlarmType.GPS_DISCONNECTED) & (
+                AlarmLog.acknowledge_time == None)
+        ).count()
+
+        if cnt == 0:
+            AlarmLog.create(
+                utc_date_time=utc_timer.get_utc_date_time(),
+                alarm_type=AlarmType.GPS_DISCONNECTED,
+            )
+            pubsub = self.page.pubsub
+            pubsub.send_all_on_topic(PubSubTopic.ALARM_OCCURED, True)
 
     async def receive_data(self):
         while not self.reader.at_eof():
@@ -113,4 +133,4 @@ class GpsReadTask:
         self.page.session.set(key, value)
 
     def __send_message(self, message: str):
-        self.page.pubsub.send_all_on_topic('gps_log', message)
+        self.page.pubsub.send_all_on_topic(PubSubTopic.TRACE_GPS_LOG, message)

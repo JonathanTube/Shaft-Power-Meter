@@ -2,7 +2,7 @@ import asyncio
 import flet as ft
 from db.models.data_log import DataLog
 from utils.formula_cal import FormulaCalculator
-
+from task.utc_timer_task import utc_timer
 
 class DataSaveTask:
     def __init__(self, page: ft.Page):
@@ -25,7 +25,7 @@ class DataSaveTask:
             await asyncio.sleep(1)
 
     async def save_data(self, name: str):
-        utc_date_time = self.__get_session('utc_date_time')
+        utc_date_time = utc_timer.get_utc_date_time()
         speed = self.__get_session(f'{name}_instant_speed')
 
         thrust = self.__get_session(f'{name}_instant_thrust')

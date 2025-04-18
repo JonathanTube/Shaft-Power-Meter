@@ -1,5 +1,6 @@
 import flet as ft
 import asyncio
+from const.pubsub_topic import PubSubTopic
 from db.models.event_log import EventLog
 from db.models.system_settings import SystemSettings
 from db.models.report_info import ReportInfo
@@ -57,8 +58,7 @@ class BreachLogTask:
             self.report_info = ReportInfo.create(event_log=event_log,
                                                  report_name=f"Compliance Report #{event_log.id}")
             self.event_log_id = event_log.id
-            self.page.pubsub.send_all_on_topic("breach_event_occured", True)
-            self.page.pubsub.send_all_on_topic("breach_alarm_occured", True)
+            self.page.pubsub.send_all_on_topic(PubSubTopic.EEXI_BREACH_OCCURED, True)       
 
         if self.breach_times > self.checking_continuous_interval:
             self.__record_report_detail()
@@ -95,8 +95,7 @@ class BreachLogTask:
             event_log.ended_position = self.__get_instant_gps_location()
             event_log.save()
             self.__reset_all()
-            self.page.pubsub.send_all_on_topic("breach_event_occured", False)
-            self.page.pubsub.send_all_on_topic("breach_alarm_occured", False)
+            self.page.pubsub.send_all_on_topic(PubSubTopic.EEXI_BREACH_OCCURED, False)
 
         if self.recovery_times <= self.checking_continuous_interval:
             self.__record_report_detail()
