@@ -93,7 +93,6 @@ class SingleShaPoLiOn(ft.Container):
             unit = self.system_unit
 
             self.eexi_limited_power.set_value(power)
-            print(speed,power,torque,thrust,unit)
             self.instant_value_grid.set_data(power, thrust, torque, speed, unit)
 
             data_logs = DataLog.select(

@@ -1,11 +1,13 @@
 import os
 import flet as ft
 from pathlib import Path
+from common.const_pubsub_topic import PubSubTopic
 
 
 class AudioAlarm(ft.Container):
-    def __init__(self):
+    def __init__(self, page: ft.Page):
         super().__init__()
+        self.page = page
         self.right = 10
         self.top = 4
 
@@ -21,6 +23,7 @@ class AudioAlarm(ft.Container):
             icon=ft.Icons.NOTIFICATIONS_ON_OUTLINED,
             icon_color=ft.Colors.WHITE,
             bgcolor=ft.Colors.RED,
+            visible=False,
             color=ft.Colors.WHITE,
             on_click=self.__on_mute
         )
@@ -51,3 +54,20 @@ class AudioAlarm(ft.Container):
         self.content.disabled = True
         self.content.bgcolor = ft.Colors.RED_400
         self.content.update()
+
+    def handle_change(self, topic, value):
+        if value:
+            self.play()
+        else:
+            self.stop()
+
+    def did_mount(self):
+        self.page.pubsub.subscribe_topic(
+            PubSubTopic.BREACH_EEXI_OCCURED_FOR_AUDIO,
+            self.handle_change
+        )
+
+    def will_unmount(self):
+        self.page.pubsub.unsubscribe_topic(
+            PubSubTopic.BREACH_EEXI_OCCURED_FOR_AUDIO
+        )

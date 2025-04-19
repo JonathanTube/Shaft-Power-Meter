@@ -2,7 +2,6 @@ import asyncio
 import flet as ft
 from db.models.data_log import DataLog
 from utils.formula_cal import FormulaCalculator
-from task.utc_timer_task import utc_timer
 from common.global_data import gdata
 
 
@@ -13,10 +12,11 @@ class DataSaveTask:
     async def start(self):
         while True:
             await self.save_data('sps1')
+            await self.save_data('sps2')
             await asyncio.sleep(1)
 
     async def save_data(self, name: str):
-        utc_date_time = utc_timer.get_utc_date_time()
+        utc_date_time = gdata.utc_date_time
         if name == 'sps1':
             speed = gdata.sps1_speed
             thrust = gdata.sps1_thrust
@@ -31,8 +31,6 @@ class DataSaveTask:
             rounds = gdata.sps2_rounds
             power = FormulaCalculator.calculate_instant_power(torque, speed)
             gdata.sps2_power = power
-
-
 
         try:
             DataLog.create(

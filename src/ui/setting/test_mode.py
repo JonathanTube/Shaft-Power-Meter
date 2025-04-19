@@ -2,6 +2,7 @@ import asyncio
 import os
 import flet as ft
 
+from common.const_pubsub_topic import PubSubTopic
 from db.models.system_settings import SystemSettings
 from utils.unit_converter import UnitConverter
 from utils.unit_parser import UnitParser
@@ -147,14 +148,6 @@ class TestMode(ft.Container):
             value=self.test_mode_conf.max_revolution
         )
 
-        self.time_interval = ft.TextField(
-            col={"sm": 12, "md": 6},
-            label=self.page.session.get('lang.setting.test_mode.data_generation_interval'),
-            suffix_text="seconds",
-            on_click=lambda e: os.system('osk'),
-            value=self.test_mode_conf.time_interval
-        )
-
         self.save_button = ft.FilledButton(
             width=120,
             height=40,
@@ -190,8 +183,7 @@ class TestMode(ft.Container):
             self.min_thrust,
             self.max_thrust,
             self.min_revolution,
-            self.max_revolution,
-            self.time_interval
+            self.max_revolution
         ])
 
         self.sps1_instant_data_card = ft.ResponsiveRow(
@@ -291,7 +283,6 @@ class TestMode(ft.Container):
             max_rev = int(self.max_revolution.value)
             min_speed = int(self.min_speed.value)
             max_speed = int(self.max_speed.value)
-            time_interval = int(self.time_interval.value)
 
             TestModeConf.update(
                 min_torque=min_torque,
@@ -301,8 +292,7 @@ class TestMode(ft.Container):
                 min_thrust=min_thrust,
                 max_thrust=max_thrust,
                 min_revolution=min_rev,
-                max_revolution=max_rev,
-                time_interval=time_interval
+                max_revolution=max_rev
             ).where(TestModeConf.id == self.test_mode_conf.id).execute()
             Toast.show_success(self.page)
         except Exception as e:
@@ -329,9 +319,6 @@ class TestMode(ft.Container):
             min_rev = int(self.min_revolution.value)
             max_rev = int(self.max_revolution.value)
             self.test_mode_task.set_revolution_range(min_rev, max_rev)
-
-            time_interval = int(self.time_interval.value)
-            self.test_mode_task.set_time_interval(time_interval)
 
             self.page.run_task(self.test_mode_task.start)
             self.page.close(self.dlg_start_modal)
@@ -361,6 +348,11 @@ class TestMode(ft.Container):
         self.stop_button.update()
         self.save_button.visible = True
         self.save_button.update()
+
+        self.page.pubsub.send_all_on_topic(PubSubTopic.BREACH_EEXI_OCCURED_FOR_AUDIO, False)
+        self.page.pubsub.send_all_on_topic(PubSubTopic.BREACH_EEXI_OCCURED_FOR_FULLSCREEN, False)
+        self.page.pubsub.send_all_on_topic(PubSubTopic.BREACH_EEXI_OCCURED_FOR_BADGE, False)
+        self.page.pubsub.send_all_on_topic(PubSubTopic.BREACH_POWER_OVERLOAD_OCCURED, False)
         Toast.show_success(self.page)
 
     def did_mount(self):

@@ -7,7 +7,6 @@ from common.const_pubsub_topic import PubSubTopic
 from db.models.io_conf import IOConf
 from db.models.alarm_log import AlarmLog
 from common.global_data import gdata
-from task.utc_timer_task import utc_timer
 
 
 class PlcSyncTask:
@@ -117,9 +116,6 @@ class PlcSyncTask:
             self.__send_msg(f"Error connecting to PLC: {e}")
             self.__create_alarm_log()
 
-    def __set_session(self, key: str, value: any):
-        self.page.session.set(key, value)
-
     def __send_msg(self, message: str):
         self.page.pubsub.send_all_on_topic(PubSubTopic.TRACE_PLC_LOG, message)
 
@@ -131,7 +127,6 @@ class PlcSyncTask:
 
         if cnt == 0:
             AlarmLog.create(
-                utc_date_time=utc_timer.get_utc_date_time(),
+                utc_date_time=gdata.utc_date_time,
                 alarm_type=AlarmType.PLC_DISCONNECTED,
             )
-            gdata.alarm_occured = True

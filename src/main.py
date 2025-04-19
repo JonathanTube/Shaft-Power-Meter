@@ -8,21 +8,13 @@ from db.models.alarm_log import AlarmLog
 from ui.common.fullscreen_alert import FullscreenAlert
 from ui.header.index import Header
 from ui.home.index import Home
-from task.breach_log_task import BreachLogTask
-from task.gps_read_task import GpsReadTask
-from task.plc_sync_task import PlcSyncTask
-from task.modbus_read_task import ModbusReadTask
-from task.data_save_task import DataSaveTask
 from db.data_init import DataInit
 from db.table_init import TableInit
 from db.models.preference import Preference
 from db.models.language import Language
-from task.counter_total_task import CounterTotalTask
-from task.counter_interval_task import CounterIntervalTask
-from task.counter_manually_task import CounterManuallyTask
 from task.test_mode_task import TestModeTask
 from ui.common.audio_alarm import AudioAlarm
-from task.utc_timer_task import utc_timer
+from task.task_manager import TaskManager
 from common.global_data import gdata
 
 
@@ -52,19 +44,6 @@ def set_system_unit(page: ft.Page):
     page.session.set('system_unit', system_unit)
 
 
-def start_tasks(page: ft.Page):
-    asyncio.create_task(utc_timer.start())
-    asyncio.create_task(CounterTotalTask(page).start())
-    asyncio.create_task(CounterManuallyTask(page).start())
-    asyncio.create_task(CounterIntervalTask(page).start())
-
-    asyncio.create_task(PlcSyncTask(page).start())
-    asyncio.create_task(ModbusReadTask(page).start())
-    asyncio.create_task(DataSaveTask(page).start())
-    asyncio.create_task(GpsReadTask(page).start())
-    asyncio.create_task(BreachLogTask(page).start())
-
-
 def add_file_picker(page: ft.Page):
     file_picker = ft.FilePicker()
     page.overlay.append(file_picker)
@@ -87,29 +66,17 @@ async def handle_unexpected_exit():
     await asyncio.sleep(5)
     date_time_conf: DateTimeConf = DateTimeConf.get()
     # if the time diff is more than 5 seconds, send the alarm
-    if abs((date_time_conf.system_date_time - utc_timer.get_utc_date_time()).total_seconds()) > 5:
+    if abs((date_time_conf.system_date_time - gdata.system_date_time).total_seconds()) > 5:
         AlarmLog.create(
-            utc_date_time=utc_timer.get_utc_date_time(),
+            utc_date_time=gdata.utc_date_time,
             alarm_type=AlarmType.APP_UNEXPECTED_EXIT
         )
-        gdata.alarm_occured = True
-
-
-async def on_breach_alarm_occured(fullscreen_alert: FullscreenAlert, audio_alarm: AudioAlarm):
-    while True:
-        if gdata.breach_eexi_occured:
-            audio_alarm.play()
-            fullscreen_alert.start()
-        else:
-            audio_alarm.stop()
-            fullscreen_alert.stop()
-        await asyncio.sleep(1)
 
 
 async def main(page: ft.Page):
     TableInit.init()
     DataInit.init()
-    start_tasks(page)
+    TaskManager(page).start_all()
 
     asyncio.create_task(handle_unexpected_exit())
 
@@ -139,15 +106,13 @@ async def main(page: ft.Page):
 
     page.appbar = Header(main_content, TestModeTask(page))
 
-    fullscreen_alert = FullscreenAlert()
-    audio_alarm = AudioAlarm()
+    fullscreen_alert = FullscreenAlert(page)
+    audio_alarm = AudioAlarm(page)
 
     main_stack = ft.Stack(
         [fullscreen_alert, main_content, audio_alarm], expand=True)
 
     page.add(main_stack)
-
-    asyncio.create_task(on_breach_alarm_occured(fullscreen_alert, audio_alarm))
 
 if __name__ == "__main__":
     check_single_instance()

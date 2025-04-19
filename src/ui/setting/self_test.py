@@ -1,7 +1,6 @@
 import flet as ft
 from common.const_pubsub_topic import PubSubTopic
-from task.utc_timer_task import utc_timer
-
+from common.global_data import gdata
 
 class SelfTest(ft.Tabs):
     def __init__(self):
@@ -36,19 +35,19 @@ class SelfTest(ft.Tabs):
         ]
 
     async def __read_plc_data(self, topic, message):
-        utc_date_time = utc_timer.get_utc_date_time()
+        utc_date_time = gdata.utc_date_time
         content = f"{utc_date_time}: {message}"
         self.plc_log.controls.append(ft.Text(content))
         self.plc_log.update()
 
     async def __read_modbus_data(self, topic, message):
-        utc_date_time = utc_timer.get_utc_date_time()
+        utc_date_time = gdata.utc_date_time
         content = f"{utc_date_time}: {message}"
         self.modbus_log.controls.append(ft.Text(content))
         self.modbus_log.update()
 
     async def __read_gps_log(self, topic, message):
-        utc_date_time = utc_timer.get_utc_date_time()
+        utc_date_time = gdata.utc_date_time
         content = f"{utc_date_time}: {message}"
         self.gps_log.controls.append(ft.Text(content))
         self.gps_log.update()

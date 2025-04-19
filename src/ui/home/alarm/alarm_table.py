@@ -26,6 +26,8 @@ class AlarmTable(AbstractTable):
                 return session.get("lang.alarm.modbus_disconnected")
             case AlarmType.APP_UNEXPECTED_EXIT:
                 return session.get("lang.alarm.app_unexpected_exit")
+            case AlarmType.POWER_OVERLOAD:
+                return session.get("lang.alarm.power_overload")
             case _:
                 return session.get("lang.alarm.unknown")
 

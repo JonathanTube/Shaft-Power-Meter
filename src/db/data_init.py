@@ -275,6 +275,12 @@ class DataInit:
                 },
 
                 {
+                    "code": "lang.common.revolution",
+                    "chinese": "圈数",
+                    "english": "Revolution"
+                },
+
+                {
                     "code": "lang.common.average_power",
                     "chinese": "平均功率",
                     "english": "Average Power"
@@ -630,13 +636,6 @@ class DataInit:
                     "code": "lang.setting.test_mode.max_revolution",
                     "chinese": "最大圈数",
                     "english": "Max Revolution"
-                },
-
-
-                {
-                    "code": "lang.setting.test_mode.data_generation_interval",
-                    "chinese": "数据生成间隔",
-                    "english": "Data Generation Interval"
                 },
 
                 {
@@ -1294,6 +1293,11 @@ class DataInit:
                     "code": "lang.alarm.app_unexpected_exit",
                     "chinese": "应用意外退出",
                     "english": "App Unexpected Exit"
+                },
+                {
+                    "code": "lang.alarm.power_overload",
+                    "chinese": "功率过载",
+                    "english": "Power Overload"
                 },
                 {
                     "code": "lang.alarm.unknown",

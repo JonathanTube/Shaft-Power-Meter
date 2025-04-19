@@ -7,8 +7,6 @@ from common.const_alarm_type import AlarmType
 from common.const_pubsub_topic import PubSubTopic
 from db.models.alarm_log import AlarmLog
 from db.models.io_conf import IOConf
-from db.models.preference import Preference
-from task.utc_timer_task import utc_timer
 from common.global_data import gdata
 
 
@@ -18,11 +16,10 @@ class ModbusReadTask:
         self.modbus_client = None
 
     async def start(self):
-        preference: Preference = Preference.get()
         await self.__connect()
         while True:
             await self.__read_sps1_data()
-            await asyncio.sleep(preference.data_refresh_interval)
+            await asyncio.sleep(1)
 
     async def __read_sps1_data(self):
         thrust = 0
@@ -80,13 +77,9 @@ class ModbusReadTask:
 
         if cnt == 0:
             AlarmLog.create(
-                utc_date_time=utc_timer.get_utc_date_time(),
+                utc_date_time=gdata.utc_date_time,
                 alarm_type=AlarmType.MODBUS_DISCONNECTED,
             )
-            gdata.alarm_occured = True
-
-    def __set_session(self, key: str, value: any):
-        self.page.session.set(key, value)
 
     def __send_msg(self, message: str):
         self.page.pubsub.send_all_on_topic(

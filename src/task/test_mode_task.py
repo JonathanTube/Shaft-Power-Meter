@@ -4,15 +4,14 @@ import random
 from db.models.data_log import DataLog
 from db.models.system_settings import SystemSettings
 from utils.formula_cal import FormulaCalculator
-from task.utc_timer_task import utc_timer
 from common.global_data import gdata
 from db.models.alarm_log import AlarmLog
 from db.models.event_log import EventLog
 from db.models.report_info import ReportInfo
-
-
+from common.const_pubsub_topic import PubSubTopic
+import flet as ft
 class TestModeTask:
-    def __init__(self, page):
+    def __init__(self, page: ft.Page):
         self.page = page
         self.min_torque = 0
         self.max_torque = 0
@@ -22,7 +21,6 @@ class TestModeTask:
         self.max_thrust = 0
         self.min_revolution = 0
         self.max_revolution = 0
-        self.time_interval = 0
         self.is_running = False
 
     def set_torque_range(self, min_torque, max_torque):
@@ -41,13 +39,11 @@ class TestModeTask:
         self.min_revolution = min_revolution
         self.max_revolution = max_revolution
 
-    def set_time_interval(self, time_interval):
-        self.time_interval = time_interval
 
     async def start(self):
         self.system_settings = SystemSettings.get()
         self.is_running = True
-        # start a thread to generate random data every time_interval seconds
+        # start a thread to generate random data every seconds
         return asyncio.create_task(self.generate_random_data())
 
     def stop(self):
@@ -68,43 +64,29 @@ class TestModeTask:
             gdata.sps2_thrust = 0
             gdata.sps2_rounds = 0
 
-            gdata.breach_eexi_occured = False
-            gdata.alarm_occured = False
-            gdata.power_overload_occured = False
+            self.page.pubsub.send_all_on_topic(PubSubTopic.BREACH_EEXI_OCCURED_FOR_AUDIO, False)
+            self.page.pubsub.send_all_on_topic(PubSubTopic.BREACH_EEXI_OCCURED_FOR_FULLSCREEN, False)
+            self.page.pubsub.send_all_on_topic(PubSubTopic.BREACH_POWER_OVERLOAD_OCCURED, False)
         except Exception as e:
             print(f'Error truncating DataLog table: {e}')
         self.is_running = False
 
     async def generate_random_data(self):
-        print(f'self.is_running={self.is_running}')
+        # print(f'self.is_running={self.is_running}')
         while self.is_running:
             # start to generate random data in range of min and max
             # print(f'generate_random_data')
             await self.save_generated_data('sps1')
             if self.system_settings.amount_of_propeller == 2:
                 await self.save_generated_data('sps2')
-            await asyncio.sleep(self.time_interval)
+            await asyncio.sleep(1)
 
     async def save_generated_data(self, name):
         instant_torque = int(random.uniform(self.min_torque, self.max_torque))
         instant_speed = int(random.uniform(self.min_speed, self.max_speed))
         instant_thrust = int(random.uniform(self.min_thrust, self.max_thrust))
-        instant_revolution = int(random.uniform(
-            self.min_revolution, self.max_revolution))
-        # print(f'instant_torque={instant_torque}, instant_speed={instant_speed}, instant_thrust={instant_thrust}, instant_revolution={instant_revolution}')
-        instant_power = FormulaCalculator.calculate_instant_power(
-            instant_torque, instant_speed)
-        utc_date_time = utc_timer.get_utc_date_time()
-
-        DataLog.create(
-            name=name,
-            utc_date_time=utc_date_time,
-            torque=instant_torque,
-            speed=instant_speed,
-            thrust=instant_thrust,
-            rounds=instant_revolution,
-            power=instant_power
-        )
+        instant_revolution = int(random.uniform(self.min_revolution, self.max_revolution))
+        instant_power = FormulaCalculator.calculate_instant_power(instant_torque, instant_speed)
         if name == 'sps1':
             gdata.sps1_torque = instant_torque
             gdata.sps1_speed = instant_speed

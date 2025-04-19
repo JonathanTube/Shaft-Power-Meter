@@ -1,11 +1,13 @@
 import flet as ft
 
+from common.const_pubsub_topic import PubSubTopic
 from db.models.preference import Preference
 from db.models.propeller_setting import PropellerSetting
 from ui.common.color_picker import ColorDialog
 from ui.common.custom_card import CustomCard
 from ui.common.toast import Toast
 from utils.unit_converter import UnitConverter
+from common.global_data import gdata
 
 
 class PropellerConf(ft.Container):
@@ -14,8 +16,8 @@ class PropellerConf(ft.Container):
         self.expand = True
         self.alignment = ft.alignment.top_left
 
-        self.system_unit = Preference.get().system_unit
-        self.propeller_setting = PropellerSetting.get()
+        self.system_unit: Preference = Preference.get().system_unit
+        self.propeller_setting: PropellerSetting = PropellerSetting.get()
 
     def __get_shaft_power(self) -> tuple[float, str]:
         _shaft_power = self.propeller_setting.shaft_power_of_mcr_operating_point
@@ -91,7 +93,8 @@ class PropellerConf(ft.Container):
         )
         self.line_color_of_normal_propeller_curve = ColorDialog(
             color=self.propeller_setting.line_color_of_normal_propeller_curve,
-            on_change=lambda color: setattr(self.propeller_setting, 'line_color_of_normal_propeller_curve', color)
+            on_change=lambda color: setattr(
+                self.propeller_setting, 'line_color_of_normal_propeller_curve', color)
         )
 
         self.normal_propeller_curve_card = CustomCard(
@@ -208,7 +211,8 @@ class PropellerConf(ft.Container):
 
         self.line_color_of_overload_curve = ColorDialog(
             color=self.propeller_setting.line_color_of_overload_curve,
-            on_change=lambda color: setattr(self.propeller_setting, 'line_color_of_overload_curve', color)
+            on_change=lambda color: setattr(
+                self.propeller_setting, 'line_color_of_overload_curve', color)
         )
 
         self.overload_curve_card = CustomCard(
@@ -223,6 +227,11 @@ class PropellerConf(ft.Container):
             col={"md": 6})
 
     def __save_data(self, e):
+        if self.propeller_setting.alarm_enabled_of_overload_curve:
+            gdata.enable_power_overload_alarm = True
+        else:
+            gdata.enable_power_overload_alarm = False
+
         self.propeller_setting.save()
         Toast.show_success(e.page)
 

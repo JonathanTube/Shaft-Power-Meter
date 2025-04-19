@@ -19,7 +19,5 @@ class TestModeConf(BaseModel):
 
     max_revolution = IntegerField(verbose_name="最大转速", default=0)
 
-    time_interval = IntegerField(verbose_name="时间间隔", default=0)
-
     class Meta:
         table_name = 'test_mode_conf'

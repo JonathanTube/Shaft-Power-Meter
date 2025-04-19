@@ -1,5 +1,6 @@
 import asyncio
 import flet as ft
+from common.const_pubsub_topic import PubSubTopic
 from ui.home.alarm.alarm_list import AlarmList
 from ui.home.counter.index import Counter
 from ui.home.dashboard.index import Dashboard
@@ -10,7 +11,6 @@ from ui.home.event.event_list import EventList
 from db.models.event_log import EventLog
 from db.models.alarm_log import AlarmLog
 from db.models.system_settings import SystemSettings
-from common.global_data import gdata
 
 
 class Home(ft.Container):
@@ -163,7 +163,7 @@ class Home(ft.Container):
         self.event.update()
 
     def update_alarm_badge(self):
-        count = AlarmLog.select().count()
+        count = AlarmLog.select().where(AlarmLog.acknowledge_time == None).count()
         if count > 0:
             self.alarm.badge = ft.Badge(
                 text=str(count),
@@ -184,27 +184,37 @@ class Home(ft.Container):
             self.alarm.update()
             await asyncio.sleep(1)
 
-    async def update_all(self):
-        while True:
-            if gdata.breach_eexi_occured:
-                self.update_event_badge()
+    def handle_alarm_change(self, topic, value):
+        if value:
+            self.update_alarm_badge()
+            self.toggle_alarm_task = self.page.run_task(
+                self.toggle_alarm_bgcolor)
+        else:
+            if self.toggle_alarm_task is not None:
+                self.toggle_alarm_task.cancel()
 
-            if gdata.alarm_occured:
-                self.update_alarm_badge()
-                if self.current_index == 4:
-                    alarm_list: AlarmList = self.main_container.content
-                    alarm_list.table.search(start_date=None, end_date=None)
-
-            if gdata.power_overload_occured:
-                self.toggle_alarm_bgcolor()
-
-            await asyncio.sleep(5)
+    def handle_event_change(self, topic, value):
+        if value:
+            self.update_event_badge()
 
     def did_mount(self):
+        self.page.pubsub.subscribe_topic(
+            PubSubTopic.BREACH_POWER_OVERLOAD_OCCURED,
+            self.handle_alarm_change
+        )
+
+        self.page.pubsub.subscribe_topic(
+            PubSubTopic.BREACH_EEXI_OCCURED_FOR_BADGE,
+            self.handle_event_change
+        )
         self.update_event_badge()
         self.update_alarm_badge()
-        self.task = self.page.run_task(self.update_all)
+
 
     def will_unmount(self):
-        if self.task:
-            self.task.cancel()
+        self.page.pubsub.unsubscribe_topic(
+            PubSubTopic.BREACH_POWER_OVERLOAD_OCCURED
+        )
+        self.page.pubsub.unsubscribe_topic(
+            PubSubTopic.BREACH_EEXI_OCCURED_FOR_BADGE
+        )

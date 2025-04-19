@@ -7,7 +7,6 @@ from db.models.gps_log import GpsLog
 import asyncio
 import random
 from db.models.io_conf import IOConf
-from task.utc_timer_task import utc_timer
 from common.global_data import gdata
 
 
@@ -69,10 +68,9 @@ class GpsReadTask:
 
         if cnt == 0:
             AlarmLog.create(
-                utc_date_time=utc_timer.get_utc_date_time(),
+                utc_date_time=gdata.utc_date_time,
                 alarm_type=AlarmType.GPS_DISCONNECTED,
             )
-            gdata.alarm_occured = True
 
     async def receive_data(self):
         while not self.reader.at_eof():
@@ -122,15 +120,12 @@ class GpsReadTask:
                 latitude = msg.latitude
                 longitude = msg.longitude
                 location = f"{longitude},{latitude}"
-                self.__set_session('instant_gps_location', location)
+                gdata.gps_location = location
                 utc_date_time = f"{utc_date} {utc_time}"
                 GpsLog.create(location=location, utc_date_time=utc_date_time)
         except pynmea2.ParseError as e:
             self.__send_message(f"parse nmea sentence failed: {e}")
-            self.__set_session('instant_gps_location', None)
-
-    def __set_session(self, key: str, value: any):
-        self.page.session.set(key, value)
+            gdata.gps_location = None
 
     def __send_message(self, message: str):
         self.page.pubsub.send_all_on_topic(PubSubTopic.TRACE_GPS_LOG, message)

@@ -1,5 +1,5 @@
 from db.models.data_log import DataLog
-from datetime import datetime, timedelta
+from datetime import datetime
 from peewee import fn
 from typing import Literal
 import flet as ft
@@ -42,7 +42,7 @@ class CounterManuallyTask:
         average_power = data_log['average_power']
         max_rounds = data_log['max_rounds']
         min_rounds = data_log['min_rounds']
-        
+
         return self.__handle_result(name, start_time, end_time, average_power, max_rounds, min_rounds)
 
     def __handle_result(self, name: Literal['sps1', 'sps2'], start_time: datetime, end_time: datetime, average_power: float, max_rounds: int, min_rounds: int):
