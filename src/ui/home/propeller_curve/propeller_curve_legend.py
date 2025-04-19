@@ -12,6 +12,7 @@ class PropellerCurveLegend(ft.Container):
         self.border_radius = 10
         self.border_width = 1
         self.padding = 10
+        self.top = 50
         self.left = 100
 
         self.normal_propeller_color = normal_propeller_color
