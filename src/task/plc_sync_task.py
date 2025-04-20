@@ -13,7 +13,7 @@ class PlcSyncTask:
     def __init__(self, page: ft.Page):
         self.page = page
         self.plc_client = None
-        self.io_conf = IOConf.get()
+        self.io_conf: IOConf = IOConf.get()
 
     async def start(self):
         await self.__connect()
@@ -82,8 +82,7 @@ class PlcSyncTask:
         msg_range_thrust = f"4-20MA thrust (min:{thrust_range_min}, max:{thrust_range_max}, offset:{thrust_range_offset})"
         msg_range_speed = f"4-20MA speed (min:{speed_range_min}, max:{speed_range_max}, offset:{speed_range_offset})"
         msg_instant_values = f"instant values: power:{power}, torque:{torque}, thrust:{thrust}, speed:{speed}, rounds:{rounds}"
-        self.__send_msg(
-            f"[{msg_range_power}] , [{msg_range_torque}] , [{msg_range_thrust}] , [{msg_range_speed}] , [{msg_instant_values}]")
+        self.__send_msg(f"[{msg_range_power}] , [{msg_range_torque}] , [{msg_range_thrust}] , [{msg_range_speed}] , [{msg_instant_values}]")
 
         gdata.sps1_speed = speed
         gdata.sps1_rounds = rounds

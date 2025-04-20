@@ -1,35 +1,86 @@
 import flet as ft
+import pandas as pd
+import random
+import string
 
 from db.models.alarm_log import AlarmLog
 from ui.common.datetime_search import DatetimeSearch
 from ui.common.toast import Toast
 from ui.home.alarm.alarm_table import AlarmTable
 from common.global_data import gdata
+from common.const_alarm_type import AlarmType
 
 
 class AlarmList(ft.Container):
     def __init__(self):
         super().__init__()
+        self.file_picker = None
         self.expand = True
         self.padding = 10
 
     def build(self):
-        search = DatetimeSearch(self.__on_search)
+        self.search = DatetimeSearch(self.__on_search)
+        export_button = ft.OutlinedButton(text=self.page.session.get("lang.common.export"), height=40, icon=ft.Icons.DOWNLOAD_OUTLINED, on_click=self.__on_export)
+
         self.table = AlarmTable(10, show_checkbox_column=True)
 
-        self.ack_button = ft.FilledButton(
-            text=self.page.session.get("lang.alarm.acknowledge"),
-            on_click=self.__on_acknowledge
-        )
+        self.ack_button = ft.OutlinedButton(text=self.page.session.get("lang.alarm.acknowledge"), height=40, icon=ft.Icons.CHECK_CIRCLE_OUTLINED, on_click=self.__on_acknowledge)
+
         self.content = ft.Column(
             expand=False,
             spacing=5,
             controls=[
-                search,
+                ft.Row([self.search, export_button]),
                 self.table,
                 self.ack_button
             ]
         )
+
+    def __on_export(self, e):
+        self.file_picker = ft.FilePicker()
+        self.page.overlay.append(self.file_picker)
+        self.page.update()
+        random_str = ''.join(random.choices(string.ascii_letters + string.digits, k=2))
+        self.file_picker.save_file(file_name=f"AlarmLog_{random_str}.xlsx", allowed_extensions=["xlsx", "xls"])
+        self.file_picker.on_result = lambda e: self.__on_result(e)
+
+    def __on_result(self, e):
+        if e.path:
+            start_date = self.search.date_time_range.start_date.value
+            end_date = self.search.date_time_range.end_date.value
+            # print(start_date, end_date)
+            if start_date and end_date:
+                query = AlarmLog.select(AlarmLog.utc_date_time, AlarmLog.alarm_type, AlarmLog.acknowledge_time).where(
+                    AlarmLog.utc_date_time >= start_date & AlarmLog.utc_date_time <= end_date).order_by(AlarmLog.id.desc()).limit(1000)
+            else:
+                query = AlarmLog.select(AlarmLog.utc_date_time, AlarmLog.alarm_type, AlarmLog.acknowledge_time).order_by(AlarmLog.id.desc()).limit(1000)
+            data = []
+            for item in query:
+                data.append({
+                    "utc_date_time": item.utc_date_time,
+                    "alarm_type": AlarmType.get_alarm_type_name(item.alarm_type),
+                    "acknowledge_time": item.acknowledge_time
+                })
+            df = pd.DataFrame(data)
+            with pd.ExcelWriter(e.path, engine="xlsxwriter") as writer:  # 显式指定引擎
+                df.to_excel(writer, sheet_name="报警记录", index=False)
+                # 获取工作表对象
+                worksheet = writer.sheets["报警记录"]
+                # 精确设置列宽（通过列位置索引）
+                column_width_config = {
+                    0: 30,   # 第一列（时间列）宽度：22字符
+                    1: 40,   # 第二列（报警类型）宽度：25
+                    2: 30    # 第三列（确认时间）宽度：20
+                }
+                # 批量设置列宽
+                for col_num, width in column_width_config.items():
+                    worksheet.set_column(col_num, col_num, width)
+                # 如果需要设置日期格式（额外优化）
+                date_format = writer.book.add_format({'num_format': 'yyyy-mm-dd hh:mm:ss'})
+                worksheet.set_column(0, 0, 22, date_format)  # 重新设置第一列格式
+
+        if self.file_picker:
+            self.page.overlay.remove(self.file_picker)
 
     def __on_acknowledge(self, e):
         # get selected rows
@@ -37,10 +88,9 @@ class AlarmList(ft.Container):
         if len(selected_rows) == 0:
             Toast.show_error(self.page, self.page.session.get("lang.alarm.please_select_at_least_one_alarm"))
             return
+
         for row in selected_rows:
-            AlarmLog.update(
-                acknowledge_time=gdata.utc_date_time).where(
-                AlarmLog.id == row.cells[0].data).execute()
+            AlarmLog.update(acknowledge_time=gdata.utc_date_time).where(AlarmLog.id == row.cells[0].data).execute()
 
         self.table.search()
         Toast.show_success(self.page)

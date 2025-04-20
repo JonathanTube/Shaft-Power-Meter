@@ -10,6 +10,7 @@ from ui.report.report_info_exporter import ReportInfoExporter
 class ReportInfoTable(AbstractTable):
     def __init__(self, page_size: int = 10):
         super().__init__(page_size)
+        self.file_picker = None
         self.width = 1000
 
     def load_total(self):
@@ -48,16 +49,16 @@ class ReportInfoTable(AbstractTable):
 
     def create_operations(self, items: list):
         view_button = ft.TextButton(
-                    icon=ft.Icons.VISIBILITY_OUTLINED,
-                    text="View",
-                    on_click=lambda e: self.__view_report(e, items[0],items[1])
-                )
-         
+            icon=ft.Icons.VISIBILITY_OUTLINED,
+            text="View",
+            on_click=lambda e: self.__view_report(e, items[0], items[1])
+        )
+
         export_button = ft.TextButton(
-                    icon=ft.Icons.DOWNLOAD_OUTLINED,
-                    text="Export",
-                    on_click=lambda e: self.__export_report(e, items[0],items[1])
-                )   
+            icon=ft.Icons.DOWNLOAD_OUTLINED,
+            text="Export",
+            on_click=lambda e: self.__export_report(e, items[0], items[1])
+        )
 
         session = self.page.session
         view_button.text = session.get("lang.common.view")
@@ -69,17 +70,18 @@ class ReportInfoTable(AbstractTable):
         e.page.open(ReportInfoDialog(id, report_name))
 
     def __export_report(self, e, id: int, report_name: str):
-        file_picker = e.page.session.get('file_picker_for_pdf_export')
-        file_picker.save_file(
-            file_name=f"{report_name}.pdf",
-            allowed_extensions=["pdf"]
-        )
-        file_picker.on_result = lambda e: self.__on_result(e, id)
+        self.file_picker = ft.FilePicker()
+        self.page.overlay.append(self.file_picker)
+        self.page.update()
+        self.file_picker.save_file(file_name=f"{report_name}.pdf", allowed_extensions=["pdf"])
+        self.file_picker.on_result = lambda e: self.__on_result(e, id)
 
     def __on_result(self, e: ft.FilePickerResultEvent, id: int):
         if e.path:
             ReportInfoExporter().generate_pdf(e.path, id)
             Toast.show_success(e.page, self.page.session.get("lang.report.export_success"))
+        if self.file_picker:
+            self.page.overlay.remove(self.file_picker)
 
     def create_columns(self):
         return self.__get_language()

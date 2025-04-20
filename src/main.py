@@ -39,17 +39,6 @@ def load_language(page: ft.Page):
             page.session.set(item.code, item.chinese)
 
 
-def set_system_unit(page: ft.Page):
-    system_unit = Preference.get().system_unit
-    page.session.set('system_unit', system_unit)
-
-
-def add_file_picker(page: ft.Page):
-    file_picker = ft.FilePicker()
-    page.overlay.append(file_picker)
-    page.session.set('file_picker_for_pdf_export', file_picker)
-
-
 def check_single_instance(mutex_name: str = "shaft-power-meter"):
     # 创建互斥锁
     mutex = ctypes.windll.kernel32.CreateMutexW(None, False, mutex_name)
@@ -81,9 +70,6 @@ async def main(page: ft.Page):
     asyncio.create_task(handle_unexpected_exit())
 
     load_language(page)
-    set_system_unit(page)
-
-    add_file_picker(page)
 
     page.title = page.session.get("lang.lang.app.name")
     page.padding = 0
