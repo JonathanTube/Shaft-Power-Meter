@@ -130,6 +130,9 @@ class ReportInfoDialog(ft.AlertDialog):
             expand=True,
             width=self.content_width,
             controls=[
+                self.__create_label("Override activation/Reactivation:", col=6),
+                self.__create_value("activation" if started_at != "N/A" else "N/A", col=6),
+
                 self.__create_label("Date/Time of Power Reserve Breach:", col=6),
                 self.__create_value(started_at, col=6),
 
@@ -185,6 +188,9 @@ class ReportInfoDialog(ft.AlertDialog):
             expand=True,
             width=self.content_width,
             controls=[
+                self.__create_label("Override activation/Reactivation:", col=6),
+                self.__create_value("reactivation" if ended_at != "N/A" else "N/A", col=6),
+
                 self.__create_label("Date/Time when returning to limited power:", col=6),
                 self.__create_value(ended_at, col=6),
 

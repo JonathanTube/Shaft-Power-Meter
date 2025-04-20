@@ -1,0 +1,58 @@
+import flet as ft
+from db.models.preference import Preference
+from ui.setting.general.genera_limitation_max import GeneralLimitationMax
+from ui.setting.general.general_date_time import GeneralDateTime
+from ui.setting.general.general_limitation_warning import GeneralLimitationWarning
+from ui.setting.general.general_preference import GeneralPreference
+from ui.common.toast import Toast
+
+class General(ft.Container):
+    def __init__(self):
+        super().__init__()
+        self.expand = True
+        self.preference: Preference = Preference.get()
+        self.system_unit = self.preference.system_unit
+
+    def __save_data(self, e):
+        self.general_preference.save_data()
+        self.limitation_max.save_data()
+        self.limitation_warning.save_data()
+        self.general_date_time.save_data()
+        Toast.show_success(e.page)
+
+    def __reset_data(self, e):
+        self.content.clean()
+        self.build()
+        self.update()
+
+    def __on_system_unit_change(self, system_unit: int):
+        self.system_unit = system_unit
+        self.limitation_max.update_unit(system_unit)
+        self.limitation_warning.update_unit(system_unit)
+
+    def build(self):
+        self.general_preference = GeneralPreference(self.__on_system_unit_change)
+        self.limitation_max = GeneralLimitationMax(self.system_unit)
+        self.limitation_warning = GeneralLimitationWarning(self.system_unit)
+        self.general_date_time = GeneralDateTime()
+
+        self.content = ft.Column(
+            scroll=ft.ScrollMode.ADAPTIVE,
+            expand=True,
+            controls=[
+                ft.ResponsiveRow(
+                    controls=[
+                        self.general_preference,
+                        self.limitation_max,
+                        self.limitation_warning,
+                        self.general_date_time,
+                        ft.Row(
+                            alignment=ft.MainAxisAlignment.CENTER,
+                            controls=[
+                                ft.FilledButton(self.page.session.get("lang.button.save"), width=120, height=40, on_click=lambda e: self.__save_data(e)),
+                                ft.OutlinedButton(self.page.session.get("lang.button.reset"), width=120, height=40, on_click=lambda e: self.__reset_data(e))
+                            ])
+                    ]
+                )
+            ]
+        )

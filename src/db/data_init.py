@@ -1305,6 +1305,16 @@ class DataInit:
                     "english": "Unknown"
                 },
                 {
+                    "code": "lang.alarm.acknowledge",
+                    "chinese": "确认",
+                    "english": "Acknowledge"
+                },
+                {
+                    "code": "lang.alarm.please_select_at_least_one_alarm",
+                    "chinese": "请至少选择一个告警",
+                    "english": "Please select at least one alarm"
+                },
+                {
                     "code": "lang.permission.user_name",
                     "chinese": "用户名",
                     "english": "User Name"
@@ -1323,5 +1333,75 @@ class DataInit:
                     "code": "lang.permission.edit_user",
                     "chinese": "编辑用户",
                     "english": "Edit User"
+                },
+                {
+                    "code": "lang.permission.delete_user",
+                    "chinese": "删除用户",
+                    "english": "Delete User"
+                },
+                {
+                    "code": "lang.permission.role",
+                    "chinese": "角色",
+                    "english": "Role"
+                },
+                {
+                    "code": "lang.permission.add_user",
+                    "chinese": "添加用户",
+                    "english": "Add User"
+                },
+                {
+                    "code": "lang.permission.confirm_user_pwd",
+                    "chinese": "确认密码",
+                    "english": "Confirm Password"
+                },
+                {
+                    "code": "lang.permission.user_name_exists",
+                    "chinese": "用户名已存在",
+                    "english": "User Name Exists"
+                },
+                {
+                    "code": "lang.permission.password_not_match",
+                    "chinese": "密码不匹配",
+                    "english": "Password Not Match"
+                },
+                {
+                    "code": "lang.permission.user_name_required",
+                    "chinese": "用户名不能为空",
+                    "english": "User Name Required"
+                },
+                {
+                    "code": "lang.permission.user_pwd_required",
+                    "chinese": "密码不能为空",
+                    "english": "Password Required"
+                },
+                {
+                    "code": "lang.permission.confirm_user_pwd_required",
+                    "chinese": "确认密码不能为空",
+                    "english": "Confirm Password Required"
+                },
+                {
+                    "code": "lang.permission.user_role_required",
+                    "chinese": "角色不能为空",
+                    "english": "User Role Required"
+                },
+                {
+                    "code": "lang.permission.all",
+                    "chinese": "所有",
+                    "english": "All"
+                },
+                {
+                    "code": "lang.permission.admin",
+                    "chinese": "管理员",
+                    "english": "Admin"
+                },
+                {
+                    "code": "lang.permission.master",
+                    "chinese": "主控",
+                    "english": "Master"
+                },
+                {
+                    "code": "lang.permission.captain",
+                    "chinese": "船长",
+                    "english": "Captain"
                 }
             ]).execute()

@@ -1,6 +1,6 @@
 import flet as ft
 
-from ui.setting.general import General
+from ui.setting.general.index import General
 from ui.setting.io import IO
 from ui.setting.propeller_conf import PropellerConf
 from ui.setting.system_conf import SystemConf

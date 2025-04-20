@@ -19,6 +19,7 @@ class Home(ft.Container):
         self.system_settings = SystemSettings.get()
         self.current_index = 0
 
+        self.toggle_alarm_task = None
         self.default_button_style = ft.ButtonStyle(
             shape=ft.RoundedRectangleBorder(radius=ft.border_radius.all(0)),
             color=ft.Colors.INVERSE_SURFACE
@@ -187,8 +188,7 @@ class Home(ft.Container):
     def handle_alarm_change(self, topic, value):
         if value:
             self.update_alarm_badge()
-            self.toggle_alarm_task = self.page.run_task(
-                self.toggle_alarm_bgcolor)
+            self.toggle_alarm_task = self.page.run_task(self.toggle_alarm_bgcolor)
         else:
             if self.toggle_alarm_task is not None:
                 self.toggle_alarm_task.cancel()

@@ -145,7 +145,10 @@ class ReportInfoExporter(FPDF):
     def __handle_event_log_start(self):
         label_width = self.per_cell_width * 2
         value_width = self.per_cell_width * 2
-        
+        self.__insert_label("Override activation/Reactivation", w=label_width)
+        self.__insert_value("activation" if self.event_log.started_at != "N/A" else "N/A", w=value_width)
+        self.ln()
+
         self.__insert_label("Date/Time of Power Reserve Breach", w=label_width)
         if self.event_log.started_at:
             self.__insert_value(self.event_log.started_at.strftime("%Y-%m-%d %H:%M:%S"), w=value_width)
@@ -195,6 +198,11 @@ class ReportInfoExporter(FPDF):
     def __handle_event_log_end(self):
         label_width = self.per_cell_width * 2
         value_width = self.per_cell_width * 2
+
+        self.__insert_label("Override activation/Reactivation", w=label_width)
+        self.__insert_value("reactivation" if self.event_log.ended_at != "N/A" else "N/A", w=value_width)
+        self.ln()
+
         self.__insert_label(
             "Date/Time when returning to limited power", w=label_width)
         if self.event_log.ended_at:

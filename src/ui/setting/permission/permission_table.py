@@ -1,6 +1,7 @@
 import flet as ft
 from ui.common.abstract_table import AbstractTable
 from db.models.user import User
+from ui.common.toast import Toast
 
 
 class PermissionTable(AbstractTable):
@@ -46,10 +47,37 @@ class PermissionTable(AbstractTable):
         session = self.page.session
         edit_button.text = session.get("lang.button.edit")
         delete_button.text = session.get("lang.button.delete")
-
-        return ft.Row(controls=[edit_button, delete_button])
+        if items[3] == "admin":
+            return ft.Row(controls=[edit_button])
+        else:
+            return ft.Row(controls=[edit_button, delete_button])
 
     def __show_edit_user(self, e, items: list):
+        self.user_name = ft.TextField(
+            label=e.page.session.get("lang.permission.user_name"),
+            value=items[1],
+            read_only=True
+        )
+        self.password = ft.TextField(
+            label=e.page.session.get("lang.permission.user_pwd"),
+            value=items[2],
+            password=True
+        )
+        self.confirm_password = ft.TextField(
+            label=e.page.session.get("lang.permission.confirm_user_pwd"),
+            value=items[2],
+            password=True
+        )
+        self.role = ft.Dropdown(
+            label=e.page.session.get("lang.permission.user_role"),
+            expand=True,
+            width=400,
+            value=items[3],
+            options=[
+                ft.dropdown.Option(text="Master", key="master"),
+                ft.dropdown.Option(text="Captain", key="captain")
+            ]
+        )
         self.edit_dialog = ft.AlertDialog(
             modal=True,
             title=ft.Text(e.page.session.get("lang.permission.edit_user")),
@@ -58,41 +86,70 @@ class PermissionTable(AbstractTable):
                 height=250,
                 expand=False,
                 controls=[
-                    ft.TextField(
-                        label=e.page.session.get("lang.permission.user_name"),
-                        value=items[1]
-                    ),
-                    ft.TextField(
-                        label=e.page.session.get("lang.permission.user_pwd"),
-                        value=items[2],
-                        password=True
-                    ),
-                    ft.Dropdown(
-                        label=e.page.session.get("lang.permission.user_role"),
-                        expand=True,
-                        width=400,
-                        value=items[3],
-                        options=[
-                            ft.dropdown.Option(text="Admin", key="admin"),
-                            ft.dropdown.Option(text="Master", key="master"),
-                            ft.dropdown.Option(text="Captain", key="captain")
-                        ]
-                    )
+                    self.user_name,
+                    self.password,
+                    self.confirm_password,
+                    self.role
                 ]
             ),
             actions=[
                 ft.TextButton(e.page.session.get("lang.button.cancel"),
                               on_click=lambda e: e.page.close(self.edit_dialog)),
                 ft.TextButton(e.page.session.get("lang.button.save"),
-                              on_click=lambda e: e.page.close(self.edit_dialog))
+                              on_click=lambda e: self.__on_confirm_edit(e, items[0]))
             ]
         )
         self.page.open(self.edit_dialog)
 
+    def __on_confirm_edit(self, e, user_id: int):
+        if self.user_name.value.strip() == "":
+            Toast.show_warning(
+                e.page,
+                e.page.session.get("lang.permission.user_name_required")
+            )
+            return
+
+        if self.password.value.strip() == "":
+            Toast.show_warning(
+                e.page,
+                e.page.session.get("lang.permission.user_pwd_required")
+            )
+            return
+
+        if self.confirm_password.value.strip() == "":
+            Toast.show_warning(
+                e.page,
+                e.page.session.get("lang.permission.confirm_user_pwd_required")
+            )
+            return
+
+        if self.role.value.strip() == "":
+            Toast.show_warning(
+                e.page,
+                e.page.session.get("lang.permission.user_role_required")
+            )
+            return
+
+        if self.password.value.strip() != self.confirm_password.value.strip():
+            Toast.show_warning(
+                e.page,
+                e.page.session.get("lang.permission.password_not_match")
+            )
+            return
+
+        User.update(
+            user_pwd=self.password.value.strip(),
+            user_role=self.role.value.strip()
+        ).where(User.id == user_id).execute()
+
+        self.page.close(self.edit_dialog)
+        self.search()
+        Toast.show_success(e.page)
+
     def __show_delete_user(self, e, items: list):
         self.delete_dialog = ft.AlertDialog(
             modal=True,
-            title=ft.Text(e.page.session.get("lang.permission.edit_user")),
+            title=ft.Text(e.page.session.get("lang.permission.delete_user")),
             actions=[
                 ft.TextButton(e.page.session.get("lang.button.cancel"),
                               on_click=lambda e: e.page.close(self.delete_dialog)),
@@ -106,6 +163,7 @@ class PermissionTable(AbstractTable):
         User.delete().where(User.id == user_id).execute()
         self.page.close(self.delete_dialog)
         self.search()
+        Toast.show_success(e.page)
 
     def create_columns(self):
         return self.__get_language()
