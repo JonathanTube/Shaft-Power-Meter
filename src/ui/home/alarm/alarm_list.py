@@ -24,15 +24,14 @@ class AlarmList(ft.Container):
 
         self.table = AlarmTable(10, show_checkbox_column=True)
 
-        self.ack_button = ft.OutlinedButton(text=self.page.session.get("lang.alarm.acknowledge"), height=40, icon=ft.Icons.CHECK_CIRCLE_OUTLINED, on_click=self.__on_acknowledge)
+        ack_button = ft.OutlinedButton(text=self.page.session.get("lang.alarm.acknowledge"), height=40, icon=ft.Icons.CHECK_CIRCLE_OUTLINED, on_click=self.__on_acknowledge)
 
         self.content = ft.Column(
             expand=False,
             spacing=5,
             controls=[
-                ft.Row([self.search, export_button]),
-                self.table,
-                self.ack_button
+                ft.Row([self.search, export_button, ack_button]),
+                self.table
             ]
         )
 

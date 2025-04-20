@@ -23,12 +23,10 @@ from db.base import db
 class TableInit:
     @staticmethod
     def init():
-        # db.drop_tables([Limitations, PropellerSetting, SystemSettings, EventLog, ReportDetail, ReportInfo, TestModeConf], safe=False)
-        # db.drop_tables([DateTimeConf], safe=False)
-        # db.drop_tables([AlarmLog], safe=False)
-        db.drop_tables([Language], safe=False)
-        db.drop_tables([User], safe=False)
-        db.drop_tables([DataLog], safe=False)
+        # db.drop_tables([Language], safe=False)
+        # db.drop_tables([User], safe=False)
+        # db.drop_tables([DataLog], safe=False)
+        # db.drop_tables([EventLog], safe=False)
         db.create_tables([
             BreachReason,
             DataLog,

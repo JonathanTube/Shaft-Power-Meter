@@ -49,7 +49,7 @@ class CounterIntervalTask:
 
         if data_log['start_time'] is None or data_log['end_time'] is None:
             return
-        print(f'data_log: {data_log}')
+        # print(f'data_log: {data_log}')
         format_str = '%Y-%m-%d %H:%M:%S'
         actual_start_time = datetime.strptime(data_log['start_time'], format_str)
         actual_end_time = datetime.strptime(data_log['end_time'], format_str)

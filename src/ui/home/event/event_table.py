@@ -26,6 +26,7 @@ class EventTable(AbstractTable):
             EventLog.started_position,
             EventLog.ended_at,
             EventLog.ended_position,
+            EventLog.acknowledged_at,
             EventLog.note
         )
         if start_date and end_date:
@@ -42,6 +43,7 @@ class EventTable(AbstractTable):
                 item.started_position,
                 item.ended_at,
                 item.ended_position,
+                item.acknowledged_at,
                 item.note
                 ] for item in data]
 
@@ -54,6 +56,7 @@ class EventTable(AbstractTable):
             session.get("lang.common.start_position"),
             session.get("lang.common.end_date"),
             session.get("lang.common.end_position"),
+            session.get("lang.common.acknowledged_at"),
             session.get("lang.common.note")
         ]
 
@@ -65,7 +68,7 @@ class EventTable(AbstractTable):
 
     def create_operations(self, items: list):
         show_reason = items[1] is None or items[1].strip() == ""
-        show_note = items[6] is not None and items[6].strip() != ""
+        show_note = items[7] is not None and items[7].strip() != ""
         return ft.Row(controls=[
             ft.IconButton(
                 icon=ft.icons.WARNING,

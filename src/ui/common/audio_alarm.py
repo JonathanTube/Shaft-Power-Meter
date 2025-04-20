@@ -2,6 +2,9 @@ import os
 import flet as ft
 from pathlib import Path
 from common.const_pubsub_topic import PubSubTopic
+from db.models.event_log import EventLog
+from ui.common.permission_check import PermissionCheck
+from task.utc_timer_task import gdata
 
 
 class AudioAlarm(ft.Container):
@@ -25,7 +28,7 @@ class AudioAlarm(ft.Container):
             bgcolor=ft.Colors.RED,
             visible=False,
             color=ft.Colors.WHITE,
-            on_click=self.__on_mute
+            on_click=self.__on_override_button_click
         )
 
         self.audio_alarm = ft.Audio(
@@ -34,6 +37,9 @@ class AudioAlarm(ft.Container):
             release_mode=ft.audio.ReleaseMode.LOOP
         )
         self.page.overlay.append(self.audio_alarm)
+
+    def __on_override_button_click(self, e):
+        self.page.open(PermissionCheck(self.__on_mute, 1))
 
     def play(self):
         self.audio_alarm.play()
@@ -48,11 +54,15 @@ class AudioAlarm(ft.Container):
         self.content.visible = False
         self.content.update()
 
-    def __on_mute(self, e: ft.ControlEvent):
+    def __on_mute(self):
         self.audio_alarm.pause()
         self.content.icon = ft.Icons.NOTIFICATIONS_OFF_OUTLINED
         self.content.disabled = True
         self.content.bgcolor = ft.Colors.RED_400
+        event_log: EventLog = EventLog.select().order_by(EventLog.id.desc()).first()
+        if event_log:
+            event_log.acknowledged_at = gdata.utc_date_time
+            event_log.save()
         self.content.update()
 
     def handle_change(self, topic, value):

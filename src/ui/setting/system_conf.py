@@ -1,5 +1,3 @@
-import subprocess
-import sys
 import flet as ft
 
 from db.models.factor_conf import FactorConf
@@ -258,22 +256,23 @@ class SystemConf(ft.Container):
 
         self.ship_info.save()
         self.factor_conf.save()
+        Toast.show_success(self.page)
 
-        dlg = ft.AlertDialog(
-            title=ft.Text(self.page.session.get("lang.setting.test_mode.please_confirm")),
-            content=ft.Text(self.page.session.get("lang.setting.test_mode.system_restart_after_change")),
-            actions=[ft.TextButton(self.page.session.get("lang.button.confirm"), on_click=self.on_restart_app)]
-        )
-        self.page.open(dlg)
+        # dlg = ft.AlertDialog(
+        #     title=ft.Text(self.page.session.get("lang.setting.test_mode.please_confirm")),
+        #     content=ft.Text(self.page.session.get("lang.setting.test_mode.system_restart_after_change")),
+        #     actions=[ft.TextButton(self.page.session.get("lang.button.confirm"), on_click=self.on_restart_app)]
+        # )
+        # self.page.open(dlg)
 
-    async def restart_app(self):
-        exe = sys.executable
-        args = [exe] + sys.argv
-        subprocess.Popen(args)
-        sys.exit(0)
+    # async def restart_app(self):
+    #     exe = sys.executable
+    #     args = [exe] + sys.argv
+    #     subprocess.Popen(args)
+    #     sys.exit(0)
 
-    def on_restart_app(self, e):
-        self.page.run_task(self.restart_app)
+    # def on_restart_app(self, e):
+    #     self.page.run_task(self.restart_app)
 
     def __reset_data(self, e):
         self.__load_data()

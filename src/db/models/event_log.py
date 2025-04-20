@@ -16,6 +16,8 @@ class EventLog(BaseModel):
 
     ended_position = CharField(null=True, verbose_name="功率恢复到正常时的船舶位置")
 
+    acknowledged_at = DateTimeField(null=True, verbose_name="功率突破确认时间(mute)")
+
     note = TextField(null=True, verbose_name="备注说明")
 
     beaufort_number = TextField(null=True, verbose_name="风力等级")

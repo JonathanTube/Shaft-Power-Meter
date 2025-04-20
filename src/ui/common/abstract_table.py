@@ -7,7 +7,7 @@ from ui.common.pagination import Pagination
 class AbstractTable(ft.Container):
     def __init__(self, page_size: int = 10, table_width: int = None, show_checkbox_column: bool = False):
         super().__init__()
-        self.expand = False
+        self.expand = True
         self.margin = 0
         self.current_page = 1
         self.page_size = page_size

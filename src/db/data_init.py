@@ -400,6 +400,12 @@ class DataInit:
                 },
 
                 {
+                    "code": "lang.common.acknowledged_at",
+                    "chinese": "确认时间",
+                    "english": "Acknowledged At"
+                },
+
+                {
                     "code": "lang.common.note",
                     "chinese": "备注",
                     "english": "Note"
