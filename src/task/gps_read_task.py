@@ -1,3 +1,5 @@
+from datetime import datetime
+from zoneinfo import ZoneInfo
 import pynmea2
 import flet as ft
 from common.const_alarm_type import AlarmType
@@ -6,7 +8,6 @@ from db.models.alarm_log import AlarmLog
 from db.models.gps_log import GpsLog
 import asyncio
 import random
-from db.models.io_conf import IOConf
 from common.global_data import gdata
 
 
@@ -21,7 +22,6 @@ class GpsReadTask:
         self.retry_backoff = 2  # 退避系数
 
     async def start(self):
-        self.io_conf = IOConf.get()
         while True:
             # 建立连接
             await self.connect()
@@ -44,12 +44,10 @@ class GpsReadTask:
                 # 使用指数退避算法
                 delay = self.base_delay * (self.retry_backoff ** self.retries)
                 delay += random.uniform(0, 1)  # 添加随机抖动
-                self.__send_message(
-                    f"try to connect...({self.retries+1} times)")
+                self.__send_message(f"try to connect...({self.retries+1} times)")
 
                 self.reader, self.writer = await asyncio.wait_for(
-                    asyncio.open_connection(
-                        self.io_conf.gps_ip, self.io_conf.gps_port),
+                    asyncio.open_connection(gdata.gps_ip, gdata.gps_port),
                     timeout=5
                 )
                 self.__send_message("connect success")
@@ -61,27 +59,17 @@ class GpsReadTask:
                 await asyncio.sleep(delay)
 
     def __create_alarm_log(self):
-        cnt: int = AlarmLog.select().where(
-            (AlarmLog.alarm_type == AlarmType.GPS_DISCONNECTED) & (
-                AlarmLog.acknowledge_time == None)
-        ).count()
+        cnt: int = AlarmLog.select().where((AlarmLog.alarm_type == AlarmType.GPS_DISCONNECTED) & (AlarmLog.acknowledge_time == None)).count()
 
         if cnt == 0:
-            AlarmLog.create(
-                utc_date_time=gdata.utc_date_time,
-                alarm_type=AlarmType.GPS_DISCONNECTED,
-            )
+            AlarmLog.create(utc_date_time=gdata.utc_date_time, alarm_type=AlarmType.GPS_DISCONNECTED)
 
     async def receive_data(self):
         while not self.reader.at_eof():
             try:
-                data = await asyncio.wait_for(
-                    self.reader.readline(),
-                    timeout=5  # 设置读取超时
-                )
+                data = await asyncio.wait_for(self.reader.readline(), timeout=5)
                 if not data:
-                    self.__send_message(
-                        "receive empty data, connection may be closed")
+                    self.__send_message("receive empty data, connection may be closed")
                     break
 
                 str_data = data.decode('utf-8').strip()
@@ -121,8 +109,15 @@ class GpsReadTask:
                 longitude = msg.longitude
                 location = f"{longitude},{latitude}"
                 gdata.gps_location = location
-                utc_date_time = f"{utc_date} {utc_time}"
-                GpsLog.create(location=location, utc_date_time=utc_date_time)
+                time_str = f"{utc_date} {utc_time}"
+                GpsLog.create(location=location, utc_date_time=time_str)
+                # 更新UTC时间
+                if gdata.enable_utc_time_sync_with_gps:
+                    dt = datetime.fromisoformat(time_str)
+                    # UTC标准化+去除微秒
+                    dt_utc = dt.astimezone(ZoneInfo("UTC")).replace(microsecond=0, tzinfo=None)
+                    gdata.utc_date_time = dt_utc
+
         except pynmea2.ParseError as e:
             self.__send_message(f"parse nmea sentence failed: {e}")
             gdata.gps_location = None

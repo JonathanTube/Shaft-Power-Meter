@@ -4,7 +4,6 @@ from pymodbus.client.tcp import AsyncModbusTcpClient
 from pymodbus.exceptions import ConnectionException
 from common.const_alarm_type import AlarmType
 from common.const_pubsub_topic import PubSubTopic
-from db.models.io_conf import IOConf
 from db.models.alarm_log import AlarmLog
 from common.global_data import gdata
 
@@ -13,7 +12,6 @@ class PlcSyncTask:
     def __init__(self, page: ft.Page):
         self.page = page
         self.plc_client = None
-        self.io_conf: IOConf = IOConf.get()
 
     async def start(self):
         await self.__connect()
@@ -102,8 +100,8 @@ class PlcSyncTask:
         try:
             if self.plc_client is None:
                 self.plc_client = AsyncModbusTcpClient(
-                    host=self.io_conf.plc_ip,
-                    port=self.io_conf.plc_port,
+                    host=gdata.plc_ip,
+                    port=gdata.plc_port,
                     timeout=10,
                     retries=3
                 )
@@ -119,13 +117,7 @@ class PlcSyncTask:
         self.page.pubsub.send_all_on_topic(PubSubTopic.TRACE_PLC_LOG, message)
 
     def __create_alarm_log(self):
-        cnt: int = AlarmLog.select().where(
-            (AlarmLog.alarm_type == AlarmType.PLC_DISCONNECTED) & (
-                AlarmLog.acknowledge_time == None)
-        ).count()
+        cnt: int = AlarmLog.select().where((AlarmLog.alarm_type == AlarmType.PLC_DISCONNECTED) & (AlarmLog.acknowledge_time == None)).count()
 
         if cnt == 0:
-            AlarmLog.create(
-                utc_date_time=gdata.utc_date_time,
-                alarm_type=AlarmType.PLC_DISCONNECTED,
-            )
+            AlarmLog.create(utc_date_time=gdata.utc_date_time, alarm_type=AlarmType.PLC_DISCONNECTED)

@@ -32,6 +32,7 @@ class CounterTotalTask:
         ).where(
             DataLog.name == name
         ).dicts().get()
+        # print(data_log['start_time'], data_log['end_time'])
         if data_log['start_time'] is None or data_log['end_time'] is None:
             return
         str_format = '%Y-%m-%d %H:%M:%S'

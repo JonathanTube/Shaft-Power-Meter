@@ -6,7 +6,6 @@ from pymodbus.exceptions import ConnectionException
 from common.const_alarm_type import AlarmType
 from common.const_pubsub_topic import PubSubTopic
 from db.models.alarm_log import AlarmLog
-from db.models.io_conf import IOConf
 from common.global_data import gdata
 
 
@@ -53,11 +52,10 @@ class ModbusReadTask:
 
     async def __connect(self):
         try:
-            self.io_conf = IOConf.get()
             if self.modbus_client is None:
                 self.modbus_client = AsyncModbusTcpClient(
-                    host=self.io_conf.modbus_ip,
-                    port=self.io_conf.modbus_port,
+                    host=gdata.modbus_ip,
+                    port=gdata.modbus_port,
                     timeout=10,
                     retries=3
                 )

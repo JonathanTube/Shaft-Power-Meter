@@ -4,7 +4,7 @@ from ..base import BaseModel
 
 
 class DateTimeConf(BaseModel):
-    utc_date_time = DateTimeField(verbose_name="utc-日期时间")
+    utc_date_time = DateTimeField(verbose_name="UTC-日期时间")
 
     system_date_time = DateTimeField(verbose_name="操作系统-日期时间")
 

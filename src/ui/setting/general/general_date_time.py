@@ -112,6 +112,7 @@ class GeneralDateTime(ft.Container):
         self.date_time_conf.system_date_time = datetime.now()
         self.date_time_conf.date_time_format = self.date_time_format.value
         self.date_time_conf.sync_with_gps = self.sync_with_gps.value
+        gdata.enable_utc_time_sync_with_gps = self.sync_with_gps.value
         self.date_time_conf.save()
 
         # set session
