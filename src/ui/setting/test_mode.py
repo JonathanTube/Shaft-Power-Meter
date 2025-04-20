@@ -12,6 +12,7 @@ from task.test_mode_task import TestModeTask
 from ui.common.custom_card import CustomCard
 from ui.common.toast import Toast
 from common.global_data import gdata
+from ui.common.permission_check import PermissionCheck
 
 
 class TestMode(ft.Container):
@@ -25,31 +26,19 @@ class TestMode(ft.Container):
         self.test_mode_conf = TestModeConf.get()
 
     def create_stop_dlg(self):
+        s = self.page.session
         self.dlg_stop_modal = ft.AlertDialog(
             modal=True,
-            title=ft.Text("Please Confirm"),
-            content=ft.Text(
-                "All of the test data will be deleted. Are you sure you want to stop the test mode?"),
+            title=ft.Text(s.get("lang.setting.test_mode.please_confirm")),
+            content=None,
             actions=[
-                ft.TextButton(
-                    "Confirm", on_click=lambda e: self.stop_test_mode(e)),
-                ft.TextButton(
-                    "Cancel", on_click=lambda e: e.page.close(self.dlg_stop_modal))
+                ft.TextButton(s.get("lang.button.confirm"), on_click=lambda e: self.stop_test_mode(e)),
+                ft.TextButton(s.get("lang.button.cancel"), on_click=lambda e: e.page.close(self.dlg_stop_modal))
             ]
         )
 
-    def create_start_dlg(self):
-        self.dlg_start_modal = ft.AlertDialog(
-            modal=True,
-            title=ft.Text("Please Confirm"),
-            content=ft.Text("Are you sure you want to start the test mode?"),
-            actions=[
-                ft.TextButton(
-                    "Confirm", on_click=lambda e: self.start_test_mode(e)),
-                ft.TextButton(
-                    "Cancel", on_click=lambda e: e.page.close(self.dlg_start_modal))
-            ]
-        )
+    def __on_start_button_click(self, e):
+        self.page.open(PermissionCheck(self.start_test_mode, 0))
 
     def get_torque_and_unit(self, value) -> tuple[float, str]:
         system_unit = self.preference.system_unit
@@ -74,7 +63,6 @@ class TestMode(ft.Container):
 
     def build(self):
         self.create_stop_dlg()
-        self.create_start_dlg()
 
         min_torque_value, min_torque_unit = self.get_torque_and_unit(
             self.test_mode_conf.min_torque)
@@ -154,7 +142,7 @@ class TestMode(ft.Container):
             text=self.page.session.get('lang.button.save'),
             bgcolor=ft.Colors.PRIMARY,
             visible=not self.running,
-            on_click=lambda e: self.save_test_mode_conf(e)
+            on_click=lambda e: self.__on_save_button_click(e)
         )
 
         self.start_button = ft.FilledButton(
@@ -163,7 +151,7 @@ class TestMode(ft.Container):
             text=self.page.session.get('lang.button.start'),
             bgcolor=ft.Colors.GREEN,
             visible=not self.running,
-            on_click=lambda e: e.page.open(self.dlg_start_modal)
+            on_click=lambda e: self.__on_start_button_click(e)
         )
 
         self.stop_button = ft.FilledButton(
@@ -273,7 +261,10 @@ class TestMode(ft.Container):
         else:
             return UnitConverter.t_to_n(value)
 
-    def save_test_mode_conf(self, e):
+    def __on_save_button_click(self, e):
+        self.page.open(PermissionCheck(self.save_test_mode_conf, 0))
+
+    def save_test_mode_conf(self):
         try:
             min_torque = self.convert_torque(self.min_torque.value)
             max_torque = self.convert_torque(self.max_torque.value)
@@ -299,7 +290,7 @@ class TestMode(ft.Container):
             print(e)
             Toast.show_error(self.page, str(e))
 
-    def start_test_mode(self, e):
+    def start_test_mode(self):
         if self.running:
             return
 
@@ -321,7 +312,6 @@ class TestMode(ft.Container):
             self.test_mode_task.set_revolution_range(min_rev, max_rev)
 
             self.page.run_task(self.test_mode_task.start)
-            self.page.close(self.dlg_start_modal)
             self.running = True
             self.start_button.visible = False
             self.start_button.update()

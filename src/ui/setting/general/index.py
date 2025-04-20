@@ -5,6 +5,7 @@ from ui.setting.general.general_date_time import GeneralDateTime
 from ui.setting.general.general_limitation_warning import GeneralLimitationWarning
 from ui.setting.general.general_preference import GeneralPreference
 from ui.common.toast import Toast
+from ui.common.permission_check import PermissionCheck
 
 class General(ft.Container):
     def __init__(self):
@@ -13,12 +14,15 @@ class General(ft.Container):
         self.preference: Preference = Preference.get()
         self.system_unit = self.preference.system_unit
 
-    def __save_data(self, e):
+    def __on_save_button_click(self, e):
+        self.page.open(PermissionCheck(self.__save_data, 2))
+
+    def __save_data(self):
         self.general_preference.save_data()
         self.limitation_max.save_data()
         self.limitation_warning.save_data()
         self.general_date_time.save_data()
-        Toast.show_success(e.page)
+        Toast.show_success(self.page)
 
     def __reset_data(self, e):
         self.content.clean()
@@ -49,7 +53,7 @@ class General(ft.Container):
                         ft.Row(
                             alignment=ft.MainAxisAlignment.CENTER,
                             controls=[
-                                ft.FilledButton(self.page.session.get("lang.button.save"), width=120, height=40, on_click=lambda e: self.__save_data(e)),
+                                ft.FilledButton(self.page.session.get("lang.button.save"), width=120, height=40, on_click=lambda e: self.__on_save_button_click(e)),
                                 ft.OutlinedButton(self.page.session.get("lang.button.reset"), width=120, height=40, on_click=lambda e: self.__reset_data(e))
                             ])
                     ]

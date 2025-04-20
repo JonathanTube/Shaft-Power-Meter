@@ -5,6 +5,7 @@ from db.models.preference import Preference
 from db.models.propeller_setting import PropellerSetting
 from ui.common.color_picker import ColorDialog
 from ui.common.custom_card import CustomCard
+from ui.common.permission_check import PermissionCheck
 from ui.common.toast import Toast
 from utils.unit_converter import UnitConverter
 from common.global_data import gdata
@@ -226,14 +227,17 @@ class PropellerConf(ft.Container):
             ),
             col={"md": 6})
 
-    def __save_data(self, e):
+    def __on_save_button_click(self, e):
+        self.page.open(PermissionCheck(self.__save_data, 2))
+
+    def __save_data(self):
         if self.propeller_setting.alarm_enabled_of_overload_curve:
             gdata.enable_power_overload_alarm = True
         else:
             gdata.enable_power_overload_alarm = False
 
         self.propeller_setting.save()
-        Toast.show_success(e.page)
+        Toast.show_success(self.page)
 
     def __reset_data(self, e):
         self.propeller_setting = PropellerSetting.get()
@@ -253,7 +257,7 @@ class PropellerConf(ft.Container):
             self.page.session.get("lang.button.save"),
             width=120,
             height=40,
-            on_click=lambda e: self.__save_data(e)
+            on_click=lambda e: self.__on_save_button_click(e)
         )
 
         self.reset_button = ft.OutlinedButton(

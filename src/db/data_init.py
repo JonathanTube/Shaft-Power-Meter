@@ -154,13 +154,15 @@ class DataInit:
                 max_revolution=2000,
                 time_interval=1
             )
+
     def __init_user():
         if User.select().count() == 0:
             User.create(
-                user_name="admin",
-                user_pwd="123456",
-                user_role="admin"
+                user_name="root",
+                user_pwd="root",
+                user_role=0
             )
+
     def __init_language():
         if Language.select().count() == 0:
             Language.insert_many([
@@ -1403,5 +1405,20 @@ class DataInit:
                     "code": "lang.permission.captain",
                     "chinese": "船长",
                     "english": "Captain"
+                },
+                {
+                    "code": "lang.permission.authentication",
+                    "chinese": "认证",
+                    "english": "Authentication"
+                },
+                {
+                    "code": "lang.permission.user_name_and_pwd_are_required",
+                    "chinese": "用户名和密码不能为空",
+                    "english": "User Name and Password are required"
+                },
+                {
+                    "code": "lang.permission.user_name_or_pwd_is_incorrect",
+                    "chinese": "用户名或密码不正确",
+                    "english": "User Name or Password is Incorrect"
                 }
             ]).execute()

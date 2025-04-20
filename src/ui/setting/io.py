@@ -1,11 +1,10 @@
-import socket
 import flet as ft
 from pymodbus.client import ModbusTcpClient
 
 from db.models.io_conf import IOConf
 from ui.common.custom_card import CustomCard
 from ui.common.toast import Toast
-
+from ui.common.permission_check import PermissionCheck
 
 class IO(ft.Container):
     def __init__(self):
@@ -263,7 +262,10 @@ class IO(ft.Container):
             col={"md": 12}
         )
 
-    def __save_data(self, e):
+    def __on_save_button_click(self, e):
+        self.page.open(PermissionCheck(self.__save_data, 2))
+
+    def __save_data(self):
         plc_client = None
         try:
             self.last_io_conf.save()
@@ -284,9 +286,9 @@ class IO(ft.Container):
             plc_client.write_register(12328, int(self.last_io_conf.speed_range_min))
             plc_client.write_register(12329, int(self.last_io_conf.speed_range_max))
             plc_client.write_register(12330, int(self.last_io_conf.speed_range_offset))
-            Toast.show_success(e.page)
+            Toast.show_success(self.page)
         except Exception as err:
-            Toast.show_error(e.page, "lang.setting.save_limitations_to_plc_failed")
+            Toast.show_error(self.page, "lang.setting.save_limitations_to_plc_failed")
             print(err)
         finally:
             if plc_client:
@@ -381,7 +383,7 @@ class IO(ft.Container):
         self.__create_modbus_conf()
 
         self.save_button = ft.FilledButton(
-            self.page.session.get("lang.button.save"), width=120, height=40, on_click=self.__save_data)
+            self.page.session.get("lang.button.save"), width=120, height=40, on_click=lambda e: self.__on_save_button_click(e))
         self.reset_button = ft.OutlinedButton(
             self.page.session.get("lang.button.reset"), width=120, height=40, on_click=self.__reset_data)
 

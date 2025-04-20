@@ -8,6 +8,7 @@ from db.models.propeller_setting import PropellerSetting
 from db.models.ship_info import ShipInfo
 from db.models.system_settings import SystemSettings
 from ui.common.custom_card import CustomCard
+from ui.common.permission_check import PermissionCheck
 from ui.common.toast import Toast
 from utils.unit_converter import UnitConverter
 
@@ -27,7 +28,7 @@ class SystemConf(ft.Container):
             self.page.session.get("lang.button.save"),
             width=120,
             height=40,
-            on_click=self.__save_data
+            on_click=self.__on_save_button_click
         )
         self.reset_button = ft.OutlinedButton(
             self.page.session.get("lang.button.reset"),
@@ -57,6 +58,9 @@ class SystemConf(ft.Container):
                 )
             ])
 
+    def __on_save_button_click(self, e):
+        self.page.open(PermissionCheck(self.__save_data, 0))
+
     def __get_eexi_limited_power(self) -> tuple[float, str]:
         _eexi_limited_power = self.system_settings.eexi_limited_power
         if self.system_unit == 0:
@@ -74,7 +78,7 @@ class SystemConf(ft.Container):
 
     def __create_settings_card(self):
         self.display_thrust = ft.Switch(
-            col={"md": 3}, label=self.page.session.get("lang.setting.display_thrust"), 
+            col={"md": 3}, label=self.page.session.get("lang.setting.display_thrust"),
             label_position=ft.LabelPosition.LEFT,
             value=self.system_settings.display_thrust,
             on_change=lambda e: setattr(
@@ -237,7 +241,7 @@ class SystemConf(ft.Container):
             height=360
         )
 
-    def __save_data(self, e):
+    def __save_data(self):
         self.system_settings.save()
 
         if self.system_settings.sha_po_li:
@@ -256,7 +260,7 @@ class SystemConf(ft.Container):
         self.factor_conf.save()
 
         dlg = ft.AlertDialog(
-            title=ft.Text(self.page.session.get("lang.setting.test_mode.please_confirm")),    
+            title=ft.Text(self.page.session.get("lang.setting.test_mode.please_confirm")),
             content=ft.Text(self.page.session.get("lang.setting.test_mode.system_restart_after_change")),
             actions=[ft.TextButton(self.page.session.get("lang.button.confirm"), on_click=self.on_restart_app)]
         )
