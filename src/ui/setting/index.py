@@ -4,7 +4,7 @@ from ui.common.permission_check import PermissionCheck
 from ui.setting.general.index import General
 from ui.setting.io import IO
 from ui.setting.propeller_conf import PropellerConf
-from ui.setting.system_conf import SystemConf
+from ui.setting.system_conf.index import SystemConf
 from ui.setting.test_mode import TestMode
 from ui.setting.zero_cal import ZeroCal
 from ui.setting.self_test import SelfTest

@@ -2,7 +2,7 @@ import flet as ft
 
 
 class CustomCard(ft.Card):
-    def __init__(self, heading: str, body: ft.Control, col={"md": 6}, expand: bool = False, height: int = None):
+    def __init__(self, heading: str = None, body: ft.Control = None, col: dict[str, int] = {"md": 6}, expand: bool = False, height: int = None):
         super().__init__()
         self.heading = heading
         self.body = body
