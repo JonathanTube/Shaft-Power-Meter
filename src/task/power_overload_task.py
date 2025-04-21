@@ -1,12 +1,13 @@
 import asyncio
 from common.global_data import gdata
+from common.public_controls import PublicControls
 from db.models.system_settings import SystemSettings
 from db.models.propeller_setting import PropellerSetting
 from utils.formula_cal import FormulaCalculator
 from db.models.alarm_log import AlarmLog
 from common.const_alarm_type import AlarmType
 import flet as ft
-from common.const_pubsub_topic import PubSubTopic
+
 
 class PowerOverloadTask:
     def __init__(self, page: ft.Page):
@@ -29,7 +30,6 @@ class PowerOverloadTask:
         while True:
             # 如果功率过载曲线报警未开启，则不进行功率过载报警
             if gdata.enable_power_overload_alarm == False:
-                self.page.pubsub.send_all_on_topic(PubSubTopic.BREACH_POWER_OVERLOAD_OCCURED, False)
                 await asyncio.sleep(5)
                 continue
 
@@ -60,7 +60,7 @@ class PowerOverloadTask:
         # 连续突破60s，则记录突破事件
         # print(f'self.breach_times={self.checking_continuous_interval}')
         if self.breach_times == self.checking_continuous_interval:
-            self.page.pubsub.send_all_on_topic(PubSubTopic.BREACH_POWER_OVERLOAD_OCCURED, True)
+            PublicControls.on_power_overload_breach()
             AlarmLog.create(
                 utc_date_time=gdata.utc_date_time,
                 alarm_type=AlarmType.POWER_OVERLOAD
@@ -73,7 +73,7 @@ class PowerOverloadTask:
 
         self.recovery_times += 1
         if self.recovery_times == self.checking_continuous_interval:
-            self.page.pubsub.send_all_on_topic(PubSubTopic.BREACH_POWER_OVERLOAD_OCCURED, False)
+            PublicControls.on_power_overload_recovery()
 
     def __reset_all(self):
         self.breach_times = 0

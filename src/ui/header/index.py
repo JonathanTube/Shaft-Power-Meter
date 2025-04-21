@@ -1,5 +1,6 @@
 import flet as ft
 
+from common.public_controls import PublicControls
 from ui.header.shapoli import ShaPoLi
 from ui.header.logo import HeaderLogo
 from ui.header.theme_button import ThemeButton
@@ -83,16 +84,19 @@ class Header(ft.AppBar):
             self.__set_active(self.home)
             self.__set_inactive(self.report)
             self.__set_inactive(self.setting)
+            PublicControls.home = self.main_content.content
         elif name == "REPORT":
             self.main_content.content = ReportInfoList()
             self.__set_inactive(self.home)
             self.__set_active(self.report)
             self.__set_inactive(self.setting)
+            PublicControls.home = None
         else:
             self.main_content.content = Setting(self.test_mode_task)
             self.__set_inactive(self.home)
             self.__set_inactive(self.report)
             self.__set_active(self.setting)
+            PublicControls.home = None
 
         self.active_name = name
 

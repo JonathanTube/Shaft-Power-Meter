@@ -15,6 +15,7 @@ from ui.setting.permission.index import Permission
 class Setting(ft.Container):
     def __init__(self, test_mode_task: TestModeTask):
         super().__init__()
+        self.margin = ft.margin.all(10)
         self.test_mode_task = test_mode_task
 
     def __set_content(self, e):
@@ -46,8 +47,8 @@ class Setting(ft.Container):
     def build(self):
         self.right_content = ft.Container(
             expand=True,
+            padding=ft.padding.only(left=10),
             alignment=ft.alignment.top_left,
-            padding=10,
             content=SystemConf()
         )
 

@@ -1,6 +1,5 @@
 import flet as ft
 
-from common.const_pubsub_topic import PubSubTopic
 from db.models.preference import Preference
 from db.models.propeller_setting import PropellerSetting
 from ui.common.color_picker import ColorDialog

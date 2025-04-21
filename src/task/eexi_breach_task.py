@@ -1,6 +1,6 @@
 import asyncio
-from common.const_pubsub_topic import PubSubTopic
 from common.global_data import gdata
+from common.public_controls import PublicControls
 from db.models.event_log import EventLog
 from db.models.system_settings import SystemSettings
 from db.models.report_info import ReportInfo
@@ -27,9 +27,6 @@ class EEXIBreachTask:
         while True:
             # 如果shapoli功能未开启，则不进行功率过载告警
             if gdata.enable_shapoli == False:
-                self.page.pubsub.send_all_on_topic(PubSubTopic.BREACH_EEXI_OCCURED_FOR_AUDIO, False)
-                self.page.pubsub.send_all_on_topic(PubSubTopic.BREACH_EEXI_OCCURED_FOR_FULLSCREEN, False)
-                self.page.pubsub.send_all_on_topic(PubSubTopic.BREACH_EEXI_OCCURED_FOR_BADGE, False)
                 await asyncio.sleep(5)
                 continue
 
@@ -45,8 +42,10 @@ class EEXIBreachTask:
             # print("instant_power=", instant_power)
             # print("eexi_limited_power=", eexi_limited_power)
             if instant_power > eexi_limited_power:
+                print("================handle_breach_event==========")
                 self.__handle_breach_event()
             else:
+                print("================handle_recovery_event==========")
                 self.__handle_recovery_event()
             await asyncio.sleep(1)
 
@@ -59,10 +58,10 @@ class EEXIBreachTask:
             return
 
         # 连续突破60s，则记录突破事件
+        print(f"self.breach_times={self.breach_times}")
+        print(f"self.checking_continuous_interval={self.checking_continuous_interval}")
         if self.breach_times == self.checking_continuous_interval:
-            self.page.pubsub.send_all_on_topic(PubSubTopic.BREACH_EEXI_OCCURED_FOR_AUDIO, True)
-            self.page.pubsub.send_all_on_topic(PubSubTopic.BREACH_EEXI_OCCURED_FOR_FULLSCREEN, True)
-            self.page.pubsub.send_all_on_topic(PubSubTopic.BREACH_EEXI_OCCURED_FOR_BADGE, True)
+            PublicControls.on_eexi_power_breach_occured()
             event_log: EventLog = EventLog.create(
                 started_at=self.start_time,
                 started_position=gdata.gps_location
@@ -103,9 +102,7 @@ class EEXIBreachTask:
 
         self.recovery_times += 1
         if self.recovery_times == self.checking_continuous_interval:
-            self.page.pubsub.send_all_on_topic(PubSubTopic.BREACH_EEXI_OCCURED_FOR_AUDIO, False)
-            self.page.pubsub.send_all_on_topic(PubSubTopic.BREACH_EEXI_OCCURED_FOR_FULLSCREEN, False)
-            self.page.pubsub.send_all_on_topic(PubSubTopic.BREACH_EEXI_OCCURED_FOR_BADGE, False)
+            PublicControls.on_eexi_power_breach_recovery()
             event_log: EventLog = EventLog.select().where(
                 EventLog.ended_at == None
             ).order_by(EventLog.id.asc()).first()

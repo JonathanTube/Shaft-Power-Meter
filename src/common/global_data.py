@@ -5,14 +5,10 @@ from db.models.propeller_setting import PropellerSetting
 from db.models.date_time_conf import DateTimeConf
 
 
-
 class GlobalData:
     def __init__(self):
         self.utc_date_time: datetime = None
         self.system_date_time: datetime = None
-
-
-
 
         # 是否开启shapoli功能
         systemSettings: SystemSettings = SystemSettings.get()
@@ -24,7 +20,6 @@ class GlobalData:
         dateTimeConf: DateTimeConf = DateTimeConf.get()
         self.enable_utc_time_sync_with_gps = dateTimeConf.sync_with_gps
 
-
         io_conf: IOConf = IOConf.get()
         self.gps_ip = io_conf.gps_ip
         self.gps_port = io_conf.gps_port
@@ -34,7 +29,6 @@ class GlobalData:
 
         self.plc_ip = io_conf.plc_ip
         self.plc_port = io_conf.plc_port
-
 
         self.sps1_speed = 0
         self.sps1_power = 0

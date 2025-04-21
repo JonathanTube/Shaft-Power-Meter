@@ -2,7 +2,6 @@ import asyncio
 import os
 import flet as ft
 
-from common.const_pubsub_topic import PubSubTopic
 from db.models.system_settings import SystemSettings
 from utils.unit_converter import UnitConverter
 from utils.unit_parser import UnitParser
@@ -13,6 +12,7 @@ from ui.common.custom_card import CustomCard
 from ui.common.toast import Toast
 from common.global_data import gdata
 from ui.common.permission_check import PermissionCheck
+from common.public_controls import PublicControls
 
 
 class TestMode(ft.Container):
@@ -339,10 +339,8 @@ class TestMode(ft.Container):
         self.save_button.visible = True
         self.save_button.update()
 
-        self.page.pubsub.send_all_on_topic(PubSubTopic.BREACH_EEXI_OCCURED_FOR_AUDIO, False)
-        self.page.pubsub.send_all_on_topic(PubSubTopic.BREACH_EEXI_OCCURED_FOR_FULLSCREEN, False)
-        self.page.pubsub.send_all_on_topic(PubSubTopic.BREACH_EEXI_OCCURED_FOR_BADGE, False)
-        self.page.pubsub.send_all_on_topic(PubSubTopic.BREACH_POWER_OVERLOAD_OCCURED, False)
+        PublicControls.on_eexi_power_breach_recovery()
+        PublicControls.on_power_overload_recovery()
         Toast.show_success(self.page)
 
     def did_mount(self):
@@ -369,15 +367,11 @@ class TestMode(ft.Container):
                     sps2_speed = gdata.sps2_speed
                     sps2_thrust = gdata.sps2_thrust
                     sps2_revolution = gdata.sps2_rounds
-                    sps2_torque_value, sps2_torque_unit = UnitParser.parse_torque(
-                        sps2_torque, system_unit)
-                    self.sps2_instant_data_card.controls[
-                        1].value = f'{sps2_torque_value} {sps2_torque_unit}'
+                    sps2_torque_value, sps2_torque_unit = UnitParser.parse_torque(sps2_torque, system_unit)
+                    self.sps2_instant_data_card.controls[1].value = f'{sps2_torque_value} {sps2_torque_unit}'
                     self.sps2_instant_data_card.controls[3].value = f'{sps2_speed} rpm'
-                    sps2_thrust_value, sps2_thrust_unit = UnitParser.parse_thrust(
-                        sps2_thrust, system_unit)
-                    self.sps2_instant_data_card.controls[
-                        5].value = f'{sps2_thrust_value} {sps2_thrust_unit}'
+                    sps2_thrust_value, sps2_thrust_unit = UnitParser.parse_thrust(sps2_thrust, system_unit)
+                    self.sps2_instant_data_card.controls[5].value = f'{sps2_thrust_value} {sps2_thrust_unit}'
                     self.sps2_instant_data_card.controls[7].value = sps2_revolution
                     self.sps2_instant_data_card.update()
 

@@ -1,3 +1,4 @@
+import flet as ft
 import asyncio
 import random
 
@@ -8,8 +9,9 @@ from common.global_data import gdata
 from db.models.alarm_log import AlarmLog
 from db.models.event_log import EventLog
 from db.models.report_info import ReportInfo
-from common.const_pubsub_topic import PubSubTopic
-import flet as ft
+from common.public_controls import PublicControls
+
+
 class TestModeTask:
     def __init__(self, page: ft.Page):
         self.page = page
@@ -39,7 +41,6 @@ class TestModeTask:
         self.min_revolution = min_revolution
         self.max_revolution = max_revolution
 
-
     async def start(self):
         self.system_settings = SystemSettings.get()
         self.is_running = True
@@ -63,10 +64,8 @@ class TestModeTask:
             gdata.sps2_torque = 0
             gdata.sps2_thrust = 0
             gdata.sps2_rounds = 0
-
-            self.page.pubsub.send_all_on_topic(PubSubTopic.BREACH_EEXI_OCCURED_FOR_AUDIO, False)
-            self.page.pubsub.send_all_on_topic(PubSubTopic.BREACH_EEXI_OCCURED_FOR_FULLSCREEN, False)
-            self.page.pubsub.send_all_on_topic(PubSubTopic.BREACH_POWER_OVERLOAD_OCCURED, False)
+            PublicControls.on_eexi_power_breach_recovery()
+            PublicControls.on_power_overload_recovery()
         except Exception as e:
             print(f'Error truncating DataLog table: {e}')
         self.is_running = False
@@ -83,6 +82,7 @@ class TestModeTask:
 
     async def save_generated_data(self, name):
         instant_torque = int(random.uniform(self.min_torque, self.max_torque))
+        print(f'>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>instant_torque={instant_torque}')
         instant_speed = int(random.uniform(self.min_speed, self.max_speed))
         instant_thrust = int(random.uniform(self.min_thrust, self.max_thrust))
         instant_revolution = int(random.uniform(self.min_revolution, self.max_revolution))

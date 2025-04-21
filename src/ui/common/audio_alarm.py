@@ -1,16 +1,14 @@
 import os
 import flet as ft
 from pathlib import Path
-from common.const_pubsub_topic import PubSubTopic
 from db.models.event_log import EventLog
 from ui.common.permission_check import PermissionCheck
 from task.utc_timer_task import gdata
 
 
 class AudioAlarm(ft.Container):
-    def __init__(self, page: ft.Page):
+    def __init__(self):
         super().__init__()
-        self.page = page
         self.right = 10
         self.top = 4
 
@@ -70,14 +68,3 @@ class AudioAlarm(ft.Container):
             self.play()
         else:
             self.stop()
-
-    def did_mount(self):
-        self.page.pubsub.subscribe_topic(
-            PubSubTopic.BREACH_EEXI_OCCURED_FOR_AUDIO,
-            self.handle_change
-        )
-
-    def will_unmount(self):
-        self.page.pubsub.unsubscribe_topic(
-            PubSubTopic.BREACH_EEXI_OCCURED_FOR_AUDIO
-        )

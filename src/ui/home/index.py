@@ -1,6 +1,5 @@
 import asyncio
 import flet as ft
-from common.const_pubsub_topic import PubSubTopic
 from ui.home.alarm.alarm_list import AlarmList
 from ui.home.counter.index import Counter
 from ui.home.dashboard.index import Dashboard
@@ -185,36 +184,13 @@ class Home(ft.Container):
             self.alarm.update()
             await asyncio.sleep(1)
 
-    def handle_alarm_change(self, topic, value):
-        if value:
-            self.update_alarm_badge()
-            self.toggle_alarm_task = self.page.run_task(self.toggle_alarm_bgcolor)
-        else:
-            if self.toggle_alarm_task is not None:
-                self.toggle_alarm_task.cancel()
+    def alarm_bgcolor_start_blink(self):
+        self.toggle_alarm_task = self.page.run_task(self.toggle_alarm_bgcolor)
 
-    def handle_event_change(self, topic, value):
-        if value:
-            self.update_event_badge()
+    def alarm_bgcolor_stop_blink(self):
+        if self.toggle_alarm_task is not None:
+            self.toggle_alarm_task.cancel()
 
     def did_mount(self):
-        self.page.pubsub.subscribe_topic(
-            PubSubTopic.BREACH_POWER_OVERLOAD_OCCURED,
-            self.handle_alarm_change
-        )
-
-        self.page.pubsub.subscribe_topic(
-            PubSubTopic.BREACH_EEXI_OCCURED_FOR_BADGE,
-            self.handle_event_change
-        )
         self.update_event_badge()
         self.update_alarm_badge()
-
-
-    def will_unmount(self):
-        self.page.pubsub.unsubscribe_topic(
-            PubSubTopic.BREACH_POWER_OVERLOAD_OCCURED
-        )
-        self.page.pubsub.unsubscribe_topic(
-            PubSubTopic.BREACH_EEXI_OCCURED_FOR_BADGE
-        )

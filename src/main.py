@@ -3,6 +3,7 @@ import sys
 import flet as ft
 import asyncio
 from common.const_alarm_type import AlarmType
+from common.public_controls import PublicControls
 from db.models.date_time_conf import DateTimeConf
 from db.models.alarm_log import AlarmLog
 from ui.common.fullscreen_alert import FullscreenAlert
@@ -77,26 +78,33 @@ async def main(page: ft.Page):
     # page.window.full_screen = True
     # page.window.maximized = True
     page.window.resizable = False
+    page.window.title_bar_hidden = True
     page.window.width = 1024
     page.window.height = 768
     page.window.alignment = ft.alignment.center
     # page.window.always_on_top = False
     # page.window.frameless = True
-    # page.window.title_bar_hidden = False
     # page.window.maximizable = False
 
     # page.window.prevent_close = True
+    PublicControls.fullscreen_alert = FullscreenAlert()
+    PublicControls.audio_alarm = AudioAlarm()
+    PublicControls.home = Home()
+
     page.theme = ft.Theme(scrollbar_theme=ft.ScrollbarTheme(thickness=20))
 
-    main_content = ft.Container(expand=True, content=Home(), padding=0)
+    main_content = ft.Container(expand=True, content=PublicControls.home, padding=0)
 
     page.appbar = Header(main_content, TestModeTask(page))
 
-    fullscreen_alert = FullscreenAlert(page)
-    audio_alarm = AudioAlarm(page)
-
     main_stack = ft.Stack(
-        [fullscreen_alert, main_content, audio_alarm], expand=True)
+        controls=[
+            PublicControls.fullscreen_alert,
+            main_content,
+            PublicControls.audio_alarm
+        ],
+        expand=True
+    )
 
     page.add(main_stack)
 
