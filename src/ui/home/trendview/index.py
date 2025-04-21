@@ -10,7 +10,7 @@ class TrendView(ft.Container):
     def __init__(self):
         super().__init__()
         self.expand = True
-        # self.bgcolor = ft.colors.BLUE
+        # self.bgcolor = ft.Colors.BLUE
         self.padding = 10
 
     def build(self):

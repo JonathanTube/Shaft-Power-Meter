@@ -8,7 +8,7 @@ class PropellerCurveLegend(ft.Container):
                  overload_color: str):
         super().__init__()
         self.expand = False
-        self.bgcolor = ft.colors.ON_INVERSE_SURFACE
+        self.bgcolor = ft.Colors.ON_INVERSE_SURFACE
         self.border_radius = 10
         self.border_width = 1
         self.padding = 10
@@ -36,11 +36,11 @@ class PropellerCurveLegend(ft.Container):
                             expand=False,
                             width=10,
                             height=10,
-                            bgcolor=ft.colors.RED,
+                            bgcolor=ft.Colors.RED,
                             border_radius=10,
                             margin=ft.margin.symmetric(horizontal=6)
                         ),
-                        ft.Text(self.page.session.get('lang.propeller_curve.mcr_operating_point'), color=ft.colors.RED)
+                        ft.Text(self.page.session.get('lang.propeller_curve.mcr_operating_point'), color=ft.Colors.RED)
                     ]
                 ),
 
@@ -107,10 +107,10 @@ class PropellerCurveLegend(ft.Container):
                             width=10,
                             height=10,
                             border_radius=10,
-                            bgcolor=ft.colors.ORANGE,
+                            bgcolor=ft.Colors.ORANGE,
                             margin=ft.margin.symmetric(horizontal=6)
                         ),
-                        ft.Text('sps1', color=ft.colors.ORANGE)
+                        ft.Text('sps1', color=ft.Colors.ORANGE)
                     ]
                 ),
                 ft.Row(
@@ -122,10 +122,10 @@ class PropellerCurveLegend(ft.Container):
                             width=10,
                             height=10,
                             border_radius=10,
-                            bgcolor=ft.colors.LIME,
+                            bgcolor=ft.Colors.LIME,
                             margin=ft.margin.symmetric(horizontal=6)
                         ),
-                        ft.Text('sps2', color=ft.colors.LIME)
+                        ft.Text('sps2', color=ft.Colors.LIME)
                     ]
                 )
             ]

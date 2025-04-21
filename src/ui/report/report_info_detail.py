@@ -25,7 +25,7 @@ class ReportInfoDialog(ft.AlertDialog):
                         text_align=ft.TextAlign.CENTER),
                 ft.IconButton(
                     icon=ft.icons.CLOSE_OUTLINED,
-                    # icon_color=ft.colors.INVERSE_SURFACE,
+                    # icon_color=ft.Colors.INVERSE_SURFACE,
                     on_click=lambda e: e.page.close(self)
                 )
             ]
@@ -56,7 +56,7 @@ class ReportInfoDialog(ft.AlertDialog):
         return ft.Container(
             expand=True,
             content=content,
-            bgcolor=ft.colors.ON_INVERSE_SURFACE,
+            bgcolor=ft.Colors.ON_INVERSE_SURFACE,
             padding=ft.padding.only(top=20, bottom=20, left=20, right=20),
             border_radius=10
         )

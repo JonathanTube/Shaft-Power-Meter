@@ -69,8 +69,7 @@ class DualPowerLine(ft.Container):
             data_points=[]
         )
 
-        border = ft.BorderSide(width=.5, color=ft.colors.with_opacity(
-            0.15, ft.colors.INVERSE_SURFACE))
+        border = ft.BorderSide(width=.5, color=ft.Colors.with_opacity(0.15, ft.Colors.INVERSE_SURFACE))
 
         self.chart = ft.LineChart(
             expand=True,

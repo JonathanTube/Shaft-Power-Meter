@@ -46,9 +46,7 @@ class SinglePowerLine(ft.Container):
             data_points=[]
         )
 
-        border = ft.BorderSide(
-            width=.5, color=ft.colors.with_opacity(0.15, ft.colors.INVERSE_SURFACE)
-        )
+        border = ft.BorderSide(width=.5, color=ft.Colors.with_opacity(0.15, ft.Colors.INVERSE_SURFACE))
         max_y = int(self.max_y * 1.1)
         self.chart = ft.LineChart(
             min_y=0,
@@ -56,11 +54,11 @@ class SinglePowerLine(ft.Container):
             tooltip_fit_inside_horizontally=True,
             tooltip_fit_inside_vertically=True,
             # vertical_grid_lines=ft.ChartGridLines(
-            #     color=ft.colors.with_opacity(0.15, ft.colors.INVERSE_SURFACE),
+            #     color=ft.Colors.with_opacity(0.15, ft.Colors.INVERSE_SURFACE),
             #     width=.5
             # ),
             # horizontal_grid_lines=ft.ChartGridLines(
-            #     color=ft.colors.with_opacity(0.15, ft.colors.INVERSE_SURFACE),
+            #     color=ft.Colors.with_opacity(0.15, ft.Colors.INVERSE_SURFACE),
             #     width=.5
             # ),
             expand=True,

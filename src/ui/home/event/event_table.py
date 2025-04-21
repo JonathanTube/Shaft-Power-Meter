@@ -72,7 +72,7 @@ class EventTable(AbstractTable):
         return ft.Row(controls=[
             ft.IconButton(
                 icon=ft.icons.WARNING,
-                icon_color=ft.colors.RED,
+                icon_color=ft.Colors.RED,
                 icon_size=20,
                 visible=show_reason,
                 on_click=lambda e: self.page.open(
@@ -81,7 +81,7 @@ class EventTable(AbstractTable):
             ),
             ft.IconButton(
                 icon=ft.icons.NOTE,
-                icon_color=ft.colors.GREEN,
+                icon_color=ft.Colors.GREEN,
                 icon_size=20,
                 visible=show_note
             )

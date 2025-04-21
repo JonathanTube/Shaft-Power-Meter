@@ -1,5 +1,4 @@
 import flet as ft
-import asyncio
 from db.models.data_log import DataLog
 from db.models.limitations import Limitations
 from db.models.preference import Preference
@@ -65,36 +64,27 @@ class SingleShaPoLiOff(ft.Stack):
 
     def did_mount(self):
         self.single_meters.set_power_limit(self.power_max, self.power_warning)
-        self.single_meters.set_torque_limit(
-            self.torque_max, self.torque_warning)
+        self.single_meters.set_torque_limit(self.torque_max, self.torque_warning)
         self.single_meters.set_speed_limit(self.speed_max, self.speed_warning)
-        self._task = self.page.run_task(self.__load_data)
 
-    def will_unmount(self):
-        if self._task:
-            self._task.cancel()
+    def load_data(self):
+        speed = gdata.sps1_speed
+        power = gdata.sps1_power
+        torque = gdata.sps1_torque
+        thrust = gdata.sps1_thrust
 
-    async def __load_data(self):
-        while True:
-            speed = gdata.sps1_speed
-            power = gdata.sps1_power
-            torque = gdata.sps1_torque
-            thrust = gdata.sps1_thrust
+        system_unit = self.system_unit
+        display_thrust = self.display_thrust
 
-            system_unit = self.system_unit
-            display_thrust = self.display_thrust
+        self.single_meters.set_data(speed, power, torque, system_unit)
+        self.thrust_power.set_data(display_thrust, thrust, system_unit)
 
-            self.single_meters.set_data(speed, power, torque, system_unit)
-            self.thrust_power.set_data(display_thrust, thrust, system_unit)
+        data_logs = DataLog.select(
+            DataLog.utc_date_time,
+            DataLog.speed,
+            DataLog.power,
+            DataLog.torque,
+            DataLog.thrust
+        ).where(DataLog.name == "sps1").order_by(DataLog.id.desc()).limit(100)
 
-            data_logs = DataLog.select(
-                DataLog.utc_date_time,
-                DataLog.speed,
-                DataLog.power,
-                DataLog.torque,
-                DataLog.thrust
-            ).where(
-                DataLog.name == "sps1").order_by(DataLog.id.desc()).limit(100)
-            self.power_line_chart.update(data_logs)
-
-            await asyncio.sleep(self.data_refresh_interval)
+        self.power_line_chart.update(data_logs)

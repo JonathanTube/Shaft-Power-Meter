@@ -8,7 +8,7 @@ class DualInstantSpeed(ft.Container):
     def __init__(self):
         super().__init__()
         self.expand = True
-        # self.bgcolor = ft.colors.BLUE_400
+        # self.bgcolor = ft.Colors.BLUE_400
 
         self.font_size_of_label = 14
         self.font_size_of_value = 16

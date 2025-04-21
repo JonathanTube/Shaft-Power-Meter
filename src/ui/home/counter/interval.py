@@ -14,7 +14,7 @@ class CounterInterval(ft.Container):
         self.padding = 10
         self.border = ft.border.all(
             width=0.5,
-            color=ft.colors.with_opacity(0.15, ft.colors.INVERSE_SURFACE)
+            color=ft.Colors.with_opacity(0.15, ft.Colors.INVERSE_SURFACE)   
         )
 
         self.name = name
@@ -56,7 +56,7 @@ class CounterInterval(ft.Container):
                 regex_string=r'^(?:\d+\.?\d*|\.\d+)$|^$'
             ),
             value=hours,
-            border_color=ft.colors.ON_SURFACE,
+            border_color=ft.Colors.ON_SURFACE,  
             size_constraints=ft.BoxConstraints(max_height=40),
             on_change=lambda e: self.on_hours_change(e)
         )
@@ -67,7 +67,7 @@ class CounterInterval(ft.Container):
                 size=12
             ),
             alignment=ft.alignment.center,
-            bgcolor=ft.colors.GREEN_500,
+            bgcolor=ft.Colors.GREEN_500,
             border_radius=ft.border_radius.all(40),
             padding=ft.padding.only(top=0, bottom=4, left=10, right=10)
         )

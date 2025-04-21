@@ -1,4 +1,3 @@
-import asyncio
 import flet as ft
 
 from ui.home.dashboard.sps_dual.on.dual_instant_grid import DualInstantGrid
@@ -9,6 +8,7 @@ from db.models.system_settings import SystemSettings
 from ui.home.dashboard.chart.single_power_line import SinglePowerLine
 from db.models.preference import Preference
 from common.global_data import gdata
+
 
 class DualShaPoLiOn(ft.Container):
     def __init__(self):
@@ -58,47 +58,44 @@ class DualShaPoLiOn(ft.Container):
             ]
         )
 
-    async def __load_data(self):
-        while True:
-            sps1_power = gdata.sps1_power
-            sps2_power = gdata.sps2_power
+    def load_data(self):
+        sps1_power = gdata.sps1_power
+        sps2_power = gdata.sps2_power
 
-            sps1_speed = gdata.sps1_speed
-            sps2_speed = gdata.sps2_speed
+        sps1_speed = gdata.sps1_speed
+        sps2_speed = gdata.sps2_speed
 
-            sps1_torque = gdata.sps1_torque
-            sps2_torque = gdata.sps2_torque
+        sps1_torque = gdata.sps1_torque
+        sps2_torque = gdata.sps2_torque
 
-            sps1_thrust = gdata.sps1_thrust
-            sps2_thrust = gdata.sps2_thrust
+        sps1_thrust = gdata.sps1_thrust
+        sps2_thrust = gdata.sps2_thrust
 
-            unit = self.system_unit
+        unit = self.system_unit
 
-            self.instant_grid.set_power_values(sps1_power, sps2_power, unit)
-            self.instant_grid.set_speed_values(sps1_speed, sps2_speed)
-            self.instant_grid.set_torque_values(sps1_torque, sps2_torque, unit)
-            self.instant_grid.set_thrust_values(sps1_thrust, sps2_thrust, unit)
-            self.eexi_limited_power.set_value(sps1_power + sps2_power)
+        self.instant_grid.set_power_values(sps1_power, sps2_power, unit)
+        self.instant_grid.set_speed_values(sps1_speed, sps2_speed)
+        self.instant_grid.set_torque_values(sps1_torque, sps2_torque, unit)
+        self.instant_grid.set_thrust_values(sps1_thrust, sps2_thrust, unit)
+        self.eexi_limited_power.set_value(sps1_power + sps2_power)
 
-            sps1_data_logs = DataLog.select(
-                DataLog.utc_date_time,
-                DataLog.power,
-                DataLog.speed,
-                DataLog.torque,
-                DataLog.thrust
-            ).where(DataLog.name == "sps1").order_by(DataLog.id.desc()).limit(50)
-            self.power_chart_sps1.update(sps1_data_logs)
+        sps1_data_logs = DataLog.select(
+            DataLog.utc_date_time,
+            DataLog.power,
+            DataLog.speed,
+            DataLog.torque,
+            DataLog.thrust
+        ).where(DataLog.name == "sps1").order_by(DataLog.id.desc()).limit(50)
+        self.power_chart_sps1.update(sps1_data_logs)
 
-            sps2_data_logs = DataLog.select(
-                DataLog.utc_date_time,
-                DataLog.power,
-                DataLog.speed,
-                DataLog.torque,
-                DataLog.thrust
-            ).where(DataLog.name == "sps2").order_by(DataLog.id.desc()).limit(50)
-            self.power_chart_sps2.update(sps2_data_logs)
-
-            await asyncio.sleep(self.data_refresh_interval)
+        sps2_data_logs = DataLog.select(
+            DataLog.utc_date_time,
+            DataLog.power,
+            DataLog.speed,
+            DataLog.torque,
+            DataLog.thrust
+        ).where(DataLog.name == "sps2").order_by(DataLog.id.desc()).limit(50)
+        self.power_chart_sps2.update(sps2_data_logs)
 
     def __load_config(self):
         self.display_thrust = False
@@ -115,21 +112,7 @@ class DualShaPoLiOn(ft.Container):
         self.unlimited_power = propeller_settings.shaft_power_of_mcr_operating_point
 
         preference = Preference.get()
-        self.data_refresh_interval = preference.data_refresh_interval
         self.system_unit = preference.system_unit
 
     def did_mount(self):
-        self.eexi_limited_power.set_config(
-            self.limited_power_normal * 2,
-            self.limited_power_warning * 2,
-            self.unlimited_power * 2
-        )
-        self._task = self.page.run_task(self.__load_data)
-
-    def will_unmount(self):
-        if self._task:
-            self._task.cancel()
-
-    def __get_session(self, key: str):
-        return self.page.session.get(key)
-
+        self.eexi_limited_power.set_config(self.limited_power_normal * 2, self.limited_power_warning * 2, self.unlimited_power * 2)

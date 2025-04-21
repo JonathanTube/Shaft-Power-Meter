@@ -56,10 +56,10 @@ class AbstractTable(ft.Container):
             width=self.default_width,
             expand=True,
             heading_row_height=40,
-            heading_row_color=ft.colors.SURFACE_CONTAINER_HIGHEST,
+            heading_row_color=ft.Colors.SURFACE_CONTAINER_HIGHEST,
             data_row_min_height=30,
-            # vertical_lines=ft.BorderSide(0.5, ft.colors.INVERSE_SURFACE),
-            # horizontal_lines=ft.BorderSide(0.5, ft.colors.INVERSE_SURFACE),
+            # vertical_lines=ft.BorderSide(0.5, ft.Colors.INVERSE_SURFACE),     
+            # horizontal_lines=ft.BorderSide(0.5, ft.Colors.INVERSE_SURFACE),
             columns=[ft.DataColumn(ft.Text("No Data"))],
             rows=[])
 

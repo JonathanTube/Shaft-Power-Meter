@@ -1,8 +1,10 @@
-import asyncio
 import flet as ft
+from common.public_controls import PublicControls
+from ui.home.alarm.alarm_button import AlarmButton
 from ui.home.alarm.alarm_list import AlarmList
 from ui.home.counter.index import Counter
 from ui.home.dashboard.index import Dashboard
+from ui.home.event.event_button import EventButton
 from ui.home.logs.index import Logs
 from ui.home.propeller_curve.index import PropellerCurve
 from ui.home.trendview.index import TrendView
@@ -18,7 +20,6 @@ class Home(ft.Container):
         self.system_settings = SystemSettings.get()
         self.current_index = 0
 
-        self.toggle_alarm_task = None
         self.default_button_style = ft.ButtonStyle(
             shape=ft.RoundedRectangleBorder(radius=ft.border_radius.all(0)),
             color=ft.Colors.INVERSE_SURFACE
@@ -27,12 +28,6 @@ class Home(ft.Container):
         self.active_button_style = ft.ButtonStyle(
             shape=ft.RoundedRectangleBorder(radius=ft.border_radius.all(0)),
             color=ft.Colors.PRIMARY,
-        )
-
-        self.power_overloaded_button_style = ft.ButtonStyle(
-            shape=ft.RoundedRectangleBorder(radius=ft.border_radius.all(0)),
-            bgcolor=ft.Colors.RED,
-            color=ft.Colors.WHITE,
         )
 
     def build(self):
@@ -64,20 +59,14 @@ class Home(ft.Container):
             style=self.default_button_style,
             on_click=lambda e: self.__on_click(e, 3)
         )
-        self.alarm = ft.TextButton(
-            text=self.page.session.get("lang.home.tab.alarm"),
-            icon=ft.Icons.WARNING_OUTLINED,
-            icon_color=ft.Colors.INVERSE_SURFACE,
-            style=self.default_button_style,
-            on_click=lambda e: self.__on_click(e, 4)
-        )
-        self.event = ft.TextButton(
-            text=self.page.session.get("lang.home.tab.event"),
-            icon=ft.Icons.EVENT_OUTLINED,
-            icon_color=ft.Colors.INVERSE_SURFACE,
-            style=self.default_button_style,
-            on_click=lambda e: self.__on_click(e, 5)
-        )
+        self.alarm_button = AlarmButton(on_click=lambda e: self.__on_click(e, 4))
+        PublicControls.alarm_button = self.alarm_button
+
+        self.event_button = EventButton(on_click=lambda e: self.__on_click(e, 5))
+        print("====================================", self.event_button)
+        PublicControls.event_button = self.event_button
+        print("====================================", PublicControls.event_button)
+
         self.logs = ft.TextButton(
             text=self.page.session.get("lang.home.tab.logs"),
             icon=ft.Icons.HISTORY_OUTLINED,
@@ -93,8 +82,8 @@ class Home(ft.Container):
                 self.counter,
                 self.trendview,
                 self.propeller_curve,
-                self.alarm,
-                self.event,
+                self.alarm_button,
+                self.event_button,
                 self.logs
             ]
         )
@@ -152,45 +141,33 @@ class Home(ft.Container):
     def update_event_badge(self):
         count = EventLog.select().where(EventLog.breach_reason == None).count()
         if count > 0:
-            self.event.badge = ft.Badge(
+            self.event_button.badge = ft.Badge(
                 text=str(count),
                 bgcolor=ft.Colors.RED,
                 text_color=ft.Colors.WHITE,
                 label_visible=True
             )
         else:
-            self.event.badge = None
-        self.event.update()
+            self.event_button.badge = None
+        self.event_button.update()
 
     def update_alarm_badge(self):
         count = AlarmLog.select().where(AlarmLog.acknowledge_time == None).count()
         if count > 0:
-            self.alarm.badge = ft.Badge(
+            self.alarm_button.badge = ft.Badge(
                 text=str(count),
                 bgcolor=ft.Colors.RED,
                 text_color=ft.Colors.WHITE,
                 label_visible=True
             )
         else:
-            self.alarm.badge = None
-        self.alarm.update()
-
-    async def toggle_alarm_bgcolor(self):
-        while True:
-            if self.alarm.style == self.default_button_style:
-                self.alarm.style = self.power_overloaded_button_style
-            else:
-                self.alarm.style = self.default_button_style
-            self.alarm.update()
-            await asyncio.sleep(1)
-
-    def alarm_bgcolor_start_blink(self):
-        self.toggle_alarm_task = self.page.run_task(self.toggle_alarm_bgcolor)
-
-    def alarm_bgcolor_stop_blink(self):
-        if self.toggle_alarm_task is not None:
-            self.toggle_alarm_task.cancel()
+            self.alarm_button.badge = None
+        self.alarm_button.update()
 
     def did_mount(self):
         self.update_event_badge()
         self.update_alarm_badge()
+
+    def will_unmount(self):
+        PublicControls.event_button = None
+        PublicControls.alarm_button = None

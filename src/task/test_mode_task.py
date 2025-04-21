@@ -78,6 +78,7 @@ class TestModeTask:
             await self.save_generated_data('sps1')
             if self.system_settings.amount_of_propeller == 2:
                 await self.save_generated_data('sps2')
+            PublicControls.on_instant_data_refresh()
             await asyncio.sleep(1)
 
     async def save_generated_data(self, name):

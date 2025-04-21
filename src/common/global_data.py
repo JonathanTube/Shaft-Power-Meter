@@ -13,6 +13,8 @@ class GlobalData:
         # 是否开启shapoli功能
         systemSettings: SystemSettings = SystemSettings.get()
         self.enable_shapoli = systemSettings.sha_po_li
+        # 螺旋桨数量
+        self.amount_of_propeller = systemSettings.amount_of_propeller
         # 是否开启功率过载告警
         propellerSetting: PropellerSetting = PropellerSetting.get()
         self.enable_power_overload_alarm = propellerSetting.alarm_enabled_of_overload_curve

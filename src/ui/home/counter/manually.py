@@ -15,7 +15,7 @@ class CounterManually(ft.Container):
         self.padding = 10
         self.border = ft.border.all(
             width=0.5,
-            color=ft.colors.with_opacity(0.15, ft.colors.INVERSE_SURFACE)
+            color=ft.Colors.with_opacity(0.15, ft.Colors.INVERSE_SURFACE)   
         )
 
         self.name = name
@@ -36,7 +36,7 @@ class CounterManually(ft.Container):
         self.stop_button.visible = True
         self.resume_button.visible = False
         self.status_text.value = self.page.session.get('lang.counter.running')
-        self.status_container.bgcolor = ft.colors.GREEN_500
+        self.status_container.bgcolor = ft.Colors.GREEN_500 
         self.__start_task()
         self.content.update()
 
@@ -45,7 +45,7 @@ class CounterManually(ft.Container):
         self.stop_button.visible = False
         self.resume_button.visible = True
         self.status_text.value = self.page.session.get('lang.counter.reset')
-        self.status_container.bgcolor = ft.colors.ORANGE_500
+        self.status_container.bgcolor = ft.Colors.ORANGE_500
 
         self.stopped_at.value = f'{self.page.session.get("lang.counter.stopped_at")} {datetime.now().strftime("%Y-%m-%d %H:%M:%S")}'
         self.stopped_at.visible = True
@@ -59,7 +59,7 @@ class CounterManually(ft.Container):
         self.stop_button.visible = False
         self.resume_button.visible = False
         self.status_text.value = self.page.session.get('lang.counter.stopped')
-        self.status_container.bgcolor = ft.colors.RED_500
+        self.status_container.bgcolor = ft.Colors.RED_500   
         self.time_elapsed.visible = False
         self.stopped_at.visible = False
         status_name = f'counter_manually_status_{self.name}'
@@ -109,7 +109,7 @@ class CounterManually(ft.Container):
         self.status_container = ft.Container(
             content=self.status_text,
             alignment=ft.alignment.center,
-            bgcolor=ft.colors.RED_500,
+            bgcolor=ft.Colors.RED_500,  
             border_radius=ft.border_radius.all(40),
             padding=ft.padding.only(top=0, bottom=4, left=10, right=10)
         )

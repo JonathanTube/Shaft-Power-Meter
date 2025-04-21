@@ -16,7 +16,7 @@ class PowerLimited(ft.Container):
             padding=ft.padding.all(10),
             border=ft.border.all(
                 width=0.5,
-                color=ft.colors.with_opacity(0.15, ft.colors.INVERSE_SURFACE)
+                color=ft.Colors.with_opacity(0.15, ft.Colors.INVERSE_SURFACE)   
             ),
             border_radius=10,
             content=ft.Row(

@@ -8,7 +8,6 @@ from db.models.system_settings import SystemSettings
 from db.models.data_log import DataLog
 from db.models.preference import Preference
 from common.global_data import gdata
-import asyncio
 
 
 class SingleShaPoLiOn(ft.Container):
@@ -59,11 +58,6 @@ class SingleShaPoLiOn(ft.Container):
             self.unlimited_power,
             self.system_unit
         )
-        self._task = self.page.run_task(self.__load_data)
-
-    def will_unmount(self):
-        if self._task:
-            self._task.cancel()
 
     def __load_config(self):
         self.display_thrust = False
@@ -84,25 +78,22 @@ class SingleShaPoLiOn(ft.Container):
         self.data_refresh_interval = preference.data_refresh_interval
         self.system_unit = preference.system_unit
 
-    async def __load_data(self):
-        while True:
-            speed = gdata.sps1_speed
-            power = gdata.sps1_power
-            torque = gdata.sps1_torque
-            thrust = gdata.sps1_thrust
-            unit = self.system_unit
+    def load_data(self):
+        speed = gdata.sps1_speed
+        power = gdata.sps1_power
+        torque = gdata.sps1_torque
+        thrust = gdata.sps1_thrust
+        unit = self.system_unit
 
-            self.eexi_limited_power.set_value(power)
-            self.instant_value_grid.set_data(power, thrust, torque, speed, unit)
+        self.eexi_limited_power.set_value(power)
+        self.instant_value_grid.set_data(power, thrust, torque, speed, unit)
 
-            data_logs = DataLog.select(
-                DataLog.power,
-                DataLog.thrust,
-                DataLog.torque,
-                DataLog.speed,
-                DataLog.utc_date_time
-            ).order_by(DataLog.id.desc()).where(DataLog.name == "sps1").limit(100)
+        data_logs = DataLog.select(
+            DataLog.power,
+            DataLog.thrust,
+            DataLog.torque,
+            DataLog.speed,
+            DataLog.utc_date_time
+        ).order_by(DataLog.id.desc()).where(DataLog.name == "sps1").limit(100)
 
-            self.power_line_chart.update(data_logs)
-
-            await asyncio.sleep(self.data_refresh_interval)
+        self.power_line_chart.update(data_logs)

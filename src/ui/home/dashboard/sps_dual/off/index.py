@@ -1,12 +1,12 @@
 import flet as ft
 from db.models.preference import Preference
 from ui.home.dashboard.sps_dual.off.dual_meters import DualMeters
-import asyncio
 from db.models.data_log import DataLog
 from db.models.limitations import Limitations
 from db.models.system_settings import SystemSettings
 from ui.home.dashboard.chart.dual_power_line import DualPowerLine
 from common.global_data import gdata
+
 
 class DualShaPoLiOff(ft.Container):
     def __init__(self):
@@ -43,12 +43,6 @@ class DualShaPoLiOff(ft.Container):
         self.sps2_meters.set_torque_limit(self.torque_max, self.torque_warning)
         self.sps2_meters.set_speed_limit(self.speed_max, self.speed_warning)
 
-        self._task = self.page.run_task(self.__load_data)
-
-    def will_unmount(self):
-        if self._task:
-            self._task.cancel()
-
     def __load_settings(self):
         self.speed_max = 0
         self.speed_warning = 0
@@ -76,50 +70,44 @@ class DualShaPoLiOff(ft.Container):
         self.data_refresh_interval = preference.data_refresh_interval
         self.system_unit = preference.system_unit
 
-    async def __load_data(self):
-        while True:
-            sps1_speed = gdata.sps1_speed
-            sps1_power = gdata.sps1_power
-            sps1_torque = gdata.sps1_torque
-            sps1_thrust = gdata.sps1_thrust
-           
-            unit = self.system_unit
-            display_thrust = self.display_thrust
+    def load_data(self):
+        sps1_speed = gdata.sps1_speed
+        sps1_power = gdata.sps1_power
+        sps1_torque = gdata.sps1_torque
+        sps1_thrust = gdata.sps1_thrust
 
-            self.sps1_meters.set_power(sps1_power, unit)
-            self.sps1_meters.set_torque(sps1_torque, unit)
-            self.sps1_meters.set_speed(sps1_speed)
-            self.sps1_meters.set_thrust(display_thrust, sps1_thrust, unit)
+        unit = self.system_unit
+        display_thrust = self.display_thrust
 
-            sps2_speed = gdata.sps1_speed
-            sps2_power = gdata.sps1_power
-            sps2_torque = gdata.sps1_torque
-            sps2_thrust = gdata.sps1_thrust
+        self.sps1_meters.set_power(sps1_power, unit)
+        self.sps1_meters.set_torque(sps1_torque, unit)
+        self.sps1_meters.set_speed(sps1_speed)
+        self.sps1_meters.set_thrust(display_thrust, sps1_thrust, unit)
 
-            self.sps2_meters.set_power(sps2_power, unit)
-            self.sps2_meters.set_torque(sps2_torque, unit)
-            self.sps2_meters.set_speed(sps2_speed)
-            self.sps2_meters.set_thrust(display_thrust, sps2_thrust, unit)
+        sps2_speed = gdata.sps1_speed
+        sps2_power = gdata.sps1_power
+        sps2_torque = gdata.sps1_torque
+        sps2_thrust = gdata.sps1_thrust
 
-            sps1_data_log = DataLog.select(
-                DataLog.utc_date_time,
-                DataLog.speed,
-                DataLog.power,
-                DataLog.torque,
-                DataLog.thrust
-            ).where(DataLog.name == 'sps1').order_by(DataLog.id.desc()).limit(100)
+        self.sps2_meters.set_power(sps2_power, unit)
+        self.sps2_meters.set_torque(sps2_torque, unit)
+        self.sps2_meters.set_speed(sps2_speed)
+        self.sps2_meters.set_thrust(display_thrust, sps2_thrust, unit)
 
-            sps2_data_log = DataLog.select(
-                DataLog.utc_date_time,
-                DataLog.speed,
-                DataLog.power,
-                DataLog.torque,
-                DataLog.thrust
-            ).where(DataLog.name == 'sps2').order_by(DataLog.id.desc()).limit(100)
+        sps1_data_log = DataLog.select(
+            DataLog.utc_date_time,
+            DataLog.speed,
+            DataLog.power,
+            DataLog.torque,
+            DataLog.thrust
+        ).where(DataLog.name == 'sps1').order_by(DataLog.id.desc()).limit(100)
 
-            self.dual_power_line.set_data(sps1_data_log, sps2_data_log)
+        sps2_data_log = DataLog.select(
+            DataLog.utc_date_time,
+            DataLog.speed,
+            DataLog.power,
+            DataLog.torque,
+            DataLog.thrust
+        ).where(DataLog.name == 'sps2').order_by(DataLog.id.desc()).limit(100)
 
-            await asyncio.sleep(self.data_refresh_interval)
-
-    def __get_session(self, key: str):
-        return self.page.session.get(key)
+        self.dual_power_line.set_data(sps1_data_log, sps2_data_log)

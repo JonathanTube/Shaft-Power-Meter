@@ -15,7 +15,7 @@ class SimpleCard(ft.Container):
         self.padding = 10
         self.border = ft.border.all(
             width=0.5,
-            color=ft.colors.with_opacity(0.15, ft.colors.INVERSE_SURFACE)
+            color=ft.Colors.with_opacity(0.15, ft.Colors.INVERSE_SURFACE)   
         )
 
         self._title = title

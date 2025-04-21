@@ -17,7 +17,7 @@ class PowerUnlimited(ft.Container):
         self.content = ft.Container(
             border=ft.border.all(
                 width=0.5,
-                color=ft.colors.with_opacity(0.15, ft.colors.INVERSE_SURFACE)
+                color=ft.Colors.with_opacity(0.15, ft.Colors.INVERSE_SURFACE)
             ),
             border_radius=10,
             padding=ft.padding.all(10),
