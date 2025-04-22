@@ -42,11 +42,9 @@ class PowerOverloadTask:
             sps2_instant_power = gdata.sps2_power
             # print(f'sps2_instant_power={sps2_instant_power}')
 
-            sps1_expected_power = FormulaCalculator.calculate_power_by_speed(
-                max_power, max_speed, torque_speed_limit_percent, sps1_speed)
+            sps1_expected_power = FormulaCalculator.calculate_power_by_speed(max_power, max_speed, torque_speed_limit_percent, sps1_speed)
             # print(f'sps1_expected_power={sps1_expected_power}')
-            sps2_expected_power = FormulaCalculator.calculate_power_by_speed(
-                max_power, max_speed, torque_speed_limit_percent, sps2_speed)
+            sps2_expected_power = FormulaCalculator.calculate_power_by_speed(max_power, max_speed, torque_speed_limit_percent, sps2_speed)
             # print(f'sps2_expected_power={sps2_expected_power}')
 
             if sps1_instant_power > sps1_expected_power or sps2_instant_power > sps2_expected_power:
@@ -60,20 +58,13 @@ class PowerOverloadTask:
         # 连续突破60s，则记录突破事件
         # print(f'self.breach_times={self.checking_continuous_interval}')
         if self.breach_times == self.checking_continuous_interval:
-            ControlManager.on_power_overload_breach()
-            AlarmLog.create(
-                utc_date_time=gdata.utc_date_time,
-                alarm_type=AlarmType.POWER_OVERLOAD
-            )
+            AlarmLog.create(utc_date_time=gdata.utc_date_time, alarm_type=AlarmType.POWER_OVERLOAD)
 
     def __handle_recovery_event(self):
         if self.breach_times < self.checking_continuous_interval:
             self.__reset_all()
             return
-
         self.recovery_times += 1
-        if self.recovery_times == self.checking_continuous_interval:
-            ControlManager.on_power_overload_recovery()
 
     def __reset_all(self):
         self.breach_times = 0

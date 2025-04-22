@@ -6,16 +6,11 @@ from ui.home.dashboard.sps_dual.on.index import DualShaPoLiOn
 from ui.home.dashboard.sps_dual.off.index import DualShaPoLiOff
 from utils.data_save import DataSave
 from common.global_data import gdata
-from ui.home.alarm.alarm_button import AlarmButton
-from ui.home.event.event_button import EventButton
 
 
 class ControlManager:
     audio_alarm: AudioAlarm | None = None
     fullscreen_alert: FullscreenAlert | None = None
-
-    alarm_button: AlarmButton | None = None
-    event_button: EventButton | None = None
 
     sps_single_on: SingleShaPoLiOn | None = None
     sps_single_off: SingleShaPoLiOff | None = None
@@ -33,17 +28,6 @@ class ControlManager:
     def on_eexi_power_breach_recovery():
         ControlManager.audio_alarm.stop()
         ControlManager.fullscreen_alert.stop()
-
-    @staticmethod
-    def on_power_overload_occured():
-        if ControlManager.alarm_button is not None:
-            ControlManager.alarm_button.update_badge()
-            ControlManager.alarm_button.start_blink()
-
-    @staticmethod
-    def on_power_overload_recovery():
-        if ControlManager.alarm_button is not None:
-            ControlManager.alarm_button.stop_blink()
 
     @staticmethod
     def on_instant_data_refresh():

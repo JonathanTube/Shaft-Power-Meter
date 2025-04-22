@@ -11,7 +11,7 @@ import random
 from common.global_data import gdata
 
 
-class GpsReadTask:
+class GpsSyncTask:
     def __init__(self, page: ft.Page):
         self.page = page
         self.reader = None
@@ -60,7 +60,6 @@ class GpsReadTask:
 
     def __create_alarm_log(self):
         cnt: int = AlarmLog.select().where((AlarmLog.alarm_type == AlarmType.GPS_DISCONNECTED) & (AlarmLog.acknowledge_time == None)).count()
-
         if cnt == 0:
             AlarmLog.create(utc_date_time=gdata.utc_date_time, alarm_type=AlarmType.GPS_DISCONNECTED)
 
