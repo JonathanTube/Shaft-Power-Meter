@@ -3,30 +3,28 @@ from typing import Literal
 
 
 class Keyboard(ft.Stack):
-    def __init__(
-        self,
-        type: Literal['int', 'float'] = 'float',
-        on_change: ft.OptionalEventCallable = None
-    ):
+    def __init__(self, type: Literal['int', 'float'] = 'float', on_change: ft.OptionalEventCallable = None):
         super().__init__()
+        self.opened = False
         self.words = ""
         self.type = type
+        self.expand = True
         self.__on_change = on_change
-        self.__x = 0
-        self.__y = 0
 
     def build(self):
         number_keys = [ft.OutlinedButton(str(i), col={"xs": 4}, on_click=self.__on_key_click) for i in range(1, 10)]
         number_keys.append(ft.OutlinedButton(str(0), col={"xs": 4}, on_click=self.__on_key_click))
+
         if self.type == 'float':
             number_keys.append(ft.OutlinedButton('.', col={"xs": 4}, on_click=self.__on_key_click))
+
         number_keys.append(ft.OutlinedButton(icon=ft.Icons.BACKSPACE_OUTLINED, col={"xs": 4}, on_click=self.__on_key_delete))
 
         kb_header = ft.Row(
             alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
             controls=[
-                ft.Container(content=ft.Text("Dragable Keyboard", weight=ft.FontWeight.BOLD), padding=ft.padding.only(left=10)),
-                ft.IconButton(icon=ft.Icons.CLOSE, on_click=self.on_close)
+                ft.Container(content=ft.Icon(ft.Icons.KEYBOARD_OUTLINED, size=30), padding=ft.padding.only(left=10)),
+                ft.IconButton(icon=ft.Icons.CLOSE_ROUNDED, on_click=self.__on_close)
             ]
         )
         self.kb = ft.Column(
@@ -37,8 +35,7 @@ class Keyboard(ft.Stack):
                 ft.Container(content=ft.ResponsiveRow(number_keys), padding=10)
             ]
         )
-        self.kb_container = ft.Container(
-            expand=False,
+        self.kb_open = ft.Container(
             width=200,
             border_radius=10,
             bgcolor=ft.Colors.SURFACE,
@@ -51,34 +48,47 @@ class Keyboard(ft.Stack):
             content=self.kb
         )
 
-        self.controls = [
-            ft.GestureDetector(
-                left=self.__x,
-                top=self.__y,
-                mouse_cursor=ft.MouseCursor.MOVE,
-                drag_interval=10,
-                on_pan_update=self.__on_pan_update,
-                content=self.kb_container
-            )
-        ]
+        self.kb_close = ft.IconButton(icon=ft.Icons.KEYBOARD_OUTLINED, on_click=self.__on_open)
 
-    def on_close(self, e):
-        if self.words.endswith("."):
-            self.words = self.words[:-1]
-        self.__on_change(self.words)
-        e.page.overlay.remove(self)
-        e.page.update()
+        self.gd = ft.GestureDetector(
+            right=10,
+            bottom=10,
+            expand=False,
+            mouse_cursor=ft.MouseCursor.MOVE,
+            drag_interval=10,
+            on_pan_update=self.__on_pan_update,
+            content=self.kb_close
+        )
 
-        # 设置所有的边框的默认颜色
-        for control in e.page.controls:
-            if isinstance(control, InputNumber):
-                control.content.border_color = ft.Colors.BLACK
-                control.content.update()
+        self.controls = [self.gd]
+
+    def open(self):
+        if not self.opened:
+            self.__on_open(None)
+
+    def __on_open(self, e):
+        self.opened = True
+        self.gd.content = self.kb_open
+        self.gd.left = 500
+        self.gd.top = 250
+        self.gd.right = None
+        self.gd.bottom = None
+        self.gd.update()
+
+    def __on_close(self, e):
+        self.opened = False
+        self.gd.content = self.kb_close
+        self.gd.left = None
+        self.gd.top = None
+        self.gd.right = 10
+        self.gd.bottom = 10
+        self.gd.update()
 
     def __on_pan_update(self, e: ft.DragUpdateEvent):
-        e.control.top = max(0, e.control.top + e.delta_y)
-        e.control.left = max(0, e.control.left + e.delta_x)
-        e.control.update()
+        if self.opened:
+            e.control.top = max(0, e.control.top + e.delta_y)
+            e.control.left = max(0, e.control.left + e.delta_x)
+            e.control.update()
 
     def __on_key_click(self, e):
         txt = e.control.text
@@ -95,67 +105,19 @@ class Keyboard(ft.Stack):
         self.words = self.words[:-1]
         self.__on_change(self.words)
 
-    def reset(self, x: int, y: int, words: any):
-        self.__x = x
-        self.__y = y
-        self.words = words
+
+async def main(page: ft.Page):
+    def on_change(e):
+        tf.value = e
+        tf.update()
+    kb = Keyboard(on_change=on_change)
+    page.overlay.append(kb)
+    tf = ft.TextField(value="123", read_only=True, on_focus=lambda e: kb.open())
+    tf2 = ft.TextField(value="123", read_only=True, on_focus=lambda e: kb.open())
+    page.add(tf)
+    page.add(tf2)
+    page.window.width = 1024
+    page.window.height = 768
 
 
-class InputNumber(ft.Container):
-    def __init__(self, col: dict[str, int] | None,
-                 label: str,
-                 value: str,
-                 suffix_text: str,
-                 visible: bool = True,
-                 on_change: ft.OptionalEventCallable = None,
-                 type: Literal['int', 'float'] = 'float'):
-
-        super().__init__()
-        self.col = col
-        self.visible = visible
-        self.label = label
-        self.value = str(value) if value is not None else ""
-        self.suffix_text = suffix_text
-        self.on_change_callback = on_change
-
-        self.kb = Keyboard(type=type, on_change=self.__on_change)
-        self.on_tap_down = self.__on_tap_down
-
-    def __on_change(self, words: str):
-        self.content.value = words
-        if words != "" and self.on_change_callback is not None:
-            self.on_change_callback(words)
-        self.content.update()
-
-    def __on_tap_down(self, e: ft.ContainerTapEvent):
-        # 把别人的移除掉
-        for kb in e.page.overlay:
-            if isinstance(kb, Keyboard):
-                kb.on_close(e)
-
-        # 设置别人的边框的默认颜色
-        for control in e.page.controls:
-            if isinstance(control, InputNumber):
-                control.content.border_color = ft.Colors.BLACK
-                control.content.update()
-
-        # 设置自己的边框的激活颜色
-        self.content.border_color = ft.Colors.PRIMARY
-        self.content.update()
-
-        self.kb.reset(e.global_x, e.global_y, self.content.value)
-        # 添加自己的
-        e.page.overlay.append(self.kb)
-        e.page.update()
-
-    def build(self):
-        self.content: ft.TextField = ft.TextField(label=self.label, value=self.value, suffix_text=self.suffix_text, visible=self.visible, read_only=True)
-
-
-# async def main(page: ft.Page):
-#     page.add(InputNumber())
-#     page.add(InputNumber())
-#     page.add(InputNumber())
-#     page.add(InputNumber())
-
-# ft.app(main)
+ft.app(main)
