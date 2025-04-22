@@ -1,10 +1,9 @@
 import flet as ft
-
+from ui.common.keyboard import keyboard
 from ui.common.permission_check import PermissionCheck
 from ui.common.toast import Toast
 from ui.setting.system_conf.system_conf_settings import SystemConfSettings
 from ui.setting.system_conf.system_conf_ship_info import SystemConfShipInfo
-from ui.setting.system_conf.system_conf_factor import SystemConfFactor
 
 
 class SystemConf(ft.Container):
@@ -14,7 +13,6 @@ class SystemConf(ft.Container):
     def build(self):
         self.system_conf_settings = SystemConfSettings()
         self.system_conf_ship_info = SystemConfShipInfo()
-        self.system_conf_factor = SystemConfFactor()
 
         self.save_button = ft.FilledButton(self.page.session.get("lang.button.save"), width=120, height=40, on_click=self.__on_save_button_click)
         self.reset_button = ft.OutlinedButton(self.page.session.get("lang.button.reset"), width=120, height=40, on_click=self.__reset_data)
@@ -30,7 +28,6 @@ class SystemConf(ft.Container):
                     controls=[
                         self.system_conf_settings,
                         self.system_conf_ship_info,
-                        self.system_conf_factor,
                         buttons
                     ]
                 )
@@ -41,14 +38,15 @@ class SystemConf(ft.Container):
 
     def __save_data(self):
         try:
+            keyboard.close()
             self.system_conf_settings.save()
             self.system_conf_ship_info.save()
-            self.system_conf_factor.save()
             Toast.show_success(self.page)
         except Exception as e:
             Toast.show_error(self.page, e)
 
     def __reset_data(self, e):
+        keyboard.close()
         self.content.clean()
         self.build()
         Toast.show_success(e.page)

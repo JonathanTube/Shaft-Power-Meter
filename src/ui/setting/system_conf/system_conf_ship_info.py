@@ -6,6 +6,7 @@ from db.models.ship_info import ShipInfo
 class SystemConfShipInfo(CustomCard):
     def __init__(self):
         super().__init__()
+        self.col = {'xs': 12}
         self.ship_info = ShipInfo.get()
 
     def build(self):
@@ -33,7 +34,6 @@ class SystemConfShipInfo(CustomCard):
             self.imo_number,
             self.ship_size
         ])
-        self.height = 360
 
         super().build()
 

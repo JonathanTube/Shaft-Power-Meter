@@ -3,9 +3,7 @@ import flet as ft
 from db.models.limitations import Limitations
 from ui.common.custom_card import CustomCard
 from utils.unit_converter import UnitConverter
-
-reg_digital = r'^(\d+\.?\d*|)$'  # 允许整数、小数或空字符串
-
+from ui.common.keyboard import keyboard
 
 class GeneralLimitationMax(ft.Container):
     def __init__(self, system_unit: int):
@@ -18,18 +16,21 @@ class GeneralLimitationMax(ft.Container):
     def build(self):
         self.speed_max = ft.TextField(suffix_text="rpm",
                                       label=self.page.session.get("lang.common.speed"),
-                                      input_filter=ft.InputFilter(regex_string=reg_digital),
-                                      value=self.limitations.speed_max)
+                                      value=self.limitations.speed_max,
+                                      read_only=True,
+                                      on_focus=lambda e: keyboard.open(e.control))
 
         self.torque_max = ft.TextField(suffix_text="kNm",
                                        label=self.page.session.get("lang.common.torque"),
-                                       input_filter=ft.InputFilter(regex_string=reg_digital),
-                                       value=self.limitations.torque_max)
+                                       value=self.limitations.torque_max,
+                                       read_only=True,
+                                       on_focus=lambda e: keyboard.open(e.control))
 
         self.power_max = ft.TextField(suffix_text="kW",
                                       label=self.page.session.get("lang.common.power"),
-                                      input_filter=ft.InputFilter(regex_string=reg_digital),
-                                      value=self.limitations.power_max)
+                                      value=self.limitations.power_max,
+                                      read_only=True,
+                                      on_focus=lambda e: keyboard.open(e.control))
 
         self.content = CustomCard(
             self.page.session.get("lang.setting.maximum_limitations"),

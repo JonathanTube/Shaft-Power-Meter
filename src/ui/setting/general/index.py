@@ -6,6 +6,7 @@ from ui.setting.general.general_limitation_warning import GeneralLimitationWarni
 from ui.setting.general.general_preference import GeneralPreference
 from ui.common.toast import Toast
 from ui.common.permission_check import PermissionCheck
+from ui.common.keyboard import keyboard
 
 class General(ft.Container):
     def __init__(self):
@@ -15,16 +16,22 @@ class General(ft.Container):
         self.system_unit = self.preference.system_unit
 
     def __on_save_button_click(self, e):
+        keyboard.close()
         self.page.open(PermissionCheck(self.__save_data, 2))
 
     def __save_data(self):
-        self.general_preference.save_data()
-        self.limitation_max.save_data()
-        self.limitation_warning.save_data()
-        self.general_date_time.save_data()
-        Toast.show_success(self.page)
+        try:
+            self.general_preference.save_data()
+            self.limitation_max.save_data()
+            self.limitation_warning.save_data()
+            self.general_date_time.save_data()
+        except Exception as e:
+            Toast.show_error(self.page, e)
+        else:
+            Toast.show_success(self.page)
 
     def __reset_data(self, e):
+        keyboard.close()
         self.content.clean()
         self.build()
         self.update()

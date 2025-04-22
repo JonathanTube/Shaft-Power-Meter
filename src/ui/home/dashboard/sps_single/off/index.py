@@ -15,30 +15,18 @@ class SingleShaPoLiOff(ft.Stack):
         self.__load_settings()
 
     def __load_settings(self):
-        self.speed_max = 0
-        self.speed_warning = 0
-        self.power_max = 0
-        self.power_warning = 0
-        self.torque_max = 0
-        self.torque_warning = 0
-        self.display_thrust = False
-
-        system_settings = SystemSettings.get()
+        system_settings: SystemSettings = SystemSettings.get()
         self.display_thrust = system_settings.display_thrust
 
-        limitations = Limitations.get()
-
+        limitations: Limitations = Limitations.get()
         self.speed_max = limitations.speed_max
         self.speed_warning = limitations.speed_warning
-
         self.power_max = limitations.power_max
         self.power_warning = limitations.power_warning
-
         self.torque_max = limitations.torque_max
         self.torque_warning = limitations.torque_warning
 
-        preference = Preference.get()
-        self.data_refresh_interval = preference.data_refresh_interval
+        preference: Preference = Preference.get()
         self.system_unit = preference.system_unit
 
     def build(self):

@@ -1,0 +1,95 @@
+import flet as ft
+from pymodbus.client import ModbusTcpClient
+
+from db.models.io_conf import IOConf
+from ui.common.toast import Toast
+from ui.common.permission_check import PermissionCheck
+from ui.setting.io_setting.io_setting_plc import IOSettingPLC
+from ui.setting.io_setting.io_setting_gps import IOSettingGPS
+from ui.setting.io_setting.io_setting_sps import IOSettingSPS
+from ui.setting.io_setting.io_setting_output import IOSettingOutput
+from ui.setting.io_setting.io_setting_factor import IOSettingFactor
+from ui.common.keyboard import keyboard
+
+
+class IOSetting(ft.Container):
+    def __init__(self):
+        super().__init__()
+        self.conf: IOConf = IOConf.get()
+
+    def build(self):
+        self.plc_conf = IOSettingPLC(self.conf)
+        self.gps_conf = IOSettingGPS(self.conf)
+        self.sps_conf = IOSettingSPS(self.conf)
+        self.output_conf = IOSettingOutput(self.conf)
+        self.factor_conf = IOSettingFactor()
+
+        self.save_button = ft.FilledButton(self.page.session.get("lang.button.save"), width=120, height=40, on_click=lambda e: self.__on_save_button_click(e))
+        self.reset_button = ft.OutlinedButton(self.page.session.get("lang.button.reset"), width=120, height=40, on_click=self.__reset_data)
+
+        self.content = ft.Column(
+            scroll=ft.ScrollMode.ADAPTIVE,
+            expand=True,
+            controls=[
+                ft.ResponsiveRow(
+                    controls=[
+                        self.plc_conf,
+                        self.gps_conf,
+                        self.sps_conf,
+                        self.factor_conf,
+                        self.output_conf,
+                        ft.Row(alignment=ft.MainAxisAlignment.CENTER, controls=[self.save_button, self.reset_button])
+                    ]
+                )
+            ]
+        )
+
+    def __on_save_button_click(self, e):
+        self.page.open(PermissionCheck(self.__save_data, 2))
+
+    def __save_data(self):
+        try:
+            keyboard.close()
+            self.__write_to_plc()
+            self.plc_conf.save_data()
+            self.gps_conf.save_data()
+            self.sps_conf.save_data()
+            self.factor_conf.save_data()
+            self.output_conf.save_data()
+            Toast.show_success(self.page)
+        except Exception as err:
+            Toast.show_error(self.page, err)
+
+    def __write_to_plc(self):
+        plc_client = None
+        try:
+            plc_client = ModbusTcpClient(host=self.conf.plc_ip, port=self.conf.plc_port)
+            plc_client.connect()
+            plc_client.write_register(12298, int(self.conf.power_range_min))
+            plc_client.write_register(12299, int(self.conf.power_range_max))
+            plc_client.write_register(12300, int(self.conf.power_range_offset))
+
+            plc_client.write_register(12308, int(self.conf.torque_range_min))
+            plc_client.write_register(12309, int(self.conf.torque_range_max))
+            plc_client.write_register(12310, int(self.conf.torque_range_offset))
+
+            plc_client.write_register(12318, int(self.conf.thrust_range_min))
+            plc_client.write_register(12319, int(self.conf.thrust_range_max))
+            plc_client.write_register(12320, int(self.conf.thrust_range_offset))
+
+            plc_client.write_register(12328, int(self.conf.speed_range_min))
+            plc_client.write_register(12329, int(self.conf.speed_range_max))
+            plc_client.write_register(12330, int(self.conf.speed_range_offset))
+        except Exception as err:
+            Toast.show_error(self.page, err)
+            raise err
+        finally:
+            if plc_client:
+                plc_client.close()
+
+    def __reset_data(self, e):
+        keyboard.close()
+        self.conf = IOConf.get()
+        self.content.clean()
+        self.build()
+        Toast.show_success(e.page)

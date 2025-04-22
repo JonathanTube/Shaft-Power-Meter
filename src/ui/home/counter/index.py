@@ -1,9 +1,9 @@
 import flet as ft
 
 from db.models.system_settings import SystemSettings
-from .manually import CounterManually
-from .interval import CounterInterval
-from .total import CounterTotal
+from ui.home.counter.interval import IntervalCounter
+from ui.home.counter.manually import ManuallyCounter
+from ui.home.counter.total import TotalCounter
 
 
 class Counter(ft.Container):
@@ -19,38 +19,24 @@ class Counter(ft.Container):
         self.dual = system_settings.amount_of_propeller == 2
 
     def build(self):
+        interval_counter_sps1 = IntervalCounter('sps1')
+        manually_counter_sps1 = ManuallyCounter('sps1')
+        total_counter_sps1 = TotalCounter('sps1')
+
         if self.dual:
-            self.content = ft.Column(
-                controls=[
-                    ft.Text('sps1', weight=ft.FontWeight.BOLD, size=16),
-                    ft.Row(
-                        expand=True,
-                        controls=[
-                            CounterInterval('sps1'),
-                            CounterManually('sps1'),
-                            CounterTotal('sps1')
-                        ]),
-                    ft.Text('sps2', weight=ft.FontWeight.BOLD, size=16),
-                    ft.Row(
-                        expand=True,
-                        controls=[
-                            CounterInterval('sps2'),
-                            CounterManually('sps2'),
-                            CounterTotal('sps2')
-                        ])
-                ]
-            )
-        else:
-            self.content = ft.Column(
-                controls=[
-                    ft.Row(
-                        expand=True,
-                        controls=[
-                            CounterInterval('sps1'),
-                            CounterManually('sps1'),
-                            CounterTotal('sps1')
-                        ]
-                    ),
-                    ft.Text('', expand=True)
-                ]
-            )
+            interval_counter_sps2 = IntervalCounter('sps2')
+            manually_counter_sps2 = ManuallyCounter('sps2')
+            total_counter_sps2 = TotalCounter('sps2')
+
+            self.content = ft.Column(controls=[
+                ft.Text('sps1', weight=ft.FontWeight.BOLD, size=16),
+                ft.Row(expand=True, controls=[interval_counter_sps1, manually_counter_sps1, total_counter_sps1]),
+                ft.Text('sps2', weight=ft.FontWeight.BOLD, size=16),
+                ft.Row(expand=True, controls=[interval_counter_sps2, manually_counter_sps2, total_counter_sps2])
+            ])
+            return
+
+        self.content = ft.Column(controls=[
+            ft.Row(expand=True, controls=[interval_counter_sps1, manually_counter_sps1, total_counter_sps1]),
+            ft.Text('', expand=True)
+        ])

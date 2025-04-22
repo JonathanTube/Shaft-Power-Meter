@@ -115,8 +115,7 @@ class GeneralDateTime(ft.Container):
         gdata.enable_utc_time_sync_with_gps = self.sync_with_gps.value
         self.date_time_conf.save()
 
-        # set session
         new_date_time = f"{new_date} {new_time}:00"
         dt_format = '%Y-%m-%d %H:%M:%S'
         new_utc_date_time = datetime.strptime(new_date_time, dt_format)
-        gdata.utc_date_time = new_utc_date_time
+        gdata.utc_date_time = new_utc_date_time 

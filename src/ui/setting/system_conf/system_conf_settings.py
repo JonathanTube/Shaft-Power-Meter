@@ -2,8 +2,8 @@ import flet as ft
 from db.models.preference import Preference
 from db.models.system_settings import SystemSettings
 from ui.common.custom_card import CustomCard
-from ui.common.keyboard import InputNumber
 from utils.unit_converter import UnitConverter
+from ui.common.keyboard import keyboard
 
 
 class SystemConfSettings(CustomCard):
@@ -35,21 +35,24 @@ class SystemConfSettings(CustomCard):
 
         eexi_limited_power_value, eexi_limited_power_unit = self.__get_eexi_limited_power()
 
-        self.eexi_limited_power = InputNumber(
+        self.eexi_limited_power = ft.TextField(
             col={"md": 6},
             label=self.page.session.get("lang.setting.eexi_limited_power"),
             value=eexi_limited_power_value,
             suffix_text=eexi_limited_power_unit,
-            visible=self.system_settings.sha_po_li
+            visible=self.system_settings.sha_po_li,
+            read_only=True,
+            on_focus=lambda e: keyboard.open(e.control, 'float')
         )
 
-        self.eexi_breach_checking_duration = InputNumber(
+        self.eexi_breach_checking_duration = ft.TextField(
             col={"md": 6},
-            type="int",
             label=self.page.session.get("lang.setting.eexi_breach_checking_duration"),
             value=self.system_settings.eexi_breach_checking_duration,
             suffix_text="seconds",
-            visible=self.system_settings.sha_po_li
+            visible=self.system_settings.sha_po_li,
+            read_only=True,
+            on_focus=lambda e: keyboard.open(e.control, 'int')
         )
 
         self.amount_of_propeller_label = ft.Text(

@@ -1,6 +1,6 @@
 import asyncio
 from common.global_data import gdata
-from common.public_controls import PublicControls
+from common.control_manager import ControlManager
 from db.models.system_settings import SystemSettings
 from db.models.propeller_setting import PropellerSetting
 from utils.formula_cal import FormulaCalculator
@@ -60,7 +60,7 @@ class PowerOverloadTask:
         # 连续突破60s，则记录突破事件
         # print(f'self.breach_times={self.checking_continuous_interval}')
         if self.breach_times == self.checking_continuous_interval:
-            PublicControls.on_power_overload_breach()
+            ControlManager.on_power_overload_breach()
             AlarmLog.create(
                 utc_date_time=gdata.utc_date_time,
                 alarm_type=AlarmType.POWER_OVERLOAD
@@ -73,7 +73,7 @@ class PowerOverloadTask:
 
         self.recovery_times += 1
         if self.recovery_times == self.checking_continuous_interval:
-            PublicControls.on_power_overload_recovery()
+            ControlManager.on_power_overload_recovery()
 
     def __reset_all(self):
         self.breach_times = 0

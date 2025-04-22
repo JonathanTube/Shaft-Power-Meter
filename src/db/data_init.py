@@ -1078,9 +1078,9 @@ class DataInit:
                 },
 
                 {
-                    "code": "lang.setting.modbus_conf",
-                    "chinese": "Modbus 配置",
-                    "english": "Modbus Conf."
+                    "code": "lang.setting.sps_conf",
+                    "chinese": "SPS 配置",
+                    "english": "SPS Conf."
                 },
 
                 {

@@ -1,45 +1,40 @@
 import asyncio
-from typing import Literal
 import flet as ft
+from datetime import datetime
+from typing import Literal
+from db.models.data_log import DataLog
 from db.models.preference import Preference
-from .display import CounterDisplay
+from ui.home.counter.display import CounterDisplay
+from peewee import fn
+
+str_format = '%Y-%m-%d %H:%M:%S'
 
 
-class CounterTotal(ft.Container):
+class TotalCounter(ft.Container):
     def __init__(self, name: Literal['sps1', 'sps2']):
         super().__init__()
+        self.name = name
+
         self.expand = True
         self.border_radius = ft.border_radius.all(10)
         self.padding = 10
-        self.border = ft.border.all(
-            width=0.5,
-            color=ft.Colors.with_opacity(0.15, ft.Colors.INVERSE_SURFACE)   
-        )
+        self.border = ft.border.all(width=0.5, color=ft.Colors.with_opacity(0.15, ft.Colors.INVERSE_SURFACE))
 
-        self.name = name
-
-        self._task = None
-
-        self.system_unit = Preference.get().system_unit
+        preference: Preference = Preference.get()
+        self.system_unit = preference.system_unit
+        self.interval = preference.data_refresh_interval
 
     def build(self):
         self.display = CounterDisplay()
         self.time_elapsed = ft.Text("")
         self.started_at = ft.Text("")
 
-        self.title = ft.Text(
-            self.page.session.get('lang.counter.total'),
-            weight=ft.FontWeight.BOLD,
-            size=16
-        )
+        self.title = ft.Text(self.page.session.get('lang.counter.total'), weight=ft.FontWeight.BOLD, size=16)
 
         self.status_container = ft.Container(
-            content=ft.Text(
-                value=self.page.session.get('lang.counter.running'),
-                size=12
-            ),
+            content=ft.Text(value=self.page.session.get('lang.counter.running'), size=12),
             alignment=ft.alignment.center,
-            bgcolor=ft.Colors.GREEN_500,    
+            bgcolor=ft.Colors.GREEN_500,
             border_radius=ft.border_radius.all(40),
             padding=ft.padding.only(top=0, bottom=4, left=10, right=10)
         )
@@ -47,43 +42,72 @@ class CounterTotal(ft.Container):
         self.content = ft.Column(
             horizontal_alignment=ft.CrossAxisAlignment.CENTER,
             controls=[
-                ft.Row(alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
-                       controls=[
-                           self.title,
-                           self.status_container
-                       ]),
+                ft.Row(alignment=ft.MainAxisAlignment.SPACE_BETWEEN, controls=[self.title, self.status_container]),
                 self.display,
                 self.time_elapsed,
                 self.started_at
             ])
 
-    async def __refresh_data(self):
-        while True:
-            result = self.page.session.get(f'counter_total_{self.name}')
-            if result is not None:
-                average_power = result['average_power']
-                total_energy = result['total_energy']
-                total_rounds = result['total_rounds']
-                average_speed = result['average_speed']
-
-                self.time_elapsed.value = f'{result["time_elapsed"]} {self.page.session.get("lang.counter.measured")}'
-                self.time_elapsed.visible = True
-                self.time_elapsed.update()
-
-                self.started_at.value = f'{self.page.session.get("lang.counter.started_at")} {result["started_at"]}'
-                self.started_at.visible = True
-                self.started_at.update()
-
-                self.display.set_average_power(average_power, self.system_unit)
-                self.display.set_total_energy(total_energy, self.system_unit)
-                self.display.set_total_rounds(total_rounds)
-                self.display.set_average_speed(average_speed)
-
-            await asyncio.sleep(Preference.get().data_refresh_interval)
+        self.txt_measured = self.page.session.get("lang.counter.measured")
+        self.txt_started_at = self.page.session.get("lang.counter.started_at")
 
     def did_mount(self):
-        self._task = self.page.run_task(self.__refresh_data)
+        self.task = self.page.run_task(self.__running)
 
     def will_unmount(self):
-        if self._task:
-            self._task.cancel()
+        if self.task:
+            self.task.cancel()
+
+    async def __running(self):
+        while True:
+            self.__calculate()
+            await asyncio.sleep(self.interval)
+
+    def __calculate(self):
+        data_log = DataLog.select(fn.COALESCE(fn.AVG(DataLog.power), 0).alias('average_power'),
+                                  fn.COALESCE(fn.MIN(DataLog.rounds), 0).alias('min_rounds'),
+                                  fn.COALESCE(fn.MAX(DataLog.rounds), 0).alias('max_rounds'),
+                                  fn.COALESCE(fn.MIN(DataLog.utc_date_time), None).alias('start_time'),
+                                  fn.COALESCE(fn.MAX(DataLog.utc_date_time), None).alias('end_time')
+                                  ).where(DataLog.name == self.name).dicts().get()
+
+        if data_log['start_time'] is None or data_log['end_time'] is None:
+            return
+
+        start_time = datetime.strptime(data_log['start_time'], str_format)
+        end_time = datetime.strptime(data_log['end_time'], str_format)
+        average_power = data_log['average_power']
+        max_rounds = data_log['max_rounds']
+        min_rounds = data_log['min_rounds']
+
+        hours = (end_time - start_time).total_seconds() / 3600
+
+        total_energy = (average_power * hours) / 1000  # kWh
+
+        total_rounds = max_rounds - min_rounds
+
+        average_speed = 0
+        if hours > 0:
+            average_speed = round(total_rounds / (hours * 60), 1)
+
+        time_elapsed = end_time - start_time
+        days = time_elapsed.days
+        hours = time_elapsed.seconds // 3600
+        minutes = (time_elapsed.seconds % 3600) // 60
+        seconds = time_elapsed.seconds % 60
+
+        time_elapsed = f'{days:02d} d {hours:02d}:{minutes:02d}:{seconds:02d} h'
+        started_at = start_time.strftime("%Y-%m-%d %H:%M:%S")
+
+        self.time_elapsed.value = f'{time_elapsed} {self.txt_measured}'
+        self.time_elapsed.visible = True
+        self.time_elapsed.update()
+
+        self.started_at.value = f'{self.txt_started_at} {started_at}'
+        self.started_at.visible = True
+        self.started_at.update()
+
+        self.display.set_average_power(average_power, self.system_unit)
+        self.display.set_total_energy(total_energy, self.system_unit)
+        self.display.set_total_rounds(total_rounds)
+        self.display.set_average_speed(average_speed)

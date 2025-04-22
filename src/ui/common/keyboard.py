@@ -3,20 +3,22 @@ from typing import Literal
 
 
 class Keyboard(ft.Stack):
-    def __init__(self, type: Literal['int', 'float'] = 'float', on_change: ft.OptionalEventCallable = None):
+    def __init__(self):
         super().__init__()
+        self.visible = False
         self.opened = False
         self.words = ""
-        self.type = type
+        self.type = 'float'
         self.expand = True
-        self.__on_change = on_change
+
+        self.tf: ft.TextField | None = None
 
     def build(self):
         number_keys = [ft.OutlinedButton(str(i), col={"xs": 4}, on_click=self.__on_key_click) for i in range(1, 10)]
         number_keys.append(ft.OutlinedButton(str(0), col={"xs": 4}, on_click=self.__on_key_click))
 
-        if self.type == 'float':
-            number_keys.append(ft.OutlinedButton('.', col={"xs": 4}, on_click=self.__on_key_click))
+        self.point = ft.OutlinedButton('.', col={"xs": 4}, on_click=self.__on_key_click)
+        number_keys.append(self.point)
 
         number_keys.append(ft.OutlinedButton(icon=ft.Icons.BACKSPACE_OUTLINED, col={"xs": 4}, on_click=self.__on_key_delete))
 
@@ -62,9 +64,39 @@ class Keyboard(ft.Stack):
 
         self.controls = [self.gd]
 
-    def open(self):
+    def show(self):
+        self.visible = True
+        self.update()
+
+    def open(self, text_field: ft.TextField, type: Literal['int', 'float', 'ip'] = 'float'):
+        self.show()
+        # recovery the border color of last text field
+        try:
+            self.tf.border_color = ft.Colors.BLACK
+            self.tf.update()
+        except:
+            pass
+
+        if text_field is not None:
+            self.words = str(text_field.value)            
+
         if not self.opened:
             self.__on_open(None)
+
+        self.type = type
+        self.point.visible = self.type == 'float'
+        self.point.update()
+
+        self.tf = text_field
+        # set the border color of current text field
+        if self.tf is not None:
+            self.tf.border_color = ft.Colors.PRIMARY
+            self.tf.update()
+
+    def close(self):
+        self.visible = False
+        self.update()
+        self.__on_close(None)
 
     def __on_open(self, e):
         self.opened = True
@@ -96,7 +128,7 @@ class Keyboard(ft.Stack):
         if self.words == "" and txt == '.':
             return
         # 只能输入一个点
-        if '.' in self.words and txt == '.':
+        if self.type == 'float' and '.' in self.words and txt == '.':
             return
         self.words += txt
         self.__on_change(self.words)
@@ -105,19 +137,25 @@ class Keyboard(ft.Stack):
         self.words = self.words[:-1]
         self.__on_change(self.words)
 
-
-async def main(page: ft.Page):
-    def on_change(e):
-        tf.value = e
-        tf.update()
-    kb = Keyboard(on_change=on_change)
-    page.overlay.append(kb)
-    tf = ft.TextField(value="123", read_only=True, on_focus=lambda e: kb.open())
-    tf2 = ft.TextField(value="123", read_only=True, on_focus=lambda e: kb.open())
-    page.add(tf)
-    page.add(tf2)
-    page.window.width = 1024
-    page.window.height = 768
+    def __on_change(self, e):
+        if self.tf is not None:
+            self.tf.value = e
+            self.tf.update()
 
 
-ft.app(main)
+keyboard = Keyboard()
+# async def main(page: ft.Page):
+#     def on_change(e):
+#         tf.value = e
+#         tf.update()
+#     kb = Keyboard(on_change=on_change)
+#     page.overlay.append(kb)
+#     tf = ft.TextField(value="123", read_only=True, on_focus=lambda e: kb.open())
+#     tf2 = ft.TextField(value="123", read_only=True, on_focus=lambda e: kb.open())
+#     page.add(tf)
+#     page.add(tf2)
+#     page.window.width = 1024
+#     page.window.height = 768
+
+
+# ft.app(main)

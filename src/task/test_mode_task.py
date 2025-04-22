@@ -9,12 +9,11 @@ from common.global_data import gdata
 from db.models.alarm_log import AlarmLog
 from db.models.event_log import EventLog
 from db.models.report_info import ReportInfo
-from common.public_controls import PublicControls
+from common.control_manager import ControlManager
 
 
 class TestModeTask:
-    def __init__(self, page: ft.Page):
-        self.page = page
+    def __init__(self):
         self.min_torque = 0
         self.max_torque = 0
         self.min_speed = 0
@@ -45,7 +44,7 @@ class TestModeTask:
         self.system_settings = SystemSettings.get()
         self.is_running = True
         # start a thread to generate random data every seconds
-        return asyncio.create_task(self.generate_random_data())
+        asyncio.create_task(self.generate_random_data())
 
     def stop(self):
         try:
@@ -64,8 +63,8 @@ class TestModeTask:
             gdata.sps2_torque = 0
             gdata.sps2_thrust = 0
             gdata.sps2_rounds = 0
-            PublicControls.on_eexi_power_breach_recovery()
-            PublicControls.on_power_overload_recovery()
+            ControlManager.on_eexi_power_breach_recovery()
+            ControlManager.on_power_overload_recovery()
         except Exception as e:
             print(f'Error truncating DataLog table: {e}')
         self.is_running = False
@@ -78,7 +77,7 @@ class TestModeTask:
             await self.save_generated_data('sps1')
             if self.system_settings.amount_of_propeller == 2:
                 await self.save_generated_data('sps2')
-            PublicControls.on_instant_data_refresh()
+            ControlManager.on_instant_data_refresh()
             await asyncio.sleep(1)
 
     async def save_generated_data(self, name):
@@ -100,3 +99,6 @@ class TestModeTask:
             gdata.sps2_thrust = instant_thrust
             gdata.sps2_power = instant_power
             gdata.sps2_rounds = instant_revolution
+
+
+testModeTask: TestModeTask = TestModeTask()

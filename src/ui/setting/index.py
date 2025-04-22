@@ -1,25 +1,24 @@
 import flet as ft
-
 from ui.common.permission_check import PermissionCheck
 from ui.setting.general.index import General
-from ui.setting.io import IO
-from ui.setting.propeller_conf import PropellerConf
-from ui.setting.system_conf.index import SystemConf
-from ui.setting.test_mode import TestMode
-from ui.setting.zero_cal import ZeroCal
+from ui.setting.propeller_conf.index import PropellerConf
 from ui.setting.self_test import SelfTest
-from task.test_mode_task import TestModeTask
+from ui.setting.system_conf.index import SystemConf
+from ui.setting.test_mode.index import TestMode
+from ui.setting.zero_cal.index import ZeroCal
 from ui.setting.permission.index import Permission
+from ui.setting.io_setting.index import IOSetting
+from ui.common.keyboard import keyboard
 
 
 class Setting(ft.Container):
-    def __init__(self, test_mode_task: TestModeTask):
+    def __init__(self):
         super().__init__()
         self.margin = ft.margin.all(10)
-        self.test_mode_task = test_mode_task
 
     def __set_content(self, e):
         idx = e.control.selected_index
+        keyboard.close()
         if idx == 0:
             self.right_content.content = SystemConf()
         elif idx == 1:
@@ -29,14 +28,14 @@ class Setting(ft.Container):
         elif idx == 3:
             self.right_content.content = ZeroCal.create()
         elif idx == 4:
-            self.right_content.content = IO()
+            self.right_content.content = IOSetting()
         elif idx == 5:
             self.right_content.content = SelfTest()
         elif idx == 6:
             self.page.open(PermissionCheck(self.__after_permission_check, 0, closable=False))
             self.right_content.content = None
         elif idx == 7:
-            self.right_content.content = TestMode(self.test_mode_task)
+            self.right_content.content = TestMode()
 
         self.right_content.update()
 

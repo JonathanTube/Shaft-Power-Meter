@@ -31,7 +31,7 @@ class ColorDialog(ft.IconButton):
         color = self.color_picker.color
 
         self.icon_color = color
-
+        self.color = color
         if callable(self.on_color_change):
             self.on_color_change(color)
 

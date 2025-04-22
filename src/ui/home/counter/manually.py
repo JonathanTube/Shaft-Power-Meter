@@ -2,75 +2,102 @@ import flet as ft
 import asyncio
 from typing import Literal
 from datetime import datetime
-
+from db.models.data_log import DataLog
 from .display import CounterDisplay
 from db.models.preference import Preference
+from common.global_data import gdata
+from peewee import fn
+
+format_str = '%Y-%m-%d %H:%M:%S'
 
 
-class CounterManually(ft.Container):
+class ManuallyCounter(ft.Container):
     def __init__(self, name: Literal['sps1', 'sps2']):
         super().__init__()
         self.expand = True
+        self.name = name
+
         self.border_radius = ft.border_radius.all(10)
         self.padding = 10
         self.border = ft.border.all(
             width=0.5,
-            color=ft.Colors.with_opacity(0.15, ft.Colors.INVERSE_SURFACE)   
+            color=ft.Colors.with_opacity(0.15, ft.Colors.INVERSE_SURFACE)
         )
 
-        self.name = name
-        self._ui_refresh_task = None
-        self._data_create_task = None
         self._task = None
 
-        self.__load_config()
-
-    def __load_config(self):
-        self.system_unit = Preference.get().system_unit
+        preference: Preference = Preference.get()
+        self.system_unit = preference.system_unit
+        self.interval = preference.data_refresh_interval
 
     def __on_start(self, e):
-        self.page.session.set(
-            f'counter_manually_start_time_{self.name}', datetime.now())
+        current_status = gdata.sps1_manually_status if self.name == 'sps1' else gdata.sps2_manually_status
+        if current_status != 'stopped':
+            return
+        self._task = self.page.run_task(self.__running)
+
+        if self.name == 'sps1':
+            gdata.sps1_manually_start_time = gdata.utc_date_time
+            gdata.sps1_manually_status = 'running'
+        else:
+            gdata.sps2_manually_start_time = gdata.utc_date_time
+            gdata.sps2_manually_status = 'running'
 
         self.start_button.visible = False
         self.stop_button.visible = True
         self.resume_button.visible = False
         self.status_text.value = self.page.session.get('lang.counter.running')
-        self.status_container.bgcolor = ft.Colors.GREEN_500 
-        self.__start_task()
+        self.status_container.bgcolor = ft.Colors.GREEN_500
+        self.started_at.value = f'{self.page.session.get("lang.counter.started_at")} {gdata.utc_date_time.strftime(format_str)}'
+        self.started_at.visible = True
         self.content.update()
 
     def __on_stop(self, e):
+        current_status = gdata.sps1_manually_status if self.name == 'sps1' else gdata.sps2_manually_status
+        if current_status != 'running':
+            return
+
+        self._task.cancel()
+        if self.name == 'sps1':
+            gdata.sps1_manually_status = 'reset'
+        else:
+            gdata.sps2_manually_status = 'reset'
+
         self.start_button.visible = False
         self.stop_button.visible = False
         self.resume_button.visible = True
         self.status_text.value = self.page.session.get('lang.counter.reset')
         self.status_container.bgcolor = ft.Colors.ORANGE_500
 
-        self.stopped_at.value = f'{self.page.session.get("lang.counter.stopped_at")} {datetime.now().strftime("%Y-%m-%d %H:%M:%S")}'
+        self.stopped_at.value = f'{self.page.session.get("lang.counter.stopped_at")} {datetime.now().strftime(format_str)}'
         self.stopped_at.visible = True
         self.stopped_at.update()
-
-        self.__stop_task()
         self.content.update()
 
     def __on_resume(self, e):
+        current_status = gdata.sps1_manually_status if self.name == 'sps1' else gdata.sps2_manually_status
+        if current_status != 'reset':
+            return
+
+        if self.name == 'sps1':
+            gdata.sps1_manually_status = 'stopped'
+        else:
+            gdata.sps2_manually_status = 'stopped'
+
         self.start_button.visible = True
         self.stop_button.visible = False
         self.resume_button.visible = False
         self.status_text.value = self.page.session.get('lang.counter.stopped')
-        self.status_container.bgcolor = ft.Colors.RED_500   
+        self.status_container.bgcolor = ft.Colors.RED_500
         self.time_elapsed.visible = False
         self.stopped_at.visible = False
-        status_name = f'counter_manually_status_{self.name}'
-        self.page.session.set(
-            status_name, self.page.session.get('lang.counter.stopped'))
+
         self.display.set_average_power(0, self.system_unit)
         self.display.set_total_energy(0, self.system_unit)
         self.display.set_total_rounds(0)
         self.display.set_average_speed(0)
-        e.page.close(self.dlg_modal)
         self.content.update()
+        e.page.close(self.dlg_modal)
 
     def __create_dlg_modal(self):
         self.dlg_modal = ft.AlertDialog(
@@ -88,19 +115,14 @@ class CounterManually(ft.Container):
         )
 
     def build(self):
+        current_status = gdata.sps1_manually_status if self.name == 'sps1' else gdata.sps2_manually_status
         self.__create_dlg_modal()
 
         self.display = CounterDisplay()
 
+        self.started_at = ft.Text("", visible=False)
         self.time_elapsed = ft.Text("", visible=False)
         self.stopped_at = ft.Text("", visible=False)
-
-        status_name = f'counter_manually_status_{self.name}'
-        status_value = self.page.session.get(status_name)
-
-        if status_value is None:
-            status_value = 'stopped'
-            self.page.session.set(status_name, 'stopped')
 
         self.status_text = ft.Text(
             value=self.page.session.get('lang.counter.stopped'),
@@ -109,7 +131,7 @@ class CounterManually(ft.Container):
         self.status_container = ft.Container(
             content=self.status_text,
             alignment=ft.alignment.center,
-            bgcolor=ft.Colors.RED_500,  
+            bgcolor=ft.Colors.RED_500,
             border_radius=ft.border_radius.all(40),
             padding=ft.padding.only(top=0, bottom=4, left=10, right=10)
         )
@@ -119,7 +141,7 @@ class CounterManually(ft.Container):
             icon=ft.icons.PLAY_CIRCLE_OUTLINED,
             bgcolor=ft.Colors.GREEN,
             width=220,
-            visible=status_value == 'stopped',
+            visible=current_status == 'stopped',
             on_click=lambda e: self.__on_start(e)
         )
 
@@ -128,7 +150,7 @@ class CounterManually(ft.Container):
             icon=ft.icons.STOP_CIRCLE_OUTLINED,
             bgcolor=ft.Colors.RED,
             width=220,
-            visible=status_value == 'running',
+            visible=current_status == 'running',
             on_click=lambda e: self.__on_stop(e)
         )
 
@@ -137,26 +159,18 @@ class CounterManually(ft.Container):
             bgcolor=ft.Colors.ORANGE,
             icon=ft.icons.RESTART_ALT_OUTLINED,
             width=220,
-            visible=status_value == 'Reset',
+            visible=current_status == 'reset',
             on_click=lambda e: e.page.open(self.dlg_modal)
         )
 
-        self.title = ft.Text(
-            self.page.session.get('lang.counter.manually'),
-            weight=ft.FontWeight.BOLD,
-            size=16
-        )
+        self.title = ft.Text(self.page.session.get('lang.counter.manually'), weight=ft.FontWeight.BOLD, size=16)
 
         self.content = ft.Column(
             horizontal_alignment=ft.CrossAxisAlignment.CENTER,
             controls=[
-                ft.Row(
-                    alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
-                    controls=[
-                        self.title,
-                        self.status_container
-                    ]),
+                ft.Row(alignment=ft.MainAxisAlignment.SPACE_BETWEEN, controls=[self.title, self.status_container]),
                 self.display,
+                self.started_at,
                 self.stopped_at,
                 self.time_elapsed,
                 self.start_button,
@@ -165,54 +179,63 @@ class CounterManually(ft.Container):
             ]
         )
 
-    def __start_task(self):
-        status_name = f'counter_manually_status_{self.name}'
-        start_time_name = f'counter_manually_start_time_{self.name}'
-        status_value = self.page.session.get(status_name)
-        if status_value == 'stopped':
-            self._task = self.page.run_task(self.__refresh_data)
-            self.page.session.set(status_name, 'running')
-            self.page.session.set(start_time_name, datetime.now())
-
-    def __stop_task(self):
-        status_name = f'counter_manually_status_{self.name}'
-        status_value = self.page.session.get(status_name)
-        if status_value == 'running':
-            self._task.cancel()
-            self.page.session.set(status_name, 'reset')
-
     def did_mount(self):
         self.display.set_average_power(0, self.system_unit)
         self.display.set_total_energy(0, self.system_unit)
         self.display.set_total_rounds(0)
         self.display.set_average_speed(0)
 
-        status_name = f'counter_manually_status_{self.name}'
-        status_value = self.page.session.get(status_name)
-        if status_value == 'running':
-            self._task = self.page.run_task(self.__refresh_data)
+        current_status = gdata.sps1_manually_status if self.name == 'sps1' else gdata.sps2_manually_status
+        if current_status == 'running':
+            self._task = self.page.run_task(self.__running)
 
     def will_unmount(self):
         if self._task:
             self._task.cancel()
 
-    async def __refresh_data(self):
+    async def __running(self):
         while True:
-            result = self.page.session.get(f'counter_manually_{self.name}')
-            if result is not None:
-                average_power = result['average_power']
-                total_energy = result['total_energy']
-                total_rounds = result['total_rounds']
-                average_speed = result['average_speed']
-                # print(average_power, total_energy, total_rounds, average_speed)
+            end_time = gdata.utc_date_time
+            start_time = gdata.sps1_manually_start_time if self.name == 'sps1' else gdata.sps2_manually_start_time
+            data_log = DataLog.select(
+                fn.COALESCE(fn.AVG(DataLog.power), 0).alias('average_power'),
+                fn.COALESCE(fn.MIN(DataLog.rounds), 0).alias('min_rounds'),
+                fn.COALESCE(fn.MAX(DataLog.rounds), 0).alias('max_rounds'),
+            ).where(
+                DataLog.name == self.name,
+                DataLog.utc_date_time >= start_time,
+                DataLog.utc_date_time <= end_time
+            ).dicts().get()
 
-                self.time_elapsed.value = f'{result["time_elapsed"]} {self.page.session.get("lang.counter.measured")}'
-                self.time_elapsed.visible = True
-                self.time_elapsed.update()
+            average_power = data_log['average_power']
+            max_rounds = data_log['max_rounds']
+            min_rounds = data_log['min_rounds']
 
-                self.display.set_average_power(average_power, self.system_unit)
-                self.display.set_total_energy(total_energy, self.system_unit)
-                self.display.set_total_rounds(total_rounds)
-                self.display.set_average_speed(average_speed)
+            hours = (end_time - start_time).total_seconds() / 3600
 
-            await asyncio.sleep(1)
+            total_energy = average_power * hours / 1000  # kWh
+
+            total_rounds = max_rounds - min_rounds
+
+            average_speed = 0
+            if hours > 0:
+                average_speed = round(total_rounds / (hours * 60), 1)
+
+            time_elapsed = end_time - start_time
+            days = time_elapsed.days
+            hours = time_elapsed.seconds // 3600
+            minutes = (time_elapsed.seconds % 3600) // 60
+            seconds = time_elapsed.seconds % 60
+
+            time_elapsed = f'{days:02d} d {hours:02d}:{minutes:02d}:{seconds:02d} h'
+
+            self.time_elapsed.value = f'{time_elapsed} {self.page.session.get("lang.counter.measured")}'
+            self.time_elapsed.visible = True
+            self.time_elapsed.update()
+
+            self.display.set_average_power(average_power, self.system_unit)
+            self.display.set_total_energy(total_energy, self.system_unit)
+            self.display.set_total_rounds(total_rounds)
+            self.display.set_average_speed(average_speed)
+
+            await asyncio.sleep(self.interval)

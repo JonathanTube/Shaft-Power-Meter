@@ -3,7 +3,7 @@ import flet as ft
 from ui.common.custom_card import CustomCard
 from db.models.limitations import Limitations
 from utils.unit_converter import UnitConverter
-reg_digital = r'^(\d+\.?\d*|)$'  # 允许整数、小数或空字符串
+from ui.common.keyboard import keyboard
 
 
 class GeneralLimitationWarning(ft.Container):
@@ -17,18 +17,21 @@ class GeneralLimitationWarning(ft.Container):
     def build(self):
         self.torque_warning = ft.TextField(suffix_text="kNm",
                                            label=self.page.session.get("lang.common.torque"),
-                                           input_filter=ft.InputFilter(regex_string=reg_digital),
-                                           value=self.limitations.torque_warning)
+                                           value=self.limitations.torque_warning,
+                                           read_only=True,
+                                           on_focus=lambda e: keyboard.open(e.control))
 
         self.speed_warning = ft.TextField(suffix_text="rpm",
                                           label=self.page.session.get("lang.common.speed"),
-                                          input_filter=ft.InputFilter(regex_string=reg_digital),
-                                          value=self.limitations.speed_warning)
+                                          value=self.limitations.speed_warning,
+                                          read_only=True,
+                                          on_focus=lambda e: keyboard.open(e.control))
 
         self.power_warning = ft.TextField(suffix_text="kW",
                                           label=self.page.session.get("lang.common.power"),
-                                          input_filter=ft.InputFilter(regex_string=reg_digital),
-                                          value=self.limitations.power_warning)
+                                          value=self.limitations.power_warning,
+                                          read_only=True,
+                                          on_focus=lambda e: keyboard.open(e.control))
 
         self.content = CustomCard(
             self.page.session.get("lang.setting.warning_limitations"),

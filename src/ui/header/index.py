@@ -1,21 +1,20 @@
 import flet as ft
 
-from common.public_controls import PublicControls
+from common.control_manager import ControlManager
 from ui.header.shapoli import ShaPoLi
 from ui.header.logo import HeaderLogo
 from ui.header.theme_button import ThemeButton
 from ui.home.index import Home
 from ui.report.report_info_list import ReportInfoList
 from ui.setting.index import Setting
-from task.test_mode_task import TestModeTask
 from db.models.system_settings import SystemSettings
+from ui.common.keyboard import keyboard
 
 
 class Header(ft.AppBar):
-    def __init__(self, main_content: ft.Container, test_mode_task: TestModeTask):
+    def __init__(self, main_content: ft.Container):
         super().__init__()
         self.toolbar_height = 40
-        self.test_mode_task = test_mode_task
         self.leading = HeaderLogo()
 
         self.center_title = False
@@ -79,24 +78,26 @@ class Header(ft.AppBar):
         if self.active_name == name:
             return
 
+        keyboard.close()
+
         if name == "HOME":
             self.main_content.content = Home()
             self.__set_active(self.home)
             self.__set_inactive(self.report)
             self.__set_inactive(self.setting)
-            PublicControls.home = self.main_content.content
+            ControlManager.home = self.main_content.content
         elif name == "REPORT":
             self.main_content.content = ReportInfoList()
             self.__set_inactive(self.home)
             self.__set_active(self.report)
             self.__set_inactive(self.setting)
-            PublicControls.home = None
+            ControlManager.home = None
         else:
-            self.main_content.content = Setting(self.test_mode_task)
+            self.main_content.content = Setting()
             self.__set_inactive(self.home)
             self.__set_inactive(self.report)
             self.__set_active(self.setting)
-            PublicControls.home = None
+            ControlManager.home = None
 
         self.active_name = name
 

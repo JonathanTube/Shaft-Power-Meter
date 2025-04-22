@@ -1,6 +1,6 @@
 import asyncio
 from common.global_data import gdata
-from common.public_controls import PublicControls
+from common.control_manager import ControlManager
 from db.models.event_log import EventLog
 from db.models.system_settings import SystemSettings
 from db.models.report_info import ReportInfo
@@ -61,7 +61,7 @@ class EEXIBreachTask:
         print(f"self.breach_times={self.breach_times}")
         print(f"self.checking_continuous_interval={self.checking_continuous_interval}")
         if self.breach_times == self.checking_continuous_interval:
-            PublicControls.on_eexi_power_breach_occured()
+            ControlManager.on_eexi_power_breach_occured()
             event_log: EventLog = EventLog.create(
                 started_at=self.start_time,
                 started_position=gdata.gps_location
@@ -102,7 +102,7 @@ class EEXIBreachTask:
 
         self.recovery_times += 1
         if self.recovery_times == self.checking_continuous_interval:
-            PublicControls.on_eexi_power_breach_recovery()
+            ControlManager.on_eexi_power_breach_recovery()
             event_log: EventLog = EventLog.select().where(
                 EventLog.ended_at == None
             ).order_by(EventLog.id.asc()).first()

@@ -1,5 +1,5 @@
 import flet as ft
-from common.public_controls import PublicControls
+from common.control_manager import ControlManager
 from ui.home.alarm.alarm_button import AlarmButton
 from ui.home.alarm.alarm_list import AlarmList
 from ui.home.counter.index import Counter
@@ -60,12 +60,12 @@ class Home(ft.Container):
             on_click=lambda e: self.__on_click(e, 3)
         )
         self.alarm_button = AlarmButton(on_click=lambda e: self.__on_click(e, 4))
-        PublicControls.alarm_button = self.alarm_button
+        ControlManager.alarm_button = self.alarm_button
 
         self.event_button = EventButton(on_click=lambda e: self.__on_click(e, 5))
         print("====================================", self.event_button)
-        PublicControls.event_button = self.event_button
-        print("====================================", PublicControls.event_button)
+        ControlManager.event_button = self.event_button
+        print("====================================", ControlManager.event_button)
 
         self.logs = ft.TextButton(
             text=self.page.session.get("lang.home.tab.logs"),
@@ -169,5 +169,5 @@ class Home(ft.Container):
         self.update_alarm_badge()
 
     def will_unmount(self):
-        PublicControls.event_button = None
-        PublicControls.alarm_button = None
+        ControlManager.event_button = None
+        ControlManager.alarm_button = None

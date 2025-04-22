@@ -3,7 +3,7 @@ import flet as ft
 from db.models.language import Language
 from ui.common.custom_card import CustomCard
 from db.models.preference import Preference
-
+from ui.common.keyboard import keyboard
 
 class GeneralPreference(ft.Container):
     def __init__(self, on_system_unit_change: callable):
@@ -46,7 +46,9 @@ class GeneralPreference(ft.Container):
             label=self.data_refresh_interval_label,
             suffix_text="seconds",
             value=self.preference.data_refresh_interval,
-            col={"md": 6}
+            col={"md": 6},
+            read_only=True,
+            on_focus=lambda e: keyboard.open(e.control, 'int')
         )
 
         self.content = CustomCard(

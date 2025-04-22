@@ -1,6 +1,6 @@
 import flet as ft
 
-from common.public_controls import PublicControls
+from common.control_manager import ControlManager
 from ui.home.dashboard.sps_dual.off.index import DualShaPoLiOff
 from ui.home.dashboard.sps_dual.on.index import DualShaPoLiOn
 from ui.home.dashboard.sps_single.off.index import SingleShaPoLiOff
@@ -27,20 +27,20 @@ class Dashboard(ft.Container):
         if amount_of_power == 1:
             if sha_po_li:
                 self.content = SingleShaPoLiOn()
-                PublicControls.sps_single_on = self.content
+                ControlManager.sps_single_on = self.content
             else:
                 self.content = SingleShaPoLiOff()
-                PublicControls.sps_single_off = self.content
+                ControlManager.sps_single_off = self.content
         elif amount_of_power == 2:
             if sha_po_li:
                 self.content = DualShaPoLiOn()
-                PublicControls.sps_dual_on = self.content
+                ControlManager.sps_dual_on = self.content
             else:
                 self.content = DualShaPoLiOff()
-                PublicControls.sps_dual_off = self.content
+                ControlManager.sps_dual_off = self.content
 
     def will_unmount(self):
-        PublicControls.sps_single_on = None
-        PublicControls.sps_single_off = None
-        PublicControls.sps_dual_on = None
-        PublicControls.sps_dual_off = None
+        ControlManager.sps_single_on = None
+        ControlManager.sps_single_off = None
+        ControlManager.sps_dual_on = None
+        ControlManager.sps_dual_off = None

@@ -3,17 +3,17 @@ import sys
 import flet as ft
 import asyncio
 from common.const_alarm_type import AlarmType
-from common.public_controls import PublicControls
+from common.control_manager import ControlManager
 from db.models.date_time_conf import DateTimeConf
 from db.models.alarm_log import AlarmLog
 from ui.common.fullscreen_alert import FullscreenAlert
+from ui.common.keyboard import keyboard
 from ui.header.index import Header
 from ui.home.index import Home
 from db.data_init import DataInit
 from db.table_init import TableInit
 from db.models.preference import Preference
 from db.models.language import Language
-from task.test_mode_task import TestModeTask
 from ui.common.audio_alarm import AudioAlarm
 from task.task_manager import TaskManager
 from common.global_data import gdata
@@ -47,8 +47,7 @@ def check_single_instance(mutex_name: str = "shaft-power-meter"):
 
     # 如果检测到已有实例，退出程序
     if last_error == 183:  # ERROR_ALREADY_EXISTS
-        ctypes.windll.user32.MessageBoxW(
-            0, "The Software is already running!", "Notice", 0x40)
+        ctypes.windll.user32.MessageBoxW(0, "The Software is already running!", "Notice", 0x40)
         sys.exit(0)
 
 
@@ -57,10 +56,7 @@ async def handle_unexpected_exit():
     date_time_conf: DateTimeConf = DateTimeConf.get()
     # if the time diff is more than 5 seconds, send the alarm
     if abs((date_time_conf.system_date_time - gdata.system_date_time).total_seconds()) > 5:
-        AlarmLog.create(
-            utc_date_time=gdata.utc_date_time,
-            alarm_type=AlarmType.APP_UNEXPECTED_EXIT
-        )
+        AlarmLog.create(utc_date_time=gdata.utc_date_time, alarm_type=AlarmType.APP_UNEXPECTED_EXIT)
 
 
 async def main(page: ft.Page):
@@ -87,26 +83,29 @@ async def main(page: ft.Page):
     # page.window.maximizable = False
 
     # page.window.prevent_close = True
-    PublicControls.fullscreen_alert = FullscreenAlert()
-    PublicControls.audio_alarm = AudioAlarm()
-    PublicControls.home = Home()
+    ControlManager.fullscreen_alert = FullscreenAlert()
+    ControlManager.audio_alarm = AudioAlarm()
+    ControlManager.home = Home()
 
     page.theme = ft.Theme(scrollbar_theme=ft.ScrollbarTheme(thickness=20))
 
-    main_content = ft.Container(expand=True, content=PublicControls.home, padding=0)
+    main_content = ft.Container(expand=True, content=ControlManager.home, padding=0)
 
-    page.appbar = Header(main_content, TestModeTask(page))
+    page.appbar = Header(main_content)
 
     main_stack = ft.Stack(
         controls=[
-            PublicControls.fullscreen_alert,
+            ControlManager.fullscreen_alert,
             main_content,
-            PublicControls.audio_alarm
+            ControlManager.audio_alarm
         ],
         expand=True
     )
 
     page.add(main_stack)
+
+    page.overlay.append(keyboard)
+    page.update()
 
 if __name__ == "__main__":
     check_single_instance()

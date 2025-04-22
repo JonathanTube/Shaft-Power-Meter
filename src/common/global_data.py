@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import Literal
 from db.models.io_conf import IOConf
 from db.models.system_settings import SystemSettings
 from db.models.propeller_setting import PropellerSetting
@@ -44,6 +45,11 @@ class GlobalData:
         self.sps2_thrust = 0
         self.sps2_rounds = 0
         self.gps_location = None
+
+        self.sps1_manually_start_time: datetime | None = None
+        self.sps2_manually_start_time: datetime | None = None
+        self.sps1_manually_status: Literal['running', 'stopped', 'reset'] = 'stopped'
+        self.sps2_manually_status: Literal['running', 'stopped', 'reset'] = 'stopped'
 
 
 gdata: GlobalData = GlobalData()

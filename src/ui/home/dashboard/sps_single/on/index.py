@@ -60,12 +60,6 @@ class SingleShaPoLiOn(ft.Container):
         )
 
     def __load_config(self):
-        self.display_thrust = False
-        self.limited_power_normal = 0
-        self.limited_power_warning = 0
-        self.unlimited_power = 0
-        self.system_unit = 0
-
         propeller_settings = PropellerSetting.get()
         self.unlimited_power = propeller_settings.shaft_power_of_mcr_operating_point
 
@@ -75,7 +69,6 @@ class SingleShaPoLiOn(ft.Container):
         self.display_thrust = system_settings.display_thrust
 
         preference = Preference.get()
-        self.data_refresh_interval = preference.data_refresh_interval
         self.system_unit = preference.system_unit
 
     def load_data(self):
