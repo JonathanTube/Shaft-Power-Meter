@@ -6,9 +6,10 @@ from ui.common.toast import Toast
 from ui.common.permission_check import PermissionCheck
 from ui.setting.io_setting.io_setting_plc import IOSettingPLC
 from ui.setting.io_setting.io_setting_gps import IOSettingGPS
-from ui.setting.io_setting.io_setting_sps import IOSettingSPS
+from ui.setting.io_setting.io_setting_sps1 import IOSettingSPS1
 from ui.setting.io_setting.io_setting_output import IOSettingOutput
 from ui.setting.io_setting.io_setting_factor import IOSettingFactor
+from ui.setting.io_setting.io_setting_sps2 import IOSettingSPS2
 from ui.common.keyboard import keyboard
 
 
@@ -20,7 +21,8 @@ class IOSetting(ft.Container):
     def build(self):
         self.plc_conf = IOSettingPLC(self.conf)
         self.gps_conf = IOSettingGPS(self.conf)
-        self.sps_conf = IOSettingSPS(self.conf)
+        self.sps1_conf = IOSettingSPS1(self.conf)
+        self.sps2_conf = IOSettingSPS2(self.conf)
         self.output_conf = IOSettingOutput(self.conf)
         self.factor_conf = IOSettingFactor()
 
@@ -35,7 +37,8 @@ class IOSetting(ft.Container):
                     controls=[
                         self.plc_conf,
                         self.gps_conf,
-                        self.sps_conf,
+                        self.sps1_conf,
+                        self.sps2_conf,
                         self.factor_conf,
                         self.output_conf,
                         ft.Row(alignment=ft.MainAxisAlignment.CENTER, controls=[self.save_button, self.reset_button])
@@ -45,6 +48,7 @@ class IOSetting(ft.Container):
         )
 
     def __on_save_button_click(self, e):
+        keyboard.close()
         self.page.open(PermissionCheck(self.__save_data, 2))
 
     def __save_data(self):
@@ -53,7 +57,8 @@ class IOSetting(ft.Container):
             self.__write_to_plc()
             self.plc_conf.save_data()
             self.gps_conf.save_data()
-            self.sps_conf.save_data()
+            self.sps1_conf.save_data()
+            self.sps2_conf.save_data()
             self.factor_conf.save_data()
             self.output_conf.save_data()
             Toast.show_success(self.page)

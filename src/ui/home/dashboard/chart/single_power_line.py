@@ -70,7 +70,7 @@ class SinglePowerLine(ft.Container):
             left_axis=ft.ChartAxis(
                 title=ft.Text(left_unit),
                 labels_interval=left_max / 5,
-                labels_size=50,
+                labels_size=len(str(left_max)) * 15,
                 labels=[
                     ft.ChartAxisLabel(value=0),
                     ft.ChartAxisLabel(value=left_max)

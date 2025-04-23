@@ -20,7 +20,7 @@ class Keyboard(ft.Stack):
         self.point = ft.OutlinedButton('.', col={"xs": 4}, on_click=self.__on_key_click)
         number_keys.append(self.point)
 
-        number_keys.append(ft.OutlinedButton(icon=ft.Icons.BACKSPACE_OUTLINED, col={"xs": 4}, on_click=self.__on_key_delete))
+        number_keys.append(ft.OutlinedButton(icon=ft.Icons.BACKSPACE_OUTLINED, col={"xs": 4}, on_click=self.__on_delete_one, on_long_press=self.__on_delete_all))
 
         kb_header = ft.Row(
             alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
@@ -84,7 +84,7 @@ class Keyboard(ft.Stack):
             self.__on_open(None)
 
         self.type = type
-        self.point.visible = self.type == 'float'
+        self.point.visible = self.type == 'float' or self.type == 'ip'
         self.point.update()
 
         self.tf = text_field
@@ -133,8 +133,12 @@ class Keyboard(ft.Stack):
         self.words += txt
         self.__on_change(self.words)
 
-    def __on_key_delete(self, e):
+    def __on_delete_one(self, e):
         self.words = self.words[:-1]
+        self.__on_change(self.words)
+
+    def __on_delete_all(self, e):
+        self.words = ""
         self.__on_change(self.words)
 
     def __on_change(self, e):

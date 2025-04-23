@@ -4,33 +4,33 @@ from ui.common.custom_card import CustomCard
 from ui.common.keyboard import keyboard
 
 
-class IOSettingGPS(CustomCard):
+class IOSettingSPS1(CustomCard):
     def __init__(self, conf: IOConf):
         super().__init__()
         self.conf = conf
 
     def build(self):
-        self.gps_ip = ft.TextField(
+        self.sps1_ip = ft.TextField(
             label=self.page.session.get("lang.setting.ip"),
-            value=self.conf.gps_ip,
+            value=self.conf.sps1_ip,
             read_only=True,
             col={"sm": 6},
             on_focus=lambda e: keyboard.open(e.control, 'ip')
         )
 
-        self.gps_port = ft.TextField(
+        self.sps1_port = ft.TextField(
             label=self.page.session.get("lang.setting.port"),
-            value=self.conf.gps_port,
+            value=self.conf.sps1_port,
             read_only=True,
             col={"sm": 6},
             on_focus=lambda e: keyboard.open(e.control, 'int')
         )
 
-        self.heading = self.page.session.get("lang.setting.gps_conf")
-        self.body = ft.ResponsiveRow(controls=[self.gps_ip, self.gps_port])
+        self.heading = self.page.session.get("lang.setting.sps1_conf")
+        self.body = ft.ResponsiveRow(controls=[self.sps1_ip, self.sps1_port])
         self.col = {"sm": 12}
         super().build()
 
     def save_data(self):
-        self.conf.gps_ip = self.gps_ip.value
-        self.conf.gps_port = self.gps_port.value
+        self.conf.sps1_ip = self.sps1_ip.value
+        self.conf.sps1_port = self.sps1_port.value

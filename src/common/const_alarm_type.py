@@ -5,9 +5,10 @@ class AlarmType(int, Enum):
     """报警类型枚举"""
     PLC_DISCONNECTED = 0
     GPS_DISCONNECTED = 1
-    SPS_DISCONNECTED = 2
-    APP_UNEXPECTED_EXIT = 3
-    POWER_OVERLOAD = 4
+    SPS1_DISCONNECTED = 2
+    SPS2_DISCONNECTED = 3
+    APP_UNEXPECTED_EXIT = 4
+    POWER_OVERLOAD = 5
 
     @classmethod
     def get_alarm_type_name(cls, alarm_type: int) -> str:

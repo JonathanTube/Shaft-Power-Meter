@@ -20,15 +20,17 @@ class GlobalData:
         #  是否开启自动从GPS同步UTC时间
         self.enable_utc_time_sync_with_gps = False
 
-        io_conf: IOConf = IOConf.get()
-        self.gps_ip = io_conf.gps_ip
-        self.gps_port = io_conf.gps_port
+        self.gps_ip = None
+        self.gps_port = None
 
-        self.sps_ip = io_conf.sps_ip
-        self.sps_port = io_conf.sps_port
+        self.sps1_ip = None
+        self.sps1_port = None
 
-        self.plc_ip = io_conf.plc_ip
-        self.plc_port = io_conf.plc_port
+        self.sps2_ip = None
+        self.sps2_port = None
+
+        self.plc_ip = None
+        self.plc_port = None
 
         self.sps1_speed = 0
         self.sps1_power = 0
@@ -63,6 +65,19 @@ class GlobalData:
 
         dateTimeConf: DateTimeConf = DateTimeConf.get()
         self.enable_utc_time_sync_with_gps = dateTimeConf.sync_with_gps
+
+        io_conf: IOConf = IOConf.get()
+        self.gps_ip = io_conf.gps_ip
+        self.gps_port = io_conf.gps_port
+
+        self.sps1_ip = io_conf.sps1_ip
+        self.sps1_port = io_conf.sps1_port
+
+        self.sps2_ip = io_conf.sps2_ip
+        self.sps2_port = io_conf.sps2_port
+
+        self.plc_ip = io_conf.plc_ip
+        self.plc_port = io_conf.plc_port
 
 
 gdata: GlobalData = GlobalData()

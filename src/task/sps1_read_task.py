@@ -9,7 +9,7 @@ from db.models.alarm_log import AlarmLog
 from common.global_data import gdata
 
 
-class SpsReadTask:
+class Sps1ReadTask:
     def __init__(self, page: ft.Page):
         self.page = page
         self.sps_client = None
@@ -56,8 +56,8 @@ class SpsReadTask:
         try:
             if self.sps_client is None:
                 self.sps_client = AsyncModbusTcpClient(
-                    host=gdata.sps_ip,   
-                    port=gdata.sps_port,
+                    host=gdata.sps1_ip,
+                    port=gdata.sps1_port,
                     timeout=10,
                     retries=3
                 )
@@ -70,17 +70,14 @@ class SpsReadTask:
             self.__send_msg(f"Error connecting to sps: {e}")
 
     def __create_alarm_log(self):
-        cnt: int = AlarmLog.select().where(
-            (AlarmLog.alarm_type == AlarmType.SPS_DISCONNECTED) & (
-                AlarmLog.acknowledge_time == None)
-        ).count()
+        cnt: int = AlarmLog.select().where((AlarmLog.alarm_type == AlarmType.SPS1_DISCONNECTED) & (AlarmLog.acknowledge_time == None)).count()
 
         if cnt == 0:
             AlarmLog.create(
                 utc_date_time=gdata.utc_date_time,
-                alarm_type=AlarmType.SPS_DISCONNECTED,
+                alarm_type=AlarmType.SPS1_DISCONNECTED,
             )
 
     def __send_msg(self, message: str):
         self.page.pubsub.send_all_on_topic(
-            PubSubTopic.TRACE_SPS_LOG, message)  
+            PubSubTopic.TRACE_SPS_LOG, message)

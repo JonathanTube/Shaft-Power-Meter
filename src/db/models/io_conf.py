@@ -27,8 +27,11 @@ class IOConf(BaseModel):
     gps_ip = CharField(verbose_name="GPS IP address", default="")
     gps_port = IntegerField(verbose_name="GPS port", default=0)
 
-    sps_ip = CharField(verbose_name="SPS IP address", default="")
-    sps_port = IntegerField(verbose_name="SPS port", default=0)
+    sps1_ip = CharField(verbose_name="SPS1 IP address", default="")
+    sps1_port = IntegerField(verbose_name="SPS1 port", default=502)
+
+    sps2_ip = CharField(verbose_name="SPS2 IP address", default="")
+    sps2_port = IntegerField(verbose_name="SPS2 port", default=502)
 
     output_torque = BooleanField(verbose_name="Torque(kN)", default=False)
 
@@ -38,11 +41,9 @@ class IOConf(BaseModel):
 
     output_speed = BooleanField(verbose_name="Speed(kN)", default=False)
 
-    output_avg_power = BooleanField(
-        verbose_name="Average Power(kw)", default=False)
+    output_avg_power = BooleanField(verbose_name="Average Power(kw)", default=False)
 
-    output_sum_power = BooleanField(
-        verbose_name="Sum of Power(kw)", default=False)
+    output_sum_power = BooleanField(verbose_name="Sum of Power(kw)", default=False)
 
     class Meta:
         table_name = 'io_conf'

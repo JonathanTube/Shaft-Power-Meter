@@ -135,10 +135,12 @@ class DataInit:
             IOConf.create(
                 plc_ip='192.168.1.2',
                 plc_port=502,
-                gps_ip='127.0.0.1',
-                gps_port=0,
-                sps_ip='127.0.0.1',
-                sps_port=0
+                gps_ip='192.168.1.3',
+                gps_port=502,
+                sps1_ip='192.168.1.4',
+                sps1_port=502,
+                sps2_ip='192.168.1.5',
+                sps2_port=502
             )
 
     def __init_test_mode_conf():
@@ -1078,9 +1080,15 @@ class DataInit:
                 },
 
                 {
-                    "code": "lang.setting.sps_conf",
-                    "chinese": "SPS 配置",
-                    "english": "SPS Conf."
+                    "code": "lang.setting.sps1_conf",
+                    "chinese": "SPS1 配置",
+                    "english": "SPS1 Conf."
+                },
+
+                {
+                    "code": "lang.setting.sps2_conf",
+                    "chinese": "SPS2 配置",
+                    "english": "SPS2 Conf."
                 },
 
                 {

@@ -22,45 +22,7 @@ class DualPowerLine(ft.Container):
         limitations: Limitations = Limitations.get()
         self.power_max = limitations.power_max
 
-    def __on_select(self, e, name):
-        color = ft.Colors.WHITE if e.data == "true" else ft.Colors.INVERSE_SURFACE
-        visible = e.data == "true"
-
-        if name == "sps1":
-            self.sps1_data_series.visible = visible
-            self.menu_sps1.label.color = color
-            self.menu_sps1.check_color = color
-        elif name == "sps2":
-            self.sps2_data_series.visible = visible
-            self.menu_sps2.label.color = color
-            self.menu_sps2.check_color = color
-
-        self.menus.update()
-
-    def __create_menus(self):
-        self.menu_sps1 = ft.Chip(
-            label=ft.Text("sps1", color=ft.Colors.WHITE),
-            selected_color=self.sps1_color,
-            selected=True,
-            check_color=ft.Colors.WHITE,
-            on_select=lambda e: self.__on_select(e, "sps1")
-        )
-        self.menu_sps2 = ft.Chip(
-            label=ft.Text("sps2", color=ft.Colors.WHITE),
-            selected_color=self.sps2_color,
-            selected=True,
-            check_color=ft.Colors.WHITE,
-            on_select=lambda e: self.__on_select(e, "sps2")
-        )
-        self.menus = ft.Row(
-            alignment=ft.MainAxisAlignment.END,
-            controls=[self.menu_sps1, self.menu_sps2],
-            spacing=10
-        )
-
     def build(self):
-        self.__create_menus()
-
         self.sps1_data_series = ft.LineChartData(
             curved=False,
             stroke_width=2,
@@ -79,7 +41,6 @@ class DualPowerLine(ft.Container):
         power_and_unit = UnitParser.parse_power(self.power_max, self.unit)
         left_max = math.ceil(power_and_unit[0])
         left_unit = power_and_unit[1]
-
         width = self.page.window.width - 80
         self.chart = ft.LineChart(
             width=width,
@@ -87,7 +48,7 @@ class DualPowerLine(ft.Container):
             border=ft.Border(left=border, bottom=border),
             max_y=left_max,
             left_axis=ft.ChartAxis(
-                labels_size=len(str(left_max)) * 8,
+                labels_size=len(str(left_max)) * 15,
                 title=ft.Text(left_unit),
                 labels=[
                     ft.ChartAxisLabel(value=0),
