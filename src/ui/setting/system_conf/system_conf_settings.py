@@ -86,11 +86,11 @@ class SystemConfSettings(CustomCard):
         if self.system_settings.sha_po_li:
             self.eexi_limited_power.visible = True
             self.eexi_breach_checking_duration.visible = True
-            self.page.session.set("eexi_limited_power", self.system_settings.eexi_limited_power)
         else:
             self.eexi_limited_power.visible = False
             self.eexi_breach_checking_duration.visible = False
-            self.page.session.set("eexi_limited_power", None)
+        self.eexi_limited_power.update()
+        self.eexi_breach_checking_duration.update()
 
     def __get_eexi_limited_power(self) -> tuple[float, str]:
         _eexi_limited_power = self.system_settings.eexi_limited_power

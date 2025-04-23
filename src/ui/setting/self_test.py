@@ -14,7 +14,7 @@ class SelfTest(ft.Tabs):
             spacing=5,
             expand=True
         )
-        self.modbus_log = ft.ListView(
+        self.sps_log = ft.ListView(
             padding=10,
             auto_scroll=True,
             height=500,
@@ -30,7 +30,7 @@ class SelfTest(ft.Tabs):
         )
         self.tabs = [
             ft.Tab(text="PLC Connection", content=self.plc_log),
-            ft.Tab(text="Modbus RTU 485", content=self.modbus_log),
+            ft.Tab(text="SPS Connection", content=self.sps_log),
             ft.Tab(text="GPS RS232", content=self.gps_log)
         ]
 
@@ -40,11 +40,11 @@ class SelfTest(ft.Tabs):
         self.plc_log.controls.append(ft.Text(content))
         self.plc_log.update()
 
-    async def __read_modbus_data(self, topic, message):
+    async def __read_sps_data(self, topic, message):
         utc_date_time = gdata.utc_date_time
         content = f"{utc_date_time}: {message}"
-        self.modbus_log.controls.append(ft.Text(content))
-        self.modbus_log.update()
+        self.sps_log.controls.append(ft.Text(content))
+        self.sps_log.update()
 
     async def __read_gps_log(self, topic, message):
         utc_date_time = gdata.utc_date_time
@@ -61,8 +61,8 @@ class SelfTest(ft.Tabs):
         )
 
         pubsub.subscribe_topic(
-            PubSubTopic.TRACE_MODBUS_LOG,
-            self.__read_modbus_data
+            PubSubTopic.TRACE_SPS_LOG,
+            self.__read_sps_data
         )
 
         pubsub.subscribe_topic(
@@ -73,5 +73,5 @@ class SelfTest(ft.Tabs):
     def will_unmount(self):
         pubsub = self.page.pubsub
         pubsub.unsubscribe_topic(PubSubTopic.TRACE_PLC_LOG)
-        pubsub.unsubscribe_topic(PubSubTopic.TRACE_MODBUS_LOG)
+        pubsub.unsubscribe_topic(PubSubTopic.TRACE_SPS_LOG)
         pubsub.unsubscribe_topic(PubSubTopic.TRACE_GPS_LOG)

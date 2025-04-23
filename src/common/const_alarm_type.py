@@ -5,7 +5,7 @@ class AlarmType(int, Enum):
     """报警类型枚举"""
     PLC_DISCONNECTED = 0
     GPS_DISCONNECTED = 1
-    MODBUS_DISCONNECTED = 2
+    SPS_DISCONNECTED = 2
     APP_UNEXPECTED_EXIT = 3
     POWER_OVERLOAD = 4
 

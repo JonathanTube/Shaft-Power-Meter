@@ -1,15 +1,24 @@
 import flet as ft
 from utils.unit_parser import UnitParser
+from db.models.preference import Preference
+from db.models.system_settings import SystemSettings
+from common.global_data import gdata
+from typing import Literal
 
 
 class ThrustPower(ft.Container):
-    def __init__(self):
+    def __init__(self, name: Literal["sps1", "sps2"]):
         super().__init__()
         self.right = 10
         self.top = 10
+        self.name = name
+        preference: Preference = Preference.get()
+        self.system_unit = preference.system_unit
+        system_settings: SystemSettings = SystemSettings.get()
+        self.visible = system_settings.display_thrust
 
     def build(self):
-        self.title = ft.Text(self.page.session.get("lang.common.thrust"), weight=ft.FontWeight.W_500)    
+        self.title = ft.Text(self.page.session.get("lang.common.thrust"), weight=ft.FontWeight.W_500)
         self.thrust_value = ft.Text("0")
         self.thrust_unit = ft.Text("W")
         self.content = ft.Column(
@@ -21,10 +30,13 @@ class ThrustPower(ft.Container):
             expand=True
         )
 
-    def set_data(self, visible: bool, value: float, unit: int):
-        self.content.visible = visible
-        if visible:
-            thrust_and_unit = UnitParser.parse_power(value, unit)
+    def reload(self):
+        if self.name == "sps1":
+            thrust_and_unit = UnitParser.parse_power(gdata.sps1_thrust, self.system_unit)
+            self.thrust_value.value = thrust_and_unit[0]
+            self.thrust_unit.value = thrust_and_unit[1]
+        else:
+            thrust_and_unit = UnitParser.parse_power(gdata.sps2_thrust, self.system_unit)
             self.thrust_value.value = thrust_and_unit[0]
             self.thrust_unit.value = thrust_and_unit[1]
         self.content.update()

@@ -1,18 +1,24 @@
-from ui.common.simple_card import SimpleCard
 import flet as ft
-
 from utils.unit_parser import UnitParser
+from db.models.preference import Preference
+from db.models.propeller_setting import PropellerSetting
 
 
 class PowerUnlimited(ft.Container):
     def __init__(self):
         super().__init__()
         self.expand = True
+        preference: Preference = Preference.get()
+        self.system_unit = preference.system_unit
+
+        propeller_settings: PropellerSetting = PropellerSetting.get()
+        self.power = propeller_settings.shaft_power_of_mcr_operating_point
 
     def build(self):
         self.title = ft.Text(self.page.session.get("lang.common.unlimited_power"), weight=ft.FontWeight.W_600)
-        self.unlimited_power_value = ft.Text('0')
-        self.unlimited_power_unit = ft.Text('W')
+        power_and_unit = UnitParser.parse_power(self.power, self.system_unit)
+        self.unlimited_power_value = ft.Text(power_and_unit[0])
+        self.unlimited_power_unit = ft.Text(power_and_unit[1])
 
         self.content = ft.Container(
             border=ft.border.all(
@@ -31,9 +37,3 @@ class PowerUnlimited(ft.Container):
                     ])
                 ]
             ))
-
-    def set_value(self, value: float, unit: int):
-        unlimited_power = UnitParser.parse_power(value, unit)
-        self.unlimited_power_value.value = unlimited_power[0]
-        self.unlimited_power_unit.value = unlimited_power[1]
-        self.content.update()

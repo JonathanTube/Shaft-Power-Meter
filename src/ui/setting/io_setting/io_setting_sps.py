@@ -9,15 +9,15 @@ class IOSettingSPS(CustomCard):
         self.conf = conf
 
     def build(self):
-        self.modbus_ip = ft.TextField(label=self.page.session.get("lang.setting.ip"), value=self.conf.modbus_ip, read_only=True, on_focus=lambda e: keyboard.open(e.control, 'ip'))
+        self.sps_ip = ft.TextField(label=self.page.session.get("lang.setting.ip"), value=self.conf.sps_ip, read_only=True, on_focus=lambda e: keyboard.open(e.control, 'ip'))
 
-        self.modbus_port = ft.TextField(label=self.page.session.get("lang.setting.port"), value=self.conf.modbus_port, read_only=True, on_focus=lambda e: keyboard.open(e.control, 'int'))
+        self.sps_port = ft.TextField(label=self.page.session.get("lang.setting.port"), value=self.conf.sps_port, read_only=True, on_focus=lambda e: keyboard.open(e.control, 'int'))
 
         self.heading = self.page.session.get("lang.setting.sps_conf")
-        self.body = ft.ResponsiveRow(controls=[self.modbus_ip, self.modbus_port])
+        self.body = ft.ResponsiveRow(controls=[self.sps_ip, self.sps_port])
         self.col = {"sm": 6}
         super().build()
 
     def save_data(self):
-        self.conf.modbus_ip = self.modbus_ip.value
-        self.conf.modbus_port = self.modbus_port.value
+        self.conf.sps_ip = self.sps_ip.value
+        self.conf.sps_port = self.sps_port.value

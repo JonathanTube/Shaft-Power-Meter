@@ -9,7 +9,7 @@ from task.test_mode_task import testModeTask
 from ui.common.toast import Toast
 from ui.common.permission_check import PermissionCheck
 from common.control_manager import ControlManager
-
+from common.global_data import gdata
 
 class TestMode(ft.Container):
     def __init__(self):
@@ -36,15 +36,6 @@ class TestMode(ft.Container):
         self.range_card = TestModeRange()
         self.instant_card = TestModeInstant()
 
-        self.save_button = ft.FilledButton(
-            width=120,
-            height=40,
-            text=self.page.session.get('lang.button.save'),
-            bgcolor=ft.Colors.PRIMARY,
-            visible=not self.running,
-            on_click=lambda e: self.__on_save_button_click(e)
-        )
-
         self.start_button = ft.FilledButton(
             width=120,
             height=40,
@@ -69,7 +60,7 @@ class TestMode(ft.Container):
                 self.instant_card,
                 ft.Row(
                     alignment=ft.MainAxisAlignment.CENTER,
-                    controls=[self.save_button, self.start_button, self.stop_button]
+                    controls=[self.start_button, self.stop_button]
                 )
             ]
         )
@@ -88,48 +79,28 @@ class TestMode(ft.Container):
         else:
             return UnitConverter.t_to_n(value)
 
-    def __on_save_button_click(self, e):
-        self.page.open(PermissionCheck(self.range_card.save_data, 0))
-
     def start_test_mode(self):
         if self.running:
             return
 
-        try:
-            conf: TestModeConf = TestModeConf.get()
-            min_torque = self.convert_torque(conf.min_torque)
-            max_torque = self.convert_torque(conf.max_torque)
-            testModeTask.set_torque_range(min_torque, max_torque)
+        self.page.run_task(testModeTask.start)
 
-            min_speed = int(conf.min_speed)
-            max_speed = int(conf.max_speed)
-            testModeTask.set_speed_range(min_speed, max_speed)
+        self.running = True
+        gdata.test_mode_running = True
+        self.range_card.enable()
 
-            min_thrust = self.convert_thrust(conf.min_thrust)
-            max_thrust = self.convert_thrust(conf.max_thrust)
-            testModeTask.set_thrust_range(min_thrust, max_thrust)
+        self.start_button.visible = False
+        self.start_button.update()
+        self.stop_button.visible = True
+        self.stop_button.update()
 
-            min_rev = int(conf.min_revolution)
-            max_rev = int(conf.max_revolution)
-            testModeTask.set_revolution_range(min_rev, max_rev)
-
-            self.page.run_task(testModeTask.start)
-            self.running = True
-            self.start_button.visible = False
-            self.start_button.update()
-            self.stop_button.visible = True
-            self.stop_button.update()
-            self.save_button.visible = False
-            self.save_button.update()
-
-            Toast.show_success(self.page)
-        except Exception as e:
-            print(e)
-            Toast.show_error(self.page, str(e))
+        Toast.show_success(self.page)
 
     def stop_test_mode(self, e):
         if not self.running:
             return
+
+        self.range_card.disable()
 
         testModeTask.stop()
         self.page.close(self.dlg_stop_modal)
@@ -138,9 +109,6 @@ class TestMode(ft.Container):
         self.start_button.update()
         self.stop_button.visible = False
         self.stop_button.update()
-        self.save_button.visible = True
-        self.save_button.update()
 
         ControlManager.on_eexi_power_breach_recovery()
-        ControlManager.on_power_overload_recovery()
         Toast.show_success(self.page)

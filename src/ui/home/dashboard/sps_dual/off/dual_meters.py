@@ -3,12 +3,13 @@ import flet as ft
 from ui.home.dashboard.meters.speed_meter import SpeedMeter
 from ui.home.dashboard.meters.power_meter import PowerMeter
 from ui.home.dashboard.meters.torque_meter import TorqueMeter
-from ui.common.simple_card import SimpleCard
 from ui.home.dashboard.thrust.thrust_power import ThrustPower
+from ui.common.simple_card import SimpleCard
+from typing import Literal
 
 
 class DualMeters(ft.Container):
-    def __init__(self, name: str = 'sps1'):
+    def __init__(self, name: Literal["sps1", "sps2"]):
         super().__init__()
         self.expand = True
         self.name = name
@@ -16,27 +17,19 @@ class DualMeters(ft.Container):
     def build(self):
         width = self.page.window.width * 0.45
         height = self.page.window.height * 0.4
-        self.speed_meter = SpeedMeter(radius=75)
-        self.power_meter = PowerMeter(radius=90)
-        self.torque_meter = TorqueMeter(radius=75)
-        self.thrust_meter = ThrustPower()
 
-        if self.name == "sps1":
-            self.title.value = self.page.session.get("lang.common.sps1")
-        elif self.name == "sps2":
-            self.title.value = self.page.session.get("lang.common.sps2")
+        self.speed_meter = SpeedMeter(self.name)
+        self.power_meter = PowerMeter(self.name)
+        self.torque_meter = TorqueMeter(self.name)
+        self.thrust_meter = ThrustPower(self.name)
 
-        self.title = ft.Text(
-            value=self.name,
-            size=18,
-            weight=ft.FontWeight.BOLD,
-            left=10,
-            top=10
-        )
+        title = self.page.session.get("lang.common.sps1")
+        if self.name == "sps2":
+            title = self.page.session.get("lang.common.sps2")
 
         self.content = ft.Stack(
             controls=[
-                self.title,
+                ft.Text(value=title, size=18, weight=ft.FontWeight.BOLD, left=10, top=10),
                 self.thrust_meter,
                 SimpleCard(
                     body_bottom_right=False,
@@ -45,43 +38,15 @@ class DualMeters(ft.Container):
                         height=height,
                         alignment=ft.alignment.center,
                         controls=[
-                            ft.Container(
-                                content=self.speed_meter,
-                                bottom=0,
-                                left=0
-                            ),
-                            ft.Container(
-                                content=self.power_meter,
-                                top=0,
-                            ),
-                            ft.Container(
-                                content=self.torque_meter,
-                                bottom=0,
-                                right=0
-                            )
-                        ]
-                    )
+                            ft.Container(content=self.speed_meter, bottom=0, left=0),
+                            ft.Container(content=self.power_meter, top=0),
+                            ft.Container(content=self.torque_meter, bottom=0, right=0)
+                        ])
                 )
-            ]
-        )
+            ])
 
-    def set_power_limit(self, power_max: float, power_warning: float):
-        self.power_meter.set_limit(power_max, power_warning)
-
-    def set_torque_limit(self, torque_max: float, torque_warning: float):
-        self.torque_meter.set_limit(torque_max, torque_warning)
-
-    def set_speed_limit(self, speed_max: float, speed_warning: float):
-        self.speed_meter.set_limit(speed_max, speed_warning)
-
-    def set_power(self, power: float, unit: int):
-        self.power_meter.set_data(power, unit)
-
-    def set_torque(self, torque: float, unit: int):
-        self.torque_meter.set_data(torque, unit)
-
-    def set_speed(self, speed: float):
-        self.speed_meter.set_data(speed)
-
-    def set_thrust(self, visible: bool, thrust: float, unit: int):
-        self.thrust_meter.set_data(visible, thrust, unit)
+    def reload(self):
+        self.power_meter.reload()
+        self.torque_meter.reload()
+        self.speed_meter.reload()
+        self.thrust_meter.reload()

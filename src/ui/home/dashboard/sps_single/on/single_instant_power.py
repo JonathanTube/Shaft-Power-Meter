@@ -1,6 +1,8 @@
 import flet as ft
+from db.models.preference import Preference
 from ui.common.simple_card import SimpleCard
 from utils.unit_parser import UnitParser
+from common.global_data import gdata
 
 
 class SingleInstantPower(ft.Container):
@@ -8,6 +10,8 @@ class SingleInstantPower(ft.Container):
         super().__init__()
         self.margin = 0
         self.expand = True
+        preference: Preference = Preference.get()
+        self.system_unit = preference.system_unit
 
     def build(self):
         self.power_value = ft.Text(
@@ -27,8 +31,8 @@ class SingleInstantPower(ft.Container):
             )
         )
 
-    def set_value(self, value: float, unit: int):
-        power = UnitParser.parse_power(value, unit)
+    def reload(self):
+        power = UnitParser.parse_power(gdata.sps1_power, self.system_unit)
         self.power_value.value = power[0]
         self.power_unit.value = power[1]
         self.content.update()

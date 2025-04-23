@@ -9,15 +9,17 @@ from db.models.alarm_log import AlarmLog
 from common.global_data import gdata
 
 
-class ModbusReadTask:
+class SpsReadTask:
     def __init__(self, page: ft.Page):
         self.page = page
-        self.modbus_client = None
+        self.sps_client = None
 
     async def start(self):
         await self.__connect()
         while True:
-            await self.__read_sps1_data()
+            # if the test mode is running, don't read the data from the sps device
+            if not gdata.test_mode_running:
+                await self.__read_sps1_data()
             await asyncio.sleep(1)
 
     async def __read_sps1_data(self):
@@ -25,12 +27,12 @@ class ModbusReadTask:
         torque = 0
         try:
             # get torque
-            torque_result = await self.modbus_client.read_holding_registers(address=10000)
+            torque_result = await self.sps_client.read_holding_registers(address=10000)
             if not torque_result.isError():
                 value_for_torque = torque_result.registers[0]
 
             # get thrust
-            thrust_result = await self.modbus_client.read_holding_registers(address=10001)
+            thrust_result = await self.sps_client.read_holding_registers(address=10001)
             if not thrust_result.isError():
                 value_for_thrust = thrust_result.registers[0]
 
@@ -52,33 +54,33 @@ class ModbusReadTask:
 
     async def __connect(self):
         try:
-            if self.modbus_client is None:
-                self.modbus_client = AsyncModbusTcpClient(
-                    host=gdata.modbus_ip,
-                    port=gdata.modbus_port,
+            if self.sps_client is None:
+                self.sps_client = AsyncModbusTcpClient(
+                    host=gdata.sps_ip,   
+                    port=gdata.sps_port,
                     timeout=10,
                     retries=3
                 )
-            is_connected = await self.modbus_client.connect()
-            self.__send_msg(f"connected to Modbus: {is_connected}")
+            is_connected = await self.sps_client.connect()
+            self.__send_msg(f"connected to sps: {is_connected}")
             if not is_connected:
                 self.__create_alarm_log()
         except Exception as e:
             self.__create_alarm_log()
-            self.__send_msg(f"Error connecting to Modbus: {e}")
+            self.__send_msg(f"Error connecting to sps: {e}")
 
     def __create_alarm_log(self):
         cnt: int = AlarmLog.select().where(
-            (AlarmLog.alarm_type == AlarmType.MODBUS_DISCONNECTED) & (
+            (AlarmLog.alarm_type == AlarmType.SPS_DISCONNECTED) & (
                 AlarmLog.acknowledge_time == None)
         ).count()
 
         if cnt == 0:
             AlarmLog.create(
                 utc_date_time=gdata.utc_date_time,
-                alarm_type=AlarmType.MODBUS_DISCONNECTED,
+                alarm_type=AlarmType.SPS_DISCONNECTED,
             )
 
     def __send_msg(self, message: str):
         self.page.pubsub.send_all_on_topic(
-            PubSubTopic.TRACE_MODBUS_LOG, message)
+            PubSubTopic.TRACE_SPS_LOG, message)  

@@ -1,4 +1,5 @@
 import flet as ft
+from common.control_manager import ControlManager
 from ui.home.alarm.alarm_button import AlarmButton
 from ui.home.alarm.index import AlarmList
 from ui.home.counter.index import Counter
@@ -61,6 +62,7 @@ class Home(ft.Container):
         )
         self.alarm_button = AlarmButton(on_click=lambda e: self.__on_click(e, 4))
         self.event_button = EventButton(on_click=lambda e: self.__on_click(e, 5))
+        ControlManager.event_button = self.event_button
 
         self.logs = ft.TextButton(
             text=self.page.session.get("lang.home.tab.logs"),
@@ -159,3 +161,6 @@ class Home(ft.Container):
     def did_mount(self):
         self.update_event_badge()
         self.update_alarm_badge()
+
+    def will_unmount(self):
+        ControlManager.event_button = None

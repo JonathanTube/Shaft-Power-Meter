@@ -18,6 +18,10 @@ from ui.common.audio_alarm import AudioAlarm
 from task.task_manager import TaskManager
 from common.global_data import gdata
 
+TableInit.init()
+DataInit.init()
+gdata.set_default_value()
+
 
 def get_theme_mode():
     theme = Preference.get().theme
@@ -60,8 +64,6 @@ async def handle_unexpected_exit():
 
 
 async def main(page: ft.Page):
-    TableInit.init()
-    DataInit.init()
     TaskManager(page).start_all()
 
     asyncio.create_task(handle_unexpected_exit())

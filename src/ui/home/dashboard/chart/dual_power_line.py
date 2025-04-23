@@ -1,21 +1,26 @@
 import flet as ft
-
-from db.models.data_log import DataLog
+import math
 from ui.common.simple_card import SimpleCard
 from utils.unit_parser import UnitParser
+from db.models.limitations import Limitations
+from db.models.preference import Preference
+from common.global_data import gdata
 
 
 class DualPowerLine(ft.Container):
-    def __init__(self, max_y: int = 0, unit: int = 0):
+    def __init__(self):
         super().__init__()
-
-        self.max_y = UnitParser.parse_power(max_y, unit)[0]
-        self.unit = unit
 
         self.sps1_color = ft.Colors.ORANGE
         self.sps2_color = ft.Colors.BLUE
 
         self.expand = True
+
+        preference: Preference = Preference.get()
+        self.unit = preference.system_unit
+
+        limitations: Limitations = Limitations.get()
+        self.power_max = limitations.power_max
 
     def __on_select(self, e, name):
         color = ft.Colors.WHITE if e.data == "true" else ft.Colors.INVERSE_SURFACE
@@ -57,13 +62,13 @@ class DualPowerLine(ft.Container):
         self.__create_menus()
 
         self.sps1_data_series = ft.LineChartData(
-            curved=True,
+            curved=False,
             stroke_width=2,
             color=self.sps1_color,
             data_points=[]
         )
         self.sps2_data_series = ft.LineChartData(
-            curved=True,
+            curved=False,
             stroke_width=2,
             color=self.sps2_color,
             data_points=[]
@@ -71,65 +76,73 @@ class DualPowerLine(ft.Container):
 
         border = ft.BorderSide(width=.5, color=ft.Colors.with_opacity(0.15, ft.Colors.INVERSE_SURFACE))
 
+        power_and_unit = UnitParser.parse_power(self.power_max, self.unit)
+        left_max = math.ceil(power_and_unit[0])
+        left_unit = power_and_unit[1]
+
+        width = self.page.window.width - 80
         self.chart = ft.LineChart(
+            width=width,
             expand=True,
             border=ft.Border(left=border, bottom=border),
-            left_axis=ft.ChartAxis(labels_size=50, labels=[
-                ft.ChartAxisLabel(value=0),
-                ft.ChartAxisLabel(value=self.max_y)
-            ]),
-            right_axis=ft.ChartAxis(labels_size=50),
-            bottom_axis=ft.ChartAxis(
-                labels_size=30, labels=[], visible=False, labels_interval=10),
+            max_y=left_max,
+            left_axis=ft.ChartAxis(
+                labels_size=len(str(left_max)) * 8,
+                title=ft.Text(left_unit),
+                labels=[
+                    ft.ChartAxisLabel(value=0),
+                    ft.ChartAxisLabel(value=left_max)
+                ]
+            ),
+            bottom_axis=ft.ChartAxis(labels_size=30, labels_interval=1, visible=False),
             data_series=[self.sps1_data_series, self.sps2_data_series]
         )
 
-        self.chart_title = ft.Text(self.page.session.get("lang.common.power"), size=18, weight=ft.FontWeight.BOLD)
+        # self.chart_title = ft.Text(self.page.session.get("lang.common.power"), size=18, weight=ft.FontWeight.BOLD)
         chart_top = ft.Row(
             alignment=ft.MainAxisAlignment.CENTER,
             spacing=10,
             controls=[
-                self.chart_title,
-                ft.Text("sps1", color=self.sps1_color),
-                ft.Text("sps2", color=self.sps2_color)
+                # self.chart_title,
+                ft.Text(self.page.session.get("lang.common.sps1"), color=self.sps1_color),
+                ft.Text(self.page.session.get("lang.common.sps2"), color=self.sps2_color)
             ])
-        self.content = SimpleCard(
-            body=ft.Column(controls=[chart_top, self.chart])
-        )
+        self.content = SimpleCard(body=ft.Column(controls=[chart_top, self.chart]))
 
-    def set_data(self, data_list_sps1: list[DataLog], data_list_sps2: list[DataLog]):
-        self.__handle_bottom_axis(data_list_sps1)
-        self.__handle_data_line_sps1(data_list_sps1)
-        self.__handle_data_line_sps2(data_list_sps2)
+    def reload(self):
+        self.__handle_bottom_axis()
+        self.__handle_data_line_sps1()
+        self.__handle_data_line_sps2()
         self.chart.update()
 
-    def __handle_bottom_axis(self, data_list: list[DataLog]):
+    def __handle_bottom_axis(self):
         labels = []
-        for index, item in enumerate(data_list):
+        for index, item in enumerate(gdata.sps1_power_history):
             label = ft.ChartAxisLabel(
                 value=index,
                 label=ft.Container(
-                    content=ft.Text(value=item.utc_date_time.strftime('%H:%M:%S')),
+                    content=ft.Text(value=item[1].strftime('%H:%M:%S')),
                     padding=ft.padding.only(top=10)
                 )
             )
             labels.append(label)
-        # print(f'labels={labels}')
         self.chart.bottom_axis.labels = labels
         self.chart.bottom_axis.visible = len(labels) > 0
+        size = 8
+        if len(labels) > size:
+            self.chart.bottom_axis.labels_interval = (len(labels) + size) // size
 
-    def __handle_data_line_sps1(self, data_list: list[DataLog]):
+    def __handle_data_line_sps1(self):
         data_points = []
-        for index, item in enumerate(data_list):
-            _power = UnitParser.parse_power(item.power, self.unit)
+        for index, item in enumerate(gdata.sps1_power_history):
+            _power = UnitParser.parse_power(item[0], self.unit)
             data_points.append(ft.LineChartDataPoint(index, _power[0]))
-
         self.sps1_data_series.data_points = data_points
 
-    def __handle_data_line_sps2(self, data_list: list[DataLog]):
+    def __handle_data_line_sps2(self):
         data_points = []
-        for index, item in enumerate(data_list):
-            _power = UnitParser.parse_power(item.power, self.unit)
+        for index, item in enumerate(gdata.sps2_power_history):
+            _power = UnitParser.parse_power(item[0], self.unit)
             data_points.append(ft.LineChartDataPoint(index, _power[0]))
 
         self.sps2_data_series.data_points = data_points

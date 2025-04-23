@@ -1,5 +1,5 @@
 import flet as ft
-
+from common.global_data import gdata
 from ui.common.simple_card import SimpleCard
 from utils.unit_parser import UnitParser
 
@@ -27,9 +27,9 @@ class DualInstantSpeed(ft.Container):
 
         self.content = SimpleCard(title=self.page.session.get("lang.common.speed"), body=content)
 
-    def set_data(self, speed_sps1_value: int, speed_sps2_value: int):
-        speed_sps1 = UnitParser.parse_speed(speed_sps1_value)
-        speed_sps2 = UnitParser.parse_speed(speed_sps2_value)
+    def reload(self):
+        speed_sps1 = UnitParser.parse_speed(gdata.sps1_speed)
+        speed_sps2 = UnitParser.parse_speed(gdata.sps2_speed)
 
         self.speed_sps1_value.value = speed_sps1[0]
         self.speed_sps1_unit.value = speed_sps1[1]

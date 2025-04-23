@@ -27,8 +27,8 @@ class IOConf(BaseModel):
     gps_ip = CharField(verbose_name="GPS IP address", default="")
     gps_port = IntegerField(verbose_name="GPS port", default=0)
 
-    modbus_ip = CharField(verbose_name="Modbus IP address", default="")
-    modbus_port = IntegerField(verbose_name="Modbus port", default=0)
+    sps_ip = CharField(verbose_name="SPS IP address", default="")
+    sps_port = IntegerField(verbose_name="SPS port", default=0)
 
     output_torque = BooleanField(verbose_name="Torque(kN)", default=False)
 

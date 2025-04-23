@@ -2,26 +2,24 @@ import flet as ft
 
 
 class MeterHalf(ft.Container):
-    def __init__(self, radius: int):
+    def __init__(self, radius: int, green: int, orange: int, red: int):
         super().__init__()
         self.max_radius = radius
+        self.green = green
+        self.orange = orange
+        self.red = red
         self.outer_radius = radius * 0.35
         self.outer_center_space_radius = radius - self.outer_radius
 
         self.inner_radius = self.outer_center_space_radius * 0.05
-        self.inner_center_space_radius = (
-            self.outer_center_space_radius - self.inner_radius) * 0.9
+        self.inner_center_space_radius = (self.outer_center_space_radius - self.inner_radius) * 0.9
 
     def build(self):
         self.__create_outer()
         self.__create_inner()
         self.__create_center()
         meter = ft.Stack(
-            controls=[
-                self.outer,
-                self.inner,
-                self.center
-            ],
+            controls=[self.outer, self.inner, self.center],
             width=self.max_radius * 2,
             height=self.max_radius * 2,
             clip_behavior=ft.ClipBehavior.HARD_EDGE
@@ -32,14 +30,6 @@ class MeterHalf(ft.Container):
             height=self.max_radius,
             controls=[ft.Container(content=meter, top=0)]
         )
-
-    def set_inner_value(self, green: int, orange: int, red: int):
-        total = green + orange + red
-        if total > 0:
-            self.inner_green.value = green / total * 180
-            self.inner_orange.value = orange / total * 180
-            self.inner_red.value = red / total * 180
-            self.inner.update()
 
     def set_outer_value(self, active_value: int, inactive_value: int):
         _active_value = round(active_value, 2)
@@ -73,19 +63,14 @@ class MeterHalf(ft.Container):
         self.center.update()
 
     def __create_outer(self):
-        self.active_part = ft.PieChartSection(
-            0, color=ft.Colors.GREEN, radius=self.outer_radius
-        )
-        self.inactive_part = ft.PieChartSection(
-            0, color=ft.Colors.GREY_200, radius=self.outer_radius
-        )
+        self.active_part = ft.PieChartSection(0, color=ft.Colors.GREEN, radius=self.outer_radius)
+        self.inactive_part = ft.PieChartSection(180, color=ft.Colors.GREY_200, radius=self.outer_radius)
         self.outer = ft.PieChart(
             sections_space=0,
             sections=[
                 self.active_part,
                 self.inactive_part,
-                ft.PieChartSection(
-                    180, color=ft.Colors.SURFACE, radius=self.outer_radius)
+                ft.PieChartSection(180, color=ft.Colors.SURFACE, radius=self.outer_radius)
             ],
             start_degree_offset=180,
             center_space_radius=self.outer_center_space_radius,
@@ -93,17 +78,19 @@ class MeterHalf(ft.Container):
         )
 
     def __create_inner(self):
-        self.inner_green = ft.PieChartSection(
-            0, color=ft.Colors.GREEN, radius=self.inner_radius
-        )
+        _green = 0
+        _orange = 0
+        _red = 0
 
-        self.inner_orange = ft.PieChartSection(
-            0, color=ft.Colors.ORANGE, radius=self.inner_radius
-        )
+        total = self.green + self.orange + self.red
+        if total > 0:
+            _green = self.green / total * 180
+            _orange = self.orange / total * 180
+            _red = self.red / total * 180
 
-        self.inner_red = ft.PieChartSection(
-            0, color=ft.Colors.RED, radius=self.inner_radius
-        )
+        self.inner_green = ft.PieChartSection(_green, color=ft.Colors.GREEN, radius=self.inner_radius)
+        self.inner_orange = ft.PieChartSection(_orange, color=ft.Colors.ORANGE, radius=self.inner_radius)
+        self.inner_red = ft.PieChartSection(_red, color=ft.Colors.RED, radius=self.inner_radius)
 
         self.inner = ft.PieChart(
             sections_space=0,
@@ -111,8 +98,7 @@ class MeterHalf(ft.Container):
                 self.inner_green,
                 self.inner_orange,
                 self.inner_red,
-                ft.PieChartSection(
-                    180, color=ft.Colors.SURFACE, radius=self.inner_radius)
+                ft.PieChartSection(180, color=ft.Colors.SURFACE, radius=self.inner_radius)
             ],
             start_degree_offset=180,
             center_space_radius=self.inner_center_space_radius,

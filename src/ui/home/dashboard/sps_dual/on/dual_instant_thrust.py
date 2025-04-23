@@ -2,17 +2,25 @@ import flet as ft
 
 from ui.common.simple_card import SimpleCard
 from utils.unit_parser import UnitParser
+from db.models.system_settings import SystemSettings
+from common.global_data import gdata
+from db.models.preference import Preference
 
 
 class DualInstantThrust(ft.Container):
-    def __init__(self, visible: bool = True):
+    def __init__(self):
         super().__init__()
         self.expand = True
-        self.visible = visible
+
+        system_settings: SystemSettings = SystemSettings.get()
+        self.visible = system_settings.display_thrust
 
         self.font_size_of_label = 14
         self.font_size_of_value = 16
         self.font_size_of_unit = 12
+
+        preference: Preference = Preference.get()
+        self.unit = preference.system_unit
 
     def build(self):
         self.__create_thrust_sps1()
@@ -27,9 +35,9 @@ class DualInstantThrust(ft.Container):
 
         self.content = SimpleCard(title=self.page.session.get("lang.common.thrust"), body=content)
 
-    def set_data(self, thrust_sps1_value: float, thrust_sps2_value: float, unit: int):
-        thrust_sps1 = UnitParser.parse_thrust(thrust_sps1_value, unit)
-        thrust_sps2 = UnitParser.parse_thrust(thrust_sps2_value, unit)
+    def reload(self):
+        thrust_sps1 = UnitParser.parse_thrust(gdata.sps1_thrust, self.unit)
+        thrust_sps2 = UnitParser.parse_thrust(gdata.sps2_thrust, self.unit)
 
         self.thrust_sps1_value.value = thrust_sps1[0]
         self.thrust_sps1_unit.value = thrust_sps1[1]

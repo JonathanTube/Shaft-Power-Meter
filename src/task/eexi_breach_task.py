@@ -42,10 +42,8 @@ class EEXIBreachTask:
             # print("instant_power=", instant_power)
             # print("eexi_limited_power=", eexi_limited_power)
             if instant_power > eexi_limited_power:
-                print("================handle_breach_event==========")
                 self.__handle_breach_event()
             else:
-                print("================handle_recovery_event==========")
                 self.__handle_recovery_event()
             await asyncio.sleep(1)
 

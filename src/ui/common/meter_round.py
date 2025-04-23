@@ -4,11 +4,12 @@ import flet as ft
 
 
 class MeterRound(ft.Container):
-    def __init__(self, heading: str, radius: int, unit: str, color: str = ft.Colors.GREEN):
+    def __init__(self, heading: str, radius: int, unit: str, color: str = ft.Colors.GREEN, max: float = 0, limit: float = 0):
         super().__init__()
         self.__hide_section = 90
 
-        self.max_value = 0
+        self.max_value = max
+        self.limit_value = limit
 
         self.heading = heading
         self.unit = unit
@@ -18,27 +19,13 @@ class MeterRound(ft.Container):
 
         self.color = color
 
-    def set_limitation(self, max_value: int, limit_value: int):
-        if max_value == 0:
-            return
-
-        self.max_value = max_value
-
-        # update warning line
-        rotate_start = math.pi * 3 / 4
-        rotate_propotion = limit_value / max_value
-        rotate_angle = rotate_start + (2 * rotate_start) * rotate_propotion
-        self.warning_line_rotate.angle = rotate_angle
-        self.warning_line.visible = limit_value > 0
-        self.warning_line.update()
-
     def set_data(self, actual_value: int, display_value: int, display_unit: str):
         if self.max_value == 0:
             return
         # update unit
         self.center_unit.value = display_unit
         self.center_unit.update()
-        
+
         # update active section
         active_val = (360 - self.__hide_section) * actual_value / self.max_value
         # 如果value大于max_value，则active_val为360 - self.__hide_section
@@ -109,8 +96,12 @@ class MeterRound(ft.Container):
         )
 
     def __create_warning_line(self):
+        rotate_start = math.pi * 3 / 4
+        rotate_propotion = self.limit_value / self.max_value
+        rotate_angle = rotate_start + (2 * rotate_start) * rotate_propotion
+
         self.warning_line_rotate = ft.transform.Rotate(
-            angle=0,
+            angle=rotate_angle,
             alignment=ft.alignment.center_left
         )
         self.warning_line = ft.Container(
@@ -119,7 +110,7 @@ class MeterRound(ft.Container):
             left=self.max_radius,
             top=self.max_radius,
             bgcolor=ft.Colors.RED,
-            visible=False,
+            visible=self.limit_value > 0,
             rotate=self.warning_line_rotate
         )
 

@@ -1,12 +1,19 @@
 import flet as ft
 from ui.common.simple_card import SimpleCard
 from utils.unit_parser import UnitParser
+from db.models.preference import Preference
+from db.models.system_settings import SystemSettings
+from common.global_data import gdata
 
 
 class SingleInstantThrust(ft.Container):
     def __init__(self):
         super().__init__()
         self.expand = True
+        preference: Preference = Preference.get()
+        self.system_unit = preference.system_unit
+        system_settings: SystemSettings = SystemSettings.get()
+        self.visible = system_settings.display_thrust
 
     def build(self):
         self.thrust_value = ft.Text(
@@ -21,8 +28,8 @@ class SingleInstantThrust(ft.Container):
             )
         )
 
-    def set_value(self, value: float, unit: int):
-        thrust = UnitParser.parse_thrust(value, unit)
+    def reload(self):
+        thrust = UnitParser.parse_thrust(gdata.sps1_thrust, self.system_unit)
         self.thrust_value.value = thrust[0]
         self.thrust_unit.value = thrust[1]
         self.content.update()

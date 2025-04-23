@@ -2,6 +2,8 @@ import flet as ft
 
 from ui.common.simple_card import SimpleCard
 from utils.unit_parser import UnitParser
+from common.global_data import gdata
+from db.models.preference import Preference
 
 
 class DualInstantTorque(ft.Container):
@@ -13,6 +15,9 @@ class DualInstantTorque(ft.Container):
         self.font_size_of_label = 14
         self.font_size_of_value = 16
         self.font_size_of_unit = 12
+
+        preference: Preference = Preference.get()
+        self.unit = preference.system_unit
 
     def build(self):
         self.__create_torque_sps1()
@@ -30,9 +35,9 @@ class DualInstantTorque(ft.Container):
 
         self.content = SimpleCard(title=self.page.session.get("lang.common.torque"), body=content)
 
-    def set_data(self, torque_sps1_value: str, torque_sps2_value: str, unit: int):
-        torque_sps1 = UnitParser.parse_torque(torque_sps1_value, unit)
-        torque_sps2 = UnitParser.parse_torque(torque_sps2_value, unit)
+    def reload(self):
+        torque_sps1 = UnitParser.parse_torque(gdata.sps1_torque, self.unit)
+        torque_sps2 = UnitParser.parse_torque(gdata.sps2_torque, self.unit)
 
         self.torque_sps1_value.value = torque_sps1[0]
         self.torque_sps1_unit.value = torque_sps1[1]

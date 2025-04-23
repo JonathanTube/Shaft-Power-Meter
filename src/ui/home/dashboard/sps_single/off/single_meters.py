@@ -3,6 +3,7 @@ from ui.home.dashboard.meters.speed_meter import SpeedMeter
 from ui.home.dashboard.meters.power_meter import PowerMeter
 from ui.home.dashboard.meters.torque_meter import TorqueMeter
 from ui.common.simple_card import SimpleCard
+from db.models.limitations import Limitations
 
 
 class SingleMeters(ft.Container):
@@ -10,11 +11,13 @@ class SingleMeters(ft.Container):
         super().__init__()
 
     def build(self):
+        limitations: Limitations = Limitations.get()
         self.speed_meter = SpeedMeter()
-
+        self.speed_meter.set_limit(limitations.speed_max, limitations.speed_warning)
         self.power_meter = PowerMeter()
-
+        self.power_meter.set_limit(limitations.power_max, limitations.power_warning)
         self.torque_meter = TorqueMeter()
+        self.torque_meter.set_limit(limitations.torque_max, limitations.torque_warning)
 
         self.content = ft.Row(
             alignment=ft.MainAxisAlignment.CENTER,
@@ -39,16 +42,7 @@ class SingleMeters(ft.Container):
             ]
         )
 
-    def set_power_limit(self, power_max: float, power_warning: float):
-        self.power_meter.set_limit(power_max, power_warning)
-
-    def set_torque_limit(self, torque_max: float, torque_warning: float):
-        self.torque_meter.set_limit(torque_max, torque_warning)
-
-    def set_speed_limit(self, speed_max: float, speed_warning: float):
-        self.speed_meter.set_limit(speed_max, speed_warning)
-
-    def set_data(self, speed: float, power: float, torque: float, unit: int):
-        self.speed_meter.set_data(speed)
-        self.power_meter.set_data(power, unit)
-        self.torque_meter.set_data(torque, unit)
+    def reload(self):
+        self.speed_meter.set_data()
+        self.power_meter.set_data()
+        self.torque_meter.set_data()

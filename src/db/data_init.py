@@ -137,8 +137,8 @@ class DataInit:
                 plc_port=502,
                 gps_ip='127.0.0.1',
                 gps_port=0,
-                modbus_ip='127.0.0.1',
-                modbus_port=0
+                sps_ip='127.0.0.1',
+                sps_port=0
             )
 
     def __init_test_mode_conf():
@@ -973,9 +973,9 @@ class DataInit:
                 },
 
                 {
-                    "code": "lang.setting.check_modbus_connection",
-                    "chinese": "检查Modbus连接",
-                    "english": "Check Modbus Connection"
+                    "code": "lang.setting.check_sps_connection",
+                    "chinese": "检查SPS连接",
+                    "english": "Check SPS Connection"
                 },
 
                 {
@@ -1293,9 +1293,9 @@ class DataInit:
                     "english": "GPS Disconnected"
                 },
                 {
-                    "code": "lang.alarm.modbus_disconnected",
-                    "chinese": "Modbus 断开",
-                    "english": "Modbus Disconnected"
+                    "code": "lang.alarm.sps_disconnected",
+                    "chinese": "SPS 断开",
+                    "english": "SPS Disconnected"
                 },
                 {
                     "code": "lang.alarm.app_unexpected_exit",

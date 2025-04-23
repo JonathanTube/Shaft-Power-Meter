@@ -1,106 +1,137 @@
 import flet as ft
+from common.global_data import gdata
+from db.models.limitations import Limitations
 from db.models.preference import Preference
+from db.models.propeller_setting import PropellerSetting
 from db.models.test_mode_conf import TestModeConf
-from ui.common.keyboard import keyboard
 from ui.common.custom_card import CustomCard
 from ui.common.toast import Toast
 from utils.unit_parser import UnitParser
+from task.test_mode_task import testModeTask
 
 
 class TestModeRange(CustomCard):
     def __init__(self):
         super().__init__()
-        self.conf = TestModeConf.get()
+        self.conf: TestModeConf = TestModeConf.get()
         preference: Preference = Preference.get()
-        self.system_unit = preference.system_unit
+        self.system_unit: int = preference.system_unit
+
+        propeller_setting: PropellerSetting = PropellerSetting.get()
+        self.max_rpm = propeller_setting.rpm_of_mcr_operating_point
+        self.max_power = propeller_setting.shaft_power_of_mcr_operating_point
+
+        limitations: Limitations = Limitations.get()
+        self.max_torque: float = limitations.torque_max
 
     def build(self):
+        disabled = not gdata.test_mode_running
         min_torque_value, min_torque_unit = self.__get_torque_and_unit(self.conf.min_torque)
-        self.min_torque = ft.TextField(
-            col={"sm": 6},
-            label=self.page.session.get('lang.setting.test_mode.min_torque'),
-            suffix_text=min_torque_unit,
-            value=min_torque_value,
-            read_only=True,
-            on_focus=lambda e: keyboard.open(e.control)
-        )
-
         max_torque_value, max_torque_unit = self.__get_torque_and_unit(self.conf.max_torque)
-        self.max_torque = ft.TextField(
-            col={"sm": 6},
-            label=self.page.session.get('lang.setting.test_mode.max_torque'),
-            suffix_text=max_torque_unit,
-            value=max_torque_value,
-            read_only=True,
-            on_focus=lambda e: keyboard.open(e.control)
+        self.start_torque_text = self.__create_range_start_text('lang.setting.test_mode.min_torque', min_torque_value, min_torque_unit)
+        self.end_torque_text = self.__create_range_end_text('lang.setting.test_mode.max_torque', max_torque_value, max_torque_unit)
+        self.torque_range = ft.RangeSlider(
+            disabled=disabled,
+            expand=True,
+            min=0,
+            max=self.max_torque,
+            start_value=self.conf.min_torque,
+            end_value=self.conf.max_torque,
+            on_change=lambda e: self.__on_torque_change(e)
         )
+        self.torque_row = ft.Row(col={"sm": 12}, expand=True, controls=[self.start_torque_text, self.torque_range, self.end_torque_text])
 
-        self.min_speed = ft.TextField(
-            col={"sm": 6},
-            label=self.page.session.get('lang.setting.test_mode.min_speed'),
-            suffix_text='rpm',
-            value=self.conf.min_speed,
-            read_only=True,
-            on_focus=lambda e: keyboard.open(e.control)
+        self.start_speed_text = self.__create_range_start_text('lang.setting.test_mode.min_speed', self.conf.min_speed, 'rpm')
+        self.end_speed_text = self.__create_range_end_text('lang.setting.test_mode.max_speed', self.conf.max_speed, 'rpm')
+        self.speed_range = ft.RangeSlider(
+            disabled=disabled,
+            expand=True,
+            min=0,
+            max=self.max_rpm,
+            start_value=self.conf.min_speed,
+            end_value=self.conf.max_speed,
+            on_change=lambda e: self.__on_speed_change(e)
         )
-
-        self.max_speed = ft.TextField(
-            col={"sm": 6},
-            label=self.page.session.get('lang.setting.test_mode.max_speed'),
-            suffix_text='rpm',
-            value=self.conf.max_speed,
-            read_only=True,
-            on_focus=lambda e: keyboard.open(e.control)
-        )
+        self.speed_row = ft.Row(col={"sm": 12}, expand=True, controls=[self.start_speed_text, self.speed_range, self.end_speed_text])
 
         min_thrust_value, min_thrust_unit = self.__get_thrust_and_unit(self.conf.min_thrust)
-        self.min_thrust = ft.TextField(
-            col={"sm": 6},
-            label=self.page.session.get('lang.setting.test_mode.min_thrust'),
-            suffix_text=min_thrust_unit,
-            value=min_thrust_value,
-            read_only=True,
-            on_focus=lambda e: keyboard.open(e.control)
-        )
-
         max_thrust_value, max_thrust_unit = self.__get_thrust_and_unit(self.conf.max_thrust)
-        self.max_thrust = ft.TextField(
-            col={"sm": 6},
-            label=self.page.session.get('lang.setting.test_mode.max_thrust'),
-            suffix_text=max_thrust_unit,
-            value=max_thrust_value,
-            read_only=True,
-            on_focus=lambda e: keyboard.open(e.control)
+        self.start_thrust_text = self.__create_range_start_text('lang.setting.test_mode.min_thrust', min_thrust_value, min_thrust_unit)
+        self.end_thrust_text = self.__create_range_end_text('lang.setting.test_mode.max_thrust', max_thrust_value, max_thrust_unit)
+        self.thrust_range = ft.RangeSlider(
+            disabled=disabled,
+            expand=True,
+            min=0,
+            max=500 * 1000,
+            start_value=self.conf.min_thrust,
+            end_value=self.conf.max_thrust,
+            on_change=lambda e: self.__on_thrust_change(e)
         )
+        self.thrust_row = ft.Row(col={"sm": 12}, expand=True, controls=[self.start_thrust_text, self.thrust_range, self.end_thrust_text])
 
-        self.min_revolution = ft.TextField(
-            col={"sm": 6},
-            label=self.page.session.get('lang.setting.test_mode.min_revolution'),
-            value=self.conf.min_revolution,
-            read_only=True,
-            on_focus=lambda e: keyboard.open(e.control)
+        self.start_revolution_text = self.__create_range_start_text('lang.setting.test_mode.min_revolution', self.conf.min_revolution, '')
+        self.end_revolution_text = self.__create_range_end_text('lang.setting.test_mode.max_revolution', self.conf.max_revolution, '')
+        self.revolution_range = ft.RangeSlider(
+            disabled=disabled,
+            expand=True,
+            min=0,
+            max=10000,
+            start_value=self.conf.min_revolution,
+            end_value=self.conf.max_revolution,
+            on_change=lambda e: self.__on_revolution_change(e)
         )
-
-        self.max_revolution = ft.TextField(
-            col={"sm": 6},
-            label=self.page.session.get('lang.setting.test_mode.max_revolution'),
-            value=self.conf.max_revolution,
-            read_only=True,
-            on_focus=lambda e: keyboard.open(e.control)
-        )
+        self.revolution_row = ft.Row(col={"sm": 12}, expand=True, controls=[self.start_revolution_text, self.revolution_range, self.end_revolution_text])
 
         self.heading = self.page.session.get('lang.setting.test_mode.customize_data_range')
         self.body = ft.ResponsiveRow([
-            self.min_torque,
-            self.max_torque,
-            self.min_speed,
-            self.max_speed,
-            self.min_thrust,
-            self.max_thrust,
-            self.min_revolution,
-            self.max_revolution
+            self.torque_row,
+            self.speed_row,
+            self.thrust_row,
+            self.revolution_row
         ])
         super().build()
+
+    def __create_range_start_text(self, lang, value, unit):
+        return ft.Text(color=ft.colors.GREEN, width=150, value=f'{self.page.session.get(lang)}: {value} {unit}')
+
+    def __create_range_end_text(self, lang, value, unit):
+        return ft.Text(color=ft.colors.RED, width=150, value=f'{self.page.session.get(lang)}: {value} {unit}')
+
+    def __on_torque_change(self, e):
+        min_torque_value, min_torque_unit = self.__get_torque_and_unit(e.control.start_value)
+        max_torque_value, max_torque_unit = self.__get_torque_and_unit(e.control.end_value)
+        self.start_torque_text.value = f'{self.page.session.get('lang.setting.test_mode.min_torque')}: {min_torque_value} {min_torque_unit}'
+        self.start_torque_text.update()
+        self.end_torque_text.value = f'{self.page.session.get('lang.setting.test_mode.max_torque')}: {max_torque_value} {max_torque_unit}'
+        self.end_torque_text.update()
+        self.__save_data()
+        testModeTask.set_torque_range(e.control.start_value, e.control.end_value)
+
+    def __on_speed_change(self, e):
+        self.start_speed_text.value = f'{self.page.session.get('lang.setting.test_mode.min_speed')}: {int(e.control.start_value)} rpm'
+        self.start_speed_text.update()
+        self.end_speed_text.value = f'{self.page.session.get('lang.setting.test_mode.max_speed')}: {int(e.control.end_value)} rpm'
+        self.end_speed_text.update()
+        self.__save_data()
+        testModeTask.set_speed_range(e.control.start_value, e.control.end_value)
+
+    def __on_revolution_change(self, e):
+        self.start_revolution_text.value = f'{self.page.session.get('lang.setting.test_mode.min_revolution')}: {int(e.control.start_value)}'
+        self.start_revolution_text.update()
+        self.end_revolution_text.value = f'{self.page.session.get('lang.setting.test_mode.max_revolution')}: {int(e.control.end_value)}'
+        self.end_revolution_text.update()
+        self.__save_data()
+        testModeTask.set_revolution_range(e.control.start_value, e.control.end_value)
+
+    def __on_thrust_change(self, e):
+        min_thrust_value, min_thrust_unit = self.__get_thrust_and_unit(e.control.start_value)
+        max_thrust_value, max_thrust_unit = self.__get_thrust_and_unit(e.control.end_value)
+        self.start_thrust_text.value = f'{self.page.session.get('lang.setting.test_mode.min_thrust')}: {min_thrust_value} {min_thrust_unit}'
+        self.start_thrust_text.update()
+        self.end_thrust_text.value = f'{self.page.session.get('lang.setting.test_mode.max_thrust')}: {max_thrust_value} {max_thrust_unit}'
+        self.end_thrust_text.update()
+        self.__save_data()
+        testModeTask.set_thrust_range(e.control.start_value, e.control.end_value)
 
     def __get_torque_and_unit(self, value) -> tuple[float, str]:
         if self.system_unit == 0:
@@ -114,16 +145,16 @@ class TestModeRange(CustomCard):
         else:
             return UnitParser.parse_thrust(value, self.system_unit)
 
-    def save_data(self):
+    def __save_data(self):
         try:
-            min_torque = self.convert_torque(self.min_torque.value)
-            max_torque = self.convert_torque(self.max_torque.value)
-            min_thrust = self.convert_thrust(self.min_thrust.value)
-            max_thrust = self.convert_thrust(self.max_thrust.value)
-            min_rev = int(self.min_revolution.value)
-            max_rev = int(self.max_revolution.value)
-            min_speed = int(self.min_speed.value)
-            max_speed = int(self.max_speed.value)
+            min_torque = self.torque_range.start_value
+            max_torque = self.torque_range.end_value
+            min_thrust = self.thrust_range.start_value
+            max_thrust = self.thrust_range.end_value
+            min_rev = self.revolution_range.start_value
+            max_rev = self.revolution_range.end_value
+            min_speed = self.speed_range.start_value
+            max_speed = self.speed_range.end_value
 
             TestModeConf.update(
                 min_torque=min_torque,
@@ -138,3 +169,21 @@ class TestModeRange(CustomCard):
             Toast.show_success(self.page)
         except Exception as e:
             Toast.show_error(self.page, str(e))
+
+    def enable(self):
+        self.torque_range.disabled = False
+        self.speed_range.disabled = False
+        self.thrust_range.disabled = False
+        self.revolution_range.disabled = False
+        self.update()
+        testModeTask.set_torque_range(int(self.torque_range.start_value), int(self.torque_range.end_value))
+        testModeTask.set_speed_range(int(self.speed_range.start_value), int(self.speed_range.end_value))
+        testModeTask.set_thrust_range(int(self.thrust_range.start_value), int(self.thrust_range.end_value))
+        testModeTask.set_revolution_range(int(self.revolution_range.start_value), int(self.revolution_range.end_value))
+
+    def disable(self):
+        self.torque_range.disabled = True
+        self.speed_range.disabled = True
+        self.thrust_range.disabled = True
+        self.revolution_range.disabled = True
+        self.update()

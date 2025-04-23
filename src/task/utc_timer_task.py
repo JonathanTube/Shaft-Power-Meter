@@ -13,7 +13,7 @@ class UtcTimer:
         gdata.utc_date_time = dt_utc
 
         while True:
-            print('gdata.utc_date_time=',gdata.utc_date_time)
+            # print('gdata.utc_date_time=',gdata.utc_date_time)
             # add 1 second
             gdata.utc_date_time = gdata.utc_date_time + timedelta(seconds=1)
             gdata.system_date_time = datetime.now()

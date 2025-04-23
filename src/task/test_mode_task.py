@@ -1,4 +1,3 @@
-import flet as ft
 import asyncio
 import random
 
@@ -10,6 +9,8 @@ from db.models.alarm_log import AlarmLog
 from db.models.event_log import EventLog
 from db.models.report_info import ReportInfo
 from common.control_manager import ControlManager
+from utils.data_saver import DataSaver
+from db.models.preference import Preference
 
 
 class TestModeTask:
@@ -40,10 +41,22 @@ class TestModeTask:
         self.min_revolution = min_revolution
         self.max_revolution = max_revolution
 
-    async def start(self):
-        self.system_settings = SystemSettings.get()
+    async def generate_random_data(self):
         self.is_running = True
-        # start a thread to generate random data every seconds
+
+        system_settings: SystemSettings = SystemSettings.get()
+        amount_of_propeller = system_settings.amount_of_propeller
+
+        preference: Preference = Preference.get()
+        interval = preference.data_refresh_interval
+
+        while self.is_running:
+            await self.save_generated_data('sps1')
+            if amount_of_propeller == 2:
+                await self.save_generated_data('sps2')
+            await asyncio.sleep(interval)
+
+    async def start(self):
         asyncio.create_task(self.generate_random_data())
 
     def stop(self):
@@ -63,42 +76,20 @@ class TestModeTask:
             gdata.sps2_torque = 0
             gdata.sps2_thrust = 0
             gdata.sps2_rounds = 0
+
+            gdata.sps1_power_history = []
+            gdata.sps2_power_history = []
             ControlManager.on_eexi_power_breach_recovery()
-            ControlManager.on_power_overload_recovery()
         except Exception as e:
             print(f'Error truncating DataLog table: {e}')
         self.is_running = False
 
-    async def generate_random_data(self):
-        # print(f'self.is_running={self.is_running}')
-        while self.is_running:
-            # start to generate random data in range of min and max
-            # print(f'generate_random_data')
-            await self.save_generated_data('sps1')
-            if self.system_settings.amount_of_propeller == 2:
-                await self.save_generated_data('sps2')
-            ControlManager.on_instant_data_refresh()
-            await asyncio.sleep(1)
-
     async def save_generated_data(self, name):
         instant_torque = int(random.uniform(self.min_torque, self.max_torque))
-        print(f'>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>instant_torque={instant_torque}')
         instant_speed = int(random.uniform(self.min_speed, self.max_speed))
         instant_thrust = int(random.uniform(self.min_thrust, self.max_thrust))
         instant_revolution = int(random.uniform(self.min_revolution, self.max_revolution))
-        instant_power = FormulaCalculator.calculate_instant_power(instant_torque, instant_speed)
-        if name == 'sps1':
-            gdata.sps1_torque = instant_torque
-            gdata.sps1_speed = instant_speed
-            gdata.sps1_thrust = instant_thrust
-            gdata.sps1_power = instant_power
-            gdata.sps1_rounds = instant_revolution
-        else:
-            gdata.sps2_torque = instant_torque
-            gdata.sps2_speed = instant_speed
-            gdata.sps2_thrust = instant_thrust
-            gdata.sps2_power = instant_power
-            gdata.sps2_rounds = instant_revolution
+        DataSaver.save(name, instant_thrust, instant_torque, instant_speed, instant_revolution)
 
 
 testModeTask: TestModeTask = TestModeTask()

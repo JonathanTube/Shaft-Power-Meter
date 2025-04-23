@@ -4,13 +4,13 @@ from ui.home.dashboard.sps_single.on.index import SingleShaPoLiOn
 from ui.home.dashboard.sps_single.off.index import SingleShaPoLiOff
 from ui.home.dashboard.sps_dual.on.index import DualShaPoLiOn
 from ui.home.dashboard.sps_dual.off.index import DualShaPoLiOff
-from utils.data_save import DataSave
-from common.global_data import gdata
+from ui.home.event.event_button import EventButton
 
 
 class ControlManager:
     audio_alarm: AudioAlarm | None = None
     fullscreen_alert: FullscreenAlert | None = None
+    event_button: EventButton | None = None
 
     sps_single_on: SingleShaPoLiOn | None = None
     sps_single_off: SingleShaPoLiOff | None = None
@@ -31,10 +31,6 @@ class ControlManager:
 
     @staticmethod
     def on_instant_data_refresh():
-        DataSave.save('sps1')
-        if gdata.amount_of_propeller == 2:
-            DataSave.save('sps2')
-
         if ControlManager.sps_single_on is not None:
             ControlManager.sps_single_on.load_data()
         if ControlManager.sps_single_off is not None:
