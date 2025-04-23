@@ -1,83 +1,108 @@
-import math
 import flet as ft
-import matplotlib
-from matplotlib import pyplot as plt
 from db.models.data_log import DataLog
-from flet.matplotlib_chart import MatplotlibChart
-from datetime import datetime
-matplotlib.use("svg")
+from utils.unit_parser import UnitParser
+from db.models.preference import Preference
 
 
-class TrendViewChart(ft.Container):
-    def __init__(self):
+class TrendviewChart(ft.Container):
+    def __init__(self, name: str):
         super().__init__()
 
+        self.name = name
+        self.power_color = ft.Colors.ORANGE
+        self.speed_color = ft.Colors.BLUE
+
         self.expand = True
-        self.chart = None
-        self.ax_rpm = None
-        self.ax_power = None
+        self.padding = 10
+        self.border = ft.border.all(width=0.5, color=ft.Colors.with_opacity(0.15, ft.Colors.INVERSE_SURFACE))
 
-    def update_chart(self, data_list: list[DataLog]):
-        date_times, rpm_data, power_data = self.__get_data(data_list)
-        self.ax_rpm.plot(date_times, rpm_data, color='red')
-        self.ax_power.plot(date_times, power_data, color='blue')
-
-        # if len(data_list) > 0:
-        #     min_date_time = min(
-        #         data_list, key=lambda x: x.utc_date_time).utc_date_time
-        #     max_date_time = max(
-        #         data_list, key=lambda x: x.utc_date_time).utc_date_time
-
-        #     days_diff = (max_date_time - min_date_time).days
-
-        #     self.ax_rpm.xaxis.set_major_locator(plt.matplotlib.dates.DayLocator(interval=int(7)))
-
-        self.chart.update()
-
-    def __get_data(self, data_list: list[DataLog]):
-        date_times = []
-        rpm_data = []
-        power_data = []
-
-        for data in data_list:
-            rpm_data.append(data.speed)
-            power_data.append(data.power)
-            date_times.append(data.utc_date_time)
-
-        return (date_times, rpm_data, power_data)
+        preference: Preference = Preference.get()
+        self.unit = preference.system_unit
 
     def build(self):
-        width = self.page.window.width
-        height = self.page.window.height * 0.7
-        aspect_ratio = width / height
+        self.speed_data_series = ft.LineChartData(curved=False, stroke_width=2, color=self.speed_color, data_points=[])
+        self.power_data_series = ft.LineChartData(curved=False, stroke_width=2, color=self.power_color, data_points=[])
+        border = ft.BorderSide(width=.5, color=ft.Colors.with_opacity(0.15, ft.Colors.INVERSE_SURFACE))
 
-        fig, self.ax_rpm = plt.subplots(figsize=(aspect_ratio*10, 10))
-        fig.subplots_adjust(left=0.08, right=0.92, top=0.95, bottom=0.1)
+        self.chart = ft.LineChart(
+            expand=True,
+            min_y=0,
+            border=ft.Border(left=border, bottom=border, right=border),
+            left_axis=ft.ChartAxis(title=ft.Text("rpm"), labels_size=40, labels=[]),
+            right_axis=ft.ChartAxis(title=ft.Text("kW" if self.unit == 0 else "sHp"), title_size=25, labels_size=40, labels=[]),
+            bottom_axis=ft.ChartAxis(title=ft.Text("UTC DateTime"), labels_size=40, labels=[]),
+            data_series=[self.speed_data_series, self.power_data_series]
+        )
+        self.content = ft.Column(
+            expand=True,
+            controls=[
+                ft.Text(self.name, size=18, weight=ft.FontWeight.W_500),
+                self.chart
+            ]
+        )
 
-        self.ax_rpm.set_xlabel('UTC date time', color='#FF6B00', fontsize=20)
-        self.ax_rpm.tick_params(axis='x', labelcolor='#FF6B00', labelsize=16)
+    def reload(self, start_date: str, end_date: str):
+        data_logs = DataLog.select(
+            DataLog.power,
+            DataLog.speed,
+            DataLog.utc_date_time
+        ).where(
+            DataLog.name == self.name
+        ).where(
+            DataLog.utc_date_time >= start_date, DataLog.utc_date_time <= end_date
+        ).order_by(
+            DataLog.id.desc()
+        )
 
-        # ax1.xaxis.set_major_locator(
-        #     plt.matplotlib.dates.SecondLocator(
-        #         interval=math.ceil(5))
-        # )
+        self.__handle_bottom_axis(data_logs)
+        self.__handle_data_line_speed(data_logs)
+        self.__handle_data_line_power(data_logs)
+        self.chart.update()
 
-        # self.ax_rpm.xaxis.set_major_formatter(
-        #     plt.matplotlib.dates.DateFormatter('%m-%d %H:%M')
-        # )
+    def __handle_bottom_axis(self, data_logs: list[DataLog]):
+        labels = []
+        for index, item in enumerate(data_logs):
+            label = ft.ChartAxisLabel(
+                value=index,
+                label=ft.Container(
+                    content=ft.Text(value=item.utc_date_time.strftime('%y-%m-%d')),
+                    padding=ft.padding.only(top=10)
+                )
+            )
+            labels.append(label)
+        self.chart.bottom_axis.labels = labels
+        self.chart.bottom_axis.visible = len(labels) > 0
+        size = 5
+        if len(labels) > size:
+            self.chart.bottom_axis.labels_interval = (len(labels) + size) // size
 
-        self.ax_rpm.set_ylabel('rpm', color='red', fontsize=20)
-        self.ax_rpm.plot([], [], color='red')
-        self.ax_rpm.tick_params(axis='y', labelcolor='red', labelsize=16)
+    def __handle_data_line_speed(self, data_logs: list[DataLog]):
+        data_points = []
+        max_speed = 0
+        for index, item in enumerate(data_logs):
+            speed_and_unit = UnitParser.parse_speed(item.speed)
+            data_points.append(ft.LineChartDataPoint(index, speed_and_unit[0]))
+            if speed_and_unit[0] > max_speed:
+                max_speed = speed_and_unit[0]
+        self.speed_data_series.data_points = data_points
+        print('max_speed=', max_speed)
+        self.chart.left_axis.labels = [
+            ft.ChartAxisLabel(value=0),
+            ft.ChartAxisLabel(value=max_speed)
+        ]
 
-        # instantiate a second Axes that shares the same x-axis
-        self.ax_power = self.ax_rpm.twinx()
-
-        # we already handled the x-label with ax1
-        self.ax_power.set_ylabel('kW', color='blue', fontsize=20)
-        self.ax_power.plot([], [], color='blue')
-        self.ax_power.tick_params(axis='y', labelcolor='blue', labelsize=16)
-
-        self.chart = MatplotlibChart(
-            fig, isolated=True, transparent=True, expand=True)
-        self.content = self.chart
+    def __handle_data_line_power(self, data_logs: list[DataLog]):
+        data_points = []
+        max_power = 0
+        for index, item in enumerate(data_logs):
+            power_and_unit = UnitParser.parse_power(item.power, self.unit, shrink=False)
+            data_points.append(ft.LineChartDataPoint(index, power_and_unit[0]))
+            if power_and_unit[0] > max_power:
+                max_power = power_and_unit[0]
+            self.chart.right_axis.title.value = power_and_unit[1]
+        self.power_data_series.data_points = data_points
+        print('max_power=', max_power)
+        self.chart.right_axis.labels = [
+            ft.ChartAxisLabel(value=0),
+            ft.ChartAxisLabel(value=max_power)
+        ]

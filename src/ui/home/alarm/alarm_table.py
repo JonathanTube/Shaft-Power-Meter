@@ -22,8 +22,10 @@ class AlarmTable(AbstractTable):
                 return session.get("lang.alarm.plc_disconnected")
             case AlarmType.GPS_DISCONNECTED:
                 return session.get("lang.alarm.gps_disconnected")
-            case AlarmType.SPS_DISCONNECTED:
-                return session.get("lang.alarm.sps_disconnected")
+            case AlarmType.SPS1_DISCONNECTED:
+                return session.get("lang.alarm.sps1_disconnected")
+            case AlarmType.SPS2_DISCONNECTED:
+                return session.get("lang.alarm.sps2_disconnected")
             case AlarmType.APP_UNEXPECTED_EXIT:
                 return session.get("lang.alarm.app_unexpected_exit")
             case AlarmType.POWER_OVERLOAD:

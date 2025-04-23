@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
 import pynmea2
 import flet as ft
@@ -100,6 +100,8 @@ class GpsSyncTask:
 
     def parse_nmea_sentence(self, sentence):
         try:
+            # delete invalid data(4 weeks * 3 = 12 weeks ago)
+            GpsLog.delete().where(GpsLog.utc_date_time < gdata.utc_date_time - timedelta(weeks=4 * 3))
             msg = pynmea2.parse(sentence)
             if isinstance(msg, pynmea2.types.talker.RMC):
                 utc_date = msg.datestamp

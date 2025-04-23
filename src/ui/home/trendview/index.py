@@ -1,8 +1,8 @@
 import flet as ft
 from datetime import datetime
-from db.models.data_log import DataLog
+from db.models.system_settings import SystemSettings
 from ui.common.datetime_search import DatetimeSearch
-from ui.home.trendview.trendview_chart import TrendViewChart
+from ui.home.trendview.trendview_chart import TrendviewChart
 from ui.common.toast import Toast
 
 
@@ -10,16 +10,23 @@ class TrendView(ft.Container):
     def __init__(self):
         super().__init__()
         self.expand = True
-        # self.bgcolor = ft.Colors.BLUE
         self.padding = 10
+
+        system_settings: SystemSettings = SystemSettings.get()
+        self.amount_of_propeller = system_settings.amount_of_propeller
 
     def build(self):
         search = DatetimeSearch(self.__on_search)
-        self.trend_view_chart = TrendViewChart()
+        self.chart_sps1 = TrendviewChart("sps1")
+
         self.content = ft.Column(
             expand=True,
-            controls=[search,self.trend_view_chart]
+            spacing=10,
+            controls=[search, self.chart_sps1]
         )
+        if self.amount_of_propeller == 2:
+            self.chart_sps2 = TrendviewChart("sps2")
+            self.content.controls.append(self.chart_sps2)
 
     def __on_search(self, start_date: str, end_date: str):
         if not start_date or not end_date:
@@ -30,15 +37,6 @@ class TrendView(ft.Container):
             Toast.show_error(self.page, self.page.session.get('lang.trendview.cannot_search_more_than_30_days'))
             return
 
-        data_logs = DataLog.select(
-            DataLog.power,
-            DataLog.speed,
-            DataLog.utc_date_time
-        ).where(
-            DataLog.name == "sps1"
-        ).where(
-            DataLog.utc_date_time >= start_date,
-            DataLog.utc_date_time <= end_date
-        ).order_by(DataLog.id.desc())
-
-        self.trend_view_chart.update_chart(data_logs)
+        self.chart_sps1.reload(start_date, end_date)
+        if self.amount_of_propeller == 2:
+            self.chart_sps2.reload(start_date, end_date)

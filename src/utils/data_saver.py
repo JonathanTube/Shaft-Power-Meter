@@ -1,3 +1,4 @@
+from datetime import timedelta
 from db.models.data_log import DataLog
 from common.global_data import gdata
 from utils.formula_cal import FormulaCalculator
@@ -11,6 +12,10 @@ class DataSaver:
         try:
             utc_date_time = gdata.utc_date_time
             power = FormulaCalculator.calculate_instant_power(torque, speed)
+
+            # delete invalid data
+            DataLog.delete().where(DataLog.utc_date_time < utc_date_time - timedelta(weeks=4 * 3))
+            # insert new data
             DataLog.create(
                 utc_date_time=utc_date_time,
                 name=name,
