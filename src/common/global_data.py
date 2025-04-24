@@ -60,6 +60,8 @@ class GlobalData:
         systemSettings: SystemSettings = SystemSettings.get()
         self.enable_shapoli = systemSettings.sha_po_li
         self.amount_of_propeller = systemSettings.amount_of_propeller
+        self.display_propeller_curve = systemSettings.display_propeller_curve
+
 
         propellerSetting: PropellerSetting = PropellerSetting.get()
         self.enable_power_overload_alarm = propellerSetting.alarm_enabled_of_overload_curve

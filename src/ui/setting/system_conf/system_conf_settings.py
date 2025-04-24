@@ -8,6 +8,8 @@ from ui.common.keyboard import keyboard
 from common.operation_type import OperationType
 from common.global_data import gdata
 from playhouse.shortcuts import model_to_dict
+from common.control_manager import ControlManager
+
 
 class SystemConfSettings(CustomCard):
     def __init__(self):
@@ -17,16 +19,22 @@ class SystemConfSettings(CustomCard):
 
     def build(self):
         self.display_thrust = ft.Switch(
-            col={"md": 3}, label=self.page.session.get("lang.setting.display_thrust"),
+            col={"md": 6}, label=self.page.session.get("lang.setting.display_thrust"),
             label_position=ft.LabelPosition.LEFT,
             value=self.system_settings.display_thrust
         )
 
         self.sha_po_li = ft.Switch(
-            col={"md": 3}, label=self.page.session.get("lang.setting.enable_sha_po_li"),
+            col={"md": 6}, label=self.page.session.get("lang.setting.enable_sha_po_li"),
             label_position=ft.LabelPosition.LEFT,
             value=self.system_settings.sha_po_li,
             on_change=self.__on_sha_po_li_change
+        )
+
+        self.display_propeller_curve = ft.Switch(
+            col={"md": 6}, label=self.page.session.get("lang.setting.display_propeller_curve"),
+            label_position=ft.LabelPosition.LEFT,
+            value=self.system_settings.display_propeller_curve
         )
 
         self.single_propeller = ft.Radio(value="1", label=self.page.session.get("lang.setting.single_propeller"))
@@ -79,6 +87,7 @@ class SystemConfSettings(CustomCard):
                 amount_of_propeller_row,
                 self.display_thrust,
                 self.sha_po_li,
+                self.display_propeller_curve,
                 self.eexi_limited_power,
                 self.eexi_breach_checking_duration
             ]
@@ -106,6 +115,7 @@ class SystemConfSettings(CustomCard):
         self.system_settings.amount_of_propeller = self.amount_of_propeller_radios.value
         self.system_settings.display_thrust = self.display_thrust.value
         self.system_settings.sha_po_li = self.sha_po_li.value
+        self.system_settings.display_propeller_curve = self.display_propeller_curve.value
 
         unit = self.preference.system_unit
         if unit == 0:
@@ -116,6 +126,11 @@ class SystemConfSettings(CustomCard):
         self.system_settings.eexi_breach_checking_duration = self.eexi_breach_checking_duration.value
 
         self.system_settings.save()
+
+        gdata.display_propeller_curve = self.display_propeller_curve.value
+        if ControlManager.zero_cal is not None:
+            ControlManager.zero_cal.visible = self.display_propeller_curve.value
+            ControlManager.zero_cal.update()
 
         OperationLog.create(
             user_id=user_id,

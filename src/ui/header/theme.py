@@ -2,16 +2,19 @@ import subprocess
 import flet as ft
 import screen_brightness_control as sbc
 
+from ui.common.toast import Toast
+
+default_avd = "C:\\Program Files (x86)\\Advantech\\Brightness\\Utility\\BIN\\AdvBrightnessUtility.exe"
+
 
 class Theme(ft.Container):
     def __init__(self):
         super().__init__()
         self.margin = ft.margin.symmetric(horizontal=20)
-        self.abc_works = True
+        self.abc_works = False
 
-    def build_sbc(self):
-        sbc.set_brightness(90)
-        self.brightness = ft.Text("90%", size=30, weight=ft.FontWeight.W_500)
+    def build(self):
+        self.brightness = ft.Text(f"{sbc.get_brightness()}%", size=30, weight=ft.FontWeight.W_500)
         self.dlg = ft.AlertDialog(
             alignment=ft.alignment.center,
             content=ft.Container(
@@ -38,16 +41,10 @@ class Theme(ft.Container):
                         ])
                     ])
             ))
-
-    def build(self):
-        try:
-            self.build_sbc()
-            self.content = ft.Row([
-                ft.IconButton(icon=ft.Icons.LIGHT_MODE, on_click=self.toggle_theme),
-                ft.IconButton(icon=ft.icons.SETTINGS_BRIGHTNESS, on_click=self.show_dlg)
-            ])
-        except Exception as e:
-            self.abc_works = False
+        self.content = ft.Row([
+            ft.IconButton(icon=ft.Icons.LIGHT_MODE, on_click=self.toggle_theme),
+            ft.IconButton(icon=ft.icons.SETTINGS_BRIGHTNESS, on_click=self.show_dlg)
+        ])
 
     def toggle_theme(self, e):
         if self.page.theme_mode == ft.ThemeMode.LIGHT:
@@ -62,7 +59,10 @@ class Theme(ft.Container):
         if self.abc_works:
             e.page.open(self.dlg)
         else:
-            subprocess.Popen('C:\\Program Files (x86)\\Advantech\\Brightness\\Utility\\BIN\\AdvBrightnessUtility.exe')
+            try:
+                subprocess.Popen(default_avd)
+            except Exception as e:
+                Toast.show_error(self.page, f"the AdvBrightnessUtility.exe should be installed at {default_avd}")
 
     def __slider_changed(self, e):
         sbc.set_brightness(e.control.value)

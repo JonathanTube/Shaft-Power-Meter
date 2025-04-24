@@ -1,4 +1,6 @@
 import flet as ft
+from common.control_manager import ControlManager
+from common.global_data import gdata
 from ui.setting.general.index import General
 from ui.setting.propeller_conf.index import PropellerConf
 from ui.setting.self_test import SelfTest
@@ -17,6 +19,10 @@ class Setting(ft.Container):
 
     def __set_content(self, e):
         idx = e.control.selected_index
+        
+        if not gdata.display_propeller_curve and idx >= 2:
+            idx = idx + 1
+        
         keyboard.close()
         if idx == 0:
             self.right_content.content = SystemConf()
@@ -48,8 +54,9 @@ class Setting(ft.Container):
         s = self.page.session
         self.system_conf = ft.NavigationRailDestination(icon=ft.Icons.SETTINGS_OUTLINED, selected_icon=ft.Icons.SETTINGS, label=s.get("lang.setting.system_conf.title"))
         self.general = ft.NavigationRailDestination(icon=ft.Icon(ft.Icons.TUNE_OUTLINED), selected_icon=ft.Icon(ft.Icons.TUNE), label=s.get("lang.setting.general.title"))
-        self.propeller_setting = ft.NavigationRailDestination(icon=ft.Icons.INSIGHTS_OUTLINED, selected_icon=ft.Icon(ft.Icons.INSIGHTS), label=s.get("lang.setting.propeller_setting.title"))
+        self.propeller_setting = ft.NavigationRailDestination(icon=ft.Icons.INSIGHTS_OUTLINED, selected_icon=ft.Icon(ft.Icons.INSIGHTS), label=s.get("lang.setting.propeller_setting.title"), visible=gdata.display_propeller_curve)
         self.zero_cal = ft.NavigationRailDestination(icon=ft.Icons.SWITCH_ACCESS_SHORTCUT_OUTLINED, selected_icon=ft.Icon(ft.Icons.SWITCH_ACCESS_SHORTCUT), label=s.get("lang.setting.zero_cal.title"))
+        ControlManager.zero_cal = self.zero_cal
         self.io_conf = ft.NavigationRailDestination(icon=ft.Icons.USB_OUTLINED, selected_icon=ft.Icon(ft.Icons.USB), label=s.get("lang.setting.io_conf.title"))
         self.self_test = ft.NavigationRailDestination(icon=ft.Icons.ASSIGNMENT_OUTLINED, selected_icon=ft.Icon(ft.Icons.ASSIGNMENT), label=s.get("lang.setting.self_test.title"))
         self.permission_conf = ft.NavigationRailDestination(icon=ft.Icons.MANAGE_ACCOUNTS_OUTLINED, selected_icon=ft.Icon(ft.Icons.MANAGE_ACCOUNTS), label=s.get("lang.setting.permission_conf.title"))
@@ -75,3 +82,6 @@ class Setting(ft.Container):
             controls=[rail, ft.VerticalDivider(width=1), self.right_content],
             expand=True
         )
+
+    def will_unmount(self):
+        ControlManager.zero_cal = None

@@ -1,9 +1,11 @@
 import flet as ft
+from common.global_data import gdata
 from ui.common.keyboard import keyboard
 from ui.common.permission_check import PermissionCheck
 from ui.common.toast import Toast
 from ui.setting.system_conf.system_conf_settings import SystemConfSettings
 from ui.setting.system_conf.system_conf_ship_info import SystemConfShipInfo
+
 
 class SystemConf(ft.Container):
     def __init__(self):
@@ -41,6 +43,7 @@ class SystemConf(ft.Container):
             self.system_conf_settings.save(user_id)
             self.system_conf_ship_info.save(user_id)
             Toast.show_success(self.page)
+            
         except Exception as e:
             Toast.show_error(self.page, e)
 

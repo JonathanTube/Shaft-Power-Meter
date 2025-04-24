@@ -5,7 +5,7 @@ from ui.home.dashboard.sps_single.off.index import SingleShaPoLiOff
 from ui.home.dashboard.sps_dual.on.index import DualShaPoLiOn
 from ui.home.dashboard.sps_dual.off.index import DualShaPoLiOff
 from ui.home.event.event_button import EventButton
-
+from ui.setting.zero_cal.index import ZeroCal
 
 class ControlManager:
     audio_alarm: AudioAlarm | None = None
@@ -16,6 +16,8 @@ class ControlManager:
     sps_single_off: SingleShaPoLiOff | None = None
     sps_dual_on: DualShaPoLiOn | None = None
     sps_dual_off: DualShaPoLiOff | None = None
+
+    zero_cal: ZeroCal | None = None
 
     @staticmethod
     def on_eexi_power_breach_occured():

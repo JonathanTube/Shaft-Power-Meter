@@ -1,5 +1,6 @@
 import flet as ft
 from common.control_manager import ControlManager
+from common.global_data import gdata
 from ui.home.alarm.alarm_button import AlarmButton
 from ui.home.alarm.index import AlarmList
 from ui.home.counter.index import Counter
@@ -58,6 +59,7 @@ class Home(ft.Container):
             icon=ft.Icons.STACKED_LINE_CHART_OUTLINED,
             icon_color=ft.Colors.INVERSE_SURFACE,
             style=self.default_button_style,
+            visible=gdata.display_propeller_curve,
             on_click=lambda e: self.__on_click(e, 3)
         )
         self.alarm_button = AlarmButton(on_click=lambda e: self.__on_click(e, 4))

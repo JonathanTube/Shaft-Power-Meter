@@ -20,6 +20,7 @@ from common.global_data import gdata
 
 TableInit.init()
 DataInit.init()
+
 gdata.set_default_value()
 
 

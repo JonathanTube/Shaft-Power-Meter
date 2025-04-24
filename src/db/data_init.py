@@ -683,7 +683,11 @@ class DataInit:
                     "chinese": "启用ShaPoLi",
                     "english": "Enable ShaPoLi"
                 },
-
+                {
+                    "code": "lang.setting.display_propeller_curve",
+                    "chinese": "显示螺旋桨曲线",
+                    "english": "Display Propeller Curve"
+                },
                 {
                     "code": "lang.setting.single_propeller",
                     "chinese": "单桨",
