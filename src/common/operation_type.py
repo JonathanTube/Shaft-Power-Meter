@@ -1,4 +1,7 @@
-class OperationType:
+from enum import Enum
+
+
+class OperationType(int, Enum):
     SYSTEM_CONF_SETTING = 0
     SYSTEM_CONF_SHIP_INFO = 1
 
@@ -22,3 +25,11 @@ class OperationType:
     PERMISSION_CONF = 20
     TEST_MODE_CONF = 21
 
+
+    @classmethod
+    def get_operation_type_name(cls, operation_type: int) -> str:
+        return cls(operation_type).name
+
+    @classmethod
+    def list_all(cls) -> list:
+        return [f"{member.value}: {member.name}" for member in cls]

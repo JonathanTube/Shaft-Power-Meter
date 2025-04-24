@@ -12,8 +12,8 @@ class DatetimeSearch(ft.Container):
         self.date_time_range = DateTimeRange()
 
         self.search_button = ft.OutlinedButton(
-            height=40,
             icon=ft.Icons.SEARCH_OUTLINED,
+            height=45,
             text=self.page.session.get("lang.button.search"),
             on_click=self.__handle_search
         )

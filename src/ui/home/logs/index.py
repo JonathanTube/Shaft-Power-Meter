@@ -2,7 +2,7 @@ import flet as ft
 
 from ui.home.logs.log_data.log_data_list import LogDataList
 from ui.home.logs.log_gps.log_gps_list import LogGpsList
-from ui.home.logs.log_operation.log_operation_list import LogOperationList
+from ui.home.logs.log_operation.log_operation import LogOperation
 
 
 class Logs(ft.Container):
@@ -12,7 +12,7 @@ class Logs(ft.Container):
             tabs=[
                 ft.Tab(text=self.page.session.get("lang.log.data_log"), content=LogDataList()),
                 ft.Tab(text=self.page.session.get("lang.log.gps_log"), content=LogGpsList()),
-                ft.Tab(text=self.page.session.get("lang.log.operation_log"), content=LogOperationList())
+                ft.Tab(text=self.page.session.get("lang.log.operation_log"), content=LogOperation())
             ],
             expand=True
         )

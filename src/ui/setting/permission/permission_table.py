@@ -13,6 +13,7 @@ class PermissionTable(AbstractTable):
     def __init__(self):
         super().__init__()
         self.user_id = None
+        self.table_width = gdata.default_table_width - 150
 
     def load_total(self):
         role = self.kwargs.get("role")

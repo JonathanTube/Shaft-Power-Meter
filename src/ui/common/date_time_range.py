@@ -6,7 +6,7 @@ class DateTimeRange(ft.Row):
         self.start_date = ft.TextField(
             expand=True,
             label=self.page.session.get("lang.common.start_date"),
-            size_constraints=ft.BoxConstraints(max_width=200, max_height=40),
+            size_constraints=ft.BoxConstraints(max_width=200),
             can_request_focus=False,
             enable_interactive_selection=False,
             on_click=lambda e: e.page.open(ft.DatePicker(on_change=self.__handle_start_date_change)))
@@ -14,7 +14,7 @@ class DateTimeRange(ft.Row):
         self.end_date = ft.TextField(
             expand=True,
             label=self.page.session.get("lang.common.end_date"),
-            size_constraints=ft.BoxConstraints(max_width=200, max_height=40),
+            size_constraints=ft.BoxConstraints(max_width=200),
             can_request_focus=False,
             enable_interactive_selection=False,
             on_click=lambda e: e.page.open(ft.DatePicker(on_change=self.__handle_end_date_change)))
