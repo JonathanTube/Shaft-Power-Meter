@@ -1,7 +1,6 @@
 import flet as ft
 from ui.common.abstract_table import AbstractTable
 from db.models.user import User
-from ui.common.permission_check import PermissionCheck
 from ui.common.toast import Toast
 from db.models.opearation_log import OperationLog
 from common.operation_type import OperationType
@@ -10,18 +9,18 @@ from playhouse.shortcuts import model_to_dict
 
 
 class PermissionTable(AbstractTable):
-    def __init__(self):
+    def __init__(self, user: User):
         super().__init__()
-        self.user_id = None
+        self.op_user = user
         self.table_width = gdata.default_table_width - 150
 
     def load_total(self):
         role = self.kwargs.get("role")
         role = int(role) if role else -1
         if role != -1:
-            return User.select().where(User.user_role == role).count()
+            return User.select().where(User.user_role >= self.op_user.user_role, User.user_role == role).count()
         else:
-            return User.select().count()
+            return User.select().where(User.user_role >= self.op_user.user_role).count()
 
     def load_data(self):
         role = self.kwargs.get("role")
@@ -31,27 +30,27 @@ class PermissionTable(AbstractTable):
             User.user_name,
             User.user_pwd,
             User.user_role
-        ).order_by(User.id.desc()).paginate(self.current_page, self.page_size)
+        ).where(User.user_role >= self.op_user.user_role).order_by(User.id.desc()).paginate(self.current_page, self.page_size)
         if role != -1:
             users = users.where(User.user_role == role)
 
-        return [[item.id, item.user_name, item.user_pwd, self.__get_role_name(item.user_role)] for item in users]
+        return [[item.id, item.user_name, '******', self.__get_role_name(item.user_role)] for item in users]
 
     def __get_role_name(self, role: int):
         if role == 0:
             return "Admin"
         elif role == 1:
-            return "Captain"
-        elif role == 2:
             return "Master"
+        elif role == 2:
+            return "User"
         return 'Unknown'
 
     def __get_role_key(self, role: int):
         if role == 'Admin':
             return 0
-        elif role == 'Captain':
-            return 1
         elif role == 'Master':
+            return 1
+        elif role == 'User':
             return 2
         return None
 
@@ -68,7 +67,7 @@ class PermissionTable(AbstractTable):
         delete_button = ft.TextButton(
             icon=ft.Icons.DELETE_OUTLINED,
             text="Delete",
-            on_click=lambda e: self.__show_delete_user(e, items)
+            on_click=lambda e: self.__on_delete(e, items[0])
         )
 
         session = self.page.session
@@ -101,9 +100,9 @@ class PermissionTable(AbstractTable):
             width=400,
             value=self.__get_role_key(items[3]),
             options=[
-                ft.dropdown.Option(text="Admin", key="0"),
-                ft.dropdown.Option(text="Captain", key="1"),
-                ft.dropdown.Option(text="Master", key="2")
+                ft.dropdown.Option(text="Admin", key="0", visible=self.op_user.user_role <= 0),
+                ft.dropdown.Option(text="Master", key="1", visible=self.op_user.user_role <= 1),
+                ft.dropdown.Option(text="User", key="2", visible=self.op_user.user_role <= 2)
             ]
         )
         self.edit_dialog = ft.AlertDialog(
@@ -123,13 +122,12 @@ class PermissionTable(AbstractTable):
             ),
             actions=[
                 ft.TextButton(e.page.session.get("lang.button.cancel"), on_click=lambda e: e.page.close(self.edit_dialog)),
-                ft.TextButton(e.page.session.get("lang.button.save"), on_click=lambda e: self.__on_confirm_edit_permission_check(e, items[0]))
+                ft.TextButton(e.page.session.get("lang.button.save"), on_click=lambda e: self.__on_confirm_edit(e, items[0]))
             ]
         )
         self.page.open(self.edit_dialog)
 
-    def __on_confirm_edit_permission_check(self, e, user_id: int):
-        self.user_id = user_id
+    def __on_confirm_edit(self, e, user_id: int):
         if self.__is_empty(self.user_name.value):
             Toast.show_warning(e.page, e.page.session.get("lang.permission.user_name_required"))
             return
@@ -149,18 +147,12 @@ class PermissionTable(AbstractTable):
         if self.password.value.strip() != self.confirm_password.value.strip():
             Toast.show_warning(e.page, e.page.session.get("lang.permission.password_not_match"))
             return
-        self.page.open(PermissionCheck(self.__on_confirm_edit, 0, self.__on_confirm_edit_cancel))
-
-    def __on_confirm_edit_cancel(self, e):
-        self.page.open(self.edit_dialog)
-
-    def __on_confirm_edit(self, op_user_id: int):
-        User.update(user_pwd=self.password.value.strip(), user_role=self.role.value).where(User.id == self.user_id).execute()
+        User.update(user_pwd=self.password.value.strip(), user_role=self.role.value).where(User.id == user_id).execute()
         OperationLog.create(
-            user_id=op_user_id,
+            user_id=self.op_user.id,
             utc_date_time=gdata.utc_date_time,
             operation_type=OperationType.USER_UPDATE,
-            operation_content=model_to_dict(User.select(User.id, User.user_name).where(User.id == self.user_id).get())
+            operation_content=model_to_dict(User.select(User.id, User.user_name).where(User.id == user_id).get())
         )
 
         self.page.close(self.edit_dialog)
@@ -170,18 +162,23 @@ class PermissionTable(AbstractTable):
     def __is_empty(self, value: str):
         return value == None or value.strip() == ""
 
-    def __show_delete_user(self, e, items: list):
-        self.user_id = items[0]
-        self.page.open(PermissionCheck(self.__on_confirm_delete, 0))
+    def __on_delete(self, e, user_id: int):
+        self.del_dialog = ft.AlertDialog(
+            title=ft.Text(self.page.session.get("lang.permission.delete_user")),
+            actions=[ft.TextButton(self.page.session.get("lang.button.cancel"), on_click=lambda e: e.page.close(self.del_dialog)),
+                     ft.TextButton(self.page.session.get("lang.button.confirm"), on_click=lambda e: self.__on_delete_confirm(e, user_id))]
+        )
+        self.page.open(self.del_dialog)
 
-    def __on_confirm_delete(self, op_user_id: int):
+    def __on_delete_confirm(self, e, user_id: int):
+        self.page.close(self.del_dialog)
         OperationLog.create(
-            user_id=op_user_id,
+            user_id=self.op_user.id,
             utc_date_time=gdata.utc_date_time,
             operation_type=OperationType.USER_DELETE,
-            operation_content=model_to_dict(User.select(User.id, User.user_name).where(User.id == self.user_id).get())
+            operation_content=model_to_dict(User.select(User.id, User.user_name).where(User.id == user_id).get())
         )
-        User.delete().where(User.id == self.user_id).execute()
+        User.delete().where(User.id == user_id).execute()
         self.search()
         Toast.show_success(self.page)
 

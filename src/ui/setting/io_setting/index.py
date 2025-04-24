@@ -2,6 +2,7 @@ import flet as ft
 from pymodbus.client import ModbusTcpClient
 
 from db.models.io_conf import IOConf
+from db.models.user import User
 from ui.common.toast import Toast
 from ui.common.permission_check import PermissionCheck
 from ui.setting.io_setting.io_setting_plc import IOSettingPLC
@@ -53,9 +54,9 @@ class IOSetting(ft.Container):
 
     def __on_save_button_click(self, e):
         keyboard.close()
-        self.page.open(PermissionCheck(self.__save_data, 2))
+        self.page.open(PermissionCheck(self.__save_data, 0))
 
-    def __save_data(self, user_id: int):
+    def __save_data(self, user: User):
         try:
             keyboard.close()
             self.__write_to_plc()
@@ -64,9 +65,9 @@ class IOSetting(ft.Container):
             self.sps1_conf.save_data()
             self.sps2_conf.save_data()
             self.output_conf.save_data()
-            self.factor_conf.save_data(user_id)
+            self.factor_conf.save_data(user.id)
             OperationLog.create(
-                user_id=user_id,
+                user_id=user.id,
                 utc_date_time=gdata.utc_date_time,
                 operation_type=OperationType.IO_CONF,
                 operation_content=model_to_dict(self.conf)

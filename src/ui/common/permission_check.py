@@ -7,20 +7,21 @@ from ui.common.toast import Toast
 class PermissionCheck(ft.AlertDialog):
     def __init__(self, on_confirm: Callable, user_role: int = 0, on_cancel: Callable = None, closable: bool = True):
         super().__init__()
+        self.modal = not closable
         self.user_role = user_role
         self.on_confirm = on_confirm
         self.on_cancel = on_cancel
         self.closable = closable
-        self.barrier_color = ft.Colors.TRANSPARENT
+        # self.barrier_color = ft.Colors.TRANSPARENT
         self.shadow_color = ft.Colors.PRIMARY
 
     def get_role_name(self):
         if self.user_role == 0:
             return "Admin"
         elif self.user_role == 1:
-            return "Captain"
-        elif self.user_role == 2:
             return "Master"
+        elif self.user_role == 2:
+            return "User"
 
     def build(self):
         s = self.page.session
@@ -61,4 +62,4 @@ class PermissionCheck(ft.AlertDialog):
             return
 
         self.page.close(self)
-        self.on_confirm(user.id)
+        self.on_confirm(user)

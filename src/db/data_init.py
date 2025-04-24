@@ -1434,9 +1434,9 @@ class DataInit:
                     "english": "Master"
                 },
                 {
-                    "code": "lang.permission.captain",
-                    "chinese": "船长",
-                    "english": "Captain"
+                    "code": "lang.permission.user",
+                    "chinese": "用户",
+                    "english": "User"
                 },
                 {
                     "code": "lang.permission.authentication",

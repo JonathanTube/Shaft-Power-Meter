@@ -7,7 +7,7 @@ from ui.setting.general.general_preference import GeneralPreference
 from ui.common.toast import Toast
 from ui.common.permission_check import PermissionCheck
 from ui.common.keyboard import keyboard
-
+from db.models.user import User
 
 class General(ft.Container):
     def __init__(self):
@@ -20,8 +20,9 @@ class General(ft.Container):
         keyboard.close()
         self.page.open(PermissionCheck(self.__save_data, 2))
 
-    def __save_data(self, user_id: int):
+    def __save_data(self, user: User):
         try:
+            user_id = user.id
             self.general_preference.save_data(user_id)
             self.limitation_max.save_data(user_id)
             self.limitation_warning.save_data(user_id)

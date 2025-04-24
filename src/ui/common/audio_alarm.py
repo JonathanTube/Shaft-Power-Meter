@@ -2,6 +2,7 @@ import os
 import flet as ft
 from pathlib import Path
 from db.models.event_log import EventLog
+from db.models.user import User
 from ui.common.permission_check import PermissionCheck
 from task.utc_timer_task import gdata
 
@@ -52,7 +53,7 @@ class AudioAlarm(ft.Container):
         self.content.visible = False
         self.content.update()
 
-    def __on_mute(self):
+    def __on_mute(self, user: User):
         self.audio_alarm.pause()
         self.content.icon = ft.Icons.NOTIFICATIONS_OFF_OUTLINED
         self.content.disabled = True

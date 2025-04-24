@@ -16,14 +16,21 @@ class Setting(ft.Container):
     def __init__(self):
         super().__init__()
         self.margin = ft.margin.all(10)
+        self.idx = 0
 
     def __set_content(self, e):
         idx = e.control.selected_index
-        
+
         if not gdata.display_propeller_curve and idx >= 2:
             idx = idx + 1
-        
+
+        if idx == self.idx:
+            return
+
+        self.idx = idx
+
         keyboard.close()
+
         if idx == 0:
             self.right_content.content = SystemConf()
         elif idx == 1:
@@ -54,7 +61,8 @@ class Setting(ft.Container):
         s = self.page.session
         self.system_conf = ft.NavigationRailDestination(icon=ft.Icons.SETTINGS_OUTLINED, selected_icon=ft.Icons.SETTINGS, label=s.get("lang.setting.system_conf.title"))
         self.general = ft.NavigationRailDestination(icon=ft.Icon(ft.Icons.TUNE_OUTLINED), selected_icon=ft.Icon(ft.Icons.TUNE), label=s.get("lang.setting.general.title"))
-        self.propeller_setting = ft.NavigationRailDestination(icon=ft.Icons.INSIGHTS_OUTLINED, selected_icon=ft.Icon(ft.Icons.INSIGHTS), label=s.get("lang.setting.propeller_setting.title"), visible=gdata.display_propeller_curve)
+        self.propeller_setting = ft.NavigationRailDestination(icon=ft.Icons.INSIGHTS_OUTLINED, selected_icon=ft.Icon(
+            ft.Icons.INSIGHTS), label=s.get("lang.setting.propeller_setting.title"), visible=gdata.display_propeller_curve)
         self.zero_cal = ft.NavigationRailDestination(icon=ft.Icons.SWITCH_ACCESS_SHORTCUT_OUTLINED, selected_icon=ft.Icon(ft.Icons.SWITCH_ACCESS_SHORTCUT), label=s.get("lang.setting.zero_cal.title"))
         ControlManager.zero_cal = self.zero_cal
         self.io_conf = ft.NavigationRailDestination(icon=ft.Icons.USB_OUTLINED, selected_icon=ft.Icon(ft.Icons.USB), label=s.get("lang.setting.io_conf.title"))

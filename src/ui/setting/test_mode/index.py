@@ -14,7 +14,7 @@ from db.models.opearation_log import OperationLog
 from common.operation_type import OperationType
 from common.global_data import gdata
 from playhouse.shortcuts import model_to_dict
-
+from db.models.user import User
 
 class TestMode(ft.Container):
     def __init__(self):
@@ -87,7 +87,7 @@ class TestMode(ft.Container):
         else:
             return UnitConverter.t_to_n(value)
 
-    def start_test_mode(self, user_id: int):
+    def start_test_mode(self, user: User):
         if self.running:
             return
 
@@ -103,14 +103,14 @@ class TestMode(ft.Container):
         self.stop_button.update()
 
         OperationLog.create(
-            user_id=user_id,
+            user_id=user.id,
             utc_date_time=gdata.utc_date_time,
             operation_type=OperationType.TEST_MODE_CONF,
             operation_content='started test mode'
         )
         Toast.show_success(self.page)
 
-    def stop_test_mode(self, user_id: int):
+    def stop_test_mode(self, user: User):
         if not self.running:
             return
 
@@ -125,7 +125,7 @@ class TestMode(ft.Container):
         self.stop_button.update()
 
         OperationLog.create(
-            user_id=user_id,
+            user_id=user.id,
             utc_date_time=gdata.utc_date_time,
             operation_type=OperationType.TEST_MODE_CONF,
             operation_content='stopped test mode'

@@ -1,5 +1,6 @@
 import flet as ft
 from common.global_data import gdata
+from db.models.user import User
 from ui.common.keyboard import keyboard
 from ui.common.permission_check import PermissionCheck
 from ui.common.toast import Toast
@@ -37,11 +38,11 @@ class SystemConf(ft.Container):
     def __on_save_button_click(self, e):
         self.page.open(PermissionCheck(self.__save_data, 0))
 
-    def __save_data(self, user_id: int):
+    def __save_data(self, user: User):
         try:
             keyboard.close()
-            self.system_conf_settings.save(user_id)
-            self.system_conf_ship_info.save(user_id)
+            self.system_conf_settings.save(user.id)
+            self.system_conf_ship_info.save(user.id)
             Toast.show_success(self.page)
             
         except Exception as e:
