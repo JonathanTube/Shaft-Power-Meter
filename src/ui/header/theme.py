@@ -1,12 +1,15 @@
+import subprocess
 import flet as ft
 import screen_brightness_control as sbc
 
 
-class ThemeButton(ft.Container):
+class Theme(ft.Container):
     def __init__(self):
         super().__init__()
+        self.margin = ft.margin.symmetric(horizontal=20)
+        self.abc_works = True
 
-    def build(self):
+    def build_sbc(self):
         sbc.set_brightness(90)
         self.brightness = ft.Text("90%", size=30, weight=ft.FontWeight.W_500)
         self.dlg = ft.AlertDialog(
@@ -36,17 +39,15 @@ class ThemeButton(ft.Container):
                     ])
             ))
 
-        self.margin = ft.margin.symmetric(horizontal=20)
-        self.content = ft.Row([
-            ft.IconButton(
-                icon=ft.Icons.LIGHT_MODE,
-                on_click=self.toggle_theme
-            ),
-            ft.IconButton(
-                icon=ft.icons.SETTINGS_BRIGHTNESS,
-                on_click=self.show_dlg
-            )
-        ])
+    def build(self):
+        try:
+            self.build_sbc()
+            self.content = ft.Row([
+                ft.IconButton(icon=ft.Icons.LIGHT_MODE, on_click=self.toggle_theme),
+                ft.IconButton(icon=ft.icons.SETTINGS_BRIGHTNESS, on_click=self.show_dlg)
+            ])
+        except Exception as e:
+            self.abc_works = False
 
     def toggle_theme(self, e):
         if self.page.theme_mode == ft.ThemeMode.LIGHT:
@@ -58,7 +59,10 @@ class ThemeButton(ft.Container):
         self.page.update()
 
     def show_dlg(self, e):
-        e.page.open(self.dlg)
+        if self.abc_works:
+            e.page.open(self.dlg)
+        else:
+            subprocess.Popen('C:\\Program Files (x86)\\Advantech\\Brightness\\Utility\\BIN\\AdvBrightnessUtility.exe')
 
     def __slider_changed(self, e):
         sbc.set_brightness(e.control.value)

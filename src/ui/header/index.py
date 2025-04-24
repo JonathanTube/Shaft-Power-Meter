@@ -3,7 +3,7 @@ import flet as ft
 from common.control_manager import ControlManager
 from ui.header.shapoli import ShaPoLi
 from ui.header.logo import HeaderLogo
-from ui.header.theme_button import ThemeButton
+from ui.header.theme import Theme
 from ui.home.index import Home
 from ui.report.report_info_list import ReportInfoList
 from ui.setting.index import Setting
@@ -59,7 +59,7 @@ class Header(ft.AppBar):
             ),
             self.shapoli,
             ft.VerticalDivider(width=.5, thickness=.5),
-            ThemeButton()
+            Theme()
         ]
 
     def __set_active(self, button: ft.ElevatedButton):
