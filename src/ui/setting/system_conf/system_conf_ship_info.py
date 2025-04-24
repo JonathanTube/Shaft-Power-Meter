@@ -1,7 +1,10 @@
 import flet as ft
 from ui.common.custom_card import CustomCard
 from db.models.ship_info import ShipInfo
-
+from db.models.opearation_log import OperationLog
+from common.operation_type import OperationType
+from playhouse.shortcuts import model_to_dict
+from common.global_data import gdata
 
 class SystemConfShipInfo(CustomCard):
     def __init__(self):
@@ -37,9 +40,15 @@ class SystemConfShipInfo(CustomCard):
 
         super().build()
 
-    def save(self):
+    def save(self, user_id: int):
         self.ship_info.ship_type = self.ship_type.value
         self.ship_info.ship_name = self.ship_name.value
         self.ship_info.imo_number = self.imo_number.value
         self.ship_info.ship_size = self.ship_size.value
         self.ship_info.save()
+        OperationLog.create(
+            user_id=user_id,
+            utc_date_time=gdata.utc_date_time,
+            operation_type=OperationType.SYSTEM_CONF_SHIP_INFO,
+            operation_content=model_to_dict(self.ship_info)
+        )

@@ -1,10 +1,10 @@
 import flet as ft
 
 from ui.common.datetime_search import DatetimeSearch
-from ui.home.logs.log_data.log_data_table import LogDataTable
+from ui.home.logs.log_operation.log_operation_table import LogOperationTable
 
 
-class LogDataList(ft.Container):
+class LogOperationList(ft.Container):
     def __init__(self):
         super().__init__()
         self.expand = True
@@ -12,7 +12,7 @@ class LogDataList(ft.Container):
 
     def build(self):
         search = DatetimeSearch(self.__on_search)
-        self.table = LogDataTable()
+        self.table = LogOperationTable()
 
         self.content = ft.Column(
             expand=True,

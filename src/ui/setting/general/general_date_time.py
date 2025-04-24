@@ -4,7 +4,9 @@ import asyncio
 from common.global_data import gdata
 from ui.common.custom_card import CustomCard
 from db.models.date_time_conf import DateTimeConf
-
+from db.models.opearation_log import OperationLog
+from common.operation_type import OperationType
+from playhouse.shortcuts import model_to_dict
 
 class GeneralDateTime(ft.Container):
     def __init__(self):
@@ -103,7 +105,7 @@ class GeneralDateTime(ft.Container):
         if self._task:
             self._task.cancel()
 
-    def save_data(self):
+    def save_data(self, user_id: int):
         # save date time conf
         new_date = self.utc_date.value
         new_time = self.utc_time.value
@@ -114,6 +116,12 @@ class GeneralDateTime(ft.Container):
         self.date_time_conf.sync_with_gps = self.sync_with_gps.value
         gdata.enable_utc_time_sync_with_gps = self.sync_with_gps.value
         self.date_time_conf.save()
+        OperationLog.create(
+            user_id=user_id,
+            utc_date_time=gdata.utc_date_time,
+            operation_type=OperationType.GENERAL_UTC_DATE_TIME,
+            operation_content=model_to_dict(self.date_time_conf)
+        )
 
         new_date_time = f"{new_date} {new_time}:00"
         dt_format = '%Y-%m-%d %H:%M:%S'

@@ -1108,7 +1108,21 @@ class DataInit:
                     "chinese": "GPS 日志",
                     "english": "GPS Log"
                 },
-
+                {
+                    "code": "lang.log.operation_log",
+                    "chinese": "操作日志",
+                    "english": "Operation Log"
+                },
+                {
+                    "code": "lang.operation_log.operation_type",
+                    "chinese": "操作类型",
+                    "english": "Operation Type"
+                },
+                {
+                    "code": "lang.operation_log.operation_content",
+                    "chinese": "操作内容",
+                    "english": "Operation Content"
+                },
                 {
                     "code": "lang.report.report_name",
                     "chinese": "报告名称",

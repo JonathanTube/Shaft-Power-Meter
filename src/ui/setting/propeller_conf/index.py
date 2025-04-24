@@ -1,6 +1,10 @@
 import flet as ft
 
 from db.models.propeller_setting import PropellerSetting
+from db.models.opearation_log import OperationLog
+from common.operation_type import OperationType
+from common.global_data import gdata
+from playhouse.shortcuts import model_to_dict
 from ui.common.keyboard import keyboard
 from ui.common.permission_check import PermissionCheck
 from ui.common.toast import Toast
@@ -68,7 +72,7 @@ class PropellerConf(ft.Container):
     def __on_save_button_click(self, e):
         self.page.open(PermissionCheck(self.__save_data, 2))
 
-    def __save_data(self):
+    def __save_data(self, user_id: int):
         try:
             keyboard.close()
             self.mcr_operating_point_card.save_data()
@@ -78,6 +82,12 @@ class PropellerConf(ft.Container):
             self.speed_limit_curve_card.save_data()
             self.overload_curve_card.save_data()
             self.ps.save()
+            OperationLog.create(
+                user_id=user_id,
+                utc_date_time=gdata.utc_date_time,
+                operation_type=OperationType.PROPELLER_SETTING,
+                operation_content=model_to_dict(self.ps)
+            )
         except Exception as e:
             Toast.show_error(self.page, e)
         else:

@@ -22,7 +22,7 @@ class AlarmList(ft.Container):
         self.search = DatetimeSearch(self.__on_search)
         export_button = ft.OutlinedButton(text=self.page.session.get("lang.common.export"), height=40, icon=ft.Icons.DOWNLOAD_OUTLINED, on_click=self.__on_export)
 
-        self.table = AlarmTable(10, show_checkbox_column=True)
+        self.table = AlarmTable()
 
         ack_button = ft.OutlinedButton(text=self.page.session.get("lang.alarm.acknowledge"), height=40, icon=ft.Icons.CHECK_CIRCLE_OUTLINED, on_click=self.__on_acknowledge)
 

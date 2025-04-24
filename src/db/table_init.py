@@ -6,6 +6,7 @@ from db.models.factor_conf import FactorConf
 from db.models.gps_log import GpsLog
 from db.models.io_conf import IOConf
 from db.models.limitations import Limitations
+from db.models.opearation_log import OperationLog
 from db.models.preference import Preference
 from db.models.propeller_setting import PropellerSetting
 from db.models.report_detail import ReportDetail
@@ -20,10 +21,11 @@ from db.models.test_mode_conf import TestModeConf
 from db.models.user import User
 from db.base import db
 
+
 class TableInit:
     @staticmethod
     def init():
-        # db.drop_tables([Language], safe=False)
+        db.drop_tables([Language], safe=False)
         # db.drop_tables([IOConf], safe=False)
         # db.drop_tables([DataLog], safe=False)
         # db.drop_tables([EventLog], safe=False)
@@ -47,5 +49,6 @@ class TableInit:
             Language,
             AlarmLog,
             TestModeConf,
-            User
+            User,
+            OperationLog
         ], safe=True)

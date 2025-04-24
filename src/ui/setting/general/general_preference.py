@@ -3,7 +3,12 @@ import flet as ft
 from db.models.language import Language
 from ui.common.custom_card import CustomCard
 from db.models.preference import Preference
+from db.models.opearation_log import OperationLog
+from common.operation_type import OperationType
+from playhouse.shortcuts import model_to_dict
 from ui.common.keyboard import keyboard
+from common.global_data import gdata
+
 
 class GeneralPreference(ft.Container):
     def __init__(self, on_system_unit_change: callable):
@@ -64,7 +69,7 @@ class GeneralPreference(ft.Container):
     def __handle_system_unit_change(self, e):
         self.on_system_unit_change(int(self.system_unit.value))
 
-    def save_data(self):
+    def save_data(self, user_id: int):
         # save preference
         new_theme = int(self.default_theme.value)
         old_theme = self.preference.theme
@@ -79,7 +84,13 @@ class GeneralPreference(ft.Container):
         self.preference.save()
         self.__change_theme()
         self.__refresh_language()
-        
+        OperationLog.create(
+            user_id=user_id,
+            utc_date_time=gdata.utc_date_time,
+            operation_type=OperationType.GENERAL_PREFERENCE,
+            operation_content=model_to_dict(self.preference)
+        )
+
         if old_theme != new_theme or old_language != new_language:
             self.__refresh_page()
 

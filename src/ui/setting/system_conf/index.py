@@ -5,7 +5,6 @@ from ui.common.toast import Toast
 from ui.setting.system_conf.system_conf_settings import SystemConfSettings
 from ui.setting.system_conf.system_conf_ship_info import SystemConfShipInfo
 
-
 class SystemConf(ft.Container):
     def __init__(self):
         super().__init__()
@@ -36,11 +35,11 @@ class SystemConf(ft.Container):
     def __on_save_button_click(self, e):
         self.page.open(PermissionCheck(self.__save_data, 0))
 
-    def __save_data(self):
+    def __save_data(self, user_id: int):
         try:
             keyboard.close()
-            self.system_conf_settings.save()
-            self.system_conf_ship_info.save()
+            self.system_conf_settings.save(user_id)
+            self.system_conf_ship_info.save(user_id)
             Toast.show_success(self.page)
         except Exception as e:
             Toast.show_error(self.page, e)

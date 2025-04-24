@@ -13,7 +13,7 @@ class EventList(ft.Container):
 
     def __create(self):
         search = DatetimeSearch(self.on_search)
-        self.table = EventTable(10, table_width=1500)
+        self.table = EventTable()
 
         return ft.Column(
             expand=True,

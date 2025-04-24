@@ -4,6 +4,10 @@ from db.models.limitations import Limitations
 from ui.common.custom_card import CustomCard
 from utils.unit_converter import UnitConverter
 from ui.common.keyboard import keyboard
+from db.models.opearation_log import OperationLog
+from common.operation_type import OperationType
+from common.global_data import gdata
+from playhouse.shortcuts import model_to_dict
 
 class GeneralLimitationMax(ft.Container):
     def __init__(self, system_unit: int):
@@ -57,7 +61,7 @@ class GeneralLimitationMax(ft.Container):
 
         self.content.update()
 
-    def save_data(self):
+    def save_data(self, user_id: int):
         # save limitations
         max_speed = float(self.speed_max.value or 0)
         max_torque = float(self.torque_max.value or 0)
@@ -80,5 +84,11 @@ class GeneralLimitationMax(ft.Container):
             speed_max=max_speed
         ).where(Limitations.id == self.limitations.id).execute()
 
+        OperationLog.create(
+            user_id=user_id,
+            utc_date_time=gdata.utc_date_time,
+            operation_type=OperationType.GENERAL_LIMITATION_MAX,
+            operation_content=model_to_dict(self.limitations)
+        )
     def did_mount(self):
         self.update_unit(self.system_unit)

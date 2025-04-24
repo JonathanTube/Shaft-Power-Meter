@@ -1,18 +1,17 @@
 from abc import abstractmethod
-from typing import final
 import flet as ft
 from ui.common.pagination import Pagination
 
 
 class AbstractTable(ft.Container):
-    def __init__(self, page_size: int = 10, table_width: int = None, show_checkbox_column: bool = False):
+    def __init__(self):
         super().__init__()
         self.expand = True
         self.margin = 0
         self.current_page = 1
-        self.page_size = page_size
-        self.table_width = table_width
-        self.show_checkbox_column = show_checkbox_column
+        self.page_size = 10
+        self.table_width = None
+        self.show_checkbox_column = False
         self.kwargs = {}  # 其他传入的参数
 
         self.pg = Pagination(self.page_size, self.__on_page_change)
@@ -23,8 +22,8 @@ class AbstractTable(ft.Container):
         self.__create_table_rows()
 
     def build(self):
-        self.default_width = self.page.window.width - \
-            35 if self.table_width is None else self.table_width
+        # self.default_width = self.page.window.width - \
+        #     35 if self.table_width is None else self.table_width
         self.__create_table()
 
         col = ft.Column(
@@ -53,12 +52,12 @@ class AbstractTable(ft.Container):
     def __create_table(self):
         self.data_table = ft.DataTable(
             show_checkbox_column=self.show_checkbox_column,
-            width=self.default_width,
+            width=self.table_width,
             expand=True,
             heading_row_height=40,
             heading_row_color=ft.Colors.SURFACE_CONTAINER_HIGHEST,
             data_row_min_height=30,
-            # vertical_lines=ft.BorderSide(0.5, ft.Colors.INVERSE_SURFACE),     
+            # vertical_lines=ft.BorderSide(0.5, ft.Colors.INVERSE_SURFACE),
             # horizontal_lines=ft.BorderSide(0.5, ft.Colors.INVERSE_SURFACE),
             columns=[ft.DataColumn(ft.Text("No Data"))],
             rows=[])

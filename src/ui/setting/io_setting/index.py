@@ -10,6 +10,10 @@ from ui.setting.io_setting.io_setting_sps1 import IOSettingSPS1
 from ui.setting.io_setting.io_setting_output import IOSettingOutput
 from ui.setting.io_setting.io_setting_factor import IOSettingFactor
 from ui.setting.io_setting.io_setting_sps2 import IOSettingSPS2
+from db.models.opearation_log import OperationLog
+from common.operation_type import OperationType
+from common.global_data import gdata
+from playhouse.shortcuts import model_to_dict
 from ui.common.keyboard import keyboard
 
 
@@ -51,7 +55,7 @@ class IOSetting(ft.Container):
         keyboard.close()
         self.page.open(PermissionCheck(self.__save_data, 2))
 
-    def __save_data(self):
+    def __save_data(self, user_id: int):
         try:
             keyboard.close()
             self.__write_to_plc()
@@ -59,8 +63,14 @@ class IOSetting(ft.Container):
             self.gps_conf.save_data()
             self.sps1_conf.save_data()
             self.sps2_conf.save_data()
-            self.factor_conf.save_data()
             self.output_conf.save_data()
+            self.factor_conf.save_data(user_id)
+            OperationLog.create(
+                user_id=user_id,
+                utc_date_time=gdata.utc_date_time,
+                operation_type=OperationType.IO_CONF,
+                operation_content=model_to_dict(self.conf)
+            )
             Toast.show_success(self.page)
         except Exception as err:
             Toast.show_error(self.page, err)

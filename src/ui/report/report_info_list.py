@@ -4,7 +4,6 @@ import flet as ft
 from ui.common.datetime_search import DatetimeSearch
 from ui.report.report_info_table import ReportInfoTable
 
-
 class ReportInfoList(ft.Container):
     def __init__(self):
         super().__init__()
@@ -13,7 +12,7 @@ class ReportInfoList(ft.Container):
 
     def build(self):
         search = DatetimeSearch(self.__on_search)
-        self.table = ReportInfoTable(10)
+        self.table = ReportInfoTable()
 
         self.content = ft.Column(
             expand=True,

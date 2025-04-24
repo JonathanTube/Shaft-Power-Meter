@@ -1,7 +1,12 @@
 import flet as ft
+from db.models.opearation_log import OperationLog
 from ui.common.toast import Toast
 from ui.setting.permission.permission_table import PermissionTable
 from db.models.user import User
+from ui.common.permission_check import PermissionCheck
+from common.operation_type import OperationType
+from common.global_data import gdata
+from playhouse.shortcuts import model_to_dict
 
 
 class Permission(ft.Container):
@@ -59,40 +64,52 @@ class Permission(ft.Container):
             ),
             actions=[
                 ft.TextButton(e.page.session.get("lang.button.cancel"), on_click=lambda e: e.page.close(self.add_dialog)),
-                ft.TextButton(e.page.session.get("lang.button.save"), on_click=lambda e: self.__on_add_user_confirm(e))
+                ft.TextButton(e.page.session.get("lang.button.save"), on_click=lambda e: self.__on_add_user_permission_check(e))
             ]
         )
         self.page.open(self.add_dialog)
 
-    def __on_add_user_confirm(self, e):
+    def __on_add_user_permission_check(self, e):
+        self.page.open(PermissionCheck(self.__on_add_user_confirm, 0, self.__on_add_user_cancel))
+
+    def __on_add_user_cancel(self, e):
+        self.page.open(self.add_dialog)
+
+    def __on_add_user_confirm(self, user_id: int):
         if self.__is_empty(self.user_name.value):
-            Toast.show_warning(e.page, e.page.session.get("lang.permission.user_name_required"))
+            Toast.show_warning(self.page, self.page.session.get("lang.permission.user_name_required"))
             return
 
         if self.__is_empty(self.password.value):
-            Toast.show_warning(e.page, e.page.session.get("lang.permission.user_pwd_required"))
+            Toast.show_warning(self.page, self.page.session.get("lang.permission.user_pwd_required"))
             return
 
         if self.__is_empty(self.confirm_password.value):
-            Toast.show_warning(e.page, e.page.session.get("lang.permission.confirm_user_pwd_required"))
+            Toast.show_warning(self.page, self.page.session.get("lang.permission.confirm_user_pwd_required"))
             return
 
         if self.role.value == None:
-            Toast.show_warning(e.page, e.page.session.get("lang.permission.user_role_required"))
+            Toast.show_warning(self.page, self.page.session.get("lang.permission.user_role_required"))
             return
 
         if self.password.value.strip() != self.confirm_password.value.strip():
-            Toast.show_warning(e.page, e.page.session.get("lang.permission.password_not_match"))
+            Toast.show_warning(self.page, self.page.session.get("lang.permission.password_not_match"))
             return
 
         if User.select().where(User.user_name == self.user_name.value.strip()).count() > 0:
-            Toast.show_warning(e.page, e.page.session.get("lang.permission.user_name_exists"))
+            Toast.show_warning(self.page, self.page.session.get("lang.permission.user_name_exists"))
             return
 
-        User.create(
+        user = User.create(
             user_name=self.user_name.value.strip(),
             user_pwd=self.password.value.strip(),
             user_role=self.role.value
+        )
+        OperationLog.create(
+            user_id=user_id,
+            utc_date_time=gdata.utc_date_time,
+            operation_type=OperationType.USER_ADD,
+            operation_content=model_to_dict(User.select(User.id, User.user_name).where(User.id == user.id).get())
         )
         self.page.close(self.add_dialog)
         self.permission_table.search(role=self.dropdown.value)

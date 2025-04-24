@@ -10,6 +10,11 @@ from ui.common.toast import Toast
 from ui.common.permission_check import PermissionCheck
 from common.control_manager import ControlManager
 from common.global_data import gdata
+from db.models.opearation_log import OperationLog
+from common.operation_type import OperationType
+from common.global_data import gdata
+from playhouse.shortcuts import model_to_dict
+
 
 class TestMode(ft.Container):
     def __init__(self):
@@ -21,6 +26,9 @@ class TestMode(ft.Container):
     def __on_start_button_click(self, e):
         self.page.open(PermissionCheck(self.start_test_mode, 0))
 
+    def __on_stop_button_click(self, e):
+        self.page.open(PermissionCheck(self.stop_test_mode, 0))
+
     def build(self):
         s = self.page.session
         self.dlg_stop_modal = ft.AlertDialog(
@@ -28,7 +36,7 @@ class TestMode(ft.Container):
             title=ft.Text(s.get("lang.setting.test_mode.please_confirm")),
             content=None,
             actions=[
-                ft.TextButton(s.get("lang.button.confirm"), on_click=lambda e: self.stop_test_mode(e)),
+                ft.TextButton(s.get("lang.button.confirm"), on_click=lambda e: self.__on_stop_button_click(e)),
                 ft.TextButton(s.get("lang.button.cancel"), on_click=lambda e: e.page.close(self.dlg_stop_modal))
             ]
         )
@@ -79,7 +87,7 @@ class TestMode(ft.Container):
         else:
             return UnitConverter.t_to_n(value)
 
-    def start_test_mode(self):
+    def start_test_mode(self, user_id: int):
         if self.running:
             return
 
@@ -94,9 +102,15 @@ class TestMode(ft.Container):
         self.stop_button.visible = True
         self.stop_button.update()
 
+        OperationLog.create(
+            user_id=user_id,
+            utc_date_time=gdata.utc_date_time,
+            operation_type=OperationType.TEST_MODE_CONF,
+            operation_content='started test mode'
+        )
         Toast.show_success(self.page)
 
-    def stop_test_mode(self, e):
+    def stop_test_mode(self, user_id: int):
         if not self.running:
             return
 
@@ -109,6 +123,13 @@ class TestMode(ft.Container):
         self.start_button.update()
         self.stop_button.visible = False
         self.stop_button.update()
+
+        OperationLog.create(
+            user_id=user_id,
+            utc_date_time=gdata.utc_date_time,
+            operation_type=OperationType.TEST_MODE_CONF,
+            operation_content='stopped test mode'
+        )
 
         ControlManager.on_eexi_power_breach_recovery()
         Toast.show_success(self.page)

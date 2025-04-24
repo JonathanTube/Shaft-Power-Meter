@@ -5,13 +5,14 @@ from db.models.report_info import ReportInfo
 from ui.common.toast import Toast
 from ui.report.report_info_detail import ReportInfoDialog
 from ui.report.report_info_exporter import ReportInfoExporter
+from common.global_data import gdata
 
 
 class ReportInfoTable(AbstractTable):
-    def __init__(self, page_size: int = 10):
-        super().__init__(page_size)
+    def __init__(self):
+        super().__init__()
         self.file_picker = None
-        self.width = 1000
+        self.table_width = gdata.default_table_width
 
     def load_total(self):
         start_date = self.kwargs.get('start_date')

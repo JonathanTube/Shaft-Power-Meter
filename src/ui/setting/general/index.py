@@ -8,6 +8,7 @@ from ui.common.toast import Toast
 from ui.common.permission_check import PermissionCheck
 from ui.common.keyboard import keyboard
 
+
 class General(ft.Container):
     def __init__(self):
         super().__init__()
@@ -19,12 +20,12 @@ class General(ft.Container):
         keyboard.close()
         self.page.open(PermissionCheck(self.__save_data, 2))
 
-    def __save_data(self):
+    def __save_data(self, user_id: int):
         try:
-            self.general_preference.save_data()
-            self.limitation_max.save_data()
-            self.limitation_warning.save_data()
-            self.general_date_time.save_data()
+            self.general_preference.save_data(user_id)
+            self.limitation_max.save_data(user_id)
+            self.limitation_warning.save_data(user_id)
+            self.general_date_time.save_data(user_id)
         except Exception as e:
             Toast.show_error(self.page, e)
         else:

@@ -3,8 +3,11 @@ import flet as ft
 from ui.common.custom_card import CustomCard
 from db.models.limitations import Limitations
 from utils.unit_converter import UnitConverter
+from db.models.opearation_log import OperationLog
+from common.operation_type import OperationType
+from playhouse.shortcuts import model_to_dict
 from ui.common.keyboard import keyboard
-
+from common.global_data import gdata
 
 class GeneralLimitationWarning(ft.Container):
     def __init__(self, system_unit: int):
@@ -58,7 +61,7 @@ class GeneralLimitationWarning(ft.Container):
 
         self.content.update()
 
-    def save_data(self):
+    def save_data(self, user_id: int):
         warning_speed = float(self.speed_warning.value or 0)
         warning_torque = float(self.torque_warning.value or 0)
         warning_power = float(self.power_warning.value or 0)
@@ -80,5 +83,11 @@ class GeneralLimitationWarning(ft.Container):
             speed_warning=warning_speed
         ).where(Limitations.id == self.limitations.id).execute()
 
+        OperationLog.create(
+            user_id=user_id,
+            utc_date_time=gdata.utc_date_time,
+            operation_type=OperationType.GENERAL_LIMITATION_WARNING,
+            operation_content=model_to_dict(self.limitations)
+        )
     def did_mount(self):
         self.update_unit(self.system_unit)

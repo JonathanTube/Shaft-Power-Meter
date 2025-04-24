@@ -1,9 +1,14 @@
 from common.const_alarm_type import AlarmType
 from ui.common.abstract_table import AbstractTable
 from db.models.alarm_log import AlarmLog
+from common.global_data import gdata
 
 
 class AlarmTable(AbstractTable):
+    def __init__(self):
+        super().__init__()
+        self.show_checkbox_column = True
+        self.table_width = gdata.default_table_width
 
     def load_total(self):
         start_date = self.kwargs.get('start_date')

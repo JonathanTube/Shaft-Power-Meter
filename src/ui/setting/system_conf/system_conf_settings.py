@@ -1,10 +1,13 @@
 import flet as ft
+from db.models.opearation_log import OperationLog
 from db.models.preference import Preference
 from db.models.system_settings import SystemSettings
 from ui.common.custom_card import CustomCard
 from utils.unit_converter import UnitConverter
 from ui.common.keyboard import keyboard
-
+from common.operation_type import OperationType
+from common.global_data import gdata
+from playhouse.shortcuts import model_to_dict
 
 class SystemConfSettings(CustomCard):
     def __init__(self):
@@ -99,7 +102,7 @@ class SystemConfSettings(CustomCard):
         else:
             return (UnitConverter.w_to_shp(_eexi_limited_power), "hp")
 
-    def save(self):
+    def save(self, user_id: int):
         self.system_settings.amount_of_propeller = self.amount_of_propeller_radios.value
         self.system_settings.display_thrust = self.display_thrust.value
         self.system_settings.sha_po_li = self.sha_po_li.value
@@ -113,3 +116,10 @@ class SystemConfSettings(CustomCard):
         self.system_settings.eexi_breach_checking_duration = self.eexi_breach_checking_duration.value
 
         self.system_settings.save()
+
+        OperationLog.create(
+            user_id=user_id,
+            utc_date_time=gdata.utc_date_time,
+            operation_type=OperationType.SYSTEM_CONF_SETTING,
+            operation_content=model_to_dict(self.system_settings)
+        )

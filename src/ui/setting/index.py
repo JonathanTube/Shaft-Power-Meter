@@ -1,5 +1,4 @@
 import flet as ft
-from ui.common.permission_check import PermissionCheck
 from ui.setting.general.index import General
 from ui.setting.propeller_conf.index import PropellerConf
 from ui.setting.self_test import SelfTest
@@ -32,15 +31,10 @@ class Setting(ft.Container):
         elif idx == 5:
             self.right_content.content = SelfTest()
         elif idx == 6:
-            self.page.open(PermissionCheck(self.__after_permission_check, 0, closable=False))
-            self.right_content.content = None
+            self.right_content.content = Permission()
         elif idx == 7:
             self.right_content.content = TestMode()
 
-        self.right_content.update()
-
-    def __after_permission_check(self):
-        self.right_content.content = Permission()
         self.right_content.update()
 
     def build(self):
