@@ -51,7 +51,7 @@ class PermissionCheck(ft.AlertDialog):
             Toast.show_error(self.page, s.get("lang.permission.user_name_and_pwd_are_required"))
             return
 
-        user: User = User.select().where(User.user_role <= self.user_role and User.user_name == user_name).first()
+        user: User = User.select().where(User.user_role <= self.user_role, User.user_name == user_name).first()
 
         if user is None:
             Toast.show_error(self.page, s.get("lang.permission.user_name_or_pwd_is_incorrect"))

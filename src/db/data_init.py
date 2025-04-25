@@ -1349,6 +1349,51 @@ class DataInit:
                     "english": "Please select at least one alarm"
                 },
                 {
+                    "code": "lang.event.reason_for_power_reserve_breach",
+                    "chinese": "功率突破原因",
+                    "english": "Reason for Power Reserve Breach"
+                },
+                {
+                    "code": "lang.event.date_time_of_power_reserve_breach",
+                    "chinese": "功率突破时间",
+                    "english": "Date/Time of Power Reserve Breach"
+                },
+                {
+                    "code": "lang.event.ship_position_of_power_reserve_breach",
+                    "chinese": "功率突破时的位置",
+                    "english": "Ship Position of Power Reserve Breach"
+                },
+                {
+                    "code": "lang.event.date_time_when_returning_to_limited_power",
+                    "chinese": "功率恢复时间",
+                    "english": "Date/Time when Returning to Limited Power"
+                },
+                {
+                    "code": "lang.event.ship_position_when_returning_to_limited_power",
+                    "chinese": "功率恢复时的位置",
+                    "english": "Ship Position when Returning to Limited Power"
+                },
+                {
+                    "code": "lang.event.note",
+                    "chinese": "备注",
+                    "english": "Note"
+                },
+                {
+                    "code": "lang.event.ice_condition",
+                    "chinese": "冰况",
+                    "english": "Ice Condition"
+                },
+                {
+                    "code": "lang.event.wave_height",
+                    "chinese": "浪高",
+                    "english": "Wave Height"
+                },
+                {
+                    "code": "lang.event.beaufort_number",
+                    "chinese": "风级",
+                    "english": "Beaufort Number"
+                },
+                {
                     "code": "lang.permission.user_name",
                     "chinese": "用户名",
                     "english": "User Name"

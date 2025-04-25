@@ -60,11 +60,13 @@ class FullscreenAlert(ft.Container):
 
     def stop(self):
         self.running = False
+        self.visible = False
+        self.update()
         if self.task:
             self.task.cancel()
 
     async def blink(self):
         while self.running:
-            await asyncio.sleep(2)
+            await asyncio.sleep(1)
             self.visible = not self.visible
             self.update()

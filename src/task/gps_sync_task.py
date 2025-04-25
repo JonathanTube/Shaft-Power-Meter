@@ -59,7 +59,7 @@ class GpsSyncTask:
                 await asyncio.sleep(delay)
 
     def __create_alarm_log(self):
-        cnt: int = AlarmLog.select().where((AlarmLog.alarm_type == AlarmType.GPS_DISCONNECTED) & (AlarmLog.acknowledge_time == None)).count()
+        cnt: int = AlarmLog.select().where(AlarmLog.alarm_type == AlarmType.GPS_DISCONNECTED, AlarmLog.acknowledge_time == None).count()
         if cnt == 0:
             AlarmLog.create(utc_date_time=gdata.utc_date_time, alarm_type=AlarmType.GPS_DISCONNECTED)
 
@@ -101,7 +101,7 @@ class GpsSyncTask:
     def parse_nmea_sentence(self, sentence):
         try:
             # delete invalid data(4 weeks * 3 = 12 weeks ago)
-            GpsLog.delete().where(GpsLog.utc_date_time < gdata.utc_date_time - timedelta(weeks=4 * 3))
+            GpsLog.delete().where(GpsLog.utc_date_time < (gdata.utc_date_time - timedelta(weeks=4 * 3)))
             msg = pynmea2.parse(sentence)
             if isinstance(msg, pynmea2.types.talker.RMC):
                 utc_date = msg.datestamp

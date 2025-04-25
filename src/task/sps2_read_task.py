@@ -76,7 +76,7 @@ class Sps2ReadTask:
             self.__send_msg(f"Error connecting to sps: {e}")
 
     def __create_alarm_log(self):
-        cnt: int = AlarmLog.select().where((AlarmLog.alarm_type == AlarmType.SPS2_DISCONNECTED) & (AlarmLog.acknowledge_time == None)).count()
+        cnt: int = AlarmLog.select().where(AlarmLog.alarm_type == AlarmType.SPS2_DISCONNECTED, AlarmLog.acknowledge_time == None).count()
 
         if cnt == 0:
             AlarmLog.create(

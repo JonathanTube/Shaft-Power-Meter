@@ -43,6 +43,9 @@ class EventTable(AbstractTable):
                 item.started_position,
                 item.ended_at,
                 item.ended_position,
+                item.beaufort_number,
+                item.wave_height,
+                item.ice_condition,
                 item.acknowledged_at,
                 item.note
                 ] for item in data]
@@ -56,6 +59,9 @@ class EventTable(AbstractTable):
             session.get("lang.common.start_position"),
             session.get("lang.common.end_date"),
             session.get("lang.common.end_position"),
+            session.get("lang.event.beaufort_number"),
+            session.get("lang.event.wave_height"),
+            session.get("lang.event.ice_condition"),
             session.get("lang.common.acknowledged_at"),
             session.get("lang.common.note")
         ]
@@ -75,9 +81,7 @@ class EventTable(AbstractTable):
                 icon_color=ft.Colors.RED,
                 icon_size=20,
                 visible=show_reason,
-                on_click=lambda e: self.page.open(
-                    EventForm(items[0], self.__update_table)
-                )
+                on_click=lambda e: self.page.open(EventForm(items[0], self.__update_table))
             ),
             ft.IconButton(
                 icon=ft.icons.NOTE,

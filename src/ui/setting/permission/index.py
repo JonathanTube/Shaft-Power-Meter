@@ -36,7 +36,11 @@ class Permission(ft.Container):
             on_change=self.__on_dropdown_change
         )
 
-        self.add_user_button = ft.OutlinedButton(text=self.page.session.get("lang.permission.add_user"), on_click=self.__on_add_user)
+        self.add_user_button = ft.OutlinedButton(
+            text=self.page.session.get("lang.permission.add_user"),
+            height=45,
+            on_click=self.__on_add_user
+        )
         self.permission_table = PermissionTable(user)
         self.content = ft.Column([ft.Row([self.dropdown, self.add_user_button]), self.permission_table])
         self.update()

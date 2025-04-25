@@ -61,10 +61,9 @@ class Setting(ft.Container):
         s = self.page.session
         self.system_conf = ft.NavigationRailDestination(icon=ft.Icons.SETTINGS_OUTLINED, selected_icon=ft.Icons.SETTINGS, label=s.get("lang.setting.system_conf.title"))
         self.general = ft.NavigationRailDestination(icon=ft.Icon(ft.Icons.TUNE_OUTLINED), selected_icon=ft.Icon(ft.Icons.TUNE), label=s.get("lang.setting.general.title"))
-        self.propeller_setting = ft.NavigationRailDestination(icon=ft.Icons.INSIGHTS_OUTLINED, selected_icon=ft.Icon(
-            ft.Icons.INSIGHTS), label=s.get("lang.setting.propeller_setting.title"), visible=gdata.display_propeller_curve)
+        self.propeller_conf = ft.NavigationRailDestination(icon=ft.Icons.INSIGHTS_OUTLINED, selected_icon=ft.Icon(ft.Icons.INSIGHTS), label=s.get("lang.setting.propeller_setting.title"), visible=gdata.display_propeller_curve)
+        ControlManager.propeller_conf = self.propeller_conf
         self.zero_cal = ft.NavigationRailDestination(icon=ft.Icons.SWITCH_ACCESS_SHORTCUT_OUTLINED, selected_icon=ft.Icon(ft.Icons.SWITCH_ACCESS_SHORTCUT), label=s.get("lang.setting.zero_cal.title"))
-        ControlManager.zero_cal = self.zero_cal
         self.io_conf = ft.NavigationRailDestination(icon=ft.Icons.USB_OUTLINED, selected_icon=ft.Icon(ft.Icons.USB), label=s.get("lang.setting.io_conf.title"))
         self.self_test = ft.NavigationRailDestination(icon=ft.Icons.ASSIGNMENT_OUTLINED, selected_icon=ft.Icon(ft.Icons.ASSIGNMENT), label=s.get("lang.setting.self_test.title"))
         self.permission_conf = ft.NavigationRailDestination(icon=ft.Icons.MANAGE_ACCOUNTS_OUTLINED, selected_icon=ft.Icon(ft.Icons.MANAGE_ACCOUNTS), label=s.get("lang.setting.permission_conf.title"))
@@ -76,7 +75,7 @@ class Setting(ft.Container):
             destinations=[
                 self.system_conf,
                 self.general,
-                self.propeller_setting,
+                self.propeller_conf,
                 self.zero_cal,
                 self.io_conf,
                 self.self_test,

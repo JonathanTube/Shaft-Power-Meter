@@ -15,8 +15,7 @@ class AlarmTable(AbstractTable):
         end_date = self.kwargs.get('end_date')
         sql = AlarmLog.select()
         if start_date and end_date:
-            sql = sql.where(AlarmLog.utc_date_time >= start_date,
-                            AlarmLog.utc_date_time <= end_date)
+            sql = sql.where(AlarmLog.utc_date_time >= start_date, AlarmLog.utc_date_time <= end_date)
 
         return sql.count()
 
@@ -48,8 +47,7 @@ class AlarmTable(AbstractTable):
         start_date = self.kwargs.get('start_date')
         end_date = self.kwargs.get('end_date')
         if start_date and end_date:
-            sql = sql.where(AlarmLog.utc_date_time >= start_date,
-                            AlarmLog.utc_date_time <= end_date)
+            sql = sql.where(AlarmLog.utc_date_time >= start_date, AlarmLog.utc_date_time <= end_date)
         data = sql.order_by(AlarmLog.id.desc()).paginate(
             self.current_page, self.page_size)
 

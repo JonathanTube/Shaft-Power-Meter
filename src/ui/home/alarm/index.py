@@ -49,10 +49,19 @@ class AlarmList(ft.Container):
             end_date = self.search.date_time_range.end_date.value
             # print(start_date, end_date)
             if start_date and end_date:
-                query = AlarmLog.select(AlarmLog.utc_date_time, AlarmLog.alarm_type, AlarmLog.acknowledge_time).where(
-                    AlarmLog.utc_date_time >= start_date & AlarmLog.utc_date_time <= end_date).order_by(AlarmLog.id.desc()).limit(1000)
+                query = AlarmLog.select(
+                    AlarmLog.utc_date_time,
+                    AlarmLog.alarm_type, AlarmLog.acknowledge_time
+                ).where(
+                    AlarmLog.utc_date_time >= start_date,
+                    AlarmLog.utc_date_time <= end_date
+                ).order_by(AlarmLog.id.desc()).limit(1000)
             else:
-                query = AlarmLog.select(AlarmLog.utc_date_time, AlarmLog.alarm_type, AlarmLog.acknowledge_time).order_by(AlarmLog.id.desc()).limit(1000)
+                query = AlarmLog.select(
+                    AlarmLog.utc_date_time,
+                    AlarmLog.alarm_type,
+                    AlarmLog.acknowledge_time
+                ).order_by(AlarmLog.id.desc()).limit(1000)
             data = []
             for item in query:
                 data.append({
