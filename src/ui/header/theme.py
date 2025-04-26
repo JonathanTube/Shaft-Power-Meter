@@ -1,3 +1,4 @@
+import os
 import subprocess
 import flet as ft
 import screen_brightness_control as sbc
@@ -11,10 +12,24 @@ class Theme(ft.Container):
     def __init__(self):
         super().__init__()
         self.margin = ft.margin.symmetric(horizontal=20)
-        self.abc_works = False
 
     def build(self):
-        self.brightness = ft.Text(f"{sbc.get_brightness()}%", size=30, weight=ft.FontWeight.W_500)
+        self.content = ft.Row([
+            ft.IconButton(icon=ft.Icons.LIGHT_MODE, on_click=self.toggle_theme),
+            ft.IconButton(icon=ft.icons.SETTINGS_BRIGHTNESS, on_click=self.show_dlg)
+        ])
+
+    def toggle_theme(self, e):
+        if self.page.theme_mode == ft.ThemeMode.LIGHT:
+            self.page.theme_mode = ft.ThemeMode.DARK
+            self.icon = ft.Icons.DARK_MODE
+        else:
+            self.page.theme_mode = ft.ThemeMode.LIGHT
+            self.icon = ft.Icons.LIGHT_MODE
+        self.page.update()
+
+    def build_dlg(self):
+        self.brightness = ft.Text(f"{100}%", size=30, weight=ft.FontWeight.W_500)
         self.dlg = ft.AlertDialog(
             alignment=ft.alignment.center,
             content=ft.Container(
@@ -41,28 +56,18 @@ class Theme(ft.Container):
                         ])
                     ])
             ))
-        self.content = ft.Row([
-            ft.IconButton(icon=ft.Icons.LIGHT_MODE, on_click=self.toggle_theme),
-            ft.IconButton(icon=ft.icons.SETTINGS_BRIGHTNESS, on_click=self.show_dlg)
-        ])
-
-    def toggle_theme(self, e):
-        if self.page.theme_mode == ft.ThemeMode.LIGHT:
-            self.page.theme_mode = ft.ThemeMode.DARK
-            self.icon = ft.Icons.DARK_MODE
-        else:
-            self.page.theme_mode = ft.ThemeMode.LIGHT
-            self.icon = ft.Icons.LIGHT_MODE
-        self.page.update()
 
     def show_dlg(self, e):
-        if self.abc_works:
-            e.page.open(self.dlg)
-        else:
+        if os.path.exists(default_avd):
             try:
                 subprocess.Popen(default_avd)
             except Exception as e:
                 Toast.show_error(self.page, f"the AdvBrightnessUtility.exe should be installed at {default_avd}")
+        else:
+            self.build_dlg()
+            # brightness = sbc.get_brightness() 太卡，去掉
+            # self.brightness.value = f"{brightness}%"
+            e.page.open(self.dlg)
 
     def __slider_changed(self, e):
         sbc.set_brightness(e.control.value)
