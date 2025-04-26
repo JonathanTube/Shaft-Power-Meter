@@ -14,6 +14,10 @@ class GlobalData:
 
         # 是否开启shapoli功能
         self.enable_shapoli = False
+        # 功率过载告警持续时间
+        self.checking_continuous_interval: int = 60
+        # 功率过载告警限制
+        self.eexi_limited_power = 0
         # 螺旋桨数量
         self.amount_of_propeller = 1
         # 是否开启功率过载告警
@@ -61,7 +65,8 @@ class GlobalData:
         self.enable_shapoli = systemSettings.sha_po_li
         self.amount_of_propeller = systemSettings.amount_of_propeller
         self.display_propeller_curve = systemSettings.display_propeller_curve
-
+        self.checking_continuous_interval = systemSettings.eexi_breach_checking_duration
+        self.eexi_limited_power = systemSettings.eexi_limited_power
 
         propellerSetting: PropellerSetting = PropellerSetting.get()
         self.enable_power_overload_alarm = propellerSetting.alarm_enabled_of_overload_curve
