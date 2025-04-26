@@ -25,7 +25,7 @@ from db.base import db
 class TableInit:
     @staticmethod
     def init():
-        db.drop_tables([Language], safe=False)
+        # db.drop_tables([Language], safe=False)
         # db.drop_tables([IOConf], safe=False)
         # db.drop_tables([DataLog], safe=False)
         # db.drop_tables([EventLog], safe=False)

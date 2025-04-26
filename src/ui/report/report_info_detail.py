@@ -1,4 +1,5 @@
 import flet as ft
+from db.models.event_log import EventLog
 from db.models.report_info import ReportInfo
 from db.models.ship_info import ShipInfo
 from db.models.propeller_setting import PropellerSetting
@@ -37,14 +38,13 @@ class ReportInfoDialog(ft.AlertDialog):
         self.__load_data()
 
     def __load_data(self):
-        self.ship_info = ShipInfo.get()
-        self.propeller_setting = PropellerSetting.get()
-        self.preference = Preference.get()
-        self.system_settings = SystemSettings.get()
-        self.report_info = ReportInfo.get_by_id(self.id)
-        self.event_log = self.report_info.event_log
-        self.report_details = ReportDetail.select().where(
-            ReportDetail.report_info == self.report_info.id).order_by(ReportDetail.id.asc())
+        self.ship_info: ShipInfo = ShipInfo.get()
+        self.propeller_setting: PropellerSetting = PropellerSetting.get()
+        self.preference: Preference = Preference.get()
+        self.system_settings: SystemSettings = SystemSettings.get()
+        self.report_info: ReportInfo = ReportInfo.get_by_id(self.id)
+        self.event_log: EventLog = self.report_info.event_log
+        self.report_details: list[ReportDetail] = ReportDetail.select().where(ReportDetail.report_info == self.report_info.id).order_by(ReportDetail.id.asc())
 
     def __create_label(self, text, col=4):
         return ft.Text(text, col=col, text_align=ft.TextAlign.LEFT, weight=ft.FontWeight.W_500)
@@ -62,7 +62,7 @@ class ReportInfoDialog(ft.AlertDialog):
         )
 
     def __create_basic_info(self):
-        unlimited_power = self.propeller_setting.shaft_power_of_mcr_operating_point
+        unlimited_power = self.propeller_setting.power_of_mcr
         limited_power = self.system_settings.eexi_limited_power
         system_unit = self.preference.system_unit
         unlimited_power_value, unlimited_power_unit = UnitParser.parse_power(unlimited_power, system_unit, shrink=False)
@@ -107,7 +107,7 @@ class ReportInfoDialog(ft.AlertDialog):
             started_position = "N/A"
 
         if self.event_log.beaufort_number:
-            beaufort_number = self.event_log.beaufort_number    
+            beaufort_number = self.event_log.beaufort_number
         else:
             beaufort_number = "N/A"
 
@@ -170,14 +170,14 @@ class ReportInfoDialog(ft.AlertDialog):
             beaufort_number = "N/A"
 
         if self.event_log.wave_height:
-            wave_height = self.event_log.wave_height    
+            wave_height = self.event_log.wave_height
         else:
             wave_height = "N/A"
 
         if self.event_log.ice_condition:
             ice_condition = self.event_log.ice_condition
         else:
-            ice_condition = "N/A"   
+            ice_condition = "N/A"
 
         if self.event_log.breach_reason:
             reason = self.event_log.breach_reason.reason

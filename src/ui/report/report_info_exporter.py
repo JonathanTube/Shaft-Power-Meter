@@ -16,7 +16,7 @@ class ReportInfoExporter(FPDF):
 
     def __load_data(self, id: int):
         self.ship_info = ShipInfo.get()
-        self.propeller_setting = PropellerSetting.get()
+        self.propeller_setting: PropellerSetting = PropellerSetting.get()
         self.preference = Preference.get()
         self.system_settings = SystemSettings.get()
         self.report_info = ReportInfo.get_by_id(id)
@@ -63,13 +63,13 @@ class ReportInfoExporter(FPDF):
 
         system_unit = self.preference.system_unit
         self.__insert_label("Un-limited Power", w=self.per_cell_width)
-        unlimited_power = self.propeller_setting.shaft_power_of_mcr_operating_point
+        unlimited_power = self.propeller_setting.power_of_mcr
         unlimited_power, unlimited_unit = UnitParser.parse_power(unlimited_power, system_unit, shrink=False)
         self.__insert_value(f"{unlimited_power} {unlimited_unit}", w=self.per_cell_width)
 
         self.__insert_label("Limited Power", w=self.per_cell_width)
         limited_power = self.system_settings.eexi_limited_power
-        limited_power, limited_unit = UnitParser.parse_power(limited_power, system_unit, shrink=False)   
+        limited_power, limited_unit = UnitParser.parse_power(limited_power, system_unit, shrink=False)
         self.__insert_value(f"{limited_power} {limited_unit}", w=self.per_cell_width)
         self.ln()
 
@@ -114,8 +114,6 @@ class ReportInfoExporter(FPDF):
         self.set_font("Arial", '', 10)
         self.set_text_color(66, 66, 66)
 
-
-
         rows = []
         for report_detail in self.report_details:
             if report_detail.utc_date_time:
@@ -127,7 +125,6 @@ class ReportInfoExporter(FPDF):
             power, _ = UnitParser.parse_power(report_detail.power, system_unit, shrink=False)
             energy, _ = UnitParser.parse_energy(report_detail.total_power, system_unit)
 
-            
             rows.append([
                 str(report_detail.id),
                 utc_date_time,
