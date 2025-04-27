@@ -4,6 +4,7 @@ import numpy as np
 import flet as ft
 from flet.matplotlib_chart import MatplotlibChart
 from db.table_init import PropellerSetting
+from common.global_data import gdata
 
 matplotlib.use('Agg')  # 使用非GUI后端
 
@@ -47,8 +48,10 @@ class PropellerCurveDiagram(ft.Container):
         self.power_of_overload = ps.value_of_overload_curve
         self.color_of_overload = ps.line_color_of_overload_curve
 
-        self.sps1 = None
-        self.sps2 = None
+        self.sps1_point = None
+        self.sps2_point = None
+        self.sps1_text = None
+        self.sps2_text = None
 
     def build(self):
         self.chart = self.create_chart()
@@ -83,8 +86,10 @@ class PropellerCurveDiagram(ft.Container):
         self.handle_style(ax)
         # 优化布局
         fig.tight_layout()
-        self.sps1 = ax.scatter(0, 0, color='green', zorder=10, label='SPS1 Operating Point', s=30)
-        self.sps2 = ax.scatter(0, 0, color='lime', zorder=10, label='SPS2 Operating Point', s=30)
+        self.sps1_point = ax.scatter(0, 0, color='orange', zorder=10, label='SPS1 Operating Point', s=40)
+        self.sps1_text = ax.text(0, 0, 'SPS1', ha='center', va='bottom', fontsize=8)
+        self.sps2_point = ax.scatter(0, 0, color='purple', zorder=10, label='SPS2 Operating Point', s=40)
+        self.sps2_text = ax.text(0, 0, 'SPS2', ha='center', va='bottom', fontsize=8)
         return MatplotlibChart(fig, isolated=True, expand=True, transparent=True)
 
     def handle_style(self, ax):
@@ -166,17 +171,22 @@ class PropellerCurveDiagram(ft.Container):
         power_points = np.append(power_points, max_power_point)
         ax.plot(rpm_points, power_points, color=color, linewidth=1, linestyle='--', label='Overload Limit Curve')
 
-    def update_sps_points(self, sps1_x, sps1_y, sps2_x, sps2_y):
+    def update_sps_points(self):
         if self.rpm_of_mcr == 0 or self.power_of_mcr == 0:
             return
 
-        sps1_percent_rpm_of_mcr = sps1_x / self.rpm_of_mcr
-        sps1_percent_power_of_mcr = sps1_y / self.power_of_mcr
-        self.sps1.set_offsets([sps1_percent_rpm_of_mcr, sps1_percent_power_of_mcr])
+        sps1_percent_rpm_of_mcr = round(gdata.sps1_speed / self.rpm_of_mcr * 100, 2)
+        sps1_percent_power_of_mcr = round(gdata.sps1_power / self.power_of_mcr * 100, 2)
+        # print(f'sps1_percent_rpm_of_mcr={sps1_percent_rpm_of_mcr}, sps1_percent_power_of_mcr={sps1_percent_power_of_mcr}')
+        self.sps1_point.set_offsets([sps1_percent_rpm_of_mcr, sps1_percent_power_of_mcr])
+        self.sps1_text.set_x(sps1_percent_rpm_of_mcr)
+        self.sps1_text.set_y(sps1_percent_power_of_mcr + 1)
 
-        sps2_percent_rpm_of_mcr = sps2_x / self.rpm_of_mcr
-        sps2_percent_power_of_mcr = sps2_y / self.power_of_mcr
-
-        self.sps2.set_offsets([sps2_percent_rpm_of_mcr, sps2_percent_power_of_mcr])
+        sps2_percent_rpm_of_mcr = round(gdata.sps2_speed / self.rpm_of_mcr * 100, 2)
+        sps2_percent_power_of_mcr = round(gdata.sps2_power / self.power_of_mcr * 100, 2)
+        # print(f'sps2_percent_rpm_of_mcr={sps2_percent_rpm_of_mcr}, sps2_percent_power_of_mcr={sps2_percent_power_of_mcr}')
+        self.sps2_point.set_offsets([sps2_percent_rpm_of_mcr, sps2_percent_power_of_mcr])
+        self.sps2_text.set_x(sps2_percent_rpm_of_mcr)
+        self.sps2_text.set_y(sps2_percent_power_of_mcr + 1)
 
         self.chart.update()
