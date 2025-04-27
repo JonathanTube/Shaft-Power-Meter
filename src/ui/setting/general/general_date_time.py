@@ -8,6 +8,7 @@ from db.models.opearation_log import OperationLog
 from common.operation_type import OperationType
 from playhouse.shortcuts import model_to_dict
 
+
 class GeneralDateTime(ft.Container):
     def __init__(self):
         super().__init__()
@@ -18,12 +19,13 @@ class GeneralDateTime(ft.Container):
     def build(self):
         s = self.page.session
         utc_date_time = gdata.utc_date_time
+        print('utc_date_time=', utc_date_time)
         self.utc_date_time = ft.TextField(
             label=s.get("lang.setting.current_utc_date_time"),
             col={"md": 12},
             read_only=True,
             can_request_focus=False,
-            value=utc_date_time.strftime('%Y-%m-%d %H:%M')
+            value=utc_date_time
         )
 
         self.utc_date = ft.TextField(
@@ -51,13 +53,13 @@ class GeneralDateTime(ft.Container):
             )
         )
 
-        self.date_time_format = ft.Dropdown(
-            label=s.get("lang.setting.date_time_format"), col={"md": 6},
-            value=self.date_time_conf.date_time_format,
-            options=[ft.DropdownOption(key="YYYY-MM-dd HH:mm:ss"),
-                     ft.DropdownOption(key="YYYY/MM/dd HH:mm:ss"),
-                     ft.DropdownOption(key="dd/MM/YYYY HH:mm:ss"),
-                     ft.DropdownOption(key="MM/dd/YYYY HH:mm:ss")]
+        self.date_format = ft.Dropdown(
+            label=s.get("lang.setting.date_format"), col={"md": 6},
+            value=self.date_time_conf.date_format,
+            options=[ft.DropdownOption(text="YYYY-MM-dd", key="%Y-%m-%d"),
+                     ft.DropdownOption(text="YYYY/MM/dd", key="%Y/%m/%d"),
+                     ft.DropdownOption(text="dd/MM/YYYY", key="%d/%m/%Y"),
+                     ft.DropdownOption(text="MM/dd/YYYY", key="%m/%d/%Y")]
         )
 
         self.sync_with_gps = ft.Switch(
@@ -73,7 +75,7 @@ class GeneralDateTime(ft.Container):
                     self.utc_date_time,
                     self.utc_date,
                     self.utc_time,
-                    self.date_time_format,
+                    self.date_format,
                     self.sync_with_gps
                 ]
             ),
@@ -94,7 +96,7 @@ class GeneralDateTime(ft.Container):
         while True:
             if self.utc_date_time:
                 utc_date_time = gdata.utc_date_time
-                self.utc_date_time.value = utc_date_time.strftime('%Y-%m-%d %H:%M')
+                self.utc_date_time.value = utc_date_time.strftime(f'{self.date_time_conf.date_format} %H:%M')
                 self.utc_date_time.update()
             await asyncio.sleep(1)
 
@@ -112,7 +114,7 @@ class GeneralDateTime(ft.Container):
         self.date_time_conf.utc_date_time = datetime.strptime(f"{new_date} {new_time}:00", '%Y-%m-%d %H:%M:%S')
 
         self.date_time_conf.system_date_time = datetime.now()
-        self.date_time_conf.date_time_format = self.date_time_format.value
+        self.date_time_conf.date_format = self.date_format.value
         self.date_time_conf.sync_with_gps = self.sync_with_gps.value
         gdata.enable_utc_time_sync_with_gps = self.sync_with_gps.value
         self.date_time_conf.save()
@@ -126,4 +128,4 @@ class GeneralDateTime(ft.Container):
         new_date_time = f"{new_date} {new_time}:00"
         dt_format = '%Y-%m-%d %H:%M:%S'
         new_utc_date_time = datetime.strptime(new_date_time, dt_format)
-        gdata.utc_date_time = new_utc_date_time 
+        gdata.utc_date_time = new_utc_date_time

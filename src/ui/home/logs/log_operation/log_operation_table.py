@@ -1,9 +1,13 @@
 from db.models.opearation_log import OperationLog
+from db.models.date_time_conf import DateTimeConf
 from common.operation_type import OperationType
 from ui.common.abstract_table import AbstractTable
 
 
 class LogOperationTable(AbstractTable):
+    def __init__(self):
+        super().__init__()
+        self.dtc: DateTimeConf = DateTimeConf.get()
 
     def load_total(self):
         start_date = self.kwargs.get('start_date')
@@ -37,7 +41,7 @@ class LogOperationTable(AbstractTable):
         return [
             [
                 item.id,
-                item.utc_date_time,
+                item.utc_date_time.strftime(f'{self.dtc.date_format} %H:%M:%S'),
                 OperationType.get_operation_type_name(item.operation_type),
                 item.operation_content
             ] for item in data

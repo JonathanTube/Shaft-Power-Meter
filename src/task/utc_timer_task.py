@@ -18,9 +18,12 @@ class UtcTimer:
             gdata.utc_date_time = gdata.utc_date_time + timedelta(seconds=1)
             gdata.system_date_time = datetime.now()
 
-            self.date_time_conf.utc_date_time = gdata.utc_date_time
-            self.date_time_conf.system_date_time = gdata.system_date_time
-            self.date_time_conf.save()
+            DateTimeConf.update(
+                utc_date_time=gdata.utc_date_time,
+                system_date_time=gdata.system_date_time
+            ).where(
+                DateTimeConf.id == self.date_time_conf.id
+            ).execute()
 
             await asyncio.sleep(1)
 

@@ -17,6 +17,10 @@ from db.models.language import Language
 from ui.common.audio_alarm import AudioAlarm
 from task.task_manager import TaskManager
 from common.global_data import gdata
+from utils.auto_startup import add_to_startup
+
+# 加入开机启动
+add_to_startup()
 
 TableInit.init()
 DataInit.init()

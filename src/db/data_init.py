@@ -57,7 +57,7 @@ class DataInit:
                 utc_date_time=datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S"),
                 system_date_time=datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
                 sync_with_gps=False,
-                date_time_format="YYYY-MM-dd HH:mm:ss",
+                date_format="%Y-%m-%d",
             )
 
     def __init_ship_info():
@@ -876,9 +876,9 @@ class DataInit:
                 },
 
                 {
-                    "code": "lang.setting.date_time_format",
-                    "chinese": "日期时间格式",
-                    "english": "Date Time Format"
+                    "code": "lang.setting.date_format",
+                    "chinese": "日期格式",
+                    "english": "Date Format"
                 },
 
                 {

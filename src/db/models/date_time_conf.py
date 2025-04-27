@@ -10,7 +10,7 @@ class DateTimeConf(BaseModel):
 
     sync_with_gps = BooleanField(verbose_name="同步GPS日期时间", default=False)
 
-    date_time_format = CharField(verbose_name="日期时间格式", default="YYYY-MM-dd HH:mm:ss")
+    date_format = CharField(verbose_name="日期格式", default="YYYY-MM-dd")
 
     class Meta:
         table_name = 'date_time_conf'

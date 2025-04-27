@@ -1,11 +1,11 @@
-from peewee import IntegerField, DateField, TextField
+from peewee import IntegerField, DateTimeField, TextField
 from ..base import BaseModel
 
 
 class OperationLog(BaseModel):
     user_id = IntegerField(verbose_name="用户ID")
 
-    utc_date_time = DateField(verbose_name="UTC时间")
+    utc_date_time = DateTimeField(verbose_name="UTC时间")
 
     operation_type = IntegerField(verbose_name="操作类型")
 

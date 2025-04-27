@@ -26,8 +26,8 @@ class PermissionCheck(ft.AlertDialog):
     def build(self):
         s = self.page.session
         self.title = ft.Text(f"{self.get_role_name()}-{s.get('lang.permission.authentication')}")
-        self.user_name = ft.TextField(label=s.get("lang.permission.user_name"))
-        self.user_pwd = ft.TextField(label=s.get("lang.permission.user_pwd"), password=True, can_reveal_password=True)
+        self.user_name = ft.TextField(value="root", label=s.get("lang.permission.user_name"))
+        self.user_pwd = ft.TextField(value="root", label=s.get("lang.permission.user_pwd"), password=True, can_reveal_password=True)
         self.content = ft.Column(
             width=300,
             height=200,
