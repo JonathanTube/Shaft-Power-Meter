@@ -1264,9 +1264,9 @@ class DataInit:
                     "english": "Interval must be greater than 0"
                 },
                 {
-                    "code": "lang.trendview.cannot_search_more_than_30_days",
-                    "chinese": "不能搜索超过30天",
-                    "english": "Cannot search more than 30 days"
+                    "code": "lang.trendview.cannot_search_more_than_15_days",
+                    "chinese": "不能搜索超过15天",
+                    "english": "Cannot search more than 15 days"
                 },
                 {
                     "code": "lang.propeller_curve.mcr_operating_point",

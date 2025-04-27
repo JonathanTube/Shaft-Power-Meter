@@ -3,6 +3,7 @@ import subprocess
 import flet as ft
 import screen_brightness_control as sbc
 
+from common.control_manager import ControlManager
 from ui.common.toast import Toast
 
 default_avd = "C:\\Program Files (x86)\\Advantech\\Brightness\\Utility\\BIN\\AdvBrightnessUtility.exe"
@@ -26,6 +27,7 @@ class Theme(ft.Container):
         else:
             self.page.theme_mode = ft.ThemeMode.LIGHT
             self.icon = ft.Icons.LIGHT_MODE
+        ControlManager.on_theme_change()
         self.page.update()
 
     def build_dlg(self):

@@ -6,6 +6,9 @@ from ui.home.dashboard.sps_single.off.index import SingleShaPoLiOff
 from ui.home.dashboard.sps_dual.on.index import DualShaPoLiOn
 from ui.home.dashboard.sps_dual.off.index import DualShaPoLiOff
 from ui.home.event.event_button import EventButton
+from ui.home.propeller_curve.diagram import PropellerCurveDiagram
+from ui.home.trendview.diagram import TrendViewDiagram
+
 
 class ControlManager:
     audio_alarm: AudioAlarm | None = None
@@ -18,6 +21,8 @@ class ControlManager:
     sps_dual_off: DualShaPoLiOff | None = None
 
     propeller_conf: PropellerSetting | None = None
+    propeller_curve_diagram: PropellerCurveDiagram | None = None
+    trend_view_diagram: TrendViewDiagram | None = None
 
     @staticmethod
     def on_eexi_power_breach_occured():
@@ -35,9 +40,23 @@ class ControlManager:
     def on_instant_data_refresh():
         if ControlManager.sps_single_on is not None:
             ControlManager.sps_single_on.load_data()
+
         if ControlManager.sps_single_off is not None:
             ControlManager.sps_single_off.load_data()
+
         if ControlManager.sps_dual_on is not None:
             ControlManager.sps_dual_on.load_data()
+
         if ControlManager.sps_dual_off is not None:
             ControlManager.sps_dual_off.load_data()
+
+        if ControlManager.propeller_curve_diagram is not None:
+            ControlManager.propeller_curve_diagram.update_sps_points()
+
+    @staticmethod
+    def on_theme_change():
+        if ControlManager.propeller_curve_diagram is not None:
+            ControlManager.propeller_curve_diagram.update_style()
+
+        if ControlManager.trend_view_diagram is not None:
+            ControlManager.trend_view_diagram.update_style()
