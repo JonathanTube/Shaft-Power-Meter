@@ -435,8 +435,11 @@ class DataInit:
                     "chinese": "导出",
                     "english": "Export"
                 },
-
-
+                {
+                    "code": "lang.common.ip_address_format_error",
+                    "chinese": "IP地址格式错误",
+                    "english": "IP Address Format Error"
+                },
                 {
                     "code": "lang.header.home",
                     "chinese": "主页",

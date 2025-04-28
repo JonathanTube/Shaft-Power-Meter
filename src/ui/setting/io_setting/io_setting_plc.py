@@ -1,3 +1,4 @@
+import ipaddress
 import flet as ft
 from db.models.io_conf import IOConf
 from ui.common.custom_card import CustomCard
@@ -139,6 +140,11 @@ class IOSettingPLC(CustomCard):
         super().build()
 
     def save_data(self):
+        try:
+            ipaddress.ip_address(self.plc_ip.value)
+        except ValueError:
+            raise Exception(f'{self.page.session.get("lang.common.ip_address_format_error")}: {self.plc_ip.value}')
+
         self.conf.plc_ip = self.plc_ip.value
         self.conf.plc_port = self.plc_port.value
 

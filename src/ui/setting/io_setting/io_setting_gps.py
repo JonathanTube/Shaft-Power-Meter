@@ -1,3 +1,4 @@
+import ipaddress
 import flet as ft
 from db.models.io_conf import IOConf
 from ui.common.custom_card import CustomCard
@@ -32,5 +33,10 @@ class IOSettingGPS(CustomCard):
         super().build()
 
     def save_data(self):
+        try:
+            ipaddress.ip_address(self.gps_ip.value)
+        except ValueError:
+            raise Exception(f'{self.page.session.get("lang.common.ip_address_format_error")}: {self.gps_ip.value}')
+
         self.conf.gps_ip = self.gps_ip.value
         self.conf.gps_port = self.gps_port.value

@@ -1,4 +1,5 @@
 import flet as ft
+import subprocess
 from db.models.opearation_log import OperationLog
 from ui.common.permission_check import PermissionCheck
 from ui.common.toast import Toast
@@ -46,9 +47,9 @@ class Permission(ft.Container):
         self.update()
 
     def __on_add_user(self, e):
-        self.user_name = ft.TextField(label=e.page.session.get("lang.permission.user_name"))
-        self.password = ft.TextField(label=e.page.session.get("lang.permission.user_pwd"), password=True)
-        self.confirm_password = ft.TextField(label=e.page.session.get("lang.permission.confirm_user_pwd"), password=True)
+        self.user_name = ft.TextField(label=e.page.session.get("lang.permission.user_name"), on_click=lambda e: subprocess.run(["osk.exe"]))
+        self.password = ft.TextField(label=e.page.session.get("lang.permission.user_pwd"), password=True, on_click=lambda e: subprocess.run(["osk.exe"]))
+        self.confirm_password = ft.TextField(label=e.page.session.get("lang.permission.confirm_user_pwd"), password=True, on_click=lambda e: subprocess.run(["osk.exe"]))
         self.role = ft.Dropdown(
             label=e.page.session.get("lang.permission.user_role"),
             expand=True,

@@ -1,5 +1,5 @@
 import flet as ft
-
+import subprocess
 from common.operation_type import OperationType
 from db.models.breach_reason import BreachReason
 from db.models.event_log import EventLog
@@ -62,22 +62,26 @@ class EventForm(ft.AlertDialog):
         self.note = ft.TextField(
             label=self.page.session.get("lang.event.note"),
             multiline=True,
-            value=self.event_log.note
+            value=self.event_log.note,
+            on_click=lambda e: subprocess.run(["osk.exe"])
         )
 
         self.beaufort_number = ft.TextField(
             label=self.page.session.get("lang.event.beaufort_number"),
-            value=self.event_log.beaufort_number
+            value=self.event_log.beaufort_number,
+            on_click=lambda e: subprocess.run(["osk.exe"])
         )
 
         self.wave_height = ft.TextField(
             label=self.page.session.get("lang.event.wave_height"),
-            value=self.event_log.wave_height
+            value=self.event_log.wave_height,
+            on_click=lambda e: subprocess.run(["osk.exe"])
         )
 
         self.ice_condition = ft.TextField(
             label=self.page.session.get("lang.event.ice_condition"),
-            value=self.event_log.ice_condition
+            value=self.event_log.ice_condition,
+            on_click=lambda e: subprocess.run(["osk.exe"])
         )
 
         self.content = ft.Column(

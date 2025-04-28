@@ -60,7 +60,6 @@ class IOSetting(ft.Container):
     def __save_data(self, user: User):
         try:
             keyboard.close()
-            self.__write_to_plc()
             self.plc_conf.save_data()
             self.gps_conf.save_data()
             self.sps1_conf.save_data()
@@ -73,6 +72,7 @@ class IOSetting(ft.Container):
                 operation_type=OperationType.IO_CONF,
                 operation_content=model_to_dict(self.conf)
             )
+            self.__write_to_plc()
             Toast.show_success(self.page)
         except Exception as err:
             logging.error(f"io setting save data error: {err}")

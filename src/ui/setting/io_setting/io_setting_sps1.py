@@ -1,3 +1,4 @@
+import ipaddress
 import flet as ft
 from db.models.io_conf import IOConf
 from ui.common.custom_card import CustomCard
@@ -33,4 +34,9 @@ class IOSettingSPS1(CustomCard):
 
     def save_data(self):
         self.conf.sps1_ip = self.sps1_ip.value
+        try:
+            ipaddress.ip_address(self.sps1_ip.value)
+        except ValueError:
+            raise Exception(f'{self.page.session.get("lang.common.ip_address_format_error")}: {self.sps1_ip.value}')
+
         self.conf.sps1_port = self.sps1_port.value

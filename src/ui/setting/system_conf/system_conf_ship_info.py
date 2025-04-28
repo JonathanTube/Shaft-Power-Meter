@@ -1,4 +1,5 @@
 import flet as ft
+import subprocess
 from ui.common.custom_card import CustomCard
 from db.models.ship_info import ShipInfo
 from db.models.opearation_log import OperationLog
@@ -15,19 +16,23 @@ class SystemConfShipInfo(CustomCard):
     def build(self):
         self.ship_type = ft.TextField(
             label=self.page.session.get("lang.setting.ship_type"),
-            value=self.ship_info.ship_type
+            value=self.ship_info.ship_type,
+            on_click=lambda e: subprocess.run(["osk.exe"])
         )
         self.ship_name = ft.TextField(
             label=self.page.session.get("lang.setting.ship_name"),
-            value=self.ship_info.ship_name
+            value=self.ship_info.ship_name,
+            on_click=lambda e: subprocess.run(["osk.exe"])
         )
         self.imo_number = ft.TextField(
             label=self.page.session.get("lang.setting.imo_number"),
-            value=self.ship_info.imo_number
+            value=self.ship_info.imo_number,
+            on_click=lambda e: subprocess.run(["osk.exe"])
         )
         self.ship_size = ft.TextField(
             label=self.page.session.get("lang.setting.ship_size"),
-            value=self.ship_info.ship_size
+            value=self.ship_info.ship_size,
+            on_click=lambda e: subprocess.run(["osk.exe"])
         )
 
         self.heading = self.page.session.get("lang.setting.ship_info")

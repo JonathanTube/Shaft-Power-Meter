@@ -1,3 +1,4 @@
+import ipaddress
 import flet as ft
 from db.models.io_conf import IOConf
 from db.models.system_settings import SystemSettings
@@ -36,5 +37,10 @@ class IOSettingSPS2(CustomCard):
         super().build()
 
     def save_data(self):
+        try:
+            ipaddress.ip_address(self.sps2_ip.value)
+        except ValueError:
+            raise Exception(f'{self.page.session.get("lang.common.ip_address_format_error")}: {self.sps2_ip.value}')
+
         self.conf.sps2_ip = self.sps2_ip.value
         self.conf.sps2_port = self.sps2_port.value
