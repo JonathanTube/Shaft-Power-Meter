@@ -82,24 +82,6 @@ class FormulaCalculator:
         power = (2 * math.pi * rpm * torque) / 60
         return round(power, 2)
 
-#     torque_speed_limit_data = np.minimum(
-#     max_power * torque_speed_limit_percent / 100,
-#     max_power
-#     * torque_speed_limit_percent
-#     / 100
-#     * (speed_data / (max_speed * torque_speed_limit_percent / 100)) ** 2
-# )
-    @staticmethod
-    def calculate_power_by_speed(max_power, max_speed, torque_speed_limit_percent, speed):
-        power = min(
-            max_power * torque_speed_limit_percent / 100,
-            max_power
-            * torque_speed_limit_percent
-            / 100
-            * (speed / (max_speed * torque_speed_limit_percent / 100)) ** 2
-        )
-        return round(power, 2)
-
     @staticmethod
     def calculate_average_power_kw(sum_of_power, hours):
         """

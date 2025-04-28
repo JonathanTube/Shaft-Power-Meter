@@ -134,7 +134,7 @@ class SystemConfSettings(CustomCard):
 
         gdata.enable_shapoli = self.system_settings.sha_po_li
         gdata.eexi_limited_power = self.system_settings.eexi_limited_power
-        gdata.checking_continuous_interval = self.system_settings.eexi_breach_checking_duration
+        gdata.eexi_breach_checking_duration = self.system_settings.eexi_breach_checking_duration
 
         OperationLog.create(
             user_id=user_id,

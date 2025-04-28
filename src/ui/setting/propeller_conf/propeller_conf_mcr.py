@@ -1,4 +1,5 @@
 import flet as ft
+from common.global_data import gdata
 from db.models.preference import Preference
 from db.models.propeller_setting import PropellerSetting
 from ui.common.custom_card import CustomCard
@@ -60,3 +61,6 @@ class PropellerConfMcr(CustomCard):
             self.ps.shaft_power_of_mcr_operating_point = shaft_power * 1000
         else:
             self.ps.shaft_power_of_mcr_operating_point = UnitConverter.shp_to_w(shaft_power)
+
+        gdata.power_of_mcr = self.ps.shaft_power_of_mcr_operating_point
+        gdata.speed_of_mcr = self.ps.rpm_of_mcr_operating_point

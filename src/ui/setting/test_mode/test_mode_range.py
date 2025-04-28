@@ -108,9 +108,11 @@ class TestModeRange(CustomCard):
         testModeTask.set_torque_range(e.control.start_value, e.control.end_value)
 
     def __on_speed_change(self, e):
-        self.start_speed_text.value = f'{self.page.session.get('lang.setting.test_mode.min_speed')}: {int(e.control.start_value)} rpm'
+        start_speed_percentage = round(e.control.start_value * 100 / gdata.speed_of_mcr, 2)
+        end_speed_percentage = round(e.control.end_value * 100 / gdata.speed_of_mcr, 2)
+        self.start_speed_text.value = f'{self.page.session.get('lang.setting.test_mode.min_speed')}: {int(e.control.start_value)} rpm, {start_speed_percentage}% MCR'
         self.start_speed_text.update()
-        self.end_speed_text.value = f'{self.page.session.get('lang.setting.test_mode.max_speed')}: {int(e.control.end_value)} rpm'
+        self.end_speed_text.value = f'{self.page.session.get('lang.setting.test_mode.max_speed')}: {int(e.control.end_value)} rpm, {end_speed_percentage}% MCR'
         self.end_speed_text.update()
         self.__save_data()
         testModeTask.set_speed_range(e.control.start_value, e.control.end_value)

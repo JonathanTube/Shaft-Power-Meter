@@ -70,3 +70,6 @@ class FullscreenAlert(ft.Container):
             await asyncio.sleep(1)
             self.visible = not self.visible
             self.update()
+        # 退出时，设置为不可见
+        self.visible = False
+        self.update()

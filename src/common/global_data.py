@@ -15,13 +15,11 @@ class GlobalData:
         # 是否开启shapoli功能
         self.enable_shapoli = False
         # 功率过载告警持续时间
-        self.checking_continuous_interval: int = 60
+        self.eexi_breach_checking_duration: int = 60
         # 功率过载告警限制
         self.eexi_limited_power = 0
         # 螺旋桨数量
         self.amount_of_propeller = 1
-        # 是否开启功率过载告警
-        self.enable_power_overload_alarm = False
         #  是否开启自动从GPS同步UTC时间
         self.enable_utc_time_sync_with_gps = False
 
@@ -60,16 +58,21 @@ class GlobalData:
 
         self.test_mode_running: bool = False
 
+        # 是否开启功率过载告警
+        self.enable_power_overload_alarm = False
+        self.speed_of_mcr = 0
+        self.power_of_mcr = 0
+        self.speed_of_torque_load_limit = 0
+        self.power_of_torque_load_limit = 0
+        self.power_of_overload = 0
+
     def set_default_value(self):
         systemSettings: SystemSettings = SystemSettings.get()
         self.enable_shapoli = systemSettings.sha_po_li
         self.amount_of_propeller = systemSettings.amount_of_propeller
         self.display_propeller_curve = systemSettings.display_propeller_curve
-        self.checking_continuous_interval = systemSettings.eexi_breach_checking_duration
+        self.eexi_breach_checking_duration = systemSettings.eexi_breach_checking_duration
         self.eexi_limited_power = systemSettings.eexi_limited_power
-
-        propellerSetting: PropellerSetting = PropellerSetting.get()
-        self.enable_power_overload_alarm = propellerSetting.alarm_enabled_of_overload_curve
 
         dateTimeConf: DateTimeConf = DateTimeConf.get()
         self.enable_utc_time_sync_with_gps = dateTimeConf.sync_with_gps
@@ -87,5 +90,12 @@ class GlobalData:
         self.plc_ip = io_conf.plc_ip
         self.plc_port = io_conf.plc_port
 
+        propellerSetting: PropellerSetting = PropellerSetting.get()
+        self.enable_power_overload_alarm = propellerSetting.alarm_enabled_of_overload_curve
+        self.speed_of_mcr = propellerSetting.rpm_of_mcr_operating_point
+        self.power_of_mcr = propellerSetting.shaft_power_of_mcr_operating_point
+        self.speed_of_torque_load_limit = propellerSetting.rpm_right_of_torque_load_limit_curve
+        self.power_of_torque_load_limit = propellerSetting.bhp_right_of_torque_load_limit_curve + propellerSetting.value_of_overload_curve
+        self.power_of_overload = propellerSetting.value_of_overload_curve
 
 gdata: GlobalData = GlobalData()

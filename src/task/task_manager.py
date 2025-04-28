@@ -21,5 +21,5 @@ class TaskManager:
         asyncio.create_task(Sps2ReadTask(self.page).start())
         asyncio.create_task(GpsSyncTask(self.page).start())
 
-        asyncio.create_task(EEXIBreachTask(self.page).start())
-        asyncio.create_task(PowerOverloadTask(self.page).start())
+        asyncio.create_task(EEXIBreachTask().start())
+        asyncio.create_task(PowerOverloadTask().start())

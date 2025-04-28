@@ -177,16 +177,17 @@ class PropellerCurveDiagram(ft.Container):
 
         sps1_percent_rpm_of_mcr = round(gdata.sps1_speed / self.rpm_of_mcr * 100, 2)
         sps1_percent_power_of_mcr = round(gdata.sps1_power / self.power_of_mcr * 100, 2)
-        # print(f'sps1_percent_rpm_of_mcr={sps1_percent_rpm_of_mcr}, sps1_percent_power_of_mcr={sps1_percent_power_of_mcr}')
         self.sps1_point.set_offsets([sps1_percent_rpm_of_mcr, sps1_percent_power_of_mcr])
         self.sps1_text.set_x(sps1_percent_rpm_of_mcr)
         self.sps1_text.set_y(sps1_percent_power_of_mcr + 1)
 
         sps2_percent_rpm_of_mcr = round(gdata.sps2_speed / self.rpm_of_mcr * 100, 2)
         sps2_percent_power_of_mcr = round(gdata.sps2_power / self.power_of_mcr * 100, 2)
-        # print(f'sps2_percent_rpm_of_mcr={sps2_percent_rpm_of_mcr}, sps2_percent_power_of_mcr={sps2_percent_power_of_mcr}')
         self.sps2_point.set_offsets([sps2_percent_rpm_of_mcr, sps2_percent_power_of_mcr])
         self.sps2_text.set_x(sps2_percent_rpm_of_mcr)
         self.sps2_text.set_y(sps2_percent_power_of_mcr + 1)
+
+        print(f'update_sps1_points: sps1_percent_rpm_of_mcr={sps1_percent_rpm_of_mcr}%, sps1_percent_power_of_mcr={sps1_percent_power_of_mcr}%')
+        print(f'update_sps2_points: sps2_percent_rpm_of_mcr={sps2_percent_rpm_of_mcr}%, sps2_percent_power_of_mcr={sps2_percent_power_of_mcr}%')
 
         self.chart.update()
