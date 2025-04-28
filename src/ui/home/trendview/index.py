@@ -5,6 +5,7 @@ from ui.common.datetime_search import DatetimeSearch
 from ui.home.trendview.diagram import TrendViewDiagram
 from common.control_manager import ControlManager
 from ui.common.toast import Toast
+from db.models.date_time_conf import DateTimeConf
 
 
 class TrendView(ft.Container):
@@ -13,6 +14,8 @@ class TrendView(ft.Container):
         self.expand = True
         # self.bgcolor = ft.colors.BLUE
         self.padding = 10
+        datetime_conf: DateTimeConf = DateTimeConf.get()
+        self.date_format = datetime_conf.date_format
 
     def build(self):
         search = DatetimeSearch(self.__on_search)
@@ -27,7 +30,8 @@ class TrendView(ft.Container):
         if not start_date or not end_date:
             return
 
-        days_diff = (datetime.strptime(end_date, "%Y-%m-%d %H:%M:%S") - datetime.strptime(start_date, "%Y-%m-%d %H:%M:%S")).days
+        date_time_format = f"{self.date_format} %H:%M:%S"
+        days_diff = (datetime.strptime(end_date, date_time_format) - datetime.strptime(start_date, date_time_format)).days
         if days_diff > 15:
             Toast.show_error(self.page, self.page.session.get('lang.trendview.cannot_search_more_than_15_days'))
             return

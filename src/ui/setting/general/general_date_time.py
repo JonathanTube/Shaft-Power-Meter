@@ -108,10 +108,11 @@ class GeneralDateTime(ft.Container):
             self._task.cancel()
 
     def save_data(self, user_id: int):
+        standard_date_time_format = '%Y-%m-%d %H:%M:%S'
         # save date time conf
         new_date = self.utc_date.value
         new_time = self.utc_time.value
-        self.date_time_conf.utc_date_time = datetime.strptime(f"{new_date} {new_time}:00", '%Y-%m-%d %H:%M:%S')
+        self.date_time_conf.utc_date_time = datetime.strptime(f"{new_date} {new_time}:00", standard_date_time_format)
 
         self.date_time_conf.system_date_time = datetime.now()
         self.date_time_conf.date_format = self.date_format.value
@@ -126,6 +127,6 @@ class GeneralDateTime(ft.Container):
         )
 
         new_date_time = f"{new_date} {new_time}:00"
-        dt_format = '%Y-%m-%d %H:%M:%S'
-        new_utc_date_time = datetime.strptime(new_date_time, dt_format)
+
+        new_utc_date_time = datetime.strptime(new_date_time, standard_date_time_format)
         gdata.utc_date_time = new_utc_date_time

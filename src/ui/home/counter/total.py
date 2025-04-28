@@ -4,10 +4,9 @@ from datetime import datetime
 from typing import Literal
 from db.models.data_log import DataLog
 from db.models.preference import Preference
+from db.models.date_time_conf import DateTimeConf
 from ui.home.counter.display import CounterDisplay
 from peewee import fn
-
-str_format = '%Y-%m-%d %H:%M:%S'
 
 
 class TotalCounter(ft.Container):
@@ -21,8 +20,12 @@ class TotalCounter(ft.Container):
         self.border = ft.border.all(width=0.5, color=ft.Colors.with_opacity(0.15, ft.Colors.INVERSE_SURFACE))
 
         preference: Preference = Preference.get()
+        datetime_conf: DateTimeConf = DateTimeConf.get()
         self.system_unit = preference.system_unit
         self.interval = preference.data_refresh_interval
+        self.standard_date_time_format = '%Y-%m-%d %H:%M:%S'
+        self.date_format = datetime_conf.date_format
+
 
     def build(self):
         self.display = CounterDisplay()
@@ -74,8 +77,8 @@ class TotalCounter(ft.Container):
         if data_log['start_time'] is None or data_log['end_time'] is None:
             return
 
-        start_time = datetime.strptime(data_log['start_time'], str_format)
-        end_time = datetime.strptime(data_log['end_time'], str_format)
+        start_time = datetime.strptime(data_log['start_time'], self.standard_date_time_format)
+        end_time = datetime.strptime(data_log['end_time'], self.standard_date_time_format)
         average_power = data_log['average_power']
         max_rounds = data_log['max_rounds']
         min_rounds = data_log['min_rounds']
@@ -97,7 +100,7 @@ class TotalCounter(ft.Container):
         seconds = time_elapsed.seconds % 60
 
         time_elapsed = f'{days:02d} d {hours:02d}:{minutes:02d}:{seconds:02d} h'
-        started_at = start_time.strftime("%Y-%m-%d %H:%M:%S")
+        started_at = start_time.strftime(f"{self.date_format} %H:%M:%S")
 
         self.time_elapsed.value = f'{time_elapsed} {self.txt_measured}'
         self.time_elapsed.visible = True

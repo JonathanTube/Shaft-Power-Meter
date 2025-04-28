@@ -1,4 +1,5 @@
 from fpdf import FPDF
+from db.models.event_log import EventLog
 from db.models.report_info import ReportInfo
 from db.models.ship_info import ShipInfo
 from db.models.propeller_setting import PropellerSetting
@@ -6,22 +7,28 @@ from db.models.system_settings import SystemSettings
 from db.models.preference import Preference
 from db.models.report_detail import ReportDetail
 from utils.unit_parser import UnitParser
+from db.models.date_time_conf import DateTimeConf
 
 
 class ReportInfoExporter(FPDF):
     def __init__(self):
         super().__init__()
+
+        datetime_conf: DateTimeConf = DateTimeConf.get()
+        self.date_format = datetime_conf.date_format
+        self.date_time_format = f"{self.date_format} %H:%M:%S"
+
         self.per_cell_width = 47.5
         self.add_page()
 
     def __load_data(self, id: int):
-        self.ship_info = ShipInfo.get()
+        self.ship_info: ShipInfo = ShipInfo.get()
         self.propeller_setting: PropellerSetting = PropellerSetting.get()
-        self.preference = Preference.get()
-        self.system_settings = SystemSettings.get()
-        self.report_info = ReportInfo.get_by_id(id)
-        self.event_log = self.report_info.event_log
-        self.report_details = ReportDetail.select().where(
+        self.preference: Preference = Preference.get()
+        self.system_settings: SystemSettings = SystemSettings.get()
+        self.report_info: ReportInfo = ReportInfo.get_by_id(id)
+        self.event_log: EventLog = self.report_info.event_log
+        self.report_details: list[ReportDetail] = ReportDetail.select().where(
             ReportDetail.report_info == self.report_info.id).order_by(ReportDetail.id.asc())
 
     def generate_pdf(self, path, id: int):
@@ -63,7 +70,7 @@ class ReportInfoExporter(FPDF):
 
         system_unit = self.preference.system_unit
         self.__insert_label("Un-limited Power", w=self.per_cell_width)
-        unlimited_power = self.propeller_setting.power_of_mcr
+        unlimited_power = self.propeller_setting.shaft_power_of_mcr_operating_point
         unlimited_power, unlimited_unit = UnitParser.parse_power(unlimited_power, system_unit, shrink=False)
         self.__insert_value(f"{unlimited_power} {unlimited_unit}", w=self.per_cell_width)
 
@@ -117,7 +124,7 @@ class ReportInfoExporter(FPDF):
         rows = []
         for report_detail in self.report_details:
             if report_detail.utc_date_time:
-                utc_date_time = report_detail.utc_date_time.strftime("%Y-%m-%d %H:%M:%S")
+                utc_date_time = report_detail.utc_date_time.strftime(self.date_time_format)
             else:
                 utc_date_time = "N/A"
 
@@ -148,7 +155,7 @@ class ReportInfoExporter(FPDF):
 
         self.__insert_label("Date/Time of Power Reserve Breach", w=label_width)
         if self.event_log.started_at:
-            self.__insert_value(self.event_log.started_at.strftime("%Y-%m-%d %H:%M:%S"), w=value_width)
+            self.__insert_value(self.event_log.started_at.strftime(self.date_time_format), w=value_width)
         else:
             self.__insert_value("N/A", w=value_width)
 
@@ -203,8 +210,7 @@ class ReportInfoExporter(FPDF):
         self.__insert_label(
             "Date/Time when returning to limited power", w=label_width)
         if self.event_log.ended_at:
-            self.__insert_value(self.event_log.ended_at.strftime(
-                "%Y-%m-%d %H:%M:%S"), w=value_width)
+            self.__insert_value(self.event_log.ended_at.strftime(self.date_time_format), w=value_width)
         else:
             self.__insert_value("N/A", w=value_width)
         self.ln()

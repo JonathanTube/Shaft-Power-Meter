@@ -2,11 +2,13 @@ from db.models.opearation_log import OperationLog
 from db.models.date_time_conf import DateTimeConf
 from common.operation_type import OperationType
 from ui.common.abstract_table import AbstractTable
+from common.global_data import gdata
 
 
 class LogOperationTable(AbstractTable):
     def __init__(self):
         super().__init__()
+        self.table_width = gdata.default_table_width
         self.dtc: DateTimeConf = DateTimeConf.get()
 
     def load_total(self):
@@ -20,7 +22,10 @@ class LogOperationTable(AbstractTable):
         if operation_type != -1 or operation_type != None:
             sql = sql.where(OperationLog.operation_type == operation_type)
 
-        return sql.count()
+        cnt = sql.count()
+        if cnt > 0:
+            self.table_width = None
+        return cnt
 
     def load_data(self):
         sql = OperationLog.select(

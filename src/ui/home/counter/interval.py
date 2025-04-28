@@ -4,13 +4,12 @@ from typing import Literal
 import flet as ft
 from db.models.data_log import DataLog
 from db.models.preference import Preference
+from db.models.date_time_conf import DateTimeConf
 from ui.common.toast import Toast
 from .display import CounterDisplay
 from ui.common.keyboard import keyboard
 from peewee import fn
 from common.global_data import gdata
-format_str = '%Y-%m-%d %H:%M:%S'
-
 
 class IntervalCounter(ft.Container):
     def __init__(self, name: Literal['sps1', 'sps2']):
@@ -24,8 +23,10 @@ class IntervalCounter(ft.Container):
 
         self.hours = 24
         preference: Preference = Preference.get()
+        datetime_conf: DateTimeConf = DateTimeConf.get()
         self.system_unit = preference.system_unit
         self.interval = preference.data_refresh_interval
+        self.date_format = datetime_conf.date_format
 
     def build(self):
         self.display = CounterDisplay()
@@ -119,8 +120,8 @@ class IntervalCounter(ft.Container):
         if data_log['start_time'] is None or data_log['end_time'] is None:
             return
 
-        start_time = datetime.strptime(data_log['start_time'], format_str)
-        end_time = datetime.strptime(data_log['end_time'], format_str)
+        start_time = datetime.strptime(data_log['start_time'], self.date_format)
+        end_time = datetime.strptime(data_log['end_time'], self.date_format)
 
         hours = (end_time - start_time).total_seconds() / 3600
 

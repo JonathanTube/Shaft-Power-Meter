@@ -20,16 +20,15 @@ class GeneralPreference(ft.Container):
     def build(self):
         s = self.page.session
         self.theme_label = ft.Text(s.get("lang.setting.theme"))
-        self.theme_system = ft.Radio(value=0, label=s.get("lang.setting.theme.system"))
-        self.theme_light = ft.Radio(value=1, label=s.get("lang.setting.theme.light"))
-        self.theme_dark = ft.Radio(value=2, label=s.get("lang.setting.theme.dark"))
+        self.theme_light = ft.Radio(value=0, label=s.get("lang.setting.theme.light"))
+        self.theme_dark = ft.Radio(value=1, label=s.get("lang.setting.theme.dark"))
 
         self.language_label = ft.Text(s.get("lang.setting.language"))
         self.system_unit_label = ft.Text(s.get("lang.setting.unit"))
         self.data_refresh_interval_label = ft.Text(s.get("lang.setting.data_refresh_interval"))
 
         self.default_theme = ft.RadioGroup(
-            content=ft.Row([self.theme_system, self.theme_light, self.theme_dark]),
+            content=ft.Row([self.theme_light, self.theme_dark]),
             value=self.preference.theme
         )
 
@@ -96,18 +95,13 @@ class GeneralPreference(ft.Container):
 
     def __change_theme(self):
         theme = int(self.preference.theme)
-        if theme == 1:
-            self.page.theme_mode = ft.ThemeMode.LIGHT
-        elif theme == 2:
-            self.page.theme_mode = ft.ThemeMode.DARK
-        else:
-            self.page.theme_mode = ft.ThemeMode.SYSTEM
+        self.page.theme_mode = ft.ThemeMode.LIGHT if theme == 0 else ft.ThemeMode.DARK
 
     def __refresh_language(self):
-        lang = Preference.get().language
+        preference: Preference = Preference.get()
         language_items = Language.select()
         for item in language_items:
-            self.page.session.set(item.code, item.english if lang == 0 else item.chinese)
+            self.page.session.set(item.code, item.english if preference.language == 0 else item.chinese)
 
     def __refresh_page(self):
         self.page.appbar.clean()

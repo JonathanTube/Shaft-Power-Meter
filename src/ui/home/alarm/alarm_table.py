@@ -2,11 +2,17 @@ from common.const_alarm_type import AlarmType
 from ui.common.abstract_table import AbstractTable
 from db.models.alarm_log import AlarmLog
 from common.global_data import gdata
-
+from db.models.date_time_conf import DateTimeConf
 
 class AlarmTable(AbstractTable):
     def __init__(self):
         super().__init__()
+
+        datetime_conf: DateTimeConf = DateTimeConf.get()
+        date_format = datetime_conf.date_format
+        self.date_time_format = f"{date_format} %H:%M:%S"
+
+
         self.show_checkbox_column = True
         self.table_width = gdata.default_table_width
 
@@ -54,9 +60,9 @@ class AlarmTable(AbstractTable):
         return [
             [
                 item.id,
-                item.utc_date_time,
+                item.utc_date_time.strftime(self.date_time_format),
                 self.get_event_name(item.alarm_type),
-                item.acknowledge_time
+                item.acknowledge_time.strftime(self.date_time_format) if item.acknowledge_time else ""
             ] for item in data
         ]
 

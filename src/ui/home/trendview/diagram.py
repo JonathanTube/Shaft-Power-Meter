@@ -2,6 +2,7 @@ import flet as ft
 from matplotlib import pyplot as plt
 import matplotlib
 from db.models.data_log import DataLog
+from db.models.date_time_conf import DateTimeConf
 from flet.matplotlib_chart import MatplotlibChart
 
 matplotlib.use('Agg')  # 使用非GUI后端
@@ -14,6 +15,8 @@ class TrendViewDiagram(ft.Container):
         self.chart = None
         self.ax_rpm = None
         self.ax_power = None
+        datetime_conf: DateTimeConf = DateTimeConf.get()
+        self.date_format = datetime_conf.date_format
 
     def update_chart(self, data_list: list[DataLog]):
         date_times, rpm_data, power_data = self.__get_data(data_list)
@@ -33,7 +36,7 @@ class TrendViewDiagram(ft.Container):
         for data in data_list:
             rpm_data.append(data.speed)
             power_data.append(data.power)
-            date_times.append(data.utc_date_time.strftime('%Y-%m-%d %H:%M:%S'))
+            date_times.append(data.utc_date_time.strftime(f'{self.date_format} %H:%M:%S'))
 
         return (date_times, rpm_data, power_data)
 

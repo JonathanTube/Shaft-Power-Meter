@@ -3,7 +3,7 @@ from ..base import BaseModel
 
 
 class Preference(BaseModel):
-    theme = IntegerField(verbose_name="主题: Auto-0, Light-1, Dark-2")
+    theme = IntegerField(verbose_name="主题: Light-0, Dark-1")
 
     system_unit = IntegerField(verbose_name="系统单位: SI-0, Metric-1")
 

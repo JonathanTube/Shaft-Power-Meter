@@ -52,10 +52,11 @@ class DataInit:
             )
 
     def __init_date_time_conf():
+        standard_date_time_format = '%Y-%m-%d %H:%M:%S'
         if DateTimeConf.select().count() == 0:
             DateTimeConf.create(
-                utc_date_time=datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S"),
-                system_date_time=datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                utc_date_time=datetime.now(timezone.utc).strftime(standard_date_time_format),
+                system_date_time=datetime.now().strftime(standard_date_time_format),
                 sync_with_gps=False,
                 date_format="%Y-%m-%d",
             )
@@ -124,7 +125,7 @@ class DataInit:
     def __init_preference():
         if Preference.select().count() == 0:
             Preference.create(
-                theme=0,
+                theme=1,
                 system_unit=0,
                 language=0,
                 data_refresh_interval=5
@@ -337,14 +338,14 @@ class DataInit:
                 },
                 {
                     "code": "lang.common.start_date",
-                    "chinese": "开始日期",
-                    "english": "Start Date"
+                    "chinese": "UTC 开始日期",
+                    "english": "UTC Start Date"
                 },
 
                 {
                     "code": "lang.common.end_date",
-                    "chinese": "结束日期",
-                    "english": "End Date"
+                    "chinese": "UTC 结束日期",
+                    "english": "UTC End Date"
                 },
 
                 {
@@ -791,12 +792,6 @@ class DataInit:
                     "chinese": "主题",
                     "english": "Theme"
                 },
-                {
-                    "code": "lang.setting.theme.system",
-                    "chinese": "系统",
-                    "english": "System"
-                },
-
                 {
                     "code": "lang.setting.theme.light",
                     "chinese": "浅色",

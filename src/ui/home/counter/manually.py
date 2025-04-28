@@ -1,14 +1,12 @@
 import flet as ft
 import asyncio
 from typing import Literal
-from datetime import datetime
 from db.models.data_log import DataLog
 from .display import CounterDisplay
 from db.models.preference import Preference
+from db.models.date_time_conf import DateTimeConf
 from common.global_data import gdata
 from peewee import fn
-
-format_str = '%Y-%m-%d %H:%M:%S'
 
 
 class ManuallyCounter(ft.Container):
@@ -27,8 +25,10 @@ class ManuallyCounter(ft.Container):
         self._task = None
 
         preference: Preference = Preference.get()
+        datetime_conf: DateTimeConf = DateTimeConf.get()
         self.system_unit = preference.system_unit
         self.interval = preference.data_refresh_interval
+        self.date_format = datetime_conf.date_format
 
     def __on_start(self, e):
         current_status = gdata.sps1_manually_status if self.name == 'sps1' else gdata.sps2_manually_status
@@ -48,7 +48,7 @@ class ManuallyCounter(ft.Container):
         self.resume_button.visible = False
         self.status_text.value = self.page.session.get('lang.counter.running')
         self.status_container.bgcolor = ft.Colors.GREEN_500
-        self.started_at.value = f'{self.page.session.get("lang.counter.started_at")} {gdata.utc_date_time.strftime(format_str)}'
+        self.started_at.value = f'{self.page.session.get("lang.counter.started_at")} {gdata.utc_date_time.strftime(self.date_format)}'
         self.started_at.visible = True
         self.content.update()
 
@@ -69,7 +69,7 @@ class ManuallyCounter(ft.Container):
         self.status_text.value = self.page.session.get('lang.counter.reset')
         self.status_container.bgcolor = ft.Colors.ORANGE_500
 
-        self.stopped_at.value = f'{self.page.session.get("lang.counter.stopped_at")} {datetime.now().strftime(format_str)}'
+        self.stopped_at.value = f'{self.page.session.get("lang.counter.stopped_at")} {gdata.utc_date_time.strftime(self.date_format)}'
         self.stopped_at.visible = True
         self.stopped_at.update()
         self.content.update()

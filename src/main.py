@@ -29,22 +29,17 @@ gdata.set_default_value()
 
 
 def get_theme_mode():
-    theme = Preference.get().theme
-    if theme == 0:
-        return ft.ThemeMode.SYSTEM
-    elif theme == 1:
-        return ft.ThemeMode.LIGHT
-    elif theme == 2:
-        return ft.ThemeMode.DARK
+    theme: Preference = Preference.get()
+    return ft.ThemeMode.LIGHT if theme.theme == 0 else ft.ThemeMode.DARK
 
 
 def load_language(page: ft.Page):
-    language = Preference.get().language
+    language: Preference = Preference.get()
     language_items = Language.select()
-    if language == 0:
+    if language.language == 0:
         for item in language_items:
             page.session.set(item.code, item.english)
-    elif language == 1:
+    else:
         for item in language_items:
             page.session.set(item.code, item.chinese)
 

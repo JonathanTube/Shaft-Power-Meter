@@ -6,6 +6,7 @@ from ui.common.toast import Toast
 from ui.report.report_info_detail import ReportInfoDialog
 from ui.report.report_info_exporter import ReportInfoExporter
 from common.global_data import gdata
+from db.models.date_time_conf import DateTimeConf
 
 
 class ReportInfoTable(AbstractTable):
@@ -13,6 +14,10 @@ class ReportInfoTable(AbstractTable):
         super().__init__()
         self.file_picker = None
         self.table_width = gdata.default_table_width
+
+        datetime_conf: DateTimeConf = DateTimeConf.get()
+        date_format = datetime_conf.date_format
+        self.date_time_format = f"{date_format} %H:%M:%S"
 
     def load_total(self):
         start_date = self.kwargs.get('start_date')
@@ -43,7 +48,7 @@ class ReportInfoTable(AbstractTable):
         data = sql.order_by(ReportInfo.id.desc()).paginate(
             self.current_page, self.page_size)
 
-        return [[item.id, item.report_name, item.created_at] for item in data]
+        return [[item.id, item.report_name, item.created_at.strftime(self.date_time_format)] for item in data]
 
     def has_operations(self):
         return True

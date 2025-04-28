@@ -3,9 +3,17 @@ import flet as ft
 from db.models.event_log import EventLog
 from ui.common.abstract_table import AbstractTable
 from ui.home.event.event_form import EventForm
+from db.models.date_time_conf import DateTimeConf
 
 
 class EventTable(AbstractTable):
+    def __init__(self):
+        super().__init__()
+
+        datetime_conf: DateTimeConf = DateTimeConf.get()
+        date_format = datetime_conf.date_format
+        self.date_time_format = f"{date_format} %H:%M:%S"
+
     def load_total(self):
         start_date = self.kwargs.get('start_date')
         end_date = self.kwargs.get('end_date')
@@ -39,14 +47,14 @@ class EventTable(AbstractTable):
         return [[
                 item.id,
                 item.breach_reason.reason if item.breach_reason else "",
-                item.started_at,
+                item.started_at.strftime(self.date_time_format) if item.started_at else "",
                 item.started_position,
-                item.ended_at,
+                item.ended_at.strftime(self.date_time_format) if item.ended_at else "",
                 item.ended_position,
                 item.beaufort_number,
                 item.wave_height,
                 item.ice_condition,
-                item.acknowledged_at,
+                item.acknowledged_at.strftime(self.date_time_format) if item.acknowledged_at else "",
                 item.note
                 ] for item in data]
 
