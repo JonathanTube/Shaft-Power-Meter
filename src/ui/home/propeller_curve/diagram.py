@@ -5,6 +5,7 @@ import flet as ft
 from flet.matplotlib_chart import MatplotlibChart
 from db.table_init import PropellerSetting
 from common.global_data import gdata
+import logging
 
 matplotlib.use('Agg')  # 使用非GUI后端
 
@@ -114,7 +115,7 @@ class PropellerCurveDiagram(ft.Container):
         x_ticks = [self.left_rpm_of_torque_limit]
         for i in range(x_begin + 1, 12, 1):
             x_ticks.append(i * 10)
-        # print('x_ticks=', x_ticks)
+        
         plt.xticks(x_ticks, [f'{x}' for x in x_ticks], fontsize=10)
         # 设置x轴范围
         ax.set_xlim(xmin=x_ticks[0], xmax=x_ticks[-1])
@@ -125,7 +126,7 @@ class PropellerCurveDiagram(ft.Container):
         y_ticks = [self.left_power_of_normal]
         for i in range(y_begin + 1, 12, 1):
             y_ticks.append(i * 10)
-        # print('y_ticks=', y_ticks)
+        
         plt.yticks(y_ticks, [f'{x}' for x in y_ticks], fontsize=10)
         # 设置y轴范围
         ax.set_ylim(ymin=y_ticks[0], ymax=y_ticks[-1])
@@ -187,7 +188,7 @@ class PropellerCurveDiagram(ft.Container):
         self.sps2_text.set_x(sps2_percent_rpm_of_mcr)
         self.sps2_text.set_y(sps2_percent_power_of_mcr + 1)
 
-        print(f'update_sps1_points: sps1_percent_rpm_of_mcr={sps1_percent_rpm_of_mcr}%, sps1_percent_power_of_mcr={sps1_percent_power_of_mcr}%')
-        print(f'update_sps2_points: sps2_percent_rpm_of_mcr={sps2_percent_rpm_of_mcr}%, sps2_percent_power_of_mcr={sps2_percent_power_of_mcr}%')
+        logging.info(f'update_sps1_points: sps1_percent_rpm_of_mcr={sps1_percent_rpm_of_mcr}%, sps1_percent_power_of_mcr={sps1_percent_power_of_mcr}%')
+        logging.info(f'update_sps2_points: sps2_percent_rpm_of_mcr={sps2_percent_rpm_of_mcr}%, sps2_percent_power_of_mcr={sps2_percent_power_of_mcr}%')
 
         self.chart.update()

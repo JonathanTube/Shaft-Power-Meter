@@ -1,5 +1,5 @@
 import asyncio
-
+import logging
 import flet as ft
 from pymodbus.client.tcp import AsyncModbusTcpClient
 from pymodbus.exceptions import ConnectionException
@@ -44,9 +44,11 @@ class Sps1ReadTask:
             torque = value_for_torque
 
         except ConnectionException as e:
+            logging.error(f"sps1 read task connection error: {e}")
             self.__send_msg(f"Connection error: {e}")
             await self.__connect()
         except Exception as e:
+            logging.error(f"sps1 read task error: {e}")
             self.__send_msg(f"Error getting data: {e}")
         finally:
             gdata.sps1_thrust = thrust
@@ -66,6 +68,7 @@ class Sps1ReadTask:
             if not is_connected:
                 self.__create_alarm_log()
         except Exception as e:
+            logging.error(f"sps1 read task connect error: {e}")
             self.__create_alarm_log()
             self.__send_msg(f"Error connecting to sps: {e}")
 

@@ -47,7 +47,6 @@ class AlarmList(ft.Container):
         if e.path:
             start_date = self.search.date_time_range.start_date.value
             end_date = self.search.date_time_range.end_date.value
-            # print(start_date, end_date)
             if start_date and end_date:
                 query = AlarmLog.select(
                     AlarmLog.utc_date_time,

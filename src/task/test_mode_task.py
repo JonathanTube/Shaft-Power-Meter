@@ -1,5 +1,6 @@
 import asyncio
 import random
+import logging
 
 from db.models.data_log import DataLog
 from db.models.system_settings import SystemSettings
@@ -81,7 +82,7 @@ class TestModeTask:
             gdata.sps2_power_history = []
             ControlManager.on_eexi_power_breach_recovery()
         except Exception as e:
-            print(f'Error truncating DataLog table: {e}')
+            logging.error(f'test mode task error: {e}')
         self.is_running = False
 
     async def save_generated_data(self, name):

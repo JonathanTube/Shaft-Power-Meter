@@ -1,4 +1,5 @@
 import ctypes
+import logging
 import sys
 import flet as ft
 import asyncio
@@ -18,7 +19,7 @@ from ui.common.audio_alarm import AudioAlarm
 from task.task_manager import TaskManager
 from common.global_data import gdata
 from utils.auto_startup import add_to_startup
-
+from utils.logger import Logger
 # 加入开机启动
 add_to_startup()
 
@@ -111,4 +112,5 @@ async def main(page: ft.Page):
 
 if __name__ == "__main__":
     check_single_instance()
+    Logger(console=True, show_sql=False)
     ft.app(target=main)

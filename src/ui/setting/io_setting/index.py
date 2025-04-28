@@ -1,4 +1,5 @@
 import flet as ft
+import logging
 from pymodbus.client import ModbusTcpClient
 
 from db.models.io_conf import IOConf
@@ -74,6 +75,7 @@ class IOSetting(ft.Container):
             )
             Toast.show_success(self.page)
         except Exception as err:
+            logging.error(f"io setting save data error: {err}")
             Toast.show_error(self.page, err)
 
     def __write_to_plc(self):
@@ -97,6 +99,7 @@ class IOSetting(ft.Container):
             plc_client.write_register(12329, int(self.conf.speed_range_max))
             plc_client.write_register(12330, int(self.conf.speed_range_offset))
         except Exception as err:
+            logging.error(f"io setting write to plc error: {err}")
             Toast.show_error(self.page, err)
             raise err
         finally:

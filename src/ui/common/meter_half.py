@@ -34,7 +34,6 @@ class MeterHalf(ft.Container):
     def set_outer_value(self, active_value: int, inactive_value: int):
         _active_value = round(active_value, 2)
         _inactive_value = round(inactive_value, 2)
-        # print(f"set_outer_value: {_active_value}, {_inactive_value}")
         total = _active_value + _inactive_value
         if total > 0:
             self.active_part.value = _active_value / total * 180

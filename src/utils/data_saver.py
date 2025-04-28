@@ -1,4 +1,5 @@
 from datetime import timedelta
+import logging
 from db.models.data_log import DataLog
 from common.global_data import gdata
 from utils.formula_cal import FormulaCalculator
@@ -8,7 +9,6 @@ from common.control_manager import ControlManager
 class DataSaver:
     @staticmethod
     def save(name: str, thrust: float, torque: float, speed: float, rounds: float):
-        # print(f'name: {name}, thrust: {thrust}, torque: {torque}, speed: {speed}, rounds: {rounds}')
         try:
             utc_date_time = gdata.utc_date_time
             power = FormulaCalculator.calculate_instant_power(torque, speed)
@@ -47,4 +47,4 @@ class DataSaver:
 
             ControlManager.on_instant_data_refresh()
         except Exception as e:
-            print(f"Error generating data: {e}")
+            logging.error(f"data saver error: {e}")

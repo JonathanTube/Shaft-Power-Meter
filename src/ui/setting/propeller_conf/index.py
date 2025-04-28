@@ -1,5 +1,5 @@
 import flet as ft
-
+import logging
 from db.models.propeller_setting import PropellerSetting
 from db.models.opearation_log import OperationLog
 from common.operation_type import OperationType
@@ -90,6 +90,7 @@ class PropellerConf(ft.Container):
                 operation_content=model_to_dict(self.ps)
             )
         except Exception as e:
+            logging.error(f"propeller conf save data error: {e}")
             Toast.show_error(self.page, e)
         else:
             Toast.show_success(self.page)

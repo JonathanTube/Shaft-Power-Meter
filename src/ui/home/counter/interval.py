@@ -1,4 +1,5 @@
 import asyncio
+import logging
 from datetime import datetime, timedelta
 from typing import Literal
 import flet as ft
@@ -98,8 +99,8 @@ class IntervalCounter(ft.Container):
         param_end_time = gdata.utc_date_time
         param_start_time = param_end_time - timedelta(hours=self.hours)
 
-        print(f'param_start_time: {param_start_time}')
-        print(f'param_end_time: {param_end_time}')
+        logging.info(f'IntervalCounter param_start_time: {param_start_time}')
+        logging.info(f'IntervalCounter param_end_time: {param_end_time}')
 
         data_log = DataLog.select(
             fn.COALESCE(fn.AVG(DataLog.power), 0).alias('average_power'),

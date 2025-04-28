@@ -1,4 +1,5 @@
 import flet as ft
+import logging
 from common.global_data import gdata
 from db.models.limitations import Limitations
 from db.models.preference import Preference
@@ -170,6 +171,7 @@ class TestModeRange(CustomCard):
             ).where(TestModeConf.id == self.conf.id).execute()
             Toast.show_success(self.page)
         except Exception as e:
+            logging.error(f"test mode range save data error: {e}")
             Toast.show_error(self.page, str(e))
 
     def enable(self):

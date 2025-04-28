@@ -232,7 +232,6 @@ class ZeroCalExecutor:
         # 设置为已接受
         query = ZeroCalInfo.update(state=1).where(ZeroCalInfo.id == self.latest_zero_cal.id)
         query.execute()
-        print(query.sql())
 
         self.__reset_to_start()
         Toast.show_success(e.page, message="lang.setting.zero_cal.accepted")
@@ -240,7 +239,6 @@ class ZeroCalExecutor:
     def __on_abort(self, e):
         query = ZeroCalInfo.update(state=2).where(ZeroCalInfo.id == self.latest_zero_cal.id)
         query.execute()
-        print(query.sql())
 
         self.__reset_to_start()
         Toast.show_success(e.page, message="lang.setting.zero_cal.aborted")
@@ -276,7 +274,6 @@ class ZeroCalExecutor:
             torque_error_ratio=error_ratio_torque,
             thrust_error_ratio=error_ratio_thrust).where(ZeroCalInfo.id == self.latest_zero_cal.id))
         query.execute()
-        print(query.sql())
 
         # 筛选平均值
         self.new_avg_torque.value = avg_torque

@@ -20,9 +20,6 @@ class TrendViewDiagram(ft.Container):
 
     def update_chart(self, data_list: list[DataLog]):
         date_times, rpm_data, power_data = self.__get_data(data_list)
-        # print(f'date_times={date_times}')
-        # print(f'rpm_data={rpm_data}')
-        # print(f'power_data={power_data}')
         self.ax_rpm.plot(date_times, rpm_data)
         self.ax_power.plot(date_times, power_data)
 

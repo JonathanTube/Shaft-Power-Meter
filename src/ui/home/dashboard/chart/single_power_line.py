@@ -1,6 +1,6 @@
 import math
 import flet as ft
-
+import logging
 from ui.common.simple_card import SimpleCard
 from utils.unit_parser import UnitParser
 from common.global_data import gdata
@@ -125,6 +125,7 @@ class SinglePowerLine(ft.Container):
             try:
                 power_sps2 = gdata.sps2_power_history[index][0]
             except IndexError:
+                logging.error(f"sps2 power history index error: {IndexError}")
                 power_sps2 = 0
 
             power = power_sps1 + power_sps2

@@ -1,4 +1,5 @@
 import asyncio
+import logging
 from common.global_data import gdata
 from db.models.alarm_log import AlarmLog
 from common.const_alarm_type import AlarmType
@@ -38,7 +39,7 @@ class PowerOverloadTask:
         overload_power_percentage = round((speed_percentage / max_speed) ** 2 * max_power, 2)
         # 实际的功率百分比
         actual_power_percentage = round(power / gdata.power_of_mcr * 100, 2)
-        print(f"power_overload_task: overload_power_percentage={overload_power_percentage}, actual_power_percentage={actual_power_percentage}")
+        logging.info(f"power_overload_task: overload_power_percentage={overload_power_percentage}, actual_power_percentage={actual_power_percentage}")
         return actual_power_percentage > overload_power_percentage
 
     def __handle_breach_event(self):

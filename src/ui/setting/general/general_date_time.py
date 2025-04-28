@@ -19,7 +19,6 @@ class GeneralDateTime(ft.Container):
     def build(self):
         s = self.page.session
         utc_date_time = gdata.utc_date_time
-        print('utc_date_time=', utc_date_time)
         self.utc_date_time = ft.TextField(
             label=s.get("lang.setting.current_utc_date_time"),
             col={"md": 12},

@@ -148,18 +148,3 @@ class Keyboard(ft.Stack):
 
 
 keyboard = Keyboard()
-# async def main(page: ft.Page):
-#     def on_change(e):
-#         tf.value = e
-#         tf.update()
-#     kb = Keyboard(on_change=on_change)
-#     page.overlay.append(kb)
-#     tf = ft.TextField(value="123", read_only=True, on_focus=lambda e: kb.open())
-#     tf2 = ft.TextField(value="123", read_only=True, on_focus=lambda e: kb.open())
-#     page.add(tf)
-#     page.add(tf2)
-#     page.window.width = 1024
-#     page.window.height = 768
-
-
-# ft.app(main)

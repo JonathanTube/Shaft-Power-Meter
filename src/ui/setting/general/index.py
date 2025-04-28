@@ -1,4 +1,5 @@
 import flet as ft
+import logging
 from db.models.preference import Preference
 from ui.setting.general.genera_limitation_max import GeneralLimitationMax
 from ui.setting.general.general_date_time import GeneralDateTime
@@ -28,6 +29,7 @@ class General(ft.Container):
             self.limitation_warning.save_data(user_id)
             self.general_date_time.save_data(user_id)
         except Exception as e:
+            logging.error(f"general save data error: {e}")
             Toast.show_error(self.page, e)
         else:
             Toast.show_success(self.page)

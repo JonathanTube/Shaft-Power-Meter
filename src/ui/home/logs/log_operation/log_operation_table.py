@@ -15,7 +15,6 @@ class LogOperationTable(AbstractTable):
         start_date = self.kwargs.get('start_date')
         end_date = self.kwargs.get('end_date')
         operation_type = self.kwargs.get('operation_type')
-        print(start_date, end_date, operation_type)
         sql = OperationLog.select()
         if start_date and end_date:
             sql = sql.where(OperationLog.utc_date_time >= start_date, OperationLog.utc_date_time <= end_date)

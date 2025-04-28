@@ -1,5 +1,6 @@
 import asyncio
 import flet as ft
+import logging
 from pymodbus.client.tcp import AsyncModbusTcpClient
 from pymodbus.exceptions import ConnectionException
 from common.const_alarm_type import AlarmType
@@ -20,10 +21,12 @@ class PlcSyncTask:
                 await self.__read_data()
                 await self.__write_data()
             except ConnectionException as e:
+                logging.error(f"plc sync task connection error: {e}")
                 self.__send_msg(f"Connection error: {e}")
                 self.__create_alarm_log()
                 await self.__connect()
             except Exception as e:
+                logging.error(f"plc sync task error: {e}")
                 self.__send_msg(f"Error: {e}")
             await asyncio.sleep(1)
 
@@ -110,6 +113,7 @@ class PlcSyncTask:
             if not is_connected:
                 self.__create_alarm_log()
         except Exception as e:
+            logging.error(f"plc sync task connect error: {e}")
             self.__send_msg(f"Error connecting to PLC: {e}")
             self.__create_alarm_log()
 

@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta
+import logging
 from zoneinfo import ZoneInfo
 import pynmea2
 import flet as ft
@@ -29,10 +30,10 @@ class GpsSyncTask:
                 # 数据接收循环
                 await self.receive_data()
             except (ConnectionRefusedError, ConnectionResetError) as e:
-                print(f"连接错误: {e}")
+                logging.error(f"gps connection error: {e}")
                 await self.handle_connection_error()
             except Exception as e:
-                print(f"未知错误: {e}")
+                logging.error(f"gps unknown error: {e}")
                 await self.handle_connection_error()
             finally:
                 await self.close_connection()
@@ -53,6 +54,7 @@ class GpsSyncTask:
                 self.__send_message("connect success")
                 return
             except Exception as e:
+                logging.error(f"gps connect error: {e}")
                 self.__send_message(f"connect failed: {str(e)}")
                 self.retries += 1
                 self.__create_alarm_log()
@@ -75,9 +77,11 @@ class GpsSyncTask:
                 self.__send_message(f"receive data: {str_data}")
                 self.parse_nmea_sentence(str_data)
             except asyncio.TimeoutError:
+                logging.error("gps receive data timeout, keep connection")
                 self.__send_message("read timeout, keep connection")
                 break
             except Exception as e:
+                logging.error(f"gps data receive error: {e}")
                 self.__send_message(f"data receive error: {e}")
                 break
 
@@ -93,6 +97,7 @@ class GpsSyncTask:
                 self.writer.close()
                 await self.writer.wait_closed()
             except Exception as e:
+                logging.error(f"gps close connection error: {e}")
                 self.__send_message(f"close connection error: {e}")
             finally:
                 self.writer = None
@@ -120,6 +125,7 @@ class GpsSyncTask:
                     gdata.utc_date_time = dt_utc
 
         except pynmea2.ParseError as e:
+            logging.error(f"gps parse nmea sentence failed: {e}")
             self.__send_message(f"parse nmea sentence failed: {e}")
             gdata.gps_location = None
 

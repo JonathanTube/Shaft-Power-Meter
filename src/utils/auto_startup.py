@@ -1,13 +1,13 @@
 import os
 import sys
 import winshell
-
+import logging
 
 def add_to_startup():
     try:
         # 获取启动文件夹路径
         startup_folder = winshell.startup()
-        print(f'startup_folder={startup_folder}')
+        logging.info(f'startup_folder={startup_folder}')
         # 创建快捷方式
         exe_path = sys.executable
         shortcut_path = os.path.join(startup_folder, "Shaft Power Meter.lnk")
@@ -18,5 +18,5 @@ def add_to_startup():
 
         return True
     except Exception as e:
-        print(e)
+        logging.error(e)
         return False

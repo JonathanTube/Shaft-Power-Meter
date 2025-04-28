@@ -1,4 +1,5 @@
 import flet as ft
+import logging
 from common.global_data import gdata
 from db.models.user import User
 from ui.common.keyboard import keyboard
@@ -46,6 +47,7 @@ class SystemConf(ft.Container):
             Toast.show_success(self.page)
             
         except Exception as e:
+            logging.error(f"system conf save data error: {e}")
             Toast.show_error(self.page, e)
 
     def __reset_data(self, e):

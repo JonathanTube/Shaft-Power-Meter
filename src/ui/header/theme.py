@@ -2,6 +2,7 @@ import os
 import subprocess
 import flet as ft
 import screen_brightness_control as sbc
+import logging
 
 from common.control_manager import ControlManager
 from ui.common.toast import Toast
@@ -64,6 +65,7 @@ class Theme(ft.Container):
             try:
                 subprocess.Popen(default_avd)
             except Exception as e:
+                logging.error(f"AdvBrightnessUtility error: {e}")
                 Toast.show_error(self.page, f"the AdvBrightnessUtility.exe should be installed at {default_avd}")
         else:
             self.build_dlg()
