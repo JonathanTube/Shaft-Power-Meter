@@ -22,7 +22,9 @@ class ControlManager:
 
     propeller_conf: PropellerSetting | None = None
     propeller_curve_diagram: PropellerCurveDiagram | None = None
-    trend_view_diagram: TrendViewDiagram | None = None
+
+    trend_view_sps1: TrendViewDiagram | None = None
+    trend_view_sps2: TrendViewDiagram | None = None
 
     @staticmethod
     def on_eexi_power_breach_occured():
@@ -58,5 +60,8 @@ class ControlManager:
         if ControlManager.propeller_curve_diagram is not None:
             ControlManager.propeller_curve_diagram.update_style()
 
-        if ControlManager.trend_view_diagram is not None:
-            ControlManager.trend_view_diagram.update_style()
+        if ControlManager.trend_view_sps1 is not None:
+            ControlManager.trend_view_sps1.update_style()
+
+        if ControlManager.trend_view_sps2 is not None:
+            ControlManager.trend_view_sps2.update_style()

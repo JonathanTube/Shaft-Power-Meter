@@ -11,6 +11,7 @@ matplotlib.use('Agg')  # 使用非GUI后端
 plt.rcParams['font.sans-serif'] = ['Microsoft YaHei', 'SimHei']  # 指定常用中文字体
 plt.rcParams['axes.unicode_minus'] = False  # 解决负号 '-' 显示为方块的问题
 
+
 class PropellerCurveDiagram(ft.Container):
     def __init__(self):
         super().__init__()
@@ -63,10 +64,7 @@ class PropellerCurveDiagram(ft.Container):
         # 清除当前图形缓存
         plt.close('all')
         # 重新应用样式
-        if self.page.theme_mode == ft.ThemeMode.DARK:
-            plt.style.use('dark_background')
-        else:
-            plt.style.use('default')
+        self.set_style()
         # 重建图表对象
         self.chart = self.create_chart()
         # 替换容器内容
@@ -74,10 +72,7 @@ class PropellerCurveDiagram(ft.Container):
         self.update()
 
     def create_chart(self) -> MatplotlibChart:
-        if self.page.theme_mode == ft.ThemeMode.DARK:
-            plt.style.use('dark_background')
-        else:
-            plt.style.use('default')
+        self.set_style()
         fig, ax = plt.subplots(figsize=(10, 6))
         self.handle_mcr_point(ax)
         self.handle_normal_propeller_curve(ax)
@@ -94,9 +89,19 @@ class PropellerCurveDiagram(ft.Container):
         self.sps2_text = ax.text(0, 0, 'SPS2', ha='center', va='bottom', fontsize=8)
         return MatplotlibChart(fig, isolated=True, expand=True, transparent=True)
 
+    def set_style(self):
+        # 重新应用样式
+        if self.page.theme_mode == ft.ThemeMode.DARK:
+            plt.style.use('dark_background')
+        else:
+            plt.style.use('default')
+        """更新主题样式"""
+        plt.rcParams['font.sans-serif'] = ['Microsoft YaHei', 'SimHei',  'WenQuanYi Zen Hei']  # 指定常用中文字体
+        plt.rcParams['axes.unicode_minus'] = False  # 解决负号 '-' 显示为方块的问题
+
     def handle_style(self, ax):
         # 配置样式
-        ax.set_xlabel(self.page.session.get('lang.propeller_curve.engine_speed'), fontsize=10)      
+        ax.set_xlabel(self.page.session.get('lang.propeller_curve.engine_speed'), fontsize=10)
         ax.set_ylabel(self.page.session.get('lang.propeller_curve.engine_shaft_power'), fontsize=10)
         ax.grid(True, linestyle='--', alpha=0.2)
         ax.legend(loc='upper left', fontsize=10)

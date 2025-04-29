@@ -28,7 +28,7 @@ class PowerOverloadTask:
                 self.__handle_breach_event()
             else:
                 self.__handle_recovery_event()
-            await asyncio.sleep(1)
+            await asyncio.sleep(gdata.eexi_breach_checking_duration)
 
     def _is_overload(self, speed, power):
         max_speed = gdata.speed_of_torque_load_limit

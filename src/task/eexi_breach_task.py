@@ -28,7 +28,7 @@ class EEXIBreachTask:
                 self.__handle_breach_event()
             else:
                 self.__handle_recovery_event()
-            await asyncio.sleep(1)
+            await asyncio.sleep(gdata.eexi_breach_checking_duration)
 
     def __handle_breach_event(self):
         interval = gdata.eexi_breach_checking_duration
