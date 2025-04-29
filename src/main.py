@@ -1,5 +1,4 @@
 import ctypes
-import logging
 import sys
 import flet as ft
 import asyncio
@@ -112,5 +111,4 @@ async def main(page: ft.Page):
 
 if __name__ == "__main__":
     check_single_instance()
-    Logger(console=True, show_sql=True)
     ft.app(target=main)

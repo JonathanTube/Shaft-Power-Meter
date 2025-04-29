@@ -1,4 +1,4 @@
-from peewee import IntegerField, DateTimeField, CharField
+from peewee import IntegerField, DateTimeField, CharField, BooleanField
 from ..base import BaseModel
 
 
@@ -16,6 +16,8 @@ class DataLog(BaseModel):
     torque = IntegerField(verbose_name="扭矩(Nm)")
 
     rounds = IntegerField(verbose_name="圈数")
+
+    is_overload = BooleanField(verbose_name="是否过载", default=False)
 
     class Meta:
         table_name = 'data_log'

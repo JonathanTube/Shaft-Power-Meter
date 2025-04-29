@@ -4,7 +4,7 @@ import os
 
 
 class Logger:
-    def __init__(self, console=False, show_sql=True):
+    def __init__(self, show_sql=True):
         """
         初始化数据库日志记录器
         :param console: 是否输出到控制台（默认False）
@@ -18,31 +18,22 @@ class Logger:
         # 创建通用日志格式
         formatter = logging.Formatter('[%(asctime)s] [%(levelname)s] %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
 
+       # 控制台处理器
+        console_handler = logging.StreamHandler()
+        console_handler.setLevel(logging.INFO)  # 控制台只显示 INFO 及以上
+        console_handler.setFormatter(formatter)
+
         # 文件处理器（始终启用）
-        file_handler = TimedRotatingFileHandler(
-            filename=log_file,
-            when='midnight',
-            backupCount=15,
-            encoding='utf-8'
-        )
+        file_handler = TimedRotatingFileHandler(filename=log_file, when='midnight', backupCount=15, encoding='utf-8')
         file_handler.setFormatter(formatter)
 
-        # 获取peewee日志记录器
-        root_logger = logging.getLogger()
-        root_logger.setLevel(logging.INFO)
-        root_logger.propagate = False
-        root_logger.addHandler(file_handler)
+        logging.basicConfig(level=logging.INFO, datefmt='%Y-%m-%d %H:%M:%S', handlers=[file_handler, console_handler])
 
-        peewee_logger = logging.getLogger('peewee')
-        peewee_logger.setLevel(logging.DEBUG)
-        peewee_logger.propagate = False  # 禁止日志传播到根记录器
         if show_sql:
+            peewee_logger = logging.getLogger('peewee')
+            peewee_logger.setLevel(logging.DEBUG)
+            peewee_logger.propagate = False
             peewee_logger.addHandler(file_handler)
+            peewee_logger.addHandler(console_handler)
 
-        # 控制台处理器（按需启用）
-        if console:
-            console_handler = logging.StreamHandler()
-            console_handler.setFormatter(formatter)
-            root_logger.addHandler(console_handler)
-            if show_sql:
-                peewee_logger.addHandler(console_handler)
+Logger(show_sql=True)

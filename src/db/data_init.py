@@ -262,6 +262,12 @@ class DataInit:
                 },
 
                 {
+                    "code": "lang.common.is_overload",
+                    "chinese": "是否过载",
+                    "english": "Overload"
+                },
+
+                {
                     "code": "lang.common.speed",
                     "chinese": "转速",
                     "english": "Speed"
@@ -1317,9 +1323,14 @@ class DataInit:
                     "english": "GPS Disconnected"
                 },
                 {
-                    "code": "lang.alarm.sps_disconnected",
-                    "chinese": "SPS 断开",
-                    "english": "SPS Disconnected"
+                    "code": "lang.alarm.sps1_disconnected",
+                    "chinese": "SPS1 断开",
+                    "english": "SPS1 Disconnected"
+                },
+                {
+                    "code": "lang.alarm.sps2_disconnected",
+                    "chinese": "SPS2 断开",
+                    "english": "SPS2 Disconnected"
                 },
                 {
                     "code": "lang.alarm.app_unexpected_exit",

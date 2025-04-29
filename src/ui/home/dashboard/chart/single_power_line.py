@@ -123,9 +123,12 @@ class SinglePowerLine(ft.Container):
             power_sps1 = gdata.sps1_power_history[index][0]
             power_sps2 = 0
             try:
+                # print(f"gdata.sps2_power_history======================: {gdata.sps2_power_history}")
+                # print(f"index======================: {index}")
+                # print(f"gdata.sps2_power_history[index]================111======: {gdata.sps2_power_history[index]}")
                 power_sps2 = gdata.sps2_power_history[index][0]
             except IndexError:
-                logging.error(f"sps2 power history index error: {IndexError}")
+                # logging.error(f"sps2 power history index error: {IndexError}")
                 power_sps2 = 0
 
             power = power_sps1 + power_sps2

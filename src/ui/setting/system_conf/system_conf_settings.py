@@ -132,10 +132,6 @@ class SystemConfSettings(CustomCard):
             ControlManager.propeller_conf.visible = self.display_propeller_curve.value
             ControlManager.propeller_conf.update()
 
-        gdata.enable_shapoli = self.system_settings.sha_po_li
-        gdata.eexi_limited_power = self.system_settings.eexi_limited_power
-        gdata.eexi_breach_checking_duration = self.system_settings.eexi_breach_checking_duration
-
         OperationLog.create(
             user_id=user_id,
             utc_date_time=gdata.utc_date_time,

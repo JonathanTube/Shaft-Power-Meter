@@ -40,9 +40,4 @@ class PropellerConfOverloadCurve(CustomCard):
         self.ps.alarm_enabled_of_overload_curve = self.overload_alarm.value
         self.ps.line_color_of_overload_curve = self.line_color_of_overload_curve.color
 
-        if self.ps.alarm_enabled_of_overload_curve:
-            gdata.enable_power_overload_alarm = True
-        else:
-            gdata.enable_power_overload_alarm = False
-
         gdata.power_of_overload = self.ps.value_of_overload_curve
