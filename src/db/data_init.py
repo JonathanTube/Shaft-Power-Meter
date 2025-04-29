@@ -1262,9 +1262,9 @@ class DataInit:
                     "english": "Interval must be greater than 0"
                 },
                 {
-                    "code": "lang.trendview.cannot_search_more_than_15_days",
-                    "chinese": "不能搜索超过15天",
-                    "english": "Cannot search more than 15 days"
+                    "code": "lang.trendview.cannot_search_more_than_90_days",
+                    "chinese": "不能搜索超过90天",
+                    "english": "Cannot search more than 90 days"
                 },
                 {
                     "code": "lang.propeller_curve.mcr_operating_point",
@@ -1298,13 +1298,13 @@ class DataInit:
                 },
                 {
                     "code": "lang.propeller_curve.engine_speed",
-                    "chinese": "发动机转速",
-                    "english": "Engine Speed"
+                    "chinese": "发动机转速, % of A",
+                    "english": "Engine Speed, % of A"
                 },
                 {
                     "code": "lang.propeller_curve.engine_shaft_power",
-                    "chinese": "发动机轴功率",
-                    "english": "Engine Shaft Power"
+                    "chinese": "发动机轴功率, % of A",
+                    "english": "Engine Shaft Power, % of A"
                 },
                 {
                     "code": "lang.alarm.plc_disconnected",

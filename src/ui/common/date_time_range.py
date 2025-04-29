@@ -1,7 +1,14 @@
 import flet as ft
 
+from db.models.date_time_conf import DateTimeConf
+
 
 class DateTimeRange(ft.Row):
+    def __init__(self):
+        super().__init__()
+        datetime_conf: DateTimeConf = DateTimeConf.get()
+        self.date_format = datetime_conf.date_format
+
     def build(self):
         self.start_date = ft.TextField(
             expand=True,
@@ -25,11 +32,11 @@ class DateTimeRange(ft.Row):
         ]
 
     def __handle_start_date_change(self, e):
-        self.start_date.value = e.control.value.strftime("%Y-%m-%d")
+        self.start_date.value = e.control.value.strftime(self.date_format)
         self.start_date.update()
 
     def __handle_end_date_change(self, e):
-        self.end_date.value = e.control.value.strftime('%Y-%m-%d')
+        self.end_date.value = e.control.value.strftime(self.date_format)
         self.end_date.update()
 
     def get_date_range(self):

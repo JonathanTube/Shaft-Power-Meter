@@ -8,7 +8,8 @@ from common.global_data import gdata
 import logging
 
 matplotlib.use('Agg')  # 使用非GUI后端
-
+plt.rcParams['font.sans-serif'] = ['Microsoft YaHei', 'SimHei']  # 指定常用中文字体
+plt.rcParams['axes.unicode_minus'] = False  # 解决负号 '-' 显示为方块的问题
 
 class PropellerCurveDiagram(ft.Container):
     def __init__(self):
@@ -95,9 +96,8 @@ class PropellerCurveDiagram(ft.Container):
 
     def handle_style(self, ax):
         # 配置样式
-        ax.set_xlabel('Engine Speed, % of A', fontsize=10)
-        ax.set_ylabel('Engine Shaft Power, % of A', fontsize=10)
-        ax.set_title('Engine Load Diagram', fontsize=12)
+        ax.set_xlabel(self.page.session.get('lang.propeller_curve.engine_speed'), fontsize=10)      
+        ax.set_ylabel(self.page.session.get('lang.propeller_curve.engine_shaft_power'), fontsize=10)
         ax.grid(True, linestyle='--', alpha=0.2)
         ax.legend(loc='upper left', fontsize=10)
         # 设置x轴和y轴为对数坐标
@@ -115,7 +115,7 @@ class PropellerCurveDiagram(ft.Container):
         x_ticks = [self.left_rpm_of_torque_limit]
         for i in range(x_begin + 1, 12, 1):
             x_ticks.append(i * 10)
-        
+
         plt.xticks(x_ticks, [f'{x}' for x in x_ticks], fontsize=10)
         # 设置x轴范围
         ax.set_xlim(xmin=x_ticks[0], xmax=x_ticks[-1])
@@ -126,24 +126,24 @@ class PropellerCurveDiagram(ft.Container):
         y_ticks = [self.left_power_of_normal]
         for i in range(y_begin + 1, 12, 1):
             y_ticks.append(i * 10)
-        
+
         plt.yticks(y_ticks, [f'{x}' for x in y_ticks], fontsize=10)
         # 设置y轴范围
         ax.set_ylim(ymin=y_ticks[0], ymax=y_ticks[-1])
 
     def handle_mcr_point(self, ax):
-        ax.scatter(100, 100, color='red', zorder=5, label='MCR Operating Point', s=40)
+        ax.scatter(100, 100, color='red', zorder=5, label=self.page.session.get('lang.propeller_curve.mcr_operating_point'), s=40)
 
     def handle_normal_propeller_curve(self, ax):
         color = self.color_of_normal
         rpm_points = np.linspace(self.left_rpm_of_normal, 105, 500)
         power_points = (rpm_points / self.right_rpm_of_normal) ** 3 * self.right_power_of_normal
         power_points = np.minimum(power_points, 100)
-        ax.plot(rpm_points, power_points, color=color, linewidth=1, label='Normal Propeller Curve')
+        ax.plot(rpm_points, power_points, color=color, linewidth=1, label=self.page.session.get('lang.propeller_curve.normal_propeller_curve'))
         ax.scatter([self.left_rpm_of_normal, self.right_rpm_of_normal], [self.left_power_of_normal, self.right_power_of_normal], color=color, zorder=1, s=10)  # 标出两端点
 
     def handle_speed_limit(self, ax):
-        ax.axvline(x=self.rpm_of_speed_limit, color=self.color_of_speed_limit, linewidth=1, label='Speed Limit Curve')
+        ax.axvline(x=self.rpm_of_speed_limit, color=self.color_of_speed_limit, linewidth=1, label=self.page.session.get('lang.propeller_curve.speed_limit_curve'))
 
     def handle_light_load_propeller_curve(self, ax):
         color = self.color_of_light_load
@@ -151,7 +151,7 @@ class PropellerCurveDiagram(ft.Container):
         power_points = (rpm_points / self.right_rpm_of_normal) ** 3 * (self.right_power_of_normal + self.power_of_light_load * -1)
         power_points = np.minimum(power_points, 100)
         # power_points = np.maximum(power_points, left_power_of_normal)
-        ax.plot(rpm_points, power_points, color=color, linewidth=1, linestyle='dashed', label='Light Propeller Curve')
+        ax.plot(rpm_points, power_points, color=color, linewidth=1, linestyle='dashed', label=self.page.session.get('lang.propeller_curve.light_propeller_curve'))
 
     def handle_torque_or_speed_limit_curve(self, ax):
         color = self.color_of_torque_limit
@@ -160,7 +160,7 @@ class PropellerCurveDiagram(ft.Container):
         rpm_points = np.append(rpm_points, 100)
         power_points = (rpm_points / self.right_rpm_of_torque_limit) ** 2 * self.right_power_of_torque_limit
         power_points = np.minimum(power_points, 100)
-        ax.plot(rpm_points, power_points, color=color, linewidth=1, label='Torque/Speed Limit Curve')
+        ax.plot(rpm_points, power_points, color=color, linewidth=1, label=self.page.session.get('lang.propeller_curve.torque_load_limit_curve'))
         ax.scatter([self.left_rpm_of_torque_limit, self.right_rpm_of_torque_limit], [self.left_power_of_torque_limit, self.right_power_of_torque_limit], color=color, zorder=2, s=10)  # 标出两端点
 
     def handle_overload_curve(self, ax):
@@ -170,7 +170,7 @@ class PropellerCurveDiagram(ft.Container):
         max_power_point = np.max(power_points)
         rpm_points = np.append(rpm_points, 105)
         power_points = np.append(power_points, max_power_point)
-        ax.plot(rpm_points, power_points, color=color, linewidth=1, linestyle='--', label='Overload Limit Curve')
+        ax.plot(rpm_points, power_points, color=color, linewidth=1, linestyle='--', label=self.page.session.get('lang.propeller_curve.overload_curve'))
 
     def update_sps_points(self):
         if self.rpm_of_mcr == 0 or self.power_of_mcr == 0:

@@ -51,7 +51,7 @@ class PropellerConfMcr(CustomCard):
         if self.system_unit == 0:
             return (_shaft_power / 1000, "kW")
         else:
-            return (UnitConverter.w_to_shp(_shaft_power), "hp")
+            return (UnitConverter.w_to_shp(_shaft_power), "sHp")
 
     def save_data(self):
         self.ps.rpm_of_mcr_operating_point = self.rpm_of_mcr_operating_point.value

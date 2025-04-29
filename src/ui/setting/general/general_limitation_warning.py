@@ -56,7 +56,7 @@ class GeneralLimitationWarning(ft.Container):
             self.torque_warning.suffix_text = "Tm"
             self.torque_warning.value = UnitConverter.nm_to_tm(torque_warning)
 
-            self.power_warning.suffix_text = "shp"
+            self.power_warning.suffix_text = "sHp"
             self.power_warning.value = UnitConverter.w_to_shp(power_warning)
 
         self.content.update()

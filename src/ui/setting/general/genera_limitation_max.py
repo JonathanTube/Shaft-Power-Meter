@@ -56,7 +56,7 @@ class GeneralLimitationMax(ft.Container):
             self.torque_max.suffix_text = "Tm"
             self.torque_max.value = UnitConverter.nm_to_tm(torque_limit)
 
-            self.power_max.suffix_text = "shp"
+            self.power_max.suffix_text = "sHp"
             self.power_max.value = UnitConverter.w_to_shp(power_limit)
 
         self.content.update()

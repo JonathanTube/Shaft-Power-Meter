@@ -4,7 +4,9 @@ import matplotlib
 from db.models.data_log import DataLog
 from db.models.date_time_conf import DateTimeConf
 from flet.matplotlib_chart import MatplotlibChart
-
+from matplotlib import dates as mdates  # 新增日期格式化模块
+from db.models.preference import Preference
+from utils.unit_converter import UnitConverter
 matplotlib.use('Agg')  # 使用非GUI后端
 
 
@@ -17,11 +19,13 @@ class TrendViewDiagram(ft.Container):
         self.ax_power = None
         datetime_conf: DateTimeConf = DateTimeConf.get()
         self.date_format = datetime_conf.date_format
+        preference: Preference = Preference.get()
+        self.system_unit = preference.system_unit
 
     def update_chart(self, data_list: list[DataLog]):
         date_times, rpm_data, power_data = self.__get_data(data_list)
-        self.ax_rpm.plot(date_times, rpm_data)
-        self.ax_power.plot(date_times, power_data)
+        self.ax_rpm.plot(date_times, rpm_data, color='blue')
+        self.ax_power.plot(date_times, power_data, color='red')
 
         self.chart.update()
 
@@ -32,8 +36,12 @@ class TrendViewDiagram(ft.Container):
 
         for data in data_list:
             rpm_data.append(data.speed)
-            power_data.append(data.power)
-            date_times.append(data.utc_date_time.strftime(f'{self.date_format} %H:%M:%S'))
+            date_times.append(data.utc_date_time)
+
+            if self.system_unit == 0:
+                power_data.append(data.power / 1000)
+            else:
+                power_data.append(UnitConverter.w_to_shp(data.power))
 
         return (date_times, rpm_data, power_data)
 
@@ -63,12 +71,17 @@ class TrendViewDiagram(ft.Container):
         fig, self.ax_rpm = plt.subplots(figsize=(10, 6))
         fig.subplots_adjust(left=0.08, right=0.92, top=0.95, bottom=0.1)
 
+        # 格式化日期轴（重要修改）
+        self.ax_rpm.xaxis.set_major_locator(mdates.AutoDateLocator())  # 自动分布
+        self.ax_rpm.xaxis.set_major_formatter(
+            mdates.ConciseDateFormatter(self.ax_rpm.xaxis.get_major_locator())
+        )
         self.ax_rpm.grid(True, linestyle='--', alpha=0.2)
         self.ax_rpm.set_xlabel('UTC date time',  fontsize=12)
         self.ax_rpm.tick_params(axis='x', labelsize=10)
 
-        self.ax_rpm.set_ylabel('rpm',  fontsize=12)
-        self.ax_rpm.plot([], [])
+        self.ax_rpm.set_ylabel('RPM',  fontsize=10)
+        self.ax_rpm.plot([], [], color='blue')
         self.ax_rpm.tick_params(axis='y', labelsize=10)
         self.ax_rpm.spines['top'].set_visible(False)
 
@@ -76,8 +89,8 @@ class TrendViewDiagram(ft.Container):
         self.ax_power = self.ax_rpm.twinx()
 
         # we already handled the x-label with ax1
-        self.ax_power.set_ylabel('kW', fontsize=10)
-        self.ax_power.plot([], [])
+        self.ax_power.set_ylabel('kW' if self.system_unit == 0 else 'sHp', fontsize=10)
+        self.ax_power.plot([], [], color='red')
         self.ax_power.tick_params(axis='y', labelsize=10)
         self.ax_power.spines['top'].set_visible(False)
 

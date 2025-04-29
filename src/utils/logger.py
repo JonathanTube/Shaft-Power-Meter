@@ -30,6 +30,7 @@ class Logger:
         # 获取peewee日志记录器
         root_logger = logging.getLogger()
         root_logger.setLevel(logging.INFO)
+        root_logger.propagate = False
         root_logger.addHandler(file_handler)
 
         peewee_logger = logging.getLogger('peewee')

@@ -272,8 +272,8 @@ class ReportInfoDialog(ft.AlertDialog):
                 ft.DataColumn(ft.Text("Date/Time")),
                 ft.DataColumn(ft.Text(f"Speed(rpm)")),
                 ft.DataColumn(ft.Text(f"Torque(kNm)") if system_unit == 0 else ft.Text(f"Torque(Tm)")),
-                ft.DataColumn(ft.Text(f"Power(kW)") if system_unit == 0 else ft.Text(f"Power(SHp)")),
-                ft.DataColumn(ft.Text(f"Total Power(kWh)") if system_unit == 0 else ft.Text(f"Total Power(SHph)"))
+                ft.DataColumn(ft.Text(f"Power(kW)") if system_unit == 0 else ft.Text(f"Power(sHp)")),
+                ft.DataColumn(ft.Text(f"Total Power(kWh)") if system_unit == 0 else ft.Text(f"Total Power(sHph)"))
             ],
             rows=rows
         )

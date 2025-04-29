@@ -108,8 +108,8 @@ class ReportInfoExporter(FPDF):
             headers[5] = "Total Power(Wh)"
         else:
             headers[3] = "Torque(Tm)"
-            headers[4] = "Power(SHp)"
-            headers[5] = "Total Power(SHph)"
+            headers[4] = "Power(sHp)"
+            headers[5] = "Total Power(sHph)"
 
         self.set_font("Arial", 'B', 10)
 

@@ -10,7 +10,7 @@ class UnitParser:
         if system_unit == 0:
             return [float(f'{_energy:.2f}'), 'kWh']
         else:
-            return [float(f'{UnitConverter.kwh_to_shph(_energy):.2f}'), 'SHph']
+            return [float(f'{UnitConverter.kwh_to_shph(_energy):.2f}'), 'sHph']
 
     @staticmethod
     def parse_power(power: float, system_unit: int, shrink: bool = True) -> tuple[float, str]:
@@ -21,7 +21,7 @@ class UnitParser:
             else:
                 return [float(f'{_power/1000:.1f}'), 'kW']
         else:
-            return [float(f'{UnitConverter.w_to_shp(_power):.1f}'), 'SHp']
+            return [float(f'{UnitConverter.w_to_shp(_power):.1f}'), 'sHp']
 
     @staticmethod
     def parse_speed(speed: float) -> tuple[float, str]:

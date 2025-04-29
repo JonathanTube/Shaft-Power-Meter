@@ -109,7 +109,7 @@ class SystemConfSettings(CustomCard):
         if self.preference.system_unit == 0:
             return (_eexi_limited_power / 1000, "kW")
         else:
-            return (UnitConverter.w_to_shp(_eexi_limited_power), "hp")
+            return (UnitConverter.w_to_shp(_eexi_limited_power), "sHp")
 
     def save(self, user_id: int):
         self.system_settings.amount_of_propeller = self.amount_of_propeller_radios.value
