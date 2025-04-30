@@ -131,5 +131,6 @@ class TestMode(ft.Container):
             operation_content='stopped test mode'
         )
 
-        ControlManager.on_eexi_power_breach_recovery()
+        ControlManager.audio_alarm.stop()
+        ControlManager.fullscreen_alert.stop()
         Toast.show_success(self.page)

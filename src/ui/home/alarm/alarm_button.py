@@ -23,17 +23,14 @@ class AlarmButton(ft.TextButton):
     def build(self):
         self.text = self.page.session.get("lang.home.tab.alarm")
 
-    def update_badge(self):
-        count = AlarmLog.select().where(AlarmLog.acknowledge_time == None).count()
+    def update_alarm(self):
+        count = AlarmLog.select().where(AlarmLog.acknowledge_time.is_null()).count()
         if count > 0:
-            self.badge = ft.Badge(
-                text=str(count),
-                bgcolor=ft.Colors.RED,
-                text_color=ft.Colors.WHITE,
-                label_visible=True
-            )
+            self.badge = ft.Badge(text=str(count), bgcolor=ft.Colors.RED, text_color=ft.Colors.WHITE, label_visible=True)
+            self.start_blink()
         else:
             self.badge = None
+            self.stop_blink()
         self.update()
 
     async def __blink(self):
@@ -58,8 +55,9 @@ class AlarmButton(ft.TextButton):
             cnt += 1
 
     def start_blink(self):
-        self.blinking = True
-        self.task = self.page.run_task(self.__blink)
+        if not self.blinking:
+            self.blinking = True
+            self.task = self.page.run_task(self.__blink)
 
     def stop_blink(self):
         self.blinking = False

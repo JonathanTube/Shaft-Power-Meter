@@ -10,6 +10,7 @@ from db.models.gps_log import GpsLog
 import asyncio
 import random
 from common.global_data import gdata
+from utils.alarm_saver import AlarmSaver
 
 
 class GpsSyncTask:
@@ -57,13 +58,8 @@ class GpsSyncTask:
                 logging.error(f"gps connect error: {e}")
                 self.__send_message(f"connect failed: {str(e)}")
                 self.retries += 1
-                self.__create_alarm_log()
+                AlarmSaver.create(AlarmType.GPS_DISCONNECTED)
                 await asyncio.sleep(delay)
-
-    def __create_alarm_log(self):
-        cnt: int = AlarmLog.select().where(AlarmLog.alarm_type == AlarmType.GPS_DISCONNECTED, AlarmLog.acknowledge_time == None).count()
-        if cnt == 0:
-            AlarmLog.create(utc_date_time=gdata.utc_date_time, alarm_type=AlarmType.GPS_DISCONNECTED)
 
     async def receive_data(self):
         while not self.reader.at_eof():

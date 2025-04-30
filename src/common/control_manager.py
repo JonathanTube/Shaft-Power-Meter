@@ -6,6 +6,7 @@ from ui.home.dashboard.sps_single.off.index import SingleShaPoLiOff
 from ui.home.dashboard.sps_dual.on.index import DualShaPoLiOn
 from ui.home.dashboard.sps_dual.off.index import DualShaPoLiOff
 from ui.home.event.event_button import EventButton
+from ui.home.alarm.alarm_button import AlarmButton
 from ui.home.propeller_curve.diagram import PropellerCurveDiagram
 from ui.home.trendview.diagram import TrendViewDiagram
 
@@ -14,6 +15,7 @@ class ControlManager:
     audio_alarm: AudioAlarm | None = None
     fullscreen_alert: FullscreenAlert | None = None
     event_button: EventButton | None = None
+    alarm_button: AlarmButton | None = None
 
     sps_single_on: SingleShaPoLiOn | None = None
     sps_single_off: SingleShaPoLiOff | None = None
@@ -25,18 +27,6 @@ class ControlManager:
 
     trend_view_sps1: TrendViewDiagram | None = None
     trend_view_sps2: TrendViewDiagram | None = None
-
-    @staticmethod
-    def on_eexi_power_breach_occured():
-        ControlManager.audio_alarm.play()
-        ControlManager.fullscreen_alert.start()
-        if ControlManager.event_button is not None:
-            ControlManager.event_button.update_badge()
-
-    @staticmethod
-    def on_eexi_power_breach_recovery():
-        ControlManager.audio_alarm.stop()
-        ControlManager.fullscreen_alert.stop()
 
     @staticmethod
     def on_instant_data_refresh():

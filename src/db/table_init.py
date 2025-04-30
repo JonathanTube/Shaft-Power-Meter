@@ -28,7 +28,7 @@ class TableInit:
         # db.drop_tables([Language], safe=False)
         # db.drop_tables([DataLog], safe=False)
         # db.drop_tables([OperationLog], safe=False)
-        # db.drop_tables([EventLog], safe=False)
+        # db.drop_tables([IOConf], safe=False)
         db.create_tables([
             BreachReason,
             DataLog,

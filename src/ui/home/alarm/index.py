@@ -9,6 +9,8 @@ from ui.common.toast import Toast
 from ui.home.alarm.alarm_table import AlarmTable
 from common.global_data import gdata
 from common.const_alarm_type import AlarmType
+from common.control_manager import ControlManager
+from utils.alarm_saver import AlarmSaver
 
 
 class AlarmList(ft.Container):
@@ -96,8 +98,7 @@ class AlarmList(ft.Container):
             Toast.show_error(self.page, self.page.session.get("lang.alarm.please_select_at_least_one_alarm"))
             return
 
-        for row in selected_rows:
-            AlarmLog.update(acknowledge_time=gdata.utc_date_time).where(AlarmLog.id == row.cells[0].data).execute()
+        AlarmSaver.acknowledge(selected_rows)
 
         self.table.search()
         Toast.show_success(self.page)

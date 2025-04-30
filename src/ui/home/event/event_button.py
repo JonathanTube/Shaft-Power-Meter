@@ -19,15 +19,10 @@ class EventButton(ft.TextButton):
     def build(self):
         self.text = self.page.session.get("lang.home.tab.event")
 
-    def update_badge(self):
+    def update_event(self):
         count = EventLog.select().where(EventLog.breach_reason == None).count()
         if count > 0:
-            self.badge = ft.Badge(
-                text=str(count),
-                bgcolor=ft.Colors.RED,
-                text_color=ft.Colors.WHITE,
-                label_visible=True
-            )
+            self.badge = ft.Badge(text=str(count), bgcolor=ft.Colors.RED, text_color=ft.Colors.WHITE, label_visible=True)
         else:
             self.badge = None
         self.update()

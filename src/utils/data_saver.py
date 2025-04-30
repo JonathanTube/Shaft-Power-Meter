@@ -1,13 +1,14 @@
+import asyncio
 from datetime import timedelta
 import logging
+from common.const_alarm_type import AlarmType
 from db.models.data_log import DataLog
 from common.global_data import gdata
-from db.models.report_detail import ReportDetail
-from db.models.report_info import ReportInfo
+from utils import plc_util
 from utils.eexi_breach import EEXIBreach
 from utils.formula_cal import FormulaCalculator
 from common.control_manager import ControlManager
-from utils.power_overload import PowerOverload
+from utils.alarm_saver import AlarmSaver
 
 
 class DataSaver:
@@ -16,9 +17,9 @@ class DataSaver:
         try:
             utc_date_time = gdata.utc_date_time
             power = FormulaCalculator.calculate_instant_power(torque, speed)
-
             # delete invalid data
             DataLog.delete().where(DataLog.utc_date_time < utc_date_time - timedelta(weeks=4 * 3))
+            is_overload: bool = DataSaver.is_overload(speed, power)
             # insert new data
             DataLog.create(
                 utc_date_time=utc_date_time,
@@ -28,7 +29,7 @@ class DataSaver:
                 thrust=thrust,
                 torque=torque,
                 rounds=rounds,
-                is_overload=DataSaver.is_overload(speed, power)
+                is_overload=is_overload
             )
             if name == 'sps1':
                 gdata.sps1_thrust = thrust
@@ -54,8 +55,6 @@ class DataSaver:
             ControlManager.on_instant_data_refresh()
             # 处理EEXI过载和恢复
             EEXIBreach.handle_breach_and_recovery()
-            # 处理功率过载
-            PowerOverload.handle_power_overlaod()
         except Exception as e:
             logging.error(f"data saver error: {e}")
 
@@ -70,4 +69,14 @@ class DataSaver:
         # 实际的功率百分比
         actual_power_percentage = round(power / gdata.power_of_mcr * 100, 2)
         logging.info(f"date_saver: overload_power_percentage={overload_power_percentage}, actual_power_percentage={actual_power_percentage}")
-        return actual_power_percentage > overload_power_percentage
+        overload: bool = actual_power_percentage > overload_power_percentage
+
+        if overload:  # 处理功率过载
+            AlarmSaver.create(AlarmType.POWER_OVERLOAD)
+            # 写入plc-overload
+            asyncio.create_task(plc_util.write_overload(False))
+        else:  # 功率恢复
+            # 写入plc-overload
+            asyncio.create_task(plc_util.write_overload(True))
+
+        return overload

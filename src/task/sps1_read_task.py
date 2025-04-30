@@ -7,6 +7,7 @@ from common.const_alarm_type import AlarmType
 from common.const_pubsub_topic import PubSubTopic
 from db.models.alarm_log import AlarmLog
 from common.global_data import gdata
+from utils.alarm_saver import AlarmSaver
 
 
 class Sps1ReadTask:
@@ -66,20 +67,11 @@ class Sps1ReadTask:
             is_connected = await self.sps_client.connect()
             self.__send_msg(f"connected to sps: {is_connected}")
             if not is_connected:
-                self.__create_alarm_log()
+                AlarmSaver.create(AlarmType.SPS1_DISCONNECTED)
         except Exception as e:
             logging.error(f"sps1 read task connect error: {e}")
-            self.__create_alarm_log()
+            AlarmSaver.create(AlarmType.SPS1_DISCONNECTED)
             self.__send_msg(f"Error connecting to sps: {e}")
-
-    def __create_alarm_log(self):
-        cnt: int = AlarmLog.select().where(AlarmLog.alarm_type == AlarmType.SPS1_DISCONNECTED, AlarmLog.acknowledge_time == None).count()
-
-        if cnt == 0:
-            AlarmLog.create(
-                utc_date_time=gdata.utc_date_time,
-                alarm_type=AlarmType.SPS1_DISCONNECTED,
-            )
 
     def __send_msg(self, message: str):
         self.page.pubsub.send_all_on_topic(

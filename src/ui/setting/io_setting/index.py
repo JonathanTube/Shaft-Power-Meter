@@ -1,7 +1,5 @@
 import flet as ft
 import logging
-from pymodbus.client import ModbusTcpClient
-
 from db.models.io_conf import IOConf
 from db.models.user import User
 from ui.common.toast import Toast
@@ -9,9 +7,9 @@ from ui.common.permission_check import PermissionCheck
 from ui.setting.io_setting.io_setting_plc import IOSettingPLC
 from ui.setting.io_setting.io_setting_gps import IOSettingGPS
 from ui.setting.io_setting.io_setting_sps1 import IOSettingSPS1
+from ui.setting.io_setting.io_setting_sps2 import IOSettingSPS2
 from ui.setting.io_setting.io_setting_output import IOSettingOutput
 from ui.setting.io_setting.io_setting_factor import IOSettingFactor
-from ui.setting.io_setting.io_setting_sps2 import IOSettingSPS2
 from db.models.opearation_log import OperationLog
 from common.operation_type import OperationType
 from common.global_data import gdata
@@ -72,39 +70,10 @@ class IOSetting(ft.Container):
                 operation_type=OperationType.IO_CONF,
                 operation_content=model_to_dict(self.conf)
             )
-            self.__write_to_plc()
             Toast.show_success(self.page)
         except Exception as err:
             logging.error(f"io setting save data error: {err}")
             Toast.show_error(self.page, err)
-
-    def __write_to_plc(self):
-        plc_client = None
-        try:
-            plc_client = ModbusTcpClient(host=self.conf.plc_ip, port=self.conf.plc_port)
-            plc_client.connect()
-            plc_client.write_register(12298, int(self.conf.power_range_min))
-            plc_client.write_register(12299, int(self.conf.power_range_max))
-            plc_client.write_register(12300, int(self.conf.power_range_offset))
-
-            plc_client.write_register(12308, int(self.conf.torque_range_min))
-            plc_client.write_register(12309, int(self.conf.torque_range_max))
-            plc_client.write_register(12310, int(self.conf.torque_range_offset))
-
-            plc_client.write_register(12318, int(self.conf.thrust_range_min))
-            plc_client.write_register(12319, int(self.conf.thrust_range_max))
-            plc_client.write_register(12320, int(self.conf.thrust_range_offset))
-
-            plc_client.write_register(12328, int(self.conf.speed_range_min))
-            plc_client.write_register(12329, int(self.conf.speed_range_max))
-            plc_client.write_register(12330, int(self.conf.speed_range_offset))
-        except Exception as err:
-            logging.error(f"io setting write to plc error: {err}")
-            Toast.show_error(self.page, err)
-            raise err
-        finally:
-            if plc_client:
-                plc_client.close()
 
     def __reset_data(self, e):
         keyboard.close()

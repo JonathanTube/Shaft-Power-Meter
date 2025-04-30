@@ -7,10 +7,9 @@ from datetime import timedelta, datetime
 from db.models.data_log import DataLog
 from db.models.preference import Preference
 from db.models.system_settings import SystemSettings
+from utils.formula_cal import FormulaCalculator
 from peewee import fn
 import logging
-
-from utils.formula_cal import FormulaCalculator
 
 
 class EEXIBreach:
@@ -98,7 +97,12 @@ class EEXIBreach:
     def __handle_breach_event(start_time: datetime):
         # 如果还没有创建报告，则创建报告
         if EEXIBreach.report_id is None:
-            ControlManager.on_eexi_power_breach_occured()
+
+            ControlManager.audio_alarm.play()
+            ControlManager.fullscreen_alert.start()
+            if ControlManager.event_button is not None:
+                ControlManager.event_button.update_event()
+
             event_log: EventLog = EventLog.create(started_at=start_time, started_position=gdata.gps_location)
 
             report_info = ReportInfo.create(event_log=event_log, report_name=f"Compliance Report #{event_log.id}")
@@ -120,7 +124,8 @@ class EEXIBreach:
     @staticmethod
     def __handle_recovery_event(start_time: datetime):
         if EEXIBreach.report_id is not None:
-            ControlManager.on_eexi_power_breach_recovery()
+            ControlManager.audio_alarm.stop()
+            ControlManager.fullscreen_alert.stop()
             event_log: EventLog = EventLog.select().where(EventLog.ended_at == None).order_by(EventLog.id.asc()).first()
 
             if event_log is not None:
@@ -131,11 +136,7 @@ class EEXIBreach:
             EEXIBreach.report_id = None
             # 记录之前所有的恢复数据
             data = DataLog.select(
-                DataLog.name,
-                DataLog.utc_date_time,
-                DataLog.speed,
-                DataLog.torque,
-                DataLog.power
+                DataLog.name, DataLog.utc_date_time, DataLog.speed, DataLog.torque, DataLog.power
             ).where(
                 DataLog.utc_date_time >= start_time
             ).order_by(DataLog.utc_date_time.asc())
@@ -145,9 +146,12 @@ class EEXIBreach:
     @staticmethod
     def __save_report_detail(name: str, utc_date_time: datetime, speed: float, torque: float, power: float):
         try:
+            report_info = ReportInfo.get(ReportInfo.id == EEXIBreach.report_id)
+            if report_info is None:
+                return
             total_power = FormulaCalculator.calculate_energy_kwh(power)
             ReportDetail.create(
-                report_info=ReportInfo.get(ReportInfo.id == EEXIBreach.report_id),
+                report_info=report_info,
                 name=name,
                 utc_date_time=utc_date_time,
                 speed=speed,

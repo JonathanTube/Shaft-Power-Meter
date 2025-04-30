@@ -10,8 +10,6 @@ from ui.home.logs.index import Logs
 from ui.home.propeller_curve.index import PropellerCurve
 from ui.home.trendview.index import TrendView
 from ui.home.event.event_list import EventList
-from db.models.event_log import EventLog
-from db.models.alarm_log import AlarmLog
 from db.models.system_settings import SystemSettings
 
 
@@ -63,6 +61,7 @@ class Home(ft.Container):
             on_click=lambda e: self.__on_click(e, 3)
         )
         self.alarm_button = AlarmButton(on_click=lambda e: self.__on_click(e, 4))
+        ControlManager.alarm_button = self.alarm_button
         self.event_button = EventButton(on_click=lambda e: self.__on_click(e, 5))
         ControlManager.event_button = self.event_button
 
@@ -137,32 +136,12 @@ class Home(ft.Container):
 
         self.update()
 
-    def update_event_badge(self):
-        count = EventLog.select().where(EventLog.breach_reason == None).count()
-        if count > 0:
-            self.event_button.badge = ft.Badge(
-                text=str(count),
-                bgcolor=ft.Colors.RED,
-                text_color=ft.Colors.WHITE,
-                label_visible=True
-            )
-        else:
-            self.event_button.badge = None
-        self.event_button.update()
-
-    def update_alarm_badge(self):
-        count = AlarmLog.select().where(AlarmLog.acknowledge_time == None).count()
-        if count > 0:
-            self.alarm_button.badge = ft.Badge(text=str(count), bgcolor=ft.Colors.RED, text_color=ft.Colors.WHITE, label_visible=True)
-            self.alarm_button.start_blink()
-        else:
-            self.alarm_button.badge = None
-            self.alarm_button.stop_blink()
-        self.alarm_button.update()
-
     def did_mount(self):
-        self.update_event_badge()
-        self.update_alarm_badge()
+        if ControlManager.event_button is not None:
+            ControlManager.event_button.update_event()
+        if ControlManager.alarm_button is not None:
+            ControlManager.alarm_button.update_alarm()
 
     def will_unmount(self):
         ControlManager.event_button = None
+        ControlManager.alarm_button = None

@@ -80,7 +80,6 @@ class TestModeTask:
 
             gdata.sps1_power_history = []
             gdata.sps2_power_history = []
-            ControlManager.on_eexi_power_breach_recovery()
         except Exception as e:
             logging.error(f'test mode task error: {e}')
         self.is_running = False

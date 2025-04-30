@@ -17,6 +17,7 @@ from db.models.language import Language
 from ui.common.audio_alarm import AudioAlarm
 from task.task_manager import TaskManager
 from common.global_data import gdata
+from utils.alarm_saver import AlarmSaver
 from utils.auto_startup import add_to_startup
 from utils.logger import Logger
 # 加入开机启动
@@ -60,7 +61,7 @@ async def handle_unexpected_exit():
     date_time_conf: DateTimeConf = DateTimeConf.get()
     # if the time diff is more than 5 seconds, send the alarm
     if abs((date_time_conf.system_date_time - gdata.system_date_time).total_seconds()) > 5:
-        AlarmLog.create(utc_date_time=gdata.utc_date_time, alarm_type=AlarmType.APP_UNEXPECTED_EXIT)
+        AlarmSaver.create(AlarmType.APP_UNEXPECTED_EXIT)
 
 
 async def main(page: ft.Page):
