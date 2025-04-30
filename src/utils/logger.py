@@ -35,5 +35,3 @@ class Logger:
             peewee_logger.propagate = False
             peewee_logger.addHandler(file_handler)
             peewee_logger.addHandler(console_handler)
-
-Logger(show_sql=True)

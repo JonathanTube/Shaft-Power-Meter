@@ -18,7 +18,9 @@ from task.task_manager import TaskManager
 from common.global_data import gdata
 from utils.alarm_saver import AlarmSaver
 from utils.auto_startup import add_to_startup
-from utils.plc_util import plc_util
+from utils.logger import Logger
+Logger(show_sql=True)
+
 # 加入开机启动
 add_to_startup()
 
