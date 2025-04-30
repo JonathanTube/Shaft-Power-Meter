@@ -1,6 +1,6 @@
 import flet as ft
+import matplotlib.backends.backend_svg
 from matplotlib import pyplot as plt
-import matplotlib
 from db.models.data_log import DataLog
 from db.models.date_time_conf import DateTimeConf
 from flet.matplotlib_chart import MatplotlibChart

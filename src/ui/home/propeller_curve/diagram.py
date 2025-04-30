@@ -1,4 +1,4 @@
-import matplotlib
+import matplotlib.backends.backend_svg
 import matplotlib.pyplot as plt
 import numpy as np
 import flet as ft
