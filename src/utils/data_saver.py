@@ -4,7 +4,7 @@ import logging
 from common.const_alarm_type import AlarmType
 from db.models.data_log import DataLog
 from common.global_data import gdata
-from utils import plc_util
+from utils.plc_util import plc_util
 from utils.eexi_breach import EEXIBreach
 from utils.formula_cal import FormulaCalculator
 from common.control_manager import ControlManager
@@ -74,9 +74,9 @@ class DataSaver:
         if overload:  # 处理功率过载
             AlarmSaver.create(AlarmType.POWER_OVERLOAD)
             # 写入plc-overload
-            asyncio.create_task(plc_util.write_overload(False))
+            asyncio.create_task(plc_util.write_overload(True))
         else:  # 功率恢复
             # 写入plc-overload
-            asyncio.create_task(plc_util.write_overload(True))
+            asyncio.create_task(plc_util.write_overload(False))
 
         return overload

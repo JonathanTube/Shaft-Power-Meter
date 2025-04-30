@@ -5,7 +5,6 @@ import asyncio
 from common.const_alarm_type import AlarmType
 from common.control_manager import ControlManager
 from db.models.date_time_conf import DateTimeConf
-from db.models.alarm_log import AlarmLog
 from ui.common.fullscreen_alert import FullscreenAlert
 from ui.common.keyboard import keyboard
 from ui.header.index import Header
@@ -19,7 +18,7 @@ from task.task_manager import TaskManager
 from common.global_data import gdata
 from utils.alarm_saver import AlarmSaver
 from utils.auto_startup import add_to_startup
-from utils.logger import Logger
+from utils.plc_util import plc_util
 # 加入开机启动
 add_to_startup()
 
@@ -108,6 +107,7 @@ async def main(page: ft.Page):
     page.add(main_stack)
 
     page.overlay.append(keyboard)
+
     page.update()
 
 if __name__ == "__main__":

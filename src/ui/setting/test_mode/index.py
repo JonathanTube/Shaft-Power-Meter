@@ -3,6 +3,7 @@ import flet as ft
 from db.models.test_mode_conf import TestModeConf
 from ui.setting.test_mode.test_mode_instant import TestModeInstant
 from ui.setting.test_mode.test_mode_range import TestModeRange
+from utils import plc_util
 from utils.unit_converter import UnitConverter
 from db.models.preference import Preference
 from task.test_mode_task import testModeTask
@@ -15,6 +16,7 @@ from common.operation_type import OperationType
 from common.global_data import gdata
 from playhouse.shortcuts import model_to_dict
 from db.models.user import User
+
 
 class TestMode(ft.Container):
     def __init__(self):
@@ -133,4 +135,6 @@ class TestMode(ft.Container):
 
         ControlManager.audio_alarm.stop()
         ControlManager.fullscreen_alert.stop()
+        self.page.run_task(plc_util.write_alarm, False)
+        self.page.run_task(plc_util.write_overload, False)
         Toast.show_success(self.page)

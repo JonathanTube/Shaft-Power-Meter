@@ -16,16 +16,3 @@ class AlarmSaver:
 
         if ControlManager.alarm_button:
             ControlManager.alarm_button.update_alarm()
-
-    @staticmethod
-    def acknowledge(data: list[AlarmLog]):
-        for row in data:
-            AlarmLog.update(acknowledge_time=gdata.utc_date_time).where(AlarmLog.id == row.id).execute()
-
-        if ControlManager.alarm_button:
-            ControlManager.alarm_button.update_alarm()
-
-        # 如果全部已确认，则关闭plc-alarm
-        cnt: int = AlarmLog.select().where(AlarmLog.acknowledge_time.is_null()).count()
-        if cnt == 0:
-            asyncio.create_task(plc_util.write_alarm(False))

@@ -2,7 +2,6 @@ import flet as ft
 import pandas as pd
 import random
 import string
-
 from db.models.alarm_log import AlarmLog
 from ui.common.datetime_search import DatetimeSearch
 from ui.common.toast import Toast
@@ -10,7 +9,7 @@ from ui.home.alarm.alarm_table import AlarmTable
 from common.global_data import gdata
 from common.const_alarm_type import AlarmType
 from common.control_manager import ControlManager
-from utils.alarm_saver import AlarmSaver
+from utils.plc_util import plc_util
 
 
 class AlarmList(ft.Container):
@@ -98,7 +97,16 @@ class AlarmList(ft.Container):
             Toast.show_error(self.page, self.page.session.get("lang.alarm.please_select_at_least_one_alarm"))
             return
 
-        AlarmSaver.acknowledge(selected_rows)
+        for row in selected_rows:
+            AlarmLog.update(acknowledge_time=gdata.utc_date_time).where(AlarmLog.id == row.cells[0].data).execute()
+
+        if ControlManager.alarm_button:
+            ControlManager.alarm_button.update_alarm()
+
+        # 如果全部已确认，则关闭plc-alarm
+        cnt: int = AlarmLog.select().where(AlarmLog.acknowledge_time.is_null()).count()
+        if cnt == 0:
+            self.page.run_task(plc_util.write_alarm, False)
 
         self.table.search()
         Toast.show_success(self.page)

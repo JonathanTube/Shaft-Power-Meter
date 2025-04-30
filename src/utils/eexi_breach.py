@@ -145,8 +145,11 @@ class EEXIBreach:
 
     @staticmethod
     def __save_report_detail(name: str, utc_date_time: datetime, speed: float, torque: float, power: float):
+        print(f"EEXIBreach.__save_report_detail: {name}, {utc_date_time}, {speed}, {torque}, {power}")
         try:
-            report_info = ReportInfo.get(ReportInfo.id == EEXIBreach.report_id)
+            print(f"EEXIBreach.report_id: {EEXIBreach.report_id}")
+            report_info = ReportInfo.get_or_none(ReportInfo.id == EEXIBreach.report_id)
+            print(f"report_info: {report_info}")
             if report_info is None:
                 return
             total_power = FormulaCalculator.calculate_energy_kwh(power)

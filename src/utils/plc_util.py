@@ -133,7 +133,7 @@ class PLCUtil:
             self.save_alarm()
             return False
 
-    async def write_alarm(self, occured: bool):
+    async def write_alarm(self, occured: bool) -> bool:
         if not await self.auto_reconnect():
             return False
 
@@ -144,9 +144,9 @@ class PLCUtil:
         except Exception as e:
             logging.error(f"PLC write alarm failed: {e}")
             self.save_alarm()
-            return False
+        return False
 
-    async def write_overload(self, occured: bool):
+    async def write_overload(self, occured: bool) -> bool:
         if not await self.auto_reconnect():
             return False
 
@@ -157,7 +157,7 @@ class PLCUtil:
         except Exception as e:
             logging.error(f"PLC write eexi breach failed: {e}")
             self.save_alarm()
-            return False
+        return False
 
     async def read_alarm(self) -> bool:
         if not await self.auto_reconnect():
@@ -188,7 +188,7 @@ class PLCUtil:
             return response.registers[0] if not response.isError() else None
         except Exception as e:
             logging.warning(f"PLC address {address} read failed: {e}")
-            AlarmSaver.create(AlarmType.PLC_READ_DATA_UNKNOWN_ERROR)
+            self.save_alarm()
             return None
 
     def _empty_4_20ma_data(self) -> dict:
