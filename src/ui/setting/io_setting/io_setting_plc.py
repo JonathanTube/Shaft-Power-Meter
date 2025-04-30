@@ -138,9 +138,11 @@ class IOSettingPLC(CustomCard):
         self.page.run_task(self.load_range_data)
 
     async def load_range_data(self):
-        if self.plc_status:
+        try:
             self.plc_status.visible = not await plc_util.auto_reconnect()
             self.plc_status.update()
+        except Exception as e:
+            pass
 
         plc_4_20_ma_data = await plc_util.read_4_20_ma_data()
         self.txt_power_range_min.value = plc_4_20_ma_data["power_range_min"]
@@ -183,9 +185,11 @@ class IOSettingPLC(CustomCard):
         self.page.run_task(self.__write_to_plc)
 
     async def __write_to_plc(self):
-        if self.plc_status:
+        try:
             self.plc_status.visible = not await plc_util.auto_reconnect()
             self.plc_status.update()
+        except Exception as e:
+            pass
 
         data = {
             "power_range_min": self.txt_power_range_min.value,

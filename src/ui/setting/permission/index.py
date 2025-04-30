@@ -1,9 +1,10 @@
 import flet as ft
 import subprocess
+import asyncio
 from db.models.opearation_log import OperationLog
 from ui.common.permission_check import PermissionCheck
-from ui.common.toast import Toast
 from ui.setting.permission.permission_table import PermissionTable
+from ui.common.toast import Toast
 from db.models.user import User
 from common.operation_type import OperationType
 from common.global_data import gdata
@@ -14,8 +15,14 @@ class Permission(ft.Container):
     def __init__(self):
         super().__init__()
         self.expand = True
+        self.visible = False
         self.padding = 10
         self.op_user = None
+        self.last_op_utc_date_time = gdata.utc_date_time
+        self.on_click = self.__on_click
+
+    def __on_click(self, e):
+        self.last_op_utc_date_time = gdata.utc_date_time
 
     def build(self):
         self.permission_check = PermissionCheck(on_confirm=self.__on_permission_checked, user_role=2)
@@ -23,6 +30,8 @@ class Permission(ft.Container):
     def __on_permission_checked(self, user: User):
         self.visible = True
         self.op_user = user
+
+        self.last_op_utc_date_time = gdata.utc_date_time
 
         self.dropdown = ft.Dropdown(
             label=self.page.session.get("lang.permission.role"),
@@ -131,3 +140,19 @@ class Permission(ft.Container):
 
     def did_mount(self):
         self.page.open(self.permission_check)
+        self.task = self.page.run_task(self.__auto_lock)
+
+    async def __auto_lock(self):
+        while True:
+            if self.visible:
+                time_diff = gdata.utc_date_time - self.last_op_utc_date_time
+                print(time_diff.total_seconds())
+                if time_diff.total_seconds() > 60 * 10:
+                    self.visible = False
+                    self.page.open(self.permission_check)
+                    self.update()
+            await asyncio.sleep(1)
+
+    def will_unmount(self):
+        if self.task is not None:
+            self.task.cancel()
