@@ -839,7 +839,7 @@ class DataInit:
 
                 {
                     "code": "lang.setting.data_refresh_interval",
-                    "chinese": "数据刷新间隔",
+                    "chinese": "界面数据刷新间隔",
                     "english": "Data Refresh Interval"
                 },
 
@@ -1198,14 +1198,9 @@ class DataInit:
                     "english": "Average Power"
                 },
                 {
-                    "code": "lang.counter.revolution",
-                    "chinese": "总圈数",
-                    "english": "Revolution"
-                },
-                {
                     "code": "lang.counter.average_speed",
-                    "chinese": "平均速度",
-                    "english": "Average Speed"
+                    "chinese": "转速",
+                    "english": "Rotational Speed"
                 },
                 {
                     "code": "lang.counter.interval_setting",

@@ -12,6 +12,7 @@ from ui.common.keyboard import keyboard
 from peewee import fn
 from common.global_data import gdata
 
+
 class IntervalCounter(ft.Container):
     def __init__(self, name: Literal['sps1', 'sps2']):
         super().__init__()
@@ -104,8 +105,7 @@ class IntervalCounter(ft.Container):
 
         data_log = DataLog.select(
             fn.COALESCE(fn.AVG(DataLog.power), 0).alias('average_power'),
-            fn.COALESCE(fn.MIN(DataLog.rounds), 0).alias('min_rounds'),
-            fn.COALESCE(fn.MAX(DataLog.rounds), 0).alias('max_rounds'),
+            fn.COALESCE(fn.AVG(DataLog.speed), 0).alias('average_speed'),
             fn.COALESCE(fn.MIN(DataLog.utc_date_time), None).alias('start_time'),
             fn.COALESCE(fn.MAX(DataLog.utc_date_time), None).alias('end_time')
         ).where(
@@ -115,8 +115,7 @@ class IntervalCounter(ft.Container):
         ).dicts().get()
 
         average_power = data_log['average_power']
-        max_rounds = data_log['max_rounds']
-        min_rounds = data_log['min_rounds']
+        average_speed = data_log['average_speed']
 
         if data_log['start_time'] is None or data_log['end_time'] is None:
             return
@@ -128,13 +127,6 @@ class IntervalCounter(ft.Container):
 
         total_energy = (average_power * hours) / 1000  # kWh
 
-        total_rounds = max_rounds - min_rounds
-
-        average_speed = 0
-        if hours > 0:
-            average_speed = round(total_rounds / (hours * 60), 1)
-
         self.display.set_average_power(average_power, self.system_unit)
         self.display.set_total_energy(total_energy, self.system_unit)
-        self.display.set_total_rounds(total_rounds)
         self.display.set_average_speed(average_speed)

@@ -35,15 +35,12 @@ class EEXIBreach:
         eexi_limited_power = system_settings.eexi_limited_power
         logging.info(f"eexi_breach_checking_duration = {seconds}s")
 
-        preference: Preference = Preference.get()
-        logging.info(f"preference.data_refresh_interval = {preference.data_refresh_interval}s")
-
         start_time = gdata.utc_date_time - timedelta(seconds=seconds)
         logging.info(f"start_time = {gdata.utc_date_time} - {seconds}s = {start_time}")
 
-        # 再减去数据刷新间隔，类似滑动窗口，因为数据刷新间隔是5s，所以需要减去5s
-        start_time = start_time - timedelta(seconds=preference.data_refresh_interval)
-        logging.info(f"start_time = {gdata.utc_date_time} - {seconds}s - {preference.data_refresh_interval}s = {start_time}")
+        # 再减去数据刷新间隔，类似滑动窗口，因为下位机数据采集间隔是1s，所以需要减去1s
+        start_time = start_time - timedelta(seconds=1)
+        logging.info(f"start_time = {gdata.utc_date_time} - {seconds}s - 1s = {start_time}")
 
         # 查找时间窗口内的功率记录
         data = EEXIBreach.__query_data_in_time_window(start_time)

@@ -94,7 +94,6 @@ class ManuallyCounter(ft.Container):
 
         self.display.set_average_power(0, self.system_unit)
         self.display.set_total_energy(0, self.system_unit)
-        self.display.set_total_rounds(0)
         self.display.set_average_speed(0)
         self.content.update()
         e.page.close(self.dlg_modal)
@@ -182,7 +181,6 @@ class ManuallyCounter(ft.Container):
     def did_mount(self):
         self.display.set_average_power(0, self.system_unit)
         self.display.set_total_energy(0, self.system_unit)
-        self.display.set_total_rounds(0)
         self.display.set_average_speed(0)
 
         current_status = gdata.sps1_manually_status if self.name == 'sps1' else gdata.sps2_manually_status
@@ -199,8 +197,7 @@ class ManuallyCounter(ft.Container):
             start_time = gdata.sps1_manually_start_time if self.name == 'sps1' else gdata.sps2_manually_start_time
             data_log = DataLog.select(
                 fn.COALESCE(fn.AVG(DataLog.power), 0).alias('average_power'),
-                fn.COALESCE(fn.MIN(DataLog.rounds), 0).alias('min_rounds'),
-                fn.COALESCE(fn.MAX(DataLog.rounds), 0).alias('max_rounds'),
+                fn.COALESCE(fn.AVG(DataLog.speed), 0).alias('average_speed')
             ).where(
                 DataLog.name == self.name,
                 DataLog.utc_date_time >= start_time,
@@ -208,18 +205,11 @@ class ManuallyCounter(ft.Container):
             ).dicts().get()
 
             average_power = data_log['average_power']
-            max_rounds = data_log['max_rounds']
-            min_rounds = data_log['min_rounds']
+            average_speed = data_log['average_speed']
 
             hours = (end_time - start_time).total_seconds() / 3600
 
             total_energy = average_power * hours / 1000  # kWh
-
-            total_rounds = max_rounds - min_rounds
-
-            average_speed = 0
-            if hours > 0:
-                average_speed = round(total_rounds / (hours * 60), 1)
 
             time_elapsed = end_time - start_time
             days = time_elapsed.days
@@ -235,7 +225,6 @@ class ManuallyCounter(ft.Container):
 
             self.display.set_average_power(average_power, self.system_unit)
             self.display.set_total_energy(total_energy, self.system_unit)
-            self.display.set_total_rounds(total_rounds)
             self.display.set_average_speed(average_speed)
 
             await asyncio.sleep(self.interval)

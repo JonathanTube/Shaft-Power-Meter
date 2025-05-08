@@ -8,7 +8,7 @@ class CounterDisplay(ft.Container):
         super().__init__()
         self.expand = True
         # self.bgcolor = "yellow"
-        self.padding = ft.padding.symmetric(horizontal=20)
+        self.padding = ft.padding.symmetric(horizontal=20, vertical=20)
 
     def __create_label(self, text: str = ""):
         return ft.Text(
@@ -73,34 +73,8 @@ class CounterDisplay(ft.Container):
             ]
         )
 
-    def __create_total_rounds(self):
-        self.total_rounds_label = self.__create_label(
-            self.page.session.get('lang.counter.revolution')
-        )
-        self.total_rounds_value = self.__create_value()
-
-        self.total_rounds = ft.Row(
-            alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
-            controls=[
-                ft.Row(
-                    controls=[
-                        ft.Icon(ft.icons.CYCLONE_OUTLINED, size=16),
-                        self.total_rounds_label
-                    ]
-                ),
-                ft.Row(
-                    controls=[
-                        self.total_rounds_value,
-                        self.__create_unit("")
-                    ]
-                )
-            ]
-        )
-
     def __create_average_speed(self):
-        self.average_speed_label = self.__create_label(
-            self.page.session.get('lang.counter.average_speed')
-        )
+        self.average_speed_label = self.__create_label(self.page.session.get('lang.counter.average_speed'))
         self.average_speed_value = self.__create_value()
         self.average_speed_unit = self.__create_unit('rpm')
 
@@ -123,14 +97,13 @@ class CounterDisplay(ft.Container):
     def build(self):
         self.__create_total_energy()
         self.__create_average_power()
-        self.__create_total_rounds()
         self.__create_average_speed()
         self.content = ft.Column(
+            spacing=20,
             expand=True,
             controls=[
                 self.total_energy,
                 self.average_power,
-                self.total_rounds,
                 self.average_speed
             ]
         )
@@ -152,7 +125,3 @@ class CounterDisplay(ft.Container):
         self.average_speed_value.value = value_and_unit[0]
         self.average_speed_unit.value = value_and_unit[1]
         self.average_speed.update()
-
-    def set_total_rounds(self, total_rounds: int):
-        self.total_rounds_value.value = total_rounds
-        self.total_rounds.update()

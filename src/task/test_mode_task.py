@@ -46,14 +46,11 @@ class TestModeTask:
         system_settings: SystemSettings = SystemSettings.get()
         amount_of_propeller = system_settings.amount_of_propeller
 
-        preference: Preference = Preference.get()
-        interval = preference.data_refresh_interval
-
         while self.is_running:
             await self.save_generated_data('sps1')
             if amount_of_propeller == 2:
                 await self.save_generated_data('sps2')
-            await asyncio.sleep(interval)
+            await asyncio.sleep(1)
 
     async def start(self):
         asyncio.create_task(self.generate_random_data())
