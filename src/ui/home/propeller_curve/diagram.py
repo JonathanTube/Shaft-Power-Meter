@@ -1,8 +1,10 @@
+import asyncio
 import matplotlib.backends.backend_svg
 import matplotlib.pyplot as plt
 import numpy as np
 import flet as ft
 from flet.matplotlib_chart import MatplotlibChart
+from db.models.preference import Preference
 from db.table_init import PropellerSetting
 from common.global_data import gdata
 import logging
@@ -177,23 +179,34 @@ class PropellerCurveDiagram(ft.Container):
         power_points = np.append(power_points, max_power_point)
         ax.plot(rpm_points, power_points, color=color, linewidth=1, linestyle='--', label=self.page.session.get('lang.propeller_curve.overload_curve'))
 
-    def update_sps_points(self):
-        if self.rpm_of_mcr == 0 or self.power_of_mcr == 0:
-            return
+    async def update_sps_points(self):
+        preference: Preference = Preference().get()
+        interval = preference.data_refresh_interval
+        while True:
+            if self.rpm_of_mcr == 0 or self.power_of_mcr == 0:
+                return
 
-        sps1_percent_rpm_of_mcr = round(gdata.sps1_speed / self.rpm_of_mcr * 100, 2)
-        sps1_percent_power_of_mcr = round(gdata.sps1_power / self.power_of_mcr * 100, 2)
-        self.sps1_point.set_offsets([sps1_percent_rpm_of_mcr, sps1_percent_power_of_mcr])
-        self.sps1_text.set_x(sps1_percent_rpm_of_mcr)
-        self.sps1_text.set_y(sps1_percent_power_of_mcr + 1)
+            sps1_percent_rpm_of_mcr = round(gdata.sps1_speed / self.rpm_of_mcr * 100, 2)
+            sps1_percent_power_of_mcr = round(gdata.sps1_power / self.power_of_mcr * 100, 2)
+            self.sps1_point.set_offsets([sps1_percent_rpm_of_mcr, sps1_percent_power_of_mcr])
+            self.sps1_text.set_x(sps1_percent_rpm_of_mcr)
+            self.sps1_text.set_y(sps1_percent_power_of_mcr + 1)
 
-        sps2_percent_rpm_of_mcr = round(gdata.sps2_speed / self.rpm_of_mcr * 100, 2)
-        sps2_percent_power_of_mcr = round(gdata.sps2_power / self.power_of_mcr * 100, 2)
-        self.sps2_point.set_offsets([sps2_percent_rpm_of_mcr, sps2_percent_power_of_mcr])
-        self.sps2_text.set_x(sps2_percent_rpm_of_mcr)
-        self.sps2_text.set_y(sps2_percent_power_of_mcr + 1)
+            sps2_percent_rpm_of_mcr = round(gdata.sps2_speed / self.rpm_of_mcr * 100, 2)
+            sps2_percent_power_of_mcr = round(gdata.sps2_power / self.power_of_mcr * 100, 2)
+            self.sps2_point.set_offsets([sps2_percent_rpm_of_mcr, sps2_percent_power_of_mcr])
+            self.sps2_text.set_x(sps2_percent_rpm_of_mcr)
+            self.sps2_text.set_y(sps2_percent_power_of_mcr + 1)
 
-        logging.info(f'update_sps1_points: sps1_percent_rpm_of_mcr={sps1_percent_rpm_of_mcr}%, sps1_percent_power_of_mcr={sps1_percent_power_of_mcr}%')
-        logging.info(f'update_sps2_points: sps2_percent_rpm_of_mcr={sps2_percent_rpm_of_mcr}%, sps2_percent_power_of_mcr={sps2_percent_power_of_mcr}%')
+            logging.info(f'update_sps1_points: sps1_percent_rpm_of_mcr={sps1_percent_rpm_of_mcr}%, sps1_percent_power_of_mcr={sps1_percent_power_of_mcr}%')
+            logging.info(f'update_sps2_points: sps2_percent_rpm_of_mcr={sps2_percent_rpm_of_mcr}%, sps2_percent_power_of_mcr={sps2_percent_power_of_mcr}%')
 
-        self.chart.update()
+            self.chart.update()
+            await asyncio.sleep(interval)
+
+    def did_mount(self):
+        self.task = self.page.run_task(self.update_sps_points)
+
+    def will_unmount(self):
+        if self.task:
+            self.task.cancel()

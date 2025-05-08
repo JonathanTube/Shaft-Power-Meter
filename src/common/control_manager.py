@@ -42,9 +42,6 @@ class ControlManager:
         if ControlManager.sps_dual_off is not None:
             ControlManager.sps_dual_off.load_data()
 
-        if ControlManager.propeller_curve_diagram is not None:
-            ControlManager.propeller_curve_diagram.update_sps_points()
-
     @staticmethod
     def on_theme_change():
         if ControlManager.propeller_curve_diagram is not None:

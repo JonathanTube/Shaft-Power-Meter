@@ -14,10 +14,11 @@ class EEXILimitedPower(ft.Container):
         self.container_height = height
 
         propeller_settings: PropellerSetting = PropellerSetting.get()
-        self.system_settings: SystemSettings = SystemSettings.get()
+        system_settings: SystemSettings = SystemSettings.get()
 
         self.unlimited_power = propeller_settings.shaft_power_of_mcr_operating_point
-        self.eexi_power = self.system_settings.eexi_limited_power
+        self.amount_of_propeller = system_settings.amount_of_propeller
+        self.eexi_power = system_settings.eexi_limited_power
         self.normal_power = self.eexi_power * 0.9
 
     def build(self):
@@ -53,13 +54,20 @@ class EEXILimitedPower(ft.Container):
         )
 
     def reload(self):
-        active_value = gdata.sps1_power + gdata.sps2_power
+        active_value = gdata.sps1_power
+
+        if self.amount_of_propeller == 2:
+            active_value += gdata.sps2_power
+
         inactive_value = self.unlimited_power - active_value
         self.meter_half.set_outer_value(active_value, inactive_value)
         self.update_mode()
 
     def update_mode(self):
-        instant_power = gdata.sps1_power + gdata.sps2_power
+        instant_power = gdata.sps1_power
+        if self.amount_of_propeller == 2:
+            instant_power += gdata.sps2_power
+
         if instant_power <= self.normal_power:
             self.unlimited_mode_icon.visible = False
         elif instant_power <= self.eexi_power:
