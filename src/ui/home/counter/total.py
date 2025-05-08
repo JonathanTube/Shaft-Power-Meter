@@ -26,7 +26,6 @@ class TotalCounter(ft.Container):
         self.standard_date_time_format = '%Y-%m-%d %H:%M:%S'
         self.date_format = datetime_conf.date_format
 
-
     def build(self):
         self.display = CounterDisplay()
         self.time_elapsed = ft.Text("")
@@ -67,11 +66,12 @@ class TotalCounter(ft.Container):
             await asyncio.sleep(self.interval)
 
     def __calculate(self):
-        data_log = DataLog.select(fn.COALESCE(fn.AVG(DataLog.power), 0).alias('average_power'),
-                                  fn.COALESCE(fn.AVG(DataLog.speed), 0).alias('average_speed'),
-                                  fn.COALESCE(fn.MIN(DataLog.utc_date_time), None).alias('start_time'),
-                                  fn.COALESCE(fn.MAX(DataLog.utc_date_time), None).alias('end_time')
-                                  ).where(DataLog.name == self.name).dicts().get()
+        data_log = DataLog.select(
+            fn.COALESCE(fn.AVG(DataLog.power), 0).alias('average_power'),
+            fn.COALESCE(fn.AVG(DataLog.speed), 0).alias('average_speed'),
+            fn.COALESCE(fn.MIN(DataLog.utc_date_time), None).alias('start_time'),
+            fn.COALESCE(fn.MAX(DataLog.utc_date_time), None).alias('end_time')
+        ).where(DataLog.name == self.name).dicts().get()
 
         if data_log['start_time'] is None or data_log['end_time'] is None:
             return

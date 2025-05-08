@@ -199,9 +199,9 @@ class ManuallyCounter(ft.Container):
                 fn.COALESCE(fn.AVG(DataLog.power), 0).alias('average_power'),
                 fn.COALESCE(fn.AVG(DataLog.speed), 0).alias('average_speed')
             ).where(
-                DataLog.name == self.name,
-                DataLog.utc_date_time >= start_time,
-                DataLog.utc_date_time <= end_time
+                DataLog.name == self.name
+                and (DataLog.utc_date_time >= start_time and DataLog.utc_date_time <= end_time)
+                and DataLog.speed > 10  # 大于10RPM的时候才开始计算累计能耗的
             ).dicts().get()
 
             average_power = data_log['average_power']

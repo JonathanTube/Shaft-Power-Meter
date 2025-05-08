@@ -1,6 +1,8 @@
+import asyncio
 import flet as ft
-
+from common.global_data import gdata
 from common.control_manager import ControlManager
+from db.models.date_time_conf import DateTimeConf
 from ui.header.shapoli import ShaPoLi
 from ui.header.logo import HeaderLogo
 from ui.header.theme import Theme
@@ -51,8 +53,10 @@ class Header(ft.AppBar):
             bgcolor=ft.Colors.LIGHT_BLUE_100,
             on_click=lambda e: self.on_click("SETTING"))
 
+        self.utc_date_time = ft.Text()
         self.shapoli = ShaPoLi()
         self.actions = [
+            self.utc_date_time,
             ft.Container(
                 content=ft.Row([self.home, self.report, self.setting]),
                 margin=ft.margin.symmetric(horizontal=20)
@@ -102,3 +106,18 @@ class Header(ft.AppBar):
         self.active_name = name
 
         self.main_content.update()
+
+    async def sync_utc_date_time(self):
+        datetime_conf: DateTimeConf = DateTimeConf.get()
+        date_format = datetime_conf.date_format
+        while True:
+            self.utc_date_time.value = gdata.utc_date_time.strftime(f"{date_format} %H:%M:%S")
+            self.utc_date_time.update()
+            await asyncio.sleep(1)
+
+    def did_mount(self):
+        self.task = self.page.run_task(self.sync_utc_date_time)
+
+    def will_unmount(self):
+        if self.task:
+            self.task.cancel()

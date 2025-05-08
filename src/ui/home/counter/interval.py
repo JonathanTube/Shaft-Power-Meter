@@ -25,10 +25,8 @@ class IntervalCounter(ft.Container):
 
         self.hours = 24
         preference: Preference = Preference.get()
-        datetime_conf: DateTimeConf = DateTimeConf.get()
         self.system_unit = preference.system_unit
         self.interval = preference.data_refresh_interval
-        self.date_format = datetime_conf.date_format
 
     def build(self):
         self.display = CounterDisplay()
@@ -111,17 +109,20 @@ class IntervalCounter(ft.Container):
         ).where(
             DataLog.name == self.name,
             DataLog.utc_date_time >= param_start_time,
-            DataLog.utc_date_time <= param_end_time
+            DataLog.utc_date_time <= param_end_time,
+            DataLog.speed > 10  # 大于10RPM的时候才开始计算累计能耗的
         ).dicts().get()
 
+        print('data_log=', data_log)
         average_power = data_log['average_power']
         average_speed = data_log['average_speed']
 
         if data_log['start_time'] is None or data_log['end_time'] is None:
             return
 
-        start_time = datetime.strptime(data_log['start_time'], self.date_format)
-        end_time = datetime.strptime(data_log['end_time'], self.date_format)
+        date_time_format = '%Y-%m-%d %H:%M:%S'
+        start_time = datetime.strptime(data_log['start_time'], date_time_format)
+        end_time = datetime.strptime(data_log['end_time'], date_time_format)
 
         hours = (end_time - start_time).total_seconds() / 3600
 

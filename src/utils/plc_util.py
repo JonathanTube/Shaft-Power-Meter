@@ -204,7 +204,9 @@ class PLCUtil:
             await self.plc_client.close()
 
     def save_alarm(self):
-        AlarmLog.create(utc_date_time=gdata.utc_date_time, alarm_type=AlarmType.PLC_DISCONNECTED)
+        cnt: int = AlarmLog.select().where(AlarmLog.alarm_type == AlarmType.PLC_DISCONNECTED, AlarmLog.acknowledge_time.is_null()).count()
+        if cnt == 0:
+            AlarmLog.create(utc_date_time=gdata.utc_date_time, alarm_type=AlarmType.PLC_DISCONNECTED)
 
 
 # 全局单例
