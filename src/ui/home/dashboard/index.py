@@ -25,20 +25,10 @@ class Dashboard(ft.Container):
         if amount_of_power == 1:
             if sha_po_li:
                 self.content = SingleShaPoLiOn()
-                ControlManager.sps_single_on = self.content
             else:
                 self.content = SingleShaPoLiOff()
-                ControlManager.sps_single_off = self.content
         elif amount_of_power == 2:
             if sha_po_li:
                 self.content = DualShaPoLiOn()
-                ControlManager.sps_dual_on = self.content
             else:
                 self.content = DualShaPoLiOff()
-                ControlManager.sps_dual_off = self.content
-
-    def will_unmount(self):
-        ControlManager.sps_single_on = None
-        ControlManager.sps_single_off = None
-        ControlManager.sps_dual_on = None
-        ControlManager.sps_dual_off = None

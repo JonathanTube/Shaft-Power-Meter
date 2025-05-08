@@ -180,7 +180,7 @@ class PropellerCurveDiagram(ft.Container):
         ax.plot(rpm_points, power_points, color=color, linewidth=1, linestyle='--', label=self.page.session.get('lang.propeller_curve.overload_curve'))
 
     async def update_sps_points(self):
-        preference: Preference = Preference().get()
+        preference: Preference = Preference.get()
         interval = preference.data_refresh_interval
         while True:
             if self.rpm_of_mcr == 0 or self.power_of_mcr == 0:

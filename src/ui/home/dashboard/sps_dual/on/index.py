@@ -1,5 +1,7 @@
+import asyncio
 import flet as ft
 
+from db.models.preference import Preference
 from ui.home.dashboard.sps_dual.on.dual_instant_grid import DualInstantGrid
 from ui.home.dashboard.eexi.eexi_limited_power import EEXILimitedPower
 from ui.home.dashboard.chart.single_power_line import SinglePowerLine
@@ -25,10 +27,18 @@ class DualShaPoLiOn(ft.Container):
             ]
         )
 
-    def did_mount(self):
-        self.load_data()
+    async def load_data(self):
+        preference: Preference = Preference.get()
+        interval = preference.data_refresh_interval
+        while True:
+            self.instant_grid.reload()
+            self.eexi_limited_power.reload()
+            self.power_chart.reload()
+            await asyncio.sleep(interval)
 
-    def load_data(self):
-        self.instant_grid.reload()
-        self.eexi_limited_power.reload()
-        self.power_chart.reload()
+    def did_mount(self):
+        self.task = self.page.run_task(self.load_data)
+
+    def will_unmount(self):
+        if self.task:
+            self.task.cancel()

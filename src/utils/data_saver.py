@@ -52,7 +52,6 @@ class DataSaver:
                 gdata.sps2_power_history.insert(0, (power, utc_date_time))
                 # print(f"sps2_power_history: {gdata.sps2_power_history}")
 
-            ControlManager.on_instant_data_refresh()
             # 处理EEXI过载和恢复
             EEXIBreach.handle_breach_and_recovery()
         except Exception as e:
