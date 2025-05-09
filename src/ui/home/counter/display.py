@@ -97,7 +97,6 @@ class CounterDisplay(ft.Container):
         self.__create_average_power()
         self.__create_average_speed()
         self.content = ft.Column(
-            spacing=20,
             expand=True,
             controls=[
                 self.total_energy,

@@ -117,6 +117,7 @@ class ManuallyCounter(ft.Container):
 
         self.infos = ft.Column(
             expand=True,
+            spacing=0,
             horizontal_alignment=ft.CrossAxisAlignment.CENTER,
             alignment=ft.MainAxisAlignment.CENTER,
             controls=[

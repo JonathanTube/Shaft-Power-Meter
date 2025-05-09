@@ -45,8 +45,14 @@ class TotalCounter(ft.Container):
             controls=[
                 ft.Row(alignment=ft.MainAxisAlignment.SPACE_BETWEEN, controls=[self.title, self.status_container]),
                 self.display,
-                self.time_elapsed,
-                self.started_at
+                ft.Column(
+                    spacing=0,
+                    horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+                    controls=[
+                        self.time_elapsed,
+                        self.started_at
+                    ]
+                )
             ])
 
         self.txt_measured = self.page.session.get("lang.counter.measured")
