@@ -18,6 +18,9 @@ class ReportInfoDialog(ft.AlertDialog):
         self.date_format = datetime_conf.date_format
         self.date_time_format = f"{self.date_format} %H:%M:%S"
 
+        system_settings: SystemSettings = SystemSettings.get()
+        self.is_dual = system_settings.amount_of_propeller == 2
+
         self.id = id
         self.report_name = report_name
         self.content_width = 1000
@@ -46,7 +49,19 @@ class ReportInfoDialog(ft.AlertDialog):
         self.report_info: ReportInfo = ReportInfo.get_by_id(self.id)
         self.event_log: EventLog = self.report_info.event_log
         # limit the max report details to 200 otherwise the database will be locked
-        self.report_details: list[ReportDetail] = ReportDetail.select().where(ReportDetail.report_info == self.report_info.id).order_by(ReportDetail.id.asc()).limit(200)
+        if self.is_dual:
+            self.report_details: list[ReportDetail] = ReportDetail.select().where(
+                ReportDetail.report_info == self.report_info.id
+            ).order_by(
+                ReportDetail.id.asc()
+            ).limit(250)
+        else:
+            self.report_details: list[ReportDetail] = ReportDetail.select().where(
+                ReportDetail.report_info == self.report_info.id,
+                ReportDetail.name == 'sps1'
+            ).order_by(
+                ReportDetail.id.asc()
+            ).limit(250)
 
     def __create_label(self, text, col=4):
         return ft.Text(text, col=col, text_align=ft.TextAlign.LEFT, weight=ft.FontWeight.W_500)
@@ -237,37 +252,78 @@ class ReportInfoDialog(ft.AlertDialog):
         self.event_log_container = self.__create_container(event_log)
 
     def __create_data_log(self):
+        system_unit = self.preference.system_unit
         title = ft.Text("ShaPoLi Data Log", expand=True, text_align=ft.TextAlign.CENTER, size=16, weight=ft.FontWeight.W_500)
 
         rows = []
-        for index, report_detail in enumerate(self.report_details):
-            utc_date_time = report_detail.utc_date_time.strftime(self.date_time_format)
-            system_unit = self.preference.system_unit
-            torque_value, _ = UnitParser.parse_torque(report_detail.torque, system_unit, shrink=False)
-            power_value, _ = UnitParser.parse_power(report_detail.power, system_unit, shrink=False)
-            energy_value, _ = UnitParser.parse_energy(report_detail.total_power, system_unit)
 
-            rows.append(ft.DataRow(
-                cells=[
-                    ft.DataCell(ft.Text(index + 1)),
-                    ft.DataCell(ft.Text(utc_date_time)),
-                    ft.DataCell(ft.Text(f"{report_detail.speed}")),
-                    ft.DataCell(ft.Text(f"{torque_value}")),
-                    ft.DataCell(ft.Text(f"{power_value}")),
-                    ft.DataCell(ft.Text(f"{energy_value}"))
-                ]
-            ))
+        if self.is_dual:
+            # get distinct utc_date_time list from report_details
+            utc_date_times = list(set([report_detail.utc_date_time for report_detail in self.report_details]))
+            for index, utc_date_time in enumerate(utc_date_times):
+                report_details = [report_detail for report_detail in self.report_details if report_detail.utc_date_time == utc_date_time]
+
+                _utc_date_time = utc_date_time.strftime(self.date_time_format)
+                _speed_value = ""
+                _torque_value = ""
+                _power_value = ""
+                _total_power_value = 0
+                for report_detail in report_details:
+                    if report_detail.name == 'sps1':
+                        _speed_value = f"sps1: {report_detail.speed}"
+                        _sps1_torque, _ = UnitParser.parse_torque(report_detail.torque, system_unit, shrink=False)
+                        _torque_value = f"sps1: {_sps1_torque}"
+                        _sps1_power, _ = UnitParser.parse_power(report_detail.power, system_unit, shrink=False)
+                        _power_value = f"sps1: {_sps1_power}"
+                        _total_power_value = _sps1_power
+                    else:
+                        _speed_value = f"{_speed_value}\nsps2: {report_detail.speed}"
+                        _sps2_torque, _ = UnitParser.parse_torque(report_detail.torque, system_unit, shrink=False)
+                        _torque_value = f"{_torque_value}\nsps2: {_sps2_torque}"
+                        _sps2_power, _ = UnitParser.parse_power(report_detail.power, system_unit, shrink=False)
+                        _power_value = f"{_power_value}\nsps2: {_sps2_power}"
+                        _total_power_value = round(_total_power_value + _sps2_power, 1)
+
+                rows.append(ft.DataRow(
+                    cells=[
+                        ft.DataCell(ft.Text(index + 1)),
+                        ft.DataCell(ft.Text(_utc_date_time)),
+                        ft.DataCell(ft.Text(_speed_value)),
+                        ft.DataCell(ft.Text(_torque_value)),
+                        ft.DataCell(ft.Text(_power_value)),
+                        ft.DataCell(ft.Text(_total_power_value))
+                    ]
+                ))
+
+        else:
+            for index, report_detail in enumerate(self.report_details):
+                utc_date_time = report_detail.utc_date_time.strftime(self.date_time_format)
+                torque_value, _ = UnitParser.parse_torque(report_detail.torque, system_unit, shrink=False)
+                power_value, _ = UnitParser.parse_power(report_detail.power, system_unit, shrink=False)
+
+                rows.append(ft.DataRow(
+                    cells=[
+                        ft.DataCell(ft.Text(index + 1)),
+                        ft.DataCell(ft.Text(utc_date_time)),
+                        ft.DataCell(ft.Text(f"{report_detail.speed}")),
+                        ft.DataCell(ft.Text(f"{torque_value}")),
+                        ft.DataCell(ft.Text(f"{power_value}"))
+                    ]
+                ))
+
+        columns = [
+            ft.DataColumn(ft.Text("No.")),
+            ft.DataColumn(ft.Text("Date/Time")),
+            ft.DataColumn(ft.Text(f"Speed(rpm)")),
+            ft.DataColumn(ft.Text(f"Torque(kNm)") if system_unit == 0 else ft.Text(f"Torque(Tm)")),
+            ft.DataColumn(ft.Text(f"Power(kW)") if system_unit == 0 else ft.Text(f"Power(sHp)")),
+        ]
+        if self.is_dual:
+            columns.append(ft.DataColumn(ft.Text(f"Total Power(kW)") if system_unit == 0 else ft.Text(f"Total Power(sHp)")))
 
         table = ft.DataTable(
             width=self.content_width,
-            columns=[
-                ft.DataColumn(ft.Text("No.")),
-                ft.DataColumn(ft.Text("Date/Time")),
-                ft.DataColumn(ft.Text(f"Speed(rpm)")),
-                ft.DataColumn(ft.Text(f"Torque(kNm)") if system_unit == 0 else ft.Text(f"Torque(Tm)")),
-                ft.DataColumn(ft.Text(f"Power(kW)") if system_unit == 0 else ft.Text(f"Power(sHp)")),
-                ft.DataColumn(ft.Text(f"Total Power(kWh)") if system_unit == 0 else ft.Text(f"Total Power(sHph)"))
-            ],
+            columns=columns,
             rows=rows
         )
         data_log = ft.Column(

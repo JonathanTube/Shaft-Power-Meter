@@ -13,7 +13,10 @@ from utils.alarm_saver import AlarmSaver
 
 class DataSaver:
     @staticmethod
-    def save(name: str, thrust: float, torque: float, speed: float, rounds: float):
+    def save(name: str, thrust: float, torque: float, speed: float):
+        # if speed is less than 10, it is not valid data
+        if speed < 10:
+            return
         try:
             utc_date_time = gdata.utc_date_time
             power = FormulaCalculator.calculate_instant_power(torque, speed)
@@ -28,7 +31,6 @@ class DataSaver:
                 power=power,
                 thrust=thrust,
                 torque=torque,
-                rounds=rounds,
                 is_overload=is_overload
             )
             # save counter log of total
@@ -39,7 +41,6 @@ class DataSaver:
                 gdata.sps1_thrust = thrust
                 gdata.sps1_torque = torque
                 gdata.sps1_speed = speed
-                gdata.sps1_rounds = rounds
                 gdata.sps1_power = power
                 if len(gdata.sps1_power_history) > 100:
                     gdata.sps1_power_history.pop()
@@ -48,7 +49,6 @@ class DataSaver:
                 gdata.sps2_thrust = thrust
                 gdata.sps2_torque = torque
                 gdata.sps2_speed = speed
-                gdata.sps2_rounds = rounds
                 gdata.sps2_power = power
                 if len(gdata.sps2_power_history) > 100:
                     gdata.sps2_power_history.pop()

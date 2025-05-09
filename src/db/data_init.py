@@ -153,8 +153,6 @@ class DataInit:
                 max_speed=2002,
                 min_thrust=1002,
                 max_thrust=2002,
-                min_revolution=1000,
-                max_revolution=2000,
                 time_interval=1
             )
 
@@ -283,12 +281,6 @@ class DataInit:
                     "code": "lang.common.thrust",
                     "chinese": "推力",
                     "english": "Thrust"
-                },
-
-                {
-                    "code": "lang.common.revolution",
-                    "chinese": "圈数",
-                    "english": "Revolution"
                 },
 
                 {
@@ -644,18 +636,6 @@ class DataInit:
                     "code": "lang.setting.test_mode.max_thrust",
                     "chinese": "最大推力",
                     "english": "Max Thrust"
-                },
-
-                {
-                    "code": "lang.setting.test_mode.min_revolution",
-                    "chinese": "最小圈数",
-                    "english": "Min Revolution"
-                },
-
-                {
-                    "code": "lang.setting.test_mode.max_revolution",
-                    "chinese": "最大圈数",
-                    "english": "Max Revolution"
                 },
 
                 {

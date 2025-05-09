@@ -15,9 +15,5 @@ class TestModeConf(BaseModel):
 
     max_thrust = IntegerField(verbose_name="最大推力", default=0)
 
-    min_revolution = IntegerField(verbose_name="最小转速", default=0)
-
-    max_revolution = IntegerField(verbose_name="最大转速", default=0)
-
     class Meta:
         table_name = 'test_mode_conf'

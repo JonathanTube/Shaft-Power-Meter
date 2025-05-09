@@ -26,10 +26,15 @@ class ReportInfoExporter(FPDF):
         self.propeller_setting: PropellerSetting = PropellerSetting.get()
         self.preference: Preference = Preference.get()
         self.system_settings: SystemSettings = SystemSettings.get()
+
+        self.is_dual = self.system_settings.amount_of_propeller == 2
         self.report_info: ReportInfo = ReportInfo.get_by_id(id)
         self.event_log: EventLog = self.report_info.event_log
         self.report_details: list[ReportDetail] = ReportDetail.select().where(
-            ReportDetail.report_info == self.report_info.id).order_by(ReportDetail.id.asc())
+            ReportDetail.report_info == self.report_info.id
+        ).order_by(
+            ReportDetail.id.asc()
+        )
 
     def generate_pdf(self, path, id: int):
         self.__load_data(id)
@@ -97,19 +102,23 @@ class ReportInfoExporter(FPDF):
         self.set_font(family="Arial", size=10)
         self.set_text_color(51, 51, 51)
         # 表头
-        col_widths = [15, 35, 35, 35, 35, 35]
+        col_widths = [15, 35, 35, 35, 35]
+        if self.is_dual:
+            col_widths.append(35)
 
         system_unit = self.preference.system_unit
 
-        headers = ["No.", "Date/Time", "Speed", "Torque", "Power", "Total Power"]
+        headers = ["No.", "Date/Time", "Speed"]
         if system_unit == 0:
-            headers[3] = "Torque(Nm)"
-            headers[4] = "Power(W)"
-            headers[5] = "Total Power(Wh)"
+            headers.append("Torque(Nm)")
+            headers.append("Power(kw)")
+            if self.is_dual:
+                headers.append("Total Power(kw)")
         else:
-            headers[3] = "Torque(Tm)"
-            headers[4] = "Power(sHp)"
-            headers[5] = "Total Power(sHph)"
+            headers.append("Torque(Tm)")
+            headers.append("Power(sHp)")
+            if self.is_dual:
+                headers.append("Total Power(sHp)")
 
         self.set_font("Arial", 'B', 10)
 
@@ -122,23 +131,58 @@ class ReportInfoExporter(FPDF):
         self.set_text_color(66, 66, 66)
 
         rows = []
-        for report_detail in self.report_details:
-            if report_detail.utc_date_time:
-                utc_date_time = report_detail.utc_date_time.strftime(self.date_time_format)
+        if self.is_dual:
+            # get distinct utc_date_time list from report_details
+            utc_date_times = list(set([report_detail.utc_date_time for report_detail in self.report_details]))
+            for index, utc_date_time in enumerate(utc_date_times):
+                report_details = [report_detail for report_detail in self.report_details if report_detail.utc_date_time == utc_date_time]
+
+                _utc_date_time = utc_date_time.strftime(self.date_time_format)
+                _speed_value = ""
+                _torque_value = ""
+                _power_value = ""
+                _total_power_value = 0
+
+                for report_detail in report_details:
+                    if report_detail.name == 'sps1':
+                        _speed_value = f"sps1: {report_detail.speed}"
+                        _sps1_torque, _ = UnitParser.parse_torque(report_detail.torque, system_unit, shrink=False)
+                        _torque_value = f"sps1: {_sps1_torque}"
+                        _sps1_power, _ = UnitParser.parse_power(report_detail.power, system_unit, shrink=False)
+                        _power_value = f"sps1: {_sps1_power}"
+                        _total_power_value = _sps1_power
+                    else:
+                        _speed_value = f"{_speed_value}\nsps2: {report_detail.speed}"
+                        _sps2_torque, _ = UnitParser.parse_torque(report_detail.torque, system_unit, shrink=False)
+                        _torque_value = f"{_torque_value}\nsps2: {_sps2_torque}"
+                        _sps2_power, _ = UnitParser.parse_power(report_detail.power, system_unit, shrink=False)
+                        _power_value = f"{_power_value}\nsps2: {_sps2_power}"
+                        _total_power_value = round(_total_power_value + _sps2_power, 1)
+
+                rows.append([
+                    str(index + 1),
+                    _utc_date_time,
+                    _speed_value,
+                    _torque_value,
+                    _power_value,
+                    str(_total_power_value)
+                ])
+        else:
+            for index, report_detail in enumerate(self.report_details):
+                if report_detail.utc_date_time:
+                    utc_date_time = report_detail.utc_date_time.strftime(self.date_time_format)
             else:
                 utc_date_time = "N/A"
 
             torque, _ = UnitParser.parse_torque(report_detail.torque, system_unit, shrink=False)
             power, _ = UnitParser.parse_power(report_detail.power, system_unit, shrink=False)
-            energy, _ = UnitParser.parse_energy(report_detail.total_power, system_unit)
 
             rows.append([
-                str(report_detail.id),
+                str(index + 1),
                 utc_date_time,
                 f"{report_detail.speed}",
                 f"{torque}",
-                f"{power}",
-                f"{energy}"
+                f"{power}"
             ])
 
         for row in rows:

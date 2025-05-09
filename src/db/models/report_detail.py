@@ -18,7 +18,5 @@ class ReportDetail(BaseModel):
 
     power = FloatField()
 
-    total_power = FloatField()
-
     class Meta:
         table_name = 'report_detail'

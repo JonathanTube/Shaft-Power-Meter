@@ -18,7 +18,6 @@ class TestModeInstant(ft.ResponsiveRow):
         self.sps1_torque = self.__get_uniform_text("0")
         self.sps1_speed = self.__get_uniform_text("0")
         self.sps1_thrust = self.__get_uniform_text("0")
-        self.sps1_revolution = self.__get_uniform_text("0")
         self.sps1_power = self.__get_uniform_text("0")
         self.sps1_instant_data_card = ft.ResponsiveRow(
             alignment=ft.alignment.center,
@@ -29,8 +28,6 @@ class TestModeInstant(ft.ResponsiveRow):
                 self.sps1_speed,
                 self.__get_uniform_text(self.page.session.get('lang.common.thrust')),
                 self.sps1_thrust,
-                self.__get_uniform_text(self.page.session.get('lang.common.revolution')),
-                self.sps1_revolution,
                 self.__get_uniform_text(self.page.session.get('lang.common.power')),
                 self.sps1_power
             ]
@@ -43,7 +40,6 @@ class TestModeInstant(ft.ResponsiveRow):
             self.sps2_torque = self.__get_uniform_text("0")
             self.sps2_speed = self.__get_uniform_text("0")
             self.sps2_thrust = self.__get_uniform_text("0")
-            self.sps2_revolution = self.__get_uniform_text("0")
             self.sps2_power = self.__get_uniform_text("0")
             self.sps2_instant_data_card = ft.ResponsiveRow(
                 alignment=ft.alignment.center,
@@ -54,8 +50,6 @@ class TestModeInstant(ft.ResponsiveRow):
                     self.sps2_speed,
                     self.__get_uniform_text(self.page.session.get('lang.common.thrust')),
                     self.sps2_thrust,
-                    self.__get_uniform_text(self.page.session.get('lang.common.revolution')),
-                    self.sps2_revolution,
                     self.__get_uniform_text(self.page.session.get('lang.common.power')),
                     self.sps2_power
                 ]
@@ -80,9 +74,6 @@ class TestModeInstant(ft.ResponsiveRow):
             self.sps1_speed.value = f'{gdata.sps1_speed} rpm'
             self.sps1_speed.update()
 
-            self.sps1_revolution.value = gdata.sps1_rounds
-            self.sps1_revolution.update()
-
             sps1_torque_value, sps1_torque_unit = UnitParser.parse_torque(gdata.sps1_torque, self.system_unit)
             self.sps1_torque.value = f'{sps1_torque_value} {sps1_torque_unit}'
             self.sps1_torque.update()
@@ -98,9 +89,6 @@ class TestModeInstant(ft.ResponsiveRow):
             if self.system_settings.amount_of_propeller == 2:
                 self.sps2_speed.value = f'{gdata.sps2_speed} rpm'
                 self.sps2_speed.update()
-
-                self.sps2_revolution.value = gdata.sps2_rounds
-                self.sps2_revolution.update()
 
                 sps2_torque_value, sps2_torque_unit = UnitParser.parse_torque(gdata.sps2_torque, self.system_unit)
 

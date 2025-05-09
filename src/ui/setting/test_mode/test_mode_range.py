@@ -70,25 +70,11 @@ class TestModeRange(CustomCard):
         )
         self.thrust_row = ft.Row(col={"sm": 12}, expand=True, controls=[self.start_thrust_text, self.thrust_range, self.end_thrust_text])
 
-        self.start_revolution_text = self.__create_range_start_text('lang.setting.test_mode.min_revolution', self.conf.min_revolution, '')
-        self.end_revolution_text = self.__create_range_end_text('lang.setting.test_mode.max_revolution', self.conf.max_revolution, '')
-        self.revolution_range = ft.RangeSlider(
-            disabled=disabled,
-            expand=True,
-            min=0,
-            max=10000,
-            start_value=self.conf.min_revolution,
-            end_value=self.conf.max_revolution,
-            on_change=lambda e: self.__on_revolution_change(e)
-        )
-        self.revolution_row = ft.Row(col={"sm": 12}, expand=True, controls=[self.start_revolution_text, self.revolution_range, self.end_revolution_text])
-
         self.heading = self.page.session.get('lang.setting.test_mode.customize_data_range')
         self.body = ft.ResponsiveRow([
             self.torque_row,
             self.speed_row,
-            self.thrust_row,
-            self.revolution_row
+            self.thrust_row
         ])
         super().build()
 
@@ -118,14 +104,6 @@ class TestModeRange(CustomCard):
         self.__save_data()
         testModeTask.set_speed_range(e.control.start_value, e.control.end_value)
 
-    def __on_revolution_change(self, e):
-        self.start_revolution_text.value = f'{self.page.session.get('lang.setting.test_mode.min_revolution')}: {int(e.control.start_value)}'
-        self.start_revolution_text.update()
-        self.end_revolution_text.value = f'{self.page.session.get('lang.setting.test_mode.max_revolution')}: {int(e.control.end_value)}'
-        self.end_revolution_text.update()
-        self.__save_data()
-        testModeTask.set_revolution_range(e.control.start_value, e.control.end_value)
-
     def __on_thrust_change(self, e):
         min_thrust_value, min_thrust_unit = self.__get_thrust_and_unit(e.control.start_value)
         max_thrust_value, max_thrust_unit = self.__get_thrust_and_unit(e.control.end_value)
@@ -154,8 +132,6 @@ class TestModeRange(CustomCard):
             max_torque = self.torque_range.end_value
             min_thrust = self.thrust_range.start_value
             max_thrust = self.thrust_range.end_value
-            min_rev = self.revolution_range.start_value
-            max_rev = self.revolution_range.end_value
             min_speed = self.speed_range.start_value
             max_speed = self.speed_range.end_value
 
@@ -165,9 +141,7 @@ class TestModeRange(CustomCard):
                 min_speed=min_speed,
                 max_speed=max_speed,
                 min_thrust=min_thrust,
-                max_thrust=max_thrust,
-                min_revolution=min_rev,
-                max_revolution=max_rev
+                max_thrust=max_thrust
             ).where(TestModeConf.id == self.conf.id).execute()
             Toast.show_success(self.page)
         except Exception as e:
@@ -178,16 +152,13 @@ class TestModeRange(CustomCard):
         self.torque_range.disabled = False
         self.speed_range.disabled = False
         self.thrust_range.disabled = False
-        self.revolution_range.disabled = False
         self.update()
         testModeTask.set_torque_range(int(self.torque_range.start_value), int(self.torque_range.end_value))
         testModeTask.set_speed_range(int(self.speed_range.start_value), int(self.speed_range.end_value))
         testModeTask.set_thrust_range(int(self.thrust_range.start_value), int(self.thrust_range.end_value))
-        testModeTask.set_revolution_range(int(self.revolution_range.start_value), int(self.revolution_range.end_value))
 
     def disable(self):
         self.torque_range.disabled = True
         self.speed_range.disabled = True
         self.thrust_range.disabled = True
-        self.revolution_range.disabled = True
         self.update()
