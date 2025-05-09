@@ -102,7 +102,7 @@ class ReportInfoExporter(FPDF):
         self.set_font(family="Arial", size=10)
         self.set_text_color(51, 51, 51)
         # 表头
-        col_widths = [15, 35, 35, 35, 35]
+        col_widths = [12, 38, 35, 35, 35]
         if self.is_dual:
             col_widths.append(35)
 
@@ -110,7 +110,7 @@ class ReportInfoExporter(FPDF):
 
         headers = ["No.", "Date/Time", "Speed"]
         if system_unit == 0:
-            headers.append("Torque(Nm)")
+            headers.append("Torque(kNm)")
             headers.append("Power(kw)")
             if self.is_dual:
                 headers.append("Total Power(kw)")
@@ -145,18 +145,18 @@ class ReportInfoExporter(FPDF):
 
                 for report_detail in report_details:
                     if report_detail.name == 'sps1':
-                        _speed_value = f"sps1: {report_detail.speed}"
+                        _speed_value = f"{report_detail.speed}"
                         _sps1_torque, _ = UnitParser.parse_torque(report_detail.torque, system_unit, shrink=False)
-                        _torque_value = f"sps1: {_sps1_torque}"
+                        _torque_value = f"{_sps1_torque}"
                         _sps1_power, _ = UnitParser.parse_power(report_detail.power, system_unit, shrink=False)
-                        _power_value = f"sps1: {_sps1_power}"
+                        _power_value = f"{_sps1_power}"
                         _total_power_value = _sps1_power
                     else:
-                        _speed_value = f"{_speed_value}\nsps2: {report_detail.speed}"
+                        _speed_value = f"{_speed_value} ; {report_detail.speed}"
                         _sps2_torque, _ = UnitParser.parse_torque(report_detail.torque, system_unit, shrink=False)
-                        _torque_value = f"{_torque_value}\nsps2: {_sps2_torque}"
+                        _torque_value = f"{_torque_value} ; {_sps2_torque}"
                         _sps2_power, _ = UnitParser.parse_power(report_detail.power, system_unit, shrink=False)
-                        _power_value = f"{_power_value}\nsps2: {_sps2_power}"
+                        _power_value = f"{_power_value} ; {_sps2_power}"
                         _total_power_value = round(_total_power_value + _sps2_power, 1)
 
                 rows.append([
@@ -171,19 +171,19 @@ class ReportInfoExporter(FPDF):
             for index, report_detail in enumerate(self.report_details):
                 if report_detail.utc_date_time:
                     utc_date_time = report_detail.utc_date_time.strftime(self.date_time_format)
-            else:
-                utc_date_time = "N/A"
+                else:
+                    utc_date_time = "N/A"
 
-            torque, _ = UnitParser.parse_torque(report_detail.torque, system_unit, shrink=False)
-            power, _ = UnitParser.parse_power(report_detail.power, system_unit, shrink=False)
+                torque, _ = UnitParser.parse_torque(report_detail.torque, system_unit, shrink=False)
+                power, _ = UnitParser.parse_power(report_detail.power, system_unit, shrink=False)
 
-            rows.append([
-                str(index + 1),
-                utc_date_time,
-                f"{report_detail.speed}",
-                f"{torque}",
-                f"{power}"
-            ])
+                rows.append([
+                    str(index + 1),
+                    utc_date_time,
+                    f"{report_detail.speed}",
+                    f"{torque}",
+                    f"{power}"
+                ])
 
         for row in rows:
             for i, item in enumerate(row):
