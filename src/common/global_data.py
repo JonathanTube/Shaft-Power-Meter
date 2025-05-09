@@ -43,11 +43,6 @@ class GlobalData:
         self.sps2_power_history: list[float, datetime] = []
         self.gps_location = None
 
-        self.sps1_manually_start_time: datetime | None = None
-        self.sps2_manually_start_time: datetime | None = None
-        self.sps1_manually_status: Literal['running', 'stopped', 'reset'] = 'stopped'
-        self.sps2_manually_status: Literal['running', 'stopped', 'reset'] = 'stopped'
-
         self.test_mode_running: bool = False
 
         self.speed_of_mcr = 0

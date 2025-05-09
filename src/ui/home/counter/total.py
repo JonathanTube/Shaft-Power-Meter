@@ -65,7 +65,7 @@ class TotalCounter(ft.Container):
             await asyncio.sleep(self.interval)
 
     def __calculate(self):
-        counter_log = CounterLog.get_or_none(CounterLog.sps_name == self.name, CounterLog.counter_type == 0)
+        counter_log = CounterLog.get_or_none(CounterLog.sps_name == self.name, CounterLog.counter_type == 2)
         if counter_log is None:
             return
         start_time = counter_log.start_utc_date_time

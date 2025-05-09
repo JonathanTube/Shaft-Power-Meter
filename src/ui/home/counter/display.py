@@ -6,8 +6,6 @@ from utils.unit_parser import UnitParser
 class CounterDisplay(ft.Container):
     def __init__(self):
         super().__init__()
-        self.expand = True
-        # self.bgcolor = "yellow"
         self.padding = ft.padding.symmetric(horizontal=20, vertical=20)
 
     def __create_label(self, text: str = ""):
@@ -17,7 +15,7 @@ class CounterDisplay(ft.Container):
         )
 
     def __create_value(self):
-        return ft.Text(value="", size=14, weight=ft.FontWeight.BOLD)
+        return ft.Text(value="0", size=14, weight=ft.FontWeight.BOLD)
 
     def __create_unit(self, text: str):
         return ft.Text(

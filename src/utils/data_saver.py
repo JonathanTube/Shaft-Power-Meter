@@ -32,25 +32,9 @@ class DataSaver:
                 is_overload=is_overload
             )
             # save counter log of total
-            cnt = CounterLog.select().where(CounterLog.sps_name == name, CounterLog.counter_type == 0).count()
-            if cnt == 0:
-                CounterLog.create(
-                    sps_name=name,
-                    counter_type=0,
-                    total_speed=speed,
-                    total_power=power,
-                    times=1,
-                    start_utc_date_time=utc_date_time
-                )
-            else:
-                CounterLog.update(
-                    total_speed=CounterLog.total_speed + speed,
-                    total_power=CounterLog.total_power + power,
-                    times=CounterLog.times + 1
-                ).where(
-                    CounterLog.sps_name == name,
-                    CounterLog.counter_type == 0
-                ).execute()
+            DataSaver.save_counter_total(name, speed, power)
+            # save counter log of interval
+            DataSaver.save_counter_interval(name, speed, power)
             if name == 'sps1':
                 gdata.sps1_thrust = thrust
                 gdata.sps1_torque = torque
@@ -97,3 +81,42 @@ class DataSaver:
             asyncio.create_task(plc_util.write_overload(False))
 
         return overload
+
+    @staticmethod
+    def save_counter_total(name: str, speed: float, power: float):
+        cnt = CounterLog.select().where(CounterLog.sps_name == name, CounterLog.counter_type == 2).count()
+        if cnt == 0:
+            CounterLog.create(
+                sps_name=name,
+                counter_type=2,
+                total_speed=speed,
+                total_power=power,
+                times=1,
+                start_utc_date_time=gdata.utc_date_time,
+                counter_status="running"
+            )
+        else:
+            CounterLog.update(
+                total_speed=CounterLog.total_speed + speed,
+                total_power=CounterLog.total_power + power,
+                times=CounterLog.times + 1
+            ).where(
+                CounterLog.sps_name == name,
+                CounterLog.counter_type == 2
+            ).execute()
+
+    @staticmethod
+    def save_counter_interval(name: str, speed: float, power: float):
+        cnt = CounterLog.select().where(CounterLog.sps_name == name, CounterLog.counter_type == 1, CounterLog.counter_status == "running").count()
+        # the intervar counter hasn't been started since the cnt is 0
+        if cnt == 0:
+            return
+
+        CounterLog.update(
+            total_speed=CounterLog.total_speed + speed,
+            total_power=CounterLog.total_power + power,
+            times=CounterLog.times + 1
+        ).where(
+            CounterLog.sps_name == name,
+            CounterLog.counter_type == 1
+        ).execute()

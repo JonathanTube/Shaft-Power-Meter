@@ -65,7 +65,13 @@ class IntervalCounter(ft.Container):
             controls=[
                 ft.Row(alignment=ft.MainAxisAlignment.SPACE_BETWEEN, controls=[self.title, self.status_container]),
                 self.display,
-                self.hours_field
+                ft.Column(
+                    alignment=ft.MainAxisAlignment.END,
+                    expand=True,
+                    controls=[
+                        self.hours_field
+                    ]
+                )
             ])
 
     def on_hours_change(self, e):
@@ -98,8 +104,6 @@ class IntervalCounter(ft.Container):
         param_end_time = gdata.utc_date_time
         param_start_time = param_end_time - timedelta(hours=self.hours)
 
-        logging.info(f'IntervalCounter param_start_time: {param_start_time}')
-        logging.info(f'IntervalCounter param_end_time: {param_end_time}')
 
         data_log = DataLog.select(
             fn.COALESCE(fn.AVG(DataLog.power), 0).alias('average_power'),
