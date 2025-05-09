@@ -9,6 +9,7 @@ from db.models.report_detail import ReportDetail
 from utils.unit_parser import UnitParser
 from db.models.date_time_conf import DateTimeConf
 
+
 class ReportInfoDialog(ft.AlertDialog):
     def __init__(self, id, report_name):
         super().__init__()
@@ -27,13 +28,8 @@ class ReportInfoDialog(ft.AlertDialog):
         self.title = ft.Row(
             controls=[
                 ft.Text(""),
-                ft.Text(report_name, expand=True,
-                        text_align=ft.TextAlign.CENTER),
-                ft.IconButton(
-                    icon=ft.icons.CLOSE_OUTLINED,
-                    # icon_color=ft.Colors.INVERSE_SURFACE,
-                    on_click=lambda e: e.page.close(self)
-                )
+                ft.Text(report_name, expand=True, text_align=ft.TextAlign.CENTER),
+                ft.IconButton(icon=ft.icons.CLOSE_OUTLINED, on_click=lambda e: e.page.close(self))
             ]
         )
         self.adaptive_width = True
@@ -49,7 +45,8 @@ class ReportInfoDialog(ft.AlertDialog):
         self.system_settings: SystemSettings = SystemSettings.get()
         self.report_info: ReportInfo = ReportInfo.get_by_id(self.id)
         self.event_log: EventLog = self.report_info.event_log
-        self.report_details: list[ReportDetail] = ReportDetail.select().where(ReportDetail.report_info == self.report_info.id).order_by(ReportDetail.id.asc())
+        # limit the max report details to 200 otherwise the database will be locked
+        self.report_details: list[ReportDetail] = ReportDetail.select().where(ReportDetail.report_info == self.report_info.id).order_by(ReportDetail.id.asc()).limit(200)
 
     def __create_label(self, text, col=4):
         return ft.Text(text, col=col, text_align=ft.TextAlign.LEFT, weight=ft.FontWeight.W_500)
@@ -240,11 +237,7 @@ class ReportInfoDialog(ft.AlertDialog):
         self.event_log_container = self.__create_container(event_log)
 
     def __create_data_log(self):
-        title = ft.Text("ShaPoLi Data Log",
-                        expand=True,
-                        text_align=ft.TextAlign.CENTER,
-                        size=16,
-                        weight=ft.FontWeight.W_500)
+        title = ft.Text("ShaPoLi Data Log", expand=True, text_align=ft.TextAlign.CENTER, size=16, weight=ft.FontWeight.W_500)
 
         rows = []
         for index, report_detail in enumerate(self.report_details):
@@ -295,9 +288,5 @@ class ReportInfoDialog(ft.AlertDialog):
 
         self.content = ft.Column(
             expand=True,
-            controls=[
-                self.basic_info_container,
-                self.event_log_container,
-                self.data_log_container
-            ]
+            controls=[self.basic_info_container, self.event_log_container, self.data_log_container]
         )

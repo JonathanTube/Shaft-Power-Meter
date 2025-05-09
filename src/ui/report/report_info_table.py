@@ -73,7 +73,7 @@ class ReportInfoTable(AbstractTable):
         return ft.Row(controls=[view_button, export_button])
 
     def __view_report(self, e, id: int, report_name: str):
-        e.page.open(ReportInfoDialog(id, report_name))
+        self.page.open(ReportInfoDialog(id, report_name))
 
     def __export_report(self, e, id: int, report_name: str):
         self.file_picker = ft.FilePicker()

@@ -5,7 +5,6 @@ from db.models.report_detail import ReportDetail
 from db.models.report_info import ReportInfo
 from datetime import timedelta, datetime
 from db.models.data_log import DataLog
-from db.models.preference import Preference
 from db.models.system_settings import SystemSettings
 from utils.formula_cal import FormulaCalculator
 from peewee import fn
@@ -144,22 +143,24 @@ class EEXIBreach:
 
     @staticmethod
     def __save_report_detail(name: str, utc_date_time: datetime, speed: float, torque: float, power: float):
-        print(f"EEXIBreach.__save_report_detail: {name}, {utc_date_time}, {speed}, {torque}, {power}")
+        # print(f"EEXIBreach.__save_report_detail: {name}, {utc_date_time}, {speed}, {torque}, {power}")
         try:
-            print(f"EEXIBreach.report_id: {EEXIBreach.report_id}")
+            # print(f"EEXIBreach.report_id: {EEXIBreach.report_id}")
             report_info = ReportInfo.get_or_none(ReportInfo.id == EEXIBreach.report_id)
-            print(f"report_info: {report_info}")
+            # print(f"report_info: {report_info}")
             if report_info is None:
                 return
             total_power = FormulaCalculator.calculate_energy_kwh(power)
-            ReportDetail.create(
-                report_info=report_info,
-                name=name,
-                utc_date_time=utc_date_time,
-                speed=speed,
-                torque=torque,
-                power=power,
-                total_power=total_power
-            )
+            # save each 15 seconds for reducing the the amount of data
+            if utc_date_time.second % 15 == 0:
+                ReportDetail.create(
+                    report_info=report_info,
+                    name=name,
+                    utc_date_time=utc_date_time,
+                    speed=speed,
+                    torque=torque,
+                    power=power,
+                    total_power=total_power
+                )
         except Exception as e:
             logging.error(f"save eexi breach report detail error: {e}")
