@@ -2,6 +2,7 @@ import asyncio
 import random
 import logging
 
+from db.models.counter_log import CounterLog
 from db.models.data_log import DataLog
 from db.models.system_settings import SystemSettings
 from common.global_data import gdata
@@ -61,6 +62,7 @@ class TestModeTask:
             AlarmLog.truncate_table()
             EventLog.truncate_table()
             ReportInfo.truncate_table()
+            CounterLog.truncate_table()
             gdata.sps1_speed = 0
             gdata.sps1_power = 0
             gdata.sps1_torque = 0

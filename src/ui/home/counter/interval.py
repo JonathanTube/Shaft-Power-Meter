@@ -113,7 +113,6 @@ class IntervalCounter(ft.Container):
             DataLog.speed > 10  # 大于10RPM的时候才开始计算累计能耗的
         ).dicts().get()
 
-        print('data_log=', data_log)
         average_power = data_log['average_power']
         average_speed = data_log['average_speed']
 

@@ -1,4 +1,5 @@
 from db.models.breach_reason import BreachReason
+from db.models.counter_log import CounterLog
 from db.models.data_log import DataLog
 from db.models.date_time_conf import DateTimeConf
 from db.models.event_log import EventLog
@@ -50,5 +51,6 @@ class TableInit:
             AlarmLog,
             TestModeConf,
             User,
-            OperationLog
+            OperationLog,
+            CounterLog
         ], safe=True)

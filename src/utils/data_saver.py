@@ -2,12 +2,12 @@ import asyncio
 from datetime import timedelta
 import logging
 from common.const_alarm_type import AlarmType
+from db.models.counter_log import CounterLog
 from db.models.data_log import DataLog
 from common.global_data import gdata
 from utils.plc_util import plc_util
 from utils.eexi_breach import EEXIBreach
 from utils.formula_cal import FormulaCalculator
-from common.control_manager import ControlManager
 from utils.alarm_saver import AlarmSaver
 
 
@@ -31,6 +31,26 @@ class DataSaver:
                 rounds=rounds,
                 is_overload=is_overload
             )
+            # save counter log of total
+            cnt = CounterLog.select().where(CounterLog.sps_name == name, CounterLog.counter_type == 0).count()
+            if cnt == 0:
+                CounterLog.create(
+                    sps_name=name,
+                    counter_type=0,
+                    total_speed=speed,
+                    total_power=power,
+                    times=1,
+                    start_utc_date_time=utc_date_time
+                )
+            else:
+                CounterLog.update(
+                    total_speed=CounterLog.total_speed + speed,
+                    total_power=CounterLog.total_power + power,
+                    times=CounterLog.times + 1
+                ).where(
+                    CounterLog.sps_name == name,
+                    CounterLog.counter_type == 0
+                ).execute()
             if name == 'sps1':
                 gdata.sps1_thrust = thrust
                 gdata.sps1_torque = torque
@@ -40,7 +60,6 @@ class DataSaver:
                 if len(gdata.sps1_power_history) > 100:
                     gdata.sps1_power_history.pop()
                 gdata.sps1_power_history.insert(0, (power, utc_date_time))
-
             else:
                 gdata.sps2_thrust = thrust
                 gdata.sps2_torque = torque
@@ -50,7 +69,6 @@ class DataSaver:
                 if len(gdata.sps2_power_history) > 100:
                     gdata.sps2_power_history.pop()
                 gdata.sps2_power_history.insert(0, (power, utc_date_time))
-                # print(f"sps2_power_history: {gdata.sps2_power_history}")
 
             # 处理EEXI过载和恢复
             EEXIBreach.handle_breach_and_recovery()

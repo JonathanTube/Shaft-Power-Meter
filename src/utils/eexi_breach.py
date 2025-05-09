@@ -17,7 +17,7 @@ class EEXIBreach:
 
     @staticmethod
     def handle_breach_and_recovery():
-        logging.info('==================eexi_breach_task: start==================')
+        # logging.info('==================eexi_breach_task: start==================')
         system_settings: SystemSettings = SystemSettings.get()
         is_enable = system_settings.sha_po_li
         if not is_enable:
@@ -33,14 +33,10 @@ class EEXIBreach:
 
         seconds = system_settings.eexi_breach_checking_duration
         eexi_limited_power = system_settings.eexi_limited_power
-        logging.info(f"eexi_breach_checking_duration = {seconds}s")
-
         start_time = gdata.utc_date_time - timedelta(seconds=seconds)
-        logging.info(f"start_time = {gdata.utc_date_time} - {seconds}s = {start_time}")
 
         # 再减去数据刷新间隔，类似滑动窗口，因为下位机数据采集间隔是1s，所以需要减去1s
         start_time = start_time - timedelta(seconds=1)
-        logging.info(f"start_time = {gdata.utc_date_time} - {seconds}s - 1s = {start_time}")
 
         # 查找时间窗口内的功率记录
         data = EEXIBreach.__query_data_in_time_window(start_time)
@@ -53,26 +49,32 @@ class EEXIBreach:
 
         # 计算过载次数
         breach_times = sum(1 for item in data if item.total_power > eexi_limited_power)
-        logging.info(f"breach_times = {breach_times}")
         if breach_times == len(data):
+            logging.info(f"eexi_breach_checking_duration = {seconds}s")
+            logging.info(f"start_time = {gdata.utc_date_time} - {seconds}s = {start_time}")
+            logging.info(f"start_time = {gdata.utc_date_time} - {seconds}s - 1s = {start_time}")
+            logging.info(f"breach_times = {breach_times}")
             EEXIBreach.__handle_breach_event(start_time)
 
         # 计算恢复次数
         recovery_times = sum(1 for item in data if item.total_power <= eexi_limited_power)
-        logging.info(f"recovery_times = {recovery_times}")
         if recovery_times == len(data):
+            logging.info(f"eexi_breach_checking_duration = {seconds}s")
+            logging.info(f"start_time = {gdata.utc_date_time} - {seconds}s = {start_time}")
+            logging.info(f"start_time = {gdata.utc_date_time} - {seconds}s - 1s = {start_time}")
+            logging.info(f"recovery_times = {recovery_times}")
             EEXIBreach.__handle_recovery_event(start_time)
-        logging.info('==================eexi_breach_task: end==================\n')
+        # logging.info('==================eexi_breach_task: end==================\n')
 
     @staticmethod
     def __is_invalid_seconds_diff(data, seconds) -> bool:
         # 计算时间差，如果时间差小于60s，则不进行处理
         start_time: datetime = data[0].utc_date_time
-        logging.info(f"start_time of data list = {start_time}")
+        # logging.info(f"start_time of data list = {start_time}")
         end_time: datetime = data[-1].utc_date_time
-        logging.info(f"end_time of data list = {end_time}")
+        # logging.info(f"end_time of data list = {end_time}")
         time_diff = abs(end_time - start_time)
-        logging.info(f"time_diff = {time_diff.total_seconds()}s")
+        # logging.info(f"time_diff = {time_diff.total_seconds()}s")
         return time_diff.total_seconds() < seconds
 
     @staticmethod
@@ -87,7 +89,7 @@ class EEXIBreach:
         ).order_by(
             DataLog.utc_date_time.asc()
         )
-        logging.info(f"data.length = {len(data)}")
+        # logging.info(f"data.length = {len(data)}")
         return data
 
     @staticmethod

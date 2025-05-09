@@ -1,12 +1,11 @@
 import asyncio
 import flet as ft
-from datetime import datetime
 from typing import Literal
-from db.models.data_log import DataLog
+from db.models.counter_log import CounterLog
 from db.models.preference import Preference
 from db.models.date_time_conf import DateTimeConf
 from ui.home.counter.display import CounterDisplay
-from peewee import fn
+from common.global_data import gdata
 
 
 class TotalCounter(ft.Container):
@@ -66,20 +65,14 @@ class TotalCounter(ft.Container):
             await asyncio.sleep(self.interval)
 
     def __calculate(self):
-        data_log = DataLog.select(
-            fn.COALESCE(fn.AVG(DataLog.power), 0).alias('average_power'),
-            fn.COALESCE(fn.AVG(DataLog.speed), 0).alias('average_speed'),
-            fn.COALESCE(fn.MIN(DataLog.utc_date_time), None).alias('start_time'),
-            fn.COALESCE(fn.MAX(DataLog.utc_date_time), None).alias('end_time')
-        ).where(DataLog.name == self.name).dicts().get()
-
-        if data_log['start_time'] is None or data_log['end_time'] is None:
+        counter_log = CounterLog.get_or_none(CounterLog.sps_name == self.name, CounterLog.counter_type == 0)
+        if counter_log is None:
             return
+        start_time = counter_log.start_utc_date_time
+        end_time = gdata.utc_date_time
 
-        start_time = datetime.strptime(data_log['start_time'], self.standard_date_time_format)
-        end_time = datetime.strptime(data_log['end_time'], self.standard_date_time_format)
-        average_power = data_log['average_power']
-        average_speed = data_log['average_speed']
+        average_power = counter_log.total_power / counter_log.times
+        average_speed = counter_log.total_speed / counter_log.times
 
         hours = (end_time - start_time).total_seconds() / 3600
 

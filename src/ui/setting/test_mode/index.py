@@ -3,7 +3,7 @@ import flet as ft
 from db.models.test_mode_conf import TestModeConf
 from ui.setting.test_mode.test_mode_instant import TestModeInstant
 from ui.setting.test_mode.test_mode_range import TestModeRange
-from utils import plc_util
+from utils.plc_util import plc_util
 from utils.unit_converter import UnitConverter
 from db.models.preference import Preference
 from task.test_mode_task import testModeTask
