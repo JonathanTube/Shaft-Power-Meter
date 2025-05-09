@@ -22,6 +22,7 @@ class DualInstantSpeed(ft.Container):
             expand=True,
             horizontal_alignment=ft.CrossAxisAlignment.END,
             alignment=ft.MainAxisAlignment.END,
+            spacing=0,
             controls=[self.speed_sps1, self.speed_sps2]
         )
 

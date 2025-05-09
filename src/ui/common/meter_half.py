@@ -41,6 +41,9 @@ class MeterHalf(ft.Container):
 
             center_value = int(_active_value / total * 100)
             self.__set_center_value(center_value)
+            if center_value > 100:
+                self.active_part.value = 180
+                self.inactive_part.value = 0
 
         # set outer color
         self.__set_outer_color()

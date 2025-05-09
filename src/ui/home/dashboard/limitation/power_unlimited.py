@@ -2,12 +2,15 @@ import flet as ft
 from utils.unit_parser import UnitParser
 from db.models.preference import Preference
 from db.models.propeller_setting import PropellerSetting
+from db.models.system_settings import SystemSettings
 
 
 class PowerUnlimited(ft.Container):
     def __init__(self):
         super().__init__()
         self.expand = True
+        system_settings: SystemSettings = SystemSettings.get()
+        self.is_dual = system_settings.amount_of_propeller == 2
         preference: Preference = Preference.get()
         self.system_unit = preference.system_unit
 
@@ -16,7 +19,8 @@ class PowerUnlimited(ft.Container):
 
     def build(self):
         self.title = ft.Text(self.page.session.get("lang.common.unlimited_power"), weight=ft.FontWeight.W_600)
-        power_and_unit = UnitParser.parse_power(self.power, self.system_unit)
+        power = self.power * 2 if self.is_dual else self.power
+        power_and_unit = UnitParser.parse_power(power, self.system_unit)
         self.unlimited_power_value = ft.Text(power_and_unit[0])
         self.unlimited_power_unit = ft.Text(power_and_unit[1])
 

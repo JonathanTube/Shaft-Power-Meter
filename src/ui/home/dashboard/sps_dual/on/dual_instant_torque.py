@@ -27,6 +27,7 @@ class DualInstantTorque(ft.Container):
             expand=True,
             horizontal_alignment=ft.CrossAxisAlignment.END,
             alignment=ft.MainAxisAlignment.END,
+            spacing=0,
             controls=[
                 self.torque_sps1,
                 self.torque_sps2

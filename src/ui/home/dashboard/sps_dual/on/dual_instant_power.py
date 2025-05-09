@@ -27,6 +27,7 @@ class DualInstantPower(ft.Container):
             expand=True,
             horizontal_alignment=ft.CrossAxisAlignment.END,
             alignment=ft.MainAxisAlignment.END,
+            spacing=0,
             controls=[
                 self.power_total,
                 self.power_sps1,

@@ -30,6 +30,7 @@ class DualInstantThrust(ft.Container):
             expand=True,
             horizontal_alignment=ft.CrossAxisAlignment.END,
             alignment=ft.MainAxisAlignment.END,
+            spacing=0,
             controls=[self.thrust_sps1, self.thrust_sps2]
         )
 
