@@ -4,8 +4,6 @@ import flet as ft
 from pymodbus.client.tcp import AsyncModbusTcpClient
 from pymodbus.exceptions import ConnectionException
 from common.const_alarm_type import AlarmType
-from common.const_pubsub_topic import PubSubTopic
-from db.models.alarm_log import AlarmLog
 from common.global_data import gdata
 from utils.alarm_saver import AlarmSaver
 
@@ -72,7 +70,3 @@ class Sps1ReadTask:
             logging.error(f"sps1 read task connect error: {e}")
             AlarmSaver.create(AlarmType.SPS1_DISCONNECTED)
             self.__send_msg(f"Error connecting to sps: {e}")
-
-    def __send_msg(self, message: str):
-        self.page.pubsub.send_all_on_topic(
-            PubSubTopic.TRACE_SPS_LOG, message)

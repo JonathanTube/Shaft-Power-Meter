@@ -14,4 +14,4 @@ class TaskManager:
         asyncio.create_task(utc_timer.start())
         # asyncio.create_task(Sps1ReadTask(self.page).start())
         # asyncio.create_task(Sps2ReadTask(self.page).start())
-        # asyncio.create_task(GpsSyncTask(self.page).start())
+        asyncio.create_task(GpsSyncTask(self.page).start())

@@ -1,5 +1,4 @@
 from datetime import datetime
-from typing import Literal
 from db.models.io_conf import IOConf
 from db.models.system_settings import SystemSettings
 from db.models.propeller_setting import PropellerSetting

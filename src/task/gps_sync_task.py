@@ -4,8 +4,6 @@ from zoneinfo import ZoneInfo
 import pynmea2
 import flet as ft
 from common.const_alarm_type import AlarmType
-from common.const_pubsub_topic import PubSubTopic
-from db.models.alarm_log import AlarmLog
 from db.models.gps_log import GpsLog
 import asyncio
 import random
@@ -124,6 +122,3 @@ class GpsSyncTask:
             logging.error(f"gps parse nmea sentence failed: {e}")
             self.__send_message(f"parse nmea sentence failed: {e}")
             gdata.gps_location = None
-
-    def __send_message(self, message: str):
-        self.page.pubsub.send_all_on_topic(PubSubTopic.TRACE_GPS_LOG, message)

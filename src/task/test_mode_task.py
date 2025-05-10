@@ -10,7 +10,6 @@ from db.models.alarm_log import AlarmLog
 from db.models.event_log import EventLog
 from db.models.report_info import ReportInfo
 from utils.data_saver import DataSaver
-from db.models.preference import Preference
 
 
 class TestModeTask:
