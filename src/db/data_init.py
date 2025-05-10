@@ -405,7 +405,6 @@ class DataInit:
                     "chinese": "确认时间",
                     "english": "Acknowledged At"
                 },
-
                 {
                     "code": "lang.common.note",
                     "chinese": "备注",
@@ -1376,6 +1375,11 @@ class DataInit:
                     "code": "lang.event.beaufort_number",
                     "chinese": "风级",
                     "english": "Beaufort Number"
+                },
+                {
+                    "code": "lang.event.please_input_all_fields_except_note",
+                    "chinese": "请输入除备注外的所有字段",
+                    "english": "Please input all fields except note"
                 },
                 {
                     "code": "lang.permission.user_name",

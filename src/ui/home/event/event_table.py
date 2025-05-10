@@ -3,6 +3,7 @@ import flet as ft
 from db.models.event_log import EventLog
 from ui.common.abstract_table import AbstractTable
 from ui.home.event.event_form import EventForm
+from ui.home.event.event_note import EventNote
 from db.models.date_time_conf import DateTimeConf
 
 
@@ -19,8 +20,7 @@ class EventTable(AbstractTable):
         end_date = self.kwargs.get('end_date')
         sql = EventLog.select()
         if start_date and end_date:
-            sql = sql.where(EventLog.started_at >= start_date,
-                            EventLog.started_at <= end_date)
+            sql = sql.where(EventLog.started_at >= start_date, EventLog.started_at <= end_date)
 
         return sql.count()
 
@@ -35,14 +35,15 @@ class EventTable(AbstractTable):
             EventLog.ended_at,
             EventLog.ended_position,
             EventLog.acknowledged_at,
+            EventLog.beaufort_number,
+            EventLog.wave_height,
+            EventLog.ice_condition,
             EventLog.note
         )
         if start_date and end_date:
-            sql = sql.where(EventLog.started_at >= start_date,
-                            EventLog.started_at <= end_date)
+            sql = sql.where(EventLog.started_at >= start_date, EventLog.started_at <= end_date)
 
-        data = sql.order_by(EventLog.id.desc()).paginate(
-            self.current_page, self.page_size)
+        data = sql.order_by(EventLog.id.desc()).paginate(self.current_page, self.page_size)
 
         return [[
                 item.id,
@@ -54,8 +55,7 @@ class EventTable(AbstractTable):
                 item.beaufort_number,
                 item.wave_height,
                 item.ice_condition,
-                item.acknowledged_at.strftime(self.date_time_format) if item.acknowledged_at else "",
-                item.note
+                item.acknowledged_at.strftime(self.date_time_format) if item.acknowledged_at else ""
                 ] for item in data]
 
     def get_columns(self):
@@ -70,8 +70,7 @@ class EventTable(AbstractTable):
             session.get("lang.event.beaufort_number"),
             session.get("lang.event.wave_height"),
             session.get("lang.event.ice_condition"),
-            session.get("lang.common.acknowledged_at"),
-            session.get("lang.common.note")
+            session.get("lang.common.acknowledged_at")
         ]
 
     def create_columns(self):
@@ -95,7 +94,8 @@ class EventTable(AbstractTable):
                 icon=ft.icons.NOTE,
                 icon_color=ft.Colors.GREEN,
                 icon_size=20,
-                visible=show_note
+                visible=show_note,
+                on_click=lambda e: self.page.open(EventNote(items[7]))
             )
         ])
 

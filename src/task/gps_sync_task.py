@@ -44,17 +44,15 @@ class GpsSyncTask:
                 # 使用指数退避算法
                 delay = self.base_delay * (self.retry_backoff ** self.retries)
                 delay += random.uniform(0, 1)  # 添加随机抖动
-                self.__send_message(f"try to connect...({self.retries+1} times)")
 
                 self.reader, self.writer = await asyncio.wait_for(
                     asyncio.open_connection(gdata.gps_ip, gdata.gps_port),
                     timeout=5
                 )
-                self.__send_message("connect success")
+
                 return
             except Exception as e:
                 logging.error(f"gps connect error: {e}")
-                self.__send_message(f"connect failed: {str(e)}")
                 self.retries += 1
                 AlarmSaver.create(AlarmType.GPS_DISCONNECTED)
                 await asyncio.sleep(delay)
@@ -64,23 +62,18 @@ class GpsSyncTask:
             try:
                 data = await asyncio.wait_for(self.reader.readline(), timeout=5)
                 if not data:
-                    self.__send_message("receive empty data, connection may be closed")
                     break
 
                 str_data = data.decode('utf-8').strip()
-                self.__send_message(f"receive data: {str_data}")
                 self.parse_nmea_sentence(str_data)
             except asyncio.TimeoutError:
                 logging.error("gps receive data timeout, keep connection")
-                self.__send_message("read timeout, keep connection")
                 break
             except Exception as e:
                 logging.error(f"gps data receive error: {e}")
-                self.__send_message(f"data receive error: {e}")
                 break
 
     async def handle_connection_error(self):
-        self.__send_message("try to reconnect...")
         # 重置重试计数
         self.retries = 0
         await asyncio.sleep(1)
@@ -92,7 +85,6 @@ class GpsSyncTask:
                 await self.writer.wait_closed()
             except Exception as e:
                 logging.error(f"gps close connection error: {e}")
-                self.__send_message(f"close connection error: {e}")
             finally:
                 self.writer = None
                 self.reader = None
@@ -120,5 +112,4 @@ class GpsSyncTask:
 
         except pynmea2.ParseError as e:
             logging.error(f"gps parse nmea sentence failed: {e}")
-            self.__send_message(f"parse nmea sentence failed: {e}")
             gdata.gps_location = None
