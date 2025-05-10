@@ -50,7 +50,7 @@ class IOSettingPLC(CustomCard):
             suffix_text='kNm',
             col={'md': 6},
             read_only=True,
-            on_focus=lambda e: keyboard.open(e.control)
+            on_focus=lambda e: keyboard.open(e.control, 'int')
         )
         self.txt_torque_range_max = ft.TextField(
             label=self.page.session.get("lang.setting.4_20_ma_torque_max"),
@@ -143,32 +143,32 @@ class IOSettingPLC(CustomCard):
             self.plc_status.update()
 
             plc_4_20_ma_data = await plc_util.read_4_20_ma_data()
-            self.txt_power_range_min.value = plc_4_20_ma_data["power_range_min"]
+            self.txt_power_range_min.value = plc_4_20_ma_data["power_range_min"] // 10
             self.txt_power_range_min.update()
-            self.txt_power_range_max.value = plc_4_20_ma_data["power_range_max"]
+            self.txt_power_range_max.value = plc_4_20_ma_data["power_range_max"] // 10
             self.txt_power_range_max.update()
-            self.txt_power_range_offset.value = plc_4_20_ma_data["power_range_offset"]
+            self.txt_power_range_offset.value = plc_4_20_ma_data["power_range_offset"] // 10
             self.txt_power_range_offset.update()
 
-            self.txt_torque_range_min.value = plc_4_20_ma_data["torque_range_min"]
+            self.txt_torque_range_min.value = plc_4_20_ma_data["torque_range_min"] // 10
             self.txt_torque_range_min.update()
-            self.txt_torque_range_max.value = plc_4_20_ma_data["torque_range_max"]
+            self.txt_torque_range_max.value = plc_4_20_ma_data["torque_range_max"] // 10
             self.txt_torque_range_max.update()
-            self.txt_torque_range_offset.value = plc_4_20_ma_data["torque_range_offset"]
+            self.txt_torque_range_offset.value = plc_4_20_ma_data["torque_range_offset"] // 10
             self.txt_torque_range_offset.update()
 
-            self.txt_thrust_range_min.value = plc_4_20_ma_data["thrust_range_min"]
+            self.txt_thrust_range_min.value = plc_4_20_ma_data["thrust_range_min"] // 10
             self.txt_thrust_range_min.update()
-            self.txt_thrust_range_max.value = plc_4_20_ma_data["thrust_range_max"]
+            self.txt_thrust_range_max.value = plc_4_20_ma_data["thrust_range_max"] // 10
             self.txt_thrust_range_max.update()
-            self.txt_thrust_range_offset.value = plc_4_20_ma_data["thrust_range_offset"]
+            self.txt_thrust_range_offset.value = plc_4_20_ma_data["thrust_range_offset"] // 10
             self.txt_thrust_range_offset.update()
 
-            self.txt_speed_range_min.value = plc_4_20_ma_data["speed_range_min"]
+            self.txt_speed_range_min.value = plc_4_20_ma_data["speed_range_min"] // 10
             self.txt_speed_range_min.update()
-            self.txt_speed_range_max.value = plc_4_20_ma_data["speed_range_max"]
+            self.txt_speed_range_max.value = plc_4_20_ma_data["speed_range_max"] // 10
             self.txt_speed_range_max.update()
-            self.txt_speed_range_offset.value = plc_4_20_ma_data["speed_range_offset"]
+            self.txt_speed_range_offset.value = plc_4_20_ma_data["speed_range_offset"] // 10
             self.txt_speed_range_offset.update()
         except Exception as e:
             pass
@@ -191,21 +191,22 @@ class IOSettingPLC(CustomCard):
         except Exception as e:
             pass
 
+        # 传递给PLC的单位最小是0.1,PLC无法显示0.1，所以乘以10, 所以量程和偏移量也要乘以10
         data = {
-            "power_range_min": self.txt_power_range_min.value,
-            "power_range_max": self.txt_power_range_max.value,
-            "power_range_offset": self.txt_power_range_offset.value,
+            "power_range_min": int(self.txt_power_range_min.value) * 10,
+            "power_range_max": int(self.txt_power_range_max.value) * 10,
+            "power_range_offset": int(self.txt_power_range_offset.value) * 10,
 
-            "torque_range_min": self.txt_torque_range_min.value,
-            "torque_range_max": self.txt_torque_range_max.value,
-            "torque_range_offset": self.txt_torque_range_offset.value,
+            "torque_range_min": int(self.txt_torque_range_min.value) * 10,
+            "torque_range_max": int(self.txt_torque_range_max.value) * 10,
+            "torque_range_offset": int(self.txt_torque_range_offset.value) * 10,
 
-            "thrust_range_min": self.txt_thrust_range_min.value,
-            "thrust_range_max": self.txt_thrust_range_max.value,
-            "thrust_range_offset": self.txt_thrust_range_offset.value,
+            "thrust_range_min": int(self.txt_thrust_range_min.value) * 10,
+            "thrust_range_max": int(self.txt_thrust_range_max.value) * 10,
+            "thrust_range_offset": int(self.txt_thrust_range_offset.value) * 10,
 
-            "speed_range_min": self.txt_speed_range_min.value,
-            "speed_range_max": self.txt_speed_range_max.value,
-            "speed_range_offset": self.txt_speed_range_offset.value
+            "speed_range_min": int(self.txt_speed_range_min.value) * 10,
+            "speed_range_max": int(self.txt_speed_range_max.value) * 10,
+            "speed_range_offset": int(self.txt_speed_range_offset.value) * 10
         }
         await plc_util.write_4_20_ma_data(data)

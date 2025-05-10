@@ -136,5 +136,5 @@ class TestMode(ft.Container):
         ControlManager.audio_alarm.stop()
         ControlManager.fullscreen_alert.stop()
         self.page.run_task(plc_util.write_alarm, False)
-        self.page.run_task(plc_util.write_overload, False)
+        self.page.run_task(plc_util.write_power_overload, False)
         Toast.show_success(self.page)

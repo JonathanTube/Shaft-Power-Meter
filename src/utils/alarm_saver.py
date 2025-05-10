@@ -12,7 +12,8 @@ class AlarmSaver:
         cnt: int = AlarmLog.select().where(AlarmLog.alarm_type == alarm_type, AlarmLog.acknowledge_time.is_null()).count()
         if cnt == 0:
             AlarmLog.create(utc_date_time=gdata.utc_date_time, alarm_type=alarm_type)
-            asyncio.create_task(plc_util.write_alarm(True))
 
         if ControlManager.alarm_button:
             ControlManager.alarm_button.update_alarm()
+
+        asyncio.create_task(plc_util.write_alarm(True))

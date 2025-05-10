@@ -2,9 +2,9 @@ import flet as ft
 from db.models.factor_conf import FactorConf
 from db.models.opearation_log import OperationLog
 from common.operation_type import OperationType
-from common.global_data import gdata
 from playhouse.shortcuts import model_to_dict
 from ui.common.custom_card import CustomCard
+from common.global_data import gdata
 from ui.common.keyboard import keyboard
 
 class IOSettingFactor(CustomCard):

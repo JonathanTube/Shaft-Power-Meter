@@ -38,7 +38,7 @@ class EEXIBreach:
         start_time = start_time - timedelta(seconds=1)
 
         # 查找时间窗口内的功率记录
-        data = EEXIBreach.__query_data_in_time_window(start_time)
+        data: list[DataLog] = EEXIBreach.__query_data_in_time_window(start_time)
 
         if len(data) == 0:
             return
@@ -47,7 +47,7 @@ class EEXIBreach:
             return
 
         # 计算过载次数
-        breach_times = sum(1 for item in data if item.total_power > eexi_limited_power)
+        breach_times = sum(1 for item in data if item.power > eexi_limited_power)
         if breach_times == len(data):
             logging.info(f"eexi_breach_checking_duration = {seconds}s")
             logging.info(f"start_time = {gdata.utc_date_time} - {seconds}s = {start_time}")
@@ -56,7 +56,7 @@ class EEXIBreach:
             EEXIBreach.__handle_breach_event(start_time)
 
         # 计算恢复次数
-        recovery_times = sum(1 for item in data if item.total_power <= eexi_limited_power)
+        recovery_times = sum(1 for item in data if item.power <= eexi_limited_power)
         if recovery_times == len(data):
             logging.info(f"eexi_breach_checking_duration = {seconds}s")
             logging.info(f"start_time = {gdata.utc_date_time} - {seconds}s = {start_time}")
@@ -80,7 +80,7 @@ class EEXIBreach:
     def __query_data_in_time_window(start_time: datetime) -> list[DataLog]:
         data = DataLog.select(
             DataLog.utc_date_time,
-            fn.sum(DataLog.power).alias("total_power")
+            fn.sum(DataLog.power).alias("power")
         ).where(
             DataLog.utc_date_time >= start_time
         ).group_by(

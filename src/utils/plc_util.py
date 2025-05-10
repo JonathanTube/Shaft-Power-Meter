@@ -33,7 +33,7 @@ class PLCUtil:
                         self.plc_client = AsyncModbusTcpClient(
                             host=io_conf.plc_ip,
                             port=io_conf.plc_port,
-                            timeout=10,
+                            timeout=5,
                             retries=3,
                             reconnect_delay=5  # 自动重连间隔
                         )
@@ -56,25 +56,25 @@ class PLCUtil:
 
     async def read_4_20_ma_data(self) -> dict:
         if not await self.auto_reconnect():
-            return self._empty_4_20ma_data()
+            raise Exception("PLC connection error")
 
         try:
             return {  # 全部使用async/await
-                "power_range_min": await self._safe_read(12298),
-                "power_range_max": await self._safe_read(12299),
-                "power_range_offset": await self._safe_read(12300),
+                "power_range_min": await self._safe_read_register(12298),
+                "power_range_max": await self._safe_read_register(12299),
+                "power_range_offset": await self._safe_read_register(12300),
 
-                "torque_range_min": await self._safe_read(12308),
-                "torque_range_max": await self._safe_read(12309),
-                "torque_range_offset": await self._safe_read(12310),
+                "torque_range_min": await self._safe_read_register(12308),
+                "torque_range_max": await self._safe_read_register(12309),
+                "torque_range_offset": await self._safe_read_register(12310),
 
-                "thrust_range_min": await self._safe_read(12318),
-                "thrust_range_max": await self._safe_read(12319),
-                "thrust_range_offset": await self._safe_read(12320),
+                "thrust_range_min": await self._safe_read_register(12318),
+                "thrust_range_max": await self._safe_read_register(12319),
+                "thrust_range_offset": await self._safe_read_register(12320),
 
-                "speed_range_min": await self._safe_read(12328),
-                "speed_range_max": await self._safe_read(12329),
-                "speed_range_offset": await self._safe_read(12330)
+                "speed_range_min": await self._safe_read_register(12328),
+                "speed_range_max": await self._safe_read_register(12329),
+                "speed_range_offset": await self._safe_read_register(12330)
             }
         except ConnectionException as e:
             logging.error(f"PLC connection error: {e}")
@@ -115,11 +115,12 @@ class PLCUtil:
         if not await self.auto_reconnect():
             return False
 
+        # power的单位是kw，保留一位小数，plc无法显示小数，所以除以1000 再乘以 10，也就是除以100
         scaled_values = (
-            int(power / 1000),
-            int(torque / 1000),
-            int(thrust / 1000),
-            int(speed)
+            int(power / 100),  # 功率 kw
+            int(torque / 100),  # 扭矩 kNm
+            int(thrust / 100),  # 推力 kN
+            int(speed)  # 速度 rpm
         )
 
         try:
@@ -133,12 +134,36 @@ class PLCUtil:
             self.save_alarm()
             return False
 
+    async def read_instant_data(self) -> dict:
+        if not await self.auto_reconnect():
+            raise Exception("PLC connection error")
+
+        try:
+            return {
+                "power": await self._safe_read_register(12301),
+                "torque": await self._safe_read_register(12311),
+                "thrust": await self._safe_read_register(12321),
+                "speed": await self._safe_read_register(12331)
+            }
+        except Exception as e:
+            logging.error(f"PLC read data failed: {e}")
+            self.save_alarm()
+            return self._empty_instant_data()
+
+    def _empty_instant_data(self) -> dict:
+        return {
+            "power": None,
+            "torque": None,
+            "thrust": None,
+            "speed": None
+        }
+
     async def write_alarm(self, occured: bool) -> bool:
         if not await self.auto_reconnect():
             return False
 
         try:
-            await self.plc_client.write_register(12288, 1 if occured else 0)
+            await self.plc_client.write_coil(address=12288, value=occured)
             logging.info(f"PLC write alarm: {occured}")
             return True
         except Exception as e:
@@ -146,46 +171,58 @@ class PLCUtil:
             self.save_alarm()
         return False
 
-    async def write_overload(self, occured: bool) -> bool:
+    async def write_power_overload(self, occured: bool) -> bool:
         if not await self.auto_reconnect():
             return False
 
         try:
-            await self.plc_client.write_register(12289, 1 if occured else 0)
-            logging.info(f"PLC write eexi breach: {occured}")
+            await self.plc_client.write_coil(address=12289, value=occured)
+            logging.info(f"PLC write power overload: {occured}")
             return True
         except Exception as e:
-            logging.error(f"PLC write eexi breach failed: {e}")
+            logging.error(f"PLC write power overload failed: {e}")
             self.save_alarm()
         return False
 
     async def read_alarm(self) -> bool:
         if not await self.auto_reconnect():
-            return False
+            raise Exception("PLC connection error")
 
         try:
-            return await self._safe_read(12288) == 1
+            return await self._safe_read_coil(12288)
         except Exception as e:
             logging.error(f"PLC read alarm failed: {e}")
             self.save_alarm()
             return False
 
-    async def read_eexi_overload(self) -> bool:
+    async def read_power_overload(self) -> bool:
         if not await self.auto_reconnect():
-            return False
+            raise Exception("PLC connection error")
+
         try:
-            return await self._safe_read(12289) == 1
+            return await self._safe_read_coil(12289)
         except Exception as e:
-            logging.error(f"PLC read eexi breach failed: {e}")
+            logging.error(f"PLC read power overload failed: {e}")
             self.save_alarm()
             return False
 
-    async def _safe_read(self, address: int) -> Optional[int]:
+    async def _safe_read_register(self, address: int) -> Optional[int]:
         try:
             if not self.plc_client.connected:
                 return None
             response = await self.plc_client.read_holding_registers(address)
             return response.registers[0] if not response.isError() else None
+        except Exception as e:
+            logging.warning(f"PLC address {address} read failed: {e}")
+            self.save_alarm()
+            return None
+
+    async def _safe_read_coil(self, address: int) -> Optional[int]:
+        try:
+            if not self.plc_client.connected:
+                return None
+            response = await self.plc_client.read_coils(address=address, count=1)
+            return response.bits[0] if not response.isError() else None
         except Exception as e:
             logging.warning(f"PLC address {address} read failed: {e}")
             self.save_alarm()

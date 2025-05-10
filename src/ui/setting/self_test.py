@@ -1,6 +1,5 @@
 import asyncio
 import flet as ft
-from common.global_data import gdata
 from utils.plc_util import plc_util
 
 
@@ -25,18 +24,17 @@ class SelfTest(ft.Tabs):
             self.plc_task.cancel()
 
     async def __read_plc_data(self):
-        connected = await plc_util.auto_reconnect()
-        if connected:
-            self.plc_log.controls.append(ft.Text("PLC connected..."))
-        else:
-            self.plc_log.controls.append(ft.Text("PLC disconnected..."))
-
         while True:
-            plc_4_20_ma_data = await plc_util.read_4_20_ma_data()
-            self.plc_log.controls.append(ft.Text(f"4-20mA: {plc_4_20_ma_data}"))
-            self.plc_log.controls.append(ft.Text(f"alarm: {await plc_util.read_alarm()}"))
-            self.plc_log.controls.append(ft.Text(f"EEXI overload: {await plc_util.read_eexi_overload()}"))
-            self.plc_log.update()
+            try:
+                plc_4_20_ma_data = await plc_util.read_4_20_ma_data()
+                self.plc_log.controls.append(ft.Text(f"4-20mA: {plc_4_20_ma_data}"))
+                self.plc_log.controls.append(ft.Text(f"alarm: {await plc_util.read_alarm()}"))
+                self.plc_log.controls.append(ft.Text(f"overload: {await plc_util.read_power_overload()}"))
+                self.plc_log.controls.append(ft.Text(f"instant data: {await plc_util.read_instant_data()}"))
+            except Exception as e:
+                self.plc_log.controls.append(ft.Text(f"error: {e}"))
+            finally:
+                self.plc_log.update()
             await asyncio.sleep(5)
 
     # async def __read_sps_data(self):

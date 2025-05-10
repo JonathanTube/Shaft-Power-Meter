@@ -33,6 +33,8 @@ class DataSaver:
                 torque=torque,
                 is_overload=is_overload
             )
+            # 保存瞬时数据
+            asyncio.create_task(plc_util.write_instant_data(power, torque, thrust, speed))
             # save counter log of total
             DataSaver.save_counter_total(name, speed, power)
             # save counter log of interval
@@ -61,6 +63,7 @@ class DataSaver:
 
     @staticmethod
     def is_overload(speed, power):
+        # 这里判断的是overload curve，而不是简单的判断power_of_mcr
         max_speed = gdata.speed_of_torque_load_limit
         max_power = gdata.power_of_torque_load_limit + gdata.power_of_overload
         # 相对MCR的转速百分比
@@ -75,10 +78,10 @@ class DataSaver:
         if overload:  # 处理功率过载
             AlarmSaver.create(AlarmType.POWER_OVERLOAD)
             # 写入plc-overload
-            asyncio.create_task(plc_util.write_overload(True))
+            asyncio.create_task(plc_util.write_power_overload(True))
         else:  # 功率恢复
             # 写入plc-overload
-            asyncio.create_task(plc_util.write_overload(False))
+            asyncio.create_task(plc_util.write_power_overload(False))
 
         return overload
 
