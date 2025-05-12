@@ -19,10 +19,7 @@ class PropellerConfOverloadCurve(CustomCard):
             on_focus=lambda e: keyboard.open(e.control)
         )
 
-        self.overload_alarm = ft.Switch(
-            label=self.page.session.get("lang.setting.enable_overload_alarm"), label_position=ft.LabelPosition.LEFT, col={"md": 6},
-            value=self.ps.alarm_enabled_of_overload_curve
-        )
+        self.overload_alarm = ft.Checkbox(label=self.page.session.get("lang.setting.enable_overload_alarm"), col={"md": 6}, value=self.ps.alarm_enabled_of_overload_curve)
 
         self.line_color_of_overload_curve = ColorDialog(color=self.ps.line_color_of_overload_curve)
 

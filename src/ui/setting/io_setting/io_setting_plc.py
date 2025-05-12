@@ -5,6 +5,7 @@ from db.models.io_conf import IOConf
 from ui.common.custom_card import CustomCard
 from ui.common.keyboard import keyboard
 from utils.plc_util import plc_util
+from common.global_data import gdata
 
 
 class IOSettingPLC(CustomCard):
@@ -19,6 +20,9 @@ class IOSettingPLC(CustomCard):
             visible=False,
             content=ft.Text(value=self.page.session.get("lang.alarm.plc_disconnected"), weight=ft.FontWeight.BOLD, color=ft.Colors.RED)
         )
+
+        self.write_real_time_data_to_plc = ft.Checkbox(label=self.page.session.get("lang.setting.write_real_time_data_to_plc"), value=self.conf.write_real_time_data_to_plc, col={'md': 12})
+
         self.plc_ip = ft.TextField(label=self.page.session.get("lang.setting.ip"), value=self.conf.plc_ip, col={'md': 6}, read_only=True, on_focus=lambda e: keyboard.open(e.control, 'ip'))
 
         self.plc_port = ft.TextField(label=self.page.session.get("lang.setting.port"), value=self.conf.plc_port, col={'md': 6}, read_only=True, on_focus=lambda e: keyboard.open(e.control, 'int'))
@@ -114,6 +118,7 @@ class IOSettingPLC(CustomCard):
         self.heading = self.page.session.get("lang.setting.plc_conf")
         self.body = ft.ResponsiveRow(controls=[
             self.plc_status,
+            self.write_real_time_data_to_plc,
             self.plc_ip,
             self.plc_port,
 
@@ -181,6 +186,8 @@ class IOSettingPLC(CustomCard):
 
         self.conf.plc_ip = self.plc_ip.value
         self.conf.plc_port = self.plc_port.value
+        self.conf.write_real_time_data_to_plc = self.write_real_time_data_to_plc.value
+        gdata.write_real_time_data_to_plc = self.write_real_time_data_to_plc.value
 
         self.page.run_task(self.__write_to_plc)
 

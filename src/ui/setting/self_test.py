@@ -31,9 +31,9 @@ class SelfTest(ft.Tabs):
                 self.plc_log.controls.append(ft.Text(f"alarm: {await plc_util.read_alarm()}"))
                 self.plc_log.controls.append(ft.Text(f"overload: {await plc_util.read_power_overload()}"))
                 self.plc_log.controls.append(ft.Text(f"instant data: {await plc_util.read_instant_data()}"))
+                self.plc_log.update()
             except Exception as e:
                 self.plc_log.controls.append(ft.Text(f"error: {e}"))
-            finally:
                 self.plc_log.update()
             await asyncio.sleep(5)
 

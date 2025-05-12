@@ -18,22 +18,19 @@ class SystemConfSettings(CustomCard):
         self.preference: Preference = Preference.get()
 
     def build(self):
-        self.display_thrust = ft.Switch(
+        self.display_thrust = ft.Checkbox(
             col={"md": 6}, label=self.page.session.get("lang.setting.display_thrust"),
-            label_position=ft.LabelPosition.LEFT,
             value=self.system_settings.display_thrust
         )
 
-        self.sha_po_li = ft.Switch(
+        self.sha_po_li = ft.Checkbox(
             col={"md": 6}, label=self.page.session.get("lang.setting.enable_sha_po_li"),
-            label_position=ft.LabelPosition.LEFT,
             value=self.system_settings.sha_po_li,
             on_change=self.__on_sha_po_li_change
         )
 
-        self.display_propeller_curve = ft.Switch(
+        self.display_propeller_curve = ft.Checkbox(
             col={"md": 6}, label=self.page.session.get("lang.setting.display_propeller_curve"),
-            label_position=ft.LabelPosition.LEFT,
             value=self.system_settings.display_propeller_curve
         )
 

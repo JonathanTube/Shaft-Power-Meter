@@ -61,11 +61,7 @@ class GeneralDateTime(ft.Container):
                      ft.DropdownOption(text="MM/dd/YYYY", key="%m/%d/%Y")]
         )
 
-        self.sync_with_gps = ft.Switch(
-            label=s.get("lang.setting.sync_with_gps"),
-            col={"md": 6},
-            value=self.date_time_conf.sync_with_gps
-        )
+        self.sync_with_gps = ft.Checkbox(label=s.get("lang.setting.sync_with_gps"), col={"md": 6}, value=self.date_time_conf.sync_with_gps)
 
         self.content = CustomCard(
             s.get("lang.setting.utc_date_time_conf"),

@@ -25,6 +25,7 @@ class GlobalData:
 
         self.plc_ip = None
         self.plc_port = None
+        self.write_real_time_data_to_plc = False
 
         self.sps1_speed = 0
         self.sps1_power = 0
@@ -60,6 +61,7 @@ class GlobalData:
         io_conf: IOConf = IOConf.get()
         self.gps_ip = io_conf.gps_ip
         self.gps_port = io_conf.gps_port
+        self.write_real_time_data_to_plc = io_conf.write_real_time_data_to_plc
 
         self.sps1_ip = io_conf.sps1_ip
         self.sps1_port = io_conf.sps1_port

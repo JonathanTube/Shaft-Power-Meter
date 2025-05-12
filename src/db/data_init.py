@@ -1079,6 +1079,12 @@ class DataInit:
                 },
 
                 {
+                    "code": "lang.setting.write_real_time_data_to_plc",
+                    "chinese": "实时数据写入PLC(请确保同时只能有一个HMI向PLC写入实时数据)",
+                    "english": "Write Real-time Data To PLC (Please ensure that only one HMI is writing real-time data to PLC at the same time)"
+                },
+
+                {
                     "code": "lang.log.event_log",
                     "chinese": "事件日志",
                     "english": "Event Log"
