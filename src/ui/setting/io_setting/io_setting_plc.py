@@ -1,5 +1,6 @@
 import asyncio
 import ipaddress
+import logging
 import flet as ft
 from db.models.io_conf import IOConf
 from ui.common.custom_card import CustomCard
@@ -32,6 +33,7 @@ class IOSettingPLC(CustomCard):
             suffix_text='kW',
             col={'md': 6},
             read_only=True,
+            value=0,
             on_focus=lambda e: keyboard.open(e.control, 'int')
         )
         self.txt_power_range_max = ft.TextField(
@@ -39,6 +41,7 @@ class IOSettingPLC(CustomCard):
             suffix_text='kW',
             col={'md': 6},
             read_only=True,
+            value=0,
             on_focus=lambda e: keyboard.open(e.control, 'int')
         )
         self.txt_power_range_offset = ft.TextField(
@@ -46,6 +49,7 @@ class IOSettingPLC(CustomCard):
             suffix_text='kW',
             col={'md': 6},
             read_only=True,
+            value=0,
             on_focus=lambda e: keyboard.open(e.control, 'int')
         )
 
@@ -54,6 +58,7 @@ class IOSettingPLC(CustomCard):
             suffix_text='kNm',
             col={'md': 6},
             read_only=True,
+            value=0,
             on_focus=lambda e: keyboard.open(e.control, 'int')
         )
         self.txt_torque_range_max = ft.TextField(
@@ -61,6 +66,7 @@ class IOSettingPLC(CustomCard):
             suffix_text='kNm',
             col={'md': 6},
             read_only=True,
+            value=0,
             on_focus=lambda e: keyboard.open(e.control, 'int')
         )
         self.txt_torque_range_offset = ft.TextField(
@@ -68,6 +74,7 @@ class IOSettingPLC(CustomCard):
             suffix_text='kNm',
             col={'md': 6},
             read_only=True,
+            value=0,
             on_focus=lambda e: keyboard.open(e.control, 'int')
         )
 
@@ -76,6 +83,7 @@ class IOSettingPLC(CustomCard):
             suffix_text='kN',
             col={'md': 6},
             read_only=True,
+            value=0,
             on_focus=lambda e: keyboard.open(e.control, 'int')
         )
         self.txt_thrust_range_max = ft.TextField(
@@ -83,6 +91,7 @@ class IOSettingPLC(CustomCard):
             suffix_text='kN',
             col={'md': 6},
             read_only=True,
+            value=0,
             on_focus=lambda e: keyboard.open(e.control, 'int')
         )
         self.txt_thrust_range_offset = ft.TextField(
@@ -90,6 +99,7 @@ class IOSettingPLC(CustomCard):
             suffix_text='kN',
             col={'md': 6},
             read_only=True,
+            value=0,
             on_focus=lambda e: keyboard.open(e.control, 'int')
         )
 
@@ -98,6 +108,7 @@ class IOSettingPLC(CustomCard):
             suffix_text='rpm',
             col={'md': 6},
             read_only=True,
+            value=0,
             on_focus=lambda e: keyboard.open(e.control, 'int')
         )
         self.txt_speed_range_max = ft.TextField(
@@ -105,6 +116,7 @@ class IOSettingPLC(CustomCard):
             suffix_text='rpm',
             col={'md': 6},
             read_only=True,
+            value=0,
             on_focus=lambda e: keyboard.open(e.control, 'int')
         )
         self.txt_speed_range_offset = ft.TextField(
@@ -112,6 +124,7 @@ class IOSettingPLC(CustomCard):
             suffix_text='rpm',
             col={'md': 6},
             read_only=True,
+            value=0,
             on_focus=lambda e: keyboard.open(e.control, 'int')
         )
 
@@ -195,25 +208,25 @@ class IOSettingPLC(CustomCard):
         try:
             self.plc_status.visible = not await plc_util.auto_reconnect()
             self.plc_status.update()
+            # 传递给PLC的单位最小是0.1,PLC无法显示0.1，所以乘以10, 所以量程和偏移量也要乘以10
+            data = {
+                "power_range_min": int(self.txt_power_range_min.value) * 10,
+                "power_range_max": int(self.txt_power_range_max.value) * 10,
+                "power_range_offset": int(self.txt_power_range_offset.value) * 10,
+
+                "torque_range_min": int(self.txt_torque_range_min.value) * 10,
+                "torque_range_max": int(self.txt_torque_range_max.value) * 10,
+                "torque_range_offset": int(self.txt_torque_range_offset.value) * 10,
+
+                "thrust_range_min": int(self.txt_thrust_range_min.value) * 10,
+                "thrust_range_max": int(self.txt_thrust_range_max.value) * 10,
+                "thrust_range_offset": int(self.txt_thrust_range_offset.value) * 10,
+
+                "speed_range_min": int(self.txt_speed_range_min.value) * 10,
+                "speed_range_max": int(self.txt_speed_range_max.value) * 10,
+                "speed_range_offset": int(self.txt_speed_range_offset.value) * 10
+            }
+            await plc_util.write_4_20_ma_data(data)
+
         except Exception as e:
-            pass
-
-        # 传递给PLC的单位最小是0.1,PLC无法显示0.1，所以乘以10, 所以量程和偏移量也要乘以10
-        data = {
-            "power_range_min": int(self.txt_power_range_min.value) * 10,
-            "power_range_max": int(self.txt_power_range_max.value) * 10,
-            "power_range_offset": int(self.txt_power_range_offset.value) * 10,
-
-            "torque_range_min": int(self.txt_torque_range_min.value) * 10,
-            "torque_range_max": int(self.txt_torque_range_max.value) * 10,
-            "torque_range_offset": int(self.txt_torque_range_offset.value) * 10,
-
-            "thrust_range_min": int(self.txt_thrust_range_min.value) * 10,
-            "thrust_range_max": int(self.txt_thrust_range_max.value) * 10,
-            "thrust_range_offset": int(self.txt_thrust_range_offset.value) * 10,
-
-            "speed_range_min": int(self.txt_speed_range_min.value) * 10,
-            "speed_range_max": int(self.txt_speed_range_max.value) * 10,
-            "speed_range_offset": int(self.txt_speed_range_offset.value) * 10
-        }
-        await plc_util.write_4_20_ma_data(data)
+            logging.error(f"plc save data error: {e}")

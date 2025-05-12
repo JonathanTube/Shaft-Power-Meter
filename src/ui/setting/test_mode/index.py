@@ -1,6 +1,5 @@
 import flet as ft
 
-from db.models.test_mode_conf import TestModeConf
 from ui.setting.test_mode.test_mode_instant import TestModeInstant
 from ui.setting.test_mode.test_mode_range import TestModeRange
 from utils.plc_util import plc_util
@@ -13,8 +12,6 @@ from common.control_manager import ControlManager
 from common.global_data import gdata
 from db.models.opearation_log import OperationLog
 from common.operation_type import OperationType
-from common.global_data import gdata
-from playhouse.shortcuts import model_to_dict
 from db.models.user import User
 
 
@@ -26,10 +23,16 @@ class TestMode(ft.Container):
         self.preference: Preference = Preference.get()
 
     def __on_start_button_click(self, e):
-        self.page.open(PermissionCheck(self.start_test_mode, 0))
+        try:
+            self.page.open(PermissionCheck(self.start_test_mode, 0))
+        except Exception as e:
+            pass
 
     def __on_stop_button_click(self, e):
-        self.page.open(PermissionCheck(self.stop_test_mode, 0))
+        try:
+            self.page.open(PermissionCheck(self.stop_test_mode, 0))
+        except Exception as e:
+            pass
 
     def build(self):
         s = self.page.session

@@ -138,10 +138,10 @@ class DataInit:
                 plc_port=502,
                 gps_ip='192.168.1.3',
                 gps_port=502,
-                sps1_ip='192.168.1.4',
-                sps1_port=502,
-                sps2_ip='192.168.1.5',
-                sps2_port=502
+                sps1_ip='192.168.1.5',
+                sps1_port=6800,
+                sps2_ip='192.168.1.6',
+                sps2_port=6800
             )
 
     def __init_test_mode_conf():

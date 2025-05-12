@@ -70,6 +70,7 @@ class IOSetting(ft.Container):
                 operation_type=OperationType.IO_CONF,
                 operation_content=model_to_dict(self.conf)
             )
+            self.conf.save()
             Toast.show_success(self.page)
         except Exception as err:
             logging.error(f"io setting save data error: {err}")

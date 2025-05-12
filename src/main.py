@@ -19,6 +19,8 @@ from common.global_data import gdata
 from utils.alarm_saver import AlarmSaver
 from utils.auto_startup import add_to_startup
 from utils.logger import Logger
+from utils.modbus_output import modbus_output
+
 Logger(show_sql=True)
 
 # 加入开机启动
@@ -72,6 +74,8 @@ async def main(page: ft.Page):
 
     load_language(page)
 
+    await modbus_output.start_modbus_server()
+
     page.title = page.session.get("lang.lang.app.name")
     page.padding = 0
     page.theme_mode = get_theme_mode()
@@ -81,7 +85,7 @@ async def main(page: ft.Page):
     # page.window.title_bar_hidden = True
     page.window.width = 1024
     page.window.height = 768
-    page.window.alignment = ft.alignment.bottom_center
+    page.window.alignment = ft.alignment.center
     # page.window.always_on_top = False
     # page.window.frameless = True
     # page.window.maximizable = False

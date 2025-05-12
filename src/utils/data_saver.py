@@ -9,7 +9,7 @@ from utils.plc_util import plc_util
 from utils.eexi_breach import EEXIBreach
 from utils.formula_cal import FormulaCalculator
 from utils.alarm_saver import AlarmSaver
-
+from utils.modbus_output import modbus_output
 
 class DataSaver:
     @staticmethod
@@ -60,6 +60,8 @@ class DataSaver:
 
             # 处理EEXI过载和恢复
             EEXIBreach.handle_breach_and_recovery()
+            # 输出modbus数据
+            asyncio.create_task(modbus_output.update_registers())
         except Exception as e:
             logging.error(f"data saver error: {e}")
 
@@ -74,7 +76,7 @@ class DataSaver:
         overload_power_percentage = round((speed_percentage / max_speed) ** 2 * max_power, 2)
         # 实际的功率百分比
         actual_power_percentage = round(power / gdata.power_of_mcr * 100, 2)
-        logging.info(f"date_saver: overload_power_percentage={overload_power_percentage}, actual_power_percentage={actual_power_percentage}")
+        # logging.info(f"date_saver: overload_power_percentage={overload_power_percentage}, actual_power_percentage={actual_power_percentage}")
         overload: bool = actual_power_percentage > overload_power_percentage
 
         if overload:  # 处理功率过载
