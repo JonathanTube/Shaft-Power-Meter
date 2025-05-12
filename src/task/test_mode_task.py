@@ -61,13 +61,11 @@ class TestModeTask:
             gdata.sps1_power = 0
             gdata.sps1_torque = 0
             gdata.sps1_thrust = 0
-            gdata.sps1_rounds = 0
 
             gdata.sps2_speed = 0
             gdata.sps2_power = 0
             gdata.sps2_torque = 0
             gdata.sps2_thrust = 0
-            gdata.sps2_rounds = 0
 
             gdata.sps1_power_history = []
             gdata.sps2_power_history = []

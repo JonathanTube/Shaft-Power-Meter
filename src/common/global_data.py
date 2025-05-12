@@ -31,13 +31,11 @@ class GlobalData:
         self.sps1_power = 0
         self.sps1_torque = 0
         self.sps1_thrust = 0
-        self.sps1_rounds = 0
 
         self.sps2_speed = 0
         self.sps2_power = 0
         self.sps2_torque = 0
         self.sps2_thrust = 0
-        self.sps2_rounds = 0
 
         self.sps1_power_history: list[float, datetime] = []
         self.sps2_power_history: list[float, datetime] = []

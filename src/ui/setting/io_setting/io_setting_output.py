@@ -94,4 +94,4 @@ class IOSettingOutput(CustomCard):
 
     async def __start_modbus_server(self):
         await modbus_output.stop_modbus_server()
-        await modbus_output.start_modbus_server(self.serial_port.value)
+        await modbus_output.start_modbus_server()
