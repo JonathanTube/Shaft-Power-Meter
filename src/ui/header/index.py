@@ -52,6 +52,7 @@ class Header(ft.AppBar):
             icon_color=ft.Colors.GREY_800,
             color=ft.Colors.GREY_800,
             bgcolor=ft.Colors.LIGHT_BLUE_100,
+            visible=self.system_settings.sha_po_li,
             on_click=lambda e: self.on_click("REPORT"))
 
         self.setting = ft.ElevatedButton(
