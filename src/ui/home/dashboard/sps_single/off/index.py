@@ -11,7 +11,7 @@ class SingleShaPoLiOff(ft.Stack):
         super().__init__()
 
     def build(self):
-        self.thrust_power = ThrustPower()
+        self.thrust_power = ThrustPower("sps1")
         self.single_meters = SingleMeters()
         self.power_line_chart = SinglePowerLine()
 
