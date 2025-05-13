@@ -82,8 +82,8 @@ async def main(page: ft.Page):
     page.window.resizable = False
     page.window.alignment = ft.alignment.center
     page.window.frameless = True
-    if page.window.width <= 1100:
-        page.window.maximized = True    
+    if page.window.width <= 1200:
+        page.window.maximized = True
         page.window.full_screen = True
     else:
         page.window.maximizable = False
