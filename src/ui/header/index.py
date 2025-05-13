@@ -1,8 +1,14 @@
 import asyncio
+import sys
 import flet as ft
 from common.global_data import gdata
 from common.control_manager import ControlManager
+from common.operation_type import OperationType
 from db.models.date_time_conf import DateTimeConf
+from db.models.opearation_log import OperationLog
+from db.models.user import User
+from ui.common.permission_check import PermissionCheck
+from ui.common.toast import Toast
 from ui.header.shapoli import ShaPoLi
 from ui.header.logo import HeaderLogo
 from ui.header.theme import Theme
@@ -28,7 +34,10 @@ class Header(ft.AppBar):
         self.system_settings = SystemSettings.get()
 
     def build(self):
-        self.title = ft.Text(value=self.page.session.get("lang.common.app_name"), weight=ft.FontWeight.W_800)
+        self.title = ft.Text(value=self.page.session.get("lang.common.app_name"), weight=ft.FontWeight.W_700, size=20)
+
+        self.utc_date_time = ft.Text()
+
         self.home = ft.ElevatedButton(
             text=self.page.session.get("lang.header.home"),
             icon=ft.Icons.HOME_OUTLINED,
@@ -53,8 +62,14 @@ class Header(ft.AppBar):
             bgcolor=ft.Colors.LIGHT_BLUE_100,
             on_click=lambda e: self.on_click("SETTING"))
 
-        self.utc_date_time = ft.Text()
         self.shapoli = ShaPoLi()
+
+        self.close_button = ft.IconButton(
+            icon=ft.Icons.CLOSE_ROUNDED,
+            icon_color=ft.Colors.GREY_200,
+            on_click=lambda e: self.__close_app(e)
+        )
+
         self.actions = [
             self.utc_date_time,
             ft.Container(
@@ -63,8 +78,24 @@ class Header(ft.AppBar):
             ),
             self.shapoli,
             ft.VerticalDivider(width=.5, thickness=.5),
-            Theme()
+            Theme(),
+            ft.VerticalDivider(width=.5, thickness=.5),
+            self.close_button
         ]
+
+    def __close_app(self, e):
+        self.page.open(PermissionCheck(self.__exit_app, 1))
+
+    def __exit_app(self, user: User):
+        user_id = user.id
+        OperationLog.create(
+            user_id=user_id,
+            utc_date_time=gdata.utc_date_time,
+            operation_type=OperationType.SYSTEM_EXIT,
+            operation_content=user.user_name
+        )
+        Toast.show_error(self.page, self.page.session.get("lang.toast.system_exit"))
+        self.page.window.destroy()
 
     def __set_active(self, button: ft.ElevatedButton):
         button.bgcolor = ft.Colors.BLUE_800

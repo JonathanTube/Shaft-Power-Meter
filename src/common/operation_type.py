@@ -25,6 +25,8 @@ class OperationType(int, Enum):
     PERMISSION_CONF = 20
     TEST_MODE_CONF = 21
 
+    SYSTEM_EXIT = 22
+
 
     @classmethod
     def get_operation_type_name(cls, operation_type: int) -> str:

@@ -87,10 +87,10 @@ async def main(page: ft.Page):
     page.window.height = 768
     page.window.alignment = ft.alignment.center
     # page.window.always_on_top = False
-    # page.window.frameless = True
+    page.window.frameless = True
     # page.window.maximizable = False
 
-    # page.window.prevent_close = True
+    page.window.prevent_close = True
     ControlManager.fullscreen_alert = FullscreenAlert()
     ControlManager.audio_alarm = AudioAlarm()
     ControlManager.home = Home()

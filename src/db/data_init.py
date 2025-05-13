@@ -174,6 +174,12 @@ class DataInit:
                 },
 
                 {
+                    "code": "lang.toast.system_exit",
+                    "chinese": "系统正在关闭中，请勿操作...",
+                    "english": "System is closing, please do not operate..."
+                },
+
+                {
                     "code": "lang.toast.success",
                     "chinese": "操作成功",
                     "english": "Operation Success"

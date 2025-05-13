@@ -59,6 +59,9 @@ class ModbusOutput:
             logger.info("Modbus server stopped")
 
     async def update_registers(self):
+        if not self.running:
+            return False
+
         try:
             sps1_torque = int(gdata.sps1_torque / 100) if self.io_conf.output_torque else 0
             sps1_thrust = int(gdata.sps1_thrust / 100) if self.io_conf.output_thrust else 0

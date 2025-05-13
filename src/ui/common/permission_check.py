@@ -1,4 +1,3 @@
-import os
 import subprocess
 import flet as ft
 from typing import Callable
