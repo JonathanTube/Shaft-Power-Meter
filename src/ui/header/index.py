@@ -66,7 +66,6 @@ class Header(ft.AppBar):
 
         self.close_button = ft.IconButton(
             icon=ft.Icons.CLOSE_ROUNDED,
-            icon_color=ft.Colors.GREY_200,
             on_click=lambda e: self.__close_app(e)
         )
 

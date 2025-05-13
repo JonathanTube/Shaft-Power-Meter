@@ -6,7 +6,8 @@ from utils.unit_parser import UnitParser
 class CounterDisplay(ft.Container):
     def __init__(self):
         super().__init__()
-        self.padding = ft.padding.symmetric(horizontal=20, vertical=20)
+        # self.bgcolor = ft.Colors.GREY_100
+        self.padding = ft.padding.only(top=10, bottom=10)
 
     def __create_label(self, text: str = ""):
         return ft.Text(
@@ -98,6 +99,7 @@ class CounterDisplay(ft.Container):
         self.__create_average_speed()
         self.content = ft.Column(
             expand=True,
+            spacing=0 if self.page.window.height <= 600 else 10,
             controls=[
                 self.total_energy,
                 self.average_power,

@@ -1,16 +1,14 @@
 import asyncio
-import logging
 from datetime import datetime, timedelta
 from typing import Literal
 import flet as ft
 from db.models.data_log import DataLog
 from db.models.preference import Preference
-from db.models.date_time_conf import DateTimeConf
 from ui.common.toast import Toast
 from .display import CounterDisplay
 from ui.common.keyboard import keyboard
-from peewee import fn
 from common.global_data import gdata
+from peewee import fn
 
 
 class IntervalCounter(ft.Container):
@@ -62,6 +60,7 @@ class IntervalCounter(ft.Container):
         self.content = ft.Column(
             expand=True,
             horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+            spacing=5 if self.page.window.height <= 600 else 20,
             controls=[
                 ft.Row(alignment=ft.MainAxisAlignment.SPACE_BETWEEN, controls=[self.title, self.status_container]),
                 self.display,

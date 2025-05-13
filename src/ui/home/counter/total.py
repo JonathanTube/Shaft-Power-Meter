@@ -42,6 +42,7 @@ class TotalCounter(ft.Container):
 
         self.content = ft.Column(
             horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+            spacing=5 if self.page.window.height <= 600 else 20,
             controls=[
                 ft.Row(alignment=ft.MainAxisAlignment.SPACE_BETWEEN, controls=[self.title, self.status_container]),
                 self.display,
