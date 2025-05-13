@@ -13,7 +13,6 @@ class SingleShaPoLiOff(ft.Stack):
     def build(self):
         self.thrust_power = ThrustPower("sps1")
         self.single_meters = SingleMeters()
-        self.power_line_chart = SinglePowerLine()
 
         self.controls = [
             self.thrust_power,
@@ -22,8 +21,7 @@ class SingleShaPoLiOff(ft.Stack):
                 spacing=10,
                 alignment=ft.alignment.center,
                 controls=[
-                    self.single_meters,
-                    self.power_line_chart
+                    self.single_meters
                 ]
             )
         ]
@@ -34,7 +32,6 @@ class SingleShaPoLiOff(ft.Stack):
         while True:
             self.single_meters.reload()
             self.thrust_power.reload()
-            self.power_line_chart.reload()
             await asyncio.sleep(interval)
 
     def did_mount(self):

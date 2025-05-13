@@ -6,6 +6,7 @@ from ui.home.dashboard.meters.torque_meter import TorqueMeter
 from ui.home.dashboard.thrust.thrust_power import ThrustPower
 from ui.common.simple_card import SimpleCard
 from typing import Literal
+from db.models.system_settings import SystemSettings
 
 
 class DualMeters(ft.Container):
@@ -13,14 +14,19 @@ class DualMeters(ft.Container):
         super().__init__()
         self.expand = True
         self.name = name
+        system_settings: SystemSettings = SystemSettings.get()
+        self.amount_of_propeller = system_settings.amount_of_propeller
+
+    def get_radius(self, radio):
+        radius = self.page.window.height * radio
+        if self.amount_of_propeller == 2:
+            radius = radius * 0.75
+        return radius
 
     def build(self):
-        width = self.page.window.width * 0.45
-        height = self.page.window.height * 0.4
-
-        self.speed_meter = SpeedMeter(self.name)
-        self.power_meter = PowerMeter(self.name)
-        self.torque_meter = TorqueMeter(self.name)
+        self.speed_meter = SpeedMeter(self.name, self.get_radius(0.22))
+        self.power_meter = PowerMeter(self.name, self.get_radius(0.26))
+        self.torque_meter = TorqueMeter(self.name, self.get_radius(0.22))
         self.thrust_meter = ThrustPower(self.name)
 
         title = self.page.session.get("lang.common.sps1")
@@ -34,13 +40,12 @@ class DualMeters(ft.Container):
                 SimpleCard(
                     body_bottom_right=False,
                     body=ft.Stack(
-                        width=width,
-                        height=height,
+                        expand=True,
                         alignment=ft.alignment.center,
                         controls=[
-                            ft.Container(content=self.speed_meter, bottom=0, left=0),
-                            ft.Container(content=self.power_meter, top=0),
-                            ft.Container(content=self.torque_meter, bottom=0, right=0)
+                            ft.Container(content=self.speed_meter, bottom=10, left=10),
+                            ft.Container(content=self.power_meter, top=10),
+                            ft.Container(content=self.torque_meter, bottom=10, right=10)
                         ])
                 )
             ])

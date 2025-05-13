@@ -23,8 +23,7 @@ class DualShaPoLiOff(ft.Container):
                     expand=True,
                     spacing=10,
                     controls=[self.sps1_meters, self.sps2_meters]
-                ),
-                self.dual_power_line
+                )
             ]
         )
 
@@ -34,7 +33,6 @@ class DualShaPoLiOff(ft.Container):
         while True:
             self.sps1_meters.reload()
             self.sps2_meters.reload()
-            self.dual_power_line.reload()
             await asyncio.sleep(interval)
 
     def did_mount(self):

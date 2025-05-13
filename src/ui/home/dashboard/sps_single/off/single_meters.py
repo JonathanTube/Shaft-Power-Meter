@@ -3,20 +3,31 @@ from ui.home.dashboard.meters.speed_meter import SpeedMeter
 from ui.home.dashboard.meters.power_meter import PowerMeter
 from ui.home.dashboard.meters.torque_meter import TorqueMeter
 from ui.common.simple_card import SimpleCard
+from db.models.system_settings import SystemSettings
 
 
 class SingleMeters(ft.Container):
     def __init__(self):
         super().__init__()
+        self.expand = True
+        system_settings: SystemSettings = SystemSettings.get()
+        self.amount_of_propeller = system_settings.amount_of_propeller
+
+    def get_radius(self, radio):
+        radius = self.page.window.height * radio
+        if self.amount_of_propeller == 2:
+            radius = radius * 0.75
+        return radius
 
     def build(self):
-        self.speed_meter = SpeedMeter("sps1")
-        self.power_meter = PowerMeter("sps1")
-        self.torque_meter = TorqueMeter("sps1")
+        self.speed_meter = SpeedMeter("sps1", self.get_radius(0.2))
+        self.power_meter = PowerMeter("sps1", self.get_radius(0.26))
+        self.torque_meter = TorqueMeter("sps1", self.get_radius(0.2))
 
-        self.content = ft.Row(
+        row = ft.Row(
             alignment=ft.MainAxisAlignment.CENTER,
-            spacing=10,
+            vertical_alignment=ft.CrossAxisAlignment.CENTER,
+            spacing=20,
             controls=[
                 SimpleCard(
                     body=self.speed_meter,
@@ -33,8 +44,15 @@ class SingleMeters(ft.Container):
                     body_bottom_right=False,
                     expand=False
                 )
-
             ]
+        )
+
+        self.content = ft.Column(
+            expand=True,
+            run_alignment=ft.MainAxisAlignment.CENTER,
+            horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+            alignment=ft.MainAxisAlignment.CENTER,
+            controls=[row]
         )
 
     def reload(self):
