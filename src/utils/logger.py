@@ -1,6 +1,8 @@
 import logging
 from logging.handlers import TimedRotatingFileHandler
 import os
+import sys
+import win32api
 
 
 class Logger:
@@ -11,7 +13,7 @@ class Logger:
         :param show_sql: 是否输出SQL语句（默认False）
         """
         # 配置日志路径
-        log_dir = os.path.join(os.getcwd(), 'logs')
+        log_dir = os.path.join(self.get_exe_dir(), 'logs')
         os.makedirs(log_dir, exist_ok=True)
         log_file = os.path.join(log_dir, 'info.log')
 
@@ -35,3 +37,10 @@ class Logger:
             peewee_logger.propagate = False
             peewee_logger.addHandler(file_handler)
             peewee_logger.addHandler(console_handler)
+
+    def get_exe_dir(self):
+        if getattr(sys, 'frozen', False):
+            exe_path = win32api.GetLongPathName(sys.executable)
+            return os.path.dirname(exe_path)
+        else:
+            return os.path.dirname(os.path.abspath(__file__))

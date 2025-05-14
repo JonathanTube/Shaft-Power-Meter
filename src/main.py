@@ -21,7 +21,7 @@ from utils.auto_startup import add_to_startup
 from utils.logger import Logger
 from utils.modbus_output import modbus_output
 
-Logger(show_sql=True)
+Logger(show_sql=False)
 
 # 加入开机启动
 add_to_startup()
@@ -82,14 +82,15 @@ async def main(page: ft.Page):
     page.window.resizable = False
     page.window.alignment = ft.alignment.center
     page.window.frameless = True
+    page.window.always_on_top = False
     if page.window.width <= 1200:
         page.window.maximized = True
-        page.window.full_screen = True
+        page.window.full_screen = False
     else:
         page.window.maximizable = False
         page.window.width = 1024
         page.window.height = 600
-    # page.window.always_on_top = False
+        page.window.resizable = False
     page.window.prevent_close = True
     ControlManager.fullscreen_alert = FullscreenAlert()
     ControlManager.audio_alarm = AudioAlarm()
