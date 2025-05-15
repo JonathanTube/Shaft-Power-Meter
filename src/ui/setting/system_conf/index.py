@@ -45,7 +45,7 @@ class SystemConf(ft.Container):
             self.system_conf_settings.save(user.id)
             self.system_conf_ship_info.save(user.id)
             Toast.show_success(self.page)
-            
+            self.__refresh_page()
         except Exception as e:
             logging.error(f"system conf save data error: {e}")
             Toast.show_error(self.page, e)
@@ -55,3 +55,13 @@ class SystemConf(ft.Container):
         self.content.clean()
         self.build()
         Toast.show_success(e.page)
+
+
+    def __refresh_page(self):
+        self.page.appbar.clean()
+        self.page.appbar.build()
+        self.page.appbar.update()
+        for control in self.page.controls:
+            control.clean()
+            control.build()
+            control.update()

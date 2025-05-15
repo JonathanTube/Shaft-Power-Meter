@@ -1,5 +1,4 @@
 import asyncio
-import sys
 import flet as ft
 from common.global_data import gdata
 from common.control_manager import ControlManager
@@ -31,9 +30,8 @@ class Header(ft.AppBar):
         self.active_name = "HOME"
         self.main_content = main_content
 
-        self.system_settings = SystemSettings.get()
-
     def build(self):
+        self.system_settings = SystemSettings.get()
         self.title = ft.Text(value=self.page.session.get("lang.common.app_name"), weight=ft.FontWeight.W_700, size=20)
 
         self.utc_date_time = ft.Text()
