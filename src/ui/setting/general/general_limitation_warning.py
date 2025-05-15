@@ -3,7 +3,7 @@ import flet as ft
 from ui.common.custom_card import CustomCard
 from db.models.limitations import Limitations
 from utils.unit_converter import UnitConverter
-from db.models.opearation_log import OperationLog
+from db.models.operation_log import OperationLog
 from common.operation_type import OperationType
 from playhouse.shortcuts import model_to_dict
 from ui.common.keyboard import keyboard
@@ -89,5 +89,6 @@ class GeneralLimitationWarning(ft.Container):
             operation_type=OperationType.GENERAL_LIMITATION_WARNING,
             operation_content=model_to_dict(self.limitations)
         )
+
     def did_mount(self):
         self.update_unit(self.system_unit)

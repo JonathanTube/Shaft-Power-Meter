@@ -3,7 +3,7 @@ import flet as ft
 from db.models.language import Language
 from ui.common.custom_card import CustomCard
 from db.models.preference import Preference
-from db.models.opearation_log import OperationLog
+from db.models.operation_log import OperationLog
 from common.operation_type import OperationType
 from playhouse.shortcuts import model_to_dict
 from ui.common.keyboard import keyboard

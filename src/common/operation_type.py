@@ -27,7 +27,7 @@ class OperationType(int, Enum):
 
     SYSTEM_EXIT = 22
 
-
+    OFFLINE_DEFAULT_VALUE = 23
     @classmethod
     def get_operation_type_name(cls, operation_type: int) -> str:
         return cls(operation_type).name

@@ -4,7 +4,7 @@ import asyncio
 from common.global_data import gdata
 from ui.common.custom_card import CustomCard
 from db.models.date_time_conf import DateTimeConf
-from db.models.opearation_log import OperationLog
+from db.models.operation_log import OperationLog
 from common.operation_type import OperationType
 from playhouse.shortcuts import model_to_dict
 

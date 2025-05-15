@@ -1,6 +1,6 @@
 import flet as ft
 from db.models.factor_conf import FactorConf
-from db.models.opearation_log import OperationLog
+from db.models.operation_log import OperationLog
 from common.operation_type import OperationType
 from playhouse.shortcuts import model_to_dict
 from ui.common.custom_card import CustomCard

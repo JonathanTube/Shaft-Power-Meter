@@ -1,4 +1,3 @@
-import subprocess
 import flet as ft
 from typing import Callable
 from db.models.user import User
@@ -39,8 +38,7 @@ class PermissionCheck(ft.AlertDialog):
             value="root",
             label=s.get("lang.permission.user_pwd"),
             password=True,
-            can_reveal_password=True,
-            on_click=lambda e: subprocess.run(["osk.exe"])
+            can_reveal_password=True
         )
         self.content = ft.Column(
             height=150,

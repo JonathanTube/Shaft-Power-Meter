@@ -12,6 +12,11 @@ class UnitConverter:
         # 1 kNm = 1000 Nm
         return round(value * 1000, 1)
 
+    @staticmethod
+    def kn_to_n(value: float):
+        # 1 kN = 1000 N
+        return round(value * 1000, 1)
+
     # https://www.unitconverters.net/power/watts-to-hp.htm
     @staticmethod
     def w_to_shp(value: float):

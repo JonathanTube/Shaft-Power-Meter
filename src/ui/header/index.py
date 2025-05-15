@@ -5,7 +5,7 @@ from common.global_data import gdata
 from common.control_manager import ControlManager
 from common.operation_type import OperationType
 from db.models.date_time_conf import DateTimeConf
-from db.models.opearation_log import OperationLog
+from db.models.operation_log import OperationLog
 from db.models.user import User
 from ui.common.permission_check import PermissionCheck
 from ui.common.toast import Toast

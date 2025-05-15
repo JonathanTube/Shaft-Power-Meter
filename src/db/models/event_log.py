@@ -1,4 +1,4 @@
-from peewee import CharField, TextField, ForeignKeyField, DateTimeField, IntegerField, FloatField
+from peewee import CharField, TextField, ForeignKeyField, DateTimeField
 from ..base import BaseModel
 from .breach_reason import BreachReason
 

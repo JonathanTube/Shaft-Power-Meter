@@ -2,11 +2,10 @@ import flet as ft
 from ui.common.abstract_table import AbstractTable
 from db.models.user import User
 from ui.common.toast import Toast
-from db.models.opearation_log import OperationLog
+from db.models.operation_log import OperationLog
 from common.operation_type import OperationType
 from common.global_data import gdata
 from playhouse.shortcuts import model_to_dict
-import subprocess
 
 class PermissionTable(AbstractTable):
     def __init__(self, user: User):
@@ -87,14 +86,12 @@ class PermissionTable(AbstractTable):
         self.password = ft.TextField(
             label=e.page.session.get("lang.permission.user_pwd"),
             value=items[2],
-            password=True,
-            on_click=lambda e: subprocess.run(["osk.exe"])
+            password=True
         )
         self.confirm_password = ft.TextField(
             label=e.page.session.get("lang.permission.confirm_user_pwd"),
             value=items[2],
-            password=True,
-            on_click=lambda e: subprocess.run(["osk.exe"])
+            password=True
         )
         self.role = ft.Dropdown(
             label=e.page.session.get("lang.permission.user_role"),

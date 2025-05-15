@@ -7,7 +7,8 @@ from db.models.factor_conf import FactorConf
 from db.models.gps_log import GpsLog
 from db.models.io_conf import IOConf
 from db.models.limitations import Limitations
-from db.models.opearation_log import OperationLog
+from db.models.operation_log import OperationLog
+from db.models.offline_default_value import OfflineDefaultValue
 from db.models.preference import Preference
 from db.models.propeller_setting import PropellerSetting
 from db.models.report_detail import ReportDetail
@@ -52,5 +53,6 @@ class TableInit:
             TestModeConf,
             User,
             OperationLog,
-            CounterLog
+            CounterLog,
+            OfflineDefaultValue
         ], safe=True)

@@ -2,6 +2,7 @@ from datetime import datetime, timezone
 
 from db.models.io_conf import IOConf
 from db.models.language import Language
+from db.models.offline_default_value import OfflineDefaultValue
 from db.models.propeller_setting import PropellerSetting
 from db.models.system_settings import SystemSettings
 from db.models.ship_info import ShipInfo
@@ -29,6 +30,16 @@ class DataInit:
         DataInit.__init_limitations()
         DataInit.__init_test_mode_conf()
         DataInit.__init_user()
+        DataInit.__init_offline_default_value()
+
+    def __init_offline_default_value():
+        if OfflineDefaultValue.select().count() == 0:
+            OfflineDefaultValue.create(
+                torque_default_value=0,
+                thrust_default_value=0,
+                power_default_value=0,
+                speed_default_value=0
+            )
 
     def __init_limitations():
         if Limitations.select().count() == 0:
@@ -653,6 +664,12 @@ class DataInit:
                     "code": "lang.setting.test_mode.system_restart_after_change",
                     "chinese": "修改系统配置后,软件需要重启才能生效",
                     "english": "This software need to be restarted after you changed the system settings."
+                },
+
+                {
+                    "code": "lang.setting.offline_default_value",
+                    "chinese": "SPS离线默认值",
+                    "english": "SPS Offline Default Value"
                 },
 
                 {
