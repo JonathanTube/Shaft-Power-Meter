@@ -1,8 +1,7 @@
 import flet as ft
-import subprocess
 from ui.common.custom_card import CustomCard
 from db.models.ship_info import ShipInfo
-from db.models.opearation_log import OperationLog
+from db.models.operation_log import OperationLog
 from common.operation_type import OperationType
 from playhouse.shortcuts import model_to_dict
 from common.global_data import gdata
@@ -17,26 +16,26 @@ class SystemConfShipInfo(CustomCard):
         self.ship_type = ft.TextField(
             label=self.page.session.get("lang.setting.ship_type"),
             value=self.ship_info.ship_type,
-            on_click=lambda e: subprocess.run(["osk.exe"])
+            col={'xs': 6}
         )
         self.ship_name = ft.TextField(
             label=self.page.session.get("lang.setting.ship_name"),
             value=self.ship_info.ship_name,
-            on_click=lambda e: subprocess.run(["osk.exe"])
+            col={'xs': 6}
         )
         self.imo_number = ft.TextField(
             label=self.page.session.get("lang.setting.imo_number"),
             value=self.ship_info.imo_number,
-            on_click=lambda e: subprocess.run(["osk.exe"])
+            col={'xs': 6}
         )
         self.ship_size = ft.TextField(
             label=self.page.session.get("lang.setting.ship_size"),
             value=self.ship_info.ship_size,
-            on_click=lambda e: subprocess.run(["osk.exe"])
+            col={'xs': 6}
         )
 
         self.heading = self.page.session.get("lang.setting.ship_info")
-        self.body = ft.Column(controls=[
+        self.body = ft.ResponsiveRow(controls=[
             self.ship_type,
             self.ship_name,
             self.imo_number,

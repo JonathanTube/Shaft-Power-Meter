@@ -1,5 +1,5 @@
 import flet as ft
-from db.models.opearation_log import OperationLog
+from db.models.operation_log import OperationLog
 from db.models.preference import Preference
 from db.models.system_settings import SystemSettings
 from ui.common.custom_card import CustomCard
