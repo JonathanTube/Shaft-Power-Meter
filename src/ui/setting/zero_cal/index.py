@@ -13,19 +13,17 @@ class ZeroCal:
             tabs=[
                 ft.Tab(
                     text="Zero Cal.",
-                    icon=ft.Icons.ADJUST_OUTLINED,
                     content=ft.Container(
-                        padding=ft.padding.symmetric(10, 20),
-                        content=ZeroCalExecutor().create()
+                        padding=ft.padding.symmetric(10, 0),
+                        content=ZeroCalExecutor()
                     )
                 ),
 
                 ft.Tab(
                     text="Zero Cal. History",
-                    icon=ft.icons.HISTORY_OUTLINED,
                     content=ft.Container(
-                        padding=ft.padding.symmetric(10, 20),
-                        content=ZeroCalHis().create()
+                        padding=ft.padding.symmetric(0, 0),
+                        content=ZeroCalHis()
                     )
                 )
 

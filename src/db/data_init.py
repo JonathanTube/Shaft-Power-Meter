@@ -1514,5 +1514,30 @@ class DataInit:
                     "code": "lang.permission.user_name_or_pwd_is_incorrect",
                     "chinese": "用户名或密码不正确",
                     "english": "User Name or Password is Incorrect"
+                },
+                {
+                    "code":"lang.zero_cal.torque_ad",
+                    "chinese":"扭矩-AD",
+                    "english":"Torque-AD"
+                },
+                {
+                    "code":"lang.zero_cal.thrust_ad",
+                    "chinese":"推力-AD",
+                    "english":"Thrust-AD"
+                },
+                {
+                    "code":"lang.zero_cal.torque_offset",
+                    "chinese":"扭矩-偏移量",
+                    "english":"Torque-Offset"
+                },
+                {
+                    "code":"lang.zero_cal.thrust_offset",
+                    "chinese":"推力-偏移量",
+                    "english":"Thrust-Offset"
+                },
+                {
+                    "code":"lang.zero_cal.state",
+                    "chinese":"状态",
+                    "english":"State"
                 }
             ]).execute()
