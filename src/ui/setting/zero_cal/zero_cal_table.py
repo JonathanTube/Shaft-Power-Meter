@@ -7,7 +7,7 @@ from db.models.date_time_conf import DateTimeConf
 class ZeroCalTable(AbstractTable):
     def __init__(self):
         super().__init__()
-        self.table_width = gdata.default_table_width
+        self.table_width = gdata.default_table_width - 90
         self.dtc: DateTimeConf = DateTimeConf.get()
 
     def load_total(self):
@@ -26,13 +26,13 @@ class ZeroCalTable(AbstractTable):
             ZeroCalInfo.torque_ad,
             ZeroCalInfo.thrust_ad,
             ZeroCalInfo.torque_offset,
-            ZeroCalInfo.thrust_offset
+            ZeroCalInfo.thrust_offset,
+            ZeroCalInfo.state
         )
         start_date = self.kwargs.get('start_date')
         end_date = self.kwargs.get('end_date')
         if start_date and end_date:
-            sql = sql.where(ZeroCalInfo.utc_date_time >= start_date,
-                            ZeroCalInfo.utc_date_time <= end_date)
+            sql = sql.where(ZeroCalInfo.utc_date_time >= start_date, ZeroCalInfo.utc_date_time <= end_date)
         data = sql.order_by(ZeroCalInfo.id.desc()).paginate(self.current_page, self.page_size)
 
         return [
@@ -43,9 +43,18 @@ class ZeroCalTable(AbstractTable):
                 item.thrust_ad,
                 item.torque_offset,
                 item.thrust_offset,
-                item.state
+                self.get_state_name(item.state)
             ] for item in data
         ]
+
+    def get_state_name(self, state: int):
+        if state == 0:
+            return self.page.session.get("lang.zero_cal.on_progress")
+        elif state == 1:
+            return self.page.session.get("lang.zero_cal.accepted")
+        elif state == 2:
+            return self.page.session.get("lang.zero_cal.aborted")
+        return ""
 
     def create_columns(self):
         return self.get_columns()
