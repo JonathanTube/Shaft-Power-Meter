@@ -1539,5 +1539,90 @@ class DataInit:
                     "code":"lang.zero_cal.state",
                     "chinese":"状态",
                     "english":"State"
+                },
+                {
+                    "code":"lang.zero_cal.executor",
+                    "chinese":"调零",
+                    "english":"Zero Cal."
+                },
+                {
+                    "code": "lang.zero_cal.history",
+                    "chinese":"历史记录",
+                    "english":"Zero Cal. History"
+                },
+                {
+                    "code": "lang.zero_cal.on_progress",
+                    "chinese":"调零进行中",
+                    "english":"Zero Cal. is on progress."
+                },
+                {
+                    "code": "lang.zero_cal.last_performed",
+                    "chinese":"上次调零时间:",
+                    "english":"Last Performed:"
+                },
+                {
+                    "code": "lang.zero_cal.recommend_next_performing_time",
+                    "chinese":"推荐下次调零时间:",
+                    "english":"Recommend Next Performing Time:"
+                },
+                {
+                    "code": "lang.zero_cal.start",
+                    "chinese":"开始",
+                    "english":"Start"
+                },
+                {
+                    "code": "lang.zero_cal.accept",
+                    "chinese":"接受",
+                    "english":"Accept"
+                },
+                {
+                    "code": "lang.zero_cal.abort",
+                    "chinese":"中止",
+                    "english":"Abort"
+                },
+                {
+                    "code": "lang.zero_cal.reset",
+                    "chinese":"重置",
+                    "english":"Reset"
+                },
+                {
+                    "code": "lang.zero_cal.accepted",
+                    "chinese":"已接受",
+                    "english":"Accepted"
+                },
+                {
+                    "code": "lang.zero_cal.aborted",
+                    "chinese":"已中止",
+                    "english":"Aborted"
+                },
+                {
+                    "code": "lang.zero_cal.torque_ad",
+                    "chinese":"扭矩-AD(mV)",
+                    "english":"Torque-AD(mV)"
+                },
+                {
+                    "code": "lang.zero_cal.thrust_ad",
+                    "chinese":"推力-AD(mV)",
+                    "english":"Thrust-AD(mV)"
+                },
+                {
+                    "code": "lang.zero_cal.new_torque_ad",
+                    "chinese":"新扭矩-AD(mV)",
+                    "english":"New Torque-AD(mV)"
+                },
+                {
+                    "code": "lang.zero_cal.new_thrust_ad",
+                    "chinese":"新推力-AD(mV)",
+                    "english":"New Thrust-AD(mV)"
+                },
+                {
+                    "code": "lang.zero_cal.new_torque_offset",
+                    "chinese":"新扭矩-偏移量",
+                    "english":"New Torque-Offset"
+                },
+                {
+                    "code": "lang.zero_cal.new_thrust_offset",
+                    "chinese":"新推力-偏移量",
+                    "english":"New Thrust-Offset"
                 }
             ]).execute()

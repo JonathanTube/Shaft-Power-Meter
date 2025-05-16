@@ -38,7 +38,7 @@ class Setting(ft.Container):
         elif idx == 2:
             self.right_content.content = PropellerConf()
         elif idx == 3:
-            self.right_content.content = ZeroCal.create()
+            self.right_content.content = ZeroCal()
         elif idx == 4:
             self.right_content.content = IOSetting()
         elif idx == 5:

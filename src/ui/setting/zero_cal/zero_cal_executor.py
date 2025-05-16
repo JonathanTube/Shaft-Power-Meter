@@ -4,79 +4,67 @@ from datetime import datetime
 import flet as ft
 from dateutil.relativedelta import relativedelta
 
+from db.models.date_time_conf import DateTimeConf
 from db.models.zero_cal_info import ZeroCalInfo
 from db.models.zero_cal_record import ZeroCalRecord
-from ui.common.custom_card import CustomCard
 from ui.common.toast import Toast
-
 
 class ZeroCalExecutor(ft.Container):
     def __init__(self):
         super().__init__()
         self.__load_data()
 
-        # 初始化操作按钮
-        self.start_button = ft.FilledButton(
-            text="Start", width=120, height=40, on_click=self.__on_start)
-        self.accept_button = ft.FilledButton(
-            text="Accept", bgcolor=ft.Colors.GREEN, width=120, height=40, on_click=self.__on_accept)
-        self.abort_button = ft.FilledButton(
-            text="Abort", bgcolor=ft.Colors.RED, width=120, height=40, on_click=self.__on_abort)
-
-        self.__create_tips_card()
-        self.__create_instant_records()
-
     def __load_data(self):
         # 查询最近一次[接受]的调零记录
-        self.latest_accepted_zero_cal = ZeroCalInfo.select().where(ZeroCalInfo.state == 1).order_by(
-            ZeroCalInfo.id.desc()).first()
+        self.latest_accepted_zero_cal:ZeroCalInfo = ZeroCalInfo.select().where(ZeroCalInfo.state == 1).order_by(ZeroCalInfo.id.desc()).first()
         # 查询最新的一条进行中的记录
-        self.latest_zero_cal = ZeroCalInfo.select().where(ZeroCalInfo.state == 0).order_by(
-            ZeroCalInfo.id.desc()).first()
+        self.latest_zero_cal:ZeroCalInfo = ZeroCalInfo.select().where(ZeroCalInfo.state == 0).order_by(ZeroCalInfo.id.desc()).first()
+        
+        date_time_conf:DateTimeConf = DateTimeConf.get()
+        self.date_format = date_time_conf.date_format
 
     def __get_next_performing_time(self):
         zero_cal_last_performed = "None"
         recommend_next_performing_time = "None"
 
         if self.latest_accepted_zero_cal is not None:
-            zero_cal_last_performed = self.latest_accepted_zero_cal.utc_date_time
+            format_str = f'{self.date_format} %H:%M'
+            zero_cal_last_performed =  self.latest_accepted_zero_cal.utc_date_time.strftime(format_str)
             # 默认每隔6个月建议调零一次
-            recommend_next_performing_time = zero_cal_last_performed + \
-                relativedelta(months=+6)
+            recommend_next_performing_time = (self.latest_accepted_zero_cal.utc_date_time+ relativedelta(months=+6)).strftime(format_str)
 
         return zero_cal_last_performed, recommend_next_performing_time
 
     def __create_tips_card(self):
-        self.state_info = ft.Text('Zero Cal. is on progress.',
-                                  color=ft.Colors.GREEN_600,
-                                  size=14, col={"md": 12},
+        self.state_info = ft.Text(self.page.session.get("lang.zero_cal.on_progress"),
+                                  color=ft.Colors.GREEN_600, size=14,
                                   visible=self.latest_zero_cal is not None and self.latest_zero_cal.state == 0)
 
         zero_cal_last_performed, recommend_next_performing_time = self.__get_next_performing_time()
 
-        self.zero_cal_last_performed = ft.Text(
-            zero_cal_last_performed, size=14)
+        self.zero_cal_last_performed = ft.Text(zero_cal_last_performed, size=14)
 
-        self.recommend_next_performing_time = ft.Text(
-            recommend_next_performing_time, size=14)
+        self.recommend_next_performing_time = ft.Text(recommend_next_performing_time, size=14)
 
-        self.tips_card = ft.ResponsiveRow(
+        row =  ft.Row(
+            height=40,
+            alignment=ft.MainAxisAlignment.SPACE_AROUND,
             controls=[
-                self.state_info,
                 ft.Row(
-                    col={"md": 6},
                     controls=[
-                        ft.Text("Zero calibration last performed:", size=14, weight=ft.FontWeight.W_500),
+                        ft.Text(self.page.session.get("lang.zero_cal.last_performed"), size=14, weight=ft.FontWeight.W_500),
                         self.zero_cal_last_performed
                     ]),
                 ft.Row(
-                    col={"md": 6},
                     controls=[
-                        ft.Text("Recommend next performing time:", size=14, weight=ft.FontWeight.W_500),
+                        ft.Text(self.page.session.get("lang.zero_cal.recommend_next_performing_time"), size=14, weight=ft.FontWeight.W_500),
                         self.recommend_next_performing_time
-                    ])
+                    ]),
+                self.state_info
             ]
         )
+
+        self.tips_card = ft.Card(content=row)
 
     def __get_table_rows(self):
         rows = []
@@ -117,38 +105,43 @@ class ZeroCalExecutor(ft.Container):
 
         self.table = ft.DataTable(
             col={"xs": 12},
+            width=920,
+            height=320,
             heading_row_height=40,
             data_row_min_height=35,
             data_row_max_height=35,
             expand=True,
             columns=[
-                ft.DataColumn(ft.Text("No.")),
-                ft.DataColumn(ft.Text("Torque AD"), numeric=True),
-                ft.DataColumn(ft.Text("Thrust AD"), numeric=True)
+                ft.DataColumn(ft.Text("No.", size=14, weight=ft.FontWeight.W_500)),
+                ft.DataColumn(ft.Text(self.page.session.get("lang.zero_cal.torque_ad"), size=14, weight=ft.FontWeight.W_500)),
+                ft.DataColumn(ft.Text(self.page.session.get("lang.zero_cal.thrust_ad"), size=14, weight=ft.FontWeight.W_500))
             ],
             rows=table_rows)
 
         self.new_avg_torque = ft.Text(avg_torque, width=50)
         self.new_avg_thrust = ft.Text(avg_thrust, width=50)
 
-        table_card= ft.Card(content=self.table)
+        self.table_card= ft.Card(content=self.table)
 
-        result_card = ft.Card(
+        self.result_card = ft.Card(
+            visible=self.latest_accepted_zero_cal is not None,
             content=ft.Row(
+                height=40,
                 controls=[
-                    ft.Text("New Torque AD:", width=140, text_align=ft.TextAlign.RIGHT), self.new_avg_torque,
-                    ft.Text("New Thrust AD:", width=140, text_align=ft.TextAlign.RIGHT), self.new_avg_thrust,
-                    ft.Text("New Torque Offset:", width=140, text_align=ft.TextAlign.RIGHT), self.new_avg_torque,
-                    ft.Text("New Thrust Offset:", width=140, text_align=ft.TextAlign.RIGHT), self.new_avg_thrust
+                    ft.Text(self.page.session.get("lang.zero_cal.new_torque_ad"), width=140, text_align=ft.TextAlign.RIGHT), self.new_avg_torque,
+                    ft.Text(self.page.session.get("lang.zero_cal.new_thrust_ad"), width=140, text_align=ft.TextAlign.RIGHT), self.new_avg_thrust,
+                    ft.Text(self.page.session.get("lang.zero_cal.new_torque_offset"), width=140, text_align=ft.TextAlign.RIGHT), self.new_avg_torque,
+                    ft.Text(self.page.session.get("lang.zero_cal.new_thrust_offset"), width=140, text_align=ft.TextAlign.RIGHT), self.new_avg_thrust
                 ]
             )
         )
 
         self.instant_records = ft.Column(
                 expand=True,
+                spacing=0,
                 controls=[
-                    table_card,
-                    result_card
+                    self.table_card,
+                    self.result_card
                 ]
         )
         
@@ -156,7 +149,7 @@ class ZeroCalExecutor(ft.Container):
     def __on_start(self, e):
         ZeroCalInfo.create(utc_date_time=datetime.now(), state=0)
         self.__load_data()
-        Toast.show_success(e.page, message="lang.setting.zero_cal.started")
+        Toast.show_success(e.page, message=self.page.session.get("lang.zero_cal.started"))
         # 控制Tips过程label显示
         self.state_info.visible = True
         self.state_info.update()
@@ -203,7 +196,7 @@ class ZeroCalExecutor(ft.Container):
         query.execute()
 
         self.__reset_to_start()
-        Toast.show_success(e.page, message="lang.setting.zero_cal.accepted")
+        Toast.show_success(e.page, message=self.page.session.get("lang.zero_cal.accepted"))
 
     def __on_abort(self, e):
         query = ZeroCalInfo.update(state=2).where(
@@ -211,7 +204,7 @@ class ZeroCalExecutor(ft.Container):
         query.execute()
 
         self.__reset_to_start()
-        Toast.show_success(e.page, message="lang.setting.zero_cal.aborted")
+        Toast.show_success(e.page, message=self.page.session.get("lang.zero_cal.aborted"))
 
     def __on_stimulate(self, e):
         # 如果主记录为空，说明还没开始，跳过
@@ -226,6 +219,9 @@ class ZeroCalExecutor(ft.Container):
             torque=random.randint(100, 105),
             thrust=random.randint(100, 105)
         )
+
+        self.result_card.visible = True
+        self.result_card.update()
 
         self.__load_data()
 
@@ -255,6 +251,14 @@ class ZeroCalExecutor(ft.Container):
         Toast.show_success(e.page)
 
     def build(self):
+        # 初始化操作按钮
+        self.start_button = ft.FilledButton(text=self.page.session.get("lang.zero_cal.start"), width=120, height=40, on_click=self.__on_start)
+        self.accept_button = ft.FilledButton(text=self.page.session.get("lang.zero_cal.accept"), bgcolor=ft.Colors.GREEN, width=120, height=40, on_click=self.__on_accept)
+        self.abort_button = ft.FilledButton(text=self.page.session.get("lang.zero_cal.abort"), bgcolor=ft.Colors.RED, width=120, height=40, on_click=self.__on_abort)
+
+        self.__create_tips_card()
+        self.__create_instant_records()
+
         if self.latest_zero_cal is None:
             self.start_button.visible = True
             self.accept_button.visible = False
@@ -274,6 +278,7 @@ class ZeroCalExecutor(ft.Container):
         stimulate_button = ft.FilledButton(text="Stimulate Data", color=ft.Colors.ORANGE, width=120, height=40, on_click=self.__on_stimulate)
 
         self.content = ft.Column(
+            spacing=0,
             controls=[
                 self.tips_card,
                 self.instant_records,
