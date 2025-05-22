@@ -33,7 +33,7 @@ class TotalCounter(ft.Container):
         self.title = ft.Text(self.page.session.get('lang.counter.total'), weight=ft.FontWeight.BOLD, size=16)
 
         self.status_container = ft.Container(
-            content=ft.Text(value=self.page.session.get('lang.counter.running'), size=12),
+            content=ft.Text(value=self.page.session.get('lang.counter.running'), color=ft.Colors.WHITE, size=12),
             alignment=ft.alignment.center,
             bgcolor=ft.Colors.GREEN_500,
             border_radius=ft.border_radius.all(40),
