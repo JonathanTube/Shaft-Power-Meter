@@ -1,5 +1,6 @@
 import flet as ft
 import asyncio
+import hashlib
 from db.models.operation_log import OperationLog
 from ui.common.permission_check import PermissionCheck
 from ui.setting.permission.permission_table import PermissionTable
@@ -24,7 +25,7 @@ class Permission(ft.Container):
         self.last_op_utc_date_time = gdata.utc_date_time
 
     def build(self):
-        self.permission_check = PermissionCheck(on_confirm=self.__on_permission_checked, user_role=2)
+        self.permission_check = PermissionCheck(on_confirm=self.__on_permission_checked, user_role=0)
 
     def __on_permission_checked(self, user: User):
         self.visible = True
@@ -117,7 +118,7 @@ class Permission(ft.Container):
 
         user = User.create(
             user_name=self.user_name.value.strip(),
-            user_pwd=self.password.value.strip(),
+            user_pwd=hashlib.sha256(self.password.value.strip().encode()).hexdigest(),
             user_role=self.role.value
         )
         OperationLog.create(
@@ -145,7 +146,7 @@ class Permission(ft.Container):
         while True:
             if self.visible:
                 time_diff = gdata.utc_date_time - self.last_op_utc_date_time
-                print(time_diff.total_seconds())
+                # print(time_diff.total_seconds())
                 if time_diff.total_seconds() > 60 * 10:
                     self.visible = False
                     self.page.open(self.permission_check)
