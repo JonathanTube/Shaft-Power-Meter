@@ -65,11 +65,14 @@ class AbstractTable(ft.Container):
     def __create_cells(self, items: list):
         cells = []
         for item in items:
-            cells.append(ft.DataCell(ft.Text(item), data=item))
+            cells.append(ft.DataCell(ft.Text(item), data=item, on_double_tap=lambda e: self.__on_double_tap(e, item)))
         if self.has_operations():
             cells.append(ft.DataCell(self.create_operations(items), data=items))
 
         return cells
+
+    def __on_double_tap(self, e, content):
+        self.page.set_clipboard(str(content))
 
     def __create_table_columns(self):
         columns = self.create_columns()

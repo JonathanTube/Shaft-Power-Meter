@@ -7,7 +7,7 @@ from db.models.date_time_conf import DateTimeConf
 
 class GlobalData:
     def __init__(self):
-        self.default_table_width = 980
+        self.default_table_width = 1010
         self.utc_date_time: datetime = None
         self.system_date_time: datetime = None
 
