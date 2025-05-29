@@ -20,7 +20,6 @@ from utils.alarm_saver import AlarmSaver
 from utils.auto_startup import add_to_startup
 from utils.logger import Logger
 from utils.modbus_output import modbus_output
-from jm3846.JM3846_client import jm3846Client
 
 Logger(show_sql=False)
 
@@ -121,5 +120,3 @@ async def main(page: ft.Page):
 if __name__ == "__main__":
     check_single_instance()
     ft.app(target=main)
-    jm3846Client.async_handle_0x45()
-    jm3846Client.async_disconnect()

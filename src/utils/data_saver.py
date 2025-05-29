@@ -14,13 +14,14 @@ from utils.modbus_output import modbus_output
 
 class DataSaver:
     @staticmethod
-    def save(name: str, thrust_mv_per_v: float, thrust: float, torque_mv_per_v: float, torque: float, speed: float):
-        # if speed is less than 10, it is not valid data
-        if speed < 10:
-            return
+    def save(name: str,
+            ad_0, ad_0_mv_per_v: float, ad_0_microstrain, ad_0_torque: float,
+            ad_1, ad_1_mv_per_v: float, ad_1_thrust: float, 
+            speed: float
+    ):
         try:
             utc_date_time = gdata.utc_date_time
-            power = FormulaCalculator.calculate_instant_power(torque, speed)
+            power = FormulaCalculator.calculate_instant_power(ad_0_torque, speed)
             # delete invalid data which is over than 3 months.
             DataLog.delete().where(DataLog.utc_date_time < utc_date_time - timedelta(weeks=4 * 3))
             is_overload: bool = DataSaver.is_overload(speed, power)
@@ -30,37 +31,44 @@ class DataSaver:
                 name=name,
                 speed=speed,
                 power=power,
-                thrust=thrust,
-                torque=torque,
+
+                ad_0=ad_0,
+                ad_0_mv_per_v=ad_0_mv_per_v,
+                ad_0_microstrain=ad_0_microstrain,
+                ad_0_torque=ad_0_torque,
+
+                ad_1=ad_1,
+                ad_1_mv_per_v=ad_1_mv_per_v,
+                ad_1_thrust=ad_1_thrust,
                 is_overload=is_overload
             )
             # 保存瞬时数据
             if gdata.write_real_time_data_to_plc:
-                print(f"write real time data to plc: {power}, {torque}, {thrust}, {speed}")
-                asyncio.create_task(plc_util.write_instant_data(power, torque, thrust, speed))
+                logging.info(f"write real time data to plc: {power}, {ad_0_torque}, {ad_1_thrust}, {speed}")
+                asyncio.create_task(plc_util.write_instant_data(power, ad_0_torque, ad_1_thrust, speed))
             # save counter log of total
             DataSaver.save_counter_total(name, speed, power)
             # save counter log of interval
             DataSaver.save_counter_interval(name, speed, power)
             if name == 'sps1':
-                gdata.sps1_thrust = thrust
-                gdata.sps1_torque = torque
+                gdata.sps1_thrust = ad_1_thrust
+                gdata.sps1_torque = ad_0_torque
                 gdata.sps1_speed = speed
                 gdata.sps1_power = power
                 # 毫伏/伏 调零用
-                gdata.sps1_thrust_mv_per_v = thrust_mv_per_v
-                gdata.sps1_torque_mv_per_v = torque_mv_per_v
+                gdata.sps1_thrust_mv_per_v = ad_1_mv_per_v
+                gdata.sps1_torque_mv_per_v = ad_0_mv_per_v
                 if len(gdata.sps1_power_history) > 100:
                     gdata.sps1_power_history.pop()
                 gdata.sps1_power_history.insert(0, (power, utc_date_time))
             else:
-                gdata.sps2_thrust = thrust
-                gdata.sps2_torque = torque
+                gdata.sps2_thrust = ad_1_thrust
+                gdata.sps2_torque = ad_0_torque
                 gdata.sps2_speed = speed
                 gdata.sps2_power = power
                 # 毫伏/伏 调零用
-                gdata.sps2_thrust_mv_per_v = thrust_mv_per_v
-                gdata.sps2_torque_mv_per_v = torque_mv_per_v
+                gdata.sps2_thrust_mv_per_v = ad_1_mv_per_v
+                gdata.sps2_torque_mv_per_v = ad_0_mv_per_v
                 if len(gdata.sps2_power_history) > 100:
                     gdata.sps2_power_history.pop()
                 gdata.sps2_power_history.insert(0, (power, utc_date_time))
@@ -98,6 +106,9 @@ class DataSaver:
 
     @staticmethod
     def save_counter_total(name: str, speed: float, power: float):
+        # if speed is less than 10, it is not valid data, don't record total energy
+        if speed <= 10:
+            return
         cnt = CounterLog.select().where(CounterLog.sps_name == name, CounterLog.counter_type == 2).count()
         if cnt == 0:
             CounterLog.create(
@@ -121,6 +132,10 @@ class DataSaver:
 
     @staticmethod
     def save_counter_interval(name: str, speed: float, power: float):
+        # if speed is less than 10, it is not valid data, don't record total energy
+        if speed <= 10:
+            return
+
         cnt = CounterLog.select().where(CounterLog.sps_name == name, CounterLog.counter_type == 1, CounterLog.counter_status == "running").count()
         # the intervar counter hasn't been started since the cnt is 0
         if cnt == 0:

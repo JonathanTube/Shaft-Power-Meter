@@ -1,3 +1,4 @@
+from math import ceil
 import struct
 from typing import Dict, Optional
 
@@ -22,7 +23,7 @@ class JM38460x44Async:
         )
 
     @staticmethod
-    def parse_response(data: bytes, ch_sel1: int, ch_sel0: int, speed_sel: int) -> Optional[Dict]:
+    def parse_response(data: bytes, frame_size: int, sample_rate: int, ch_sel1: int, ch_sel0: int, speed_sel: int) -> Optional[Dict]:
         # print('data=', data)
         """
         解析0x44功能码响应
@@ -80,7 +81,11 @@ class JM38460x44Async:
                 # 小端序，无符号整型
                 values.append(struct.unpack('<H', payload[i:i+2])[0])
 
-            return {
+            channel_count: int = JM38460x44Async.get_channel_count(ch_sel1, ch_sel0, speed_sel)
+            frames_per_second: int = JM38460x44Async.get_frames_per_second(channel_count, sample_rate, frame_size)
+            first_frame_per_second = current_frame % frames_per_second == 0
+            print('first_frame_per_second=', first_frame_per_second)
+            result = {
                 'success': True,
                 'func_code': func_code,
                 'transaction_id': transaction_id,
@@ -88,12 +93,29 @@ class JM38460x44Async:
                 'unit_id': unit_id,
                 'current_frame': current_frame + 1,
                 'total_frames': total_frames,
+                'first_frame_per_second': first_frame_per_second,  # 是否1s数据范围内的第一帧
                 'values': JM38460x44Async.convert_data(values, ch_sel1, ch_sel0, speed_sel)
             }
+
+            # print(result)
+
+            return result
         except struct.error as e:
             return {'success': False, 'error': f'解包错误: {str(e)}'}
         except Exception as e:
             return {'success': False, 'error': str(e)}
+
+    @staticmethod
+    def get_channel_count(ch_sel1: int, ch_sel0: int, speed_sel: int):
+        if ch_sel1 != 0 and ch_sel0 != 0 and speed_sel == 1:
+            return 3
+        return 2
+
+    @staticmethod
+    def get_frames_per_second(channel_count: int, sample_rate: int, frame_size: int):
+        # 2字节 * 通道数 * 采样率hz / 帧大小 = 传输1s的数据需要多少帧
+        frames_per_second = (2 * channel_count * sample_rate) / frame_size
+        return ceil(frames_per_second)
 
     @staticmethod
     def convert_data(values: list[int], ch_sel1: int, ch_sel0: int, speed_sel: int):
@@ -107,10 +129,10 @@ class JM38460x44Async:
         rpm_sum = 0
         values_length = len(values)
         if ch_sel1 != 0 and ch_sel0 != 0 and speed_sel == 1:
-            size = 3
-            part_length = values_length / size
-            for i in range(0, values_length, size):
-                chunk = values[i: i + size]
+            channel_count = 3
+            part_length = values_length / channel_count
+            for i in range(0, values_length, channel_count):
+                chunk = values[i: i + channel_count]
                 # print(f'i = {i}, chunk[0]={chunk[0]}')
                 ch0_sum += chunk[0]
                 ch1_sum += chunk[1]
@@ -125,10 +147,10 @@ class JM38460x44Async:
             }
 
         if ch_sel1 != 4 and ch_sel0 != 0 and speed_sel == 1:
-            size = 2
-            part_length = values_length / size
-            for i in range(0, values_length, size):
-                chunk = values[i: i + size]
+            channel_count = 2
+            part_length = values_length / channel_count
+            for i in range(0, values_length, channel_count):
+                chunk = values[i: i + channel_count]
                 ch1_sum += chunk[0]
                 rpm_sum += chunk[1]
             ch1_ad = ch1_sum / part_length
@@ -139,10 +161,10 @@ class JM38460x44Async:
             }
 
         if ch_sel1 != 0 and ch_sel0 != 1 and speed_sel == 1:
-            size = 2
-            part_length = values_length / size
-            for i in range(0, values_length, size):
-                chunk = values[i: i + size]
+            channel_count = 2
+            part_length = values_length / channel_count
+            for i in range(0, values_length, channel_count):
+                chunk = values[i: i + channel_count]
                 ch0_sum += chunk[0]
                 rpm_sum += chunk[1]
             ch0_ad = ch0_sum / part_length
@@ -153,10 +175,10 @@ class JM38460x44Async:
             }
 
         if ch_sel1 != 1 and ch_sel0 != 1 and speed_sel == 0:
-            size = 2
-            part_length = values_length / size
-            for i in range(0, values_length, size):
-                chunk = values[i: i + size]
+            channel_count = 2
+            part_length = values_length / channel_count
+            for i in range(0, values_length, channel_count):
+                chunk = values[i: i + channel_count]
                 ch0_sum += chunk[0]
                 ch1_sum += chunk[1]
             ch0_ad = ch0_sum / part_length

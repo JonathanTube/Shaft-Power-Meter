@@ -23,6 +23,3 @@ class UtcTimer:
             ).execute()
 
             await asyncio.sleep(1)
-
-
-utc_timer: UtcTimer = UtcTimer()

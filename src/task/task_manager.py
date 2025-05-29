@@ -1,10 +1,9 @@
 import asyncio
 import flet as ft
-from jm3846.JM3846_client import jm3846Client
-from task.utc_timer_task import utc_timer
+from db.models.system_settings import SystemSettings
+from task.utc_timer_task import UtcTimer
 from task.sps1_read_task import Sps1ReadTask
 from task.sps2_read_task import Sps2ReadTask
-from task.gps_sync_task import GpsSyncTask
 
 
 class TaskManager:
@@ -12,8 +11,13 @@ class TaskManager:
         self.page = page
 
     def start_all(self):
-        asyncio.create_task(utc_timer.start())
-        asyncio.create_task(jm3846Client.start())
-        # asyncio.create_task(Sps1ReadTask(self.page).start())
-        # asyncio.create_task(Sps2ReadTask(self.page).start())
+        asyncio.create_task(UtcTimer().start())
+        asyncio.create_task(Sps1ReadTask().start())
+
+        # start sps2 JM3846 if dual propellers.
+        system_settings: SystemSettings = SystemSettings.get()
+        amount_of_propeller = system_settings.amount_of_propeller
+        if amount_of_propeller > 1:
+            asyncio.create_task(Sps2ReadTask().start())
+
         # asyncio.create_task(GpsSyncTask(self.page).start())

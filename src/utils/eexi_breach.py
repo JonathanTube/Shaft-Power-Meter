@@ -111,7 +111,7 @@ class EEXIBreach:
                 DataLog.name,
                 DataLog.utc_date_time,
                 DataLog.speed,
-                DataLog.torque,
+                DataLog.ad_0_torque,
                 DataLog.power
             ).where(
                 DataLog.utc_date_time >= start_time
@@ -134,7 +134,7 @@ class EEXIBreach:
             EEXIBreach.report_id = None
             # 记录之前所有的恢复数据
             data = DataLog.select(
-                DataLog.name, DataLog.utc_date_time, DataLog.speed, DataLog.torque, DataLog.power
+                DataLog.name, DataLog.utc_date_time, DataLog.speed, DataLog.ad_0_torque, DataLog.power
             ).where(
                 DataLog.utc_date_time >= start_time
             ).order_by(DataLog.utc_date_time.asc())

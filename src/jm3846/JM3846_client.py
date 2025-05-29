@@ -1,17 +1,19 @@
+from abc import abstractmethod
 import asyncio
+import logging
 from typing import Optional
 from jm3846.JM3846_0x03 import JM38460x03Async
 from jm3846.JM3846_0x44 import JM38460x44Async
 from jm3846.JM3846_0x45 import JM38460x45Async
 from jm3846.JM3846_calculator import JM3846Calculator
-from db.models.io_conf import IOConf
 from utils.data_saver import DataSaver
 
 
 class JM3846AsyncClient:
     """基于asyncio的Modbus TCP异步客户端"""
 
-    def __init__(self):
+    def __init__(self, name: str):
+        self.name = name
         self.frame_size = 120
         self.total_frames = 0xFFFF
 
@@ -27,9 +29,14 @@ class JM3846AsyncClient:
         self.ch_sel_0 = None
         self.gain_0 = None
         self.speed_sel = None
+        self.sample_rate = None
 
         self.jm3846Calculator = JM3846Calculator()
         self._lock = asyncio.Lock()
+
+    @abstractmethod
+    def get_ip_port() -> tuple[str, int]:
+        pass
 
     async def start(self) -> None:
         """启动客户端"""
@@ -40,18 +47,16 @@ class JM3846AsyncClient:
     async def async_connect(self) -> None:
         """建立异步连接"""
         try:
-            print('JM3846 Connecting...')
-            io_conf: IOConf = IOConf.get()
-            host = io_conf.sps1_ip
-            port = io_conf.sps2_port
+            logging.info(f'{self.name} JM3846 Connecting...')
+            host, port = self.get_ip_port()
             self.reader, self.writer = await asyncio.wait_for(
                 asyncio.open_connection(host, port),
                 timeout=self.timeout
             )
             self.running = True
-            print('JM3846 Connected successfully')
+            logging.info(f'{self.name} JM3846 Connected successfully')
         except Exception as e:
-            print(f'JM3846 Connection error: {e}')
+            logging.info(f'{self.name} JM3846 Connection error: {e}')
             raise
 
     async def async_disconnect(self) -> None:
@@ -60,7 +65,7 @@ class JM3846AsyncClient:
         if self.writer:
             self.writer.close()
             await self.writer.wait_closed()
-            print('JM3846 Connection closed')
+            logging.info(f'{self.name} JM3846 Connection closed')
 
     async def async_handle_0x03(self):
         """异步处理功能码0x03"""
@@ -80,16 +85,16 @@ class JM3846AsyncClient:
                 )
 
                 res = JM38460x03Async.parse_response(response)
-                print(f'JM3846 0x03 Response: {res}')
+                logging.info(f'{self.name} JM3846 0x03 Response: {res}')
 
                 if res['success']:
                     config = res['values']
                     self._update_config(config)
 
             except asyncio.TimeoutError:
-                print('JM3846 0x03 request timeout')
+                logging.info(f'{self.name} JM3846 0x03 request timeout')
             except Exception as e:
-                print(f'JM3846 0x03 error: {e}')
+                logging.info(f'{self.name} JM3846 0x03 error: {e}')
                 await self.async_disconnect()
 
     def _update_config(self, config: dict):
@@ -99,6 +104,7 @@ class JM3846AsyncClient:
         self.ch_sel_0 = config['ch_sel_0']
         self.gain_0 = config['gain_0']
         self.speed_sel = config['speed_sel']
+        self.sample_rate = config['sample_rate']
 
     async def async_handle_0x44(self):
         """异步处理功能码0x44"""
@@ -116,9 +122,9 @@ class JM3846AsyncClient:
                 await self.writer.drain()
 
             except asyncio.TimeoutError:
-                print('JM3846 0x44 request timeout')
+                logging.info(f'{self.name} JM3846 0x44 request timeout')
             except Exception as e:
-                print(f'JM3846 0x44 error: {e}')
+                logging.info(f'{self.name} JM3846 0x44 error: {e}')
                 await self.async_disconnect()
 
     async def async_receive_looping_0x44(self):
@@ -136,7 +142,7 @@ class JM3846AsyncClient:
                     timeout=self.timeout * 2
                 )
 
-                # print('=================', response)
+                # logging.info('=================', response)
 
                 if not response:
                     await asyncio.sleep(2)
@@ -144,49 +150,69 @@ class JM3846AsyncClient:
 
                 res = JM38460x44Async.parse_response(
                     response,
+                    frame_size=self.frame_size,
+                    sample_rate=self.sample_rate,
                     ch_sel1=self.ch_sel_1,
                     ch_sel0=self.ch_sel_0,
                     speed_sel=self.speed_sel
                 )
 
-                # print('=================', res)
+                # logging.info('=================', res)
 
                 if res['success']:
-                    current_frame = res['current_frame']
-                    self.save_0x44_result(res['values'])
+                    first_frame_per_second = res['first_frame_per_second']
+                    if first_frame_per_second:
+                        # 只处理1s内数据的第一帧
+                        self.save_0x44_result(res['values'])
 
+                    current_frame = res['current_frame']
                     if current_frame >= self.total_frames:
                         await self.async_handle_0x44()
 
             except asyncio.TimeoutError:
-                print('JM3846 0x44 receive timeout, retrying...')
+                logging.info(f'{self.name} JM3846 0x44 receive timeout, retrying...')
                 await self.async_handle_0x44()
             except ConnectionResetError as e:
-                print(f'JM3846 Connection reset: {e}')
+                logging.info(f'{self.name} JM3846 Connection reset: {e}')
                 await self.async_disconnect()
                 break
             except Exception as e:
-                print(f'JM3846 0x44 Receive error: {e}')
+                logging.info(f'{self.name} JM3846 0x44 Receive error: {e}')
                 await self.async_disconnect()
                 break
 
     def save_0x44_result(self, result: dict):
-        print('result=', result)
-        """数据存储方法（保持原逻辑）"""
+        # logging.info('result=', result)
+        """数据存储方法"""
+        ad0 = 0
+        ad0_mv_per_v = 0
+        ad0_microstrain = 0
+        ad0_torque = 0
+
+        ad1 = 0
+        ad1_mv_per_v = 0
+        ad1_thrust = 0
+
+        speed = 0
+
         if 'ch0_ad' in result:
             ad0 = result['ch0_ad']
-            # ad0_mv_per_v = self.jm3846Calculator.calculate_mv_per_v(ad0, self.gain_0)
-            microstrain = self.jm3846Calculator.calculate_microstrain(ad0, self.gain_0)
-            # torque = self.jm3846Calculator.calculate_torque(ad0, self.gain_0)
-            # print(f'ad0={ad0}, ad0_mv_per_v={ad0_mv_per_v}, microstrain={microstrain}, torque={torque}')
+            ad0_mv_per_v = self.jm3846Calculator.calculate_mv_per_v(ad0, self.gain_0)
+            ad0_microstrain = self.jm3846Calculator.calculate_microstrain(ad0, self.gain_0)
+            ad0_torque = self.jm3846Calculator.calculate_torque(ad0, self.gain_0)
+            # logging.info(f'ad0={ad0}, ad0_mv_per_v={ad0_mv_per_v}, microstrain={microstrain}, torque={torque}')
         if 'ch1_ad' in result:
             ad1 = result['ch1_ad']
-            # ad1_mv_per_v = self.jm3846Calculator.calculate_mv_per_v(ad1, self.gain_1)
-            # thrust = self.jm3846Calculator.calculate_thrust(ad1, self.gain_1)
-            # print(f'ad1={ad1},ad1_mv_per_v={ad1_mv_per_v},thrust={thrust}')
+            ad1_mv_per_v = self.jm3846Calculator.calculate_mv_per_v(ad1, self.gain_1)
+            ad1_thrust = self.jm3846Calculator.calculate_thrust(ad1, self.gain_1)
+            # logging.info(f'ad1={ad1},ad1_mv_per_v={ad1_mv_per_v},thrust={thrust}')
         if 'rpm' in result:
-            rpm = result['rpm'] / 10
-            # print('rpm=', rpm)
+            speed = result['rpm'] / 10
+            # logging.info('rpm=', rpm)
+        DataSaver.save(self.name,
+                       ad0, ad0_mv_per_v, ad0_microstrain, ad0_torque,
+                       ad1, ad1_mv_per_v, ad1_thrust,
+                       speed)
 
     async def async_handle_0x45(self):
         """异步处理功能码0x45"""
@@ -207,13 +233,9 @@ class JM3846AsyncClient:
                 )
 
                 res = JM38460x45Async.parse_response(response)
-                print(f'JM3846 0x45 Response: {res}')
-
+                logging.info(f'{self.name} JM3846 0x45 Response: {res}')
             except asyncio.TimeoutError:
-                print('JM3846 0x45 request timeout')
+                logging.info(f'{self.name} JM3846 0x45 request timeout')
             except Exception as e:
-                print(f'JM3846 0x45 error: {e}')
+                logging.info(f'{self.name} JM3846 0x45 error: {e}')
                 await self.async_disconnect()
-
-
-jm3846Client: JM3846AsyncClient = JM3846AsyncClient()
