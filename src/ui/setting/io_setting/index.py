@@ -10,7 +10,7 @@ from ui.setting.io_setting.io_setting_sps1 import IOSettingSPS1
 from ui.setting.io_setting.io_setting_sps2 import IOSettingSPS2
 from ui.setting.io_setting.io_setting_output import IOSettingOutput
 from ui.setting.io_setting.io_setting_factor import IOSettingFactor
-from db.models.opearation_log import OperationLog
+from db.models.operation_log import OperationLog
 from common.operation_type import OperationType
 from common.global_data import gdata
 from playhouse.shortcuts import model_to_dict

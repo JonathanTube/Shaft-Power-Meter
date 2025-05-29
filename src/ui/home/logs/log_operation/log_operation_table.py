@@ -1,4 +1,4 @@
-from db.models.opearation_log import OperationLog
+from db.models.operation_log import OperationLog
 from db.models.date_time_conf import DateTimeConf
 from common.operation_type import OperationType
 from ui.common.abstract_table import AbstractTable

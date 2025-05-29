@@ -1,7 +1,7 @@
 import flet as ft
 import logging
 from db.models.preference import Preference
-from ui.setting.general.genera_limitation_max import GeneralLimitationMax
+from ui.setting.general.general_limitation_max import GeneralLimitationMax
 from ui.setting.general.general_date_time import GeneralDateTime
 from ui.setting.general.general_limitation_warning import GeneralLimitationWarning
 from ui.setting.general.general_preference import GeneralPreference
@@ -9,6 +9,7 @@ from ui.common.toast import Toast
 from ui.common.permission_check import PermissionCheck
 from ui.common.keyboard import keyboard
 from db.models.user import User
+from ui.setting.general.general_ofline_default_value import GeneralOflineDefaultValue
 
 class General(ft.Container):
     def __init__(self):
@@ -27,6 +28,7 @@ class General(ft.Container):
             self.general_preference.save_data(user_id)
             self.limitation_max.save_data(user_id)
             self.limitation_warning.save_data(user_id)
+            self.general_ofline_default_value.save_data(user_id)
             self.general_date_time.save_data(user_id)
         except Exception as e:
             logging.error(f"general save data error: {e}")
@@ -44,12 +46,15 @@ class General(ft.Container):
         self.system_unit = system_unit
         self.limitation_max.update_unit(system_unit)
         self.limitation_warning.update_unit(system_unit)
+        self.general_ofline_default_value.update_unit(system_unit)
 
     def build(self):
         self.general_preference = GeneralPreference(self.__on_system_unit_change)
         self.limitation_max = GeneralLimitationMax(self.system_unit)
         self.limitation_warning = GeneralLimitationWarning(self.system_unit)
         self.general_date_time = GeneralDateTime()
+        self.general_ofline_default_value = GeneralOflineDefaultValue(self.system_unit)
+
 
         self.content = ft.Column(
             scroll=ft.ScrollMode.ADAPTIVE,
@@ -60,6 +65,7 @@ class General(ft.Container):
                         self.general_preference,
                         self.limitation_max,
                         self.limitation_warning,
+                        self.general_ofline_default_value,
                         self.general_date_time,
                         ft.Row(
                             alignment=ft.MainAxisAlignment.CENTER,

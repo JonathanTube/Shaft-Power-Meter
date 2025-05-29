@@ -4,7 +4,7 @@ from db.models.limitations import Limitations
 from ui.common.custom_card import CustomCard
 from utils.unit_converter import UnitConverter
 from ui.common.keyboard import keyboard
-from db.models.opearation_log import OperationLog
+from db.models.operation_log import OperationLog
 from common.operation_type import OperationType
 from common.global_data import gdata
 from playhouse.shortcuts import model_to_dict

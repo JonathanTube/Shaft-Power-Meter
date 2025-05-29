@@ -71,9 +71,9 @@ class AlarmList(ft.Container):
                 })
             df = pd.DataFrame(data)
             with pd.ExcelWriter(e.path, engine="xlsxwriter") as writer:  # 显式指定引擎
-                df.to_excel(writer, sheet_name="报警记录", index=False)
+                df.to_excel(writer, sheet_name="Alarm Log", index=False)
                 # 获取工作表对象
-                worksheet = writer.sheets["报警记录"]
+                worksheet = writer.sheets["Alarm Log"]
                 # 精确设置列宽（通过列位置索引）
                 column_width_config = {
                     0: 30,   # 第一列（时间列）宽度：22字符

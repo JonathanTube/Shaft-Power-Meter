@@ -73,7 +73,7 @@ class ManuallyCounter(ft.Container):
         self.time_elapsed = ft.Text("", visible=False)
         self.stopped_at = ft.Text("", visible=False)
 
-        self.status_text = ft.Text(value=self.page.session.get('lang.counter.stopped'), size=12)
+        self.status_text = ft.Text(value=self.page.session.get('lang.counter.stopped'), color=ft.Colors.WHITE, size=12)
 
         self.status_container = ft.Container(
             content=self.status_text,

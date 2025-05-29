@@ -1,7 +1,7 @@
 import flet as ft
 import logging
 from db.models.propeller_setting import PropellerSetting
-from db.models.opearation_log import OperationLog
+from db.models.operation_log import OperationLog
 from common.operation_type import OperationType
 from common.global_data import gdata
 from playhouse.shortcuts import model_to_dict

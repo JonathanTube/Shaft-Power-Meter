@@ -1,4 +1,3 @@
-import subprocess
 import flet as ft
 from typing import Callable
 from db.models.user import User
@@ -36,11 +35,10 @@ class PermissionCheck(ft.AlertDialog):
         )
         self.user_pwd = ft.TextField(
             width=300,
-            value="root",
+            value="",
             label=s.get("lang.permission.user_pwd"),
             password=True,
-            can_reveal_password=True,
-            on_click=lambda e: subprocess.run(["osk.exe"])
+            can_reveal_password=True
         )
         self.content = ft.Column(
             height=150,
@@ -74,7 +72,7 @@ class PermissionCheck(ft.AlertDialog):
             Toast.show_error(self.page, s.get("lang.permission.user_name_or_pwd_is_incorrect"))
             return
 
-        if user.user_pwd != user_pwd:
+        if not user.check_password(user_pwd):
             Toast.show_error(self.page, s.get("lang.permission.user_name_or_pwd_is_incorrect"))
             return
 

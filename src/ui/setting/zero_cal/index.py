@@ -4,28 +4,28 @@ from ui.setting.zero_cal.zero_cal_executor import ZeroCalExecutor
 from ui.setting.zero_cal.zero_cal_his import ZeroCalHis
 
 
-class ZeroCal:
-    @staticmethod
-    def create():
-        return ft.Tabs(
+class ZeroCal(ft.Container):
+    def __init__(self):
+        super().__init__()
+
+    def build(self):
+        self.content = ft.Tabs(
             selected_index=0,
             animation_duration=300,
             tabs=[
                 ft.Tab(
-                    text="Zero Cal.",
-                    icon=ft.Icons.ADJUST_OUTLINED,
+                    text=self.page.session.get("lang.zero_cal.executor"),
                     content=ft.Container(
-                        padding=ft.padding.symmetric(10, 20),
-                        content=ZeroCalExecutor().create()
+                        padding=ft.padding.only(top=10, bottom=5),
+                        content=ZeroCalExecutor()
                     )
                 ),
 
                 ft.Tab(
-                    text="Zero Cal. History",
-                    icon=ft.icons.HISTORY_OUTLINED,
+                    text=self.page.session.get("lang.zero_cal.history"),
                     content=ft.Container(
-                        padding=ft.padding.symmetric(10, 20),
-                        content=ZeroCalHis().create()
+                        padding=ft.padding.symmetric(0, 0),
+                        content=ZeroCalHis()
                     )
                 )
 

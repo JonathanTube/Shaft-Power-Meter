@@ -11,7 +11,7 @@ if getattr(sys, 'frozen', False):
 else:
     PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))  # 本地开发目录
     
-DB_PATH = os.path.join(PROJECT_ROOT, 'main.db')
+DB_PATH = os.path.join(PROJECT_ROOT, '988bbc4fc383')
 
 # 配置日志
 # logging.basicConfig(level=logging.DEBUG)

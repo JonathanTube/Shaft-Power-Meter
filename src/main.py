@@ -88,7 +88,7 @@ async def main(page: ft.Page):
     else:
         page.window.maximizable = False
         page.window.width = 1024
-        page.window.height = 600
+        page.window.height = 800
         page.window.resizable = False
     page.window.prevent_close = True
     ControlManager.fullscreen_alert = FullscreenAlert()
