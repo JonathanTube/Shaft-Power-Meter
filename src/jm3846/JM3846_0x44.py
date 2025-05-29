@@ -63,8 +63,8 @@ class JM38460x44Async:
             current_frame = struct.unpack('>H', data[8:10])[0]
             total_frames = struct.unpack('>H', data[10:12])[0]
 
-            print('len(data)=', len(data))  # 212
-            print('length=', length)  # 206
+            # print('len(data)=', len(data))  # 212
+            # print('length=', length)  # 206
             # 计算有效载荷长度
             payload_length = length - 5  # 从长度字段减去unit_id(1)和func_code(1) # 206 - 5 = 201
             payload_start = 12
@@ -77,7 +77,8 @@ class JM38460x44Async:
             for i in range(0, len(payload), 2):
                 if i+1 >= len(payload):
                     break
-                values.append(struct.unpack('<h', payload[i:i+2])[0])
+                # 小端序，无符号整型
+                values.append(struct.unpack('<H', payload[i:i+2])[0])
 
             return {
                 'success': True,
@@ -96,7 +97,7 @@ class JM38460x44Async:
 
     @staticmethod
     def convert_data(values: list[int], ch_sel1: int, ch_sel0: int, speed_sel: int):
-        # print('values=', values)
+        # print(values)
         # CH_SEL1\CH_SEL0 都不为0且SPEED_SEL=1时：ch0-ch1-rpm-ch0-ch1-rpm-；
         # CH_SEL1\CH_SEL0 都不为4\0且SPEED_SEL=1时： ch1-rpm -ch1-rpm-;
         # CH_SEL1\CH_SEL0 都不为0\1且SPEED_SEL=1时： ch0-rpm -ch0-rpm-;
@@ -107,14 +108,16 @@ class JM38460x44Async:
         values_length = len(values)
         if ch_sel1 != 0 and ch_sel0 != 0 and speed_sel == 1:
             size = 3
+            part_length = values_length / size
             for i in range(0, values_length, size):
                 chunk = values[i: i + size]
+                # print(f'i = {i}, chunk[0]={chunk[0]}')
                 ch0_sum += chunk[0]
                 ch1_sum += chunk[1]
                 rpm_sum += chunk[2]
-            ch0_ad = ch0_sum / values_length
-            ch1_ad = ch1_sum / values_length
-            rpm = rpm_sum / values_length
+            ch0_ad = ch0_sum / part_length
+            ch1_ad = ch1_sum / part_length
+            rpm = rpm_sum / part_length
             return {
                 'ch0_ad': ch0_ad,
                 'ch1_ad': ch1_ad,
@@ -123,12 +126,13 @@ class JM38460x44Async:
 
         if ch_sel1 != 4 and ch_sel0 != 0 and speed_sel == 1:
             size = 2
+            part_length = values_length / size
             for i in range(0, values_length, size):
                 chunk = values[i: i + size]
                 ch1_sum += chunk[0]
                 rpm_sum += chunk[1]
-            ch1_ad = ch1_sum / values_length
-            rpm = rpm_sum / values_length
+            ch1_ad = ch1_sum / part_length
+            rpm = rpm_sum / part_length
             return {
                 'ch1_ad': ch1_ad,
                 'rpm': rpm
@@ -136,12 +140,13 @@ class JM38460x44Async:
 
         if ch_sel1 != 0 and ch_sel0 != 1 and speed_sel == 1:
             size = 2
+            part_length = values_length / size
             for i in range(0, values_length, size):
                 chunk = values[i: i + size]
                 ch0_sum += chunk[0]
                 rpm_sum += chunk[1]
-            ch0_ad = ch0_sum / values_length
-            rpm = rpm_sum / values_length
+            ch0_ad = ch0_sum / part_length
+            rpm = rpm_sum / part_length
             return {
                 'ch0_ad': ch0_ad,
                 'rpm': rpm
@@ -149,12 +154,13 @@ class JM38460x44Async:
 
         if ch_sel1 != 1 and ch_sel0 != 1 and speed_sel == 0:
             size = 2
+            part_length = values_length / size
             for i in range(0, values_length, size):
                 chunk = values[i: i + size]
                 ch0_sum += chunk[0]
                 ch1_sum += chunk[1]
-            ch0_ad = ch0_sum / values_length
-            ch1_ad = ch1_sum / values_length * 0.1
+            ch0_ad = ch0_sum / part_length
+            ch1_ad = ch1_sum / part_length
             return {
                 'ch0_ad': ch0_ad,
                 'ch1_ad': ch1_ad

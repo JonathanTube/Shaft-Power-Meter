@@ -72,7 +72,7 @@ class DataInit:
             FactorConf.create(
                 bearing_outer_diameter_D=0.2,
                 bearing_inner_diameter_d=0,
-                sensitivity_factor_k=2.09,
+                sensitivity_factor_k=2.0,
                 elastic_modulus_E=207000,
                 poisson_ratio_mu=0.285)
 

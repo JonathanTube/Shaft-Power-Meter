@@ -13,11 +13,7 @@ class JM3846AsyncClient:
 
     def __init__(self):
         self.frame_size = 120
-        self.total_frames = 0x0001
-
-        io_conf: IOConf = IOConf.get()
-        self.host = io_conf.sps1_ip
-        self.port = io_conf.sps2_port
+        self.total_frames = 0xFFFF
 
         self.timeout = 5
         self.running = False
@@ -45,8 +41,11 @@ class JM3846AsyncClient:
         """建立异步连接"""
         try:
             print('JM3846 Connecting...')
+            io_conf: IOConf = IOConf.get()
+            host = io_conf.sps1_ip
+            port = io_conf.sps2_port
             self.reader, self.writer = await asyncio.wait_for(
-                asyncio.open_connection(self.host, self.port),
+                asyncio.open_connection(host, port),
                 timeout=self.timeout
             )
             self.running = True
@@ -175,19 +174,19 @@ class JM3846AsyncClient:
         print('result=', result)
         """数据存储方法（保持原逻辑）"""
         if 'ch0_ad' in result:
-            ad0 = abs(result['ch0_ad'])
-            ad0_mv_per_v = self.jm3846Calculator.calculate_mv_per_v(ad0, self.gain_0)
+            ad0 = result['ch0_ad']
+            # ad0_mv_per_v = self.jm3846Calculator.calculate_mv_per_v(ad0, self.gain_0)
             microstrain = self.jm3846Calculator.calculate_microstrain(ad0, self.gain_0)
-            torque = self.jm3846Calculator.calculate_torque(ad0, self.gain_0)
-            print(f'ad0={ad0},ad0_mv_per_v={ad0_mv_per_v},microstrain={microstrain},torque={torque}')
-        # if 'ch1_ad' in result:
-        #     ad1 = abs(result['ch1_ad'])
-        #     ad1_mv_per_v = self.jm3846Calculator.calculate_mv_per_v(ad1, self.gain_1)
-        #     thrust = self.jm3846Calculator.calculate_thrust(ad1, self.gain_1)
-        #     print(f'ad1={ad1},ad1_mv_per_v={ad1_mv_per_v},thrust={thrust}')
-        # if 'rpm' in result:
-        #     rpm = result['rpm'] / 10
-        #     print('rpm=', rpm)
+            # torque = self.jm3846Calculator.calculate_torque(ad0, self.gain_0)
+            # print(f'ad0={ad0}, ad0_mv_per_v={ad0_mv_per_v}, microstrain={microstrain}, torque={torque}')
+        if 'ch1_ad' in result:
+            ad1 = result['ch1_ad']
+            # ad1_mv_per_v = self.jm3846Calculator.calculate_mv_per_v(ad1, self.gain_1)
+            # thrust = self.jm3846Calculator.calculate_thrust(ad1, self.gain_1)
+            # print(f'ad1={ad1},ad1_mv_per_v={ad1_mv_per_v},thrust={thrust}')
+        if 'rpm' in result:
+            rpm = result['rpm'] / 10
+            # print('rpm=', rpm)
 
     async def async_handle_0x45(self):
         """异步处理功能码0x45"""

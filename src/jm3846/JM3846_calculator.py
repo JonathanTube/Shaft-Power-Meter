@@ -12,22 +12,25 @@ class JM3846Calculator:
     """物理量计算类 (单一职责: 力学计算)"""
 
     def __init__(self):
-        self.config: FactorConf = FactorConf.get()
+        self.config: FactorConf = None
 
     def calculate_mv_per_v(self, ad_value: int, gain: int) -> float:
-        logging.info(f"calculate_mv_per_v: const_central={const_central}, ad_value={ad_value}, gain={gain}")
+        if self.config is None:
+            self.config = FactorConf.get()
+
+        # logging.info(f"calculate_mv_per_v: const_central={const_central}, ad_value={ad_value}, gain={gain}")
         """计算中间值, mv/v"""
-        numerator = (ad_value - const_central) * (10 ** 3)
+        numerator = (const_central - ad_value) * (10 ** 3)
         denominator = const_central * gain
         if denominator == 0:
             return 0
         result = numerator / denominator
-        logging.info(f"calculate_mv_per_v: result={result}\r\n")
+        # logging.info(f"calculate_mv_per_v: result={result}\r\n")
         return result
 
     def calculate_microstrain(self, ad_value: int, gain: int) -> float:
         """AD值转微应变 (精确浮点计算)"""
-        logging.info(f"calculate_microstrain: const_central={const_central}, ad_value={ad_value}, gain={gain}")
+        # logging.info(f"calculate_microstrain: const_central={const_central}, ad_value={ad_value}, gain={gain}")
         mv_v = self.calculate_mv_per_v(ad_value, gain)
         if self.config.sensitivity_factor_k == 0:
             return 0

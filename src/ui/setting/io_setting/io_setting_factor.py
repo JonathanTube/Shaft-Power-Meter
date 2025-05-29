@@ -14,7 +14,7 @@ class IOSettingFactor(CustomCard):
 
     def build(self):
         self.shaft_outer_diameter = ft.TextField(
-            label=self.page.session.get("lang.setting.bearing_outer_diameter_D"), suffix_text="mm",
+            label=self.page.session.get("lang.setting.bearing_outer_diameter_D"), suffix_text="m",
             value=self.factor_conf.bearing_outer_diameter_D,
             col={'sm': 6},
             read_only=True,
@@ -23,7 +23,7 @@ class IOSettingFactor(CustomCard):
 
         self.shaft_inner_diameter = ft.TextField(
             label=self.page.session.get("lang.setting.bearing_inner_diameter_d"),
-            suffix_text="mm",
+            suffix_text="m",
             value=self.factor_conf.bearing_inner_diameter_d,
             col={'sm': 6},
             read_only=True,
@@ -41,7 +41,7 @@ class IOSettingFactor(CustomCard):
         self.elastic_modulus_E = ft.TextField(
             label=self.page.session.get("lang.setting.elastic_modulus_E"),
             value=self.factor_conf.elastic_modulus_E,
-            suffix_text="Gpa",
+            suffix_text="Mpa",
             col={'sm': 6},
             read_only=True,
             on_focus=lambda e: keyboard.open(e.control)

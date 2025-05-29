@@ -5,15 +5,15 @@ from ..base import BaseModel
 class FactorConf(BaseModel):
     bearing_outer_diameter_D = FloatField(
         help_text="轴承外径D(mm)",
-        verbose_name="Bearing outer diameter D (mm)"
+        verbose_name="Bearing outer diameter D (m)"
     )
     bearing_inner_diameter_d = FloatField(
         help_text="轴承内径d(mm)",
-        verbose_name="Bearing inner diameter d (mm)"
+        verbose_name="Bearing inner diameter d (m)"
     )
     elastic_modulus_E = FloatField(
         help_text="弹性模量E(Gpa)",
-        verbose_name="Elastic modulus E (GPa)"
+        verbose_name="Elastic modulus E (MPa)"
     )
     poisson_ratio_mu = FloatField(
         help_text="泊松比μ",
