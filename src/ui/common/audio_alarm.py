@@ -18,7 +18,7 @@ class AudioAlarm(ft.Container):
         audit_src = os.path.join(
             Path(__file__).parent.parent.parent,
             "assets",
-            "alarm.mp3"
+            "TF001.WAV"
         )
         self.content: ft.FilledButton = ft.FilledButton(
             text="Override",
