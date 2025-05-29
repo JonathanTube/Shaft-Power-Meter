@@ -11,9 +11,10 @@ from utils.formula_cal import FormulaCalculator
 from utils.alarm_saver import AlarmSaver
 from utils.modbus_output import modbus_output
 
+
 class DataSaver:
     @staticmethod
-    def save(name: str, thrust: float, torque: float, speed: float):
+    def save(name: str, thrust_mv_per_v: float, thrust: float, torque_mv_per_v: float, torque: float, speed: float):
         # if speed is less than 10, it is not valid data
         if speed < 10:
             return
@@ -46,6 +47,9 @@ class DataSaver:
                 gdata.sps1_torque = torque
                 gdata.sps1_speed = speed
                 gdata.sps1_power = power
+                # 毫伏/伏 调零用
+                gdata.sps1_thrust_mv_per_v = thrust_mv_per_v
+                gdata.sps1_torque_mv_per_v = torque_mv_per_v
                 if len(gdata.sps1_power_history) > 100:
                     gdata.sps1_power_history.pop()
                 gdata.sps1_power_history.insert(0, (power, utc_date_time))
@@ -54,6 +58,9 @@ class DataSaver:
                 gdata.sps2_torque = torque
                 gdata.sps2_speed = speed
                 gdata.sps2_power = power
+                # 毫伏/伏 调零用
+                gdata.sps2_thrust_mv_per_v = thrust_mv_per_v
+                gdata.sps2_torque_mv_per_v = torque_mv_per_v
                 if len(gdata.sps2_power_history) > 100:
                     gdata.sps2_power_history.pop()
                 gdata.sps2_power_history.insert(0, (power, utc_date_time))

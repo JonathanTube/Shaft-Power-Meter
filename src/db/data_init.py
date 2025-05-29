@@ -70,11 +70,11 @@ class DataInit:
     def __init_factor_conf():
         if FactorConf.select().count() == 0:
             FactorConf.create(
-                bearing_outer_diameter_D=0,
+                bearing_outer_diameter_D=0.2,
                 bearing_inner_diameter_d=0,
-                sensitivity_factor_k=0,
-                elastic_modulus_E=0,
-                poisson_ratio_mu=0)
+                sensitivity_factor_k=2.09,
+                elastic_modulus_E=207000,
+                poisson_ratio_mu=0.285)
 
     def __init_breach_reason():
         if BreachReason.select().count() == 0:

@@ -20,6 +20,7 @@ from utils.alarm_saver import AlarmSaver
 from utils.auto_startup import add_to_startup
 from utils.logger import Logger
 from utils.modbus_output import modbus_output
+from jm3846.JM3846_client import jm3846Client
 
 Logger(show_sql=False)
 
@@ -68,8 +69,6 @@ async def handle_unexpected_exit():
 
 
 async def main(page: ft.Page):
-    TaskManager(page).start_all()
-
     asyncio.create_task(handle_unexpected_exit())
 
     load_language(page)
@@ -117,6 +116,10 @@ async def main(page: ft.Page):
 
     page.update()
 
+    TaskManager(page).start_all()
+
 if __name__ == "__main__":
     check_single_instance()
     ft.app(target=main)
+    jm3846Client.async_handle_0x45()
+    jm3846Client.async_disconnect()

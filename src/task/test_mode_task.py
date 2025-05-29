@@ -34,7 +34,6 @@ class TestModeTask:
         self.min_thrust = min_thrust
         self.max_thrust = max_thrust
 
-
     async def generate_random_data(self):
         self.is_running = True
 
@@ -77,7 +76,7 @@ class TestModeTask:
         instant_torque = int(random.uniform(self.min_torque, self.max_torque))
         instant_speed = int(random.uniform(self.min_speed, self.max_speed))
         instant_thrust = int(random.uniform(self.min_thrust, self.max_thrust))
-        DataSaver.save(name, instant_thrust, instant_torque, instant_speed)
+        DataSaver.save(name, 0, instant_thrust, 0, instant_torque, instant_speed)
 
 
 testModeTask: TestModeTask = TestModeTask()
