@@ -14,18 +14,32 @@ class IOSettingPLC(CustomCard):
         self.conf = conf
 
     def build(self):
-        self.plc_status = ft.Container(
-            expand=True,
-            alignment=ft.alignment.center,
-            visible=False,
-            content=ft.Text(value=self.page.session.get("lang.alarm.plc_disconnected"), weight=ft.FontWeight.BOLD, color=ft.Colors.RED)
+        self.plc_enabled = ft.Checkbox(
+            label=self.page.session.get("lang.setting.plc_enabled"), 
+            value=self.conf.plc_enabled, col={'md': 6},
+            on_change=lambda e : self.__plc_enabled_change(e)
         )
 
-        self.write_real_time_data_to_plc = ft.Checkbox(label=self.page.session.get("lang.setting.write_real_time_data_to_plc"), value=self.conf.write_real_time_data_to_plc, col={'md': 12})
+        self.plc_status = ft.Container(
+            col={'md': 6},
+            content=ft.Text(
+                visible=self.conf.plc_enabled,
+                value=self.page.session.get("lang.alarm.plc_disconnected"),
+                weight=ft.FontWeight.BOLD, color=ft.Colors.RED
+            )
+        )
 
-        self.plc_ip = ft.TextField(label=self.page.session.get("lang.setting.ip"), value=self.conf.plc_ip, col={'md': 6}, read_only=True, on_focus=lambda e: keyboard.open(e.control, 'ip'))
+        self.plc_ip = ft.TextField(
+            label=self.page.session.get("lang.setting.ip"), value=self.conf.plc_ip, col={'md': 6}, 
+            read_only=True, on_focus=lambda e: keyboard.open(e.control, 'ip'), 
+            visible=self.conf.plc_enabled
+        )
 
-        self.plc_port = ft.TextField(label=self.page.session.get("lang.setting.port"), value=self.conf.plc_port, col={'md': 6}, read_only=True, on_focus=lambda e: keyboard.open(e.control, 'int'))
+        self.plc_port = ft.TextField(
+            label=self.page.session.get("lang.setting.port"), value=self.conf.plc_port, col={'md': 6}, 
+            read_only=True, on_focus=lambda e: keyboard.open(e.control, 'int'), 
+            visible=self.conf.plc_enabled
+        )
 
         self.txt_power_range_min = ft.TextField(
             label=self.page.session.get("lang.setting.4_20_ma_power_min"),
@@ -33,7 +47,8 @@ class IOSettingPLC(CustomCard):
             col={'md': 6},
             read_only=True,
             value=0,
-            on_focus=lambda e: keyboard.open(e.control, 'int')
+            on_focus=lambda e: keyboard.open(e.control, 'int'),
+            visible=self.conf.plc_enabled
         )
         self.txt_power_range_max = ft.TextField(
             label=self.page.session.get("lang.setting.4_20_ma_power_max"),
@@ -41,6 +56,7 @@ class IOSettingPLC(CustomCard):
             col={'md': 6},
             read_only=True,
             value=0,
+            visible=self.conf.plc_enabled,
             on_focus=lambda e: keyboard.open(e.control, 'int')
         )
         self.txt_power_range_offset = ft.TextField(
@@ -49,6 +65,7 @@ class IOSettingPLC(CustomCard):
             col={'md': 6},
             read_only=True,
             value=0,
+            visible=self.conf.plc_enabled,
             on_focus=lambda e: keyboard.open(e.control, 'int')
         )
 
@@ -58,6 +75,7 @@ class IOSettingPLC(CustomCard):
             col={'md': 6},
             read_only=True,
             value=0,
+            visible=self.conf.plc_enabled,
             on_focus=lambda e: keyboard.open(e.control, 'int')
         )
         self.txt_torque_range_max = ft.TextField(
@@ -66,6 +84,7 @@ class IOSettingPLC(CustomCard):
             col={'md': 6},
             read_only=True,
             value=0,
+            visible=self.conf.plc_enabled,
             on_focus=lambda e: keyboard.open(e.control, 'int')
         )
         self.txt_torque_range_offset = ft.TextField(
@@ -74,6 +93,7 @@ class IOSettingPLC(CustomCard):
             col={'md': 6},
             read_only=True,
             value=0,
+            visible=self.conf.plc_enabled,
             on_focus=lambda e: keyboard.open(e.control, 'int')
         )
 
@@ -83,6 +103,7 @@ class IOSettingPLC(CustomCard):
             col={'md': 6},
             read_only=True,
             value=0,
+            visible=self.conf.plc_enabled,
             on_focus=lambda e: keyboard.open(e.control, 'int')
         )
         self.txt_thrust_range_max = ft.TextField(
@@ -91,6 +112,7 @@ class IOSettingPLC(CustomCard):
             col={'md': 6},
             read_only=True,
             value=0,
+            visible=self.conf.plc_enabled,
             on_focus=lambda e: keyboard.open(e.control, 'int')
         )
         self.txt_thrust_range_offset = ft.TextField(
@@ -99,6 +121,7 @@ class IOSettingPLC(CustomCard):
             col={'md': 6},
             read_only=True,
             value=0,
+            visible=self.conf.plc_enabled,
             on_focus=lambda e: keyboard.open(e.control, 'int')
         )
 
@@ -108,6 +131,7 @@ class IOSettingPLC(CustomCard):
             col={'md': 6},
             read_only=True,
             value=0,
+            visible=self.conf.plc_enabled,
             on_focus=lambda e: keyboard.open(e.control, 'int')
         )
         self.txt_speed_range_max = ft.TextField(
@@ -116,6 +140,7 @@ class IOSettingPLC(CustomCard):
             col={'md': 6},
             read_only=True,
             value=0,
+            visible=self.conf.plc_enabled,
             on_focus=lambda e: keyboard.open(e.control, 'int')
         )
         self.txt_speed_range_offset = ft.TextField(
@@ -124,13 +149,14 @@ class IOSettingPLC(CustomCard):
             col={'md': 6},
             read_only=True,
             value=0,
+            visible=self.conf.plc_enabled,
             on_focus=lambda e: keyboard.open(e.control, 'int')
         )
 
         self.heading = self.page.session.get("lang.setting.plc_conf")
         self.body = ft.ResponsiveRow(controls=[
+            self.plc_enabled,
             self.plc_status,
-            self.write_real_time_data_to_plc,
             self.plc_ip,
             self.plc_port,
 
@@ -152,7 +178,8 @@ class IOSettingPLC(CustomCard):
         ])
         self.col = {"md": 12}
         super().build()
-        self.page.run_task(self.load_range_data)
+        if self.conf.plc_enabled:
+            self.page.run_task(self.load_range_data)
 
     async def load_range_data(self):
         try:
@@ -198,10 +225,53 @@ class IOSettingPLC(CustomCard):
 
         self.conf.plc_ip = self.plc_ip.value
         self.conf.plc_port = self.plc_port.value
-        self.conf.write_real_time_data_to_plc = self.write_real_time_data_to_plc.value
-        gdata.write_real_time_data_to_plc = self.write_real_time_data_to_plc.value
+        self.conf.plc_enabled = self.plc_enabled.value
+        gdata.plc_enabled = self.plc_enabled.value
 
-        self.page.run_task(self.__write_to_plc)
+        if self.conf.plc_enabled:
+            self.page.run_task(self.__write_to_plc)
+
+    def __plc_enabled_change(self, e):
+        plc_enabled = e.data
+        self.plc_status.visible = plc_enabled
+        self.plc_status.update()
+
+        self.plc_ip.visible = plc_enabled
+        self.plc_ip.update()
+
+        self.plc_port.visible = plc_enabled
+        self.plc_port.update()
+
+        self.txt_power_range_min.visible = plc_enabled
+        self.txt_power_range_min.update()
+        self.txt_power_range_max.visible = plc_enabled
+        self.txt_power_range_max.update()
+        self.txt_power_range_offset.visible = plc_enabled
+        self.txt_power_range_offset.update()
+
+        self.txt_torque_range_min.visible = plc_enabled
+        self.txt_torque_range_min.update()
+        self.txt_torque_range_max.visible = plc_enabled
+        self.txt_torque_range_max.update()
+        self.txt_torque_range_offset.visible = plc_enabled
+        self.txt_torque_range_offset.update()
+
+        self.txt_thrust_range_min.visible = plc_enabled
+        self.txt_thrust_range_min.update()
+        self.txt_thrust_range_max.visible = plc_enabled
+        self.txt_thrust_range_max.update()
+        self.txt_thrust_range_offset.visible = plc_enabled
+        self.txt_thrust_range_offset.update()
+
+        self.txt_speed_range_min.visible = plc_enabled
+        self.txt_speed_range_min.update()
+        self.txt_speed_range_max.visible = plc_enabled
+        self.txt_speed_range_max.update()
+        self.txt_speed_range_offset.visible = plc_enabled
+        self.txt_speed_range_offset.update()
+        # 如果plc打开，触发，从plc加载默认配置
+        if plc_enabled:
+            self.page.run_task(self.load_range_data)
 
     async def __write_to_plc(self):
         try:

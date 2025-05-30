@@ -1,26 +1,33 @@
 import asyncio
 import flet as ft
+from db.models.io_conf import IOConf
 from utils.plc_util import plc_util
 
 
 class SelfTest(ft.Tabs):
     def __init__(self):
         super().__init__()
+        self.conf: IOConf = IOConf.get()
         self.plc_task = None
 
     def build(self):
         self.plc_log = ft.ListView(padding=10, auto_scroll=True, height=500, spacing=5, expand=True)
         self.sps_log = ft.ListView(padding=10, auto_scroll=True, height=500, spacing=5, expand=True)
         self.gps_log = ft.ListView(padding=10, auto_scroll=True, height=500, spacing=5, expand=True)
-        self.tabs = [ft.Tab(text="PLC", content=self.plc_log), ft.Tab(text="SPS", content=self.sps_log), ft.Tab(text="GPS", content=self.gps_log)]
+        self.tabs = [
+            ft.Tab(text="SPS-1", content=self.sps_log), 
+            ft.Tab(text="GPS", content=self.gps_log),
+            ft.Tab(text="PLC", content=self.plc_log, visible=self.conf.plc_enabled) 
+        ]
 
     def did_mount(self):
-        self.plc_task = self.page.run_task(self.__read_plc_data)
+        if self.conf.plc_enabled:
+            self.plc_task = self.page.run_task(self.__read_plc_data)
         # self.page.run_task(self.__read_sps_data)
         # self.page.run_task(self.__read_gps_data)
 
     def will_unmount(self):
-        if self.plc_task:
+        if self.conf.plc_enabled and self.plc_task:
             self.plc_task.cancel()
 
     async def __read_plc_data(self):

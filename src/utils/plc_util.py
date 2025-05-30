@@ -16,12 +16,17 @@ class PLCUtil:
         self._is_connecting = False  # 防止重复重连
         self._max_retries = 3  # 最大重连次数
 
+        self.ip = None
+        self.port = None
+
     async def auto_reconnect(self) -> bool:
         async with self._lock:  # 确保单线程重连
             if self.plc_client and self.plc_client.connected:
                 return True
 
             for attempt in range(self._max_retries):
+                if not gdata.plc_enabled:
+                    return False
                 try:
                     if self._is_connecting:
                         return False
@@ -29,7 +34,10 @@ class PLCUtil:
                     self._is_connecting = True
                     # 初始化或重新创建客户端
                     if not self.plc_client:
-                        io_conf = IOConf.get()
+                        io_conf:IOConf = IOConf.get()
+                        self.ip = io_conf.plc_ip
+                        self.port = io_conf.plc_port
+
                         self.plc_client = AsyncModbusTcpClient(
                             host=io_conf.plc_ip,
                             port=io_conf.plc_port,
@@ -56,7 +64,7 @@ class PLCUtil:
 
     async def read_4_20_ma_data(self) -> dict:
         if not await self.auto_reconnect():
-            raise Exception("PLC connection error")
+            raise Exception(f"{self.ip}:{self.port} PLC connection error")
 
         try:
             return {  # 全部使用async/await
@@ -77,10 +85,10 @@ class PLCUtil:
                 "speed_range_offset": await self._safe_read_register(12330)
             }
         except ConnectionException as e:
-            logging.error(f"PLC connection error: {e}")
+            logging.error(f"{self.ip}:{self.port} PLC connection error: {e}")
             self.save_alarm()
         except Exception as e:
-            logging.error(f"PLC read data unknown error: {e}")
+            logging.error(f"{self.ip}:{self.port} PLC read data unknown error: {e}")
             self.save_alarm()
         return self._empty_4_20ma_data()
 
@@ -112,6 +120,9 @@ class PLCUtil:
         return False
 
     async def write_instant_data(self, power: float, torque: float, thrust: float, speed: float) -> bool:
+        if not gdata.plc_enabled:
+            return False
+
         if not await self.auto_reconnect():
             return False
 
@@ -136,7 +147,7 @@ class PLCUtil:
 
     async def read_instant_data(self) -> dict:
         if not await self.auto_reconnect():
-            raise Exception("PLC connection error")
+            raise Exception(f"{self.ip}:{self.port} PLC connection error")
 
         try:
             return {
@@ -146,7 +157,7 @@ class PLCUtil:
                 "speed": await self._safe_read_register(12331)
             }
         except Exception as e:
-            logging.error(f"PLC read data failed: {e}")
+            logging.error(f"{self.ip}:{self.port} PLC read data failed: {e}")
             self.save_alarm()
             return self._empty_instant_data()
 
@@ -159,6 +170,9 @@ class PLCUtil:
         }
 
     async def write_alarm(self, occured: bool) -> bool:
+        if not gdata.plc_enabled:
+            return False
+
         if not await self.auto_reconnect():
             return False
 
@@ -172,6 +186,9 @@ class PLCUtil:
         return False
 
     async def write_power_overload(self, occured: bool) -> bool:
+        if not gdata.plc_enabled:
+            return False
+
         if not await self.auto_reconnect():
             return False
 

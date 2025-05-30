@@ -149,7 +149,7 @@ class DataInit:
                 plc_port=502,
                 gps_ip='192.168.1.3',
                 gps_port=51001,
-                sps1_ip='192.168.1.5',
+                sps1_ip='127.0.0.1',
                 sps1_port=6800,
                 sps2_ip='192.168.1.6',
                 sps2_port=6800
@@ -1120,9 +1120,9 @@ class DataInit:
                 },
 
                 {
-                    "code": "lang.setting.write_real_time_data_to_plc",
-                    "chinese": "实时数据写入PLC(请确保同时只能有一个HMI向PLC写入实时数据)",
-                    "english": "Write Real-time Data To PLC (Please ensure that only one HMI is writing real-time data to PLC at the same time)"
+                    "code": "lang.setting.plc_enabled",
+                    "chinese": "启用PLC",
+                    "english": "PLC Enabled"
                 },
 
                 {

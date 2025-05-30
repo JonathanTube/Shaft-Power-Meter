@@ -26,7 +26,7 @@ class ModbusOutput:
         self.io_conf: IOConf = IOConf().get()
         port = self.io_conf.output_com_port
         if not port:
-            logger.warning("Modbus output port is not set")
+            logger.warning("Modbus output port is not set, skip starting Modbus server.")
             return
 
         system_settings: SystemSettings = SystemSettings().get()
