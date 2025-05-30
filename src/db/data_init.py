@@ -1120,9 +1120,9 @@ class DataInit:
                 },
 
                 {
-                    "code": "lang.setting.write_real_time_data_to_plc",
-                    "chinese": "实时数据写入PLC(请确保同时只能有一个HMI向PLC写入实时数据)",
-                    "english": "Write Real-time Data To PLC (Please ensure that only one HMI is writing real-time data to PLC at the same time)"
+                    "code": "lang.setting.plc_enabled",
+                    "chinese": "启用PLC",
+                    "english": "PLC Enabled"
                 },
 
                 {
@@ -1614,14 +1614,14 @@ class DataInit:
                     "english": "Aborted"
                 },
                 {
-                    "code": "lang.zero_cal.torque_ad",
-                    "chinese": "扭矩-AD(mV)",
-                    "english": "Torque-AD(mV)"
+                    "code": "lang.zero_cal.mv_per_v_for_torque",
+                    "chinese": "mv/v - 扭矩",
+                    "english": "mv/v for Torque"
                 },
                 {
-                    "code": "lang.zero_cal.thrust_ad",
-                    "chinese": "推力-AD(mV)",
-                    "english": "Thrust-AD(mV)"
+                    "code": "lang.zero_cal.mv_per_v_for_thrust",
+                    "chinese": "mv/v - 推力",
+                    "english": "mv/v for Thrust"
                 },
                 {
                     "code": "lang.zero_cal.new_torque_ad",

@@ -113,8 +113,8 @@ class ZeroCalExecutor(ft.Container):
             expand=True,
             columns=[
                 ft.DataColumn(ft.Text("No.", size=14, weight=ft.FontWeight.W_500)),
-                ft.DataColumn(ft.Text(self.page.session.get("lang.zero_cal.torque_ad"), size=14, weight=ft.FontWeight.W_500)),
-                ft.DataColumn(ft.Text(self.page.session.get("lang.zero_cal.thrust_ad"), size=14, weight=ft.FontWeight.W_500))
+                ft.DataColumn(ft.Text(self.page.session.get("lang.zero_cal.mv_per_v_for_torque"), size=14, weight=ft.FontWeight.W_500)),
+                ft.DataColumn(ft.Text(self.page.session.get("lang.zero_cal.mv_per_v_for_thrust"), size=14, weight=ft.FontWeight.W_500))
             ],
             rows=table_rows)
 

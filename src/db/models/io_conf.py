@@ -4,11 +4,11 @@ from ..base import BaseModel
 
 
 class IOConf(BaseModel):
+    plc_enabled = BooleanField(verbose_name="PLC enabled", default=False)
+
     plc_ip = CharField(verbose_name="PLC IP address")
 
     plc_port = IntegerField(verbose_name="PLC port")
-
-    write_real_time_data_to_plc = BooleanField(verbose_name="write real time data to PLC", default=False)
 
     gps_ip = CharField(verbose_name="GPS IP address", default="")
     gps_port = IntegerField(verbose_name="GPS port", default=0)
