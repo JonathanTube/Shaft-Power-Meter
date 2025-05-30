@@ -1614,14 +1614,14 @@ class DataInit:
                     "english": "Aborted"
                 },
                 {
-                    "code": "lang.zero_cal.torque_ad",
-                    "chinese": "扭矩-AD(mV)",
-                    "english": "Torque-AD(mV)"
+                    "code": "lang.zero_cal.mv_per_v_for_torque",
+                    "chinese": "mv/v - 扭矩",
+                    "english": "mv/v for Torque"
                 },
                 {
-                    "code": "lang.zero_cal.thrust_ad",
-                    "chinese": "推力-AD(mV)",
-                    "english": "Thrust-AD(mV)"
+                    "code": "lang.zero_cal.mv_per_v_for_thrust",
+                    "chinese": "mv/v - 推力",
+                    "english": "mv/v for Thrust"
                 },
                 {
                     "code": "lang.zero_cal.new_torque_ad",

@@ -31,7 +31,7 @@ class IOConf(BaseModel):
 
     output_sum_power = BooleanField(verbose_name="Sum of Power(kw)", default=False)
 
-    output_com_port = CharField(verbose_name="COM port", null=False)
+    output_com_port = CharField(verbose_name="COM port", null=True)
 
     class Meta:
         table_name = 'io_conf'
