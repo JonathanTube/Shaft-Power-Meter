@@ -12,7 +12,7 @@ class TaskManager:
 
     def start_all(self):
         asyncio.create_task(UtcTimer().start())
-        # asyncio.create_task(Sps1ReadTask().start())
+        asyncio.create_task(Sps1ReadTask().start())
 
         # start sps2 JM3846 if dual propellers.
         system_settings: SystemSettings = SystemSettings.get()

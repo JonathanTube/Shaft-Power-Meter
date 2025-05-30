@@ -51,24 +51,24 @@ class DataSaver:
             # save counter log of interval
             DataSaver.save_counter_interval(name, speed, power)
             if name == 'sps1':
-                gdata.sps1_thrust = ad_1_thrust
                 gdata.sps1_torque = ad_0_torque
+                gdata.sps1_thrust = ad_1_thrust
                 gdata.sps1_speed = speed
                 gdata.sps1_power = power
                 # 毫伏/伏 调零用
-                gdata.sps1_thrust_mv_per_v = ad_1_mv_per_v
-                gdata.sps1_torque_mv_per_v = ad_0_mv_per_v
+                gdata.sps1_mv_per_v_for_torque = ad_0_mv_per_v
+                gdata.sps1_mv_per_v_for_thrust = ad_1_mv_per_v
                 if len(gdata.sps1_power_history) > 100:
                     gdata.sps1_power_history.pop()
                 gdata.sps1_power_history.insert(0, (power, utc_date_time))
             else:
-                gdata.sps2_thrust = ad_1_thrust
                 gdata.sps2_torque = ad_0_torque
+                gdata.sps2_thrust = ad_1_thrust
                 gdata.sps2_speed = speed
                 gdata.sps2_power = power
                 # 毫伏/伏 调零用
-                gdata.sps2_thrust_mv_per_v = ad_1_mv_per_v
-                gdata.sps2_torque_mv_per_v = ad_0_mv_per_v
+                gdata.sps2_mv_per_v_for_torque = ad_0_mv_per_v
+                gdata.sps2_mv_per_v_for_thrust = ad_1_mv_per_v
                 if len(gdata.sps2_power_history) > 100:
                     gdata.sps2_power_history.pop()
                 gdata.sps2_power_history.insert(0, (power, utc_date_time))

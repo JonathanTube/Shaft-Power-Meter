@@ -11,9 +11,9 @@ class ZeroCalRecord(BaseModel):
         on_delete='CASCADE',
         verbose_name="关联的调零信息")
 
-    torque = FloatField(verbose_name="扭矩相关数值")
+    mv_per_v_for_torque = FloatField(verbose_name="扭矩 - mv/v")
 
-    thrust = FloatField(verbose_name="推力相关数值")
+    mv_per_v_for_thrust = FloatField(verbose_name="推力 - mv/v")
 
     class Meta:
         table_name = 'zero_cal_record'

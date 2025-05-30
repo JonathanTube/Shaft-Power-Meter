@@ -20,7 +20,7 @@ class JM3846Calculator:
 
         # logging.info(f"calculate_mv_per_v: const_central={const_central}, ad_value={ad_value}, gain={gain}")
         """计算中间值, mv/v"""
-        numerator = (const_central - ad_value) * (10 ** 3)
+        numerator = (ad_value - const_central) * (10 ** 3)
         denominator = const_central * gain
         if denominator == 0:
             return 0

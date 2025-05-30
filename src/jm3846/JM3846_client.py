@@ -200,12 +200,12 @@ class JM3846AsyncClient:
             ad0_mv_per_v = self.jm3846Calculator.calculate_mv_per_v(ad0, self.gain_0)
             ad0_microstrain = self.jm3846Calculator.calculate_microstrain(ad0, self.gain_0)
             ad0_torque = self.jm3846Calculator.calculate_torque(ad0, self.gain_0)
-            # logging.info(f'ad0={ad0}, ad0_mv_per_v={ad0_mv_per_v}, microstrain={microstrain}, torque={torque}')
+            logging.info(f'ad0={ad0}, ad0_mv_per_v={ad0_mv_per_v}, microstrain={ad0_microstrain}, torque={ad0_torque}')
         if 'ch1_ad' in result:
             ad1 = result['ch1_ad']
             ad1_mv_per_v = self.jm3846Calculator.calculate_mv_per_v(ad1, self.gain_1)
             ad1_thrust = self.jm3846Calculator.calculate_thrust(ad1, self.gain_1)
-            # logging.info(f'ad1={ad1},ad1_mv_per_v={ad1_mv_per_v},thrust={thrust}')
+            logging.info(f'ad1={ad1},ad1_mv_per_v={ad1_mv_per_v},thrust={ad1_thrust}')
         if 'rpm' in result:
             speed = result['rpm'] / 10
             # logging.info('rpm=', rpm)

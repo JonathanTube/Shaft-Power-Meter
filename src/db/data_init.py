@@ -1623,16 +1623,16 @@ class DataInit:
                     "chinese": "mv/v - 推力",
                     "english": "mv/v for Thrust"
                 },
-                {
-                    "code": "lang.zero_cal.new_torque_ad",
-                    "chinese": "新扭矩-AD(mV)",
-                    "english": "New Torque-AD(mV)"
-                },
-                {
-                    "code": "lang.zero_cal.new_thrust_ad",
-                    "chinese": "新推力-AD(mV)",
-                    "english": "New Thrust-AD(mV)"
-                },
+                # {
+                #     "code": "lang.zero_cal.new_torque_ad",
+                #     "chinese": "新扭矩-AD(mV)",
+                #     "english": "New Torque-AD(mV)"
+                # },
+                # {
+                #     "code": "lang.zero_cal.new_thrust_ad",
+                #     "chinese": "新推力-AD(mV)",
+                #     "english": "New Thrust-AD(mV)"
+                # },
                 {
                     "code": "lang.zero_cal.new_torque_offset",
                     "chinese": "新扭矩-偏移量",

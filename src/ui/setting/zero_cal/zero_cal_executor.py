@@ -1,13 +1,12 @@
-import random
-from datetime import datetime
-
 import flet as ft
+from datetime import datetime
 from dateutil.relativedelta import relativedelta
-
 from db.models.date_time_conf import DateTimeConf
 from db.models.zero_cal_info import ZeroCalInfo
 from db.models.zero_cal_record import ZeroCalRecord
 from ui.common.toast import Toast
+from common.global_data import gdata
+
 
 class ZeroCalExecutor(ft.Container):
     def __init__(self):
@@ -16,11 +15,11 @@ class ZeroCalExecutor(ft.Container):
 
     def __load_data(self):
         # 查询最近一次[接受]的调零记录
-        self.latest_accepted_zero_cal:ZeroCalInfo = ZeroCalInfo.select().where(ZeroCalInfo.state == 1).order_by(ZeroCalInfo.id.desc()).first()
+        self.latest_accepted_zero_cal: ZeroCalInfo = ZeroCalInfo.select().where(ZeroCalInfo.state == 1).order_by(ZeroCalInfo.id.desc()).first()
         # 查询最新的一条进行中的记录
-        self.latest_zero_cal:ZeroCalInfo = ZeroCalInfo.select().where(ZeroCalInfo.state == 0).order_by(ZeroCalInfo.id.desc()).first()
-        
-        date_time_conf:DateTimeConf = DateTimeConf.get()
+        self.latest_zero_cal: ZeroCalInfo = ZeroCalInfo.select().where(ZeroCalInfo.state == 0).order_by(ZeroCalInfo.id.desc()).first()
+
+        date_time_conf: DateTimeConf = DateTimeConf.get()
         self.date_format = date_time_conf.date_format
 
     def __get_next_performing_time(self):
@@ -29,9 +28,9 @@ class ZeroCalExecutor(ft.Container):
 
         if self.latest_accepted_zero_cal is not None:
             format_str = f'{self.date_format} %H:%M'
-            zero_cal_last_performed =  self.latest_accepted_zero_cal.utc_date_time.strftime(format_str)
+            zero_cal_last_performed = self.latest_accepted_zero_cal.utc_date_time.strftime(format_str)
             # 默认每隔6个月建议调零一次
-            recommend_next_performing_time = (self.latest_accepted_zero_cal.utc_date_time+ relativedelta(months=+6)).strftime(format_str)
+            recommend_next_performing_time = (self.latest_accepted_zero_cal.utc_date_time + relativedelta(months=+6)).strftime(format_str)
 
         return zero_cal_last_performed, recommend_next_performing_time
 
@@ -46,7 +45,7 @@ class ZeroCalExecutor(ft.Container):
 
         self.recommend_next_performing_time = ft.Text(recommend_next_performing_time, size=14)
 
-        row =  ft.Row(
+        row = ft.Row(
             height=40,
             alignment=ft.MainAxisAlignment.SPACE_AROUND,
             controls=[
@@ -69,11 +68,12 @@ class ZeroCalExecutor(ft.Container):
     def __get_table_rows(self):
         rows = []
         if self.latest_zero_cal is not None and self.latest_zero_cal.state == 0:
-            for index, record in enumerate(self.latest_zero_cal.records):
+            records: dict[ZeroCalRecord] = self.latest_zero_cal.records
+            for index, record in enumerate(records):
                 rows.append(ft.DataRow(cells=[
                     ft.DataCell(ft.Text(f'#{index + 1}')),
-                    ft.DataCell(ft.Text(record.torque)),
-                    ft.DataCell(ft.Text(record.thrust))
+                    ft.DataCell(ft.Text(record.mv_per_v_for_torque)),
+                    ft.DataCell(ft.Text(record.mv_per_v_for_thrust))
                 ]))
         return rows
 
@@ -89,13 +89,13 @@ class ZeroCalExecutor(ft.Container):
 
         sum_torque = 0
         sum_thrust = 0
-        records = self.latest_zero_cal.records[:8]
+        records: dict[ZeroCalRecord] = self.latest_zero_cal.records[:8]
         for record in records:
-            sum_torque += record.torque
-            sum_thrust += record.thrust
+            sum_torque += record.mv_per_v_for_torque
+            sum_thrust += record.mv_per_v_for_thrust
 
-        avg_torque = round(sum_torque / len(records), 2)
-        avg_thrust = round(sum_thrust / len(records), 2)
+        avg_torque = sum_torque / len(records)
+        avg_thrust = sum_thrust / len(records)
 
         return [avg_torque, avg_thrust]
 
@@ -118,38 +118,34 @@ class ZeroCalExecutor(ft.Container):
             ],
             rows=table_rows)
 
-        self.new_avg_torque = ft.Text(avg_torque, width=50)
-        self.new_avg_thrust = ft.Text(avg_thrust, width=50)
+        self.new_avg_torque = ft.Text(avg_torque)
+        self.new_avg_thrust = ft.Text(avg_thrust)
 
-        self.table_card= ft.Card(content=self.table)
+        self.table_card = ft.Card(content=self.table)
 
         self.result_card = ft.Card(
             visible=self.latest_accepted_zero_cal is not None,
             content=ft.Row(
                 height=40,
                 controls=[
-                    ft.Text(self.page.session.get("lang.zero_cal.new_torque_ad"), width=140, text_align=ft.TextAlign.RIGHT), self.new_avg_torque,
-                    ft.Text(self.page.session.get("lang.zero_cal.new_thrust_ad"), width=140, text_align=ft.TextAlign.RIGHT), self.new_avg_thrust,
-                    ft.Text(self.page.session.get("lang.zero_cal.new_torque_offset"), width=140, text_align=ft.TextAlign.RIGHT), self.new_avg_torque,
-                    ft.Text(self.page.session.get("lang.zero_cal.new_thrust_offset"), width=140, text_align=ft.TextAlign.RIGHT), self.new_avg_thrust
+                    ft.Text(self.page.session.get("lang.zero_cal.new_torque_offset"), text_align=ft.TextAlign.RIGHT), self.new_avg_torque,
+                    ft.Text(self.page.session.get("lang.zero_cal.new_thrust_offset"), text_align=ft.TextAlign.RIGHT), self.new_avg_thrust
                 ]
             )
         )
 
         self.instant_records = ft.Column(
-                expand=True,
-                spacing=0,
-                controls=[
-                    self.table_card,
-                    self.result_card
-                ]
+            expand=True,
+            spacing=0,
+            controls=[
+                self.table_card,
+                self.result_card
+            ]
         )
-        
 
     def __on_start(self, e):
         ZeroCalInfo.create(utc_date_time=datetime.now(), state=0)
         self.__load_data()
-        Toast.show_success(e.page, message=self.page.session.get("lang.zero_cal.started"))
         # 控制Tips过程label显示
         self.state_info.visible = True
         self.state_info.update()
@@ -157,11 +153,15 @@ class ZeroCalExecutor(ft.Container):
         self.start_button.visible = False
         self.start_button.update()
 
-        self.accept_button.visible = True
+        self.accept_button.visible = len(self.latest_zero_cal.records) == 8
         self.accept_button.update()
 
         self.abort_button.visible = True
         self.abort_button.update()
+
+        self.fetch_button.visible = len(self.latest_zero_cal.records) < 8
+        self.fetch_button.update()
+        Toast.show_success(e.page, message=self.page.session.get("lang.zero_cal.started"))
 
     def __reset_to_start(self):
         self.__load_data()
@@ -187,7 +187,14 @@ class ZeroCalExecutor(ft.Container):
         self.start_button.visible = True
         self.start_button.update()
 
+        self.fetch_button.visible = False
+        self.fetch_button.update()
+
     def __on_accept(self, e):
+        # if times of recording is less than 8, do nothing.
+        if len(self.latest_zero_cal.records) < 8:
+            return
+
         self.__load_data()
 
         # 设置为已接受
@@ -199,25 +206,30 @@ class ZeroCalExecutor(ft.Container):
         Toast.show_success(e.page, message=self.page.session.get("lang.zero_cal.accepted"))
 
     def __on_abort(self, e):
-        query = ZeroCalInfo.update(state=2).where(
-            ZeroCalInfo.id == self.latest_zero_cal.id)
+        query = ZeroCalInfo.update(state=2).where(ZeroCalInfo.id == self.latest_zero_cal.id)
         query.execute()
 
         self.__reset_to_start()
         Toast.show_success(e.page, message=self.page.session.get("lang.zero_cal.aborted"))
 
-    def __on_stimulate(self, e):
+    def __on_fetch(self, e):
         # 如果主记录为空，说明还没开始，跳过
         if self.latest_zero_cal is None:
             return
+
+        self.accept_button.visible = len(self.latest_zero_cal.records) == 8
+        self.accept_button.update()
+
+        self.fetch_button.visible = len(self.latest_zero_cal.records) < 8
+        self.fetch_button.update()
 
         if len(self.latest_zero_cal.records) >= 8:
             return
 
         ZeroCalRecord.create(
             zero_cal_info=self.latest_zero_cal.id,
-            torque=random.randint(100, 105),
-            thrust=random.randint(100, 105)
+            mv_per_v_for_torque=gdata.sps1_mv_per_v_for_torque,
+            mv_per_v_for_thrust=gdata.sps1_mv_per_v_for_thrust
         )
 
         self.result_card.visible = True
@@ -251,10 +263,10 @@ class ZeroCalExecutor(ft.Container):
         Toast.show_success(e.page)
 
     def build(self):
-        # 初始化操作按钮
-        self.start_button = ft.FilledButton(text=self.page.session.get("lang.zero_cal.start"), width=120, height=40, on_click=self.__on_start)
-        self.accept_button = ft.FilledButton(text=self.page.session.get("lang.zero_cal.accept"), bgcolor=ft.Colors.GREEN, width=120, height=40, on_click=self.__on_accept)
-        self.abort_button = ft.FilledButton(text=self.page.session.get("lang.zero_cal.abort"), bgcolor=ft.Colors.RED, width=120, height=40, on_click=self.__on_abort)
+        self.start_button = ft.FilledButton(text=self.page.session.get("lang.zero_cal.start"), bgcolor=ft.Colors.GREEN_900, color=ft.Colors.WHITE, width=120, height=40, on_click=self.__on_start)
+        self.accept_button = ft.FilledButton(text=self.page.session.get("lang.zero_cal.accept"), bgcolor=ft.Colors.LIGHT_GREEN, color=ft.Colors.WHITE, width=120, height=40, on_click=self.__on_accept)
+        self.abort_button = ft.FilledButton(text=self.page.session.get("lang.zero_cal.abort"), bgcolor=ft.Colors.RED, color=ft.Colors.WHITE, width=120, height=40, on_click=self.__on_abort)
+        self.fetch_button = ft.FilledButton(text="Fetch Data", bgcolor=ft.Colors.BLUE, color=ft.Colors.WHITE, width=120, height=40, on_click=self.__on_fetch)
 
         self.__create_tips_card()
         self.__create_instant_records()
@@ -263,19 +275,19 @@ class ZeroCalExecutor(ft.Container):
             self.start_button.visible = True
             self.accept_button.visible = False
             self.abort_button.visible = False
+            self.fetch_button.visible = False
 
         elif self.latest_zero_cal.state == 0:  # 调零中
             self.start_button.visible = False
-            self.accept_button.visible = True
+            self.accept_button.visible = len(self.latest_zero_cal.records) == 8
             self.abort_button.visible = True
+            self.fetch_button.visible = len(self.latest_zero_cal.records) < 8
 
         elif self.latest_zero_cal.state in (1, 2):  # 已接受 # 已废弃
             self.start_button.visible = True
             self.accept_button.visible = False
             self.abort_button.visible = False
-
-        # 模拟造数据按钮
-        stimulate_button = ft.FilledButton(text="Stimulate Data", color=ft.Colors.ORANGE, width=120, height=40, on_click=self.__on_stimulate)
+            self.fetch_button.visible = False
 
         self.content = ft.Column(
             spacing=0,
@@ -288,6 +300,6 @@ class ZeroCalExecutor(ft.Container):
                         self.start_button,
                         self.accept_button,
                         self.abort_button,
-                        stimulate_button
+                        self.fetch_button
                     ])
             ])
