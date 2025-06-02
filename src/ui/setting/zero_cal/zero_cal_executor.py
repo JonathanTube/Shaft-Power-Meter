@@ -72,8 +72,8 @@ class ZeroCalExecutor(ft.Container):
             for index, record in enumerate(records):
                 rows.append(ft.DataRow(cells=[
                     ft.DataCell(ft.Text(f'#{index + 1}')),
-                    ft.DataCell(ft.Text(record.mv_per_v_for_torque)),
-                    ft.DataCell(ft.Text(record.mv_per_v_for_thrust))
+                    ft.DataCell(ft.Text(round(record.mv_per_v_for_torque,10))),
+                    ft.DataCell(ft.Text(round(record.mv_per_v_for_thrust,10)))
                 ]))
         return rows
 
@@ -118,17 +118,19 @@ class ZeroCalExecutor(ft.Container):
             ],
             rows=table_rows)
 
-        self.new_avg_torque = ft.Text(avg_torque)
-        self.new_avg_thrust = ft.Text(avg_thrust)
+        self.new_avg_torque = ft.Text(round(avg_torque,10))
+        self.new_avg_thrust = ft.Text(round(avg_thrust,10))
 
         self.table_card = ft.Card(content=self.table)
 
         self.result_card = ft.Card(
-            visible=self.latest_accepted_zero_cal is not None,
+            visible=self.latest_zero_cal is not None,
             content=ft.Row(
                 height=40,
+                expand=True,
+                alignment=ft.MainAxisAlignment.SPACE_AROUND,
                 controls=[
-                    ft.Text(self.page.session.get("lang.zero_cal.new_torque_offset"), text_align=ft.TextAlign.RIGHT), self.new_avg_torque,
+                    ft.Text(self.page.session.get("lang.zero_cal.new_torque_offset"), text_align=ft.TextAlign.LEFT), self.new_avg_torque,
                     ft.Text(self.page.session.get("lang.zero_cal.new_thrust_offset"), text_align=ft.TextAlign.RIGHT), self.new_avg_thrust
                 ]
             )
@@ -144,7 +146,7 @@ class ZeroCalExecutor(ft.Container):
         )
 
     def __on_start(self, e):
-        ZeroCalInfo.create(utc_date_time=datetime.now(), state=0)
+        ZeroCalInfo.create(utc_date_time=gdata.utc_date_time, state=0)
         self.__load_data()
         # 控制Tips过程label显示
         self.state_info.visible = True
@@ -217,12 +219,6 @@ class ZeroCalExecutor(ft.Container):
         if self.latest_zero_cal is None:
             return
 
-        self.accept_button.visible = len(self.latest_zero_cal.records) == 8
-        self.accept_button.update()
-
-        self.fetch_button.visible = len(self.latest_zero_cal.records) < 8
-        self.fetch_button.update()
-
         if len(self.latest_zero_cal.records) >= 8:
             return
 
@@ -237,6 +233,12 @@ class ZeroCalExecutor(ft.Container):
 
         self.__load_data()
 
+        self.accept_button.visible = len(self.latest_zero_cal.records) == 8
+        self.accept_button.update()
+
+        self.fetch_button.visible = len(self.latest_zero_cal.records) < 8
+        self.fetch_button.update()
+
         # 刷新表格与统计
         self.table.rows = self.__get_table_rows()
         self.table.update()
@@ -246,18 +248,16 @@ class ZeroCalExecutor(ft.Container):
 
         # 保存值到数据库
         query = (ZeroCalInfo.update(
-            torque_ad=avg_torque,
-            thrust_ad=avg_thrust,
             torque_offset=avg_torque,
             thrust_offset=avg_thrust
         ).where(ZeroCalInfo.id == self.latest_zero_cal.id))
         query.execute()
 
         # 筛选平均值
-        self.new_avg_torque.value = avg_torque
+        self.new_avg_torque.value = round(avg_torque,10)
         self.new_avg_torque.update()
 
-        self.new_avg_thrust.value = avg_thrust
+        self.new_avg_thrust.value = round(avg_thrust,10)
         self.new_avg_thrust.update()
 
         Toast.show_success(e.page)
@@ -265,8 +265,8 @@ class ZeroCalExecutor(ft.Container):
     def build(self):
         self.start_button = ft.FilledButton(text=self.page.session.get("lang.zero_cal.start"), bgcolor=ft.Colors.GREEN_900, color=ft.Colors.WHITE, width=120, height=40, on_click=self.__on_start)
         self.accept_button = ft.FilledButton(text=self.page.session.get("lang.zero_cal.accept"), bgcolor=ft.Colors.LIGHT_GREEN, color=ft.Colors.WHITE, width=120, height=40, on_click=self.__on_accept)
+        self.fetch_button = ft.FilledButton(text=self.page.session.get("lang.zero_cal.fetch_data"), bgcolor=ft.Colors.BLUE, color=ft.Colors.WHITE, width=120, height=40, on_click=self.__on_fetch)
         self.abort_button = ft.FilledButton(text=self.page.session.get("lang.zero_cal.abort"), bgcolor=ft.Colors.RED, color=ft.Colors.WHITE, width=120, height=40, on_click=self.__on_abort)
-        self.fetch_button = ft.FilledButton(text="Fetch Data", bgcolor=ft.Colors.BLUE, color=ft.Colors.WHITE, width=120, height=40, on_click=self.__on_fetch)
 
         self.__create_tips_card()
         self.__create_instant_records()
@@ -299,7 +299,7 @@ class ZeroCalExecutor(ft.Container):
                     controls=[
                         self.start_button,
                         self.accept_button,
-                        self.abort_button,
-                        self.fetch_button
+                        self.fetch_button,
+                        self.abort_button
                     ])
             ])

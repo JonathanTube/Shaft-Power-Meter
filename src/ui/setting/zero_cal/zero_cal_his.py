@@ -52,8 +52,6 @@ class ZeroCalHis(ft.Container):
                 query = ZeroCalInfo.select(
                     ZeroCalInfo.utc_date_time,
                     ZeroCalInfo.state,
-                    ZeroCalInfo.torque_ad,
-                    ZeroCalInfo.thrust_ad,
                     ZeroCalInfo.torque_offset,
                     ZeroCalInfo.thrust_offset
                 ).where(
@@ -64,8 +62,6 @@ class ZeroCalHis(ft.Container):
                 query = ZeroCalInfo.select(
                     ZeroCalInfo.utc_date_time,
                     ZeroCalInfo.state,
-                    ZeroCalInfo.torque_ad,
-                    ZeroCalInfo.thrust_ad,
                     ZeroCalInfo.torque_offset,
                     ZeroCalInfo.thrust_offset
                 ).order_by(ZeroCalInfo.id.desc()).limit(1000)
@@ -73,8 +69,6 @@ class ZeroCalHis(ft.Container):
             for item in query:
                 data.append({
                     self.page.session.get("lang.common.utc_date_time"): item.utc_date_time,
-                    self.page.session.get("lang.zero_cal.torque_ad"): item.torque_ad,
-                    self.page.session.get("lang.zero_cal.thrust_ad"): item.thrust_ad,
                     self.page.session.get("lang.zero_cal.torque_offset"): item.torque_offset,
                     self.page.session.get("lang.zero_cal.thrust_offset"): item.thrust_offset,
                     self.page.session.get("lang.zero_cal.state"): self.get_state_name(item.state)

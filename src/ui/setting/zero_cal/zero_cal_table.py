@@ -23,8 +23,6 @@ class ZeroCalTable(AbstractTable):
         sql = ZeroCalInfo.select(
             ZeroCalInfo.id,
             ZeroCalInfo.utc_date_time,
-            ZeroCalInfo.torque_ad,
-            ZeroCalInfo.thrust_ad,
             ZeroCalInfo.torque_offset,
             ZeroCalInfo.thrust_offset,
             ZeroCalInfo.state
@@ -39,10 +37,8 @@ class ZeroCalTable(AbstractTable):
             [
                 item.id,
                 item.utc_date_time.strftime(f'{self.dtc.date_format} %H:%M:%S'),
-                item.torque_ad,
-                item.thrust_ad,
-                item.torque_offset,
-                item.thrust_offset,
+                round(item.torque_offset,10),
+                round(item.thrust_offset,10),
                 self.get_state_name(item.state)
             ] for item in data
         ]
@@ -64,8 +60,6 @@ class ZeroCalTable(AbstractTable):
         return [
             session.get("lang.common.no"),
             session.get("lang.common.utc_date_time"),
-            session.get("lang.zero_cal.torque_ad"),
-            session.get("lang.zero_cal.thrust_ad"),
             session.get("lang.zero_cal.torque_offset"),
             session.get("lang.zero_cal.thrust_offset"),
             session.get("lang.zero_cal.state")

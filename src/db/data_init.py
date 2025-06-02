@@ -1534,16 +1534,6 @@ class DataInit:
                     "english": "User Name or Password is Incorrect"
                 },
                 {
-                    "code": "lang.zero_cal.torque_ad",
-                    "chinese": "扭矩-AD",
-                    "english": "Torque-AD"
-                },
-                {
-                    "code": "lang.zero_cal.thrust_ad",
-                    "chinese": "推力-AD",
-                    "english": "Thrust-AD"
-                },
-                {
                     "code": "lang.zero_cal.torque_offset",
                     "chinese": "扭矩-偏移量",
                     "english": "Torque-Offset"
@@ -1571,7 +1561,7 @@ class DataInit:
                 {
                     "code": "lang.zero_cal.on_progress",
                     "chinese": "调零进行中",
-                    "english": "Zero Cal. is on progress."
+                    "english": "Progressing"
                 },
                 {
                     "code": "lang.zero_cal.last_performed",
@@ -1599,6 +1589,11 @@ class DataInit:
                     "english": "Abort"
                 },
                 {
+                    "code": "lang.zero_cal.fetch_data",
+                    "chinese": "获取数据",
+                    "english": "Fetch Data"
+                },
+                {
                     "code": "lang.zero_cal.reset",
                     "chinese": "重置",
                     "english": "Reset"
@@ -1623,24 +1618,14 @@ class DataInit:
                     "chinese": "mv/v - 推力",
                     "english": "mv/v for Thrust"
                 },
-                # {
-                #     "code": "lang.zero_cal.new_torque_ad",
-                #     "chinese": "新扭矩-AD(mV)",
-                #     "english": "New Torque-AD(mV)"
-                # },
-                # {
-                #     "code": "lang.zero_cal.new_thrust_ad",
-                #     "chinese": "新推力-AD(mV)",
-                #     "english": "New Thrust-AD(mV)"
-                # },
                 {
                     "code": "lang.zero_cal.new_torque_offset",
                     "chinese": "新扭矩-偏移量",
-                    "english": "New Torque-Offset"
+                    "english": "New Torque Offset"
                 },
                 {
                     "code": "lang.zero_cal.new_thrust_offset",
                     "chinese": "新推力-偏移量",
-                    "english": "New Thrust-Offset"
+                    "english": "New Thrust Offset"
                 }
             ]).execute()

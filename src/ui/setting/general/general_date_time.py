@@ -18,14 +18,6 @@ class GeneralDateTime(ft.Container):
 
     def build(self):
         s = self.page.session
-        utc_date_time = gdata.utc_date_time
-        self.utc_date_time = ft.TextField(
-            label=s.get("lang.setting.current_utc_date_time"),
-            col={"md": 12},
-            read_only=True,
-            can_request_focus=False,
-            value=utc_date_time
-        )
 
         self.utc_date = ft.TextField(
             label=s.get("lang.setting.date"),
@@ -67,7 +59,6 @@ class GeneralDateTime(ft.Container):
             s.get("lang.setting.utc_date_time_conf"),
             ft.ResponsiveRow(
                 controls=[
-                    self.utc_date_time,
                     self.utc_date,
                     self.utc_time,
                     self.date_format,

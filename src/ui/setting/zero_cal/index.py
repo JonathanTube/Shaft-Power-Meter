@@ -8,10 +8,17 @@ class ZeroCal(ft.Container):
     def __init__(self):
         super().__init__()
 
+    def __on_change(self, e):
+        data = int(e.data)
+        if data == 1:
+            self.his.table.search()
+
     def build(self):
+        self.his = ZeroCalHis()
         self.content = ft.Tabs(
             selected_index=0,
             animation_duration=300,
+            on_change=lambda e: self.__on_change(e),
             tabs=[
                 ft.Tab(
                     text=self.page.session.get("lang.zero_cal.executor"),
@@ -20,15 +27,13 @@ class ZeroCal(ft.Container):
                         content=ZeroCalExecutor()
                     )
                 ),
-
                 ft.Tab(
                     text=self.page.session.get("lang.zero_cal.history"),
                     content=ft.Container(
                         padding=ft.padding.symmetric(0, 0),
-                        content=ZeroCalHis()
+                        content=self.his
                     )
                 )
-
             ],
             expand=True
         )
