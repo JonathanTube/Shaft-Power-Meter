@@ -7,7 +7,7 @@ from jm3846.JM3846_0x44 import JM38460x44Async
 from jm3846.JM3846_0x45 import JM38460x45Async
 from jm3846.JM3846_calculator import JM3846Calculator
 from utils.data_saver import DataSaver
-
+from common.global_data import gdata
 
 class JM3846AsyncClient:
     """基于asyncio的Modbus TCP异步客户端"""
@@ -198,13 +198,17 @@ class JM3846AsyncClient:
         if 'ch0_ad' in result:
             ad0 = result['ch0_ad']
             ad0_mv_per_v = self.jm3846Calculator.calculate_mv_per_v(ad0, self.gain_0)
-            ad0_microstrain = self.jm3846Calculator.calculate_microstrain(ad0, self.gain_0)
-            ad0_torque = self.jm3846Calculator.calculate_torque(ad0, self.gain_0)
+            # 加上偏移量
+            ad0_mv_per_v = ad0_mv_per_v + gdata.torque_offset
+            ad0_microstrain = self.jm3846Calculator.calculate_microstrain(ad0_mv_per_v)
+            ad0_torque = self.jm3846Calculator.calculate_torque(ad0_microstrain)
             logging.info(f'ad0={ad0}, ad0_mv_per_v={ad0_mv_per_v}, microstrain={ad0_microstrain}, torque={ad0_torque}')
         if 'ch1_ad' in result:
             ad1 = result['ch1_ad']
             ad1_mv_per_v = self.jm3846Calculator.calculate_mv_per_v(ad1, self.gain_1)
-            ad1_thrust = self.jm3846Calculator.calculate_thrust(ad1, self.gain_1)
+            # 加上偏移量
+            ad1_mv_per_v = ad1_mv_per_v + gdata.thrust_offset
+            ad1_thrust = self.jm3846Calculator.calculate_thrust(ad1_mv_per_v)
             logging.info(f'ad1={ad1},ad1_mv_per_v={ad1_mv_per_v},thrust={ad1_thrust}')
         if 'rpm' in result:
             speed = result['rpm'] / 10

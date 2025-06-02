@@ -1,5 +1,4 @@
 import flet as ft
-from datetime import datetime
 from dateutil.relativedelta import relativedelta
 from db.models.date_time_conf import DateTimeConf
 from db.models.zero_cal_info import ZeroCalInfo
@@ -35,35 +34,61 @@ class ZeroCalExecutor(ft.Container):
         return zero_cal_last_performed, recommend_next_performing_time
 
     def __create_tips_card(self):
-        self.state_info = ft.Text(self.page.session.get("lang.zero_cal.on_progress"),
-                                  color=ft.Colors.GREEN_600, size=14,
-                                  visible=self.latest_zero_cal is not None and self.latest_zero_cal.state == 0)
+        self.state_info = ft.Text(self.page.session.get("lang.zero_cal.on_progress"), color=ft.Colors.GREEN_600, visible=self.latest_zero_cal is not None and self.latest_zero_cal.state == 0)
 
         zero_cal_last_performed, recommend_next_performing_time = self.__get_next_performing_time()
 
-        self.zero_cal_last_performed = ft.Text(zero_cal_last_performed, size=14)
+        self.zero_cal_last_performed = ft.Text(zero_cal_last_performed)
 
-        self.recommend_next_performing_time = ft.Text(recommend_next_performing_time, size=14)
+        self.recommend_next_performing_time = ft.Text(recommend_next_performing_time)
 
         row = ft.Row(
             height=40,
-            alignment=ft.MainAxisAlignment.SPACE_AROUND,
+            spacing=20,
             controls=[
                 ft.Row(
                     controls=[
-                        ft.Text(self.page.session.get("lang.zero_cal.last_performed"), size=14, weight=ft.FontWeight.W_500),
+                        ft.Text(self.page.session.get("lang.zero_cal.last_performed")),
                         self.zero_cal_last_performed
                     ]),
                 ft.Row(
                     controls=[
-                        ft.Text(self.page.session.get("lang.zero_cal.recommend_next_performing_time"), size=14, weight=ft.FontWeight.W_500),
+                        ft.Text(self.page.session.get("lang.zero_cal.recommend_next_performing_time")),
                         self.recommend_next_performing_time
                     ]),
                 self.state_info
             ]
         )
 
-        self.tips_card = ft.Card(content=row)
+        self.tips_card = ft.Card(content=ft.Container(
+            padding=ft.padding.symmetric(0,10),
+            content=row
+        ))
+
+    def __create_current_offset(self):
+        self.current_torque_offset = ft.Text(round(gdata.torque_offset,10))
+        self.current_thrust_offset = ft.Text(round(gdata.thrust_offset,10))
+        row = ft.Row(
+            height=40,
+            spacing=20,
+            controls=[
+                ft.Row(
+                    controls=[
+                        ft.Text(f'{self.page.session.get("lang.zero_cal.mv_per_v_for_torque")}:'),
+                        self.current_torque_offset
+                    ]),
+                ft.Row(
+                    controls=[
+                        ft.Text(f'{self.page.session.get("lang.zero_cal.mv_per_v_for_thrust")}:'),
+                        self.current_thrust_offset
+                    ])
+            ]
+        )
+
+        self.current_offset = ft.Card(content=ft.Container(
+            padding=ft.padding.symmetric(0,10),
+            content=row
+        ))
 
     def __get_table_rows(self):
         rows = []
@@ -94,8 +119,8 @@ class ZeroCalExecutor(ft.Container):
             sum_torque += record.mv_per_v_for_torque
             sum_thrust += record.mv_per_v_for_thrust
 
-        avg_torque = sum_torque / len(records)
-        avg_thrust = sum_thrust / len(records)
+        avg_torque = (sum_torque / len(records)) * -1
+        avg_thrust = (sum_thrust / len(records)) * -1
 
         return [avg_torque, avg_thrust]
 
@@ -125,14 +150,16 @@ class ZeroCalExecutor(ft.Container):
 
         self.result_card = ft.Card(
             visible=self.latest_zero_cal is not None,
-            content=ft.Row(
-                height=40,
-                expand=True,
-                alignment=ft.MainAxisAlignment.SPACE_AROUND,
-                controls=[
-                    ft.Text(self.page.session.get("lang.zero_cal.new_torque_offset"), text_align=ft.TextAlign.LEFT), self.new_avg_torque,
-                    ft.Text(self.page.session.get("lang.zero_cal.new_thrust_offset"), text_align=ft.TextAlign.RIGHT), self.new_avg_thrust
-                ]
+            content=ft.Container(
+                    padding=ft.padding.symmetric(0,10),
+                    content=ft.Row(
+                        height=40,
+                        expand=True,
+                        controls=[
+                            ft.Text(self.page.session.get("lang.zero_cal.new_torque_offset")), self.new_avg_torque,
+                            ft.Text(self.page.session.get("lang.zero_cal.new_thrust_offset")), self.new_avg_thrust
+                        ]
+                    )
             )
         )
 
@@ -197,14 +224,18 @@ class ZeroCalExecutor(ft.Container):
         if len(self.latest_zero_cal.records) < 8:
             return
 
-        self.__load_data()
-
         # 设置为已接受
-        query = ZeroCalInfo.update(state=1).where(
-            ZeroCalInfo.id == self.latest_zero_cal.id)
+        query = ZeroCalInfo.update(state=1).where(ZeroCalInfo.id == self.latest_zero_cal.id)
         query.execute()
 
         self.__reset_to_start()
+
+        gdata.torque_offset = self.latest_accepted_zero_cal.torque_offset
+        gdata.thrust_offset = self.latest_accepted_zero_cal.thrust_offset
+        self.current_torque_offset.value = round(gdata.torque_offset,10)
+        self.current_thrust_offset.value = round(gdata.thrust_offset,10)
+        self.current_offset.update()
+
         Toast.show_success(e.page, message=self.page.session.get("lang.zero_cal.accepted"))
 
     def __on_abort(self, e):
@@ -269,6 +300,7 @@ class ZeroCalExecutor(ft.Container):
         self.abort_button = ft.FilledButton(text=self.page.session.get("lang.zero_cal.abort"), bgcolor=ft.Colors.RED, color=ft.Colors.WHITE, width=120, height=40, on_click=self.__on_abort)
 
         self.__create_tips_card()
+        self.__create_current_offset()
         self.__create_instant_records()
 
         if self.latest_zero_cal is None:
@@ -293,6 +325,7 @@ class ZeroCalExecutor(ft.Container):
             spacing=0,
             controls=[
                 self.tips_card,
+                self.current_offset,
                 self.instant_records,
                 ft.Row(
                     alignment=ft.MainAxisAlignment.CENTER,
