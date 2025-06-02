@@ -1,8 +1,12 @@
 import flet as ft
 from dateutil.relativedelta import relativedelta
+from common.operation_type import OperationType
 from db.models.date_time_conf import DateTimeConf
+from db.models.operation_log import OperationLog
+from db.models.user import User
 from db.models.zero_cal_info import ZeroCalInfo
 from db.models.zero_cal_record import ZeroCalRecord
+from ui.common.permission_check import PermissionCheck
 from ui.common.toast import Toast
 from common.global_data import gdata
 
@@ -172,7 +176,10 @@ class ZeroCalExecutor(ft.Container):
             ]
         )
 
-    def __on_start(self, e):
+    def __on_start_permission(self, e):
+        self.page.open(PermissionCheck(self.__on_start, 0))
+        
+    def __on_start(self, user: User):
         ZeroCalInfo.create(utc_date_time=gdata.utc_date_time, state=0)
         self.__load_data()
         # 控制Tips过程label显示
@@ -190,7 +197,15 @@ class ZeroCalExecutor(ft.Container):
 
         self.fetch_button.visible = len(self.latest_zero_cal.records) < 8
         self.fetch_button.update()
-        Toast.show_success(e.page, message=self.page.session.get("lang.zero_cal.started"))
+
+        OperationLog.create(
+            user_id=user.id,
+            utc_date_time=gdata.utc_date_time,
+            operation_type=OperationType.ZERO_CAL,
+            operation_content=""
+        )
+        
+        Toast.show_success(self.page, message=self.page.session.get("lang.zero_cal.started"))
 
     def __reset_to_start(self):
         self.__load_data()
@@ -294,7 +309,7 @@ class ZeroCalExecutor(ft.Container):
         Toast.show_success(e.page)
 
     def build(self):
-        self.start_button = ft.FilledButton(text=self.page.session.get("lang.zero_cal.start"), bgcolor=ft.Colors.GREEN_900, color=ft.Colors.WHITE, width=120, height=40, on_click=self.__on_start)
+        self.start_button = ft.FilledButton(text=self.page.session.get("lang.zero_cal.start"), bgcolor=ft.Colors.GREEN_900, color=ft.Colors.WHITE, width=120, height=40, on_click=self.__on_start_permission)
         self.accept_button = ft.FilledButton(text=self.page.session.get("lang.zero_cal.accept"), bgcolor=ft.Colors.LIGHT_GREEN, color=ft.Colors.WHITE, width=120, height=40, on_click=self.__on_accept)
         self.fetch_button = ft.FilledButton(text=self.page.session.get("lang.zero_cal.fetch_data"), bgcolor=ft.Colors.BLUE, color=ft.Colors.WHITE, width=120, height=40, on_click=self.__on_fetch)
         self.abort_button = ft.FilledButton(text=self.page.session.get("lang.zero_cal.abort"), bgcolor=ft.Colors.RED, color=ft.Colors.WHITE, width=120, height=40, on_click=self.__on_abort)
