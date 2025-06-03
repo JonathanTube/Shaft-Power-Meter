@@ -151,7 +151,7 @@ class DataInit:
                 gps_port=51001,
                 sps1_ip='127.0.0.1',
                 sps1_port=6800,
-                sps2_ip='192.168.1.6',
+                sps2_ip='127.0.0.1',
                 sps2_port=6800
             )
 
@@ -1532,6 +1532,11 @@ class DataInit:
                     "code": "lang.permission.user_name_or_pwd_is_incorrect",
                     "chinese": "用户名或密码不正确",
                     "english": "User Name or Password is Incorrect"
+                },
+                {
+                    "code": "lang.zero_cal.name",
+                    "chinese": "名称",
+                    "english": "Name"
                 },
                 {
                     "code": "lang.zero_cal.torque_offset",

@@ -1,6 +1,5 @@
 from datetime import datetime
 import flet as ft
-import asyncio
 from common.global_data import gdata
 from ui.common.custom_card import CustomCard
 from db.models.date_time_conf import DateTimeConf
@@ -13,7 +12,6 @@ class GeneralDateTime(ft.Container):
     def __init__(self):
         super().__init__()
         self.expand = True
-        self._task = None
         self.date_time_conf: DateTimeConf = DateTimeConf.get()
 
     def build(self):
@@ -77,21 +75,6 @@ class GeneralDateTime(ft.Container):
         utc_time = e.control.value.strftime('%H:%M')
         self.utc_time.value = utc_time
         self.utc_time.update()
-
-    async def __refresh_utc_date_time(self):
-        while True:
-            if self.utc_date_time:
-                utc_date_time = gdata.utc_date_time
-                self.utc_date_time.value = utc_date_time.strftime(f'{self.date_time_conf.date_format} %H:%M')
-                self.utc_date_time.update()
-            await asyncio.sleep(1)
-
-    def did_mount(self):
-        self._task = self.page.run_task(self.__refresh_utc_date_time)
-
-    def will_unmount(self):
-        if self._task:
-            self._task.cancel()
 
     def save_data(self, user_id: int):
         standard_date_time_format = '%Y-%m-%d %H:%M:%S'

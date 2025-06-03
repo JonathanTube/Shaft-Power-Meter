@@ -31,19 +31,20 @@ class GlobalData:
         self.sps1_speed = 0
         self.sps1_power = 0
         self.sps1_torque = 0
-        self.sps1_mv_per_v_for_torque = 0
         self.sps1_thrust = 0
+        self.sps1_mv_per_v_for_torque = 0
         self.sps1_mv_per_v_for_thrust = 0
+        self.sps1_torque_offset = 0
+        self.sps1_thrust_offset = 0
 
         self.sps2_speed = 0
         self.sps2_power = 0
         self.sps2_torque = 0
-        self.sps2_mv_per_v_for_torque = 0
         self.sps2_thrust = 0
+        self.sps2_mv_per_v_for_torque = 0
         self.sps2_mv_per_v_for_thrust = 0
-
-        self.torque_offset = 0
-        self.thrust_offset = 0
+        self.sps2_torque_offset = 0
+        self.sps2_thrust_offset = 0
 
         self.sps1_power_history: list[float, datetime] = []
         self.sps2_power_history: list[float, datetime] = []
@@ -85,9 +86,14 @@ class GlobalData:
         self.power_of_torque_load_limit = propellerSetting.bhp_right_of_torque_load_limit_curve + propellerSetting.value_of_overload_curve
         self.power_of_overload = propellerSetting.value_of_overload_curve
         # get the last accepted zero cal. record.
-        latest_accepted_zero_cal: ZeroCalInfo = ZeroCalInfo.select().where(ZeroCalInfo.state == 1).order_by(ZeroCalInfo.id.desc()).first()
-        if latest_accepted_zero_cal is not None:
-            self.torque_offset = latest_accepted_zero_cal.torque_offset
-            self.thrust_offset = latest_accepted_zero_cal.thrust_offset
+        sps1_accepted_zero_cal: ZeroCalInfo = ZeroCalInfo.select().where(ZeroCalInfo.state == 1, ZeroCalInfo.name == 'sps1').order_by(ZeroCalInfo.id.desc()).first()
+        if sps1_accepted_zero_cal is not None:
+            self.sps1_torque_offset = sps1_accepted_zero_cal.torque_offset
+            self.sps1_thrust_offset = sps1_accepted_zero_cal.thrust_offset
+
+        sps2_accepted_zero_cal: ZeroCalInfo = ZeroCalInfo.select().where(ZeroCalInfo.state == 1, ZeroCalInfo.name == 'sps2').order_by(ZeroCalInfo.id.desc()).first()
+        if sps2_accepted_zero_cal is not None:
+            self.sps2_torque_offset = sps2_accepted_zero_cal.torque_offset
+            self.sps2_thrust_offset = sps2_accepted_zero_cal.thrust_offset
 
 gdata: GlobalData = GlobalData()

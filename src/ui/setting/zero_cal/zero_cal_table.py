@@ -7,7 +7,7 @@ from db.models.date_time_conf import DateTimeConf
 class ZeroCalTable(AbstractTable):
     def __init__(self):
         super().__init__()
-        self.table_width = gdata.default_table_width - 90
+        self.table_width = gdata.default_table_width - 160
         self.dtc: DateTimeConf = DateTimeConf.get()
 
     def load_total(self):
@@ -22,6 +22,7 @@ class ZeroCalTable(AbstractTable):
     def load_data(self):
         sql = ZeroCalInfo.select(
             ZeroCalInfo.id,
+            ZeroCalInfo.name,
             ZeroCalInfo.utc_date_time,
             ZeroCalInfo.torque_offset,
             ZeroCalInfo.thrust_offset,
@@ -36,9 +37,10 @@ class ZeroCalTable(AbstractTable):
         return [
             [
                 item.id,
+                item.name,
                 item.utc_date_time.strftime(f'{self.dtc.date_format} %H:%M:%S'),
-                round(item.torque_offset,10),
-                round(item.thrust_offset,10),
+                round(item.torque_offset,10) if item.torque_offset else 0,
+                round(item.thrust_offset,10) if item.thrust_offset else 0,
                 self.get_state_name(item.state)
             ] for item in data
         ]
@@ -59,6 +61,7 @@ class ZeroCalTable(AbstractTable):
         session = self.page.session
         return [
             session.get("lang.common.no"),
+            session.get("lang.zero_cal.name"),
             session.get("lang.common.utc_date_time"),
             session.get("lang.zero_cal.torque_offset"),
             session.get("lang.zero_cal.thrust_offset"),

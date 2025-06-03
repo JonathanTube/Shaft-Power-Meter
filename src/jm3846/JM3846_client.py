@@ -199,20 +199,20 @@ class JM3846AsyncClient:
             ad0 = result['ch0_ad']
             ad0_mv_per_v = self.jm3846Calculator.calculate_mv_per_v(ad0, self.gain_0)
             # 加上偏移量
-            ad0_mv_per_v = ad0_mv_per_v + gdata.torque_offset
-            ad0_microstrain = self.jm3846Calculator.calculate_microstrain(ad0_mv_per_v)
+            torque_offset = gdata.sps1_torque_offset if self.name == 'sps1' else gdata.sps2_torque_offset
+            ad0_microstrain = self.jm3846Calculator.calculate_microstrain(ad0_mv_per_v + torque_offset)
             ad0_torque = self.jm3846Calculator.calculate_torque(ad0_microstrain)
-            logging.info(f'ad0={ad0}, ad0_mv_per_v={ad0_mv_per_v}, microstrain={ad0_microstrain}, torque={ad0_torque}')
+            logging.info(f'name={self.name},ad0={ad0}, ad0_mv_per_v={ad0_mv_per_v}, torque_offset={torque_offset}, microstrain={ad0_microstrain}, torque={ad0_torque}')
         if 'ch1_ad' in result:
             ad1 = result['ch1_ad']
             ad1_mv_per_v = self.jm3846Calculator.calculate_mv_per_v(ad1, self.gain_1)
             # 加上偏移量
-            ad1_mv_per_v = ad1_mv_per_v + gdata.thrust_offset
-            ad1_thrust = self.jm3846Calculator.calculate_thrust(ad1_mv_per_v)
-            logging.info(f'ad1={ad1},ad1_mv_per_v={ad1_mv_per_v},thrust={ad1_thrust}')
+            thrust_offset = gdata.sps2_thrust_offset if self.name == 'sps1' else gdata.sps2_thrust_offset
+            ad1_thrust = self.jm3846Calculator.calculate_thrust(ad1_mv_per_v + thrust_offset)
+            logging.info(f'name={self.name},ad1={ad1},ad1_mv_per_v={ad1_mv_per_v}, thrust_offset={thrust_offset}, thrust={ad1_thrust}')
         if 'rpm' in result:
             speed = result['rpm'] / 10
-            # logging.info('rpm=', rpm)
+            logging.info(f'name={self.name},rpm={speed}')
         DataSaver.save(self.name,
                        ad0, ad0_mv_per_v, ad0_microstrain, ad0_torque,
                        ad1, ad1_mv_per_v, ad1_thrust,

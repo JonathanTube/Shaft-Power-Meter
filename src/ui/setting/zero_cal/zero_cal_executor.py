@@ -12,15 +12,16 @@ from common.global_data import gdata
 
 
 class ZeroCalExecutor(ft.Container):
-    def __init__(self):
+    def __init__(self, name:str):
         super().__init__()
+        self.name = name
         self.__load_data()
 
     def __load_data(self):
         # 查询最近一次[接受]的调零记录
-        self.latest_accepted_zero_cal: ZeroCalInfo = ZeroCalInfo.select().where(ZeroCalInfo.state == 1).order_by(ZeroCalInfo.id.desc()).first()
+        self.latest_accepted_zero_cal: ZeroCalInfo = ZeroCalInfo.select().where(ZeroCalInfo.state == 1, ZeroCalInfo.name == self.name).order_by(ZeroCalInfo.id.desc()).first()
         # 查询最新的一条进行中的记录
-        self.latest_zero_cal: ZeroCalInfo = ZeroCalInfo.select().where(ZeroCalInfo.state == 0).order_by(ZeroCalInfo.id.desc()).first()
+        self.latest_zero_cal: ZeroCalInfo = ZeroCalInfo.select().where(ZeroCalInfo.state == 0, ZeroCalInfo.name == self.name).order_by(ZeroCalInfo.id.desc()).first()
 
         date_time_conf: DateTimeConf = DateTimeConf.get()
         self.date_format = date_time_conf.date_format
@@ -70,8 +71,8 @@ class ZeroCalExecutor(ft.Container):
         ))
 
     def __create_current_offset(self):
-        self.current_torque_offset = ft.Text(round(gdata.torque_offset,10))
-        self.current_thrust_offset = ft.Text(round(gdata.thrust_offset,10))
+        self.current_torque_offset = ft.Text(round(gdata.sps1_torque_offset if self.name == 'sps1' else gdata.sps2_torque_offset,10))
+        self.current_thrust_offset = ft.Text(round(gdata.sps1_thrust_offset if self.name == 'sps1' else gdata.sps2_thrust_offset,10))
         row = ft.Row(
             height=40,
             spacing=20,
@@ -180,7 +181,7 @@ class ZeroCalExecutor(ft.Container):
         self.page.open(PermissionCheck(self.__on_start, 0))
         
     def __on_start(self, user: User):
-        ZeroCalInfo.create(utc_date_time=gdata.utc_date_time, state=0)
+        ZeroCalInfo.create(utc_date_time=gdata.utc_date_time, state=0, name = self.name)
         self.__load_data()
         # 控制Tips过程label显示
         self.state_info.visible = True
@@ -240,21 +241,26 @@ class ZeroCalExecutor(ft.Container):
             return
 
         # 设置为已接受
-        query = ZeroCalInfo.update(state=1).where(ZeroCalInfo.id == self.latest_zero_cal.id)
+        query = ZeroCalInfo.update(state=1).where(ZeroCalInfo.id == self.latest_zero_cal.id, ZeroCalInfo.name == self.name)
         query.execute()
 
         self.__reset_to_start()
 
-        gdata.torque_offset = self.latest_accepted_zero_cal.torque_offset
-        gdata.thrust_offset = self.latest_accepted_zero_cal.thrust_offset
-        self.current_torque_offset.value = round(gdata.torque_offset,10)
-        self.current_thrust_offset.value = round(gdata.thrust_offset,10)
+        if self.name == 'sps1':
+            gdata.sps1_torque_offset = self.latest_accepted_zero_cal.torque_offset
+            gdata.sps1_thrust_offset = self.latest_accepted_zero_cal.thrust_offset
+        else:
+            gdata.sps2_torque_offset = self.latest_accepted_zero_cal.torque_offset
+            gdata.sps2_thrust_offset = self.latest_accepted_zero_cal.thrust_offset
+
+        self.current_torque_offset.value = round(self.latest_accepted_zero_cal.torque_offset,10)
+        self.current_thrust_offset.value = round(self.latest_accepted_zero_cal.thrust_offset,10)
         self.current_offset.update()
 
         Toast.show_success(e.page, message=self.page.session.get("lang.zero_cal.accepted"))
 
     def __on_abort(self, e):
-        query = ZeroCalInfo.update(state=2).where(ZeroCalInfo.id == self.latest_zero_cal.id)
+        query = ZeroCalInfo.update(state=2).where(ZeroCalInfo.id == self.latest_zero_cal.id, ZeroCalInfo.name == self.name)
         query.execute()
 
         self.__reset_to_start()
@@ -269,9 +275,10 @@ class ZeroCalExecutor(ft.Container):
             return
 
         ZeroCalRecord.create(
+            name = self.name,
             zero_cal_info=self.latest_zero_cal.id,
-            mv_per_v_for_torque=gdata.sps1_mv_per_v_for_torque,
-            mv_per_v_for_thrust=gdata.sps1_mv_per_v_for_thrust
+            mv_per_v_for_torque=gdata.sps1_mv_per_v_for_torque if self.name == 'sps1' else gdata.sps2_mv_per_v_for_torque,
+            mv_per_v_for_thrust=gdata.sps1_mv_per_v_for_thrust if self.name == 'sps1' else gdata.sps2_mv_per_v_for_thrust
         )
 
         self.result_card.visible = True
