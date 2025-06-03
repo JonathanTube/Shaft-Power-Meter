@@ -8,6 +8,7 @@ from jm3846.JM3846_0x45 import JM38460x45Async
 from jm3846.JM3846_calculator import JM3846Calculator
 from utils.data_saver import DataSaver
 from common.global_data import gdata
+from websocket.websocket_server import ws_server
 
 class JM3846AsyncClient:
     """基于asyncio的Modbus TCP异步客户端"""
@@ -57,7 +58,6 @@ class JM3846AsyncClient:
             logging.info(f'{self.name} JM3846 Connected successfully')
         except Exception as e:
             logging.info(f'{self.name} JM3846 Connection error: {e}')
-            raise
 
     async def async_disconnect(self) -> None:
         """断开连接"""
@@ -163,7 +163,7 @@ class JM3846AsyncClient:
                     first_frame_per_second = res['first_frame_per_second']
                     if first_frame_per_second:
                         # 只处理1s内数据的第一帧
-                        self.save_0x44_result(res['values'])
+                        await self.save_0x44_result(res['values'])
 
                     current_frame = res['current_frame']
                     if current_frame >= self.total_frames:
@@ -181,7 +181,7 @@ class JM3846AsyncClient:
                 await self.async_disconnect()
                 break
 
-    def save_0x44_result(self, result: dict):
+    async def save_0x44_result(self, result: dict):
         # logging.info('result=', result)
         """数据存储方法"""
         ad0 = 0
@@ -195,6 +195,9 @@ class JM3846AsyncClient:
 
         speed = 0
 
+        json_data = {
+            'name': self.name
+        }
         if 'ch0_ad' in result:
             ad0 = result['ch0_ad']
             ad0_mv_per_v = self.jm3846Calculator.calculate_mv_per_v(ad0, self.gain_0)
@@ -203,6 +206,8 @@ class JM3846AsyncClient:
             ad0_microstrain = self.jm3846Calculator.calculate_microstrain(ad0_mv_per_v + torque_offset)
             ad0_torque = self.jm3846Calculator.calculate_torque(ad0_microstrain)
             logging.info(f'name={self.name},ad0={ad0}, ad0_mv_per_v={ad0_mv_per_v}, torque_offset={torque_offset}, microstrain={ad0_microstrain}, torque={ad0_torque}')
+            json_data['ch0_ad'] = ad0
+            json_data['ch0_gain'] = self.gain_0
         if 'ch1_ad' in result:
             ad1 = result['ch1_ad']
             ad1_mv_per_v = self.jm3846Calculator.calculate_mv_per_v(ad1, self.gain_1)
@@ -210,13 +215,20 @@ class JM3846AsyncClient:
             thrust_offset = gdata.sps2_thrust_offset if self.name == 'sps1' else gdata.sps2_thrust_offset
             ad1_thrust = self.jm3846Calculator.calculate_thrust(ad1_mv_per_v + thrust_offset)
             logging.info(f'name={self.name},ad1={ad1},ad1_mv_per_v={ad1_mv_per_v}, thrust_offset={thrust_offset}, thrust={ad1_thrust}')
+            json_data['ch1_ad'] = ad1
+            json_data['ch1_gain'] = self.gain_1
         if 'rpm' in result:
             speed = result['rpm'] / 10
             logging.info(f'name={self.name},rpm={speed}')
+            json_data['rpm'] = speed
         DataSaver.save(self.name,
                        ad0, ad0_mv_per_v, ad0_microstrain, ad0_torque,
                        ad1, ad1_mv_per_v, ad1_thrust,
                        speed)
+
+        # 如果作为服务端，那需要向外发送数据
+        if gdata.hmi_server_started:
+           await ws_server.broadcast(json_data)
 
     async def async_handle_0x45(self):
         """异步处理功能码0x45"""

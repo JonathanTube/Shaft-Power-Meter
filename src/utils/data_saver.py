@@ -11,7 +11,6 @@ from utils.formula_cal import FormulaCalculator
 from utils.alarm_saver import AlarmSaver
 from utils.modbus_output import modbus_output
 
-
 class DataSaver:
     @staticmethod
     def save(name: str,

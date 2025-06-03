@@ -1082,6 +1082,47 @@ class DataInit:
                     "english": "4-20mA Speed Offset"
                 },
 
+                {
+                    "code": "lang.setting.connect_to_sps",
+                    "chinese": "连接到SPS",
+                    "english": "Connect to SPS"
+                },
+
+                {
+                    "code": "lang.setting.hmi_server_ip",
+                    "chinese": "HMI 服务器IP",
+                    "english": "HMI Server IP"
+                },
+
+                {
+                    "code": "lang.setting.hmi_server_port",
+                    "chinese": "HMI 服务器端口",
+                    "english": "HMI Server Port"
+                },
+
+                {
+                    "code": "lang.setting.start_hmi_server",
+                    "chinese": "启动HMI服务器",
+                    "english": "Start HMI Server"
+                },
+
+                {
+                    "code": "lang.setting.stop_hmi_server",
+                    "chinese": "停止HMI服务器",
+                    "english": "Stop HMI Server"
+                },
+
+                {
+                    "code": "lang.setting.connect_to_hmi_server",
+                    "chinese": "连接到HMI服务器",
+                    "english": "Connect to HMI Server"
+                },
+
+                {
+                    "code": "lang.setting.disconnect_from_hmi_server",
+                    "chinese": "断开HMI服务器",
+                    "english": "Disconnect from HMI Server"
+                },
 
                 {
                     "code": "lang.setting.ip",
@@ -1108,15 +1149,9 @@ class DataInit:
                 },
 
                 {
-                    "code": "lang.setting.sps1_conf",
-                    "chinese": "SPS1 配置",
-                    "english": "SPS1 Conf."
-                },
-
-                {
-                    "code": "lang.setting.sps2_conf",
-                    "chinese": "SPS2 配置",
-                    "english": "SPS2 Conf."
+                    "code": "lang.setting.sps_conf",
+                    "chinese": "SPS 配置",
+                    "english": "SPS Conf."
                 },
 
                 {
