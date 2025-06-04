@@ -2,6 +2,7 @@ from abc import abstractmethod
 import asyncio
 import logging
 from typing import Optional
+from db.models.io_conf import IOConf
 from jm3846.JM3846_0x03 import JM38460x03Async
 from jm3846.JM3846_0x44 import JM38460x44Async
 from jm3846.JM3846_0x45 import JM38460x45Async
@@ -41,9 +42,13 @@ class JM3846AsyncClient:
 
     async def start(self) -> None:
         """启动客户端"""
-        await self.async_connect()
-        asyncio.create_task(self.async_receive_looping_0x44())
-        await self.async_handle_0x44()
+        io_conf: IOConf = IOConf.get()
+        if io_conf.connect_to_sps:
+            await self.async_connect()
+            asyncio.create_task(self.async_receive_looping_0x44())
+            await self.async_handle_0x44()
+        else:
+            logging.info(f'{self.name} JM3846 not connected to sps, skip starting')
 
     async def async_connect(self) -> None:
         """建立异步连接"""
@@ -196,6 +201,7 @@ class JM3846AsyncClient:
         speed = 0
 
         json_data = {
+            'type': 'sps_data',
             'name': self.name
         }
         if 'ch0_ad' in result:
@@ -218,9 +224,10 @@ class JM3846AsyncClient:
             json_data['ch1_ad'] = ad1
             json_data['ch1_gain'] = self.gain_1
         if 'rpm' in result:
-            speed = result['rpm'] / 10
-            logging.info(f'name={self.name},rpm={speed}')
-            json_data['rpm'] = speed
+            rpm = result['rpm']
+            speed = rpm / 10
+            logging.info(f'name={self.name},rpm={rpm}, speed={speed}')
+            json_data['rpm'] = rpm
         DataSaver.save(self.name,
                        ad0, ad0_mv_per_v, ad0_microstrain, ad0_torque,
                        ad1, ad1_mv_per_v, ad1_thrust,

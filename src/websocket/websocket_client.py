@@ -1,15 +1,23 @@
 
 # ====================== 客户端类 ======================
 import asyncio
+from datetime import datetime
 import websockets
 import logging
 import msgpack
 from db.models.io_conf import IOConf
+from db.models.zero_cal_info import ZeroCalInfo
+from db.models.zero_cal_record import ZeroCalRecord
+from jm3846.JM3846_calculator import JM3846Calculator
+from utils.data_saver import DataSaver
+from common.global_data import gdata
+
 
 class WebSocketClient:
     def __init__(self):
         self.websocket = None
         self._running = False
+        self.jm3846Calculator = JM3846Calculator()
 
     async def connect(self):
         """连接服务端"""
@@ -34,7 +42,10 @@ class WebSocketClient:
                 raw_data = await self.websocket.recv()
                 data = msgpack.unpackb(raw_data)
                 logging.info(f"客户端收到: {data}")
-                self.__handle_data_from_server(data)
+                if data['type'] == 'sps_data':
+                    self.__handle_jm3846_data(data)
+                elif data['type'] == 'zero_cal':
+                    self.__handle_zero_cal(data)
         except websockets.ConnectionClosed:
             logging.error("服务端连接已关闭")
 
@@ -46,30 +57,66 @@ class WebSocketClient:
             return True
         return False
 
-    def __handle_data_from_server(self, data):
+    def __handle_jm3846_data(self, data):
         """处理从服务端接收到的数据"""
-        if 'ch0_ad' in result:
-            ad0 = result['ch0_ad']
-            ad0_mv_per_v = self.jm3846Calculator.calculate_mv_per_v(ad0, self.gain_0)
+        name = data['name']
+        ad0 = 0
+        ad0_mv_per_v = 0
+        ad0_microstrain = 0
+        ad0_torque = 0
+
+        ad1 = 0
+        ad1_mv_per_v = 0
+        ad1_thrust = 0
+
+        speed = 0
+
+        if 'ch0_ad' in data:
+            ad0 = data['ch0_ad']
+            gain0 = data['ch0_gain']
+            ad0_mv_per_v = self.jm3846Calculator.calculate_mv_per_v(ad0, gain0)
             # 加上偏移量
-            torque_offset = gdata.sps1_torque_offset if self.name == 'sps1' else gdata.sps2_torque_offset
+            torque_offset = gdata.sps1_torque_offset if name == 'sps1' else gdata.sps2_torque_offset
             ad0_microstrain = self.jm3846Calculator.calculate_microstrain(ad0_mv_per_v + torque_offset)
             ad0_torque = self.jm3846Calculator.calculate_torque(ad0_microstrain)
-            logging.info(f'name={self.name},ad0={ad0}, ad0_mv_per_v={ad0_mv_per_v}, torque_offset={torque_offset}, microstrain={ad0_microstrain}, torque={ad0_torque}')
-        if 'ch1_ad' in result:
-            ad1 = result['ch1_ad']
-            ad1_mv_per_v = self.jm3846Calculator.calculate_mv_per_v(ad1, self.gain_1)
+            logging.info(f'name={name},ad0={ad0}, ad0_mv_per_v={ad0_mv_per_v}, torque_offset={torque_offset}, microstrain={ad0_microstrain}, torque={ad0_torque}')
+        if 'ch1_ad' in data:
+            ad1 = data['ch1_ad']
+            gain1 = data['ch1_gain']
+            ad1_mv_per_v = self.jm3846Calculator.calculate_mv_per_v(ad1, gain1)
             # 加上偏移量
-            thrust_offset = gdata.sps2_thrust_offset if self.name == 'sps1' else gdata.sps2_thrust_offset
+            thrust_offset = gdata.sps2_thrust_offset if name == 'sps2' else gdata.sps1_thrust_offset
             ad1_thrust = self.jm3846Calculator.calculate_thrust(ad1_mv_per_v + thrust_offset)
-            logging.info(f'name={self.name},ad1={ad1},ad1_mv_per_v={ad1_mv_per_v}, thrust_offset={thrust_offset}, thrust={ad1_thrust}')
-        if 'rpm' in result:
-            speed = result['rpm'] / 10
-            logging.info(f'name={self.name},rpm={speed}')
-        DataSaver.save(self.name,
+            logging.info(f'name={name},ad1={ad1},ad1_mv_per_v={ad1_mv_per_v}, thrust_offset={thrust_offset}, thrust={ad1_thrust}')
+        if 'rpm' in data:
+            speed = data['rpm'] / 10
+            logging.info(f'name={name},rpm={speed}')
+
+        DataSaver.save(name,
                        ad0, ad0_mv_per_v, ad0_microstrain, ad0_torque,
                        ad1, ad1_mv_per_v, ad1_thrust,
                        speed)
+
+    def __handle_zero_cal(self, data):
+        """处理零点校准数据"""
+        id = data['id']
+        zero_cal_info: ZeroCalInfo = ZeroCalInfo.get_or_none(ZeroCalInfo.id == id)
+        if zero_cal_info is None:
+            new_zero_cal_info = ZeroCalInfo.create(
+                id=data['id'],
+                name=data['name'],
+                utc_date_time=datetime.strptime(data['utc_date_time'], '%Y-%m-%d %H:%M:%S'),
+                torque_offset=data['torque_offset'],
+                thrust_offset=data['thrust_offset'],
+            )
+
+            for record in data['records']:
+                ZeroCalRecord.create(
+                    zero_cal_info=new_zero_cal_info,
+                    name=record['name'],
+                    mv_per_v_for_torque=record['mv_per_v_for_torque'],
+                    mv_per_v_for_thrust=record['mv_per_v_for_thrust'],
+                )
 
     async def close(self):
         """关闭连接"""
@@ -92,7 +139,7 @@ ws_client = WebSocketClient()
 #     client = WebSocketClient("ws://localhost:8765")
 #     client.set_message_handler(client_message_handler)
 #     await client.connect()
-    
+
 #     # 客户端主动发送消息（每3秒一次）
 #     counter = 0
 #     while True:

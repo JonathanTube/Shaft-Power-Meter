@@ -20,13 +20,13 @@ class ModbusOutput:
 
     async def start_modbus_server(self):
         if self.running:
-            logger.warning("Modbus server is already running")
+            logger.info("Modbus server is already running")
             return
 
         self.io_conf: IOConf = IOConf().get()
         port = self.io_conf.output_com_port
         if not port:
-            logger.warning("Modbus output port is not set, skip starting Modbus server.")
+            logger.info("Modbus output port is not set, skip starting Modbus server.")
             return
 
         system_settings: SystemSettings = SystemSettings().get()

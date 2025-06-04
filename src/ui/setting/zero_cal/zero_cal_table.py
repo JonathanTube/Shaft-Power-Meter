@@ -1,7 +1,11 @@
+import flet as ft
 from db.models.zero_cal_info import ZeroCalInfo
+from db.models.zero_cal_record import ZeroCalRecord
 from ui.common.abstract_table import AbstractTable
 from common.global_data import gdata
 from db.models.date_time_conf import DateTimeConf
+from db.models.io_conf import IOConf
+from websocket.websocket_client import ws_client
 
 
 class ZeroCalTable(AbstractTable):
@@ -39,8 +43,8 @@ class ZeroCalTable(AbstractTable):
                 item.id,
                 item.name,
                 item.utc_date_time.strftime(f'{self.dtc.date_format} %H:%M:%S'),
-                round(item.torque_offset,10) if item.torque_offset else 0,
-                round(item.thrust_offset,10) if item.thrust_offset else 0,
+                round(item.torque_offset, 10) if item.torque_offset else 0,
+                round(item.thrust_offset, 10) if item.thrust_offset else 0,
                 self.get_state_name(item.state)
             ] for item in data
         ]
@@ -53,6 +57,40 @@ class ZeroCalTable(AbstractTable):
         elif state == 2:
             return self.page.session.get("lang.zero_cal.aborted")
         return ""
+
+    def has_operations(self):
+        io_conf: IOConf = IOConf.get()
+        return io_conf.connect_to_sps
+
+    def create_operations(self, items: list):
+        return ft.IconButton(
+            icon=ft.icons.WARNING,
+            icon_color=ft.Colors.RED,
+            icon_size=20,
+            on_click=lambda e: self.__on_click(items[0])
+        )
+
+    def __on_click(self, id: int):
+        zero_cal_info: ZeroCalInfo = ZeroCalInfo.get(id)
+        if zero_cal_info:
+            records: list[ZeroCalRecord] = zero_cal_info.records
+            ws_client.send({
+                'type': 'zero_cal',
+                'id': zero_cal_info.id,
+                'utc_date_time': zero_cal_info.utc_date_time.strftime('%Y-%m-%d %H:%M:%S'),
+                'name': zero_cal_info.name,
+                'torque_offset': zero_cal_info.torque_offset,
+                'thrust_offset': zero_cal_info.thrust_offset,
+                'state': zero_cal_info.state,
+                'records': [
+                    {
+                        'id': record.id,
+                        'name': record.name,
+                        'mv_per_v_for_torque': record.mv_per_v_for_torque,
+                        'mv_per_v_for_thrust': record.mv_per_v_for_thrust,
+                    } for record in records
+                ]
+            })
 
     def create_columns(self):
         return self.get_columns()
