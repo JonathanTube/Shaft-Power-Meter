@@ -120,6 +120,7 @@ class TestMode(ft.Container):
         if not self.running:
             return
 
+        gdata.test_mode_running = False
         self.range_card.disable()
 
         testModeTask.stop()

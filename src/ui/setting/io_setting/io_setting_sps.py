@@ -1,16 +1,20 @@
 import ipaddress
 import flet as ft
 from db.models.io_conf import IOConf
+from db.models.system_settings import SystemSettings
 from ui.common.custom_card import CustomCard
 from ui.common.keyboard import keyboard
 from websocket.websocket_server import ws_server
 from websocket.websocket_client import ws_client
 from common.global_data import gdata
 
+
 class IOSettingSPS(CustomCard):
     def __init__(self, conf: IOConf):
         super().__init__()
-        self.conf = conf
+        self.conf: IOConf = conf
+        system_settings: SystemSettings = SystemSettings.get()
+        self.is_dual = system_settings.amount_of_propeller > 1
 
     def build(self):
         self.connect_to_sps = ft.Checkbox(
@@ -63,7 +67,7 @@ class IOSettingSPS(CustomCard):
             value=self.conf.sps2_ip,
             read_only=True,
             col={"sm": 6},
-            visible=self.conf.connect_to_sps,
+            visible=self.conf.connect_to_sps and self.is_dual,
             on_focus=lambda e: keyboard.open(e.control, 'ip')
         )
 
@@ -72,7 +76,7 @@ class IOSettingSPS(CustomCard):
             value=self.conf.sps2_port,
             read_only=True,
             col={"sm": 6},
-            visible=self.conf.connect_to_sps,
+            visible=self.conf.connect_to_sps and self.is_dual,
             on_focus=lambda e: keyboard.open(e.control, 'int')
         )
 
@@ -112,10 +116,10 @@ class IOSettingSPS(CustomCard):
 
         self.heading = self.page.session.get("lang.setting.sps_conf")
         self.body = ft.ResponsiveRow(controls=[
-            self.connect_to_sps, 
+            self.connect_to_sps,
             self.start_server, self.stop_server,
             self.connect_server, self.disconnect_server,
-            self.sps1_ip, self.sps1_port, self.sps2_ip, 
+            self.sps1_ip, self.sps1_port, self.sps2_ip,
             self.sps2_port, self.hmi_server_ip, self.hmi_server_port
         ])
         self.col = {"sm": 12}
@@ -165,13 +169,11 @@ class IOSettingSPS(CustomCard):
         is_connect_to_sps = e.control.value
         self.sps1_ip.visible = is_connect_to_sps
         self.sps1_port.visible = is_connect_to_sps
-        self.sps2_ip.visible = is_connect_to_sps
-        self.sps2_port.visible = is_connect_to_sps
+        self.sps2_ip.visible = is_connect_to_sps and self.is_dual
+        self.sps2_port.visible = is_connect_to_sps and self.is_dual
 
         self.start_server.visible = is_connect_to_sps and not gdata.hmi_server_started
         self.stop_server.visible = is_connect_to_sps and gdata.hmi_server_started
-
-
 
         self.hmi_server_ip.visible = not is_connect_to_sps
         self.hmi_server_port.visible = not is_connect_to_sps
@@ -185,16 +187,15 @@ class IOSettingSPS(CustomCard):
     def save_data(self):
         try:
             ipaddress.ip_address(self.sps1_ip.value)
+            self.conf.sps1_ip = self.sps1_ip.value
+            self.conf.sps1_port = self.sps1_port.value
         except ValueError:
             raise Exception(f'{self.page.session.get("lang.common.ip_address_format_error")}: {self.sps1_ip.value}')
 
-        try:
-            ipaddress.ip_address(self.sps2_ip.value)
-        except ValueError:
-            raise Exception(f'{self.page.session.get("lang.common.ip_address_format_error")}: {self.sps2_ip.value}')
-
-        self.conf.sps1_ip = self.sps1_ip.value
-        self.conf.sps2_ip = self.sps2_ip.value
-
-        self.conf.sps1_port = self.sps1_port.value
-        self.conf.sps2_port = self.sps2_port.value
+        if self.is_dual:
+            try:
+                ipaddress.ip_address(self.sps2_ip.value)
+                self.conf.sps2_ip = self.sps2_ip.value
+                self.conf.sps2_port = self.sps2_port.value
+            except ValueError:
+                raise Exception(f'{self.page.session.get("lang.common.ip_address_format_error")}: {self.sps2_ip.value}')
