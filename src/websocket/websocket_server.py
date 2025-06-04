@@ -21,32 +21,34 @@ class WebSocketServer:
     async def _client_handler(self, websocket):
         """处理客户端连接"""
         self.clients.add(websocket)
-        logging.info(f"客户端 {websocket.remote_address} 已连接")
+        logging.info(f"client {websocket.remote_address} connected")
 
         try:
             async for data in websocket:
-                # 解包二进制数据
-                print(f"服务端收到: {data}")
-
                 # 调用自定义消息处理器
                 if self.message_handler:
                     response = self.message_handler(data)
                     if response:
                         await self.send_to_client(websocket, response)
         except websockets.ConnectionClosed:
-            logging.error(f"客户端 {websocket.remote_address} 断开连接")
+            logging.error(f"client {websocket.remote_address} disconnected")
         finally:
             self.clients.remove(websocket)
 
     async def start(self):
         """启动服务端"""
+        io_conf: IOConf = IOConf.get()
+
+        if not io_conf.connect_to_sps:
+            logging.info("This HMI is not configured to connect to SPS, skip starting websocket server.")
+            return False
+
         host = '0.0.0.0'
 
-        io_conf: IOConf = IOConf.get()
         port = io_conf.hmi_server_port
         try:
             self.server = await websockets.serve(self._client_handler, host, port)
-            logging.info(f"服务端已启动 ws://{host}:{port}")
+            logging.info(f"websocket server started at ws://{host}:{port}")
         except Exception:
             return False
 
@@ -62,14 +64,24 @@ class WebSocketServer:
 
     async def broadcast(self, data):
         """向所有客户端广播数据"""
-        logging.info(f"向所有客户端广播数据: {data}")
-        if not self.clients:
+        try:
+            logging.info(f"broadcast to all clients: {data}")
+            if not self.clients:
+                return False
+            packed_data = msgpack.packb(data)
+            await asyncio.gather(
+                *[client.send(packed_data) for client in self.clients]
+            )
+            return True
+        except websockets.ConnectionClosed:
+            logging.error(f"broadcast to all clients failed: connection closed")
+            self.clients.clear()
+            await self.start()
             return False
-        packed_data = msgpack.packb(data)
-        await asyncio.gather(
-            *[client.send(packed_data) for client in self.clients]
-        )
-        return True
+        except Exception as e:
+            logging.error(f"broadcast to all clients failed: {e}")
+            return False
+
 
     async def stop(self):
         """停止服务端"""
@@ -81,6 +93,7 @@ class WebSocketServer:
             return False
 
         return True
+
 
 ws_server = WebSocketServer()
 # # 服务端消息处理器

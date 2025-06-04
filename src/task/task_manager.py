@@ -4,6 +4,8 @@ from db.models.system_settings import SystemSettings
 from task.utc_timer_task import UtcTimer
 from task.sps1_read_task import Sps1ReadTask
 from task.sps2_read_task import Sps2ReadTask
+from websocket.websocket_server import ws_server
+from websocket.websocket_client import ws_client
 
 
 class TaskManager:
@@ -20,4 +22,6 @@ class TaskManager:
         if amount_of_propeller > 1:
             asyncio.create_task(Sps2ReadTask().start())
 
+        asyncio.create_task(ws_server.start())
+        asyncio.create_task(ws_client.connect())
         # asyncio.create_task(GpsSyncTask(self.page).start())

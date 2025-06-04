@@ -19,7 +19,8 @@ class ZeroCalTable(AbstractTable):
         end_date = self.kwargs.get('end_date')
         sql = ZeroCalInfo.select()
         if start_date and end_date:
-            sql = sql.where(ZeroCalInfo.utc_date_time >= start_date, ZeroCalInfo.utc_date_time <= end_date)
+            sql = sql.where(ZeroCalInfo.utc_date_time >=
+                            start_date, ZeroCalInfo.utc_date_time <= end_date)
 
         return sql.count()
 
@@ -35,14 +36,17 @@ class ZeroCalTable(AbstractTable):
         start_date = self.kwargs.get('start_date')
         end_date = self.kwargs.get('end_date')
         if start_date and end_date:
-            sql = sql.where(ZeroCalInfo.utc_date_time >= start_date, ZeroCalInfo.utc_date_time <= end_date)
-        data = sql.order_by(ZeroCalInfo.id.desc()).paginate(self.current_page, self.page_size)
+            sql = sql.where(ZeroCalInfo.utc_date_time >=
+                            start_date, ZeroCalInfo.utc_date_time <= end_date)
+        data = sql.order_by(ZeroCalInfo.id.desc()).paginate(
+            self.current_page, self.page_size)
 
         return [
             [
                 item.id,
                 item.name,
-                item.utc_date_time.strftime(f'{self.dtc.date_format} %H:%M:%S'),
+                item.utc_date_time.strftime(
+                    f'{self.dtc.date_format} %H:%M:%S'),
                 round(item.torque_offset, 10) if item.torque_offset else 0,
                 round(item.thrust_offset, 10) if item.thrust_offset else 0,
                 self.get_state_name(item.state)
@@ -74,7 +78,7 @@ class ZeroCalTable(AbstractTable):
         zero_cal_info: ZeroCalInfo = ZeroCalInfo.get(id)
         if zero_cal_info:
             records: list[ZeroCalRecord] = zero_cal_info.records
-            ws_client.send({
+            json_data = {
                 'type': 'zero_cal',
                 'id': zero_cal_info.id,
                 'utc_date_time': zero_cal_info.utc_date_time.strftime('%Y-%m-%d %H:%M:%S'),
@@ -90,7 +94,8 @@ class ZeroCalTable(AbstractTable):
                         'mv_per_v_for_thrust': record.mv_per_v_for_thrust,
                     } for record in records
                 ]
-            })
+            }
+            self.page.run_task(ws_client.send, json_data)
 
     def create_columns(self):
         return self.get_columns()

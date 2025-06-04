@@ -23,6 +23,10 @@ class WebSocketClient:
         """连接服务端"""
         try:
             io_conf: IOConf = IOConf.get()
+            if io_conf.connect_to_sps:
+                logging.info('This HMI is configured to connect to SPS, skip connecting to websocket server.')
+                return False
+
             uri = f"ws://{io_conf.hmi_server_ip}:{io_conf.hmi_server_port}"
             self.websocket = await websockets.connect(uri)
             self._running = True
@@ -48,6 +52,8 @@ class WebSocketClient:
                     self.__handle_zero_cal(data)
         except websockets.ConnectionClosed:
             logging.error("服务端连接已关闭")
+            self._running = False
+            await self.connect()
 
     async def send(self, data):
         """向服务端发送数据"""
