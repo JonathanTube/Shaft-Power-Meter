@@ -101,4 +101,20 @@ class GlobalData:
             self.sps2_torque_offset = sps2_accepted_zero_cal.torque_offset
             self.sps2_thrust_offset = sps2_accepted_zero_cal.thrust_offset
 
+    def set_offline_data(self):
+        self.sps1_speed = 0
+        self.sps1_power = 0
+        self.sps1_torque = 0
+        self.sps1_thrust = 0
+        self.sps1_mv_per_v_for_torque = 0
+        self.sps1_mv_per_v_for_thrust = 0
+
+        self.sps2_speed = 0
+        self.sps2_power = 0
+        self.sps2_torque = 0
+        self.sps2_thrust = 0
+        self.sps2_mv_per_v_for_torque = 0
+        self.sps2_mv_per_v_for_thrust = 0
+
+
 gdata: GlobalData = GlobalData()

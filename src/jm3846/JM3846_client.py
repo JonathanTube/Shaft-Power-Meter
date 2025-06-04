@@ -176,13 +176,16 @@ class JM3846AsyncClient:
 
             except asyncio.TimeoutError:
                 logging.exception(f'{self.name} JM3846 0x44 receive timeout, retrying...')
+                gdata.set_offline_data()
                 await self.async_handle_0x44()
             except ConnectionResetError as e:
                 logging.exception(f'{self.name} JM3846 Connection reset: {e}')
+                gdata.set_offline_data()
                 await self.async_disconnect()
                 break
             except Exception:
                 logging.exception(f'{self.name} JM3846 0x44 Receive error')
+                gdata.set_offline_data()
                 await self.async_disconnect()
                 break
 

@@ -31,6 +31,7 @@ class WebSocketClient:
             self.websocket = await websockets.connect(uri)
             self._running = True
             logging.info(f"connected to {uri} successfully")
+            gdata.connected_to_hmi_server = True
             # 启动后台接收任务
             asyncio.create_task(self._receive_loop())
         except Exception:
@@ -55,6 +56,8 @@ class WebSocketClient:
         except websockets.ConnectionClosed:
             logging.exception("server connection closed")
             self._running = False
+            gdata.connected_to_hmi_server = False
+            gdata.set_offline_data()
             await self.connect()
 
     async def send(self, data):

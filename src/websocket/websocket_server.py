@@ -4,7 +4,7 @@ from typing import Callable, Set
 import logging
 from db.models.io_conf import IOConf
 import msgpack
-
+from common.global_data import gdata
 # ====================== 服务端类 ======================
 
 
@@ -49,7 +49,9 @@ class WebSocketServer:
         try:
             self.server = await websockets.serve(self._client_handler, host, port)
             logging.info(f"websocket server started at ws://{host}:{port}")
+            gdata.hmi_server_started = True
         except Exception:
+            gdata.hmi_server_started = False
             return False
 
         return True
@@ -75,11 +77,13 @@ class WebSocketServer:
             return True
         except websockets.ConnectionClosed:
             logging.exception("broadcast to all clients failed: connection closed")
+            gdata.hmi_server_started = False
             self.clients.clear()
             await self.start()
             return False
         except Exception:
             logging.exception("broadcast to all clients failed")
+            gdata.hmi_server_started = False
             return False
 
 

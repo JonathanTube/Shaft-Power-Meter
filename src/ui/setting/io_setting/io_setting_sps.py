@@ -130,7 +130,6 @@ class IOSettingSPS(CustomCard):
         self.stop_server.visible = started
         self.start_server.update()
         self.stop_server.update()
-        gdata.hmi_server_started = started
 
     def __stop_hmi_server(self, e):
         self.page.run_task(self.handle_stop_server)
@@ -141,7 +140,6 @@ class IOSettingSPS(CustomCard):
         self.stop_server.visible = not stopped
         self.start_server.update()
         self.stop_server.update()
-        gdata.hmi_server_started = not stopped
 
     def __connect_to_hmi_server(self, e):
         self.page.run_task(self.handle_connect_to_hmi_server)
@@ -152,7 +150,6 @@ class IOSettingSPS(CustomCard):
         self.disconnect_server.visible = connected
         self.connect_server.update()
         self.disconnect_server.update()
-        gdata.connected_to_hmi_server = connected
 
     def __disconnect_from_hmi_server(self, e):
         self.page.run_task(self.handle_disconnect_from_hmi_server)
@@ -163,7 +160,6 @@ class IOSettingSPS(CustomCard):
         self.disconnect_server.visible = not closed
         self.connect_server.update()
         self.disconnect_server.update()
-        gdata.connected_to_hmi_server = not closed
 
     def __connect_to_sps_changed(self, e):
         is_connect_to_sps = e.control.value
