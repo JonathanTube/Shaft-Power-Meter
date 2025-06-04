@@ -10,7 +10,7 @@ class UnitParser:
         if system_unit == 0:
             return [float(f'{_energy:.2f}'), 'kWh']
         else:
-            return [float(f'{UnitConverter.kwh_to_shph(_energy):.2f}'), 'sHph']
+            return [float(f'{UnitConverter.kwh_to_shph(_energy):.2f}'), 'SHph']
 
     @staticmethod
     def parse_power(power: float, system_unit: int, shrink: bool = True) -> tuple[float, str]:
