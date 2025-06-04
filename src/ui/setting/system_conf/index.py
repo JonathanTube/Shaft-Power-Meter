@@ -46,9 +46,9 @@ class SystemConf(ft.Container):
             self.system_conf_ship_info.save(user.id)
             Toast.show_success(self.page)
             self.__refresh_page()
-        except Exception as e:
-            logging.error(f"system conf save data error: {e}")
-            Toast.show_error(self.page, e)
+        except Exception:
+            logging.exception("system conf save data error")
+            Toast.show_error(self.page)
 
     def __reset_data(self, e):
         keyboard.close()

@@ -1,3 +1,4 @@
+import logging
 import flet as ft
 
 from ui.setting.test_mode.test_mode_instant import TestModeInstant
@@ -25,14 +26,14 @@ class TestMode(ft.Container):
     def __on_start_button_click(self, e):
         try:
             self.page.open(PermissionCheck(self.start_test_mode, 0))
-        except Exception as e:
-            pass
+        except Exception:
+            logging.exception("test mode start button click error")
 
     def __on_stop_button_click(self, e):
         try:
             self.page.open(PermissionCheck(self.stop_test_mode, 0))
-        except Exception as e:
-            pass
+        except Exception:
+            logging.exception("test mode stop button click error")
 
     def build(self):
         s = self.page.session

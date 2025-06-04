@@ -31,7 +31,7 @@ class WebSocketServer:
                     if response:
                         await self.send_to_client(websocket, response)
         except websockets.ConnectionClosed:
-            logging.error(f"client {websocket.remote_address} disconnected")
+            logging.exception(f"client {websocket.remote_address} disconnected")
         finally:
             self.clients.remove(websocket)
 
@@ -74,12 +74,12 @@ class WebSocketServer:
             )
             return True
         except websockets.ConnectionClosed:
-            logging.error(f"broadcast to all clients failed: connection closed")
+            logging.exception("broadcast to all clients failed: connection closed")
             self.clients.clear()
             await self.start()
             return False
-        except Exception as e:
-            logging.error(f"broadcast to all clients failed: {e}")
+        except Exception:
+            logging.exception("broadcast to all clients failed")
             return False
 
 

@@ -297,5 +297,5 @@ class IOSettingPLC(CustomCard):
             }
             await plc_util.write_4_20_ma_data(data)
 
-        except Exception as e:
-            logging.error(f"plc save data error: {e}")
+        except Exception:
+            logging.exception("plc save data error")

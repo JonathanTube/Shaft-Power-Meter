@@ -30,11 +30,13 @@ class WebSocketClient:
             uri = f"ws://{io_conf.hmi_server_ip}:{io_conf.hmi_server_port}"
             self.websocket = await websockets.connect(uri)
             self._running = True
-            logging.info(f"已连接到服务端 {uri}")
+            logging.info(f"connected to {uri} successfully")
             # 启动后台接收任务
             asyncio.create_task(self._receive_loop())
-        except Exception as e:
-            logging.error(f"连接服务端失败: {e}")
+        except Exception:
+            logging.exception(f"failed to connect to {uri}")
+            self._running = False
+            await self.connect()
             return False
 
         return True
@@ -45,13 +47,13 @@ class WebSocketClient:
             while self._running:
                 raw_data = await self.websocket.recv()
                 data = msgpack.unpackb(raw_data)
-                logging.info(f"客户端收到: {data}")
+                logging.info(f"client received: {data}")
                 if data['type'] == 'sps_data':
                     self.__handle_jm3846_data(data)
                 elif data['type'] == 'zero_cal':
                     self.__handle_zero_cal(data)
         except websockets.ConnectionClosed:
-            logging.error("服务端连接已关闭")
+            logging.exception("server connection closed")
             self._running = False
             await self.connect()
 
@@ -107,22 +109,33 @@ class WebSocketClient:
         """处理零点校准数据"""
         id = data['id']
         zero_cal_info: ZeroCalInfo = ZeroCalInfo.get_or_none(ZeroCalInfo.id == id)
-        if zero_cal_info is None:
-            new_zero_cal_info = ZeroCalInfo.create(
-                id=data['id'],
-                name=data['name'],
-                utc_date_time=datetime.strptime(data['utc_date_time'], '%Y-%m-%d %H:%M:%S'),
-                torque_offset=data['torque_offset'],
-                thrust_offset=data['thrust_offset'],
+        if zero_cal_info is not None:
+            zero_cal_info.delete_instance()
+
+        new_zero_cal_info = ZeroCalInfo.create(
+            id=data['id'],
+            name=data['name'],
+            utc_date_time=datetime.strptime(data['utc_date_time'], '%Y-%m-%d %H:%M:%S'),
+            torque_offset=data['torque_offset'],
+            thrust_offset=data['thrust_offset'],
+            state=data['state']
+        )
+
+        for record in data['records']:
+            ZeroCalRecord.create(
+                zero_cal_info=new_zero_cal_info,
+                name=record['name'],
+                mv_per_v_for_torque=record['mv_per_v_for_torque'],
+                mv_per_v_for_thrust=record['mv_per_v_for_thrust'],
             )
 
-            for record in data['records']:
-                ZeroCalRecord.create(
-                    zero_cal_info=new_zero_cal_info,
-                    name=record['name'],
-                    mv_per_v_for_torque=record['mv_per_v_for_torque'],
-                    mv_per_v_for_thrust=record['mv_per_v_for_thrust'],
-                )
+        if data['state'] == 1:
+            if data['name'] == 'sps1':
+                gdata.sps1_torque_offset = data['torque_offset']
+                gdata.sps1_thrust_offset = data['thrust_offset']
+            elif data['name'] == 'sps2':
+                gdata.sps2_torque_offset = data['torque_offset']
+                gdata.sps2_thrust_offset = data['thrust_offset']
 
     async def close(self):
         """关闭连接"""
@@ -130,8 +143,8 @@ class WebSocketClient:
             self._running = False
             if self.websocket:
                 await self.websocket.close()
-        except Exception as e:
-            logging.error(f"关闭连接失败: {e}")
+        except Exception:
+            logging.exception("failed to close websocket connection")
             return False
         return True
 

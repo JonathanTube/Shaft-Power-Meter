@@ -51,5 +51,5 @@ class Toast:
             page.update()
             page.overlay.remove(toast)
             page.update()
-        except Exception as e:
-            logging.error(e)
+        except Exception:
+            logging.exception("toast error")

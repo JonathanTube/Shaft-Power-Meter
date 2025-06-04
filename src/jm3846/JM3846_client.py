@@ -61,8 +61,8 @@ class JM3846AsyncClient:
             )
             self.running = True
             logging.info(f'{self.name} JM3846 Connected successfully')
-        except Exception as e:
-            logging.info(f'{self.name} JM3846 Connection error: {e}')
+        except Exception:
+            logging.exception(f'{self.name} JM3846 Connection error')
 
     async def async_disconnect(self) -> None:
         """断开连接"""
@@ -97,9 +97,9 @@ class JM3846AsyncClient:
                     self._update_config(config)
 
             except asyncio.TimeoutError:
-                logging.info(f'{self.name} JM3846 0x03 request timeout')
-            except Exception as e:
-                logging.info(f'{self.name} JM3846 0x03 error: {e}')
+                logging.exception(f'{self.name} JM3846 0x03 request timeout')
+            except Exception:
+                logging.exception(f'{self.name} JM3846 0x03 error')
                 await self.async_disconnect()
 
     def _update_config(self, config: dict):
@@ -127,9 +127,9 @@ class JM3846AsyncClient:
                 await self.writer.drain()
 
             except asyncio.TimeoutError:
-                logging.info(f'{self.name} JM3846 0x44 request timeout')
-            except Exception as e:
-                logging.info(f'{self.name} JM3846 0x44 error: {e}')
+                logging.exception(f'{self.name} JM3846 0x44 request timeout')
+            except Exception:
+                logging.exception(f'{self.name} JM3846 0x44 error')
                 await self.async_disconnect()
 
     async def async_receive_looping_0x44(self):
@@ -175,14 +175,14 @@ class JM3846AsyncClient:
                         await self.async_handle_0x44()
 
             except asyncio.TimeoutError:
-                logging.info(f'{self.name} JM3846 0x44 receive timeout, retrying...')
+                logging.exception(f'{self.name} JM3846 0x44 receive timeout, retrying...')
                 await self.async_handle_0x44()
             except ConnectionResetError as e:
-                logging.info(f'{self.name} JM3846 Connection reset: {e}')
+                logging.exception(f'{self.name} JM3846 Connection reset: {e}')
                 await self.async_disconnect()
                 break
-            except Exception as e:
-                logging.info(f'{self.name} JM3846 0x44 Receive error: {e}')
+            except Exception:
+                logging.exception(f'{self.name} JM3846 0x44 Receive error')
                 await self.async_disconnect()
                 break
 
@@ -258,7 +258,7 @@ class JM3846AsyncClient:
                 res = JM38460x45Async.parse_response(response)
                 logging.info(f'{self.name} JM3846 0x45 Response: {res}')
             except asyncio.TimeoutError:
-                logging.info(f'{self.name} JM3846 0x45 request timeout')
-            except Exception as e:
-                logging.info(f'{self.name} JM3846 0x45 error: {e}')
+                logging.exception(f'{self.name} JM3846 0x45 request timeout')
+            except Exception:
+                logging.exception(f'{self.name} JM3846 0x45 error')
                 await self.async_disconnect()

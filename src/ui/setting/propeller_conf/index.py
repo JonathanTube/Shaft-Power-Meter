@@ -89,9 +89,9 @@ class PropellerConf(ft.Container):
                 operation_type=OperationType.PROPELLER_SETTING,
                 operation_content=model_to_dict(self.ps)
             )
-        except Exception as e:
-            logging.error(f"propeller conf save data error: {e}")
-            Toast.show_error(self.page, e)
+        except Exception:
+            logging.exception("propeller conf save data error")
+            Toast.show_error(self.page)
         else:
             Toast.show_success(self.page)
 

@@ -107,7 +107,7 @@ class EEXIBreach:
 
             EEXIBreach.report_id = report_info.id
             # 记录之前所有的过载数据
-            data = DataLog.select(
+            data: list[DataLog] = DataLog.select(
                 DataLog.name,
                 DataLog.utc_date_time,
                 DataLog.speed,
@@ -117,7 +117,7 @@ class EEXIBreach:
                 DataLog.utc_date_time >= start_time
             ).order_by(DataLog.utc_date_time.asc())
             for item in data:
-                EEXIBreach.__save_report_detail(item.name, item.utc_date_time, item.speed, item.torque, item.power)
+                EEXIBreach.__save_report_detail(item.name, item.utc_date_time, item.speed, item.ad_0_torque, item.power)
 
     @staticmethod
     def __handle_recovery_event(start_time: datetime):
@@ -162,5 +162,5 @@ class EEXIBreach:
                     power=power,
                     total_power=total_power
                 )
-        except Exception as e:
-            logging.error(f"save eexi breach report detail error: {e}")
+        except Exception:
+            logging.exception("save eexi breach report detail error")

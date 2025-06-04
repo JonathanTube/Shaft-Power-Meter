@@ -68,8 +68,8 @@ class TestModeTask:
 
             gdata.sps1_power_history = []
             gdata.sps2_power_history = []
-        except Exception as e:
-            logging.error(f'test mode task error: {e}')
+        except Exception:
+            logging.exception('test mode task error')
         self.is_running = False
 
     async def save_generated_data(self, name):

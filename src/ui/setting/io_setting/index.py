@@ -68,9 +68,9 @@ class IOSetting(ft.Container):
             )
             self.conf.save()
             Toast.show_success(self.page)
-        except Exception as err:
-            logging.error(f"io setting save data error: {err}")
-            Toast.show_error(self.page, err)
+        except Exception:
+            logging.exception("io setting save data error")
+            Toast.show_error(self.page)
 
     def __reset_data(self, e):
         keyboard.close()

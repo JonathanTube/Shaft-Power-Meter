@@ -76,8 +76,8 @@ class DataSaver:
             EEXIBreach.handle_breach_and_recovery()
             # 输出modbus数据
             asyncio.create_task(modbus_output.update_registers())
-        except Exception as e:
-            logging.error(f"data saver error: {e}")
+        except Exception:
+            logging.exception("data saver error")
 
     @staticmethod
     def is_overload(speed, power):

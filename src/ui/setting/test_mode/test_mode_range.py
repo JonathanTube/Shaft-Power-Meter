@@ -143,8 +143,8 @@ class TestModeRange(CustomCard):
                 min_thrust=min_thrust,
                 max_thrust=max_thrust
             ).where(TestModeConf.id == self.conf.id).execute()
-        except Exception as e:
-            logging.error(f"test mode range save data error: {e}")
+        except Exception:
+            logging.exception("test mode range save data error")
             Toast.show_error(self.page, str(e))
 
     def enable(self):

@@ -1,4 +1,5 @@
 import struct
+import logging
 from typing import Dict, Optional
 
 
@@ -73,12 +74,14 @@ class JM38460x45Async:
                 'unit_id': unit_id
             }
         except struct.error as e:
+            logging.exception(f"JM38460x45Async.parse_response")
             return {
                 'success': False,
                 'error': f'解包错误: {str(e)}',
                 'transaction_id': transaction_id if 'transaction_id' in locals() else None
             }
         except Exception as e:
+            logging.exception(f"JM38460x45Async.parse_response")
             return {
                 'success': False,
                 'error': str(e),

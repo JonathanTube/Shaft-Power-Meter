@@ -30,9 +30,9 @@ class General(ft.Container):
             self.limitation_warning.save_data(user_id)
             self.general_ofline_default_value.save_data(user_id)
             self.general_date_time.save_data(user_id)
-        except Exception as e:
-            logging.error(f"general save data error: {e}")
-            Toast.show_error(self.page, e)
+        except Exception:
+            logging.exception("general save data error")
+            Toast.show_error(self.page)
         else:
             Toast.show_success(self.page)
 

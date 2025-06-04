@@ -1,3 +1,4 @@
+import logging
 from math import ceil
 import struct
 from typing import Dict, Optional
@@ -101,8 +102,10 @@ class JM38460x44Async:
 
             return result
         except struct.error as e:
+            logging.exception(f"JM38460x44Async.parse_response")
             return {'success': False, 'error': f'解包错误: {str(e)}'}
         except Exception as e:
+            logging.exception(f"JM38460x44Async.parse_response")
             return {'success': False, 'error': str(e)}
 
     @staticmethod

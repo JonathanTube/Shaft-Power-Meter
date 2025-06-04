@@ -52,8 +52,8 @@ class PLCUtil:
                         self._is_connecting = False
                         return True
 
-                except Exception as e:
-                    logging.warning(f"PLC {attempt + 1}th reconnect failed: {str(e)}")
+                except Exception:
+                    logging.exception(f"PLC {attempt + 1}th reconnect failed")
                     await asyncio.sleep(2 ** attempt)  # 指数退避
                 finally:
                     self._is_connecting = False
@@ -84,11 +84,11 @@ class PLCUtil:
                 "speed_range_max": await self._safe_read_register(12329),
                 "speed_range_offset": await self._safe_read_register(12330)
             }
-        except ConnectionException as e:
-            logging.error(f"{self.ip}:{self.port} PLC connection error: {e}")
+        except ConnectionException:
+            logging.exception(f"{self.ip}:{self.port} PLC connection error")
             self.save_alarm()
-        except Exception as e:
-            logging.error(f"{self.ip}:{self.port} PLC read data unknown error: {e}")
+        except Exception:
+            logging.exception(f"{self.ip}:{self.port} PLC read data unknown error")
             self.save_alarm()
         return self._empty_4_20ma_data()
 
@@ -113,8 +113,8 @@ class PLCUtil:
             await self.plc_client.write_register(12329, int(data["speed_range_max"]))
             await self.plc_client.write_register(12330, int(data["speed_range_offset"]))
             return True
-        except Exception as e:
-            logging.error(f"PLC write data failed: {e}")
+        except Exception:
+            logging.exception("PLC write data failed")
             self.save_alarm()
 
         return False
@@ -140,8 +140,8 @@ class PLCUtil:
             await self.plc_client.write_register(12321, scaled_values[2])
             await self.plc_client.write_register(12331, scaled_values[3])
             return True
-        except Exception as e:
-            logging.error(f"PLC write data failed: {e}")
+        except Exception:
+            logging.exception("PLC write data failed")
             self.save_alarm()
             return False
 
@@ -156,8 +156,8 @@ class PLCUtil:
                 "thrust": await self._safe_read_register(12321),
                 "speed": await self._safe_read_register(12331)
             }
-        except Exception as e:
-            logging.error(f"{self.ip}:{self.port} PLC read data failed: {e}")
+        except Exception:
+            logging.exception(f"{self.ip}:{self.port} PLC read data failed")
             self.save_alarm()
             return self._empty_instant_data()
 
@@ -180,8 +180,8 @@ class PLCUtil:
             await self.plc_client.write_coil(address=12288, value=occured)
             logging.info(f"PLC write alarm: {occured}")
             return True
-        except Exception as e:
-            logging.error(f"PLC write alarm failed: {e}")
+        except Exception:
+            logging.exception("PLC write alarm failed")
             self.save_alarm()
         return False
 
@@ -196,8 +196,8 @@ class PLCUtil:
             await self.plc_client.write_coil(address=12289, value=occured)
             logging.info(f"PLC write power overload: {occured}")
             return True
-        except Exception as e:
-            logging.error(f"PLC write power overload failed: {e}")
+        except Exception:
+            logging.exception("PLC write power overload failed")
             self.save_alarm()
         return False
 
@@ -207,8 +207,8 @@ class PLCUtil:
 
         try:
             return await self._safe_read_coil(12288)
-        except Exception as e:
-            logging.error(f"PLC read alarm failed: {e}")
+        except Exception:
+            logging.exception("PLC read alarm failed")
             self.save_alarm()
             return False
 
@@ -218,8 +218,8 @@ class PLCUtil:
 
         try:
             return await self._safe_read_coil(12289)
-        except Exception as e:
-            logging.error(f"PLC read power overload failed: {e}")
+        except Exception:
+            logging.exception("PLC read power overload failed")
             self.save_alarm()
             return False
 
@@ -229,8 +229,8 @@ class PLCUtil:
                 return None
             response = await self.plc_client.read_holding_registers(address)
             return response.registers[0] if not response.isError() else None
-        except Exception as e:
-            logging.warning(f"PLC address {address} read failed: {e}")
+        except Exception:
+            logging.exception(f"PLC address {address} read failed")
             self.save_alarm()
             return None
 
@@ -240,8 +240,8 @@ class PLCUtil:
                 return None
             response = await self.plc_client.read_coils(address=address, count=1)
             return response.bits[0] if not response.isError() else None
-        except Exception as e:
-            logging.warning(f"PLC address {address} read failed: {e}")
+        except Exception:
+            logging.exception(f"PLC address {address} read failed")
             self.save_alarm()
             return None
 

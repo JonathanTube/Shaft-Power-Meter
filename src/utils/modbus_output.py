@@ -81,8 +81,8 @@ class ModbusOutput:
             self.context[self.slave_id].setValues(3, 0, values)
             logger.info(f"Registers updated: {values}")
             return True
-        except Exception as e:
-            logger.error(f"更新寄存器失败: {str(e)}")
+        except Exception:
+            logger.exception("更新寄存器失败")
             return False
 
     def get_average_power_and_total_energy(self, sps_name: str):

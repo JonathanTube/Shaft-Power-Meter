@@ -29,10 +29,10 @@ class GpsSyncTask:
                 # 数据接收循环
                 await self.receive_data()
             except (ConnectionRefusedError, ConnectionResetError) as e:
-                logging.error(f"gps connection error: {e}")
+                logging.exception(f"gps connection error")
                 await self.handle_connection_error()
-            except Exception as e:
-                logging.error(f"gps unknown error: {e}")
+            except Exception:
+                logging.exception(f"gps unknown error")
                 await self.handle_connection_error()
             finally:
                 await self.close_connection()
@@ -51,8 +51,8 @@ class GpsSyncTask:
                 )
 
                 return
-            except Exception as e:
-                logging.error(f"gps connect error: {e}")
+            except Exception:
+                logging.exception(f"gps connect error")
                 self.retries += 1
                 AlarmSaver.create(AlarmType.GPS_DISCONNECTED)
                 await asyncio.sleep(delay)
@@ -67,10 +67,10 @@ class GpsSyncTask:
                 str_data = data.decode('utf-8').strip()
                 self.parse_nmea_sentence(str_data)
             except asyncio.TimeoutError:
-                logging.error("gps receive data timeout, keep connection")
+                logging.exception("gps receive data timeout, keep connection")
                 break
-            except Exception as e:
-                logging.error(f"gps data receive error: {e}")
+            except Exception:
+                logging.exception("gps data receive error")
                 break
 
     async def handle_connection_error(self):
@@ -83,8 +83,8 @@ class GpsSyncTask:
             try:
                 self.writer.close()
                 await self.writer.wait_closed()
-            except Exception as e:
-                logging.error(f"gps close connection error: {e}")
+            except Exception:
+                logging.exception("gps close connection error")
             finally:
                 self.writer = None
                 self.reader = None
@@ -110,6 +110,6 @@ class GpsSyncTask:
                     dt_utc = dt.astimezone(ZoneInfo("UTC")).replace(microsecond=0, tzinfo=None)
                     gdata.utc_date_time = dt_utc
 
-        except pynmea2.ParseError as e:
-            logging.error(f"gps parse nmea sentence failed: {e}")
+        except pynmea2.ParseError:
+            logging.exception("gps parse nmea sentence failed")
             gdata.gps_location = None
