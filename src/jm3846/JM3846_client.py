@@ -191,6 +191,9 @@ class JM3846AsyncClient:
 
     async def save_0x44_result(self, result: dict):
         # logging.info('result=', result)
+        if gdata.test_mode_running:
+            logging.info('test mode is running, skip save 0x44 result from JM3456.')
+            return
         """数据存储方法"""
         ad0 = 0
         ad0_mv_per_v = 0

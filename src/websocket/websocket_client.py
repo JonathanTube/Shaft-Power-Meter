@@ -70,6 +70,10 @@ class WebSocketClient:
 
     def __handle_jm3846_data(self, data):
         """处理从服务端接收到的数据"""
+        if gdata.test_mode_running:
+            logging.info('test mode is running, skip handle jm3846 data from websocket.')
+            return
+
         name = data['name']
         ad0 = 0
         ad0_mv_per_v = 0
