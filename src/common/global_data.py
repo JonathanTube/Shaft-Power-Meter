@@ -15,6 +15,11 @@ class GlobalData:
         #  是否开启自动从GPS同步UTC时间
         self.enable_utc_time_sync_with_gps = False
 
+        # 是否已经连接上SPS1
+        self.connected_to_sps1 = False
+        # 是否已经连接上SPS2
+        self.connected_to_sps2 = False
+
         # 作为服务端, 是否已启动
         self.hmi_server_started = False
         # 作为客户端，是否已连接

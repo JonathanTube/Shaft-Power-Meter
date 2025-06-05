@@ -12,3 +12,4 @@ class Sps1ReadTask(JM3846AsyncClient):
         port = io_conf.sps1_port
         return [host, port]
 
+sps1_read_task = Sps1ReadTask()

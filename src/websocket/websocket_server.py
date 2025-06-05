@@ -39,10 +39,6 @@ class WebSocketServer:
         """启动服务端"""
         io_conf: IOConf = IOConf.get()
 
-        if not io_conf.connect_to_sps:
-            logging.info("This HMI is not configured to connect to SPS, skip starting websocket server.")
-            return False
-
         host = '0.0.0.0'
 
         port = io_conf.hmi_server_port
@@ -93,10 +89,13 @@ class WebSocketServer:
             if self.server:
                 self.server.close()
                 await self.server.wait_closed()
+                gdata.hmi_server_started = False
+                logging.info('websocket server has been closed')
+                return True
         except Exception:
-            return False
+            logging.exception('stop websocket server failed')
 
-        return True
+        return False
 
 
 ws_server = WebSocketServer()

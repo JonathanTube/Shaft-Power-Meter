@@ -40,17 +40,18 @@ class JM3846AsyncClient:
     def get_ip_port() -> tuple[str, int]:
         pass
 
-    async def start(self) -> None:
+    async def start(self) -> bool:
         """启动客户端"""
-        io_conf: IOConf = IOConf.get()
-        if io_conf.connect_to_sps:
-            await self.async_connect()
+        try:
+            connected = await self.async_connect()
             asyncio.create_task(self.async_receive_looping_0x44())
             await self.async_handle_0x44()
-        else:
-            logging.info(f'{self.name} JM3846 not connected to sps, skip starting')
+            return connected
+        except Exception:
+            logging.exception(f'{self.name} start JM3846 client failed')
+        return False
 
-    async def async_connect(self) -> None:
+    async def async_connect(self) -> bool:
         """建立异步连接"""
         try:
             logging.info(f'{self.name} JM3846 Connecting...')
@@ -61,10 +62,12 @@ class JM3846AsyncClient:
             )
             self.running = True
             logging.info(f'{self.name} JM3846 Connected successfully')
+            return True
         except Exception:
             logging.exception(f'{self.name} JM3846 Connection error')
+        return False
 
-    async def async_disconnect(self) -> None:
+    async def async_disconnect(self) -> bool:
         """断开连接"""
         self.running = False
         if self.writer:

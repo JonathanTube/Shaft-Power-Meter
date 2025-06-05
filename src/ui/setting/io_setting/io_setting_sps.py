@@ -8,7 +8,8 @@ from ui.common.keyboard import keyboard
 from websocket.websocket_server import ws_server
 from websocket.websocket_client import ws_client
 from common.global_data import gdata
-
+from task.sps1_read_task import sps1_read_task
+from task.sps2_read_task import sps2_read_task
 
 class IOSettingSPS(CustomCard):
     def __init__(self, conf: IOConf):
@@ -28,13 +29,13 @@ class IOSettingSPS(CustomCard):
 
         # working as a websocket client start
         self.websocket_server_ip = ft.TextField(
-            label=f'{self.page.session.get("lang.setting.ip")}',
+            label=f'HMI {self.page.session.get("lang.setting.ip")}',
             value='0.0.0.0',
             read_only=True
         )
 
         self.websocket_server_port = ft.TextField(
-            label=f'{self.page.session.get("lang.setting.port")}',
+            label=f'HMI {self.page.session.get("lang.setting.port")}',
             value='8000',
             read_only=True
         )
@@ -73,10 +74,18 @@ class IOSettingSPS(CustomCard):
 
         self.sps1_connect = ft.FilledButton(
             text=self.page.session.get("lang.setting.connect"),
-            width=80,
             bgcolor=ft.colors.GREEN,
             color=ft.colors.WHITE,
+            visible=not gdata.connected_to_sps1,
             on_click=lambda e: self.__connect_to_sps1(e)
+        )
+
+        self.sps1_disconnect = ft.FilledButton(
+            text=self.page.session.get("lang.setting.disconnect"),
+            bgcolor=ft.colors.RED,
+            color=ft.colors.WHITE,
+            visible=gdata.connected_to_sps1,
+            on_click=lambda e: self.__disconnect_from_sps1(e)
         )
 
         self.sps2_ip = ft.TextField(
@@ -95,10 +104,18 @@ class IOSettingSPS(CustomCard):
 
         self.sps2_connect = ft.FilledButton(
             text=self.page.session.get("lang.setting.connect"),
-            width=80,
             bgcolor=ft.colors.GREEN,
             color=ft.colors.WHITE,
+            visible=not gdata.connected_to_sps2,
             on_click=lambda e: self.__connect_to_sps2(e)
+        )
+
+        self.sps2_disconnect = ft.FilledButton(
+            text=self.page.session.get("lang.setting.disconnect"),
+            bgcolor=ft.colors.RED,
+            color=ft.colors.WHITE,
+            visible=gdata.connected_to_sps2,
+            on_click=lambda e: self.__disconnect_from_sps2(e)
         )
 
         self.connect_server = ft.FilledButton(
@@ -172,12 +189,12 @@ class IOSettingSPS(CustomCard):
         self.heading = self.page.session.get("lang.setting.sps_conf")
 
         self.row_sps1 = ft.Row(
-                            controls=[self.sps1_ip, self.sps1_port, self.sps1_connect], 
+                            controls=[self.sps1_ip, self.sps1_port, self.sps1_connect, self.sps1_disconnect], 
                             visible=self.conf.connect_to_sps
                         )
         
         self.row_sps2 = ft.Row(
-                            controls=[self.sps2_ip, self.sps2_port, self.sps2_connect], 
+                            controls=[self.sps2_ip, self.sps2_port, self.sps2_connect, self.sps2_disconnect], 
                             visible=self.conf.connect_to_sps and self.is_dual
                         )
         
@@ -211,11 +228,54 @@ class IOSettingSPS(CustomCard):
         self.col = {"sm": 12}
         super().build()
 
-    def __connect_to_sps1(self,e):
-        print('connect to sps1')
 
-    def __connect_to_sps2(self,e):
-        print('connect to sps2')
+
+
+    def __connect_to_sps1(self,e):
+        self.page.run_task(self.__start_sps1_task)
+
+    async def __start_sps1_task(self):
+        connected = await sps1_read_task.start()
+        self.sps1_connect.visible = not connected
+        self.sps1_connect.update()
+        self.sps1_disconnect.visible = connected
+        self.sps1_disconnect.update()
+
+    def __disconnect_from_sps1(self, e):
+        self.page.run_task(self.__stop_sps1_task)
+
+    async def __stop_sps1_task(self):
+        disconnected = await sps1_read_task.async_disconnect()
+        self.sps1_connect.visible = disconnected
+        self.sps1_connect.update()
+        self.sps1_disconnect.visible = not disconnected
+        self.sps1_disconnect.update()
+
+
+
+
+    def __connect_to_sps2(self, e):
+        self.page.run_task(self.__start_sps2_task)
+
+    async def __start_sps2_task(self):
+        connected = await sps2_read_task.start()
+        self.sps2_connect.visible = not connected
+        self.sps2_connect.update()
+        self.sps2_disconnect.visible = connected
+        self.sps2_disconnect.update()
+
+    def __disconnect_from_sps2(self, e):
+        self.page.run_task(self.__stop_sps2_task)
+
+    async def __stop_sps2_task(self):
+        disconnected = await sps2_read_task.async_disconnect()
+        self.sps2_connect.visible = disconnected
+        self.sps2_connect.update()
+        self.sps2_disconnect.visible = not disconnected
+        self.sps2_disconnect.update()
+
+
+
 
     def __start_hmi_server(self, e):
         self.page.run_task(self.handle_start_server)
@@ -291,6 +351,14 @@ class IOSettingSPS(CustomCard):
                 raise Exception(f'{self.page.session.get("lang.common.ip_address_format_error")}: {self.sps2_ip.value}')
 
         self.save_factor()
+
+        if self.connect_to_sps.value:
+            # 关闭websocket客户端连接
+            self.page.run_task(ws_client.close)
+        else:
+            self.page.run_task(ws_server.stop)
+            self.page.run_task(sps1_read_task.async_disconnect)
+            self.page.run_task(sps2_read_task.async_disconnect)
     
     def save_factor(self):
         self.factor_conf.bearing_outer_diameter_D = self.shaft_outer_diameter.value

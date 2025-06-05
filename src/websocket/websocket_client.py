@@ -23,10 +23,6 @@ class WebSocketClient:
         """连接服务端"""
         try:
             io_conf: IOConf = IOConf.get()
-            if io_conf.connect_to_sps:
-                logging.info('This HMI is configured to connect to SPS, skip connecting to websocket server.')
-                return False
-
             uri = f"ws://{io_conf.hmi_server_ip}:{io_conf.hmi_server_port}"
             self.websocket = await websockets.connect(uri)
             self._running = True

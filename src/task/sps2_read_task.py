@@ -11,3 +11,5 @@ class Sps2ReadTask(JM3846AsyncClient):
         host = io_conf.sps2_ip
         port = io_conf.sps2_port
         return [host, port]
+
+sps2_read_task = Sps2ReadTask()
