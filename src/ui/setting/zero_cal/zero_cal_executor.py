@@ -181,7 +181,7 @@ class ZeroCalExecutor(ft.Container):
         )
 
     def __on_start_permission(self, e):
-        self.page.open(PermissionCheck(self.__on_start, 0))
+        self.page.open(PermissionCheck(self.__on_start, 2))
         
     def __on_start(self, user: User):
         ZeroCalInfo.create(utc_date_time=gdata.utc_date_time, state=0, name = self.name)

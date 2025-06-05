@@ -1,6 +1,5 @@
 import flet as ft
 import logging
-from common.global_data import gdata
 from db.models.user import User
 from ui.common.keyboard import keyboard
 from ui.common.permission_check import PermissionCheck

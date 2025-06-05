@@ -1,5 +1,6 @@
 import flet as ft
 from typing import Callable
+from db.models.system_settings import SystemSettings
 from db.models.user import User
 from ui.common.toast import Toast
 
@@ -15,6 +16,8 @@ class PermissionCheck(ft.AlertDialog):
         # self.barrier_color = ft.Colors.TRANSPARENT
         self.shadow_color = ft.Colors.PRIMARY
         self.elevation = 8
+
+        self.system_settings:SystemSettings = SystemSettings.get()
 
     def get_role_name(self):
         if self.user_role == 0:
@@ -50,7 +53,13 @@ class PermissionCheck(ft.AlertDialog):
         ]
 
     def before_update(self):
-        users = User.select().where(User.user_role <= self.user_role).execute()
+        users = []
+        if self.user_role == 0: # admin rights
+            users = User.select().where(User.user_role == 0).execute()
+        elif self.system_settings.hide_admin_account:
+            users = User.select().where(User.user_role <= self.user_role, User.user_role > 0).execute()
+        else:
+            users = User.select().where(User.user_role <= self.user_role).execute()
         self.user_name.options = [ft.dropdown.Option(text=user.user_name, key=user.id) for user in users]
 
     def __on_cancel(self, e):

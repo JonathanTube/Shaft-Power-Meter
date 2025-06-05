@@ -63,6 +63,11 @@ class SystemConfSettings(CustomCard):
             on_focus=lambda e: keyboard.open(e.control, 'int')
         )
 
+        self.chk_hide_admin_account = ft.Checkbox(
+            col={"md": 6}, label=self.page.session.get("lang.setting.hide_admin_account"),
+            value=self.system_settings.hide_admin_account
+        )
+
         self.amount_of_propeller_label = ft.Text(
             self.page.session.get("lang.setting.amount_of_propeller"),
             text_align=ft.TextAlign.RIGHT
@@ -86,7 +91,8 @@ class SystemConfSettings(CustomCard):
                 self.sha_po_li,
                 self.display_propeller_curve,
                 self.eexi_limited_power,
-                self.eexi_breach_checking_duration
+                self.eexi_breach_checking_duration,
+                self.chk_hide_admin_account
             ]
         )
         super().build()
@@ -113,6 +119,7 @@ class SystemConfSettings(CustomCard):
         self.system_settings.display_thrust = self.display_thrust.value
         self.system_settings.sha_po_li = self.sha_po_li.value
         self.system_settings.display_propeller_curve = self.display_propeller_curve.value
+        self.system_settings.hide_admin_account = self.chk_hide_admin_account.value
 
         unit = self.preference.system_unit
         if unit == 0:

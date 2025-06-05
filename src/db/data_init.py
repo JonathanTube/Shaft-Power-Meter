@@ -728,6 +728,12 @@ class DataInit:
                 },
 
                 {
+                    "code": "lang.setting.hide_admin_account",
+                    "chinese": "隐藏Admin账号",
+                    "english": "Hide Admin Accounts"
+                },
+
+                {
                     "code": "lang.setting.ship_info",
                     "chinese": "船体信息",
                     "english": "Ship Info"

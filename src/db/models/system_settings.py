@@ -15,5 +15,7 @@ class SystemSettings(BaseModel):
 
     display_propeller_curve = BooleanField(verbose_name="是否显示螺旋桨曲线", default=True)
 
+    hide_admin_account = BooleanField(verbose_name="是否隐藏admin账号", default=False)
+
     class Meta:
         table_name = 'system_settings'
