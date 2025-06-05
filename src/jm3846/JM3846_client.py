@@ -69,11 +69,16 @@ class JM3846AsyncClient:
 
     async def async_disconnect(self) -> bool:
         """断开连接"""
-        self.running = False
-        if self.writer:
-            self.writer.close()
-            await self.writer.wait_closed()
-            logging.info(f'{self.name} JM3846 Connection closed')
+        try:
+            self.running = False
+            if self.writer:
+                self.writer.close()
+                await self.writer.wait_closed()
+                logging.info(f'{self.name} JM3846 Connection closed')
+                return True
+        except Exception:
+            logging.exception(f'{self.name} disconnect from sps failed')
+        return False
 
     async def async_handle_0x03(self):
         """异步处理功能码0x03"""

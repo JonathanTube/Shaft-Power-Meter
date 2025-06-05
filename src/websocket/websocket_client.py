@@ -36,7 +36,6 @@ class WebSocketClient:
             logging.exception(f"failed to connect to {uri}")
             self._running = False
             AlarmSaver.create(alarm_type=AlarmType.HMI_CLIENT_DISCONNECTED)
-            await self.connect()
             return False
 
         return True

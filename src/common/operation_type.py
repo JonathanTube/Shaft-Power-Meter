@@ -28,6 +28,19 @@ class OperationType(int, Enum):
     SYSTEM_EXIT = 22
 
     OFFLINE_DEFAULT_VALUE = 23
+
+    CONNECT_TO_HMI_SERVER = 24
+    DISCONNECT_FROM_HMI_SERVER = 25
+
+    START_HMI_SERVER = 26
+    STOP_HMI_SERVER = 27
+
+    CONNECT_TO_SPS1 = 28
+    DISCONNECT_FROM_SPS1 = 29
+
+    CONNECT_TO_SPS2 = 30
+    DISCONNECT_FROM_SPS2 = 31
+    
     @classmethod
     def get_operation_type_name(cls, operation_type: int) -> str:
         return cls(operation_type).name
