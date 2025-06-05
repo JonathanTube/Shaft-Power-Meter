@@ -7,17 +7,7 @@ class DataLog(BaseModel):
 
     name = CharField(verbose_name="名称:sps1 or sps2")
 
-    ad_0 = FloatField(verbose_name="AD_0")
-
-    ad_0_mv_per_v = FloatField(verbose_name="AD_0 mv/v 毫伏/每伏")
-
-    ad_0_microstrain = FloatField(verbose_name="微应变0")
-
     ad_0_torque = FloatField(verbose_name="扭矩(Nm)")
-
-    ad_1 = FloatField(verbose_name="AD_1")
-
-    ad_1_mv_per_v = FloatField(verbose_name="AD_1 mv/v 毫伏/每伏")
 
     ad_1_thrust = FloatField(verbose_name="推力(N)")
 

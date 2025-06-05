@@ -21,7 +21,7 @@ class CounterDisplay(ft.Container):
     def __create_unit(self, text: str):
         return ft.Text(
             value=text,
-            width=30
+            width=40
         )
 
     def __create_total_energy(self):

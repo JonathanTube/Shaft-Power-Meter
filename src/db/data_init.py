@@ -310,9 +310,9 @@ class DataInit:
                 },
 
                 {
-                    "code": "lang.common.sum_power",
-                    "chinese": "总功率",
-                    "english": "Sum Power"
+                    "code": "lang.common.total_energy",
+                    "chinese": "总能耗",
+                    "english": "Total Energy"
                 },
 
                 {
@@ -382,24 +382,6 @@ class DataInit:
                     "code": "lang.common.propeller_name",
                     "chinese": "名称",
                     "english": "Name"
-                },
-
-                {
-                    "code": "lang.common.microstrain",
-                    "chinese": "微应变",
-                    "english": "Microstrain"
-                },
-
-                {
-                    "code": "lang.common.ad_0_mv_per_v",
-                    "chinese": "通道0(毫伏/伏)",
-                    "english": "AD0(mv/v)"
-                },
-
-                {
-                    "code": "lang.common.ad_1_mv_per_v",
-                    "chinese": "通道1(毫伏/伏)",
-                    "english": "AD1(mv/v)"
                 },
 
                 {

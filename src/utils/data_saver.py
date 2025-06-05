@@ -30,14 +30,7 @@ class DataSaver:
                 name=name,
                 speed=speed,
                 power=power,
-
-                ad_0=ad_0,
-                ad_0_mv_per_v=ad_0_mv_per_v,
-                ad_0_microstrain=ad_0_microstrain,
                 ad_0_torque=ad_0_torque,
-
-                ad_1=ad_1,
-                ad_1_mv_per_v=ad_1_mv_per_v,
                 ad_1_thrust=ad_1_thrust,
                 is_overload=is_overload
             )

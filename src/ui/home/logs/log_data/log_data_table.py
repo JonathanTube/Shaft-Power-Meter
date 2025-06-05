@@ -6,6 +6,7 @@ from db.models.date_time_conf import DateTimeConf
 class LogDataTable(AbstractTable):
     def __init__(self):
         super().__init__()
+        self.table_width = gdata.default_table_width
         self.dtc: DateTimeConf = DateTimeConf.get()
 
     def load_total(self):
@@ -22,12 +23,7 @@ class LogDataTable(AbstractTable):
             DataLog.id,
             DataLog.name,
             DataLog.utc_date_time,
-            DataLog.ad_0,
-            DataLog.ad_0_mv_per_v,
-            DataLog.ad_0_microstrain,
             DataLog.ad_0_torque,
-            DataLog.ad_1,
-            DataLog.ad_1_mv_per_v,
             DataLog.ad_1_thrust,
             DataLog.speed,
             DataLog.power,
@@ -46,10 +42,7 @@ class LogDataTable(AbstractTable):
                 item.id,
                 item.name,
                 item.utc_date_time.strftime(f'{self.dtc.date_format} %H:%M:%S'),
-                item.ad_0_mv_per_v,
-                item.ad_0_microstrain,
                 item.ad_0_torque,
-                item.ad_1_mv_per_v,
                 item.ad_1_thrust,
                 item.speed,
                 item.power,
@@ -65,10 +58,7 @@ class LogDataTable(AbstractTable):
             session.get("lang.common.no"),
             session.get("lang.common.propeller_name"),
             session.get("lang.common.utc_date_time"),
-            session.get("lang.common.ad_0_mv_per_v"),
-            session.get("lang.common.microstrain"),
-            f'{session.get("lang.common.torque")}(N·m)',
-            session.get("lang.common.ad_1_mv_per_v"),
+            f'{session.get("lang.common.torque")}(Nm)',
             f'{session.get("lang.common.thrust")}(N)',
             session.get("lang.common.speed"),
             session.get("lang.common.power"),

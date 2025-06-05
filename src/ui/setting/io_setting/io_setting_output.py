@@ -49,7 +49,7 @@ class IOSettingOutput(CustomCard):
         )
 
         self.check_sum_power = ft.Checkbox(
-            label=self.page.session.get("lang.common.sum_power"),
+            label=self.page.session.get("lang.common.total_energy"),
             value=self.conf.output_sum_power
         )
 
