@@ -1,6 +1,5 @@
 import flet as ft
 
-from common.control_manager import ControlManager
 from ui.home.dashboard.sps_dual.off.index import DualShaPoLiOff
 from ui.home.dashboard.sps_dual.on.index import DualShaPoLiOn
 from ui.home.dashboard.sps_single.off.index import SingleShaPoLiOff

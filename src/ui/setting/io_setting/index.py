@@ -8,7 +8,6 @@ from ui.setting.io_setting.io_setting_plc import IOSettingPLC
 from ui.setting.io_setting.io_setting_gps import IOSettingGPS
 from ui.setting.io_setting.io_setting_sps import IOSettingSPS
 from ui.setting.io_setting.io_setting_output import IOSettingOutput
-from ui.setting.io_setting.io_setting_factor import IOSettingFactor
 from db.models.operation_log import OperationLog
 from common.operation_type import OperationType
 from common.global_data import gdata
@@ -26,7 +25,6 @@ class IOSetting(ft.Container):
         self.gps_conf = IOSettingGPS(self.conf)
         self.sps_conf = IOSettingSPS(self.conf)
         self.output_conf = IOSettingOutput(self.conf)
-        self.factor_conf = IOSettingFactor()
 
         self.save_button = ft.FilledButton(self.page.session.get("lang.button.save"), width=120, height=40, on_click=lambda e: self.__on_save_button_click(e))
         self.reset_button = ft.OutlinedButton(self.page.session.get("lang.button.reset"), width=120, height=40, on_click=self.__reset_data)
@@ -40,7 +38,6 @@ class IOSetting(ft.Container):
                         self.plc_conf,
                         self.gps_conf,
                         self.sps_conf,
-                        self.factor_conf,
                         self.output_conf,
                         ft.Row(alignment=ft.MainAxisAlignment.CENTER, controls=[self.save_button, self.reset_button])
                     ]
@@ -59,7 +56,6 @@ class IOSetting(ft.Container):
             self.gps_conf.save_data()
             self.sps_conf.save_data()
             self.output_conf.save_data()
-            self.factor_conf.save_data(user.id)
             OperationLog.create(
                 user_id=user.id,
                 utc_date_time=gdata.utc_date_time,

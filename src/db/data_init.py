@@ -758,12 +758,6 @@ class DataInit:
                 },
 
                 {
-                    "code": "lang.setting.factor_conf",
-                    "chinese": "系数配置",
-                    "english": "Factor Conf."
-                },
-
-                {
                     "code": "lang.setting.bearing_outer_diameter_D",
                     "chinese": "轴承外径",
                     "english": "Bearing Outer Diameter"
@@ -1107,6 +1101,18 @@ class DataInit:
                     "code": "lang.setting.disconnect_from_hmi_server",
                     "chinese": "断开HMI服务器",
                     "english": "Disconnect from HMI Server"
+                },
+
+                {
+                    "code": "lang.setting.connect",
+                    "chinese": "连接",
+                    "english": "Connect"
+                },
+
+                {
+                    "code": "lang.setting.disconnect",
+                    "chinese": "断开",
+                    "english": "Disconnect"
                 },
 
                 {

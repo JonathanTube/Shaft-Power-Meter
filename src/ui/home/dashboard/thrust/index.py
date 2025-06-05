@@ -6,7 +6,7 @@ from common.global_data import gdata
 from typing import Literal
 
 
-class ThrustPower(ft.Container):
+class ThrustBlock(ft.Container):
     def __init__(self, name: Literal["sps1", "sps2"]):
         super().__init__()
         self.right = 10
@@ -18,9 +18,9 @@ class ThrustPower(ft.Container):
         self.visible = system_settings.display_thrust
 
     def build(self):
-        self.title = ft.Text(self.page.session.get("lang.common.thrust"), weight=ft.FontWeight.W_500)
+        self.title = ft.Text(self.page.session.get("lang.common.thrust"), weight=ft.FontWeight.W_500, size=20)
         self.thrust_value = ft.Text("0")
-        self.thrust_unit = ft.Text("W")
+        self.thrust_unit = ft.Text("N")
         self.content = ft.Column(
             horizontal_alignment=ft.CrossAxisAlignment.CENTER,
             controls=[
@@ -32,11 +32,11 @@ class ThrustPower(ft.Container):
 
     def reload(self):
         if self.name == "sps1":
-            thrust_and_unit = UnitParser.parse_power(gdata.sps1_thrust, self.system_unit)
+            thrust_and_unit = UnitParser.parse_thrust(gdata.sps1_thrust, self.system_unit)
             self.thrust_value.value = thrust_and_unit[0]
             self.thrust_unit.value = thrust_and_unit[1]
         else:
-            thrust_and_unit = UnitParser.parse_power(gdata.sps2_thrust, self.system_unit)
+            thrust_and_unit = UnitParser.parse_thrust(gdata.sps2_thrust, self.system_unit)
             self.thrust_value.value = thrust_and_unit[0]
             self.thrust_unit.value = thrust_and_unit[1]
         self.content.update()

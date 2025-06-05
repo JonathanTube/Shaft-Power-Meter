@@ -1,5 +1,6 @@
 import ipaddress
 import flet as ft
+from db.models.factor_conf import FactorConf
 from db.models.io_conf import IOConf
 from db.models.system_settings import SystemSettings
 from ui.common.custom_card import CustomCard
@@ -16,40 +17,50 @@ class IOSettingSPS(CustomCard):
         system_settings: SystemSettings = SystemSettings.get()
         self.is_dual = system_settings.amount_of_propeller > 1
 
+        self.factor_conf:FactorConf = FactorConf.get()
+
     def build(self):
         self.connect_to_sps = ft.Checkbox(
             label=self.page.session.get("lang.setting.connect_to_sps"),
             value=self.conf.connect_to_sps,
-            col={"sm": 6},
             on_change=lambda e: self.__connect_to_sps_changed(e)
         )
 
-        self.start_server = ft.FilledButton(
+        # working as a websocket client start
+        self.websocket_server_ip = ft.TextField(
+            label=f'{self.page.session.get("lang.setting.ip")}',
+            value='0.0.0.0',
+            read_only=True
+        )
+
+        self.websocket_server_port = ft.TextField(
+            label=f'{self.page.session.get("lang.setting.port")}',
+            value='8000',
+            read_only=True
+        )
+
+        self.start_hmi_server = ft.FilledButton(
             text=self.page.session.get("lang.setting.start_hmi_server"),
-            col={"sm": 6},
-            width=80,
             bgcolor=ft.colors.GREEN,
             color=ft.colors.WHITE,
-            visible=self.conf.connect_to_sps and not gdata.hmi_server_started,
+            visible=not gdata.hmi_server_started,
             on_click=lambda e: self.__start_hmi_server(e)
         )
 
-        self.stop_server = ft.FilledButton(
+        self.stop_hmi_server = ft.FilledButton(
             text=self.page.session.get("lang.setting.stop_hmi_server"),
-            col={"sm": 6},
-            width=80,
             bgcolor=ft.colors.RED,
             color=ft.colors.WHITE,
-            visible=self.conf.connect_to_sps and gdata.hmi_server_started,
+            visible=gdata.hmi_server_started,
             on_click=lambda e: self.__stop_hmi_server(e)
         )
+        # working as a websocket end.
 
+        # sps conf. start
         self.sps1_ip = ft.TextField(
             label=f'{self.page.session.get("lang.setting.ip")} SPS1',
             value=self.conf.sps1_ip,
             read_only=True,
-            col={"sm": 6},
-            visible=self.conf.connect_to_sps,
             on_focus=lambda e: keyboard.open(e.control, 'ip')
         )
 
@@ -57,17 +68,21 @@ class IOSettingSPS(CustomCard):
             label=f'{self.page.session.get("lang.setting.port")} SPS1',
             value=self.conf.sps1_port,
             read_only=True,
-            col={"sm": 6},
-            visible=self.conf.connect_to_sps,
             on_focus=lambda e: keyboard.open(e.control, 'int')
+        )
+
+        self.sps1_connect = ft.FilledButton(
+            text=self.page.session.get("lang.setting.connect"),
+            width=80,
+            bgcolor=ft.colors.GREEN,
+            color=ft.colors.WHITE,
+            on_click=lambda e: self.__connect_to_sps1(e)
         )
 
         self.sps2_ip = ft.TextField(
             label=f'{self.page.session.get("lang.setting.ip")} SPS2',
             value=self.conf.sps2_ip,
             read_only=True,
-            col={"sm": 6},
-            visible=self.conf.connect_to_sps and self.is_dual,
             on_focus=lambda e: keyboard.open(e.control, 'ip')
         )
 
@@ -75,17 +90,22 @@ class IOSettingSPS(CustomCard):
             label=f'{self.page.session.get("lang.setting.port")} SPS2',
             value=self.conf.sps2_port,
             read_only=True,
-            col={"sm": 6},
-            visible=self.conf.connect_to_sps and self.is_dual,
             on_focus=lambda e: keyboard.open(e.control, 'int')
+        )
+
+        self.sps2_connect = ft.FilledButton(
+            text=self.page.session.get("lang.setting.connect"),
+            width=80,
+            bgcolor=ft.colors.GREEN,
+            color=ft.colors.WHITE,
+            on_click=lambda e: self.__connect_to_sps2(e)
         )
 
         self.connect_server = ft.FilledButton(
             text=self.page.session.get("lang.setting.connect_to_hmi_server"),
             bgcolor=ft.colors.GREEN,
             color=ft.colors.WHITE,
-            col={"sm": 6},
-            visible=not self.conf.connect_to_sps and not gdata.connected_to_hmi_server,
+            visible=not gdata.connected_to_hmi_server,
             on_click=lambda e: self.__connect_to_hmi_server(e)
         )
 
@@ -93,57 +113,129 @@ class IOSettingSPS(CustomCard):
             text=self.page.session.get("lang.setting.disconnect_from_hmi_server"),
             bgcolor=ft.colors.RED,
             color=ft.colors.WHITE,
-            col={"sm": 6},
-            visible=not self.conf.connect_to_sps and gdata.connected_to_hmi_server,
+            visible=gdata.connected_to_hmi_server,
             on_click=lambda e: self.__disconnect_from_hmi_server(e)
         )
 
         self.hmi_server_ip = ft.TextField(
             label=self.page.session.get("lang.setting.hmi_server_ip"),
             value=self.conf.hmi_server_ip,
-            read_only=True,
-            col={"sm": 6},
-            visible=not self.conf.connect_to_sps,
+            read_only=True
         )
 
         self.hmi_server_port = ft.TextField(
             label=self.page.session.get("lang.setting.hmi_server_port"),
             value=self.conf.hmi_server_port,
+            read_only=True
+        )
+        # sps conf. end
+
+        # factor conf. start
+        self.shaft_outer_diameter = ft.TextField(
+            label=self.page.session.get("lang.setting.bearing_outer_diameter_D"), suffix_text="m",
+            value=self.factor_conf.bearing_outer_diameter_D,
             read_only=True,
-            col={"sm": 6},
-            visible=not self.conf.connect_to_sps,
+            on_focus=lambda e: keyboard.open(e.control)
         )
 
+        self.shaft_inner_diameter = ft.TextField(
+            label=self.page.session.get("lang.setting.bearing_inner_diameter_d"),
+            suffix_text="m",
+            value=self.factor_conf.bearing_inner_diameter_d,
+            read_only=True,
+            on_focus=lambda e: keyboard.open(e.control)
+        )
+
+        self.sensitivity_factor_k = ft.TextField(
+            label=self.page.session.get("lang.setting.sensitivity_factor_k"),
+            value=self.factor_conf.sensitivity_factor_k,
+            read_only=True,
+            on_focus=lambda e: keyboard.open(e.control)
+        )
+
+        self.elastic_modulus_E = ft.TextField(
+            label=self.page.session.get("lang.setting.elastic_modulus_E"),
+            value=self.factor_conf.elastic_modulus_E,
+            suffix_text="Mpa",
+            read_only=True,
+            on_focus=lambda e: keyboard.open(e.control)
+        )
+
+        self.poisson_ratio_mu = ft.TextField(
+            label=self.page.session.get("lang.setting.poisson_ratio_mu"),
+            value=self.factor_conf.poisson_ratio_mu,
+            read_only=True,
+            on_focus=lambda e: keyboard.open(e.control)
+        )
+        # factor conf. end
+
         self.heading = self.page.session.get("lang.setting.sps_conf")
-        self.body = ft.ResponsiveRow(controls=[
+
+        self.row_sps1 = ft.Row(
+                            controls=[self.sps1_ip, self.sps1_port, self.sps1_connect], 
+                            visible=self.conf.connect_to_sps
+                        )
+        
+        self.row_sps2 = ft.Row(
+                            controls=[self.sps2_ip, self.sps2_port, self.sps2_connect], 
+                            visible=self.conf.connect_to_sps and self.is_dual
+                        )
+        
+        self.row_websocket_server = ft.Row(
+                            controls=[self.websocket_server_ip, self.websocket_server_port, self.start_hmi_server, self.stop_hmi_server], 
+                            visible=self.conf.connect_to_sps
+                        )
+
+        self.column_factor = ft.Column(
+                            controls=[
+                                ft.Row(controls=[self.shaft_outer_diameter, self.shaft_inner_diameter]),
+                                ft.Row(controls=[self.sensitivity_factor_k,self.elastic_modulus_E]),
+                                ft.Row(controls=[self.poisson_ratio_mu])
+                            ],
+                            visible=self.conf.connect_to_sps
+                        )
+        
+        self.row_websocket_client = ft.Row(
+                            controls=[self.hmi_server_ip, self.hmi_server_port, self.connect_server, self.disconnect_server], 
+                            visible=not self.conf.connect_to_sps
+                        )
+
+        self.body = ft.Column(controls=[
             self.connect_to_sps,
-            self.start_server, self.stop_server,
-            self.connect_server, self.disconnect_server,
-            self.sps1_ip, self.sps1_port, self.sps2_ip,
-            self.sps2_port, self.hmi_server_ip, self.hmi_server_port
+            self.row_sps1,
+            self.row_sps2,
+            self.row_websocket_server,
+            self.column_factor,
+            self.row_websocket_client    
         ])
         self.col = {"sm": 12}
         super().build()
+
+    def __connect_to_sps1(self,e):
+        print('connect to sps1')
+
+    def __connect_to_sps2(self,e):
+        print('connect to sps2')
 
     def __start_hmi_server(self, e):
         self.page.run_task(self.handle_start_server)
 
     async def handle_start_server(self):
         started = await ws_server.start()
-        self.start_server.visible = not started
-        self.stop_server.visible = started
-        self.start_server.update()
-        self.stop_server.update()
+        self.start_hmi_server.visible = not started
+        self.stop_hmi_server.visible = started
+        self.start_hmi_server.update()
+        self.stop_hmi_server.update()
 
     def __stop_hmi_server(self, e):
         self.page.run_task(self.handle_stop_server)
 
     async def handle_stop_server(self):
         stopped = await ws_server.stop()
-        self.start_server.visible = stopped
-        self.stop_server.visible = not stopped
-        self.start_server.update()
-        self.stop_server.update()
+        self.start_hmi_server.visible = stopped
+        self.stop_hmi_server.visible = not stopped
+        self.start_hmi_server.update()
+        self.stop_hmi_server.update()
 
     def __connect_to_hmi_server(self, e):
         self.page.run_task(self.handle_connect_to_hmi_server)
@@ -167,21 +259,19 @@ class IOSettingSPS(CustomCard):
 
     def __connect_to_sps_changed(self, e):
         is_connect_to_sps = e.control.value
-        self.sps1_ip.visible = is_connect_to_sps
-        self.sps1_port.visible = is_connect_to_sps
-        self.sps2_ip.visible = is_connect_to_sps and self.is_dual
-        self.sps2_port.visible = is_connect_to_sps and self.is_dual
+        self.row_sps1.visible = is_connect_to_sps
 
-        self.start_server.visible = is_connect_to_sps and not gdata.hmi_server_started
-        self.stop_server.visible = is_connect_to_sps and gdata.hmi_server_started
+        self.row_sps2.visible = is_connect_to_sps and self.is_dual
 
-        self.hmi_server_ip.visible = not is_connect_to_sps
-        self.hmi_server_port.visible = not is_connect_to_sps
+        self.row_websocket_server.visible = is_connect_to_sps
 
-        self.connect_server.visible = not is_connect_to_sps and not gdata.connected_to_hmi_server
-        self.disconnect_server.visible = not is_connect_to_sps and gdata.connected_to_hmi_server
+        self.column_factor.visible = is_connect_to_sps
 
-        self.conf.connect_to_sps = e.control.value
+        self.row_websocket_server.visible = is_connect_to_sps
+
+        self.row_websocket_client.visible = not is_connect_to_sps
+
+        self.conf.connect_to_sps = is_connect_to_sps
         self.update()
 
     def save_data(self):
@@ -199,3 +289,14 @@ class IOSettingSPS(CustomCard):
                 self.conf.sps2_port = self.sps2_port.value
             except ValueError:
                 raise Exception(f'{self.page.session.get("lang.common.ip_address_format_error")}: {self.sps2_ip.value}')
+
+        self.save_factor()
+    
+    def save_factor(self):
+        self.factor_conf.bearing_outer_diameter_D = self.shaft_outer_diameter.value
+        self.factor_conf.bearing_inner_diameter_d = self.shaft_inner_diameter.value
+        self.factor_conf.sensitivity_factor_k = self.sensitivity_factor_k.value
+        self.factor_conf.elastic_modulus_E = self.elastic_modulus_E.value
+        self.factor_conf.poisson_ratio_mu = self.poisson_ratio_mu.value
+
+        self.factor_conf.save()

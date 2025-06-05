@@ -2,8 +2,7 @@ import asyncio
 import flet as ft
 from db.models.preference import Preference
 from ui.home.dashboard.sps_single.off.single_meters import SingleMeters
-from ui.home.dashboard.chart.single_power_line import SinglePowerLine
-from ui.home.dashboard.thrust.thrust_power import ThrustPower
+from ui.home.dashboard.thrust.index import ThrustBlock
 
 
 class SingleShaPoLiOff(ft.Stack):
@@ -11,7 +10,7 @@ class SingleShaPoLiOff(ft.Stack):
         super().__init__()
 
     def build(self):
-        self.thrust_power = ThrustPower("sps1")
+        self.thrust_power = ThrustBlock("sps1")
         self.single_meters = SingleMeters()
 
         self.controls = [

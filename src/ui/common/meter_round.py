@@ -109,7 +109,7 @@ class MeterRound(ft.Container):
             height=self.max_radius * 0.02,
             left=self.max_radius,
             top=self.max_radius,
-            bgcolor=ft.Colors.RED,
+            bgcolor=ft.Colors.ORANGE_ACCENT,
             visible=self.limit_value > 0,
             rotate=self.warning_line_rotate
         )
