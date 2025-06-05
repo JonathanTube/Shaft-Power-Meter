@@ -2,9 +2,11 @@ import asyncio
 import websockets
 from typing import Callable, Set
 import logging
+from common.const_alarm_type import AlarmType
 from db.models.io_conf import IOConf
 import msgpack
 from common.global_data import gdata
+from utils.alarm_saver import AlarmSaver
 # ====================== 服务端类 ======================
 
 
@@ -32,6 +34,7 @@ class WebSocketServer:
                         await self.send_to_client(websocket, response)
         except websockets.ConnectionClosed:
             logging.exception(f"client {websocket.remote_address} disconnected")
+            AlarmSaver.create(alarm_type=AlarmType.HMI_SERVER_CLOSED)
         finally:
             self.clients.remove(websocket)
 
@@ -73,6 +76,7 @@ class WebSocketServer:
             return True
         except websockets.ConnectionClosed:
             logging.exception("broadcast to all clients failed: connection closed")
+            AlarmSaver.create(alarm_type=AlarmType.HMI_SERVER_CLOSED)
             gdata.hmi_server_started = False
             self.clients.clear()
             await self.start()
@@ -91,6 +95,7 @@ class WebSocketServer:
                 await self.server.wait_closed()
                 gdata.hmi_server_started = False
                 logging.info('websocket server has been closed')
+                AlarmSaver.create(alarm_type=AlarmType.HMI_SERVER_CLOSED)
                 return True
         except Exception:
             logging.exception('stop websocket server failed')

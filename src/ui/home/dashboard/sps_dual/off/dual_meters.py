@@ -20,12 +20,12 @@ class DualMeters(ft.Container):
     def get_radius(self, radio):
         radius = self.page.window.height * radio
         if self.amount_of_propeller == 2:
-            radius = radius * 0.75
+            radius = radius * 0.62
         return radius
 
     def build(self):
         self.speed_meter = SpeedMeter(self.name, self.get_radius(0.22))
-        self.power_meter = PowerMeter(self.name, self.get_radius(0.26))
+        self.power_meter = PowerMeter(self.name, self.get_radius(0.32))
         self.torque_meter = TorqueMeter(self.name, self.get_radius(0.22))
         self.thrust_meter = ThrustBlock(self.name)
 

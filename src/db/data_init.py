@@ -1386,6 +1386,16 @@ class DataInit:
                     "english": "SPS2 Disconnected"
                 },
                 {
+                    "code": "lang.alarm.hmi_server_closed",
+                    "chinese": "HMI 服务端已停止",
+                    "english": "HMI Server Stopped"
+                },
+                {
+                    "code": "lang.alarm.hmi_client_disconnected",
+                    "chinese": "HMI 客户端已断开连接",
+                    "english": "HMI Client Disconnected"
+                },
+                {
                     "code": "lang.alarm.app_unexpected_exit",
                     "chinese": "应用意外退出",
                     "english": "App Unexpected Exit"

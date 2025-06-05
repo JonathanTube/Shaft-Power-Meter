@@ -5,10 +5,12 @@ from datetime import datetime
 import websockets
 import logging
 import msgpack
+from common.const_alarm_type import AlarmType
 from db.models.io_conf import IOConf
 from db.models.zero_cal_info import ZeroCalInfo
 from db.models.zero_cal_record import ZeroCalRecord
 from jm3846.JM3846_calculator import JM3846Calculator
+from utils.alarm_saver import AlarmSaver
 from utils.data_saver import DataSaver
 from common.global_data import gdata
 
@@ -33,6 +35,7 @@ class WebSocketClient:
         except Exception:
             logging.exception(f"failed to connect to {uri}")
             self._running = False
+            AlarmSaver.create(alarm_type=AlarmType.HMI_CLIENT_DISCONNECTED)
             await self.connect()
             return False
 
@@ -53,6 +56,7 @@ class WebSocketClient:
             logging.exception("server connection closed")
             self._running = False
             gdata.connected_to_hmi_server = False
+            AlarmSaver.create(alarm_type=AlarmType.HMI_CLIENT_DISCONNECTED)
             gdata.set_offline_data()
             await self.connect()
 
@@ -146,6 +150,7 @@ class WebSocketClient:
             self._running = False
             if self.websocket:
                 await self.websocket.close()
+                AlarmSaver.create(alarm_type=AlarmType.HMI_SERVER_CLOSED)
         except Exception:
             logging.exception("failed to close websocket connection")
             return False
