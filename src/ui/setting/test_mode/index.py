@@ -115,6 +115,9 @@ class TestMode(ft.Container):
             operation_content='started test mode'
         )
         Toast.show_success(self.page)
+        # 将sps设备设置为在线，防止offline_task 写入默认值
+        gdata.sps1_offline = False
+        gdata.sps2_offline = False
 
     def stop_test_mode(self, user: User):
         if not self.running:

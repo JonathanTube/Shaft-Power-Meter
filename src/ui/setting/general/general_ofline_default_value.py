@@ -73,6 +73,11 @@ class GeneralOflineDefaultValue(ft.Container):
             self.odv.power_default_value = UnitConverter.shp_to_w(self.odv.power_default_value)
         self.odv.save()
 
+        gdata.sps_offline_power = self.odv.power_default_value
+        gdata.sps_offline_torque = self.odv.torque_default_value
+        gdata.sps_offline_speed = self.odv.speed_default_value
+        gdata.sps_offline_thrust = self.odv.thrust_default_value
+
         operation_log = OperationLog(
             user_id=user_id,
             utc_date_time=gdata.utc_date_time,

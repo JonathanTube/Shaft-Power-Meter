@@ -1,5 +1,6 @@
 from datetime import datetime
 from db.models.io_conf import IOConf
+from db.models.offline_default_value import OfflineDefaultValue
 from db.models.system_settings import SystemSettings
 from db.models.propeller_setting import PropellerSetting
 from db.models.date_time_conf import DateTimeConf
@@ -68,6 +69,13 @@ class GlobalData:
         self.power_of_torque_load_limit = 0
         self.power_of_overload = 0
 
+        self.sps1_offline: bool = False
+        self.sps2_offline: bool = False
+        self.sps_offline_power = 0
+        self.sps_offline_torque = 0
+        self.sps_offline_thrust = 0
+        self.sps_offline_speed = 0
+
     def set_default_value(self):
         systemSettings: SystemSettings = SystemSettings.get()
         self.display_propeller_curve = systemSettings.display_propeller_curve
@@ -93,33 +101,27 @@ class GlobalData:
         self.speed_of_mcr = propellerSetting.rpm_of_mcr_operating_point
         self.power_of_mcr = propellerSetting.shaft_power_of_mcr_operating_point
         self.speed_of_torque_load_limit = propellerSetting.rpm_right_of_torque_load_limit_curve
-        self.power_of_torque_load_limit = propellerSetting.bhp_right_of_torque_load_limit_curve + propellerSetting.value_of_overload_curve
+        self.power_of_torque_load_limit = propellerSetting.bhp_right_of_torque_load_limit_curve + \
+            propellerSetting.value_of_overload_curve
         self.power_of_overload = propellerSetting.value_of_overload_curve
         # get the last accepted zero cal. record.
-        sps1_accepted_zero_cal: ZeroCalInfo = ZeroCalInfo.select().where(ZeroCalInfo.state == 1, ZeroCalInfo.name == 'sps1').order_by(ZeroCalInfo.id.desc()).first()
+        sps1_accepted_zero_cal: ZeroCalInfo = ZeroCalInfo.select().where(
+            ZeroCalInfo.state == 1, ZeroCalInfo.name == 'sps1').order_by(ZeroCalInfo.id.desc()).first()
         if sps1_accepted_zero_cal is not None:
             self.sps1_torque_offset = sps1_accepted_zero_cal.torque_offset
             self.sps1_thrust_offset = sps1_accepted_zero_cal.thrust_offset
 
-        sps2_accepted_zero_cal: ZeroCalInfo = ZeroCalInfo.select().where(ZeroCalInfo.state == 1, ZeroCalInfo.name == 'sps2').order_by(ZeroCalInfo.id.desc()).first()
+        sps2_accepted_zero_cal: ZeroCalInfo = ZeroCalInfo.select().where(
+            ZeroCalInfo.state == 1, ZeroCalInfo.name == 'sps2').order_by(ZeroCalInfo.id.desc()).first()
         if sps2_accepted_zero_cal is not None:
             self.sps2_torque_offset = sps2_accepted_zero_cal.torque_offset
             self.sps2_thrust_offset = sps2_accepted_zero_cal.thrust_offset
 
-    def set_offline_data(self):
-        self.sps1_speed = 0
-        self.sps1_power = 0
-        self.sps1_torque = 0
-        self.sps1_thrust = 0
-        self.sps1_mv_per_v_for_torque = 0
-        self.sps1_mv_per_v_for_thrust = 0
-
-        self.sps2_speed = 0
-        self.sps2_power = 0
-        self.sps2_torque = 0
-        self.sps2_thrust = 0
-        self.sps2_mv_per_v_for_torque = 0
-        self.sps2_mv_per_v_for_thrust = 0
+        offline_default_value: OfflineDefaultValue = OfflineDefaultValue.get()
+        self.sps_offline_power = offline_default_value.power_default_value
+        self.sps_offline_thrust = offline_default_value.thrust_default_value
+        self.sps_offline_torque = offline_default_value.torque_default_value
+        self.sps_offline_speed = offline_default_value.speed_default_value
 
 
 gdata: GlobalData = GlobalData()

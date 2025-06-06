@@ -51,12 +51,15 @@ class WebSocketClient:
                     self.__handle_jm3846_data(data)
                 elif data['type'] == 'zero_cal':
                     self.__handle_zero_cal(data)
+                gdata.sps1_offline = False
+                gdata.sps2_offline = False
         except websockets.ConnectionClosed:
             logging.exception("server connection closed")
             self._running = False
             gdata.connected_to_hmi_server = False
             AlarmSaver.create(alarm_type=AlarmType.HMI_CLIENT_DISCONNECTED)
-            gdata.set_offline_data()
+            gdata.sps1_offline = True
+            gdata.sps2_offline = True
             await self.connect()
 
     async def send(self, data):
