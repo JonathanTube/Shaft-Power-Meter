@@ -13,11 +13,7 @@ from utils.modbus_output import modbus_output
 
 class DataSaver:
     @staticmethod
-    def save(name: str,
-            ad_0, ad_0_mv_per_v: float, ad_0_microstrain, ad_0_torque: float,
-            ad_1, ad_1_mv_per_v: float, ad_1_thrust: float, 
-            speed: float
-    ):
+    def save(name: str, ad_0_mv_per_v: float, ad_0_torque: float, ad_1_mv_per_v: float, ad_1_thrust: float, speed: float):
         try:
             utc_date_time = gdata.utc_date_time
             power = FormulaCalculator.calculate_instant_power(ad_0_torque, speed)

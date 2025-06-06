@@ -106,10 +106,7 @@ class WebSocketClient:
             speed = data['rpm'] / 10
             logging.info(f'name={name},rpm={speed}')
 
-        DataSaver.save(name,
-                       ad0, ad0_mv_per_v, ad0_microstrain, ad0_torque,
-                       ad1, ad1_mv_per_v, ad1_thrust,
-                       speed)
+        DataSaver.save(name, ad0_mv_per_v, ad0_torque, ad1_mv_per_v, ad1_thrust, speed)
 
     def __handle_zero_cal(self, data):
         """处理零点校准数据"""

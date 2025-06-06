@@ -244,10 +244,7 @@ class JM3846AsyncClient:
             speed = rpm / 10
             logging.info(f'name={self.name},rpm={rpm}, speed={speed}')
             json_data['rpm'] = rpm
-        DataSaver.save(self.name,
-                       ad0, ad0_mv_per_v, ad0_microstrain, ad0_torque,
-                       ad1, ad1_mv_per_v, ad1_thrust,
-                       speed)
+        DataSaver.save(self.name, ad0_mv_per_v, ad0_torque, ad1_mv_per_v, ad1_thrust, speed)
 
         # 如果作为服务端，那需要向外发送数据
         if gdata.hmi_server_started:

@@ -21,24 +21,28 @@ class GeneralOflineDefaultValue(ft.Container):
                                                  label=self.page.session.get("lang.common.torque"),
                                                  value=self.odv.torque_default_value,
                                                  col={"xs": 6},
+                                                 read_only=True,
                                                  on_focus=lambda e: keyboard.open(e.control))
 
         self.thrust_default_value = ft.TextField(suffix_text="N",
                                                  label=self.page.session.get("lang.common.thrust"),
                                                  value=self.odv.thrust_default_value,
                                                  col={"xs": 6},
+                                                 read_only=True,
                                                  on_focus=lambda e: keyboard.open(e.control))
 
         self.power_default_value = ft.TextField(suffix_text="W",
                                                 label=self.page.session.get("lang.common.power"),
                                                 value=self.odv.power_default_value,
                                                 col={"xs": 6},
+                                                read_only=True,
                                                 on_focus=lambda e: keyboard.open(e.control))
 
         self.speed_default_value = ft.TextField(suffix_text="rpm",
                                                 label=self.page.session.get("lang.common.speed"),
                                                 value=self.odv.speed_default_value,
                                                 col={"xs": 6},
+                                                read_only=True,
                                                 on_focus=lambda e: keyboard.open(e.control))
 
         self.content = CustomCard(

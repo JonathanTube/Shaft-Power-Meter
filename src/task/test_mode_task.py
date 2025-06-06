@@ -76,7 +76,7 @@ class TestModeTask:
         instant_torque = int(random.uniform(self.min_torque, self.max_torque))
         instant_speed = int(random.uniform(self.min_speed, self.max_speed))
         instant_thrust = int(random.uniform(self.min_thrust, self.max_thrust))
-        DataSaver.save(name, 0, 0, 0, instant_torque, 0, 0, instant_thrust, instant_speed)
+        DataSaver.save(name, 0, instant_torque, 0, instant_thrust, instant_speed)
 
 
 testModeTask: TestModeTask = TestModeTask()
