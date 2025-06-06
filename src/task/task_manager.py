@@ -1,6 +1,5 @@
 import asyncio
 import logging
-import flet as ft
 from db.models.io_conf import IOConf
 from db.models.system_settings import SystemSettings
 from task.sps_offline_task import sps_offline_task
@@ -12,8 +11,7 @@ from websocket.websocket_client import ws_client
 
 
 class TaskManager:
-    def __init__(self, page: ft.Page):
-        self.page = page
+    def __init__(self):
         self.io_conf: IOConf = IOConf.get()
         system_settings: SystemSettings = SystemSettings.get()
         self.amount_of_propeller = system_settings.amount_of_propeller

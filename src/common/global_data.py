@@ -13,13 +13,10 @@ class GlobalData:
         self.utc_date_time: datetime = None
         self.system_date_time: datetime = None
 
+        self.amount_of_propeller = 1
+
         #  是否开启自动从GPS同步UTC时间
         self.enable_utc_time_sync_with_gps = False
-
-        # 是否已经连接上SPS1
-        self.connected_to_sps1 = False
-        # 是否已经连接上SPS2
-        self.connected_to_sps2 = False
 
         # 作为服务端, 是否已启动
         self.hmi_server_started = False
@@ -79,6 +76,8 @@ class GlobalData:
     def set_default_value(self):
         systemSettings: SystemSettings = SystemSettings.get()
         self.display_propeller_curve = systemSettings.display_propeller_curve
+
+        self.amount_of_propeller = systemSettings.amount_of_propeller
 
         dateTimeConf: DateTimeConf = DateTimeConf.get()
         self.enable_utc_time_sync_with_gps = dateTimeConf.sync_with_gps

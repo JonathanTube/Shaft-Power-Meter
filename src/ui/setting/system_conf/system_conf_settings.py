@@ -131,6 +131,8 @@ class SystemConfSettings(CustomCard):
 
         self.system_settings.save()
 
+        gdata.amount_of_propeller = self.system_settings.amount_of_propeller
+        
         gdata.display_propeller_curve = self.display_propeller_curve.value
         if ControlManager.propeller_conf is not None:
             ControlManager.propeller_conf.visible = self.display_propeller_curve.value

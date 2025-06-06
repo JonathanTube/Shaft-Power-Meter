@@ -35,31 +35,10 @@ class JM38460x44Async:
             speed_sel: 速度选择参数
         返回: 解析后的字典或None
         """
-        # 基本头长度检查
-        if len(data) < 12:
-            return {'success': False, 'error': '数据长度不足'}
-
         try:
             # 解析MBAP头
             transaction_id, protocol_id, length, unit_id = struct.unpack(">HHHB", data[:7])
             func_code = data[7]
-
-            # 异常响应处理
-            if func_code & 0x80:
-                error_code = data[8] if len(data) >= 9 else 0
-                return {
-                    'success': False,
-                    'error_code': error_code,
-                    'transaction_id': transaction_id
-                }
-
-            # 功能码校验
-            if func_code != 0x44:
-                return {
-                    'success': False,
-                    'error': f'无效功能码: 0x{func_code:02x}',
-                    'transaction_id': transaction_id
-                }
 
             # 解析帧信息
             current_frame = struct.unpack('>H', data[8:10])[0]

@@ -10,7 +10,6 @@ from db.models.user import User
 from ui.common.custom_card import CustomCard
 from ui.common.keyboard import keyboard
 from ui.common.permission_check import PermissionCheck
-from ui.common.toast import Toast
 from websocket.websocket_server import ws_server
 from websocket.websocket_client import ws_client
 from common.global_data import gdata
@@ -83,7 +82,7 @@ class IOSettingSPS(CustomCard):
             text=self.page.session.get("lang.setting.connect"),
             bgcolor=ft.colors.GREEN,
             color=ft.colors.WHITE,
-            visible=not gdata.connected_to_sps1,
+            visible=gdata.sps1_offline,
             on_click=lambda e: self.page.open(PermissionCheck(self.__connect_to_sps1, 2))
         )
 
@@ -91,7 +90,7 @@ class IOSettingSPS(CustomCard):
             text=self.page.session.get("lang.setting.disconnect"),
             bgcolor=ft.colors.RED,
             color=ft.colors.WHITE,
-            visible=gdata.connected_to_sps1,
+            visible=not gdata.sps1_offline,
             on_click=lambda e: self.page.open(PermissionCheck(self.__disconnect_from_sps1, 2))
         )
 
@@ -113,7 +112,7 @@ class IOSettingSPS(CustomCard):
             text=self.page.session.get("lang.setting.connect"),
             bgcolor=ft.colors.GREEN,
             color=ft.colors.WHITE,
-            visible=not gdata.connected_to_sps2,
+            visible=gdata.sps2_offline,
             on_click=lambda e: self.page.open(PermissionCheck(self.__connect_to_sps2, 2))
         )
 
@@ -121,7 +120,7 @@ class IOSettingSPS(CustomCard):
             text=self.page.session.get("lang.setting.disconnect"),
             bgcolor=ft.colors.RED,
             color=ft.colors.WHITE,
-            visible=gdata.connected_to_sps2,
+            visible=not gdata.sps2_offline,
             on_click=lambda e: self.page.open(PermissionCheck(self.__disconnect_from_sps2,2))
         )
 

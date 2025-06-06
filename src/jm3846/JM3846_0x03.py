@@ -30,31 +30,10 @@ class JM38460x03Async:
         参数: data - 原始字节数据
         返回: 解析后的字典
         """
-        # 基本长度检查
-        if len(data) < 8:
-            return {'success': False, 'error': '数据长度不足'}
-
         try:
             # 解析MBAP头
             transaction_id, protocol_id, length, unit_id = struct.unpack(">HHHB", data[:7])
             func_code = data[7]
-
-            # 异常响应处理
-            if func_code & 0x80:
-                error_code = data[8] if len(data) >= 9 else 0
-                return {
-                    'success': False,
-                    'error_code': error_code,
-                    'transaction_id': transaction_id
-                }
-
-            # 功能码校验
-            if func_code != 0x03:
-                return {
-                    'success': False,
-                    'error': f'无效功能码: 0x{func_code:02x}',
-                    'transaction_id': transaction_id
-                }
 
             # 解析PDU部分
             pdu = data[7:7 + length - 1]

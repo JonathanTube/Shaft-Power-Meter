@@ -115,7 +115,7 @@ async def main(page: ft.Page):
 
     page.update()
 
-    TaskManager(page).start_all()
+    TaskManager().start_all()
 
 if __name__ == "__main__":
     check_single_instance()
