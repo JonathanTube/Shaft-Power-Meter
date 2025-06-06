@@ -1,4 +1,5 @@
 import asyncio
+import logging
 import flet as ft
 from common.global_data import gdata
 from common.control_manager import ControlManager
@@ -16,7 +17,12 @@ from ui.report.report_info_list import ReportInfoList
 from ui.setting.index import Setting
 from db.models.system_settings import SystemSettings
 from ui.common.keyboard import keyboard
-
+from task.sps1_read_task import sps1_read_task
+from task.sps2_read_task import sps2_read_task
+from websocket.websocket_client import ws_client
+from websocket.websocket_server import ws_server
+from utils.plc_util import plc_util
+from task.gps_sync_task import gps_sync_task
 
 class Header(ft.AppBar):
     def __init__(self, main_content: ft.Container):
@@ -84,6 +90,23 @@ class Header(ft.AppBar):
     def __close_app(self, e):
         self.page.open(PermissionCheck(self.__exit_app, 1))
 
+    async def __close_all_connects(self):
+        logging.info('start closing all of the connections...')
+        # 关闭sps
+        await sps1_read_task.async_disconnect()
+        await sps2_read_task.async_disconnect()
+
+        # 关闭websocket
+        await ws_server.stop()
+        await ws_client.close()
+
+        # 关闭PLC
+        await plc_util.close()
+
+        # 关闭GPS
+        await gps_sync_task.close_connection()
+        logging.info('all of the connections were closed.')
+
     def __exit_app(self, user: User):
         user_id = user.id
         OperationLog.create(
@@ -92,6 +115,9 @@ class Header(ft.AppBar):
             operation_type=OperationType.SYSTEM_EXIT,
             operation_content=user.user_name
         )
+
+        self.page.run_task(self.__close_all_connects)
+
         Toast.show_error(self.page, self.page.session.get("lang.toast.system_exit"))
         self.page.window.destroy()
 

@@ -72,6 +72,8 @@ class JM3846AsyncClient:
         try:
             self.running = False
             if self.writer:
+                # 发送0x45,断开数据流
+                self.async_handle_0x45()
                 self.writer.close()
                 await self.writer.wait_closed()
                 logging.info(f'{self.name} JM3846 Connection closed')

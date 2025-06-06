@@ -32,4 +32,4 @@ class TaskManager:
             asyncio.create_task(ws_client.connect())
             
        
-        # asyncio.create_task(GpsSyncTask(self.page).start())
+        # asyncio.create_task(GpsSyncTask().start())

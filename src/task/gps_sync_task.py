@@ -12,8 +12,7 @@ from utils.alarm_saver import AlarmSaver
 
 
 class GpsSyncTask:
-    def __init__(self, page: ft.Page):
-        self.page = page
+    def __init__(self):
         self.reader = None
         self.writer = None
 
@@ -113,3 +112,5 @@ class GpsSyncTask:
         except pynmea2.ParseError:
             logging.exception("gps parse nmea sentence failed")
             gdata.gps_location = None
+
+gps_sync_task = GpsSyncTask()
