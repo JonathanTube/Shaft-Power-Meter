@@ -7,8 +7,6 @@ class OfflineDefaultValue(BaseModel):
 
     thrust_default_value = FloatField(verbose_name="推力默认值 (N)")
 
-    power_default_value = FloatField(verbose_name="功率默认值 (W)")
-
     speed_default_value = FloatField(verbose_name="速度默认值 (RPM)")
 
     class Meta:

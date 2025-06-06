@@ -31,13 +31,6 @@ class GeneralOflineDefaultValue(ft.Container):
                                                  read_only=True,
                                                  on_focus=lambda e: keyboard.open(e.control))
 
-        self.power_default_value = ft.TextField(suffix_text="W",
-                                                label=self.page.session.get("lang.common.power"),
-                                                value=self.odv.power_default_value,
-                                                col={"xs": 6},
-                                                read_only=True,
-                                                on_focus=lambda e: keyboard.open(e.control))
-
         self.speed_default_value = ft.TextField(suffix_text="rpm",
                                                 label=self.page.session.get("lang.common.speed"),
                                                 value=self.odv.speed_default_value,
@@ -51,7 +44,6 @@ class GeneralOflineDefaultValue(ft.Container):
                 controls=[
                     self.torque_default_value,
                     self.thrust_default_value,
-                    self.power_default_value,
                     self.speed_default_value
                 ]
             )
@@ -60,20 +52,16 @@ class GeneralOflineDefaultValue(ft.Container):
     def save_data(self, user_id: int):
         self.odv.torque_default_value = float(self.torque_default_value.value or 0)
         self.odv.thrust_default_value = float(self.thrust_default_value.value or 0)
-        self.odv.power_default_value = float(self.power_default_value.value or 0)
         self.odv.speed_default_value = float(self.speed_default_value.value or 0)
 
         if self.system_unit == 0:
             self.odv.torque_default_value = UnitConverter.knm_to_nm(self.odv.torque_default_value)
             self.odv.thrust_default_value = UnitConverter.kn_to_n(self.odv.thrust_default_value)
-            self.odv.power_default_value = UnitConverter.kw_to_w(self.odv.power_default_value)
         elif self.system_unit == 1:
             self.odv.torque_default_value = UnitConverter.tm_to_nm(self.odv.torque_default_value)
             self.odv.thrust_default_value = UnitConverter.t_to_n(self.odv.thrust_default_value)
-            self.odv.power_default_value = UnitConverter.shp_to_w(self.odv.power_default_value)
         self.odv.save()
 
-        gdata.sps_offline_power = self.odv.power_default_value
         gdata.sps_offline_torque = self.odv.torque_default_value
         gdata.sps_offline_speed = self.odv.speed_default_value
         gdata.sps_offline_thrust = self.odv.thrust_default_value
@@ -82,23 +70,19 @@ class GeneralOflineDefaultValue(ft.Container):
             user_id=user_id,
             utc_date_time=gdata.utc_date_time,
             operation_type=OperationType.OFFLINE_DEFAULT_VALUE,
-            operation_content=f"update offline default value: {self.odv.torque_default_value}, {self.odv.thrust_default_value}, {self.odv.power_default_value}, {self.odv.speed_default_value}"
+            operation_content=f"update offline default value: {self.odv.torque_default_value}, {self.odv.thrust_default_value}, {self.odv.speed_default_value}"
         )
         operation_log.save()
 
     def update_unit(self, system_unit: int):
         self.system_unit = system_unit
         torque_default_value = float(self.odv.torque_default_value or 0)
-        power_default_value = float(self.odv.power_default_value or 0)
         thrust_default_value = float(self.odv.thrust_default_value or 0)
         speed_default_value = float(self.odv.speed_default_value or 0)
 
         if self.system_unit == 0:
             self.torque_default_value.suffix_text = "kNm"
             self.torque_default_value.value = round(torque_default_value / 1000, 1)
-
-            self.power_default_value.suffix_text = "kW"
-            self.power_default_value.value = round(power_default_value / 1000, 1)
 
             self.thrust_default_value.suffix_text = "kN"
             self.thrust_default_value.value = round(thrust_default_value / 1000, 1)
@@ -109,9 +93,6 @@ class GeneralOflineDefaultValue(ft.Container):
         elif self.system_unit == 1:
             self.torque_default_value.suffix_text = "Tm"
             self.torque_default_value.value = UnitConverter.nm_to_tm(torque_default_value)
-
-            self.power_default_value.suffix_text = "sHp"
-            self.power_default_value.value = UnitConverter.w_to_shp(power_default_value)
 
             self.thrust_default_value.suffix_text = "T"
             self.thrust_default_value.value = UnitConverter.n_to_t(thrust_default_value)

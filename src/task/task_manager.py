@@ -3,6 +3,7 @@ import logging
 import flet as ft
 from db.models.io_conf import IOConf
 from db.models.system_settings import SystemSettings
+from task.sps_offline_task import sps_offline_task
 from task.utc_timer_task import UtcTimer
 from task.sps1_read_task import sps1_read_task
 from task.sps2_read_task import sps2_read_task
@@ -19,6 +20,8 @@ class TaskManager:
 
     def start_all(self):
         asyncio.create_task(UtcTimer().start())
+
+        asyncio.create_task(sps_offline_task.start())
 
         if self.io_conf.connect_to_sps:
             asyncio.create_task(sps1_read_task.start())

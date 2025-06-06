@@ -37,7 +37,6 @@ class DataInit:
             OfflineDefaultValue.create(
                 torque_default_value=0,
                 thrust_default_value=0,
-                power_default_value=0,
                 speed_default_value=0
             )
 

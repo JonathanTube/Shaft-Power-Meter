@@ -69,9 +69,9 @@ class GlobalData:
         self.power_of_torque_load_limit = 0
         self.power_of_overload = 0
 
-        self.sps1_offline: bool = False
-        self.sps2_offline: bool = False
-        self.sps_offline_power = 0
+        # 默认离线
+        self.sps1_offline: bool = True
+        self.sps2_offline: bool = True
         self.sps_offline_torque = 0
         self.sps_offline_thrust = 0
         self.sps_offline_speed = 0
@@ -118,7 +118,6 @@ class GlobalData:
             self.sps2_thrust_offset = sps2_accepted_zero_cal.thrust_offset
 
         offline_default_value: OfflineDefaultValue = OfflineDefaultValue.get()
-        self.sps_offline_power = offline_default_value.power_default_value
         self.sps_offline_thrust = offline_default_value.thrust_default_value
         self.sps_offline_torque = offline_default_value.torque_default_value
         self.sps_offline_speed = offline_default_value.speed_default_value

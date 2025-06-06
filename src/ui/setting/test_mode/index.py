@@ -133,6 +133,9 @@ class TestMode(ft.Container):
         self.start_button.update()
         self.stop_button.visible = False
         self.stop_button.update()
+        # 恢复现场
+        gdata.sps1_offline = True
+        gdata.sps2_offline = True
 
         OperationLog.create(
             user_id=user.id,
