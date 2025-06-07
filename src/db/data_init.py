@@ -560,6 +560,12 @@ class DataInit:
                     "chinese": "已接受",
                     "english": "Accepted"
                 },
+
+                {
+                    "code": "lang.setting.zero_cal.disabled",
+                    "chinese": "此HMI运行在从机模式，无需配置调零。",
+                    "english": "This HMI is running as a slaver mode without zero cal."
+                },
                 {
                     "code": "lang.setting.io_conf.title",
                     "chinese": "IO 配置",
@@ -1324,6 +1330,13 @@ class DataInit:
                     "chinese": "不能搜索超过90天",
                     "english": "Cannot search more than 90 days"
                 },
+                
+                {
+                    "code": "lang.propeller_curve.propeller_curve_disabled",
+                    "chinese": "螺旋线曲线被禁用",
+                    "english": "Propeller Curve is disabled"
+                },
+
                 {
                     "code": "lang.propeller_curve.mcr_operating_point",
                     "chinese": "MCR 操作点",

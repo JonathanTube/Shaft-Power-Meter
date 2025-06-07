@@ -1,5 +1,6 @@
 import flet as ft
 
+from db.models.io_conf import IOConf
 from ui.setting.zero_cal.zero_cal_executor_sps1 import ZeroCalExecutorSPS1
 from ui.setting.zero_cal.zero_cal_executor_sps2 import ZeroCalExecutorSPS2
 from ui.setting.zero_cal.zero_cal_his import ZeroCalHis
@@ -9,8 +10,11 @@ from db.models.system_settings import SystemSettings
 class ZeroCal(ft.Container):
     def __init__(self):
         super().__init__()
+        self.expand = True
+        self.alignment=ft.alignment.center
         system_settings: SystemSettings = SystemSettings.get()
         self.amount_of_propeller = system_settings.amount_of_propeller
+        self.io_conf: IOConf = IOConf.get()
 
     def __on_change(self, e):
         data = int(e.data)
@@ -34,22 +38,25 @@ class ZeroCal(ft.Container):
         )
         self.his = ZeroCalHis()
         tabs = [
-                ft.Tab(
-                    text=self.page.session.get("lang.zero_cal.history"),
-                    content=ft.Container(
-                        padding=ft.padding.symmetric(0, 0),
-                        content=self.his
-                    )
-                ),
-                self.executor_sps1
+            ft.Tab(
+                text=self.page.session.get("lang.zero_cal.history"),
+                content=ft.Container(
+                    padding=ft.padding.symmetric(0, 0),
+                    content=self.his
+                )
+            ),
+            self.executor_sps1
         ]
         if self.amount_of_propeller > 1:
             tabs.append(self.executor_sps2)
 
-        self.content = ft.Tabs(
-            selected_index=0,
-            animation_duration=300,
-            on_change=lambda e: self.__on_change(e),
-            tabs=tabs,
-            expand=True
-        )
+        if self.io_conf.connect_to_sps:
+            self.content = ft.Tabs(
+                selected_index=0,
+                animation_duration=300,
+                on_change=lambda e: self.__on_change(e),
+                tabs=tabs,
+                expand=True
+            )
+        else:
+            self.content = ft.Text(value=self.page.session.get('lang.setting.zero_cal.disabled'))

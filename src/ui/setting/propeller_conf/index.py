@@ -5,6 +5,7 @@ from db.models.operation_log import OperationLog
 from common.operation_type import OperationType
 from common.global_data import gdata
 from playhouse.shortcuts import model_to_dict
+from db.models.system_settings import SystemSettings
 from db.models.user import User
 from ui.common.keyboard import keyboard
 from ui.common.permission_check import PermissionCheck
@@ -21,8 +22,8 @@ class PropellerConf(ft.Container):
     def __init__(self):
         super().__init__()
         self.expand = True
-        self.alignment = ft.alignment.top_left
-
+        self.alignment = ft.alignment.center
+        self.system_settings:SystemSettings = SystemSettings.get()
         self.ps: PropellerSetting = PropellerSetting.get()
 
     def build(self):
@@ -47,28 +48,31 @@ class PropellerConf(ft.Container):
             on_click=lambda e: self.__reset_data(e)
         )
 
-        self.content = ft.Column(
-            scroll=ft.ScrollMode.ADAPTIVE,
-            controls=[
-                ft.ResponsiveRow(
-                    controls=[
-                        self.mcr_operating_point_card,
-                        self.normal_propeller_curve_card,
-                        self.torque_load_limit_curve_card,
-                        self.light_propeller_curve_card,
-                        self.speed_limit_curve_card,
-                        self.overload_curve_card,
-                        ft.Row(
-                            alignment=ft.MainAxisAlignment.CENTER,
-                            controls=[
-                                self.save_button,
-                                self.reset_button
-                            ]
-                        )
-                    ]
-                )
-            ]
-        )
+        if self.system_settings.display_propeller_curve:
+            self.content = ft.Column(
+                scroll=ft.ScrollMode.ADAPTIVE,
+                controls=[
+                    ft.ResponsiveRow(
+                        controls=[
+                            self.mcr_operating_point_card,
+                            self.normal_propeller_curve_card,
+                            self.torque_load_limit_curve_card,
+                            self.light_propeller_curve_card,
+                            self.speed_limit_curve_card,
+                            self.overload_curve_card,
+                            ft.Row(
+                                alignment=ft.MainAxisAlignment.CENTER,
+                                controls=[
+                                    self.save_button,
+                                    self.reset_button
+                                ]
+                            )
+                        ]
+                    )
+                ]
+            )
+        else:
+            self.content = ft.Text(self.page.session.get('lang.propeller_curve.propeller_curve_disabled'))
 
     def __on_save_button_click(self, e):
         self.page.open(PermissionCheck(self.__save_data, 2))

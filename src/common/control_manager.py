@@ -13,7 +13,6 @@ class ControlManager:
     event_button: EventButton | None = None
     alarm_button: AlarmButton | None = None
 
-    propeller_conf: PropellerSetting | None = None
     propeller_curve_diagram: PropellerCurveDiagram | None = None
 
     trend_view_sps1: TrendViewDiagram | None = None

@@ -62,41 +62,6 @@ class ZeroCalTable(AbstractTable):
             return self.page.session.get("lang.zero_cal.aborted")
         return ""
 
-    def has_operations(self):
-        io_conf: IOConf = IOConf.get()
-        return io_conf.connect_to_sps
-
-    def create_operations(self, items: list):
-        return ft.IconButton(
-            icon=ft.icons.WARNING,
-            icon_color=ft.Colors.RED,
-            icon_size=20,
-            on_click=lambda e: self.__on_click(items[0])
-        )
-
-    def __on_click(self, id: int):
-        zero_cal_info: ZeroCalInfo = ZeroCalInfo.get(id)
-        if zero_cal_info:
-            records: list[ZeroCalRecord] = zero_cal_info.records
-            json_data = {
-                'type': 'zero_cal',
-                'id': zero_cal_info.id,
-                'utc_date_time': zero_cal_info.utc_date_time.strftime('%Y-%m-%d %H:%M:%S'),
-                'name': zero_cal_info.name,
-                'torque_offset': zero_cal_info.torque_offset,
-                'thrust_offset': zero_cal_info.thrust_offset,
-                'state': zero_cal_info.state,
-                'records': [
-                    {
-                        'id': record.id,
-                        'name': record.name,
-                        'mv_per_v_for_torque': record.mv_per_v_for_torque,
-                        'mv_per_v_for_thrust': record.mv_per_v_for_thrust,
-                    } for record in records
-                ]
-            }
-            self.page.run_task(ws_client.send, json_data)
-
     def create_columns(self):
         return self.get_columns()
 

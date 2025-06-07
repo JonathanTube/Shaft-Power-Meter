@@ -1,6 +1,5 @@
 import flet as ft
 from common.control_manager import ControlManager
-from common.global_data import gdata
 from ui.setting.general.index import General
 from ui.setting.propeller_conf.index import PropellerConf
 from ui.setting.self_test import SelfTest
@@ -21,9 +20,6 @@ class Setting(ft.Container):
     def __set_content(self, e):
         idx = e.control.selected_index
 
-        if not gdata.display_propeller_curve and idx >= 2:
-            idx = idx + 1
-
         if idx == self.idx:
             return
 
@@ -36,11 +32,11 @@ class Setting(ft.Container):
         elif idx == 1:
             self.right_content.content = General()
         elif idx == 2:
-            self.right_content.content = PropellerConf()
-        elif idx == 3:
-            self.right_content.content = ZeroCal()
-        elif idx == 4:
             self.right_content.content = IOSetting()
+        elif idx == 3:
+            self.right_content.content = PropellerConf()
+        elif idx == 4:
+            self.right_content.content = ZeroCal()
         elif idx == 5:
             self.right_content.content = SelfTest()
         elif idx == 6:
@@ -59,25 +55,57 @@ class Setting(ft.Container):
         )
 
         s = self.page.session
-        self.system_conf = ft.NavigationRailDestination(icon=ft.Icons.SETTINGS_OUTLINED, selected_icon=ft.Icons.SETTINGS, label=s.get("lang.setting.system_conf.title"))
-        self.general = ft.NavigationRailDestination(icon=ft.Icon(ft.Icons.TUNE_OUTLINED), selected_icon=ft.Icon(ft.Icons.TUNE), label=s.get("lang.setting.general.title"))
-        self.propeller_conf = ft.NavigationRailDestination(icon=ft.Icons.INSIGHTS_OUTLINED, selected_icon=ft.Icon(ft.Icons.INSIGHTS), label=s.get("lang.setting.propeller_setting.title"), visible=gdata.display_propeller_curve)
-        ControlManager.propeller_conf = self.propeller_conf
-        self.zero_cal = ft.NavigationRailDestination(icon=ft.Icons.SWITCH_ACCESS_SHORTCUT_OUTLINED, selected_icon=ft.Icon(ft.Icons.SWITCH_ACCESS_SHORTCUT), label=s.get("lang.setting.zero_cal.title"))
-        self.io_conf = ft.NavigationRailDestination(icon=ft.Icons.USB_OUTLINED, selected_icon=ft.Icon(ft.Icons.USB), label=s.get("lang.setting.io_conf.title"))
-        self.self_test = ft.NavigationRailDestination(icon=ft.Icons.ASSIGNMENT_OUTLINED, selected_icon=ft.Icon(ft.Icons.ASSIGNMENT), label=s.get("lang.setting.self_test.title"))
-        self.permission_conf = ft.NavigationRailDestination(icon=ft.Icons.MANAGE_ACCOUNTS_OUTLINED, selected_icon=ft.Icon(ft.Icons.MANAGE_ACCOUNTS), label=s.get("lang.setting.permission_conf.title"))
-        self.test_mode = ft.NavigationRailDestination(icon=ft.Icons.OUTLINED_FLAG, selected_icon=ft.Icon(ft.Icons.FLAG), label=s.get("lang.setting.test_mode.title"))
+        self.system_conf = ft.NavigationRailDestination(
+            icon=ft.Icons.SETTINGS_OUTLINED, 
+            selected_icon=ft.Icons.SETTINGS, 
+            label=s.get("lang.setting.system_conf.title")
+        )
+        self.general = ft.NavigationRailDestination(
+            icon=ft.Icon(ft.Icons.TUNE_OUTLINED), 
+            selected_icon=ft.Icon(ft.Icons.TUNE), 
+            label=s.get("lang.setting.general.title")
+        )
+        self.propeller_conf = ft.NavigationRailDestination(
+            icon=ft.Icons.INSIGHTS_OUTLINED, 
+            selected_icon=ft.Icon(ft.Icons.INSIGHTS), 
+            label=s.get("lang.setting.propeller_setting.title")
+        )
 
-        rail = ft.NavigationRail(
-            selected_index=0,
+        self.zero_cal = ft.NavigationRailDestination(
+            icon=ft.Icons.SWITCH_ACCESS_SHORTCUT_OUTLINED, 
+            selected_icon=ft.Icon(ft.Icons.SWITCH_ACCESS_SHORTCUT), 
+            label=s.get("lang.setting.zero_cal.title")
+        )
+        self.io_conf = ft.NavigationRailDestination(
+            icon=ft.Icons.USB_OUTLINED, 
+            selected_icon=ft.Icon(ft.Icons.USB), 
+            label=s.get("lang.setting.io_conf.title")
+        )
+        self.self_test = ft.NavigationRailDestination(
+            icon=ft.Icons.ASSIGNMENT_OUTLINED, 
+            selected_icon=ft.Icon(ft.Icons.ASSIGNMENT), 
+            label=s.get("lang.setting.self_test.title")
+        )
+        self.permission_conf = ft.NavigationRailDestination(
+            icon=ft.Icons.MANAGE_ACCOUNTS_OUTLINED, 
+            selected_icon=ft.Icon(ft.Icons.MANAGE_ACCOUNTS), 
+            label=s.get("lang.setting.permission_conf.title")
+        )
+        self.test_mode = ft.NavigationRailDestination(
+            icon=ft.Icons.OUTLINED_FLAG, 
+            selected_icon=ft.Icon(ft.Icons.FLAG), 
+            label=s.get("lang.setting.test_mode.title")
+        )
+
+        self.rail = ft.NavigationRail(
+            selected_index=self.idx,
             label_type=ft.NavigationRailLabelType.ALL,
             destinations=[
                 self.system_conf,
                 self.general,
+                self.io_conf,
                 self.propeller_conf,
                 self.zero_cal,
-                self.io_conf,
                 self.self_test,
                 self.permission_conf,
                 self.test_mode
@@ -86,7 +114,7 @@ class Setting(ft.Container):
         )
         self.content = ft.Row(
             spacing=0,
-            controls=[rail, ft.VerticalDivider(width=1), self.right_content],
+            controls=[self.rail, ft.VerticalDivider(width=1), self.right_content],
             expand=True
         )
 

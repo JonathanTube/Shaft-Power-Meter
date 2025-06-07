@@ -134,9 +134,6 @@ class SystemConfSettings(CustomCard):
         gdata.amount_of_propeller = self.system_settings.amount_of_propeller
         
         gdata.display_propeller_curve = self.display_propeller_curve.value
-        if ControlManager.propeller_conf is not None:
-            ControlManager.propeller_conf.visible = self.display_propeller_curve.value
-            ControlManager.propeller_conf.update()
 
         OperationLog.create(
             user_id=user_id,
