@@ -75,7 +75,7 @@ class SinglePowerLine(ft.Container):
                     ft.ChartAxisLabel(value=0),
                     ft.ChartAxisLabel(value=left_max)
                 ]),
-            bottom_axis=ft.ChartAxis(labels_size=30, labels_interval=1, visible=False),
+            bottom_axis=ft.ChartAxis(labels_size=30, show_labels=True),
             data_series=[
                 self.threshold_filled,
                 self.data_line,

@@ -47,8 +47,8 @@ class DataSaver:
                 gdata.sps1_mv_per_v_for_torque = ad_0_mv_per_v
                 gdata.sps1_mv_per_v_for_thrust = ad_1_mv_per_v
                 if len(gdata.sps1_power_history) > 100:
-                    gdata.sps1_power_history.pop()
-                gdata.sps1_power_history.insert(0, (power, utc_date_time))
+                    gdata.sps1_power_history.pop(0)
+                gdata.sps1_power_history.append((power, utc_date_time))
             else:
                 gdata.sps2_torque = ad_0_torque
                 gdata.sps2_thrust = ad_1_thrust
@@ -58,8 +58,8 @@ class DataSaver:
                 gdata.sps2_mv_per_v_for_torque = ad_0_mv_per_v
                 gdata.sps2_mv_per_v_for_thrust = ad_1_mv_per_v
                 if len(gdata.sps2_power_history) > 100:
-                    gdata.sps2_power_history.pop()
-                gdata.sps2_power_history.insert(0, (power, utc_date_time))
+                    gdata.sps2_power_history.pop(0)
+                gdata.sps2_power_history.append((power, utc_date_time))
 
             # 处理EEXI过载和恢复
             EEXIBreach.handle_breach_and_recovery()
