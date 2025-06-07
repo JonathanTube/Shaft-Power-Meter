@@ -151,7 +151,7 @@ class DataInit:
                 sps1_ip='127.0.0.1',
                 sps1_port=6800,
                 sps2_ip='127.0.0.1',
-                sps2_port=6800,
+                sps2_port=6801,
                 connect_to_sps=False,
                 hmi_server_ip='192.168.1.100',
                 hmi_server_port=8000

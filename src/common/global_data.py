@@ -40,6 +40,11 @@ class GlobalData:
         self.sps1_power = 0
         self.sps1_torque = 0
         self.sps1_thrust = 0
+        
+        self.sps1_ad0 = 0
+        self.sps1_ad1 = 0
+        self.sps1_speed = 0
+
         self.sps1_mv_per_v_for_torque = 0
         self.sps1_mv_per_v_for_thrust = 0
         self.sps1_torque_offset = 0
@@ -49,6 +54,11 @@ class GlobalData:
         self.sps2_power = 0
         self.sps2_torque = 0
         self.sps2_thrust = 0
+
+        self.sps2_ad0 = 0
+        self.sps2_ad1 = 0
+        self.sps2_speed = 0
+
         self.sps2_mv_per_v_for_torque = 0
         self.sps2_mv_per_v_for_thrust = 0
         self.sps2_torque_offset = 0
