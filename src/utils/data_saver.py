@@ -13,13 +13,10 @@ from utils.modbus_output import modbus_output
 
 class DataSaver:
     @staticmethod
-    def save(name: str, 
-             ad_0_mv_per_v: float, ad_0_torque: float, 
-             ad_1_mv_per_v: float, ad_1_thrust: float, 
-             speed: float):
+    def save(name: str, torque: float, thrust: float, speed: float):
         try:
             utc_date_time = gdata.utc_date_time
-            power = FormulaCalculator.calculate_instant_power(ad_0_torque, speed)
+            power = FormulaCalculator.calculate_instant_power(torque, speed)
             # delete invalid data which is over than 3 months.
             DataLog.delete().where(DataLog.utc_date_time < utc_date_time - timedelta(weeks=4 * 3))
             is_overload: bool = DataSaver.is_overload(speed, power)
@@ -29,37 +26,31 @@ class DataSaver:
                 name=name,
                 speed=speed,
                 power=power,
-                ad_0_torque=ad_0_torque,
-                ad_1_thrust=ad_1_thrust,
+                ad_0_torque=torque,
+                ad_1_thrust=thrust,
                 is_overload=is_overload
             )
             # 保存瞬时数据
             if gdata.plc_enabled:
-                logging.info(f"write real time data to plc: {power}, {ad_0_torque}, {ad_1_thrust}, {speed}")
-                asyncio.create_task(plc_util.write_instant_data(power, ad_0_torque, ad_1_thrust, speed))
+                logging.info(f"write real time data to plc: {power}, {torque}, {thrust}, {speed}")
+                asyncio.create_task(plc_util.write_instant_data(power, torque, thrust, speed))
             # save counter log of total
             DataSaver.save_counter_total(name, speed, power)
             # save counter log of interval
             DataSaver.save_counter_interval(name, speed, power)
             if name == 'sps1':
-                gdata.sps1_torque = ad_0_torque
-                gdata.sps1_thrust = ad_1_thrust
+                gdata.sps1_torque = torque
+                gdata.sps1_thrust = thrust
                 gdata.sps1_speed = speed
                 gdata.sps1_power = power
-                # 毫伏/伏 调零用
-                gdata.sps1_mv_per_v_for_torque = ad_0_mv_per_v
-                gdata.sps1_mv_per_v_for_thrust = ad_1_mv_per_v
                 if len(gdata.sps1_power_history) > 100:
                     gdata.sps1_power_history.pop(0)
                 gdata.sps1_power_history.append((power, utc_date_time))
             else:
-                gdata.sps2_torque = ad_0_torque
-                gdata.sps2_thrust = ad_1_thrust
+                gdata.sps2_torque = torque
+                gdata.sps2_thrust = thrust
                 gdata.sps2_speed = speed
                 gdata.sps2_power = power
-                # 毫伏/伏 调零用
-                gdata.sps2_mv_per_v_for_torque = ad_0_mv_per_v
-                gdata.sps2_mv_per_v_for_thrust = ad_1_mv_per_v
                 if len(gdata.sps2_power_history) > 100:
                     gdata.sps2_power_history.pop(0)
                 gdata.sps2_power_history.append((power, utc_date_time))

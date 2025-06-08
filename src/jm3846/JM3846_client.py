@@ -103,7 +103,6 @@ class JM3846AsyncClient:
                 logging.exception(f'{self.name} JM3846 0x03 request timeout')
             except Exception:
                 logging.exception(f'{self.name} JM3846 0x03 error')
-                await self.async_disconnect()
 
     def _update_config(self, config: dict):
         """更新设备配置"""
@@ -130,7 +129,7 @@ class JM3846AsyncClient:
                 await self.writer.drain()
 
             except asyncio.TimeoutError:
-                logging.exception(f'{self.name} JM3846 0x44 request timeout')
+                logging.error(f'{self.name} JM3846 0x44 request timeout')
             except Exception:
                 logging.exception(f'{self.name} JM3846 0x44 error')
                 await self.async_disconnect()
@@ -227,15 +226,8 @@ class JM3846AsyncClient:
             logging.info('test mode is running, skip save 0x44 result from JM3456.')
             return
         """数据存储方法"""
-        ad0 = 0
-        ad0_mv_per_v = 0
-        ad0_microstrain = 0
-        ad0_torque = 0
-
-        ad1 = 0
-        ad1_mv_per_v = 0
-        ad1_thrust = 0
-
+        torque = 0
+        thrust = 0
         speed = 0
 
         json_data = {
@@ -244,34 +236,37 @@ class JM3846AsyncClient:
         }
         if 'ch0_ad' in result:
             ad0 = round(result['ch0_ad'], 2)
+            ad0_mv_per_v = self.jm3846Calculator.calculate_mv_per_v(ad0, self.gain_0)
+
             if self.name == 'sps1':
                 gdata.sps1_ad0 = ad0
+                gdata.sps1_mv_per_v_for_torque = ad0_mv_per_v
             else:
                 gdata.sps2_ad0 = ad0
-
-            ad0_mv_per_v = self.jm3846Calculator.calculate_mv_per_v(ad0, self.gain_0)
+                gdata.sps2_mv_per_v_for_torque = ad0_mv_per_v
+            
             # 加上偏移量
             torque_offset = gdata.sps1_torque_offset if self.name == 'sps1' else gdata.sps2_torque_offset
             ad0_microstrain = self.jm3846Calculator.calculate_microstrain(ad0_mv_per_v + torque_offset)
-            ad0_torque = self.jm3846Calculator.calculate_torque(ad0_microstrain)
-            logging.info(f'name={self.name},ad0={ad0}, ad0_mv_per_v={ad0_mv_per_v}, torque_offset={torque_offset}, microstrain={ad0_microstrain}, torque={ad0_torque}')
-            json_data['ch0_ad'] = ad0
-            json_data['ch0_gain'] = self.gain_0
+            torque = self.jm3846Calculator.calculate_torque(ad0_microstrain)
+            logging.info(f'name={self.name},ad0={ad0}, ad0_mv_per_v={ad0_mv_per_v}, torque_offset={torque_offset}, microstrain={ad0_microstrain}, torque={torque}')
+            json_data['torque'] = torque
         if 'ch1_ad' in result:
             ad1 = round(result['ch1_ad'], 2)
+            ad1_mv_per_v = self.jm3846Calculator.calculate_mv_per_v(ad1, self.gain_1)
 
             if self.name == 'sps1':
                 gdata.sps1_ad1 = ad1
+                gdata.sps1_mv_per_v_for_thrust = ad1_mv_per_v
             else:
                 gdata.sps2_ad1 = ad1
+                gdata.sps2_mv_per_v_for_thrust = ad1_mv_per_v
 
-            ad1_mv_per_v = self.jm3846Calculator.calculate_mv_per_v(ad1, self.gain_1)
             # 加上偏移量
             thrust_offset = gdata.sps1_thrust_offset if self.name == 'sps1' else gdata.sps2_thrust_offset
-            ad1_thrust = self.jm3846Calculator.calculate_thrust(ad1_mv_per_v + thrust_offset)
-            logging.info(f'name={self.name},ad1={ad1},ad1_mv_per_v={ad1_mv_per_v}, thrust_offset={thrust_offset}, thrust={ad1_thrust}')
-            json_data['ch1_ad'] = ad1
-            json_data['ch1_gain'] = self.gain_1
+            thrust = self.jm3846Calculator.calculate_thrust(ad1_mv_per_v + thrust_offset)
+            logging.info(f'name={self.name},ad1={ad1},ad1_mv_per_v={ad1_mv_per_v}, thrust_offset={thrust_offset}, thrust={thrust}')
+            json_data['thrust'] = thrust
         if 'rpm' in result:
             rpm = round(result['rpm'], 2)
             if self.name == 'sps1':
@@ -282,7 +277,7 @@ class JM3846AsyncClient:
             speed = round(rpm / 10, 1)
             logging.info(f'name={self.name},rpm={rpm}, speed={speed}')
             json_data['rpm'] = rpm
-        DataSaver.save(self.name, ad0_mv_per_v, ad0_torque, ad1_mv_per_v, ad1_thrust, speed)
+        DataSaver.save(self.name, torque, thrust, speed)
 
         # 如果作为服务端，那需要向外发送数据
         if gdata.hmi_server_started:
@@ -302,10 +297,9 @@ class JM3846AsyncClient:
                 self.writer.write(request)
                 await self.writer.drain()
             except asyncio.TimeoutError:
-                logging.exception(f'{self.name} JM3846 0x45 request timeout')
+                logging.error(f'{self.name} JM3846 0x45 request timeout')
             except Exception:
-                logging.exception(f'{self.name} JM3846 0x45 error')
-                await self.async_disconnect()
+                logging.error(f'{self.name} JM3846 0x45 error')
 
     def set_offline(self, is_offline: bool):
         if self.name == 'sps1':

@@ -77,39 +77,18 @@ class WebSocketClient:
             return
 
         name = data['name']
-        ad0 = 0
-        ad0_mv_per_v = 0
-        ad0_microstrain = 0
         ad0_torque = 0
-
-        ad1 = 0
-        ad1_mv_per_v = 0
         ad1_thrust = 0
-
         speed = 0
 
-        if 'ch0_ad' in data:
-            ad0 = data['ch0_ad']
-            gain0 = data['ch0_gain']
-            ad0_mv_per_v = self.jm3846Calculator.calculate_mv_per_v(ad0, gain0)
-            # 加上偏移量
-            torque_offset = gdata.sps1_torque_offset if name == 'sps1' else gdata.sps2_torque_offset
-            ad0_microstrain = self.jm3846Calculator.calculate_microstrain(ad0_mv_per_v + torque_offset)
-            ad0_torque = self.jm3846Calculator.calculate_torque(ad0_microstrain)
-            logging.info(f'name={name},ad0={ad0}, ad0_mv_per_v={ad0_mv_per_v}, torque_offset={torque_offset}, microstrain={ad0_microstrain}, torque={ad0_torque}')
+        if 'torque' in data:
+            ad0_torque = data['torque']
         if 'ch1_ad' in data:
-            ad1 = data['ch1_ad']
-            gain1 = data['ch1_gain']
-            ad1_mv_per_v = self.jm3846Calculator.calculate_mv_per_v(ad1, gain1)
-            # 加上偏移量
-            thrust_offset = gdata.sps2_thrust_offset if name == 'sps2' else gdata.sps1_thrust_offset
-            ad1_thrust = self.jm3846Calculator.calculate_thrust(ad1_mv_per_v + thrust_offset)
-            logging.info(f'name={name},ad1={ad1},ad1_mv_per_v={ad1_mv_per_v}, thrust_offset={thrust_offset}, thrust={ad1_thrust}')
+            ad1_thrust = data['thrust']
         if 'rpm' in data:
             speed = data['rpm'] / 10
-            logging.info(f'name={name},rpm={speed}')
 
-        DataSaver.save(name, ad0_mv_per_v, ad0_torque, ad1_mv_per_v, ad1_thrust, speed)
+        DataSaver.save(name, ad0_torque, ad1_thrust, speed)
 
     def __handle_zero_cal(self, data):
         """处理零点校准数据"""
