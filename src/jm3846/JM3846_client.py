@@ -59,8 +59,8 @@ class JM3846AsyncClient:
     async def async_connect(self) -> bool:
         """建立异步连接"""
         try:
-            logging.info(f'{self.name} JM3846 Connecting...')
             host, port = self.get_ip_port()
+            logging.info(f'{self.name} JM3846 Connecting, host={host}, port={port}...')
             self.reader, self.writer = await asyncio.wait_for(
                 asyncio.open_connection(host, port),
                 timeout=self.timeout

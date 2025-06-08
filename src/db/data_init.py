@@ -148,10 +148,10 @@ class DataInit:
                 plc_port=502,
                 gps_ip='192.168.1.3',
                 gps_port=51001,
-                sps1_ip='127.0.0.1',
+                sps1_ip='192.168.1.5',
                 sps1_port=6800,
-                sps2_ip='127.0.0.1',
-                sps2_port=6801,
+                sps2_ip='192.168.1.6',
+                sps2_port=6800,
                 connect_to_sps=False,
                 hmi_server_ip='192.168.1.100',
                 hmi_server_port=8000

@@ -64,7 +64,7 @@ class JM38460x44Async:
             channel_count: int = JM38460x44Async.get_channel_count(ch_sel1, ch_sel0, speed_sel)
             frames_per_second: int = JM38460x44Async.get_frames_per_second(channel_count, sample_rate, frame_size)
             first_frame_per_second = current_frame % frames_per_second == 0
-            print('first_frame_per_second=', first_frame_per_second)
+            # print('first_frame_per_second=', first_frame_per_second)
             result = {
                 'success': True,
                 'func_code': func_code,
