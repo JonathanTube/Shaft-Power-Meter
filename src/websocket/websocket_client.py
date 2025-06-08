@@ -33,7 +33,7 @@ class WebSocketClient:
             # 启动后台接收任务
             asyncio.create_task(self._receive_loop())
         except Exception:
-            logging.exception(f"failed to connect to {uri}")
+            logging.error(f"failed to connect to {uri}")
             self._running = False
             AlarmSaver.create(alarm_type=AlarmType.HMI_CLIENT_DISCONNECTED)
             return False
