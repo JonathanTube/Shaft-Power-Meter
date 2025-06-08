@@ -22,6 +22,8 @@ class GlobalData:
         self.hmi_server_started = False
         # 作为客户端，是否已连接
         self.connected_to_hmi_server = False
+        # modbus output服务是否已经打开
+        self.modbus_server_started = False
 
         self.gps_ip = None
         self.gps_port = None

@@ -1,8 +1,10 @@
 import flet as ft
+import serial.tools.list_ports
 from db.models.io_conf import IOConf
 from ui.common.custom_card import CustomCard
-import serial.tools.list_ports
+from ui.common.toast import Toast
 from utils.modbus_output import modbus_output
+from common.global_data import gdata
 
 
 class IOSettingOutput(CustomCard):
@@ -17,11 +19,25 @@ class IOSettingOutput(CustomCard):
         ]
 
         self.serial_port = ft.Dropdown(
-            expand=True,
             label="Port",
-            width=800,
             value=self.conf.output_com_port,
             options=options
+        )
+
+        self.connect_button = ft.FilledButton(
+            text=self.page.session.get('lang.setting.connect'),
+            bgcolor=ft.Colors.GREEN,
+            color=ft.Colors.WHITE,
+            visible=not gdata.modbus_server_started,
+            on_click=lambda e : self.__on_connect(e)
+        )
+
+        self.disconnect_button = ft.FilledButton(
+            text=self.page.session.get('lang.setting.disconnect'),
+            bgcolor=ft.Colors.RED,
+            color=ft.Colors.WHITE,
+            visible=gdata.modbus_server_started,
+            on_click=lambda e: self.__on_disconnect(e)
         )
 
         self.check_torque = ft.Checkbox(
@@ -66,20 +82,22 @@ class IOSettingOutput(CustomCard):
                         self.check_avg_power,
                         self.check_sum_power
                     ]),
-                self.serial_port
+                ft.Row(
+                    expand=True,
+                    controls=[
+                        self.serial_port,
+                        self.connect_button,
+                        self.disconnect_button
+                    ]
+                )
             ]
         )
         self.col = {"sm": 12}
         super().build()
 
-    def save_data(self):
-        self.conf.output_torque = self.check_torque.value
-        self.conf.output_thrust = self.check_thrust.value
-        self.conf.output_power = self.check_power.value
-        self.conf.output_speed = self.check_speed.value
-        self.conf.output_avg_power = self.check_avg_power.value
-        self.conf.output_sum_power = self.check_sum_power.value
-        self.conf.output_com_port = self.serial_port.value
+    def __on_connect(self, e):
+        self.save_data()
+        self.conf.save()
         count_list = [
             self.conf.output_torque,
             self.conf.output_thrust,
@@ -89,9 +107,38 @@ class IOSettingOutput(CustomCard):
             self.conf.output_sum_power
         ]
         output_count: int = sum(count_list)
-        if output_count > 0:
-            self.page.run_task(self.__start_modbus_server)
+        if output_count == 0:
+            Toast.show_warning(self.page, self.page.session.get('lang.setting.io_conf.output_option_does_not_selected'))
+            return
+        if self.serial_port.value is None:
+            Toast.show_warning(self.page, self.page.session.get('lang.setting.io_conf.serial_port_can_not_be_empty'))
+            return
+
+        self.page.run_task(self.__end_modbus_server)
+        self.page.run_task(self.__start_modbus_server)
+
+    def __on_disconnect(self, e):
+        self.page.run_task(self.__end_modbus_server)
+
+    def save_data(self):
+        self.conf.output_torque = self.check_torque.value
+        self.conf.output_thrust = self.check_thrust.value
+        self.conf.output_power = self.check_power.value
+        self.conf.output_speed = self.check_speed.value
+        self.conf.output_avg_power = self.check_avg_power.value
+        self.conf.output_sum_power = self.check_sum_power.value
+        self.conf.output_com_port = self.serial_port.value
 
     async def __start_modbus_server(self):
-        await modbus_output.stop_modbus_server()
-        await modbus_output.start_modbus_server()
+        succ = await modbus_output.start_modbus_server()
+        self.connect_button.visible = not succ
+        self.connect_button.update()
+        self.disconnect_button.visible = succ
+        self.disconnect_button.update()
+    
+    async def __end_modbus_server(self):
+        succ = await modbus_output.stop_modbus_server()
+        self.connect_button.visible = succ
+        self.connect_button.update()
+        self.disconnect_button.visible = not succ
+        self.disconnect_button.update()

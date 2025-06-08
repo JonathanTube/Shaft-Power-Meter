@@ -1,3 +1,4 @@
+import logging
 import flet as ft
 from common.control_manager import ControlManager
 from ui.setting.general.index import General
@@ -18,33 +19,36 @@ class Setting(ft.Container):
         self.idx = 0
 
     def __set_content(self, e):
-        idx = e.control.selected_index
+        try:
+            idx = e.control.selected_index
 
-        if idx == self.idx:
-            return
+            if idx == self.idx:
+                return
 
-        self.idx = idx
+            self.idx = idx
 
-        keyboard.close()
+            keyboard.close()
 
-        if idx == 0:
-            self.right_content.content = SystemConf()
-        elif idx == 1:
-            self.right_content.content = General()
-        elif idx == 2:
-            self.right_content.content = IOSetting()
-        elif idx == 3:
-            self.right_content.content = PropellerConf()
-        elif idx == 4:
-            self.right_content.content = ZeroCal()
-        elif idx == 5:
-            self.right_content.content = SelfTest()
-        elif idx == 6:
-            self.right_content.content = Permission()
-        elif idx == 7:
-            self.right_content.content = TestMode()
-
-        self.right_content.update()
+            if idx == 0:
+                self.right_content.content = SystemConf()
+            elif idx == 1:
+                self.right_content.content = General()
+            elif idx == 2:
+                self.right_content.content = IOSetting()
+            elif idx == 3:
+                self.right_content.content = PropellerConf()
+            elif idx == 4:
+                self.right_content.content = ZeroCal()
+            elif idx == 5:
+                self.right_content.content = SelfTest()
+            elif idx == 6:
+                self.right_content.content = Permission()
+            elif idx == 7:
+                self.right_content.content = TestMode()
+            
+            self.right_content.update()
+        except Exception:
+            logging.exception("error occured while switch the button, please try it lately.")
 
     def build(self):
         self.right_content = ft.Container(

@@ -571,7 +571,16 @@ class DataInit:
                     "chinese": "IO 配置",
                     "english": "IO Conf."
                 },
-
+                {
+                    "code": "lang.setting.io_conf.serial_port_can_not_be_empty",
+                    "chinese": "请选择一个输出端口",
+                    "english": "please select a serial port to start to output"
+                },
+                {
+                    "code": "lang.setting.io_conf.output_option_does_not_selected",
+                    "chinese": "请至少选择输出一个项目",
+                    "english": "please check one output option at least."
+                },
                 {
                     "code": "lang.setting.language_conf.title",
                     "chinese": "语言配置",

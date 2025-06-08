@@ -13,26 +13,28 @@ class ModbusOutput:
         self.slave_id = 1
         self.context = None
         self.register_size: int = 6
-        self.amount_of_propeller: int = 1
         self.server_task = None  # 存储异步任务
         self.running = False     # 服务器运行状态
         self.io_conf: IOConf | None = None
 
-    async def start_modbus_server(self):
+    async def start_modbus_server(self)->bool:
         if self.running:
             logger.info("Modbus server is already running")
-            return
+            gdata.modbus_server_started = True
+            return True
 
         self.io_conf: IOConf = IOConf().get()
         port = self.io_conf.output_com_port
         if not port:
             logger.info("Modbus output port is not set, skip starting Modbus server.")
-            return
+            gdata.modbus_server_started = False
+            return False
 
         system_settings: SystemSettings = SystemSettings().get()
         self.amount_of_propeller = system_settings.amount_of_propeller
 
-        register_size = 6 * self.amount_of_propeller
+        # 直接100，方便后续追加变量
+        register_size = 100
 
         self.running = True
         store = ModbusSlaveContext(hr=ModbusSequentialDataBlock(0, [0] * register_size))
@@ -51,12 +53,19 @@ class ModbusOutput:
             )
         )
         logger.info(f"Modbus server started on {port}")
+        gdata.modbus_server_started = True
+        return True
 
     async def stop_modbus_server(self):
         if self.server_task and not self.server_task.done():
             self.server_task.cancel()
             self.running = False
             logger.info("Modbus server stopped")
+            gdata.connected_to_hmi_server = True
+            return True
+
+        gdata.connected_to_hmi_server = False
+        return False
 
     async def update_registers(self):
         if not self.running:
@@ -65,7 +74,7 @@ class ModbusOutput:
         try:
             sps1_torque = int(gdata.sps1_torque / 100) if self.io_conf.output_torque else 0
             sps1_thrust = int(gdata.sps1_thrust / 100) if self.io_conf.output_thrust else 0
-            sps1_speed = int(gdata.sps1_speed) if self.io_conf.output_speed else 0
+            sps1_speed = int(gdata.sps1_speed * 10) if self.io_conf.output_speed else 0
             sps1_power = int(gdata.sps1_power / 100) if self.io_conf.output_power else 0
             sps1_average_power, sps1_total_energy = self.get_average_power_and_total_energy('sps1')
             values = [sps1_torque, sps1_thrust, sps1_speed, sps1_power, sps1_average_power, sps1_total_energy]
@@ -73,7 +82,7 @@ class ModbusOutput:
             if self.amount_of_propeller > 1:
                 sps2_torque = int(gdata.sps2_torque / 100) if self.io_conf.output_torque else 0
                 sps2_thrust = int(gdata.sps2_thrust / 100) if self.io_conf.output_thrust else 0
-                sps2_speed = int(gdata.sps2_speed) if self.io_conf.output_speed else 0
+                sps2_speed = int(gdata.sps2_speed * 10) if self.io_conf.output_speed else 0
                 sps2_power = int(gdata.sps2_power / 100) if self.io_conf.output_power else 0
                 sps2_average_power, sps2_total_energy = self.get_average_power_and_total_energy('sps2')
                 values.extend([sps2_torque, sps2_thrust, sps2_speed, sps2_power, sps2_average_power, sps2_total_energy])
