@@ -249,6 +249,7 @@ class IOSettingSPS(CustomCard):
             operation_type=OperationType.CONNECT_TO_SPS1,
             operation_content=user.user_name
         )
+        self.save_data()
         self.page.run_task(self.__start_sps1_task)
 
     async def __start_sps1_task(self):
@@ -281,6 +282,7 @@ class IOSettingSPS(CustomCard):
             operation_type=OperationType.CONNECT_TO_SPS2,
             operation_content=user.user_name
         )
+        self.save_data()
         self.page.run_task(self.__start_sps2_task)
 
     async def __start_sps2_task(self):

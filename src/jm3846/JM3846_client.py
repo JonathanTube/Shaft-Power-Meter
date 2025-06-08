@@ -44,11 +44,16 @@ class JM3846AsyncClient:
         """启动客户端"""
         try:
             connected = await self.async_connect()
-            asyncio.create_task(self.async_receive_looping())
-            await self.async_handle_0x44()
-            return connected
+            if connected:
+                await self.async_handle_0x44()
+                # 异步接受数据
+                asyncio.create_task(self.async_receive_looping())
+                return connected
+            else:
+                result = await self.start()
+                return result
         except Exception:
-            logging.exception(f'{self.name} start JM3846 client failed')
+            logging.error(f'{self.name} start JM3846 client failed')
         return False
 
     async def async_connect(self) -> bool:
@@ -64,7 +69,8 @@ class JM3846AsyncClient:
             logging.info(f'{self.name} JM3846 Connected successfully')
             return True
         except Exception:
-            logging.exception(f'{self.name} JM3846 Connection error')
+            self.running = False
+            logging.error(f'{self.name} JM3846 Connection error')
             self.set_offline(True)
         return False
 
@@ -119,7 +125,7 @@ class JM3846AsyncClient:
                     frame_size=self.frame_size,
                     total_frames=self.total_frames
                 )
-
+                logging.info(f'{self.name} send 0x44 req={request}')
                 self.writer.write(request)
                 await self.writer.drain()
 
@@ -138,8 +144,6 @@ class JM3846AsyncClient:
                     self.reader.read(256),
                     timeout=self.timeout * 2
                 )
-
-                # logging.info('=================', response)
 
                 if not response:
                     await asyncio.sleep(2)
@@ -203,7 +207,10 @@ class JM3846AsyncClient:
                     continue
 
             except asyncio.TimeoutError:
-                logging.exception(f'{self.name} JM3846 0x44 receive timeout, retrying...')
+                logging.error(f'{self.name} JM3846 0x44 receive timeout, retrying...')
+                # 发送0x45,断开数据流
+                await self.async_handle_0x45()
+                await asyncio.sleep(2)
                 await self.async_handle_0x44()
             except ConnectionResetError as e:
                 logging.exception(f'{self.name} JM3846 Connection reset: {e}')
@@ -217,8 +224,7 @@ class JM3846AsyncClient:
     async def save_0x44_result(self, result: dict):
         # logging.info('result=', result)
         if gdata.test_mode_running:
-            logging.info(
-                'test mode is running, skip save 0x44 result from JM3456.')
+            logging.info('test mode is running, skip save 0x44 result from JM3456.')
             return
         """数据存储方法"""
         ad0 = 0
@@ -292,6 +298,7 @@ class JM3846AsyncClient:
                 if not self.writer:
                     return
 
+                logging.info(f'{self.name} send 0x45 req={request}')
                 self.writer.write(request)
                 await self.writer.drain()
             except asyncio.TimeoutError:
