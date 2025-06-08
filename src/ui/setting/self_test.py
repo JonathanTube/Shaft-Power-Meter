@@ -15,6 +15,8 @@ class SelfTest(ft.Tabs):
         self.sps1_task = None
         self.sps2_task = None
 
+        self.hmi_server_task = None
+
     def build(self):
         self.plc_log = ft.ListView(
             padding=10, auto_scroll=True, height=500, spacing=5, expand=True)
@@ -28,22 +30,27 @@ class SelfTest(ft.Tabs):
         self.gps_log = ft.ListView(
             padding=10, auto_scroll=True, height=500, spacing=5, expand=True)
         
+        self.hmi_server_log = ft.ListView(
+            padding=10, auto_scroll=True, height=500, spacing=5, expand=True)
+        
         self.tabs = [
-            ft.Tab(text="SPS-1", content=self.sps1_log),
-            ft.Tab(text="SPS-2", content=self.sps2_log, visible=self.system_settings.amount_of_propeller == 2),
+            ft.Tab(text="SPS-1", content=self.sps1_log, visible=self.conf.connect_to_sps),
+            ft.Tab(text="SPS-2", content=self.sps2_log, visible=self.conf.connect_to_sps and self.system_settings.amount_of_propeller == 2),
+            ft.Tab(text="HMI Server", content=self.hmi_server_log, visible=not self.conf.connect_to_sps),
             ft.Tab(text="GPS", content=self.gps_log),
-            ft.Tab(text="PLC", content=self.plc_log,
-                   visible=self.conf.plc_enabled)
+            ft.Tab(text="PLC", content=self.plc_log, visible=self.conf.plc_enabled)
         ]
 
     def did_mount(self):
         if self.conf.plc_enabled:
             self.plc_task = self.page.run_task(self.__read_plc_data)
 
-        self.sps1_task = self.page.run_task(self.__read_sps1_data)
-
-        if gdata.amount_of_propeller == 2:
-            self.sps2_task = self.page.run_task(self.__read_sps2_data)
+        if self.conf.connect_to_sps:
+            self.sps1_task = self.page.run_task(self.__read_sps1_data)
+            if gdata.amount_of_propeller == 2:
+                self.sps2_task = self.page.run_task(self.__read_sps2_data)
+        else:
+            self.hmi_server_task = self.page.run_task(self.__read_hmi_server_data)
 
         # self.page.run_task(self.__read_gps_data)
 
@@ -51,11 +58,14 @@ class SelfTest(ft.Tabs):
         if self.conf.plc_enabled and self.plc_task:
             self.plc_task.cancel()
 
-        if self.sps1_task:
-            self.sps1_task.cancel()
+        if self.conf.connect_to_sps:
+            if self.sps1_task:
+                self.sps1_task.cancel()
 
-        if self.sps2_task and gdata.amount_of_propeller == 2:
-            self.sps2_task.cancel()
+            if self.sps2_task and gdata.amount_of_propeller == 2:
+                self.sps2_task.cancel()
+        else:
+            self.hmi_server_task.cancel()
 
     async def __read_plc_data(self):
         while True:
@@ -86,6 +96,14 @@ class SelfTest(ft.Tabs):
             self.sps2_log.update()
             await asyncio.sleep(1)
 
+    async def __read_hmi_server_data(self):
+        while True:
+            sps1_data = f'sps1: torque={gdata.sps1_torque}, thrust={gdata.sps1_thrust}, speed={gdata.sps1_speed}'
+            sps2_data = f'sps2: torque={gdata.sps2_torque}, thrust={gdata.sps2_thrust}, speed={gdata.sps2_speed}'
+            self.hmi_server_log.controls.append(ft.Text(f"HMI Server Data: {sps1_data}"))
+            self.hmi_server_log.controls.append(ft.Text(f"HMI Server Data: {sps2_data}"))
+            self.hmi_server_log.update()
+            await asyncio.sleep(1)
     # async def __read_gps_data(self):
     #     while True:
     #         gps_data = await gps_util.read_gps_data()
