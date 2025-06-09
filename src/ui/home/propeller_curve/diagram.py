@@ -144,9 +144,13 @@ class PropellerCurveDiagram(ft.Container):
     def handle_normal_propeller_curve(self, ax):
         color = self.color_of_normal
         rpm_points = np.linspace(self.left_rpm_of_normal, 105, 500)
+        # calculate power points via right rpm and power.
         power_points = (rpm_points / self.right_rpm_of_normal) ** 3 * self.right_power_of_normal
+        # generate more power points.
         power_points = np.minimum(power_points, 100)
+        # plot all of the points on the diagram.
         ax.plot(rpm_points, power_points, color=color, linewidth=1, label=self.page.session.get('lang.propeller_curve.normal_propeller_curve'))
+        # mark the left point on the diagram, if the configuration of right point is propable, the line will cross through the left point.
         ax.scatter([self.left_rpm_of_normal, self.right_rpm_of_normal], [self.left_power_of_normal, self.right_power_of_normal], color=color, zorder=1, s=10)  # 标出两端点
 
     def handle_speed_limit(self, ax):

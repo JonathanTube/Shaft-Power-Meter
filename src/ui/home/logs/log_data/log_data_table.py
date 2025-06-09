@@ -61,7 +61,7 @@ class LogDataTable(AbstractTable):
             f'{session.get("lang.common.torque")}(Nm)',
             f'{session.get("lang.common.thrust")}(N)',
             session.get("lang.common.speed"),
-            session.get("lang.common.power"),
+            f'{session.get("lang.common.power")}(W)',
             session.get("lang.common.is_overload")
         ]
 
