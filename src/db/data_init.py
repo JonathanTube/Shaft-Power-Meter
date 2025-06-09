@@ -779,14 +779,14 @@ class DataInit:
 
                 {
                     "code": "lang.setting.bearing_outer_diameter_D",
-                    "chinese": "轴承外径",
-                    "english": "Bearing Outer Diameter"
+                    "chinese": "轴外径",
+                    "english": "Shaft Outer Diameter"
                 },
 
                 {
                     "code": "lang.setting.bearing_inner_diameter_d",
-                    "chinese": "轴承内径",
-                    "english": "Bearing Inner Diameter"
+                    "chinese": "轴内径",
+                    "english": "Shaft Inner Diameter"
                 },
 
                 {

@@ -1,4 +1,5 @@
 import asyncio
+import math
 import matplotlib.backends.backend_svg
 import matplotlib.pyplot as plt
 import numpy as np
@@ -115,13 +116,21 @@ class PropellerCurveDiagram(ft.Container):
         # 隐藏上边框和右边框
         ax.spines['top'].set_visible(False)
         ax.spines['right'].set_visible(False)
+    
+    def get_left_rpm_point(self):
+        rpm_point = min(self.left_rpm_of_normal, self.left_rpm_of_torque_limit)
+        return 5 * math.floor(rpm_point / 5)
+
+    def get_left_power_point(self):
+        power_point = min(self.left_power_of_normal, self.left_power_of_torque_limit)
+        return 5 * math.floor(power_point / 5)
 
     def handle_x_axis(self, ax):
         # 设置x轴刻度
-        x_begin = int(self.left_rpm_of_torque_limit // 10)
-        x_ticks = [self.left_rpm_of_torque_limit]
-        for i in range(x_begin + 1, 12, 1):
-            x_ticks.append(i * 10)
+        x_begin = self.get_left_rpm_point()
+        x_ticks = []
+        for i in range(x_begin, 115, 5):
+            x_ticks.append(i)
 
         plt.xticks(x_ticks, [f'{x}' for x in x_ticks], fontsize=10)
         # 设置x轴范围
@@ -129,10 +138,10 @@ class PropellerCurveDiagram(ft.Container):
 
     def handle_y_axis(self, ax):
         # 设置y轴刻度
-        y_begin = int(self.left_power_of_normal // 10)
-        y_ticks = [self.left_power_of_normal]
-        for i in range(y_begin + 1, 12, 1):
-            y_ticks.append(i * 10)
+        y_begin = self.get_left_power_point()
+        y_ticks = []
+        for i in range(y_begin, 115, 5):
+            y_ticks.append(i)
 
         plt.yticks(y_ticks, [f'{x}' for x in y_ticks], fontsize=10)
         # 设置y轴范围
@@ -143,7 +152,7 @@ class PropellerCurveDiagram(ft.Container):
 
     def handle_normal_propeller_curve(self, ax):
         color = self.color_of_normal
-        rpm_points = np.linspace(self.left_rpm_of_normal, 105, 500)
+        rpm_points = np.linspace(self.get_left_rpm_point(), 105, 500)
         # calculate power points via right rpm and power.
         power_points = (rpm_points / self.right_rpm_of_normal) ** 3 * self.right_power_of_normal
         # generate more power points.
@@ -158,7 +167,7 @@ class PropellerCurveDiagram(ft.Container):
 
     def handle_light_load_propeller_curve(self, ax):
         color = self.color_of_light_load
-        rpm_points = np.linspace(self.left_rpm_of_normal, 105, 500)
+        rpm_points = np.linspace(self.get_left_rpm_point(), 105, 500)
         power_points = (rpm_points / self.right_rpm_of_normal) ** 3 * (self.right_power_of_normal + self.power_of_light_load * -1)
         power_points = np.minimum(power_points, 100)
         # power_points = np.maximum(power_points, left_power_of_normal)
@@ -166,7 +175,7 @@ class PropellerCurveDiagram(ft.Container):
 
     def handle_torque_or_speed_limit_curve(self, ax):
         color = self.color_of_torque_limit
-        rpm_points = np.linspace(self.left_rpm_of_torque_limit, self.right_rpm_of_torque_limit, 500)
+        rpm_points = np.linspace(self.get_left_rpm_point(), self.right_rpm_of_torque_limit, 500)
         # add 100 to the end of rpm_points
         rpm_points = np.append(rpm_points, 100)
         power_points = (rpm_points / self.right_rpm_of_torque_limit) ** 2 * self.right_power_of_torque_limit
@@ -176,7 +185,7 @@ class PropellerCurveDiagram(ft.Container):
 
     def handle_overload_curve(self, ax):
         color = self.color_of_overload
-        rpm_points = np.linspace(self.left_rpm_of_torque_limit, 100, 500)
+        rpm_points = np.linspace(self.get_left_rpm_point(), 100, 500)
         power_points = (rpm_points / self.right_rpm_of_torque_limit) ** 2 * (self.right_power_of_torque_limit + self.power_of_overload)
         max_power_point = np.max(power_points)
         rpm_points = np.append(rpm_points, 105)
