@@ -58,5 +58,5 @@ class PropellerConfLimitCurve(CustomCard):
         self.ps.bhp_right_of_torque_load_limit_curve = self.bhp_right_of_torque_load_limit_curve.value
         self.ps.line_color_of_torque_load_limit_curve = self.line_color_of_torque_load_limit_curve.color
 
-        gdata.speed_of_torque_load_limit = self.ps.rpm_right_of_torque_load_limit_curve
-        gdata.power_of_torque_load_limit = self.ps.bhp_right_of_torque_load_limit_curve
+        gdata.speed_of_torque_load_limit = float(self.ps.rpm_right_of_torque_load_limit_curve)
+        gdata.power_of_torque_load_limit = float(self.ps.bhp_right_of_torque_load_limit_curve)
