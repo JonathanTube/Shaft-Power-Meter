@@ -1,6 +1,6 @@
-from db.models.propeller_setting import PropellerSetting
 from ui.common.audio_alarm import AudioAlarm
 from ui.common.fullscreen_alert import FullscreenAlert
+from ui.header.logo import HeaderLogo
 from ui.home.event.event_button import EventButton
 from ui.home.alarm.alarm_button import AlarmButton
 from ui.home.propeller_curve.diagram import PropellerCurveDiagram
@@ -13,6 +13,7 @@ class ControlManager:
     event_button: EventButton | None = None
     alarm_button: AlarmButton | None = None
 
+    header_logo: HeaderLogo | None = None
     propeller_curve_diagram: PropellerCurveDiagram | None = None
 
     trend_view_sps1: TrendViewDiagram | None = None
@@ -20,6 +21,9 @@ class ControlManager:
 
     @staticmethod
     def on_theme_change():
+        if ControlManager.header_logo is not None:
+            ControlManager.header_logo.update_style()
+
         if ControlManager.propeller_curve_diagram is not None:
             ControlManager.propeller_curve_diagram.update_style()
 

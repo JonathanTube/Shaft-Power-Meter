@@ -29,6 +29,7 @@ class Header(ft.AppBar):
         super().__init__()
         self.toolbar_height = 50
         self.leading = HeaderLogo()
+        ControlManager.header_logo = self.leading
 
         self.center_title = False
         self.bgcolor = ft.Colors.ON_INVERSE_SURFACE
