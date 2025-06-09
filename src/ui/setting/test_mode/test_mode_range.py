@@ -63,7 +63,7 @@ class TestModeRange(CustomCard):
             disabled=disabled,
             expand=True,
             min=0,
-            max=500 * 1000,
+            max=4000 * 1000,
             start_value=self.conf.min_thrust,
             end_value=self.conf.max_thrust,
             on_change=lambda e: self.__on_thrust_change(e)

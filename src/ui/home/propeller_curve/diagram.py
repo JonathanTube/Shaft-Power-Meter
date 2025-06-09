@@ -160,7 +160,7 @@ class PropellerCurveDiagram(ft.Container):
         # plot all of the points on the diagram.
         ax.plot(rpm_points, power_points, color=color, linewidth=1, label=self.page.session.get('lang.propeller_curve.normal_propeller_curve'))
         # mark the left point on the diagram, if the configuration of right point is propable, the line will cross through the left point.
-        ax.scatter([self.left_rpm_of_normal, self.right_rpm_of_normal], [self.left_power_of_normal, self.right_power_of_normal], color=color, zorder=1, s=10)  # 标出两端点
+        # ax.scatter([self.left_rpm_of_normal, self.right_rpm_of_normal], [self.left_power_of_normal, self.right_power_of_normal], color=color, zorder=1, s=10)  # 标出两端点
 
     def handle_speed_limit(self, ax):
         ax.axvline(x=self.rpm_of_speed_limit, color=self.color_of_speed_limit, linewidth=1, label=self.page.session.get('lang.propeller_curve.speed_limit_curve'))
@@ -181,7 +181,7 @@ class PropellerCurveDiagram(ft.Container):
         power_points = (rpm_points / self.right_rpm_of_torque_limit) ** 2 * self.right_power_of_torque_limit
         power_points = np.minimum(power_points, 100)
         ax.plot(rpm_points, power_points, color=color, linewidth=1, label=self.page.session.get('lang.propeller_curve.torque_load_limit_curve'))
-        ax.scatter([self.left_rpm_of_torque_limit, self.right_rpm_of_torque_limit], [self.left_power_of_torque_limit, self.right_power_of_torque_limit], color=color, zorder=2, s=10)  # 标出两端点
+        # ax.scatter([self.left_rpm_of_torque_limit, self.right_rpm_of_torque_limit], [self.left_power_of_torque_limit, self.right_power_of_torque_limit], color=color, zorder=2, s=10)  # 标出两端点
 
     def handle_overload_curve(self, ax):
         color = self.color_of_overload

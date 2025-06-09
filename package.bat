@@ -4,4 +4,5 @@ flet pack src/main.py
 --product-version "0.0.1" 
 --onedir 
 --add-data "src/assets:assets" 
---hidden-import=pywintypes
+--hidden-import=pywintypes 
+--icon="src/assets/icon.png"

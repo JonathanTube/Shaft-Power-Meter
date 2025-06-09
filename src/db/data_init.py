@@ -43,12 +43,12 @@ class DataInit:
     def __init_limitations():
         if Limitations.select().count() == 0:
             Limitations.create(
-                speed_max=2000,
-                torque_max=2000,
-                power_max=200000,
-                speed_warning=1800,
-                torque_warning=1800,
-                power_warning=180000
+                speed_max=120,
+                torque_max=866000,
+                power_max=7710000,
+                speed_warning=110,
+                torque_warning=800000,
+                power_warning=7500000
             )
 
     def __init_system_settings():
@@ -57,7 +57,7 @@ class DataInit:
                 display_thrust=False,
                 amount_of_propeller=1,
                 sha_po_li=True,
-                eexi_limited_power=180000,
+                eexi_limited_power=6300000,
                 eexi_breach_checking_duration=60
             )
 
@@ -100,8 +100,8 @@ class DataInit:
     def __init_propeller_setting():
         if PropellerSetting.select().count() == 0:
             PropellerSetting.create(
-                rpm_of_mcr_operating_point=2000.0,
-                shaft_power_of_mcr_operating_point=200000.0,
+                rpm_of_mcr_operating_point=120.0,
+                shaft_power_of_mcr_operating_point=7710000.0,
 
                 rpm_left_of_normal_propeller_curve=79.5,
                 bhp_left_of_normal_propeller_curve=50.0,
