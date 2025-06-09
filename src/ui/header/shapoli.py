@@ -16,8 +16,8 @@ class ShaPoLi(ft.Container):
             visible=self.sha_po_li,
             style=ft.ButtonStyle(
                 color=ft.Colors.INVERSE_SURFACE,
-                icon_size=30,
                 text_style=ft.TextStyle(
+                    weight=ft.FontWeight.BOLD,
                     size=18
                 )
             ))

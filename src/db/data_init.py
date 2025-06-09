@@ -182,7 +182,7 @@ class DataInit:
             Language.insert_many([
                 {
                     "code": "lang.lang.app.name",
-                    "chinese": "轴功率仪表",
+                    "chinese": "轴功率仪",
                     "english": "Shaft Power Meter"
                 },
 
@@ -263,7 +263,7 @@ class DataInit:
                 },
                 {
                     "code": "lang.common.app_name",
-                    "chinese": "轴功率仪表",
+                    "chinese": "轴功率仪",
                     "english": "Shaft Power Meter"
                 },
                 {
@@ -280,7 +280,7 @@ class DataInit:
 
                 {
                     "code": "lang.common.is_overload",
-                    "chinese": "是否过载",
+                    "chinese": "过载",
                     "english": "Overload"
                 },
 
@@ -339,7 +339,7 @@ class DataInit:
                 },
                 {
                     "code": "lang.common.unlimited_power",
-                    "chinese": "最大功率",
+                    "chinese": "非限制最大功率",
                     "english": "Un-limited Power"
                 },
 
@@ -421,7 +421,7 @@ class DataInit:
 
                 {
                     "code": "lang.common.acknowledged_at",
-                    "chinese": "确认时间",
+                    "chinese": "应答于", 
                     "english": "Acknowledged At"
                 },
                 {
@@ -436,7 +436,7 @@ class DataInit:
                 },
                 {
                     "code": "lang.common.acknowledge_time",
-                    "chinese": "确认时间",
+                    "chinese": "应答时间",
                     "english": "Acknowledge Time"
                 },
 
@@ -614,7 +614,7 @@ class DataInit:
                 {
                     "code": "lang.setting.permission_conf.title",
                     "chinese": "权限配置",
-                    "english": "Permission Conf."
+                    "english": "Authority Conf."
                 },
 
                 {
@@ -749,19 +749,19 @@ class DataInit:
 
                 {
                     "code": "lang.setting.ship_info",
-                    "chinese": "船体信息",
+                    "chinese": "船舶信息",
                     "english": "Ship Info"
                 },
 
                 {
                     "code": "lang.setting.ship_type",
-                    "chinese": "船体类型",
+                    "chinese": "船舶类型",
                     "english": "Ship Type"
                 },
 
                 {
                     "code": "lang.setting.ship_name",
-                    "chinese": "船体名称",
+                    "chinese": "船舶名称",
                     "english": "Ship Name"
                 },
 
@@ -773,7 +773,7 @@ class DataInit:
 
                 {
                     "code": "lang.setting.ship_size",
-                    "chinese": "船体尺寸",
+                    "chinese": "船舶尺寸",
                     "english": "Ship Size"
                 },
 
@@ -791,20 +791,20 @@ class DataInit:
 
                 {
                     "code": "lang.setting.sensitivity_factor_k",
-                    "chinese": "灵敏度系数",
-                    "english": "Sensitivity Factor"
+                    "chinese": "应变片系数",
+                    "english": "Strain gauge Factor"
                 },
 
                 {
                     "code": "lang.setting.elastic_modulus_E",
-                    "chinese": "弹性模量",
-                    "english": "Elastic Modulus"
+                    "chinese": "杨氏模量",
+                    "english": "Young's Modulus"
                 },
 
                 {
                     "code": "lang.setting.poisson_ratio_mu",
                     "chinese": "泊松比",
-                    "english": "Poisson Ratio"
+                    "english": "Poisson's Ratio"
                 },
 
 
@@ -955,7 +955,7 @@ class DataInit:
                 {
                     "code": "lang.setting.torque_load_limit_curve",
                     "chinese": "扭矩负载限制曲线 (4)",
-                    "english": "Torque Load Limit Curve (4)"
+                    "english": "Torque/Load Limit Curve (4)"
                 },
 
                 {
@@ -1040,7 +1040,7 @@ class DataInit:
 
                 {
                     "code": "lang.setting.4_20_ma_torque_offset",
-                    "chinese": "4-20mA 扭矩偏移",
+                    "chinese": "4-20mA 扭矩偏置",
                     "english": "4-20mA Torque Offset"
                 },
 
@@ -1059,7 +1059,7 @@ class DataInit:
 
                 {
                     "code": "lang.setting.4_20_ma_thrust_offset",
-                    "chinese": "4-20mA 推力偏移",
+                    "chinese": "4-20mA 推力偏置",
                     "english": "4-20mA Thrust Offset"
                 },
 
@@ -1077,7 +1077,7 @@ class DataInit:
 
                 {
                     "code": "lang.setting.4_20_ma_speed_offset",
-                    "chinese": "4-20mA 速度偏移",
+                    "chinese": "4-20mA 速度偏置",
                     "english": "4-20mA Speed Offset"
                 },
 
@@ -1688,12 +1688,12 @@ class DataInit:
                 },
                 {
                     "code": "lang.zero_cal.new_torque_offset",
-                    "chinese": "新扭矩-偏移量",
+                    "chinese": "新扭矩-偏置量",
                     "english": "New Torque Offset"
                 },
                 {
                     "code": "lang.zero_cal.new_thrust_offset",
-                    "chinese": "新推力-偏移量",
+                    "chinese": "新推力-偏置量",
                     "english": "New Thrust Offset"
                 }
             ]).execute()
