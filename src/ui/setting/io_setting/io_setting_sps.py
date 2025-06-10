@@ -144,13 +144,15 @@ class IOSettingSPS(CustomCard):
         self.hmi_server_ip = ft.TextField(
             label=self.page.session.get("lang.setting.hmi_server_ip"),
             value=self.conf.hmi_server_ip,
-            read_only=True
+            read_only=True,
+            on_focus=lambda e: keyboard.open(e.control, 'ip')
         )
 
         self.hmi_server_port = ft.TextField(
             label=self.page.session.get("lang.setting.hmi_server_port"),
             value=self.conf.hmi_server_port,
-            read_only=True
+            read_only=True,
+            on_focus=lambda e: keyboard.open(e.control, 'int')
         )
         # sps conf. end
 
@@ -397,6 +399,14 @@ class IOSettingSPS(CustomCard):
         except ValueError:
             raise Exception(
                 f'{self.page.session.get("lang.common.ip_address_format_error")}: {self.sps1_ip.value}')
+
+        try:
+            ipaddress.ip_address(self.hmi_server_ip.value)
+            self.conf.hmi_server_ip = self.hmi_server_ip.value
+            self.conf.hmi_server_port = self.hmi_server_port.value
+        except ValueError:
+            raise Exception(
+                f'{self.page.session.get("lang.common.ip_address_format_error")}: {self.hmi_server_port.value}')
 
         if self.is_dual:
             try:
