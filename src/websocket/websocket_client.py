@@ -36,7 +36,8 @@ class WebSocketClient:
             logging.error(f"failed to connect to {uri}")
             self._running = False
             AlarmSaver.create(alarm_type=AlarmType.HMI_CLIENT_DISCONNECTED)
-            return False
+            await asyncio.sleep(2)
+            return await self.connect()
 
         return True
 
@@ -46,7 +47,7 @@ class WebSocketClient:
             while self._running:
                 raw_data = await self.websocket.recv()
                 data = msgpack.unpackb(raw_data)
-                logging.info(f"client received: {data}")
+                # logging.info(f"client received: {data}")
                 if data['type'] == 'sps_data':
                     self.__handle_jm3846_data(data)
                 elif data['type'] == 'zero_cal':
@@ -54,7 +55,7 @@ class WebSocketClient:
                 gdata.sps1_offline = False
                 gdata.sps2_offline = False
         except websockets.ConnectionClosed:
-            logging.exception("server connection closed")
+            logging.error("server connection closed")
             self._running = False
             gdata.connected_to_hmi_server = False
             AlarmSaver.create(alarm_type=AlarmType.HMI_CLIENT_DISCONNECTED)
@@ -83,7 +84,7 @@ class WebSocketClient:
 
         if 'torque' in data:
             ad0_torque = data['torque']
-        if 'ch1_ad' in data:
+        if 'thrust' in data:
             ad1_thrust = data['thrust']
         if 'rpm' in data:
             speed = data['rpm'] / 10
@@ -130,7 +131,7 @@ class WebSocketClient:
                 await self.websocket.close()
                 AlarmSaver.create(alarm_type=AlarmType.HMI_SERVER_CLOSED)
         except Exception:
-            logging.exception("failed to close websocket connection")
+            logging.error("failed to close websocket connection")
             return False
         return True
 
