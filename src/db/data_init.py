@@ -35,20 +35,20 @@ class DataInit:
     def __init_offline_default_value():
         if OfflineDefaultValue.select().count() == 0:
             OfflineDefaultValue.create(
-                torque_default_value=0,
-                thrust_default_value=0,
-                speed_default_value=0
+                torque_default_value=600 * 1000,
+                thrust_default_value=32 * 1000,
+                speed_default_value=80
             )
 
     def __init_limitations():
         if Limitations.select().count() == 0:
             Limitations.create(
                 speed_max=120,
-                torque_max=866000,
-                power_max=7710000,
+                torque_max=866 * 1000,
+                power_max=7710 * 1000,
                 speed_warning=110,
-                torque_warning=800000,
-                power_warning=7500000
+                torque_warning=800 * 1000,
+                power_warning=7500 * 1000
             )
 
     def __init_system_settings():
@@ -57,7 +57,7 @@ class DataInit:
                 display_thrust=False,
                 amount_of_propeller=1,
                 sha_po_li=True,
-                eexi_limited_power=6300000,
+                eexi_limited_power=6300 * 1000,
                 eexi_breach_checking_duration=60
             )
 
@@ -101,7 +101,7 @@ class DataInit:
         if PropellerSetting.select().count() == 0:
             PropellerSetting.create(
                 rpm_of_mcr_operating_point=120.0,
-                shaft_power_of_mcr_operating_point=7710000.0,
+                shaft_power_of_mcr_operating_point=7710 * 1000,
 
                 rpm_left_of_normal_propeller_curve=79.5,
                 bhp_left_of_normal_propeller_curve=50.0,
@@ -160,12 +160,12 @@ class DataInit:
     def __init_test_mode_conf():
         if TestModeConf.select().count() == 0:
             TestModeConf.create(
-                min_torque=1000,
-                max_torque=2000,
-                min_speed=1001,
-                max_speed=2002,
-                min_thrust=1002,
-                max_thrust=2002,
+                min_torque=550 * 1000,
+                max_torque=650 * 1000,
+                min_speed=80,
+                max_speed=100,
+                min_thrust=3000 * 1000,
+                max_thrust=3500 * 1000,
                 time_interval=1
             )
 

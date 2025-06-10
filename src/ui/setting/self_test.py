@@ -98,10 +98,14 @@ class SelfTest(ft.Tabs):
 
     async def __read_hmi_server_data(self):
         while True:
-            sps1_data = f'sps1: torque={gdata.sps1_torque}, thrust={gdata.sps1_thrust}, speed={gdata.sps1_speed}'
-            sps2_data = f'sps2: torque={gdata.sps2_torque}, thrust={gdata.sps2_thrust}, speed={gdata.sps2_speed}'
-            self.hmi_server_log.controls.append(ft.Text(f"HMI Server Data: {sps1_data}"))
-            self.hmi_server_log.controls.append(ft.Text(f"HMI Server Data: {sps2_data}"))
+            if gdata.connected_to_hmi_server:
+                sps1_data = f'sps1: torque={gdata.sps1_torque}, thrust={gdata.sps1_thrust}, speed={gdata.sps1_speed}'
+                self.hmi_server_log.controls.append(ft.Text(f"HMI Server Data: {sps1_data}"))
+                if gdata.amount_of_propeller == 2:
+                    sps2_data = f'sps2: torque={gdata.sps2_torque}, thrust={gdata.sps2_thrust}, speed={gdata.sps2_speed}'
+                    self.hmi_server_log.controls.append(ft.Text(f"HMI Server Data: {sps2_data}"))
+            else:
+                self.hmi_server_log.controls.append(ft.Text(f"Disconnected from HMI Server."))
             self.hmi_server_log.update()
             await asyncio.sleep(1)
     # async def __read_gps_data(self):

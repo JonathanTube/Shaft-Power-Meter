@@ -3,7 +3,6 @@ import logging
 from common.global_data import gdata
 from db.models.limitations import Limitations
 from db.models.preference import Preference
-from db.models.propeller_setting import PropellerSetting
 from db.models.test_mode_conf import TestModeConf
 from ui.common.custom_card import CustomCard
 from ui.common.toast import Toast
@@ -18,12 +17,12 @@ class TestModeRange(CustomCard):
         preference: Preference = Preference.get()
         self.system_unit: int = preference.system_unit
 
-        propeller_setting: PropellerSetting = PropellerSetting.get()
-        self.max_rpm = propeller_setting.rpm_of_mcr_operating_point
-        self.max_power = propeller_setting.shaft_power_of_mcr_operating_point
+        limitations: Limitations = Limitations.get()
 
         limitations: Limitations = Limitations.get()
         self.max_torque: float = limitations.torque_max
+        self.max_rpm: float = limitations.speed_max
+        self.max_thrust: float = 4000 * 1000
 
     def build(self):
         disabled = not gdata.test_mode_running
@@ -63,7 +62,7 @@ class TestModeRange(CustomCard):
             disabled=disabled,
             expand=True,
             min=0,
-            max=4000 * 1000,
+            max=self.max_thrust,
             start_value=self.conf.min_thrust,
             end_value=self.conf.max_thrust,
             on_change=lambda e: self.__on_thrust_change(e)
