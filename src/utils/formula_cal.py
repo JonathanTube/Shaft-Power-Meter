@@ -25,7 +25,7 @@ class FormulaCalculator:
 
         # Calculate torque (Nm)
         torque = polar_moment_of_inertia * shear_modulus * k * 0.001 / 5 / D
-        return torque
+        return abs(torque)
 
     @staticmethod
     def calculate_thrust(D, d, E, μ, k):
@@ -49,7 +49,7 @@ class FormulaCalculator:
 
         # Calculate thrust (N)
         thrust = (cross_sectional_area / (1 + μ)) * E * k * 0.001 / 5
-        return thrust
+        return abs(thrust)
 
     @staticmethod
     def calculate_rpm(t):
@@ -65,7 +65,7 @@ class FormulaCalculator:
         if t <= 0:
             raise ValueError("Period must be greater than zero.")
         rpm = 60 / t
-        return rpm
+        return abs(rpm)
 
     @staticmethod
     def calculate_instant_power(torque, rpm):
@@ -80,7 +80,7 @@ class FormulaCalculator:
         float: The calculated power (in W).
         """
         power = (2 * math.pi * rpm * torque) / 60
-        return round(power, 2)
+        return abs(round(power, 2))
 
     @staticmethod
     def calculate_average_power_kw(sum_of_power, hours):
@@ -97,7 +97,7 @@ class FormulaCalculator:
         total_seconds = hours * 3600
         average_power_w = sum_of_power / total_seconds  # Average power in W
         average_power_kw = average_power_w / 1000  # Convert W to kW
-        return average_power_kw
+        return abs(average_power_kw)
 
     @staticmethod
     def calculate_energy_kwh(sum_of_power):
@@ -114,4 +114,4 @@ class FormulaCalculator:
         total_seconds = 60 * 60
         total_energy_wh = sum_of_power / total_seconds
         energy_kwh = total_energy_wh / 1000  # Convert Wh to kWh
-        return energy_kwh
+        return abs(energy_kwh)

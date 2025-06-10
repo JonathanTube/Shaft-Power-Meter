@@ -21,7 +21,7 @@ class WebSocketClient:
         self._running = False
         self.jm3846Calculator = JM3846Calculator()
 
-    async def connect(self):
+    async def connect(self, only_once: bool = False):
         """连接服务端"""
         try:
             io_conf: IOConf = IOConf.get()
@@ -37,6 +37,8 @@ class WebSocketClient:
             self._running = False
             AlarmSaver.create(alarm_type=AlarmType.HMI_CLIENT_DISCONNECTED)
             await asyncio.sleep(2)
+            if only_once:
+                return False
             return await self.connect()
 
         return True

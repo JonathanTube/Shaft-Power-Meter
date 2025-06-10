@@ -457,6 +457,11 @@ class DataInit:
                     "english": "IP Address Format Error"
                 },
                 {
+                    "code": "lang.common.connecting",
+                    "chinese": "连接中",
+                    "english": "Connecting..."
+                },
+                {
                     "code": "lang.header.home",
                     "chinese": "主页",
                     "english": "Home"
