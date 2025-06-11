@@ -216,6 +216,10 @@ class IOSettingPLC(CustomCard):
             operation_type=OperationType.CONNECT_TO_PLC,
             operation_content=user.user_name
         )
+        self.conf.plc_ip = self.plc_ip.value
+        self.conf.plc_port = self.plc_port.value
+        self.conf.save()
+
         self.page.run_task(self.__start_plc_task)
 
     async def __start_plc_task(self):

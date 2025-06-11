@@ -1,4 +1,5 @@
 import ipaddress
+import logging
 import flet as ft
 from common.operation_type import OperationType
 from db.models.factor_conf import FactorConf
@@ -217,10 +218,8 @@ class IOSettingSPS(CustomCard):
 
         self.column_factor = ft.Column(
             controls=[
-                ft.Row(
-                    controls=[self.shaft_outer_diameter, self.shaft_inner_diameter]),
-                ft.Row(controls=[self.sensitivity_factor_k,
-                       self.elastic_modulus_E]),
+                ft.Row(controls=[self.shaft_outer_diameter, self.shaft_inner_diameter]),
+                ft.Row(controls=[self.sensitivity_factor_k, self.elastic_modulus_E]),
                 ft.Row(controls=[self.poisson_ratio_mu])
             ],
             visible=self.conf.connect_to_sps
@@ -244,7 +243,7 @@ class IOSettingSPS(CustomCard):
 
     def __connect_to_sps1(self, user: User):
         if not self.conf.connect_to_sps:
-            Toast.show_warning(self.page,"Please save configuration before your operations.")
+            Toast.show_warning(self.page, self.page.session.get('lang.setting.save_conf_before_operations'))
             return
         OperationLog.create(
             user_id=user.id,
@@ -252,6 +251,9 @@ class IOSettingSPS(CustomCard):
             operation_type=OperationType.CONNECT_TO_SPS1,
             operation_content=user.user_name
         )
+        self.conf.sps1_ip = self.sps1_ip.value
+        self.conf.sps1_port = self.sps1_port.value
+        self.conf.save()
         self.page.run_task(self.__start_sps1_task)
 
     async def __start_sps1_task(self):
@@ -293,6 +295,9 @@ class IOSettingSPS(CustomCard):
             operation_type=OperationType.CONNECT_TO_SPS2,
             operation_content=user.user_name
         )
+        self.conf.sps2_ip = self.sps2_ip.value
+        self.conf.sps2_port = self.sps2_port.value
+        self.conf.save()
         self.page.run_task(self.__start_sps2_task)
 
     async def __start_sps2_task(self):
@@ -326,7 +331,7 @@ class IOSettingSPS(CustomCard):
 
     def __start_hmi_server(self, user:User):
         if not self.conf.connect_to_sps:
-            Toast.show_warning(self.page,"Please save configuration before your operations.")
+            Toast.show_warning(self.page, self.page.session.get('lang.setting.save_conf_before_operations'))
             return
         OperationLog.create(
             user_id=user.id,
@@ -366,6 +371,9 @@ class IOSettingSPS(CustomCard):
             operation_type=OperationType.CONNECT_TO_HMI_SERVER,
             operation_content=user.user_name
         )
+        self.hmi_server_ip = self.hmi_server_ip.value
+        self.hmi_server_port = self.hmi_server_port.value
+        self.conf.save()
         self.page.run_task(self.handle_connect_to_hmi_server)
 
     async def handle_connect_to_hmi_server(self):
@@ -460,3 +468,10 @@ class IOSettingSPS(CustomCard):
         self.factor_conf.poisson_ratio_mu = self.poisson_ratio_mu.value
 
         self.factor_conf.save()
+
+        gdata.bearing_outer_diameter_D = float(self.shaft_outer_diameter.value)
+        gdata.bearing_inner_diameter_d = float(self.shaft_inner_diameter.value)
+        gdata.sensitivity_factor_k = float(self.sensitivity_factor_k.value)
+        gdata.elastic_modulus_E = float(self.elastic_modulus_E.value)
+        gdata.poisson_ratio_mu = float(self.poisson_ratio_mu.value)
+        logging.info('factor of gdata was refreshed.')
