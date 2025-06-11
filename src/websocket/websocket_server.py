@@ -33,7 +33,7 @@ class WebSocketServer:
                     if response:
                         await self.send_to_client(websocket, response)
         except websockets.ConnectionClosed:
-            logging.exception(f"client {websocket.remote_address} disconnected")
+            logging.error(f"client {websocket.remote_address} disconnected")
             AlarmSaver.create(alarm_type=AlarmType.HMI_SERVER_CLOSED)
         finally:
             self.clients.remove(websocket)
