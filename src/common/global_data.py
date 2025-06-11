@@ -1,4 +1,5 @@
 from datetime import datetime
+from db.models.factor_conf import FactorConf
 from db.models.io_conf import IOConf
 from db.models.offline_default_value import OfflineDefaultValue
 from db.models.system_settings import SystemSettings
@@ -87,6 +88,13 @@ class GlobalData:
         self.sps_offline_thrust = 0
         self.sps_offline_speed = 0
 
+        # 计算参数
+        self.bearing_outer_diameter_D = 0
+        self.bearing_inner_diameter_d = 0
+        self.elastic_modulus_E = 0
+        self.poisson_ratio_mu = 0
+        self.sensitivity_factor_k = 0
+
     def set_default_value(self):
         systemSettings: SystemSettings = SystemSettings.get()
         self.display_propeller_curve = systemSettings.display_propeller_curve
@@ -124,8 +132,7 @@ class GlobalData:
             self.sps1_torque_offset = sps1_accepted_zero_cal.torque_offset
             self.sps1_thrust_offset = sps1_accepted_zero_cal.thrust_offset
 
-        sps2_accepted_zero_cal: ZeroCalInfo = ZeroCalInfo.select().where(
-            ZeroCalInfo.state == 1, ZeroCalInfo.name == 'sps2').order_by(ZeroCalInfo.id.desc()).first()
+        sps2_accepted_zero_cal: ZeroCalInfo = ZeroCalInfo.select().where(ZeroCalInfo.state == 1, ZeroCalInfo.name == 'sps2').order_by(ZeroCalInfo.id.desc()).first()
         if sps2_accepted_zero_cal is not None:
             self.sps2_torque_offset = sps2_accepted_zero_cal.torque_offset
             self.sps2_thrust_offset = sps2_accepted_zero_cal.thrust_offset
@@ -134,6 +141,13 @@ class GlobalData:
         self.sps_offline_thrust = offline_default_value.thrust_default_value
         self.sps_offline_torque = offline_default_value.torque_default_value
         self.sps_offline_speed = offline_default_value.speed_default_value
+
+        factor_conf: FactorConf = FactorConf.get()
+        self.bearing_outer_diameter_D = factor_conf.bearing_outer_diameter_D
+        self.bearing_inner_diameter_d = factor_conf.bearing_inner_diameter_d
+        self.elastic_modulus_E = factor_conf.elastic_modulus_E
+        self.poisson_ratio_mu = factor_conf.poisson_ratio_mu
+        self.sensitivity_factor_k = factor_conf.sensitivity_factor_k
 
 
 gdata: GlobalData = GlobalData()
