@@ -40,7 +40,7 @@ class JM3846AsyncClient:
     def get_ip_port() -> tuple[str, int]:
         pass
 
-    async def start(self) -> bool:
+    async def start(self, only_once=False) -> bool:
         """启动客户端"""
         try:
             connected = await self.async_connect()
@@ -48,12 +48,19 @@ class JM3846AsyncClient:
                 await self.async_handle_0x44()
                 # 异步接受数据
                 asyncio.create_task(self.async_receive_looping())
+            # return directly if only once.
+            if only_once:
                 return connected
-            else:
-                result = await self.start()
-                return result
+            # if not, we need to retry.
+            if not connected:
+                await asyncio.sleep(2)
+                return await self.start()
         except Exception:
             logging.error(f'{self.name} start JM3846 client failed')
+            if only_once:
+                return False
+            await asyncio.sleep(2)
+            await self.start()
         return False
 
     async def async_connect(self) -> bool:

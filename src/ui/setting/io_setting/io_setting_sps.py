@@ -1,5 +1,4 @@
 import ipaddress
-from playhouse.shortcuts import model_to_dict
 import flet as ft
 from common.operation_type import OperationType
 from db.models.factor_conf import FactorConf
@@ -10,6 +9,7 @@ from db.models.user import User
 from ui.common.custom_card import CustomCard
 from ui.common.keyboard import keyboard
 from ui.common.permission_check import PermissionCheck
+from ui.common.toast import Toast
 from websocket.websocket_server import ws_server
 from websocket.websocket_client import ws_client
 from common.global_data import gdata
@@ -48,16 +48,16 @@ class IOSettingSPS(CustomCard):
 
         self.start_hmi_server = ft.FilledButton(
             text=self.page.session.get("lang.setting.start_hmi_server"),
-            bgcolor=ft.colors.GREEN,
-            color=ft.colors.WHITE,
+            bgcolor=ft.Colors.GREEN,
+            color=ft.Colors.WHITE,
             visible=not gdata.hmi_server_started,
             on_click=lambda e: self.page.open(PermissionCheck(self.__start_hmi_server,2))
         )
 
         self.stop_hmi_server = ft.FilledButton(
             text=self.page.session.get("lang.setting.stop_hmi_server"),
-            bgcolor=ft.colors.RED,
-            color=ft.colors.WHITE,
+            bgcolor=ft.Colors.RED,
+            color=ft.Colors.WHITE,
             visible=gdata.hmi_server_started,
             on_click=lambda e: self.page.open(PermissionCheck(self.__stop_hmi_server,2))
         )
@@ -80,16 +80,16 @@ class IOSettingSPS(CustomCard):
 
         self.sps1_connect = ft.FilledButton(
             text=self.page.session.get("lang.setting.connect"),
-            bgcolor=ft.colors.GREEN,
-            color=ft.colors.WHITE,
+            bgcolor=ft.Colors.GREEN,
+            color=ft.Colors.WHITE,
             visible=gdata.sps1_offline,
             on_click=lambda e: self.page.open(PermissionCheck(self.__connect_to_sps1, 2))
         )
 
         self.sps1_disconnect = ft.FilledButton(
             text=self.page.session.get("lang.setting.disconnect"),
-            bgcolor=ft.colors.RED,
-            color=ft.colors.WHITE,
+            bgcolor=ft.Colors.RED,
+            color=ft.Colors.WHITE,
             visible=not gdata.sps1_offline,
             on_click=lambda e: self.page.open(PermissionCheck(self.__disconnect_from_sps1, 2))
         )
@@ -110,33 +110,32 @@ class IOSettingSPS(CustomCard):
 
         self.sps2_connect = ft.FilledButton(
             text=self.page.session.get("lang.setting.connect"),
-            bgcolor=ft.colors.GREEN,
-            color=ft.colors.WHITE,
+            bgcolor=ft.Colors.GREEN,
+            color=ft.Colors.WHITE,
             visible=gdata.sps2_offline,
             on_click=lambda e: self.page.open(PermissionCheck(self.__connect_to_sps2, 2))
         )
 
         self.sps2_disconnect = ft.FilledButton(
             text=self.page.session.get("lang.setting.disconnect"),
-            bgcolor=ft.colors.RED,
-            color=ft.colors.WHITE,
+            bgcolor=ft.Colors.RED,
+            color=ft.Colors.WHITE,
             visible=not gdata.sps2_offline,
             on_click=lambda e: self.page.open(PermissionCheck(self.__disconnect_from_sps2,2))
         )
 
         self.connect_server = ft.FilledButton(
             text=self.page.session.get("lang.setting.connect_to_hmi_server"),
-            bgcolor=ft.colors.GREEN,
-            color=ft.colors.WHITE,
+            bgcolor=ft.Colors.GREEN,
+            color=ft.Colors.WHITE,
             visible=not gdata.connected_to_hmi_server,
             on_click=lambda e: self.page.open(PermissionCheck(self.__connect_to_hmi_server,2))
         )
 
         self.disconnect_server = ft.FilledButton(
-            text=self.page.session.get(
-                "lang.setting.disconnect_from_hmi_server"),
-            bgcolor=ft.colors.RED,
-            color=ft.colors.WHITE,
+            text=self.page.session.get("lang.setting.disconnect_from_hmi_server"),
+            bgcolor=ft.Colors.RED,
+            color=ft.Colors.WHITE,
             visible=gdata.connected_to_hmi_server,
             on_click=lambda e: self.page.open(PermissionCheck(self.__disconnect_from_hmi_server ,2))
         )
@@ -228,8 +227,7 @@ class IOSettingSPS(CustomCard):
         )
 
         self.row_websocket_client = ft.Row(
-            controls=[self.hmi_server_ip, self.hmi_server_port,
-                      self.connect_server, self.disconnect_server],
+            controls=[self.hmi_server_ip, self.hmi_server_port, self.connect_server, self.disconnect_server],
             visible=not self.conf.connect_to_sps
         )
 
@@ -245,18 +243,26 @@ class IOSettingSPS(CustomCard):
         super().build()
 
     def __connect_to_sps1(self, user: User):
+        if not self.conf.connect_to_sps:
+            Toast.show_warning(self.page,"Please save configuration before your operations.")
+            return
         OperationLog.create(
             user_id=user.id,
             utc_date_time=gdata.utc_date_time,
             operation_type=OperationType.CONNECT_TO_SPS1,
             operation_content=user.user_name
         )
-        self.save_data()
         self.page.run_task(self.__start_sps1_task)
 
     async def __start_sps1_task(self):
-        connected = await sps1_read_task.start()
+        self.sps1_connect.text = self.page.session.get("lang.common.connecting")
+        self.sps1_connect.disabled = True
+        self.sps1_connect.update()
+
+        connected = await sps1_read_task.start(only_once=True)
+        self.sps1_connect.text = self.page.session.get("lang.setting.connect")
         self.sps1_connect.visible = not connected
+        self.sps1_connect.disabled = False
         self.sps1_connect.update()
         self.sps1_disconnect.visible = connected
         self.sps1_disconnect.update()
@@ -278,17 +284,25 @@ class IOSettingSPS(CustomCard):
         self.sps1_disconnect.update()
 
     def __connect_to_sps2(self, user: User):
+        if not self.conf.connect_to_sps:
+            Toast.show_warning(self.page,"Please save configuration before your operations.")
+            return
         OperationLog.create(
             user_id=user.id,
             utc_date_time=gdata.utc_date_time,
             operation_type=OperationType.CONNECT_TO_SPS2,
             operation_content=user.user_name
         )
-        self.save_data()
         self.page.run_task(self.__start_sps2_task)
 
     async def __start_sps2_task(self):
+        self.sps2_connect.text = self.page.session.get("lang.common.connecting")
+        self.sps2_connect.disabled = True
+        self.sps2_connect.update()
+    
         connected = await sps2_read_task.start()
+        self.sps2_connect.text = self.page.session.get("lang.setting.connect")
+        self.sps2_connect.visible = not connected
         self.sps2_connect.visible = not connected
         self.sps2_connect.update()
         self.sps2_disconnect.visible = connected
@@ -311,6 +325,9 @@ class IOSettingSPS(CustomCard):
         self.sps2_disconnect.update()
 
     def __start_hmi_server(self, user:User):
+        if not self.conf.connect_to_sps:
+            Toast.show_warning(self.page,"Please save configuration before your operations.")
+            return
         OperationLog.create(
             user_id=user.id,
             utc_date_time=gdata.utc_date_time,
@@ -352,11 +369,19 @@ class IOSettingSPS(CustomCard):
         self.page.run_task(self.handle_connect_to_hmi_server)
 
     async def handle_connect_to_hmi_server(self):
-        connected = await ws_client.connect()
-        self.connect_server.visible = not connected
-        self.disconnect_server.visible = connected
+        self.connect_server.text = self.page.session.get("lang.common.connecting")
+        self.connect_server.disabled = True
         self.connect_server.update()
+        connected = await ws_client.connect(only_once=True)
+        # recovery
+        self.connect_server.text = self.page.session.get("lang.setting.connect_to_hmi_server")
+        self.connect_server.disabled = False
+        self.connect_server.visible = not connected
+        self.connect_server.update()
+
+        self.disconnect_server.visible = connected
         self.disconnect_server.update()
+
 
     def __disconnect_from_hmi_server(self, user:User):
         OperationLog.create(
@@ -388,7 +413,6 @@ class IOSettingSPS(CustomCard):
 
         self.row_websocket_client.visible = not is_connect_to_sps
 
-        self.conf.connect_to_sps = is_connect_to_sps
         self.update()
 
     def save_data(self):
@@ -418,6 +442,7 @@ class IOSettingSPS(CustomCard):
                     f'{self.page.session.get("lang.common.ip_address_format_error")}: {self.sps2_ip.value}')
 
         self.save_factor()
+        self.conf.connect_to_sps = self.connect_to_sps.value
 
         if self.connect_to_sps.value:
             # 关闭websocket客户端连接
