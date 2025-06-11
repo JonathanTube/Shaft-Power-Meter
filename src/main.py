@@ -82,8 +82,7 @@ async def main(page: ft.Page):
     page.window.frameless = True
     page.window.always_on_top = False
     if page.window.width <= 1200:
-        page.window.maximized = True
-        page.window.full_screen = False
+        page.window.full_screen = True
     else:
         page.window.maximizable = False
         page.window.width = 1024
