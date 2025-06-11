@@ -57,10 +57,11 @@ class SystemConf(ft.Container):
 
 
     def __refresh_page(self):
-        self.page.appbar.clean()
-        self.page.appbar.build()
-        self.page.appbar.update()
-        for control in self.page.controls:
-            control.clean()
-            control.build()
-            control.update()
+        if self.page and self.page.appbar:
+            self.page.appbar.clean()
+            self.page.appbar.build()
+            self.page.appbar.update()
+            for control in self.page.controls:
+                control.clean()
+                control.build()
+                control.update()

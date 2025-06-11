@@ -58,10 +58,10 @@ class EEXIBreach:
         # 计算恢复次数
         recovery_times = sum(1 for item in data if item.power <= eexi_limited_power)
         if recovery_times == len(data):
-            logging.info(f"eexi_breach_checking_duration = {seconds}s")
-            logging.info(f"start_time = {gdata.utc_date_time} - {seconds}s = {start_time}")
-            logging.info(f"start_time = {gdata.utc_date_time} - {seconds}s - 1s = {start_time}")
-            logging.info(f"recovery_times = {recovery_times}")
+            # logging.info(f"eexi_breach_checking_duration = {seconds}s")
+            # logging.info(f"start_time = {gdata.utc_date_time} - {seconds}s = {start_time}")
+            # logging.info(f"start_time = {gdata.utc_date_time} - {seconds}s - 1s = {start_time}")
+            # logging.info(f"recovery_times = {recovery_times}")
             EEXIBreach.__handle_recovery_event(start_time)
         # logging.info('==================eexi_breach_task: end==================\n')
 

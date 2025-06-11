@@ -1,3 +1,4 @@
+import asyncio
 import ipaddress
 import logging
 import flet as ft
@@ -199,20 +200,17 @@ class IOSettingSPS(CustomCard):
         self.heading = self.page.session.get("lang.setting.sps_conf")
 
         self.row_sps1 = ft.Row(
-            controls=[self.sps1_ip, self.sps1_port,
-                      self.sps1_connect, self.sps1_disconnect],
+            controls=[self.sps1_ip, self.sps1_port, self.sps1_connect, self.sps1_disconnect],
             visible=self.conf.connect_to_sps
         )
 
         self.row_sps2 = ft.Row(
-            controls=[self.sps2_ip, self.sps2_port,
-                      self.sps2_connect, self.sps2_disconnect],
+            controls=[self.sps2_ip, self.sps2_port, self.sps2_connect, self.sps2_disconnect],
             visible=self.conf.connect_to_sps and self.is_dual
         )
 
         self.row_websocket_server = ft.Row(
-            controls=[self.websocket_server_ip, self.websocket_server_port,
-                      self.start_hmi_server, self.stop_hmi_server],
+            controls=[self.websocket_server_ip, self.websocket_server_port, self.start_hmi_server, self.stop_hmi_server],
             visible=self.conf.connect_to_sps
         )
 
@@ -261,13 +259,8 @@ class IOSettingSPS(CustomCard):
         self.sps1_connect.disabled = True
         self.sps1_connect.update()
 
-        connected = await sps1_read_task.start(only_once=True)
-        self.sps1_connect.text = self.page.session.get("lang.setting.connect")
-        self.sps1_connect.visible = not connected
-        self.sps1_connect.disabled = False
-        self.sps1_connect.update()
-        self.sps1_disconnect.visible = connected
-        self.sps1_disconnect.update()
+        await sps1_read_task.start(only_once=True)
+        self.__handle_sps1_connection()
 
     def __disconnect_from_sps1(self, user:User):
         OperationLog.create(
@@ -279,11 +272,8 @@ class IOSettingSPS(CustomCard):
         self.page.run_task(self.__stop_sps1_task)
 
     async def __stop_sps1_task(self):
-        disconnected = await sps1_read_task.async_disconnect()
-        self.sps1_connect.visible = disconnected
-        self.sps1_connect.update()
-        self.sps1_disconnect.visible = not disconnected
-        self.sps1_disconnect.update()
+        await sps1_read_task.async_disconnect()
+        self.__handle_sps1_connection()
 
     def __connect_to_sps2(self, user: User):
         if not self.conf.connect_to_sps:
@@ -305,13 +295,8 @@ class IOSettingSPS(CustomCard):
         self.sps2_connect.disabled = True
         self.sps2_connect.update()
     
-        connected = await sps2_read_task.start()
-        self.sps2_connect.text = self.page.session.get("lang.setting.connect")
-        self.sps2_connect.visible = not connected
-        self.sps2_connect.visible = not connected
-        self.sps2_connect.update()
-        self.sps2_disconnect.visible = connected
-        self.sps2_disconnect.update()
+        await sps2_read_task.start(only_once=True)
+        self.__handle_sps2_connection()
 
     def __disconnect_from_sps2(self, user:User):
         OperationLog.create(
@@ -323,11 +308,8 @@ class IOSettingSPS(CustomCard):
         self.page.run_task(self.__stop_sps2_task)
 
     async def __stop_sps2_task(self):
-        disconnected = await sps2_read_task.async_disconnect()
-        self.sps2_connect.visible = disconnected
-        self.sps2_connect.update()
-        self.sps2_disconnect.visible = not disconnected
-        self.sps2_disconnect.update()
+        await sps2_read_task.async_disconnect()
+        self.__handle_sps2_connection()
 
     def __start_hmi_server(self, user:User):
         if not self.conf.connect_to_sps:
@@ -342,11 +324,8 @@ class IOSettingSPS(CustomCard):
         self.page.run_task(self.handle_start_server)
 
     async def handle_start_server(self):
-        started = await ws_server.start()
-        self.start_hmi_server.visible = not started
-        self.stop_hmi_server.visible = started
-        self.start_hmi_server.update()
-        self.stop_hmi_server.update()
+        await ws_server.start()
+        self.__handle_hmi_server_connection()
 
     def __stop_hmi_server(self, user:User):
         OperationLog.create(
@@ -358,11 +337,8 @@ class IOSettingSPS(CustomCard):
         self.page.run_task(self.handle_stop_server)
 
     async def handle_stop_server(self):
-        stopped = await ws_server.stop()
-        self.start_hmi_server.visible = stopped
-        self.stop_hmi_server.visible = not stopped
-        self.start_hmi_server.update()
-        self.stop_hmi_server.update()
+        await ws_server.stop()
+        self.__handle_hmi_server_connection()
 
     def __connect_to_hmi_server(self, user: User):
         OperationLog.create(
@@ -475,3 +451,45 @@ class IOSettingSPS(CustomCard):
         gdata.elastic_modulus_E = float(self.elastic_modulus_E.value)
         gdata.poisson_ratio_mu = float(self.poisson_ratio_mu.value)
         logging.info('factor of gdata was refreshed.')
+
+    def __handle_sps1_connection(self):
+        self.sps1_connect.text = self.page.session.get("lang.setting.connect")
+        self.sps1_connect.visible = gdata.sps1_offline
+        self.sps1_connect.disabled = False
+        self.sps1_connect.update()
+
+        self.sps1_disconnect.visible = not gdata.sps1_offline
+        self.sps1_disconnect.update()
+    
+    def __handle_sps2_connection(self):
+        self.sps2_connect.text = self.page.session.get("lang.setting.connect")
+        self.sps2_connect.visible = gdata.sps2_offline
+        self.sps2_connect.disabled = False
+        self.sps2_connect.update()
+
+        self.sps2_disconnect.visible = not gdata.sps2_offline
+        self.sps2_disconnect.update()
+
+    def __handle_hmi_server_connection(self):
+        self.start_hmi_server.visible = not gdata.hmi_server_started
+        self.stop_hmi_server.visible = gdata.hmi_server_started
+        self.start_hmi_server.update()
+        self.stop_hmi_server.update()
+
+    def did_mount(self):
+        self.loop_task = self.page.run_task(self.__handle_connection_status)
+
+    async def __handle_connection_status(self):
+        while True:
+            if not self.sps1_connect.disabled:
+                self.__handle_sps1_connection()
+                
+            if not self.sps2_connect.disabled:
+                self.__handle_sps2_connection()
+
+            self.__handle_hmi_server_connection()
+            await asyncio.sleep(1)
+
+    def will_unmount(self):
+        if self.loop_task:
+            self.loop_task.cancel()

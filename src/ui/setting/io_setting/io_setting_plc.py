@@ -1,3 +1,4 @@
+import asyncio
 import ipaddress
 import logging
 import flet as ft
@@ -43,7 +44,7 @@ class IOSettingPLC(CustomCard):
 
         self.fetch_data_from_plc = ft.FilledButton(
             text = self.page.session.get("lang.setting.fetch_data"),
-            bgcolor=ft.Colors.LIME,
+            bgcolor=ft.Colors.BLUE,
             color=ft.Colors.WHITE,
             visible=self.conf.plc_enabled and gdata.connected_to_plc,
             on_click=lambda e: self.__on_fetch_data_from_plc()
@@ -226,18 +227,8 @@ class IOSettingPLC(CustomCard):
         self.connect_to_plc.text = self.page.session.get("lang.common.connecting")
         self.connect_to_plc.disabled = True
         self.connect_to_plc.update()
-
-        connected = await plc_util.auto_reconnect(only_once=True)
-        self.connect_to_plc.text = self.page.session.get("lang.setting.connect")
-        self.connect_to_plc.visible = not connected
-        self.connect_to_plc.disabled = False
-        self.connect_to_plc.update()
-
-        self.disconnect_from_plc.visible = connected
-        self.disconnect_from_plc.update()
-
-        self.fetch_data_from_plc.visible = connected
-        self.fetch_data_from_plc.update()
+        await plc_util.auto_reconnect(only_once=True)
+        self.__handle_plc_connection_status()
 
     def __on_disconnect(self, user:User):
         OperationLog.create(
@@ -249,11 +240,8 @@ class IOSettingPLC(CustomCard):
         self.page.run_task(self.__stop_plc_task)
 
     async def __stop_plc_task(self):
-        disconnected = plc_util.close()
-        self.connect_to_plc.visible = disconnected
-        self.connect_to_plc.update()
-        self.disconnect_from_plc.visible = not disconnected
-        self.disconnect_from_plc.update()
+        plc_util.close()
+        self.__handle_plc_connection_status()
 
     def __on_fetch_data_from_plc(self):
         self.page.run_task(self.load_range_data)
@@ -302,6 +290,9 @@ class IOSettingPLC(CustomCard):
         self.conf.plc_enabled = self.plc_enabled.value
         gdata.plc_enabled = self.plc_enabled.value
 
+        if not self.conf.plc_enabled:
+            plc_util.close()
+            
         if self.conf.plc_enabled:
             self.page.run_task(self.__write_to_plc)
 
@@ -318,6 +309,7 @@ class IOSettingPLC(CustomCard):
 
         self.connect_to_plc.update()
         self.disconnect_from_plc.update()
+        self.fetch_data_from_plc.update()
 
         self.plc_ip.visible = plc_enabled
         self.plc_ip.update()
@@ -377,3 +369,33 @@ class IOSettingPLC(CustomCard):
 
         except Exception:
             logging.exception("plc save data error")
+
+    
+    def __handle_plc_connection_status(self):
+        self.connect_to_plc.text = self.page.session.get("lang.setting.connect")
+        self.connect_to_plc.visible = not gdata.connected_to_plc
+        self.connect_to_plc.disabled = False
+        self.connect_to_plc.update()
+
+        self.disconnect_from_plc.visible = gdata.connected_to_plc
+        self.disconnect_from_plc.update()
+
+        self.fetch_data_from_plc.visible = gdata.connected_to_plc
+        self.fetch_data_from_plc.update()
+
+    def did_mount(self):
+        self.loop_task = self.page.run_task(self.__handle_connection_status)
+
+    def will_unmount(self):
+        if self.loop_task:
+            self.loop_task.cancel()
+    
+    async def __handle_connection_status(self):
+        while True:
+            await asyncio.sleep(1)
+            
+            if not self.plc_enabled.value:
+                continue
+
+            if not self.connect_to_plc.disabled:
+                self.__handle_plc_connection_status()

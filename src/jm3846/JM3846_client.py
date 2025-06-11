@@ -43,6 +43,7 @@ class JM3846AsyncClient:
     async def start(self, only_once=False) -> bool:
         """启动客户端"""
         try:
+            self.running = True
             connected = await self.async_connect()
             if connected:
                 await self.async_handle_0x44()
@@ -54,32 +55,31 @@ class JM3846AsyncClient:
             # if not, we need to retry.
             if not connected:
                 await asyncio.sleep(2)
-                return await self.start()
+                await self.start()
         except Exception:
             logging.error(f'{self.name} start JM3846 client failed')
             if only_once:
                 return False
-            await asyncio.sleep(2)
+            await asyncio.sleep(5)
             await self.start()
         return False
 
     async def async_connect(self) -> bool:
-        """建立异步连接"""
-        try:
-            host, port = self.get_ip_port()
-            logging.info(f'{self.name} JM3846 Connecting, host={host}, port={port}...')
-            self.reader, self.writer = await asyncio.wait_for(
-                asyncio.open_connection(host, port),
-                timeout=self.timeout
-            )
-            self.running = True
-            logging.info(f'{self.name} JM3846 Connected successfully')
-            return True
-        except Exception:
-            self.running = False
-            logging.error(f'{self.name} JM3846 Connection error')
-            self.set_offline(True)
-        return False
+        async with self._lock:  # 确保单线程重连
+            """建立异步连接"""
+            try:
+                host, port = self.get_ip_port()
+                logging.info(f'{self.name} JM3846 Connecting, host={host}, port={port}...')
+                self.reader, self.writer = await asyncio.wait_for(
+                    asyncio.open_connection(host, port),
+                    timeout=self.timeout
+                )
+                logging.info(f'{self.name} JM3846 Connected successfully')
+                return True
+            except Exception:
+                logging.error(f'{self.name} JM3846 Connection error')
+                self.set_offline(True)
+            return False
 
     async def async_disconnect(self) -> bool:
         """断开连接"""
@@ -99,17 +99,16 @@ class JM3846AsyncClient:
 
     async def async_handle_0x03(self):
         """异步处理功能码0x03"""
-        async with self._lock:
-            try:
-                self.transaction_id = (self.transaction_id + 1) % 0xFFFF
-                # 发送请求
-                request = JM38460x03Async.build_request(self.transaction_id)
-                self.writer.write(request)
-                await self.writer.drain()
-            except asyncio.TimeoutError:
-                logging.exception(f'{self.name} JM3846 0x03 request timeout')
-            except Exception:
-                logging.exception(f'{self.name} JM3846 0x03 error')
+        try:
+            self.transaction_id = (self.transaction_id + 1) % 0xFFFF
+            # 发送请求
+            request = JM38460x03Async.build_request(self.transaction_id)
+            self.writer.write(request)
+            await self.writer.drain()
+        except asyncio.TimeoutError:
+            logging.exception(f'{self.name} JM3846 0x03 request timeout')
+        except Exception:
+            logging.exception(f'{self.name} JM3846 0x03 error')
 
     def _update_config(self, config: dict):
         """更新设备配置"""
@@ -122,29 +121,32 @@ class JM3846AsyncClient:
 
     async def async_handle_0x44(self):
         """异步处理功能码0x44"""
-        async with self._lock:
-            try:
-                self.transaction_id = (self.transaction_id + 1) % 0xFFFF
+        try:
+            self.transaction_id = (self.transaction_id + 1) % 0xFFFF
 
-                request = JM38460x44Async.build_request(
-                    tid=self.transaction_id,
-                    frame_size=self.frame_size,
-                    total_frames=self.total_frames
-                )
-                logging.info(f'{self.name} send 0x44 req={request}')
-                self.writer.write(request)
-                await self.writer.drain()
+            request = JM38460x44Async.build_request(
+                tid=self.transaction_id,
+                frame_size=self.frame_size,
+                total_frames=self.total_frames
+            )
+            logging.info(f'{self.name} send 0x44 req={request}')
+            self.writer.write(request)
+            await self.writer.drain()
 
-            except asyncio.TimeoutError:
-                logging.error(f'{self.name} JM3846 0x44 request timeout')
-            except Exception:
-                logging.exception(f'{self.name} JM3846 0x44 error')
-                await self.async_disconnect()
+        except asyncio.TimeoutError:
+            logging.error(f'{self.name} JM3846 0x44 request timeout')
+        except Exception:
+            logging.exception(f'{self.name} JM3846 0x44 error')
 
     async def async_receive_looping(self):
         """持续接收0x44数据"""
         while self.running:
             try:
+                if self.name == 'sps2' and int(gdata.amount_of_propeller) == 1:
+                    logging.info('exit running since single propeller')
+                    gdata.sps2_offline = True
+                    return
+
                 # 接收响应
                 response = await asyncio.wait_for(
                     self.reader.read(256),
@@ -155,7 +157,7 @@ class JM3846AsyncClient:
                     await asyncio.sleep(2)
                     continue
 
-                 # 基本头长度检查
+                # 基本头长度检查
                 if len(response) < 8:
                     logging.error(f'{self.name} the length of return is invalid.')
                     continue
@@ -167,7 +169,6 @@ class JM3846AsyncClient:
                 if func_code & 0x80:
                     error_code = response[8] if len(response) >= 9 else 0
                     logging.error(f'{self.name} SPS return errors, error_code is {error_code}')
-                    self.set_offline(True)
                     continue
 
                 if func_code == 0x03:
@@ -201,10 +202,8 @@ class JM3846AsyncClient:
 
                         current_frame = res['current_frame']
                         if current_frame >= self.total_frames:
+                            await self.async_handle_0x45()
                             await self.async_handle_0x44()
-                    else:
-                        self.set_offline(True)
-
                     continue
 
                 if func_code == 0x45:
@@ -216,16 +215,17 @@ class JM3846AsyncClient:
                 logging.error(f'{self.name} JM3846 0x44 receive timeout, retrying...')
                 # 发送0x45,断开数据流
                 await self.async_handle_0x45()
-                await asyncio.sleep(2)
                 await self.async_handle_0x44()
             except ConnectionResetError as e:
-                logging.exception(f'{self.name} JM3846 Connection reset: {e}')
-                await self.async_disconnect()
-                break
+                logging.error(f'{self.name} JM3846 Connection reset: {e}')
+                self.set_offline(True)
+                await asyncio.sleep(5)
+                connected = await self.async_connect()
+                if connected:
+                    await self.async_handle_0x45()
+                    await self.async_handle_0x44()
             except Exception:
                 logging.exception(f'{self.name} JM3846 0x44 Receive error')
-                await self.async_disconnect()
-                break
 
     async def save_0x44_result(self, result: dict):
         # logging.info('result=', result)
@@ -251,7 +251,7 @@ class JM3846AsyncClient:
             else:
                 gdata.sps2_ad0 = ad0
                 gdata.sps2_mv_per_v_for_torque = ad0_mv_per_v
-            
+
             # 加上偏移量
             torque_offset = gdata.sps1_torque_offset if self.name == 'sps1' else gdata.sps2_torque_offset
             ad0_microstrain = self.jm3846Calculator.calculate_microstrain(ad0_mv_per_v + torque_offset)
@@ -292,21 +292,20 @@ class JM3846AsyncClient:
 
     async def async_handle_0x45(self):
         """异步处理功能码0x45"""
-        async with self._lock:
-            try:
-                self.transaction_id = (self.transaction_id + 1) % 0xFFFF
+        try:
+            self.transaction_id = (self.transaction_id + 1) % 0xFFFF
 
-                request = JM38460x45Async.build_request(self.transaction_id)
-                if not self.writer:
-                    return
+            request = JM38460x45Async.build_request(self.transaction_id)
+            if not self.writer:
+                return
 
-                logging.info(f'{self.name} send 0x45 req={request}')
-                self.writer.write(request)
-                await self.writer.drain()
-            except asyncio.TimeoutError:
-                logging.error(f'{self.name} JM3846 0x45 request timeout')
-            except Exception:
-                logging.error(f'{self.name} JM3846 0x45 error')
+            logging.info(f'{self.name} send 0x45 req={request}')
+            self.writer.write(request)
+            await self.writer.drain()
+        except asyncio.TimeoutError:
+            logging.error(f'{self.name} JM3846 0x45 request timeout')
+        except Exception:
+            logging.error(f'{self.name} JM3846 0x45 error')
 
     def set_offline(self, is_offline: bool):
         if self.name == 'sps1':
