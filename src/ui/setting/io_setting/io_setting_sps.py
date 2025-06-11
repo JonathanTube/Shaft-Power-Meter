@@ -285,7 +285,7 @@ class IOSettingSPS(CustomCard):
 
     def __connect_to_sps2(self, user: User):
         if not self.conf.connect_to_sps:
-            Toast.show_warning(self.page,"Please save configuration before your operations.")
+            Toast.show_warning(self.page, self.page.session.get('lang.setting.save_conf_before_operations'))
             return
         OperationLog.create(
             user_id=user.id,

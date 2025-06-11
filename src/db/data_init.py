@@ -35,9 +35,9 @@ class DataInit:
     def __init_offline_default_value():
         if OfflineDefaultValue.select().count() == 0:
             OfflineDefaultValue.create(
-                torque_default_value=600 * 1000,
+                torque_default_value=460 * 1000,
                 thrust_default_value=32 * 1000,
-                speed_default_value=80
+                speed_default_value=95
             )
 
     def __init_limitations():
@@ -1141,6 +1141,12 @@ class DataInit:
                 },
 
                 {
+                    "code": "lang.setting.fetch_data",
+                    "chinese": "获取数据",
+                    "english": "Fetch Data"
+                },
+
+                {
                     "code": "lang.setting.ip",
                     "chinese": "IP 地址",
                     "english": "IP Address"
@@ -1174,6 +1180,12 @@ class DataInit:
                     "code": "lang.setting.plc_enabled",
                     "chinese": "启用PLC",
                     "english": "PLC Enabled"
+                },
+
+                {
+                    "code": "lang.setting.save_conf_before_operations",
+                    "chinese": "请先保存配置后再操作。",
+                    "english": "Please save configuration before your operations."
                 },
 
                 {

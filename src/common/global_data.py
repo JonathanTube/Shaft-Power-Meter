@@ -24,6 +24,8 @@ class GlobalData:
         self.connected_to_hmi_server = False
         # modbus output服务是否已经打开
         self.modbus_server_started = False
+        # 是否连上PLC
+        self.connected_to_plc = False
 
         self.gps_ip = None
         self.gps_port = None

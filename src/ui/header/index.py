@@ -102,7 +102,7 @@ class Header(ft.AppBar):
         await ws_client.close()
 
         # 关闭PLC
-        await plc_util.close()
+        plc_util.close()
 
         # 关闭GPS
         await gps_sync_task.close_connection()

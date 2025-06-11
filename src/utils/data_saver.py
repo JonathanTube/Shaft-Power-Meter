@@ -32,7 +32,6 @@ class DataSaver:
             )
             # 保存瞬时数据
             if gdata.plc_enabled:
-                logging.info(f"write real time data to plc: {power}, {torque}, {thrust}, {speed}")
                 asyncio.create_task(plc_util.write_instant_data(power, torque, thrust, speed))
             # save counter log of total
             DataSaver.save_counter_total(name, speed, power)

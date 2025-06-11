@@ -1,9 +1,14 @@
 import ipaddress
 import logging
 import flet as ft
+from common.operation_type import OperationType
 from db.models.io_conf import IOConf
+from db.models.operation_log import OperationLog
+from db.models.user import User
 from ui.common.custom_card import CustomCard
 from ui.common.keyboard import keyboard
+from ui.common.permission_check import PermissionCheck
+from ui.common.toast import Toast
 from utils.plc_util import plc_util
 from common.global_data import gdata
 
@@ -16,27 +21,42 @@ class IOSettingPLC(CustomCard):
     def build(self):
         self.plc_enabled = ft.Checkbox(
             label=self.page.session.get("lang.setting.plc_enabled"), 
-            value=self.conf.plc_enabled, col={'md': 6},
+            value=self.conf.plc_enabled, col={'sm':12},
             on_change=lambda e : self.__plc_enabled_change(e)
         )
 
-        self.plc_status = ft.Container(
-            col={'md': 6},
-            content=ft.Text(
-                visible=self.conf.plc_enabled,
-                value=self.page.session.get("lang.alarm.plc_disconnected"),
-                weight=ft.FontWeight.BOLD, color=ft.Colors.RED
-            )
+        self.connect_to_plc = ft.FilledButton(
+            text = self.page.session.get("lang.setting.connect"),
+            bgcolor=ft.Colors.GREEN,
+            color=ft.Colors.WHITE,
+            visible=self.conf.plc_enabled and not gdata.connected_to_plc,
+            on_click=lambda e: self.page.open(PermissionCheck(self.__on_connect, 2))
+        )
+
+        self.disconnect_from_plc = ft.FilledButton(
+            text = self.page.session.get("lang.setting.disconnect"),
+            bgcolor=ft.Colors.RED,
+            color=ft.Colors.WHITE,
+            visible=self.conf.plc_enabled and gdata.connected_to_plc,
+            on_click=lambda e: self.page.open(PermissionCheck(self.__on_disconnect, 2))
+        )
+
+        self.fetch_data_from_plc = ft.FilledButton(
+            text = self.page.session.get("lang.setting.fetch_data"),
+            bgcolor=ft.Colors.LIME,
+            color=ft.Colors.WHITE,
+            visible=self.conf.plc_enabled and gdata.connected_to_plc,
+            on_click=lambda e: self.__on_fetch_data_from_plc()
         )
 
         self.plc_ip = ft.TextField(
-            label=self.page.session.get("lang.setting.ip"), value=self.conf.plc_ip, col={'md': 6}, 
+            label=self.page.session.get("lang.setting.ip"), value=self.conf.plc_ip,
             read_only=True, on_focus=lambda e: keyboard.open(e.control, 'ip'), 
             visible=self.conf.plc_enabled
         )
 
         self.plc_port = ft.TextField(
-            label=self.page.session.get("lang.setting.port"), value=self.conf.plc_port, col={'md': 6}, 
+            label=self.page.session.get("lang.setting.port"), value=self.conf.plc_port,
             read_only=True, on_focus=lambda e: keyboard.open(e.control, 'int'), 
             visible=self.conf.plc_enabled
         )
@@ -44,7 +64,7 @@ class IOSettingPLC(CustomCard):
         self.txt_power_range_min = ft.TextField(
             label=self.page.session.get("lang.setting.4_20_ma_power_min"),
             suffix_text='kW',
-            col={'md': 6},
+            col={'sm': 6},
             read_only=True,
             value=0,
             on_focus=lambda e: keyboard.open(e.control, 'int'),
@@ -53,7 +73,7 @@ class IOSettingPLC(CustomCard):
         self.txt_power_range_max = ft.TextField(
             label=self.page.session.get("lang.setting.4_20_ma_power_max"),
             suffix_text='kW',
-            col={'md': 6},
+            col={'sm': 6},
             read_only=True,
             value=0,
             visible=self.conf.plc_enabled,
@@ -62,7 +82,7 @@ class IOSettingPLC(CustomCard):
         self.txt_power_range_offset = ft.TextField(
             label=self.page.session.get("lang.setting.4_20_ma_power_offset"),
             suffix_text='kW',
-            col={'md': 6},
+            col={'sm': 6},
             read_only=True,
             value=0,
             visible=self.conf.plc_enabled,
@@ -72,7 +92,7 @@ class IOSettingPLC(CustomCard):
         self.txt_torque_range_min = ft.TextField(
             label=self.page.session.get("lang.setting.4_20_ma_torque_min"),
             suffix_text='kNm',
-            col={'md': 6},
+            col={'sm': 6},
             read_only=True,
             value=0,
             visible=self.conf.plc_enabled,
@@ -81,7 +101,7 @@ class IOSettingPLC(CustomCard):
         self.txt_torque_range_max = ft.TextField(
             label=self.page.session.get("lang.setting.4_20_ma_torque_max"),
             suffix_text='kNm',
-            col={'md': 6},
+            col={'sm': 6},
             read_only=True,
             value=0,
             visible=self.conf.plc_enabled,
@@ -90,7 +110,7 @@ class IOSettingPLC(CustomCard):
         self.txt_torque_range_offset = ft.TextField(
             label=self.page.session.get("lang.setting.4_20_ma_torque_offset"),
             suffix_text='kNm',
-            col={'md': 6},
+            col={'sm': 6},
             read_only=True,
             value=0,
             visible=self.conf.plc_enabled,
@@ -100,7 +120,7 @@ class IOSettingPLC(CustomCard):
         self.txt_thrust_range_min = ft.TextField(
             label=self.page.session.get("lang.setting.4_20_ma_thrust_min"),
             suffix_text='kN',
-            col={'md': 6},
+            col={'sm': 6},
             read_only=True,
             value=0,
             visible=self.conf.plc_enabled,
@@ -109,7 +129,7 @@ class IOSettingPLC(CustomCard):
         self.txt_thrust_range_max = ft.TextField(
             label=self.page.session.get("lang.setting.4_20_ma_thrust_max"),
             suffix_text='kN',
-            col={'md': 6},
+            col={'sm': 6},
             read_only=True,
             value=0,
             visible=self.conf.plc_enabled,
@@ -118,7 +138,7 @@ class IOSettingPLC(CustomCard):
         self.txt_thrust_range_offset = ft.TextField(
             label=self.page.session.get("lang.setting.4_20_ma_thrust_offset"),
             suffix_text='kN',
-            col={'md': 6},
+            col={'sm': 6},
             read_only=True,
             value=0,
             visible=self.conf.plc_enabled,
@@ -128,7 +148,7 @@ class IOSettingPLC(CustomCard):
         self.txt_speed_range_min = ft.TextField(
             label=self.page.session.get("lang.setting.4_20_ma_speed_min"),
             suffix_text='rpm',
-            col={'md': 6},
+            col={'sm': 6},
             read_only=True,
             value=0,
             visible=self.conf.plc_enabled,
@@ -137,7 +157,7 @@ class IOSettingPLC(CustomCard):
         self.txt_speed_range_max = ft.TextField(
             label=self.page.session.get("lang.setting.4_20_ma_speed_max"),
             suffix_text='rpm',
-            col={'md': 6},
+            col={'sm': 6},
             read_only=True,
             value=0,
             visible=self.conf.plc_enabled,
@@ -146,7 +166,7 @@ class IOSettingPLC(CustomCard):
         self.txt_speed_range_offset = ft.TextField(
             label=self.page.session.get("lang.setting.4_20_ma_speed_offset"),
             suffix_text='rpm',
-            col={'md': 6},
+            col={'sm': 6},
             read_only=True,
             value=0,
             visible=self.conf.plc_enabled,
@@ -154,12 +174,19 @@ class IOSettingPLC(CustomCard):
         )
 
         self.heading = self.page.session.get("lang.setting.plc_conf")
+        
         self.body = ft.ResponsiveRow(controls=[
             self.plc_enabled,
-            self.plc_status,
-            self.plc_ip,
-            self.plc_port,
-
+            ft.Row(
+                col={'sm':12},
+                controls=[
+                    self.plc_ip,
+                    self.plc_port,
+                    self.connect_to_plc,
+                    self.disconnect_from_plc,
+                    self.fetch_data_from_plc
+                ]
+            ),
             self.txt_power_range_min,
             self.txt_power_range_max,
             self.txt_power_range_offset,
@@ -176,16 +203,59 @@ class IOSettingPLC(CustomCard):
             self.txt_speed_range_max,
             self.txt_speed_range_offset,
         ])
-        self.col = {"md": 12}
+        self.col = {'sm': 12}
         super().build()
-        if self.conf.plc_enabled:
-            self.page.run_task(self.load_range_data)
+
+    def __on_connect(self, user: User):
+        if not self.conf.plc_enabled:
+            Toast.show_warning(self.page, self.page.session.get('lang.setting.save_conf_before_operations'))
+            return
+        OperationLog.create(
+            user_id=user.id,
+            utc_date_time=gdata.utc_date_time,
+            operation_type=OperationType.CONNECT_TO_PLC,
+            operation_content=user.user_name
+        )
+        self.page.run_task(self.__start_plc_task)
+
+    async def __start_plc_task(self):
+        self.connect_to_plc.text = self.page.session.get("lang.common.connecting")
+        self.connect_to_plc.disabled = True
+        self.connect_to_plc.update()
+
+        connected = await plc_util.auto_reconnect(only_once=True)
+        self.connect_to_plc.text = self.page.session.get("lang.setting.connect")
+        self.connect_to_plc.visible = not connected
+        self.connect_to_plc.disabled = False
+        self.connect_to_plc.update()
+
+        self.disconnect_from_plc.visible = connected
+        self.disconnect_from_plc.update()
+
+        self.fetch_data_from_plc.visible = connected
+        self.fetch_data_from_plc.update()
+
+    def __on_disconnect(self, user:User):
+        OperationLog.create(
+            user_id=user.id,
+            utc_date_time=gdata.utc_date_time,
+            operation_type=OperationType.DISCONNECT_FROM_PLC,
+            operation_content=user.user_name
+        )
+        self.page.run_task(self.__stop_plc_task)
+
+    async def __stop_plc_task(self):
+        disconnected = plc_util.close()
+        self.connect_to_plc.visible = disconnected
+        self.connect_to_plc.update()
+        self.disconnect_from_plc.visible = not disconnected
+        self.disconnect_from_plc.update()
+
+    def __on_fetch_data_from_plc(self):
+        self.page.run_task(self.load_range_data)
 
     async def load_range_data(self):
         try:
-            self.plc_status.visible = not await plc_util.auto_reconnect()
-            self.plc_status.update()
-
             plc_4_20_ma_data = await plc_util.read_4_20_ma_data()
             self.txt_power_range_min.value = plc_4_20_ma_data["power_range_min"] // 10
             self.txt_power_range_min.update()
@@ -233,8 +303,17 @@ class IOSettingPLC(CustomCard):
 
     def __plc_enabled_change(self, e):
         plc_enabled = e.data
-        self.plc_status.visible = plc_enabled
-        self.plc_status.update()
+        if plc_enabled == 'true':
+            self.connect_to_plc.visible = plc_enabled and not gdata.connected_to_plc
+            self.disconnect_from_plc.visible = plc_enabled and gdata.connected_to_plc
+            self.fetch_data_from_plc.visible = plc_enabled and gdata.connected_to_plc
+        else:
+            self.connect_to_plc.visible = False
+            self.disconnect_from_plc.visible = False
+            self.fetch_data_from_plc.visible = False
+
+        self.connect_to_plc.update()
+        self.disconnect_from_plc.update()
 
         self.plc_ip.visible = plc_enabled
         self.plc_ip.update()
@@ -269,14 +348,9 @@ class IOSettingPLC(CustomCard):
         self.txt_speed_range_max.update()
         self.txt_speed_range_offset.visible = plc_enabled
         self.txt_speed_range_offset.update()
-        # 如果plc打开，触发，从plc加载默认配置
-        if plc_enabled:
-            self.page.run_task(self.load_range_data)
 
     async def __write_to_plc(self):
         try:
-            self.plc_status.visible = not await plc_util.auto_reconnect()
-            self.plc_status.update()
             # 传递给PLC的单位最小是0.1,PLC无法显示0.1，所以乘以10, 所以量程和偏移量也要乘以10
             data = {
                 "power_range_min": int(self.txt_power_range_min.value) * 10,
