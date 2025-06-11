@@ -99,6 +99,9 @@ class PLCUtil:
         return self._empty_4_20ma_data()
 
     async def write_4_20_ma_data(self, data: dict) -> bool:
+        if not gdata.plc_enabled or not gdata.connected_to_plc:
+            return False
+
         try:
             await self.plc_client.write_register(12298, int(data["power_range_min"]))
             await self.plc_client.write_register(12299, int(data["power_range_max"]))

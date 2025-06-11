@@ -178,8 +178,9 @@ class DataInit:
             )
 
     def __init_language():
-        if Language.select().count() == 0:
-            Language.insert_many([
+        if Language.select().count() > 0:
+            Language.truncate_table()
+        Language.insert_many([
                 {
                     "code": "lang.lang.app.name",
                     "chinese": "轴功率仪",

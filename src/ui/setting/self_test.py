@@ -70,12 +70,14 @@ class SelfTest(ft.Tabs):
     async def __read_plc_data(self):
         while True:
             try:
-                plc_4_20_ma_data = await plc_util.read_4_20_ma_data()
-                self.plc_log.controls.append(
-                    ft.Text(f"4-20mA: {plc_4_20_ma_data}"))
-                self.plc_log.controls.append(ft.Text(f"alarm: {await plc_util.read_alarm()}"))
-                self.plc_log.controls.append(ft.Text(f"overload: {await plc_util.read_power_overload()}"))
-                self.plc_log.controls.append(ft.Text(f"instant data: {await plc_util.read_instant_data()}"))
+                if gdata.connected_to_plc:
+                    plc_4_20_ma_data = await plc_util.read_4_20_ma_data()
+                    self.plc_log.controls.append(ft.Text(f"4-20mA: {plc_4_20_ma_data}"))
+                    self.plc_log.controls.append(ft.Text(f"alarm: {await plc_util.read_alarm()}"))
+                    self.plc_log.controls.append(ft.Text(f"overload: {await plc_util.read_power_overload()}"))
+                    self.plc_log.controls.append(ft.Text(f"instant data: {await plc_util.read_instant_data()}"))
+                else:
+                    self.plc_log.controls.append(ft.Text('Disconnected from PLC'))
                 self.plc_log.update()
             except Exception as e:
                 self.plc_log.controls.append(ft.Text(f"error: {e}"))
@@ -85,14 +87,20 @@ class SelfTest(ft.Tabs):
     async def __read_sps1_data(self):
         while True:
             sps1_data = f'ad0={gdata.sps1_ad0}, ad1={gdata.sps1_ad1}, speed={gdata.sps1_speed}'
-            self.sps1_log.controls.append(ft.Text(f"SPS-1 Data: {sps1_data}"))
+            if gdata.sps1_offline:
+                self.sps1_log.controls.append(ft.Text('Disconnected from SPS-1'))
+            else:
+                self.sps1_log.controls.append(ft.Text(f"SPS-1 Data: {sps1_data}"))
             self.sps1_log.update()
             await asyncio.sleep(1)
 
     async def __read_sps2_data(self):
         while True:
             sps2_data = f'ad0={gdata.sps2_ad0}, ad1={gdata.sps2_ad1}, speed={gdata.sps2_speed}'
-            self.sps2_log.controls.append(ft.Text(f"SPS-2 Data: {sps2_data}"))
+            if gdata.sps2_offline:
+                self.sps2_log.controls.append(ft.Text('Disconnected from SPS-2'))
+            else:
+                self.sps2_log.controls.append(ft.Text(f"SPS-2 Data: {sps2_data}"))
             self.sps2_log.update()
             await asyncio.sleep(1)
 
