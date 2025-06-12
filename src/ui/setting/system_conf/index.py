@@ -63,7 +63,10 @@ class SystemConf(ft.Container):
             ControlManager.app_bar.build()
             ControlManager.app_bar.update()
 
-        for control in self.page.controls:
-            control.clean()
-            control.build()
-            control.update()
+        try:
+            for control in self.page.controls:
+                control.clean()
+                control.build()
+                control.update()
+        except:
+            logging.error('refresh controls of page failed.')

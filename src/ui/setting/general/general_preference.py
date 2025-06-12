@@ -1,3 +1,4 @@
+import logging
 import flet as ft
 
 from common.control_manager import ControlManager
@@ -110,7 +111,11 @@ class GeneralPreference(ft.Container):
             ControlManager.app_bar.clean()
             ControlManager.app_bar.build()
             ControlManager.app_bar.update()
-        for control in self.page.controls:
-            control.clean()
-            control.build()
-            control.update()
+
+        try:
+            for control in self.page.controls:
+                control.clean()
+                control.build()
+                control.update()
+        except:
+            logging.error('refresh controls of page failed.')
