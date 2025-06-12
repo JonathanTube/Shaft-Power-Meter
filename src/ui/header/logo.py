@@ -5,11 +5,10 @@ from pathlib import Path
 class HeaderLogo(ft.Container):
     def __init__(self):
         super().__init__()
-        self.fit = ft.ImageFit.FILL
-        
+        self.expand = True
 
     def build(self):       
-        self.content = ft.Image(src=self.get_src())
+        self.content = ft.Image(src=self.get_src(), fit=ft.ImageFit.FILL)
 
     def get_src(self):
         # Get absolute path to ensure reliability

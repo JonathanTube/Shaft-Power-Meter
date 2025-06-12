@@ -34,11 +34,11 @@ class GpsSyncTask:
                 if retry_once:
                     return
             except (ConnectionRefusedError, ConnectionResetError) as e:
-                logging.exception(f"gps connection error")
+                logging.error(f"gps connection error")
                 await self.handle_connection_error()
                 gdata.connected_to_gps = False
             except Exception:
-                logging.exception(f"gps unknown error")
+                logging.error(f"gps unknown error")
                 await self.handle_connection_error()
             finally:
                 gdata.connected_to_gps = False
@@ -65,7 +65,7 @@ class GpsSyncTask:
                     logging.info(f'connected to gps, ip={io_conf.gps_ip}, port={io_conf.gps_port}')
                     # 这里需要return,不然死循环
                     return
-                except TimeoutError:
+                except (TimeoutError, ConnectionRefusedError, ConnectionResetError):
                     logging.error(f"connect to gps timeout error, waiting for another retry")
                     if retry_once:
                         return
@@ -84,10 +84,10 @@ class GpsSyncTask:
                 str_data = data.decode('utf-8').strip()
                 self.parse_nmea_sentence(str_data)
             except asyncio.TimeoutError:
-                logging.exception("gps receive data timeout, keep connection")
+                logging.error("gps receive data timeout, keep connection")
                 break
             except Exception:
-                logging.exception("gps data receive error")
+                logging.error("gps data receive error")
                 break
 
     async def handle_connection_error(self):
@@ -103,7 +103,7 @@ class GpsSyncTask:
                 self.writer.close()
                 await self.writer.wait_closed()
             except Exception:
-                logging.exception("gps close connection error")
+                logging.error("gps close connection error")
             finally:
                 self.writer = None
                 self.reader = None

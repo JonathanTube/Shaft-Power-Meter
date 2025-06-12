@@ -27,8 +27,9 @@ from task.gps_sync_task import gps_sync_task
 class Header(ft.AppBar):
     def __init__(self, main_content: ft.Container):
         super().__init__()
-        self.toolbar_height = 50
         self.leading = HeaderLogo()
+        self.toolbar_height = 70
+        self.leading_width = 70
         ControlManager.header_logo = self.leading
 
         self.center_title = False
