@@ -52,7 +52,8 @@ class GeneralPreference(ft.Container):
             value=self.preference.data_refresh_interval,
             col={"md": 6},
             read_only=True,
-            on_focus=lambda e: keyboard.open(e.control, 'int')
+            can_request_focus=False,
+            on_click=lambda e: keyboard.open(e.control, 'int')
         )
 
         self.content = CustomCard(

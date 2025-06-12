@@ -22,19 +22,22 @@ class GeneralLimitationWarning(ft.Container):
                                            label=self.page.session.get("lang.common.torque"),
                                            value=self.limitations.torque_warning,
                                            read_only=True,
-                                           on_focus=lambda e: keyboard.open(e.control))
+                                           can_request_focus=False,
+                                           on_click=lambda e: keyboard.open(e.control))
 
         self.speed_warning = ft.TextField(suffix_text="rpm",
                                           label=self.page.session.get("lang.common.speed"),
                                           value=self.limitations.speed_warning,
                                           read_only=True,
-                                          on_focus=lambda e: keyboard.open(e.control))
+                                          can_request_focus=False,
+                                          on_click=lambda e: keyboard.open(e.control))
 
         self.power_warning = ft.TextField(suffix_text="kW",
                                           label=self.page.session.get("lang.common.power"),
                                           value=self.limitations.power_warning,
                                           read_only=True,
-                                          on_focus=lambda e: keyboard.open(e.control))
+                                          can_request_focus=False,
+                                          on_click=lambda e: keyboard.open(e.control))
 
         self.content = CustomCard(
             self.page.session.get("lang.setting.warning_limitations"),

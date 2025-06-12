@@ -50,7 +50,8 @@ class SystemConfSettings(CustomCard):
             suffix_text=eexi_limited_power_unit,
             visible=self.system_settings.sha_po_li,
             read_only=True,
-            on_focus=lambda e: keyboard.open(e.control, 'float')
+            can_request_focus=False,
+            on_click=lambda e: keyboard.open(e.control, 'float')
         )
 
         self.eexi_breach_checking_duration = ft.TextField(
@@ -60,7 +61,8 @@ class SystemConfSettings(CustomCard):
             suffix_text="seconds",
             visible=self.system_settings.sha_po_li,
             read_only=True,
-            on_focus=lambda e: keyboard.open(e.control, 'int')
+            can_request_focus=False,
+            on_click=lambda e: keyboard.open(e.control, 'int')
         )
 
         self.chk_hide_admin_account = ft.Checkbox(

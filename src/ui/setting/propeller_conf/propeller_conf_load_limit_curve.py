@@ -16,25 +16,29 @@ class PropellerConfLimitCurve(CustomCard):
             label=self.page.session.get("lang.setting.rpm_left"), suffix_text='[%]',
             value=self.ps.rpm_left_of_torque_load_limit_curve,
             read_only=True,
-            on_focus=lambda e: keyboard.open(e.control)
+            can_request_focus=False,
+            on_click=lambda e: keyboard.open(e.control)
         )
         self.bhp_left_of_torque_load_limit_curve = ft.TextField(
             label=self.page.session.get("lang.setting.power_left"), suffix_text='[%]',
             value=self.ps.bhp_left_of_torque_load_limit_curve,
             read_only=True,
-            on_focus=lambda e: keyboard.open(e.control)
+            can_request_focus=False,
+            on_click=lambda e: keyboard.open(e.control)
         )
         self.rpm_right_of_torque_load_limit_curve = ft.TextField(
             label=self.page.session.get("lang.setting.rpm_right"), suffix_text='[%]',
             value=self.ps.rpm_right_of_torque_load_limit_curve,
             read_only=True,
-            on_focus=lambda e: keyboard.open(e.control)
+            can_request_focus=False,
+            on_click=lambda e: keyboard.open(e.control)
         )
         self.bhp_right_of_torque_load_limit_curve = ft.TextField(
             label=self.page.session.get("lang.setting.power_right"), suffix_text='[%]',
             value=self.ps.bhp_right_of_torque_load_limit_curve,
             read_only=True,
-            on_focus=lambda e: keyboard.open(e.control)
+            can_request_focus=False,
+            on_click=lambda e: keyboard.open(e.control)
         )
         self.line_color_of_torque_load_limit_curve = ColorDialog(
             color=self.ps.line_color_of_torque_load_limit_curve

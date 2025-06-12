@@ -72,14 +72,16 @@ class IOSettingSPS(CustomCard):
             label=f'{self.page.session.get("lang.setting.ip")} SPS1',
             value=self.conf.sps1_ip,
             read_only=True,
-            on_focus=lambda e: keyboard.open(e.control, 'ip')
+            can_request_focus=False,
+            on_click=lambda e: keyboard.open(e.control, 'ip')
         )
 
         self.sps1_port = ft.TextField(
             label=f'{self.page.session.get("lang.setting.port")} SPS1',
             value=self.conf.sps1_port,
             read_only=True,
-            on_focus=lambda e: keyboard.open(e.control, 'int')
+            can_request_focus=False,
+            on_click=lambda e: keyboard.open(e.control, 'int')
         )
 
         self.sps1_connect = ft.FilledButton(
@@ -102,14 +104,16 @@ class IOSettingSPS(CustomCard):
             label=f'{self.page.session.get("lang.setting.ip")} SPS2',
             value=self.conf.sps2_ip,
             read_only=True,
-            on_focus=lambda e: keyboard.open(e.control, 'ip')
+            can_request_focus=False,
+            on_click=lambda e: keyboard.open(e.control, 'ip')
         )
 
         self.sps2_port = ft.TextField(
             label=f'{self.page.session.get("lang.setting.port")} SPS2',
             value=self.conf.sps2_port,
             read_only=True,
-            on_focus=lambda e: keyboard.open(e.control, 'int')
+            can_request_focus=False,
+            on_click=lambda e: keyboard.open(e.control, 'int')
         )
 
         self.sps2_connect = ft.FilledButton(
@@ -148,14 +152,16 @@ class IOSettingSPS(CustomCard):
             label=self.page.session.get("lang.setting.hmi_server_ip"),
             value=self.conf.hmi_server_ip,
             read_only=True,
-            on_focus=lambda e: keyboard.open(e.control, 'ip')
+            can_request_focus=False,
+            on_click=lambda e: keyboard.open(e.control, 'ip')
         )
 
         self.hmi_server_port = ft.TextField(
             label=self.page.session.get("lang.setting.hmi_server_port"),
             value=self.conf.hmi_server_port,
             read_only=True,
-            on_focus=lambda e: keyboard.open(e.control, 'int')
+            can_request_focus=False,
+            on_click=lambda e: keyboard.open(e.control, 'int')
         )
         # sps conf. end
 
@@ -164,7 +170,8 @@ class IOSettingSPS(CustomCard):
             label=self.page.session.get("lang.setting.bearing_outer_diameter_D"), suffix_text="m",
             value=self.factor_conf.bearing_outer_diameter_D,
             read_only=True,
-            on_focus=lambda e: keyboard.open(e.control)
+            can_request_focus=False,
+            on_click=lambda e: keyboard.open(e.control)
         )
 
         self.shaft_inner_diameter = ft.TextField(
@@ -173,14 +180,16 @@ class IOSettingSPS(CustomCard):
             suffix_text="m",
             value=self.factor_conf.bearing_inner_diameter_d,
             read_only=True,
-            on_focus=lambda e: keyboard.open(e.control)
+            can_request_focus=False,
+            on_click=lambda e: keyboard.open(e.control)
         )
 
         self.sensitivity_factor_k = ft.TextField(
             label=self.page.session.get("lang.setting.sensitivity_factor_k"),
             value=self.factor_conf.sensitivity_factor_k,
             read_only=True,
-            on_focus=lambda e: keyboard.open(e.control)
+            can_request_focus=False,
+            on_click=lambda e: keyboard.open(e.control)
         )
 
         self.elastic_modulus_E = ft.TextField(
@@ -188,14 +197,16 @@ class IOSettingSPS(CustomCard):
             value=self.factor_conf.elastic_modulus_E,
             suffix_text="Mpa",
             read_only=True,
-            on_focus=lambda e: keyboard.open(e.control)
+            can_request_focus=False,
+            on_click=lambda e: keyboard.open(e.control)
         )
 
         self.poisson_ratio_mu = ft.TextField(
             label=self.page.session.get("lang.setting.poisson_ratio_mu"),
             value=self.factor_conf.poisson_ratio_mu,
             read_only=True,
-            on_focus=lambda e: keyboard.open(e.control)
+            can_request_focus=False,
+            on_click=lambda e: keyboard.open(e.control)
         )
         # factor conf. end
 

@@ -52,13 +52,15 @@ class IOSettingPLC(CustomCard):
 
         self.plc_ip = ft.TextField(
             label=self.page.session.get("lang.setting.ip"), value=self.conf.plc_ip,
-            read_only=True, on_focus=lambda e: keyboard.open(e.control, 'ip'), 
+            can_request_focus=False,
+            read_only=True, on_click=lambda e: keyboard.open(e.control, 'ip'), 
             visible=self.conf.plc_enabled
         )
 
         self.plc_port = ft.TextField(
             label=self.page.session.get("lang.setting.port"), value=self.conf.plc_port,
-            read_only=True, on_focus=lambda e: keyboard.open(e.control, 'int'), 
+            can_request_focus=False,
+            read_only=True, on_click=lambda e: keyboard.open(e.control, 'int'), 
             visible=self.conf.plc_enabled
         )
 
@@ -68,7 +70,8 @@ class IOSettingPLC(CustomCard):
             col={'sm': 6},
             read_only=True,
             value=0,
-            on_focus=lambda e: keyboard.open(e.control, 'int'),
+            can_request_focus=False,
+            on_click=lambda e: keyboard.open(e.control, 'int'),
             visible=self.conf.plc_enabled
         )
         self.txt_power_range_max = ft.TextField(
@@ -78,7 +81,8 @@ class IOSettingPLC(CustomCard):
             read_only=True,
             value=0,
             visible=self.conf.plc_enabled,
-            on_focus=lambda e: keyboard.open(e.control, 'int')
+            can_request_focus=False,
+            on_click=lambda e: keyboard.open(e.control, 'int')
         )
         self.txt_power_range_offset = ft.TextField(
             label=self.page.session.get("lang.setting.4_20_ma_power_offset"),
@@ -87,7 +91,8 @@ class IOSettingPLC(CustomCard):
             read_only=True,
             value=0,
             visible=self.conf.plc_enabled,
-            on_focus=lambda e: keyboard.open(e.control, 'int')
+            can_request_focus=False,
+            on_click=lambda e: keyboard.open(e.control, 'int')
         )
 
         self.txt_torque_range_min = ft.TextField(
@@ -97,7 +102,8 @@ class IOSettingPLC(CustomCard):
             read_only=True,
             value=0,
             visible=self.conf.plc_enabled,
-            on_focus=lambda e: keyboard.open(e.control, 'int')
+            can_request_focus=False,
+            on_click=lambda e: keyboard.open(e.control, 'int')
         )
         self.txt_torque_range_max = ft.TextField(
             label=self.page.session.get("lang.setting.4_20_ma_torque_max"),
@@ -106,7 +112,8 @@ class IOSettingPLC(CustomCard):
             read_only=True,
             value=0,
             visible=self.conf.plc_enabled,
-            on_focus=lambda e: keyboard.open(e.control, 'int')
+            can_request_focus=False,
+            on_click=lambda e: keyboard.open(e.control, 'int')
         )
         self.txt_torque_range_offset = ft.TextField(
             label=self.page.session.get("lang.setting.4_20_ma_torque_offset"),
@@ -115,7 +122,8 @@ class IOSettingPLC(CustomCard):
             read_only=True,
             value=0,
             visible=self.conf.plc_enabled,
-            on_focus=lambda e: keyboard.open(e.control, 'int')
+            can_request_focus=False,
+            on_click=lambda e: keyboard.open(e.control, 'int')
         )
 
         self.txt_thrust_range_min = ft.TextField(
@@ -125,7 +133,8 @@ class IOSettingPLC(CustomCard):
             read_only=True,
             value=0,
             visible=self.conf.plc_enabled,
-            on_focus=lambda e: keyboard.open(e.control, 'int')
+            can_request_focus=False,
+            on_click=lambda e: keyboard.open(e.control, 'int')
         )
         self.txt_thrust_range_max = ft.TextField(
             label=self.page.session.get("lang.setting.4_20_ma_thrust_max"),
@@ -134,7 +143,8 @@ class IOSettingPLC(CustomCard):
             read_only=True,
             value=0,
             visible=self.conf.plc_enabled,
-            on_focus=lambda e: keyboard.open(e.control, 'int')
+            can_request_focus=False,
+            on_click=lambda e: keyboard.open(e.control, 'int')
         )
         self.txt_thrust_range_offset = ft.TextField(
             label=self.page.session.get("lang.setting.4_20_ma_thrust_offset"),
@@ -143,7 +153,8 @@ class IOSettingPLC(CustomCard):
             read_only=True,
             value=0,
             visible=self.conf.plc_enabled,
-            on_focus=lambda e: keyboard.open(e.control, 'int')
+            can_request_focus=False,
+            on_click=lambda e: keyboard.open(e.control, 'int')
         )
 
         self.txt_speed_range_min = ft.TextField(
@@ -153,7 +164,8 @@ class IOSettingPLC(CustomCard):
             read_only=True,
             value=0,
             visible=self.conf.plc_enabled,
-            on_focus=lambda e: keyboard.open(e.control, 'int')
+            can_request_focus=False,
+            on_click=lambda e: keyboard.open(e.control, 'int')
         )
         self.txt_speed_range_max = ft.TextField(
             label=self.page.session.get("lang.setting.4_20_ma_speed_max"),
@@ -162,7 +174,8 @@ class IOSettingPLC(CustomCard):
             read_only=True,
             value=0,
             visible=self.conf.plc_enabled,
-            on_focus=lambda e: keyboard.open(e.control, 'int')
+            can_request_focus=False,
+            on_click=lambda e: keyboard.open(e.control, 'int')
         )
         self.txt_speed_range_offset = ft.TextField(
             label=self.page.session.get("lang.setting.4_20_ma_speed_offset"),
@@ -171,7 +184,8 @@ class IOSettingPLC(CustomCard):
             read_only=True,
             value=0,
             visible=self.conf.plc_enabled,
-            on_focus=lambda e: keyboard.open(e.control, 'int')
+            can_request_focus=False,
+            on_click=lambda e: keyboard.open(e.control, 'int')
         )
 
         self.heading = self.page.session.get("lang.setting.plc_conf")

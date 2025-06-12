@@ -22,19 +22,22 @@ class GeneralLimitationMax(ft.Container):
                                       label=self.page.session.get("lang.common.speed"),
                                       value=self.limitations.speed_max,
                                       read_only=True,
-                                      on_focus=lambda e: keyboard.open(e.control))
+                                      can_request_focus=False,
+                                      on_click=lambda e: keyboard.open(e.control))
 
         self.torque_max = ft.TextField(suffix_text="kNm",
                                        label=self.page.session.get("lang.common.torque"),
                                        value=self.limitations.torque_max,
                                        read_only=True,
-                                       on_focus=lambda e: keyboard.open(e.control))
+                                       can_request_focus=False,
+                                       on_click=lambda e: keyboard.open(e.control))
 
         self.power_max = ft.TextField(suffix_text="kW",
                                       label=self.page.session.get("lang.common.power"),
                                       value=self.limitations.power_max,
                                       read_only=True,
-                                      on_focus=lambda e: keyboard.open(e.control))
+                                      can_request_focus=False,
+                                      on_click=lambda e: keyboard.open(e.control))
 
         self.content = CustomCard(
             self.page.session.get("lang.setting.maximum_limitations"),

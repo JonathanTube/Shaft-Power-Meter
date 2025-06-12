@@ -16,7 +16,8 @@ class PropellerConfOverloadCurve(CustomCard):
             suffix_text="[% above (4)]", col={"md": 6},
             value=self.ps.value_of_overload_curve,
             read_only=True,
-            on_focus=lambda e: keyboard.open(e.control)
+            can_request_focus=False,
+            on_click=lambda e: keyboard.open(e.control)
         )
 
         self.overload_alarm = ft.Checkbox(label=self.page.session.get("lang.setting.enable_overload_alarm"), col={"md": 6}, value=self.ps.alarm_enabled_of_overload_curve)

@@ -21,7 +21,8 @@ class PropellerConfMcr(CustomCard):
             col={"md": 6},
             value=self.ps.rpm_of_mcr_operating_point,
             read_only=True,
-            on_focus=lambda e: keyboard.open(e.control, type='int')
+            can_request_focus=False,
+            on_click=lambda e: keyboard.open(e.control, type='int')
         )
 
         shaft_power_value, shaft_power_unit = self.__get_shaft_power()
@@ -31,7 +32,8 @@ class PropellerConfMcr(CustomCard):
             value=shaft_power_value,
             suffix_text=shaft_power_unit,
             read_only=True,
-            on_focus=lambda e: keyboard.open(e.control)
+            can_request_focus=False,
+            on_click=lambda e: keyboard.open(e.control)
         )
 
         self.heading = self.page.session.get("lang.setting.mcr_operating_point")

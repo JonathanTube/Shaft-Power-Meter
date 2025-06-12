@@ -23,7 +23,8 @@ class IOSettingGPS(CustomCard):
             value=self.conf.gps_ip,
             read_only=True,
             col={"sm": 6},
-            on_focus=lambda e: keyboard.open(e.control, 'ip')
+            can_request_focus=False,
+            on_click=lambda e: keyboard.open(e.control, 'ip')
         )
 
         self.gps_port = ft.TextField(
@@ -31,7 +32,8 @@ class IOSettingGPS(CustomCard):
             value=self.conf.gps_port,
             read_only=True,
             col={"sm": 6},
-            on_focus=lambda e: keyboard.open(e.control, 'int')
+            can_request_focus=False,
+            on_click=lambda e: keyboard.open(e.control, 'int')
         )
 
         self.connect_to_gps = ft.FilledButton(
