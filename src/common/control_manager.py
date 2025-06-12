@@ -5,9 +5,10 @@ from ui.home.event.event_button import EventButton
 from ui.home.alarm.alarm_button import AlarmButton
 from ui.home.propeller_curve.diagram import PropellerCurveDiagram
 from ui.home.trendview.diagram import TrendViewDiagram
-
+import flet as ft
 
 class ControlManager:
+    app_bar: ft.AppBar | None = None
     audio_alarm: AudioAlarm | None = None
     fullscreen_alert: FullscreenAlert | None = None
     event_button: EventButton | None = None

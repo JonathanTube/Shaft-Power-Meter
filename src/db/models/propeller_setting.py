@@ -6,7 +6,7 @@ class PropellerSetting(BaseModel):
     # MCR operation point
     rpm_of_mcr_operating_point = IntegerField(constraints=[Check('rpm_of_mcr_operating_point >= 0')])
 
-    shaft_power_of_mcr_operating_point = IntegerField(constraints=[Check('shaft_power_of_mcr_operating_point >= 0')])
+    shaft_power_of_mcr_operating_point = FloatField(constraints=[Check('shaft_power_of_mcr_operating_point >= 0')])
 
     # Normal propeller curve
     rpm_left_of_normal_propeller_curve = FloatField(constraints=[Check('rpm_left_of_normal_propeller_curve >= 0')])

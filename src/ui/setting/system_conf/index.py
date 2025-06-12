@@ -1,5 +1,6 @@
 import flet as ft
 import logging
+from common.control_manager import ControlManager
 from db.models.user import User
 from ui.common.keyboard import keyboard
 from ui.common.permission_check import PermissionCheck
@@ -57,11 +58,12 @@ class SystemConf(ft.Container):
 
 
     def __refresh_page(self):
-        if self.page and self.page.appbar:
-            self.page.appbar.clean()
-            self.page.appbar.build()
-            self.page.appbar.update()
-            for control in self.page.controls:
-                control.clean()
-                control.build()
-                control.update()
+        if ControlManager.app_bar:
+            ControlManager.app_bar.clean()
+            ControlManager.app_bar.build()
+            ControlManager.app_bar.update()
+
+        for control in self.page.controls:
+            control.clean()
+            control.build()
+            control.update()

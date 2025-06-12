@@ -1,5 +1,6 @@
 import flet as ft
 
+from common.control_manager import ControlManager
 from db.models.language import Language
 from ui.common.custom_card import CustomCard
 from db.models.preference import Preference
@@ -105,9 +106,10 @@ class GeneralPreference(ft.Container):
             self.page.session.set(item.code, item.english if preference.language == 0 else item.chinese)
 
     def __refresh_page(self):
-        self.page.appbar.clean()
-        self.page.appbar.build()
-        self.page.appbar.update()
+        if ControlManager.app_bar:
+            ControlManager.app_bar.clean()
+            ControlManager.app_bar.build()
+            ControlManager.app_bar.update()
         for control in self.page.controls:
             control.clean()
             control.build()
