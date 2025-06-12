@@ -28,6 +28,8 @@ class IOSettingSPS(CustomCard):
 
         self.factor_conf: FactorConf = FactorConf.get()
 
+        self.loop_task = None
+
     def build(self):
         self.connect_to_sps = ft.Checkbox(
             label=self.page.session.get("lang.setting.connect_to_sps"),

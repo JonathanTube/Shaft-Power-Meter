@@ -2,12 +2,12 @@ from datetime import datetime, timedelta
 import logging
 from zoneinfo import ZoneInfo
 import pynmea2
-import flet as ft
 from common.const_alarm_type import AlarmType
 from db.models.gps_log import GpsLog
 import asyncio
 import random
 from common.global_data import gdata
+from db.models.io_conf import IOConf
 from utils.alarm_saver import AlarmSaver
 
 
@@ -16,48 +16,66 @@ class GpsSyncTask:
         self.reader = None
         self.writer = None
 
+        self.running = False
         self.retries = 0
         self.base_delay = 1   # 基础重连间隔（秒）
         self.retry_backoff = 2  # 退避系数
+        self._lock = asyncio.Lock()
 
-    async def start(self):
-        while True:
+    async def start(self, retry_once:bool=False):
+        self.running = True
+        while self.running:
             # 建立连接
-            await self.connect()
+            await self.connect(retry_once)
             try:
-                # 数据接收循环
-                await self.receive_data()
+                if gdata.connected_to_gps:
+                    # 数据接收循环
+                    await self.receive_data()
+                if retry_once:
+                    return
             except (ConnectionRefusedError, ConnectionResetError) as e:
                 logging.exception(f"gps connection error")
                 await self.handle_connection_error()
+                gdata.connected_to_gps = False
             except Exception:
                 logging.exception(f"gps unknown error")
                 await self.handle_connection_error()
             finally:
+                gdata.connected_to_gps = False
                 await self.close_connection()
 
-    async def connect(self):
-        self.retries = 0
-        while True:
-            try:
-                # 使用指数退避算法
-                delay = self.base_delay * (self.retry_backoff ** self.retries)
-                delay += random.uniform(0, 1)  # 添加随机抖动
+    async def connect(self, retry_once:bool):
+        async with self._lock:  # 确保单线程重连
+            self.retries = 0
+            while self.running:
+                try:
+                    # 使用指数退避算法
+                    delay = self.base_delay * (self.retry_backoff ** self.retries)
+                    delay += random.uniform(0, 1)  # 添加随机抖动
 
-                self.reader, self.writer = await asyncio.wait_for(
-                    asyncio.open_connection(gdata.gps_ip, gdata.gps_port),
-                    timeout=5
-                )
+                    io_conf : IOConf = IOConf.get()
+                    logging.info(f'connecting to gps, ip={io_conf.gps_ip}, port={io_conf.gps_port}')
 
-                return
-            except Exception:
-                logging.exception(f"gps connect error")
-                self.retries += 1
-                AlarmSaver.create(AlarmType.GPS_DISCONNECTED)
-                await asyncio.sleep(delay)
+                    self.reader, self.writer = await asyncio.wait_for(
+                        asyncio.open_connection(io_conf.gps_ip, io_conf.gps_port),
+                        timeout=5
+                    )
+
+                    gdata.connected_to_gps = True
+                    logging.info(f'connected to gps, ip={io_conf.gps_ip}, port={io_conf.gps_port}')
+                    # 这里需要return,不然死循环
+                    return
+                except TimeoutError:
+                    logging.error(f"connect to gps timeout error, waiting for another retry")
+                    if retry_once:
+                        return
+                    self.retries += 1
+                    AlarmSaver.create(AlarmType.GPS_DISCONNECTED)
+                    gdata.connected_to_gps = False
+                    await asyncio.sleep(delay)
 
     async def receive_data(self):
-        while not self.reader.at_eof():
+        while not self.reader.at_eof() and self.running:
             try:
                 data = await asyncio.wait_for(self.reader.readline(), timeout=5)
                 if not data:
@@ -78,6 +96,8 @@ class GpsSyncTask:
         await asyncio.sleep(1)
 
     async def close_connection(self):
+        self.running = False
+        logging.info(f'disconnected from GPS')
         if self.writer:
             try:
                 self.writer.close()
@@ -90,6 +110,7 @@ class GpsSyncTask:
 
     def parse_nmea_sentence(self, sentence):
         try:
+            gdata.gps_raw_data = sentence
             # delete invalid data(4 weeks * 3 = 12 weeks ago)
             GpsLog.delete().where(GpsLog.utc_date_time < (gdata.utc_date_time - timedelta(weeks=4 * 3)))
             msg = pynmea2.parse(sentence)

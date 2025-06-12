@@ -43,6 +43,9 @@ class OperationType(int, Enum):
 
     CONNECT_TO_PLC = 32
     DISCONNECT_FROM_PLC = 33
+
+    CONNECT_TO_GPS = 34
+    DISCONNECT_FROM_GPS = 35
     
     @classmethod
     def get_operation_type_name(cls, operation_type: int) -> str:

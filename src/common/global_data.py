@@ -27,19 +27,10 @@ class GlobalData:
         self.modbus_server_started = False
         # 是否连上PLC
         self.connected_to_plc = False
-
-        self.gps_ip = None
-        self.gps_port = None
-
-        self.sps1_ip = None
-        self.sps1_port = None
-
-        self.sps2_ip = None
-        self.sps2_port = None
+        # 是否连上gps
+        self.connected_to_gps = False
 
         self.plc_enabled = False
-        self.plc_ip = None
-        self.plc_port = None
 
         self.sps1_speed = 0
         self.sps1_power = 0
@@ -94,6 +85,8 @@ class GlobalData:
         self.elastic_modulus_E = 0
         self.poisson_ratio_mu = 0
         self.sensitivity_factor_k = 0
+
+        self.gps_raw_data = ""
 
     def set_default_value(self):
         systemSettings: SystemSettings = SystemSettings.get()

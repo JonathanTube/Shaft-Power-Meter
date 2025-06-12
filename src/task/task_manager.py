@@ -2,6 +2,7 @@ import asyncio
 import logging
 from db.models.io_conf import IOConf
 from db.models.system_settings import SystemSettings
+from task.gps_sync_task import gps_sync_task
 from task.sps_offline_task import sps_offline_task
 from task.utc_timer_task import UtcTimer
 from task.sps1_read_task import sps1_read_task
@@ -36,4 +37,4 @@ class TaskManager:
             asyncio.create_task(ws_client.connect())
             
        
-        # asyncio.create_task(GpsSyncTask().start())
+        asyncio.create_task(gps_sync_task.start())

@@ -14,8 +14,8 @@ class SelfTest(ft.Tabs):
         self.plc_task = None
         self.sps1_task = None
         self.sps2_task = None
-
         self.hmi_server_task = None
+        self.gps_task = None
 
     def build(self):
         self.plc_log = ft.ListView(
@@ -52,7 +52,7 @@ class SelfTest(ft.Tabs):
         else:
             self.hmi_server_task = self.page.run_task(self.__read_hmi_server_data)
 
-        # self.page.run_task(self.__read_gps_data)
+        self.gps_task = self.page.run_task(self.__read_gps_data)
 
     def will_unmount(self):
         if self.conf.plc_enabled and self.plc_task:
@@ -64,8 +64,11 @@ class SelfTest(ft.Tabs):
 
             if self.sps2_task and gdata.amount_of_propeller == 2:
                 self.sps2_task.cancel()
-        else:
+        elif self.hmi_server_task:
             self.hmi_server_task.cancel()
+
+        if self.gps_task:
+            self.gps_task.cancel()
 
     async def __read_plc_data(self):
         while True:
@@ -116,9 +119,13 @@ class SelfTest(ft.Tabs):
                 self.hmi_server_log.controls.append(ft.Text(f"Disconnected from HMI Server."))
             self.hmi_server_log.update()
             await asyncio.sleep(1)
-    # async def __read_gps_data(self):
-    #     while True:
-    #         gps_data = await gps_util.read_gps_data()
-    #         self.gps_log.controls.append(ft.Text(f"GPS Data: {gps_data}"))
-    #         self.gps_log.update()
-    #         await asyncio.sleep(1)
+
+
+    async def __read_gps_data(self):
+        while True:
+            if gdata.connected_to_gps:
+                self.gps_log.controls.append(ft.Text(f"GPS Data: {gdata.gps_raw_data}"))
+            else:
+                self.gps_log.controls.append(ft.Text("Disconnected from GPS"))
+            self.gps_log.update()
+            await asyncio.sleep(1)
