@@ -125,9 +125,9 @@ class SystemConfSettings(CustomCard):
 
         unit = self.preference.system_unit
         if unit == 0:
-            self.system_settings.eexi_limited_power = self.eexi_limited_power.value * 1000
+            self.system_settings.eexi_limited_power = float(self.eexi_limited_power.value) * 1000
         else:
-            self.system_settings.eexi_limited_power = UnitConverter.shp_to_w(self.eexi_limited_power.value)
+            self.system_settings.eexi_limited_power = UnitConverter.shp_to_w(float(self.eexi_limited_power.value))
 
         self.system_settings.eexi_breach_checking_duration = self.eexi_breach_checking_duration.value
 

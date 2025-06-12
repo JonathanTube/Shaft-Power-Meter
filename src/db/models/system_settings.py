@@ -1,4 +1,4 @@
-from peewee import IntegerField, BooleanField
+from peewee import IntegerField, BooleanField, FloatField
 from ..base import BaseModel
 
 
@@ -9,7 +9,7 @@ class SystemSettings(BaseModel):
 
     sha_po_li = BooleanField(verbose_name="是否开启ShaPoLi功能", default=False)
 
-    eexi_limited_power = IntegerField(null=True, verbose_name="EEXI 限制最大功率")
+    eexi_limited_power = FloatField(null=True, verbose_name="EEXI 限制最大功率")
 
     eexi_breach_checking_duration = IntegerField(null=True, verbose_name="EEXI 超限检查时长")
 

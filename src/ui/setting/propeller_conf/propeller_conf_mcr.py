@@ -49,7 +49,7 @@ class PropellerConfMcr(CustomCard):
         super().build()
 
     def __get_shaft_power(self) -> tuple[float, str]:
-        _shaft_power = self.ps.shaft_power_of_mcr_operating_point
+        _shaft_power = float(self.ps.shaft_power_of_mcr_operating_point)
         if self.system_unit == 0:
             return (_shaft_power / 1000, "kW")
         else:
@@ -58,7 +58,7 @@ class PropellerConfMcr(CustomCard):
     def save_data(self):
         self.ps.rpm_of_mcr_operating_point = self.rpm_of_mcr_operating_point.value
 
-        shaft_power = self.shaft_power_of_mcr_operating_point.value
+        shaft_power = float(self.shaft_power_of_mcr_operating_point.value)
         if self.system_unit == 0:
             self.ps.shaft_power_of_mcr_operating_point = shaft_power * 1000
         else:
