@@ -131,7 +131,7 @@ class WebSocketClient:
             self._running = False
             if self.websocket:
                 await self.websocket.close()
-                AlarmSaver.create(alarm_type=AlarmType.HMI_SERVER_CLOSED)
+                AlarmSaver.create(alarm_type=AlarmType.HMI_CLIENT_DISCONNECTED)
         except Exception:
             logging.error("failed to close websocket connection")
             return False

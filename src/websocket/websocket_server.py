@@ -50,6 +50,7 @@ class WebSocketServer:
             logging.info(f"websocket server started at ws://{host}:{port}")
             gdata.hmi_server_started = True
         except Exception:
+            AlarmSaver.create(alarm_type=AlarmType.HMI_SERVER_CLOSED)
             gdata.hmi_server_started = False
             return False
 

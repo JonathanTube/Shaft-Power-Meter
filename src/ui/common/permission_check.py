@@ -40,17 +40,37 @@ class PermissionCheck(ft.AlertDialog):
             width=300,
             value="",
             label=s.get("lang.permission.user_pwd"),
+            read_only=True,
             password=True,
             can_reveal_password=True
         )
+
+        self.number_keys = [ft.OutlinedButton(str(i), col={"xs": 4}, on_click=self.__on_key_click) for i in range(1, 10)]
+        self.number_keys.append(ft.OutlinedButton(str(0), col={"xs": 4}, on_click=self.__on_key_click))
+        self.number_keys.append(ft.OutlinedButton(icon=ft.Icons.BACKSPACE_OUTLINED, col={"xs": 4}, on_click=self.__on_delete_one))
+
         self.content = ft.Column(
-            height=150,
-            controls=[self.user_name, self.user_pwd]
+            height=280,
+            controls=[
+                self.user_name, 
+                self.user_pwd,
+                ft.ResponsiveRow(controls=self.number_keys)
+            ]
         )
         self.actions = [
             ft.TextButton(s.get("lang.button.confirm"), on_click=self.__on_confirm),
             ft.TextButton(s.get("lang.button.cancel"), visible=self.closable, on_click=self.__on_cancel)
         ]
+
+    def __on_key_click(self, e):
+        txt = e.control.text
+        self.user_pwd.value += txt
+        self.user_pwd.update()
+
+    def __on_delete_one(self, e):
+        if self.user_pwd:
+            self.user_pwd.value = self.user_pwd.value[:-1]
+            self.user_pwd.update()
 
     def before_update(self):
         users = []
