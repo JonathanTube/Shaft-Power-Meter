@@ -14,7 +14,7 @@ class PLCUtil:
         self._lock = asyncio.Lock()  # 线程安全锁
         self.plc_client: Optional[AsyncModbusTcpClient] = None
         self._is_connecting = False  # 防止重复重连
-        self._max_retries = 999999999  # 最大重连次数
+        self._max_retries = 10  # 最大重连次数
 
         self.ip = None
         self.port = None
@@ -57,6 +57,8 @@ class PLCUtil:
                         self._is_connecting = False
                         gdata.connected_to_plc  = True
                         return True
+                    
+                    await asyncio.sleep(2 ** attempt)  # 指数退避
 
                 except Exception:
                     logging.exception(f"PLC {attempt + 1}th reconnect failed")
