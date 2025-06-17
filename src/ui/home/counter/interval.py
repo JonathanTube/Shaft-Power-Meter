@@ -40,8 +40,14 @@ class IntervalCounter(ft.Container):
             on_click=lambda e: keyboard.open(e.control),
             value=self.hours,
             border_color=ft.Colors.ON_SURFACE,
-            size_constraints=ft.BoxConstraints(max_height=40),
-            on_change=lambda e: self.on_hours_change(e)
+            size_constraints=ft.BoxConstraints(max_height=40)
+        )
+
+        self.hours_confirm = ft.FilledButton(
+            text=self.page.session.get('lang.button.confirm'),
+            bgcolor=ft.Colors.GREEN,
+            color=ft.Colors.WHITE,
+            on_click=lambda e: self.on_hours_change(e)
         )
 
         self.status_container = ft.Container(
@@ -69,17 +75,24 @@ class IntervalCounter(ft.Container):
                     alignment=ft.MainAxisAlignment.END,
                     expand=True,
                     controls=[
-                        self.hours_field
+                        ft.Row(
+                            alignment=ft.alignment.center,
+                            controls=[
+                                self.hours_field,
+                                self.hours_confirm
+                            ]
+                        )
                     ]
                 )
             ])
 
     def on_hours_change(self, e):
-        if not e.control.value:
+        hours = self.hours_field.value
+        if not hours:
             Toast.show_error(e.page, self.page.session.get('lang.counter.interval_cannot_be_empty'))
             return
 
-        h = float(e.control.value)
+        h = float(hours)
 
         if h <= 0:
             Toast.show_error(e.page, self.page.session.get('lang.counter.interval_must_be_greater_than_0'))
