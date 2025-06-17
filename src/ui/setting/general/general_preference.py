@@ -48,6 +48,12 @@ class GeneralPreference(ft.Container):
             value=self.preference.language
         )
 
+        self.fullscreen = ft.Checkbox(
+            col={"md": 6}, label=self.page.session.get("lang.setting.fullscreen"),
+            label_position=ft.LabelPosition.LEFT,
+            value=self.preference.fullscreen
+        )
+
         self.data_refresh_interval = ft.TextField(
             label=self.data_refresh_interval_label,
             suffix_text="seconds",
@@ -64,6 +70,7 @@ class GeneralPreference(ft.Container):
                 ft.Row(controls=[self.theme_label, self.default_theme], col={"md": 6}),
                 ft.Row(controls=[self.language_label, self.language], col={"md": 6}),
                 ft.Row(controls=[self.system_unit_label, self.system_unit], col={"md": 6}),
+                self.fullscreen,
                 self.data_refresh_interval
             ]),
             col={"xs": 12})
@@ -81,6 +88,10 @@ class GeneralPreference(ft.Container):
         old_language = self.preference.language
         self.preference.language = new_language
 
+        new_fullscreen = self.fullscreen.value
+        old_fullscreen = self.preference.fullscreen
+        self.preference.fullscreen = new_fullscreen
+
         self.preference.system_unit = int(self.system_unit.value)
         self.preference.data_refresh_interval = int(self.data_refresh_interval.value)
         self.preference.save()
@@ -93,8 +104,14 @@ class GeneralPreference(ft.Container):
             operation_content=model_to_dict(self.preference)
         )
 
+        if old_fullscreen != new_fullscreen:
+            self.page.window.full_screen = new_fullscreen
+            self.page.update()
+            return
+
         if old_theme != new_theme or old_language != new_language:
             self.__refresh_page()
+
 
     def __change_theme(self):
         theme = int(self.preference.theme)

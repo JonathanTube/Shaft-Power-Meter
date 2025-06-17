@@ -136,6 +136,7 @@ class DataInit:
         if Preference.select().count() == 0:
             Preference.create(
                 theme=1,
+                fullscreen=False,
                 system_unit=0,
                 language=0,
                 data_refresh_interval=5
@@ -848,6 +849,13 @@ class DataInit:
                     "code": "lang.setting.unit.metric",
                     "chinese": "公制",
                     "english": "Metric"
+                },
+
+
+                {
+                    "code": "lang.setting.fullscreen",
+                    "chinese": "全屏",
+                    "english": "Fullscreen"
                 },
 
                 {

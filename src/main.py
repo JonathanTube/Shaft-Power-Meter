@@ -32,15 +32,15 @@ DataInit.init()
 gdata.set_default_value()
 
 
-def get_theme_mode():
-    theme: Preference = Preference.get()
-    return ft.ThemeMode.LIGHT if theme.theme == 0 else ft.ThemeMode.DARK
+def get_theme_mode(preference : Preference):
+    # theme: Preference = Preference.get()
+    return ft.ThemeMode.LIGHT if preference.theme == 0 else ft.ThemeMode.DARK
 
 
-def load_language(page: ft.Page):
-    language: Preference = Preference.get()
+def load_language(page: ft.Page, preference : Preference):
+    # language: Preference = Preference.get()
     language_items = Language.select()
-    if language.language == 0:
+    if preference.language == 0:
         for item in language_items:
             page.session.set(item.code, item.english)
     else:
@@ -70,19 +70,25 @@ async def handle_unexpected_exit():
 async def main(page: ft.Page):
     asyncio.create_task(handle_unexpected_exit())
 
-    load_language(page)
+    preference: Preference = Preference.get()
+
+    load_language(page, preference)
 
     await modbus_output.start_modbus_server()
 
     page.title = page.session.get("lang.lang.app.name")
     page.padding = 0
-    page.theme_mode = get_theme_mode()
+    page.theme_mode = get_theme_mode(preference)
     page.window.resizable = False
     page.window.alignment = ft.alignment.center
     page.window.frameless = True
     page.window.always_on_top = False
+    page.window.alignment = ft.alignment.center
     if page.window.width <= 1200:
-        page.window.full_screen = True
+        if preference.fullscreen:
+            page.window.full_screen = True
+        else:
+            page.window.maximized = True
     else:
         page.window.maximizable = False
         page.window.width = 1024

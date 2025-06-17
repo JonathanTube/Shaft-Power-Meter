@@ -1,9 +1,11 @@
-from peewee import IntegerField
+from peewee import IntegerField,BooleanField
 from ..base import BaseModel
 
 
 class Preference(BaseModel):
     theme = IntegerField(verbose_name="主题: Light-0, Dark-1", default=0)
+
+    fullscreen = BooleanField(verbose_name="是否全屏", default=False)
 
     system_unit = IntegerField(verbose_name="系统单位: SI-0, Metric-1", default=0)
 
