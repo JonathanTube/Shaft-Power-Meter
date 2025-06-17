@@ -18,7 +18,7 @@ class DataSaver:
             utc_date_time = gdata.utc_date_time
             power = FormulaCalculator.calculate_instant_power(torque, speed)
             # delete invalid data which is over than 3 months.
-            DataLog.delete().where(DataLog.utc_date_time < utc_date_time - timedelta(weeks=4 * 3))
+            DataLog.delete().where(DataLog.utc_date_time < utc_date_time - timedelta(weeks=4 * 3)).execute()
             is_overload: bool = DataSaver.is_overload(speed, power)
             # insert new data
             DataLog.create(

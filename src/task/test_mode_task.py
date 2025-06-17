@@ -1,7 +1,7 @@
 import asyncio
 import random
 import logging
-
+from peewee import fn
 from websocket.websocket_server import ws_server
 from db.models.counter_log import CounterLog
 from db.models.data_log import DataLog
@@ -48,15 +48,32 @@ class TestModeTask:
             await asyncio.sleep(1)
 
     async def start(self):
+        gdata.test_mode_start_time = gdata.utc_date_time
         asyncio.create_task(self.generate_random_data())
 
     def stop(self):
         try:
-            DataLog.truncate_table()
-            AlarmLog.truncate_table()
-            EventLog.truncate_table()
-            ReportInfo.truncate_table()
-            CounterLog.truncate_table()
+            DataLog.delete().where(DataLog.utc_date_time >= gdata.test_mode_start_time).execute()
+            AlarmLog.delete().where(AlarmLog.utc_date_time >= gdata.test_mode_start_time).execute()
+            event_logs:list[EventLog] = EventLog.select().where(EventLog.started_at >= gdata.test_mode_start_time)
+            for event in event_logs:
+                EventLog.delete().where(EventLog.id == event.id).execute()
+                ReportInfo.delete().where(ReportInfo.event_log == event).execute()
+            
+            valid_data_log = DataLog.select(
+                fn.sum(DataLog.speed).alias("speed"),
+                fn.sum(DataLog.power).alias("power"),
+                fn.count(DataLog.id).alias("times")
+            ).where(
+                DataLog.speed <= 10
+            ).dicts().get()
+
+            CounterLog.update(
+                total_speed=valid_data_log['speed'],
+                total_power=valid_data_log['power'],
+                times=valid_data_log['times']
+            )
+            # recalculate total counter
             gdata.sps1_speed = 0
             gdata.sps1_power = 0
             gdata.sps1_torque = 0

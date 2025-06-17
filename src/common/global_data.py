@@ -65,6 +65,7 @@ class GlobalData:
         self.gps_location = None
 
         self.test_mode_running: bool = False
+        self.test_mode_start_time = None
 
         self.speed_of_mcr = 0
         self.power_of_mcr = 0

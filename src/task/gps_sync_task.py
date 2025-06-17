@@ -112,7 +112,7 @@ class GpsSyncTask:
         try:
             gdata.gps_raw_data = sentence
             # delete invalid data(4 weeks * 3 = 12 weeks ago)
-            GpsLog.delete().where(GpsLog.utc_date_time < (gdata.utc_date_time - timedelta(weeks=4 * 3)))
+            GpsLog.delete().where(GpsLog.utc_date_time < (gdata.utc_date_time - timedelta(weeks=4 * 3))).execute()
             msg = pynmea2.parse(sentence)
             if isinstance(msg, pynmea2.types.talker.RMC):
                 utc_date = msg.datestamp
