@@ -87,9 +87,6 @@ class DataSaver:
 
     @staticmethod
     def save_counter_total(name: str, speed: float, power: float):
-        # if speed is less than 10, it is not valid data, don't record total energy
-        if speed <= 10:
-            return
         cnt = CounterLog.select().where(CounterLog.sps_name == name, CounterLog.counter_type == 2).count()
         if cnt == 0:
             CounterLog.create(
@@ -113,10 +110,6 @@ class DataSaver:
 
     @staticmethod
     def save_counter_interval(name: str, speed: float, power: float):
-        # if speed is less than 10, it is not valid data, don't record total energy
-        if speed <= 10:
-            return
-
         cnt = CounterLog.select().where(CounterLog.sps_name == name, CounterLog.counter_type == 1, CounterLog.counter_status == "running").count()
         # the intervar counter hasn't been started since the cnt is 0
         if cnt == 0:

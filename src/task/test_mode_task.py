@@ -70,8 +70,6 @@ class TestModeTask:
                 fn.sum(DataLog.speed).alias("speed"),
                 fn.sum(DataLog.power).alias("power"),
                 fn.count(DataLog.id).alias("times")
-            ).where(
-                DataLog.speed <= 10
             ).dicts().get()
 
             CounterLog.update(

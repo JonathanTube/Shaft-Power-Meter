@@ -60,7 +60,7 @@ def check_single_instance(mutex_name: str = "shaft-power-meter"):
         sys.exit(0)
 
 def handle_error(e):
-    logging.exception('page error:', e)
+    logging.exception('page error:', e.data)
 
 async def handle_unexpected_exit():
     await asyncio.sleep(5)
@@ -101,9 +101,9 @@ async def main(page: ft.Page):
         page.window.resizable = False
     page.window.prevent_close = True
     ControlManager.fullscreen_alert = FullscreenAlert()
-    logging.info('add fullscreen alert=', ControlManager.fullscreen_alert)
+    logging.info('add fullscreen alert')
     ControlManager.audio_alarm = AudioAlarm()
-    logging.info('add audio alert=', ControlManager.audio_alarm)
+    logging.info('add audio alert')
     ControlManager.home = Home()
 
     page.theme = ft.Theme(scrollbar_theme=ft.ScrollbarTheme(thickness=20))

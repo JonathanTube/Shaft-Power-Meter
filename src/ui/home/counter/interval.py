@@ -130,8 +130,7 @@ class IntervalCounter(ft.Container):
         ).where(
             DataLog.name == self.name,
             DataLog.utc_date_time >= param_start_time,
-            DataLog.utc_date_time <= param_end_time,
-            DataLog.speed > 10  # 大于10RPM的时候才开始计算累计能耗的
+            DataLog.utc_date_time <= param_end_time
         ).dicts().get()
 
         average_power = data_log['average_power']

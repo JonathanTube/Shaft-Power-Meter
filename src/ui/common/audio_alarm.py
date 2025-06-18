@@ -21,7 +21,7 @@ class AudioAlarm(ft.Container):
             "assets",
             "TF001.WAV"
         )
-        logging.info('audio src=',audit_src)
+        logging.info(audit_src)
         self.content: ft.FilledButton = ft.FilledButton(
             text="Override",
             icon=ft.Icons.NOTIFICATIONS_ON_OUTLINED,
@@ -37,7 +37,7 @@ class AudioAlarm(ft.Container):
             autoplay=False,
             release_mode=ft.audio.ReleaseMode.LOOP
         )
-        logging.info('create ft.Audio=',self.audio_alarm)
+        logging.info('create ft.Audio ok')
 
     def did_mount(self):
         self.page.overlay.append(self.audio_alarm)
