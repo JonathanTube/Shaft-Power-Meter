@@ -235,14 +235,14 @@ class IOSettingPLC(CustomCard):
         self.conf.plc_port = self.plc_port.value
         self.conf.save()
 
-        self.page.run_task(self.__start_plc_task)
+        self.__start_plc_task()
 
-    async def __start_plc_task(self):
+    def __start_plc_task(self):
         try:
             self.connect_to_plc.text = self.page.session.get("lang.common.connecting")
             self.connect_to_plc.disabled = True
             self.connect_to_plc.update()
-            await plc_util.auto_reconnect(only_once=True)
+            self.page.run_task(plc_util.auto_reconnect, only_once=True)
             self.__handle_plc_connection_status()
         except Exception as e:
             logging.exception(e)
@@ -254,9 +254,9 @@ class IOSettingPLC(CustomCard):
             operation_type=OperationType.DISCONNECT_FROM_PLC,
             operation_content=user.user_name
         )
-        self.page.run_task(self.__stop_plc_task)
+        self.__stop_plc_task()
 
-    async def __stop_plc_task(self):
+    def __stop_plc_task(self):
         try:
             plc_util.close()
             self.__handle_plc_connection_status()
@@ -303,7 +303,8 @@ class IOSettingPLC(CustomCard):
         try:
             ipaddress.ip_address(self.plc_ip.value)
         except ValueError:
-            raise Exception(f'{self.page.session.get("lang.common.ip_address_format_error")}: {self.plc_ip.value}')
+            Toast.show_error(self.page, f'{self.page.session.get("lang.common.ip_address_format_error")}: {self.plc_ip.value}')
+            return False
 
         self.conf.plc_ip = self.plc_ip.value
         self.conf.plc_port = self.plc_port.value
@@ -315,6 +316,8 @@ class IOSettingPLC(CustomCard):
             
         if self.conf.plc_enabled:
             self.page.run_task(self.__write_to_plc)
+        
+        return True
 
     def __plc_enabled_change(self, e):
         plc_enabled = e.data

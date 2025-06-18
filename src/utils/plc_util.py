@@ -192,19 +192,20 @@ class PLCUtil:
 
     async def write_alarm(self, occured: bool) -> bool:
         if not gdata.plc_enabled or not gdata.connected_to_plc:
+            logging.info('[***PLC**]plc is not enalbed or disconnected, skip write alarm signal.')
             return False
 
         try:
             await self.plc_client.write_coil(address=12288, value=occured)
-            logging.info(f"PLC write alarm: {occured}")
+            logging.info(f"[***PLC**]PLC write alarm: {occured}")
             return True
         except ConnectionException:
-            logging.exception(f"{self.ip}:{self.port} PLC connection error")
+            logging.error(f"[***PLC**]{self.ip}:{self.port} PLC connection error")
             self.save_alarm()
             gdata.connected_to_plc = False
             await self.auto_reconnect()
         except Exception:
-            logging.exception("PLC write alarm failed")
+            logging.error("[***PLC**]PLC write alarm failed")
             self.save_alarm()
         return False
 

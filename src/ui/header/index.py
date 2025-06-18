@@ -169,8 +169,9 @@ class Header(ft.AppBar):
         date_format = datetime_conf.date_format
         while True:
             try:
-                self.utc_date_time.value = gdata.utc_date_time.strftime(f"{date_format} %H:%M:%S")
-                self.utc_date_time.update()
+                if gdata.utc_date_time:
+                    self.utc_date_time.value = gdata.utc_date_time.strftime(f"{date_format} %H:%M:%S")
+                    self.utc_date_time.update()
             except Exception as e:
                 logging.exception(e)
             await asyncio.sleep(1)

@@ -52,10 +52,13 @@ class IOSetting(ft.Container):
     def __save_data(self, user: User):
         try:
             keyboard.close()
-            self.plc_conf.save_data()
-            self.gps_conf.save_data()
-            self.sps_conf.save_data()
-            self.output_conf.save_data()
+            plc_conf_result = self.plc_conf.save_data()
+            gps_conf_result = self.gps_conf.save_data()
+            sps_conf_result = self.sps_conf.save_data()
+            sps_conf_result = self.output_conf.save_data()
+            if not plc_conf_result or not gps_conf_result or not sps_conf_result or not sps_conf_result:
+                return
+            
             OperationLog.create(
                 user_id=user.id,
                 utc_date_time=gdata.utc_date_time,

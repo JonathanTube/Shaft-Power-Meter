@@ -265,15 +265,15 @@ class IOSettingSPS(CustomCard):
         self.conf.sps1_ip = self.sps1_ip.value
         self.conf.sps1_port = self.sps1_port.value
         self.conf.save()
-        self.page.run_task(self.__start_sps1_task)
+        self.__start_sps1_task()
 
-    async def __start_sps1_task(self):
+    def __start_sps1_task(self):
         try:
             self.sps1_connect.text = self.page.session.get("lang.common.connecting")
             self.sps1_connect.disabled = True
             self.sps1_connect.update()
 
-            await sps1_read_task.start(only_once=True)
+            self.page.run_task(sps1_read_task.start, only_once=True)
             self.__handle_sps1_connection()
         except Exception as e:
             logging.exception(e)
@@ -285,14 +285,8 @@ class IOSettingSPS(CustomCard):
             operation_type=OperationType.DISCONNECT_FROM_SPS1,
             operation_content=user.user_name
         )
-        self.page.run_task(self.__stop_sps1_task)
-
-    async def __stop_sps1_task(self):
-        try:
-            await sps1_read_task.async_disconnect()
-            self.__handle_sps1_connection()
-        except Exception as e:
-            logging.exception(e)
+        self.page.run(sps1_read_task.async_disconnect)
+        self.__handle_sps1_connection()
 
     def __connect_to_sps2(self, user: User):
         if not self.conf.connect_to_sps:
@@ -307,15 +301,15 @@ class IOSettingSPS(CustomCard):
         self.conf.sps2_ip = self.sps2_ip.value
         self.conf.sps2_port = self.sps2_port.value
         self.conf.save()
-        self.page.run_task(self.__start_sps2_task)
+        self.__start_sps2_task()
 
-    async def __start_sps2_task(self):
+    def __start_sps2_task(self):
         try:
             self.sps2_connect.text = self.page.session.get("lang.common.connecting")
             self.sps2_connect.disabled = True
             self.sps2_connect.update()
         
-            await sps2_read_task.start(only_once=True)
+            self.page.run(sps2_read_task.start, only_once=True)
             self.__handle_sps2_connection()
         except Exception as e:
             logging.exception(e)
@@ -327,14 +321,8 @@ class IOSettingSPS(CustomCard):
             operation_type=OperationType.DISCONNECT_FROM_SPS2,
             operation_content=user.user_name
         )
-        self.page.run_task(self.__stop_sps2_task)
-
-    async def __stop_sps2_task(self):
-        try:
-            await sps2_read_task.async_disconnect()
-            self.__handle_sps2_connection()
-        except Exception as e:
-            logging.exception(e)
+        self.page.run(sps2_read_task.async_disconnect)
+        self.__handle_sps2_connection()
 
     def __start_hmi_server(self, user:User):
         if not self.conf.connect_to_sps:
@@ -348,9 +336,9 @@ class IOSettingSPS(CustomCard):
         )
         self.page.run_task(self.handle_start_server)
 
-    async def handle_start_server(self):
+    def handle_start_server(self):
         try:
-            await ws_server.start()
+            self.page.run_task(ws_server.start)
             self.__handle_hmi_server_connection()
         except Exception as e:
             logging.exception(e)
@@ -362,11 +350,11 @@ class IOSettingSPS(CustomCard):
             operation_type=OperationType.STOP_HMI_SERVER,
             operation_content=user.user_name
         )
-        self.page.run_task(self.handle_stop_server)
+        self.handle_stop_server()
 
-    async def handle_stop_server(self):
+    def handle_stop_server(self):
         try:
-            await ws_server.stop()
+            self.page.run_task(ws_server.stop)
             self.__handle_hmi_server_connection()
         except Exception as e:
             logging.exception(e)
@@ -442,16 +430,16 @@ class IOSettingSPS(CustomCard):
             self.conf.sps1_ip = self.sps1_ip.value
             self.conf.sps1_port = self.sps1_port.value
         except ValueError:
-            raise Exception(
-                f'{self.page.session.get("lang.common.ip_address_format_error")}: {self.sps1_ip.value}')
+            Toast.show_error(self.page, f'{self.page.session.get("lang.common.ip_address_format_error")}: {self.sps1_ip.value}')
+            return False
 
         try:
             ipaddress.ip_address(self.hmi_server_ip.value)
             self.conf.hmi_server_ip = self.hmi_server_ip.value
             self.conf.hmi_server_port = self.hmi_server_port.value
         except ValueError:
-            raise Exception(
-                f'{self.page.session.get("lang.common.ip_address_format_error")}: {self.hmi_server_port.value}')
+            Toast.show_error(self.page, f'{self.page.session.get("lang.common.ip_address_format_error")}: {self.hmi_server_port.value}')
+            return False
 
         if self.is_dual:
             try:
@@ -459,8 +447,7 @@ class IOSettingSPS(CustomCard):
                 self.conf.sps2_ip = self.sps2_ip.value
                 self.conf.sps2_port = self.sps2_port.value
             except ValueError:
-                raise Exception(
-                    f'{self.page.session.get("lang.common.ip_address_format_error")}: {self.sps2_ip.value}')
+                Toast.show_error(self.page, f'{self.page.session.get("lang.common.ip_address_format_error")}: {self.sps2_ip.value}')
 
         self.save_factor()
         self.conf.connect_to_sps = self.connect_to_sps.value
@@ -472,6 +459,8 @@ class IOSettingSPS(CustomCard):
             self.page.run_task(ws_server.stop)
             self.page.run_task(sps1_read_task.async_disconnect)
             self.page.run_task(sps2_read_task.async_disconnect)
+        
+        return True
 
     def save_factor(self):
         self.factor_conf.bearing_outer_diameter_D = self.shaft_outer_diameter.value

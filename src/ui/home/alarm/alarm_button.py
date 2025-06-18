@@ -38,6 +38,14 @@ class AlarmButton(ft.TextButton):
             self.stop_blink()
         self.update()
 
+    def set_normal_button(self):
+        self.style = ft.ButtonStyle(
+            shape=ft.RoundedRectangleBorder(radius=ft.border_radius.all(10)),
+            color=ft.Colors.INVERSE_SURFACE,
+            bgcolor=ft.Colors.SURFACE
+        )
+        self.icon_color = ft.Colors.INVERSE_SURFACE
+    
     async def __blink(self):
         cnt = 0
         while self.blinking:
@@ -50,12 +58,7 @@ class AlarmButton(ft.TextButton):
                     )
                     self.icon_color = ft.Colors.WHITE
                 else:
-                    self.style = ft.ButtonStyle(
-                        shape=ft.RoundedRectangleBorder(radius=ft.border_radius.all(10)),
-                        color=ft.Colors.INVERSE_SURFACE,
-                        bgcolor=ft.Colors.SURFACE
-                    )
-                    self.icon_color = ft.Colors.INVERSE_SURFACE
+                    self.set_normal_button()
                 self.update()
                 cnt += 1
             except Exception as e:
@@ -72,6 +75,8 @@ class AlarmButton(ft.TextButton):
         if self.task is not None:
             self.task.cancel()
             self.task = None
+        self.set_normal_button()
+        self.update()
 
     def will_unmount(self):
         self.stop_blink()

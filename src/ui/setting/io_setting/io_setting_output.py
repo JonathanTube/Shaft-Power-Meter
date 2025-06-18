@@ -129,6 +129,7 @@ class IOSettingOutput(CustomCard):
         self.conf.output_avg_power = self.check_avg_power.value
         self.conf.output_sum_power = self.check_sum_power.value
         self.conf.output_com_port = self.serial_port.value
+        return True
 
     async def __start_modbus_server(self):
         try:
