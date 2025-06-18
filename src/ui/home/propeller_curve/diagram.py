@@ -214,8 +214,8 @@ class PropellerCurveDiagram(ft.Container):
 
                 logging.info(f'update_sps1_points: sps1_percent_rpm_of_mcr={sps1_percent_rpm_of_mcr}%, sps1_percent_power_of_mcr={sps1_percent_power_of_mcr}%')
                 logging.info(f'update_sps2_points: sps2_percent_rpm_of_mcr={sps2_percent_rpm_of_mcr}%, sps2_percent_power_of_mcr={sps2_percent_power_of_mcr}%')
-
-                self.chart.update()
+                if self.chart:
+                    self.chart.update()
             except Exception as e:
                 logging.exception(e)
             await asyncio.sleep(interval)

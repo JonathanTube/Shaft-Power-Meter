@@ -1,3 +1,4 @@
+import asyncio
 import flet as ft
 import pandas as pd
 import random
@@ -17,6 +18,7 @@ class AlarmList(ft.Container):
         self.file_picker = None
         self.expand = True
         self.padding = 10
+        self.table = None
 
     def build(self):
         self.search = DatetimeSearch(self.__on_search)
@@ -107,3 +109,16 @@ class AlarmList(ft.Container):
 
     def __on_search(self, start_date: str, end_date: str):
         self.table.search(start_date=start_date, end_date=end_date)
+
+    def did_mount(self):
+        self.__task = self.page.run_task(self.__loop)
+
+    async def __loop(self):
+        while True:
+            if self.table:
+                self.table.search()
+            await asyncio.sleep(5)
+    
+    def will_unmount(self):
+        if self.__task:
+            self.__task.cancel()
