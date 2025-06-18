@@ -1,3 +1,4 @@
+import logging
 import os
 import flet as ft
 from pathlib import Path
@@ -20,6 +21,7 @@ class AudioAlarm(ft.Container):
             "assets",
             "TF001.WAV"
         )
+        logging.info('audio src=',audit_src)
         self.content: ft.FilledButton = ft.FilledButton(
             text="Override",
             icon=ft.Icons.NOTIFICATIONS_ON_OUTLINED,
@@ -35,7 +37,11 @@ class AudioAlarm(ft.Container):
             autoplay=False,
             release_mode=ft.audio.ReleaseMode.LOOP
         )
+        logging.info('create ft.Audio=',self.audio_alarm)
+
+    def did_mount(self):
         self.page.overlay.append(self.audio_alarm)
+        logging.info('audio was added into page overlay.')
 
     def __on_override_button_click(self, e):
         self.page.open(PermissionCheck(self.__on_mute, 1))
@@ -63,9 +69,3 @@ class AudioAlarm(ft.Container):
             event_log.acknowledged_at = gdata.utc_date_time
             event_log.save()
         self.content.update()
-
-    def handle_change(self, topic, value):
-        if value:
-            self.play()
-        else:
-            self.stop()

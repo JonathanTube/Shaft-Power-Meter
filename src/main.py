@@ -101,7 +101,9 @@ async def main(page: ft.Page):
         page.window.resizable = False
     page.window.prevent_close = True
     ControlManager.fullscreen_alert = FullscreenAlert()
+    logging.info('add fullscreen alert=', ControlManager.fullscreen_alert)
     ControlManager.audio_alarm = AudioAlarm()
+    logging.info('add audio alert=', ControlManager.audio_alarm)
     ControlManager.home = Home()
 
     page.theme = ft.Theme(scrollbar_theme=ft.ScrollbarTheme(thickness=20))
