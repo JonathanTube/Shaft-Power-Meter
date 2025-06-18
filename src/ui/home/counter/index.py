@@ -28,15 +28,19 @@ class Counter(ft.Container):
             manually_counter_sps2 = ManuallyCounter('sps2')
             total_counter_sps2 = TotalCounter('sps2')
 
-            self.content = ft.Column(controls=[
-                ft.Text('sps1', weight=ft.FontWeight.BOLD, size=16),
-                ft.Row(expand=True, controls=[interval_counter_sps1, manually_counter_sps1, total_counter_sps1]),
-                ft.Text('sps2', weight=ft.FontWeight.BOLD, size=16),
-                ft.Row(expand=True, controls=[interval_counter_sps2, manually_counter_sps2, total_counter_sps2])
-            ])
+            self.content = ft.Column(
+                scroll=ft.ScrollMode.AUTO,
+                controls=[
+                    ft.Text('sps1', weight=ft.FontWeight.BOLD, size=16),
+                    ft.Row(expand=True, controls=[interval_counter_sps1, manually_counter_sps1, total_counter_sps1]),
+                    ft.Text('sps2', weight=ft.FontWeight.BOLD, size=16),
+                    ft.Row(expand=True, controls=[interval_counter_sps2, manually_counter_sps2, total_counter_sps2])
+                ])
             return
 
-        self.content = ft.Column(controls=[
-            ft.Row(expand=True, controls=[interval_counter_sps1, manually_counter_sps1, total_counter_sps1]),
-            ft.Text('', expand=True)
-        ])
+        self.content = ft.Column(
+            scroll=ft.ScrollMode.AUTO,
+            controls=[
+                ft.Row(expand=True, controls=[interval_counter_sps1, manually_counter_sps1, total_counter_sps1]),
+                ft.Text('', expand=True)
+            ])

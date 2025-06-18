@@ -63,6 +63,7 @@ class GpsSyncTask:
 
                     gdata.connected_to_gps = True
                     logging.info(f'connected to gps, ip={io_conf.gps_ip}, port={io_conf.gps_port}')
+                    AlarmSaver.recovery(alarm_type=AlarmType.GPS_DISCONNECTED)
                     # 这里需要return,不然死循环
                     return
                 except (TimeoutError, ConnectionRefusedError, ConnectionResetError):

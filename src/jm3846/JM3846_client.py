@@ -2,10 +2,12 @@ from abc import abstractmethod
 import asyncio
 import logging
 from typing import Optional
+from common.const_alarm_type import AlarmType
 from jm3846.JM3846_0x03 import JM38460x03Async
 from jm3846.JM3846_0x44 import JM38460x44Async
 from jm3846.JM3846_0x45 import JM38460x45Async
 from jm3846.JM3846_calculator import JM3846Calculator
+from utils.alarm_saver import AlarmSaver
 from utils.data_saver import DataSaver
 from common.global_data import gdata
 from websocket.websocket_server import ws_server
@@ -75,10 +77,19 @@ class JM3846AsyncClient:
                     timeout=self.timeout
                 )
                 logging.info(f'{self.name} JM3846 Connected successfully')
+                if self.name == 'sps1':
+                    AlarmSaver.recovery(alarm_type=AlarmType.SPS1_DISCONNECTED)
+                elif self.name == 'sps2':
+                    AlarmSaver.recovery(alarm_type=AlarmType.SPS2_DISCONNECTED)
                 return True
             except Exception:
                 logging.exception(f'{self.name} JM3846 Connection error')
                 self.set_offline(True)
+                if self.name == 'sps1':
+                    AlarmSaver.create(alarm_type=AlarmType.SPS1_DISCONNECTED)
+                elif self.name == 'sps2':
+                    AlarmSaver.create(alarm_type=AlarmType.SPS2_DISCONNECTED)
+
             return False
 
     async def async_disconnect(self) -> bool:
@@ -142,6 +153,7 @@ class JM3846AsyncClient:
         """持续接收0x44数据"""
         while self.running:
             try:
+                await asyncio.sleep(5)
                 if self.name == 'sps2' and int(gdata.amount_of_propeller) == 1:
                     logging.info('exit running since single propeller')
                     gdata.sps2_offline = True
@@ -213,17 +225,16 @@ class JM3846AsyncClient:
 
             except asyncio.TimeoutError:
                 logging.exception(f'{self.name} JM3846 0x44 receive timeout, retrying...')
-                # 发送0x45,断开数据流
-                await self.async_handle_0x45()
-                await self.async_handle_0x44()
+                self.set_offline(True)
+                if self.name == 'sps1':
+                    AlarmSaver.create(alarm_type=AlarmType.SPS1_DISCONNECTED)
+                elif self.name == 'sps2':
+                    AlarmSaver.create(alarm_type=AlarmType.SPS2_DISCONNECTED)
             except ConnectionResetError as e:
                 logging.exception(f'{self.name} JM3846 Connection reset: {e}')
                 self.set_offline(True)
-                await asyncio.sleep(5)
-                connected = await self.async_connect()
-                if connected:
-                    await self.async_handle_0x45()
-                    await self.async_handle_0x44()
+                self.running = False
+                await self.async_connect()
             except Exception:
                 logging.exception(f'{self.name} JM3846 0x44 Receive error')
 

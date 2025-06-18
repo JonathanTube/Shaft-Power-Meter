@@ -22,7 +22,7 @@ from utils.logger import Logger
 from utils.modbus_output import modbus_output
 import logging
 
-Logger(show_sql=False)
+Logger(show_sql=True)
 
 # 加入开机启动
 add_to_startup()

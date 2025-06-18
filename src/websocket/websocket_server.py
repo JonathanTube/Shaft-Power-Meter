@@ -50,6 +50,7 @@ class WebSocketServer:
             self.server = await websockets.serve(self._client_handler, host, port)
             logging.info(f"websocket server started at ws://{host}:{port}")
             gdata.hmi_server_started = True
+            AlarmSaver.recovery(alarm_type=AlarmType.HMI_SERVER_CLOSED)
         except Exception:
             AlarmSaver.create(alarm_type=AlarmType.HMI_SERVER_CLOSED)
             gdata.hmi_server_started = False

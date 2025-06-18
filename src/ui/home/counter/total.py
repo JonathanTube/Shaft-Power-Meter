@@ -14,6 +14,8 @@ class TotalCounter(ft.Container):
         super().__init__()
         self.name = name
 
+        self.height = 280
+        
         self.expand = True
         self.border_radius = ft.border_radius.all(10)
         self.padding = 10

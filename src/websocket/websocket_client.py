@@ -30,6 +30,7 @@ class WebSocketClient:
             self._running = True
             logging.info(f"connected to {uri} successfully")
             gdata.connected_to_hmi_server = True
+            AlarmSaver.recovery(alarm_type=AlarmType.HMI_CLIENT_DISCONNECTED)
             # 启动后台接收任务
             asyncio.create_task(self._receive_loop())
         except Exception:

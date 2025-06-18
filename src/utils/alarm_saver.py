@@ -9,11 +9,18 @@ import asyncio
 class AlarmSaver:
     @staticmethod
     def create(alarm_type: AlarmType):
-        cnt: int = AlarmLog.select().where(AlarmLog.alarm_type == alarm_type, AlarmLog.acknowledge_time.is_null()).count()
+        cnt: int = AlarmLog.select().where(AlarmLog.alarm_type == alarm_type, AlarmLog.is_recovery == False).count()
         if cnt == 0:
             AlarmLog.create(utc_date_time=gdata.utc_date_time, alarm_type=alarm_type)
+            asyncio.create_task(plc_util.write_alarm(True))
 
         if ControlManager.alarm_button:
             ControlManager.alarm_button.update_alarm()
 
-        asyncio.create_task(plc_util.write_alarm(True))
+    @staticmethod
+    def recovery(alarm_type: AlarmType):
+        AlarmLog.update(is_recovery=True).where(AlarmLog.alarm_type == alarm_type).execute()
+        # if it doesn't exist any errors. set the alarm false.
+        cnt: int = AlarmLog.select().where(AlarmLog.is_recovery == False).count()
+        if cnt == 0:
+            asyncio.create_task(plc_util.write_alarm(False))

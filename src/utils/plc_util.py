@@ -23,6 +23,7 @@ class PLCUtil:
         async with self._lock:  # 确保单线程重连
             if self.plc_client and self.plc_client.connected:
                 gdata.connected_to_plc = True
+                self.recovery_alarm()
                 return True
 
             try_times = 1 if only_once else self._max_retries
@@ -55,7 +56,8 @@ class PLCUtil:
                     if self.plc_client.connected:
                         logging.info("PLC connected successfully")
                         self._is_connecting = False
-                        gdata.connected_to_plc  = True
+                        gdata.connected_to_plc = True
+                        self.recovery_alarm()
                         return True
 
                     self.save_alarm()
@@ -291,9 +293,14 @@ class PLCUtil:
         return True        
 
     def save_alarm(self):
-        cnt: int = AlarmLog.select().where(AlarmLog.alarm_type == AlarmType.PLC_DISCONNECTED, AlarmLog.acknowledge_time.is_null()).count()
+        cnt: int = AlarmLog.select().where(AlarmLog.alarm_type == AlarmType.PLC_DISCONNECTED, AlarmLog.is_recovery == False).count()
         if cnt == 0:
             AlarmLog.create(utc_date_time=gdata.utc_date_time, alarm_type=AlarmType.PLC_DISCONNECTED)
+
+    async def recovery_alarm(self):
+        AlarmLog.update(is_recovery = True).where(AlarmLog.alarm_type == AlarmType.PLC_DISCONNECTED)
+        await self.write_alarm(False)
+
 
 
 # 全局单例
