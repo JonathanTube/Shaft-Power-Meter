@@ -62,17 +62,7 @@ def check_single_instance(mutex_name: str = "shaft-power-meter"):
 def handle_error(e):
     logging.exception(e.data)
 
-async def handle_unexpected_exit():
-    await asyncio.sleep(5)
-    date_time_conf: DateTimeConf = DateTimeConf.get()
-    # if the time diff is more than 5 seconds, send the alarm
-    if abs((date_time_conf.system_date_time - gdata.system_date_time).total_seconds()) > 5:
-        AlarmSaver.create(AlarmType.APP_UNEXPECTED_EXIT)
-
-
 async def main(page: ft.Page):
-    asyncio.create_task(handle_unexpected_exit())
-
     preference: Preference = Preference.get()
 
     load_language(page, preference)
