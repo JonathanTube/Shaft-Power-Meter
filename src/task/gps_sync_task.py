@@ -57,18 +57,16 @@ class GpsSyncTask:
                         f'[***GPS***]connecting to gps, ip={io_conf.gps_ip}, port={io_conf.gps_port}')
 
                     self.reader, self.writer = await asyncio.wait_for(
-                        asyncio.open_connection(
-                            io_conf.gps_ip, io_conf.gps_port),
+                        asyncio.open_connection(io_conf.gps_ip, io_conf.gps_port),
                         timeout=5
                     )
 
                     gdata.connected_to_gps = True
-                    logging.info(
-                        f'[***GPS***]connected to gps, ip={io_conf.gps_ip}, port={io_conf.gps_port}')
+                    logging.info(f'[***GPS***]connected to gps, ip={io_conf.gps_ip}, port={io_conf.gps_port}')
                     AlarmSaver.recovery(alarm_type=AlarmType.GPS_DISCONNECTED)
                     # 这里需要return,不然死循环
                     return
-                except (ConnectionRefusedError, ConnectionResetError):
+                except (TimeoutError, ConnectionRefusedError, ConnectionResetError):
                     if retry_once:
                         return
                     logging.error(f"[***GPS***]connect to gps timeout, retry times={self.retries}, retry after {delay} seconds")

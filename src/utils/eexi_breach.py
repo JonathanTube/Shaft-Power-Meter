@@ -5,7 +5,6 @@ from db.models.report_detail import ReportDetail
 from db.models.report_info import ReportInfo
 from datetime import timedelta, datetime
 from db.models.data_log import DataLog
-from db.models.system_settings import SystemSettings
 from utils.formula_cal import FormulaCalculator
 from peewee import fn
 import logging
@@ -17,21 +16,19 @@ class EEXIBreach:
     @staticmethod
     def handle_breach_and_recovery():
         # logging.info('==================eexi_breach_task: start==================')
-        system_settings: SystemSettings = SystemSettings.get()
-        is_enable = system_settings.sha_po_li
-        if not is_enable:
+        if not gdata.shapoli:
             return
 
         # 如果正在突破，则保存突破报告明细
         if EEXIBreach.report_id is not None:
             EEXIBreach.__save_report_detail('sps1', gdata.utc_date_time, gdata.sps1_speed, gdata.sps1_torque, gdata.sps1_power)
             # 如果是双桨，则保存双桨的报告明细
-            is_twins = system_settings.amount_of_propeller == 2
+            is_twins = gdata.amount_of_propeller == 2
             if is_twins:
                 EEXIBreach.__save_report_detail('sps2', gdata.utc_date_time, gdata.sps2_speed, gdata.sps2_torque, gdata.sps2_power)
 
-        seconds = system_settings.eexi_breach_checking_duration
-        eexi_limited_power = system_settings.eexi_limited_power
+        seconds = gdata.eexi_breach_checking_duration
+        eexi_limited_power = gdata.eexi_limited_power
         start_time = gdata.utc_date_time - timedelta(seconds=seconds)
 
         # 再减去数据刷新间隔，类似滑动窗口，因为下位机数据采集间隔是1s，所以需要减去1s
@@ -61,7 +58,7 @@ class EEXIBreach:
             # logging.info(f"eexi_breach_checking_duration = {seconds}s")
             # logging.info(f"start_time = {gdata.utc_date_time} - {seconds}s = {start_time}")
             # logging.info(f"start_time = {gdata.utc_date_time} - {seconds}s - 1s = {start_time}")
-            # logging.info(f"recovery_times = {recovery_times}")
+            logging.info(f"eexi recovery_times = {recovery_times}")
             EEXIBreach.__handle_recovery_event(start_time)
         # logging.info('==================eexi_breach_task: end==================\n')
 

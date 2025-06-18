@@ -14,7 +14,13 @@ class GlobalData:
         self.utc_date_time: datetime = None
         self.system_date_time: datetime = None
 
+        self.shapoli = False
+
         self.amount_of_propeller = 1
+
+        self.eexi_breach_checking_duration = 5
+
+        self.eexi_limited_power = 999999
 
         #  是否开启自动从GPS同步UTC时间
         self.enable_utc_time_sync_with_gps = False
@@ -96,6 +102,12 @@ class GlobalData:
         self.display_propeller_curve = systemSettings.display_propeller_curve
 
         self.amount_of_propeller = systemSettings.amount_of_propeller
+
+        self.shapoli = systemSettings.sha_po_li
+
+        self.eexi_breach_checking_duration = systemSettings.eexi_breach_checking_duration
+        
+        self.eexi_limited_power = systemSettings.eexi_limited_power
 
         dateTimeConf: DateTimeConf = DateTimeConf.get()
         self.enable_utc_time_sync_with_gps = dateTimeConf.sync_with_gps

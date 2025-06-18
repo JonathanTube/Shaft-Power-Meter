@@ -8,7 +8,6 @@ from ui.common.keyboard import keyboard
 from common.operation_type import OperationType
 from common.global_data import gdata
 from playhouse.shortcuts import model_to_dict
-from common.control_manager import ControlManager
 
 
 class SystemConfSettings(CustomCard):
@@ -136,6 +135,12 @@ class SystemConfSettings(CustomCard):
         gdata.amount_of_propeller = self.system_settings.amount_of_propeller
         
         gdata.display_propeller_curve = self.display_propeller_curve.value
+
+        gdata.shapoli = self.system_settings.sha_po_li
+
+        gdata.eexi_breach_checking_duration = self.system_settings.eexi_breach_checking_duration
+
+        gdata.eexi_limited_power = self.system_settings.eexi_limited_power
 
         OperationLog.create(
             user_id=user_id,

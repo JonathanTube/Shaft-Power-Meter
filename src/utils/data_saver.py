@@ -95,6 +95,7 @@ class DataSaver:
                 asyncio.create_task(plc_util.write_power_overload(True))
             else:  # 功率恢复
                 # 写入plc-overload
+                AlarmSaver.recovery(AlarmType.POWER_OVERLOAD)
                 asyncio.create_task(plc_util.write_power_overload(False))
 
         return overload
