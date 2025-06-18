@@ -1,4 +1,4 @@
-from peewee import IntegerField, DateTimeField
+from peewee import IntegerField, DateTimeField, BooleanField
 from ..base import BaseModel
 
 
@@ -8,6 +8,8 @@ class AlarmLog(BaseModel):
     alarm_type = IntegerField(verbose_name="告警类型")
 
     acknowledge_time = DateTimeField(verbose_name="确认时间", null=True)
+
+    is_recovery = BooleanField(verbose_name="是否恢复", default=False)
 
     class Meta:
         table_name = 'alarm_log'

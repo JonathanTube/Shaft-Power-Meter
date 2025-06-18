@@ -75,13 +75,14 @@ class DataSaver:
         # logging.info(f"date_saver: overload_power_percentage={overload_power_percentage}, actual_power_percentage={actual_power_percentage}")
         overload: bool = actual_power_percentage > overload_power_percentage
 
-        if overload:  # 处理功率过载
-            AlarmSaver.create(AlarmType.POWER_OVERLOAD)
-            # 写入plc-overload
-            asyncio.create_task(plc_util.write_power_overload(True))
-        else:  # 功率恢复
-            # 写入plc-overload
-            asyncio.create_task(plc_util.write_power_overload(False))
+        if gdata.alarm_enabled_of_overload_curve:
+            if overload:  # 处理功率过载
+                AlarmSaver.create(AlarmType.POWER_OVERLOAD)
+                # 写入plc-overload
+                asyncio.create_task(plc_util.write_power_overload(True))
+            else:  # 功率恢复
+                # 写入plc-overload
+                asyncio.create_task(plc_util.write_power_overload(False))
 
         return overload
 

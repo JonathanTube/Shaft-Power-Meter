@@ -89,6 +89,8 @@ class GlobalData:
 
         self.gps_raw_data = ""
 
+        self.alarm_enabled_of_overload_curve = False
+
     def set_default_value(self):
         systemSettings: SystemSettings = SystemSettings.get()
         self.display_propeller_curve = systemSettings.display_propeller_curve
@@ -119,6 +121,7 @@ class GlobalData:
         self.power_of_torque_load_limit = propellerSetting.bhp_right_of_torque_load_limit_curve + \
             propellerSetting.value_of_overload_curve
         self.power_of_overload = propellerSetting.value_of_overload_curve
+        self.alarm_enabled_of_overload_curve = propellerSetting.alarm_enabled_of_overload_curve
         # get the last accepted zero cal. record.
         sps1_accepted_zero_cal: ZeroCalInfo = ZeroCalInfo.select().where(
             ZeroCalInfo.state == 1, ZeroCalInfo.name == 'sps1').order_by(ZeroCalInfo.id.desc()).first()
