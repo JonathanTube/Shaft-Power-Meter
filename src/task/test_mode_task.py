@@ -100,16 +100,6 @@ class TestModeTask:
             instant_speed = int(random.uniform(self.min_speed, self.max_speed))
             instant_thrust = int(random.uniform(self.min_thrust, self.max_thrust))
             DataSaver.save(name, instant_torque, instant_thrust, instant_speed)
-            # 如果作为服务端，那需要向外发送数据
-            if gdata.hmi_server_started:
-                json_data = {
-                    'type': 'sps_data',
-                    'name': name,
-                    'torque': instant_torque,
-                    'thrust': instant_thrust,
-                    'rpm': instant_speed * 10
-                }
-                await ws_server.broadcast(json_data)
         except Exception as e:
             logging.exception(e)
 

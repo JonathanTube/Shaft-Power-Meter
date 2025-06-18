@@ -93,7 +93,7 @@ class WebSocketClient:
         if 'thrust' in data:
             ad1_thrust = data['thrust']
         if 'rpm' in data:
-            speed = data['rpm'] / 10
+            speed = data['rpm']
 
         DataSaver.save(name, ad0_torque, ad1_thrust, speed)
 

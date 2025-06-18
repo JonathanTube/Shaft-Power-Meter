@@ -10,6 +10,7 @@ from utils.eexi_breach import EEXIBreach
 from utils.formula_cal import FormulaCalculator
 from utils.alarm_saver import AlarmSaver
 from utils.modbus_output import modbus_output
+from websocket.websocket_server import ws_server
 
 class DataSaver:
     @staticmethod
@@ -37,6 +38,14 @@ class DataSaver:
             DataSaver.save_counter_total(name, speed, power)
             # save counter log of interval
             DataSaver.save_counter_interval(name, speed, power)
+            # 广播给客户端数据
+            ws_server.broadcast({
+                'type': 'sps_data',
+                'name': name,
+                'torque': torque,
+                'thrust': thrust,
+                'rpm': speed
+            })
             if name == 'sps1':
                 gdata.sps1_torque = torque
                 gdata.sps1_thrust = thrust
