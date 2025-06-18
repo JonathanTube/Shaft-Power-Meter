@@ -79,14 +79,11 @@ class WebSocketServer:
             return True
         except websockets.ConnectionClosed:
             logging.exception("broadcast to all clients failed: connection closed")
-            AlarmSaver.create(alarm_type=AlarmType.HMI_SERVER_CLOSED)
-            gdata.hmi_server_started = False
             self.clients.clear()
             await self.start()
             return False
         except Exception:
             logging.exception("broadcast to all clients failed")
-            gdata.hmi_server_started = False
             return False
 
 
