@@ -39,13 +39,17 @@ class DataSaver:
             # save counter log of interval
             DataSaver.save_counter_interval(name, speed, power)
             # 广播给客户端数据
-            ws_server.broadcast({
-                'type': 'sps_data',
-                'name': name,
-                'torque': torque,
-                'thrust': thrust,
-                'rpm': speed
-            })
+
+            asyncio.create_task(
+                ws_server.broadcast({
+                    'type': 'sps_data',
+                    'name': name,
+                    'torque': torque,
+                    'thrust': thrust,
+                    'rpm': speed
+                })
+            )
+
             if name == 'sps1':
                 gdata.sps1_torque = torque
                 gdata.sps1_thrust = thrust

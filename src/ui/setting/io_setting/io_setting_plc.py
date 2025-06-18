@@ -2,6 +2,7 @@ import asyncio
 import ipaddress
 import logging
 import flet as ft
+from common.const_alarm_type import AlarmType
 from common.operation_type import OperationType
 from db.models.io_conf import IOConf
 from db.models.operation_log import OperationLog
@@ -10,6 +11,7 @@ from ui.common.custom_card import CustomCard
 from ui.common.keyboard import keyboard
 from ui.common.permission_check import PermissionCheck
 from ui.common.toast import Toast
+from utils.alarm_saver import AlarmSaver
 from utils.plc_util import plc_util
 from common.global_data import gdata
 
@@ -312,6 +314,7 @@ class IOSettingPLC(CustomCard):
 
         if not self.conf.plc_enabled:
             plc_util.close()
+            AlarmSaver.recovery(alarm_type=AlarmType.PLC_DISCONNECTED)
             
         if self.conf.plc_enabled:
             self.page.run_task(self.__write_to_plc)

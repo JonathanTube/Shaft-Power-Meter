@@ -2,6 +2,7 @@ import asyncio
 import ipaddress
 import logging
 import flet as ft
+from common.const_alarm_type import AlarmType
 from common.operation_type import OperationType
 from db.models.factor_conf import FactorConf
 from db.models.io_conf import IOConf
@@ -12,6 +13,7 @@ from ui.common.custom_card import CustomCard
 from ui.common.keyboard import keyboard
 from ui.common.permission_check import PermissionCheck
 from ui.common.toast import Toast
+from utils.alarm_saver import AlarmSaver
 from websocket.websocket_server import ws_server
 from websocket.websocket_client import ws_client
 from common.global_data import gdata
@@ -453,10 +455,16 @@ class IOSettingSPS(CustomCard):
         if self.connect_to_sps.value:
             # 关闭websocket客户端连接
             self.page.run_task(ws_client.close)
+            AlarmSaver.recovery(alarm_type=AlarmType.HMI_CLIENT_DISCONNECTED)
         else:
             self.page.run_task(ws_server.stop)
+            AlarmSaver.recovery(alarm_type=AlarmType.HMI_SERVER_CLOSED)
+
             self.page.run_task(sps1_read_task.async_disconnect)
+            AlarmSaver.recovery(alarm_type=AlarmType.SPS1_DISCONNECTED)
+
             self.page.run_task(sps2_read_task.async_disconnect)
+            AlarmSaver.recovery(alarm_type=AlarmType.SPS2_DISCONNECTED)
 
     def save_factor(self):
         self.factor_conf.bearing_outer_diameter_D = self.shaft_outer_diameter.value
