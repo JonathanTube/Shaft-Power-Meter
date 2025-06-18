@@ -57,7 +57,8 @@ class PLCUtil:
                         self._is_connecting = False
                         gdata.connected_to_plc  = True
                         return True
-                    
+
+                    self.save_alarm()
                     await asyncio.sleep(2 ** attempt)  # 指数退避
 
                 except Exception:

@@ -36,6 +36,7 @@ class WebSocketServer:
             logging.exception(f"client {websocket.remote_address} disconnected")
             AlarmSaver.create(alarm_type=AlarmType.HMI_SERVER_CLOSED)
         finally:
+            AlarmSaver.create(alarm_type=AlarmType.HMI_CLIENT_DISCONNECTED)
             self.clients.remove(websocket)
 
     async def start(self):
@@ -69,6 +70,7 @@ class WebSocketServer:
         try:
             # logging.info(f"broadcast to all clients: {data}")
             if not self.clients:
+                AlarmSaver.create(alarm_type=AlarmType.HMI_CLIENT_DISCONNECTED)
                 return False
             packed_data = msgpack.packb(data)
             await asyncio.gather(

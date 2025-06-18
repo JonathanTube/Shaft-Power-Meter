@@ -60,7 +60,7 @@ def check_single_instance(mutex_name: str = "shaft-power-meter"):
         sys.exit(0)
 
 def handle_error(e):
-    logging.exception('page error:', e.data)
+    logging.exception(e.data)
 
 async def handle_unexpected_exit():
     await asyncio.sleep(5)
