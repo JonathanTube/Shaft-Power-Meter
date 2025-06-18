@@ -443,6 +443,12 @@ class DataInit:
                 },
 
                 {
+                    "code": "lang.common.is_recovery",
+                    "chinese": "恢复",
+                    "english": "Recovery"
+                },
+
+                {
                     "code": "lang.common.view",
                     "chinese": "查看",
                     "english": "View"

@@ -52,7 +52,8 @@ class AlarmTable(AbstractTable):
             AlarmLog.id,
             AlarmLog.utc_date_time,
             AlarmLog.alarm_type,
-            AlarmLog.acknowledge_time
+            AlarmLog.acknowledge_time,
+            AlarmLog.is_recovery
         )
         start_date = self.kwargs.get('start_date')
         end_date = self.kwargs.get('end_date')
@@ -66,7 +67,8 @@ class AlarmTable(AbstractTable):
                 item.id,
                 item.utc_date_time.strftime(self.date_time_format),
                 self.get_event_name(item.alarm_type),
-                item.acknowledge_time.strftime(self.date_time_format) if item.acknowledge_time else ""
+                item.acknowledge_time.strftime(self.date_time_format) if item.acknowledge_time else "",
+                'Y' if item.is_recovery else 'N'
             ] for item in data
         ]
 
@@ -79,7 +81,8 @@ class AlarmTable(AbstractTable):
             session.get("lang.common.no"),
             session.get("lang.common.utc_date_time"),
             session.get("lang.common.event_name"),
-            session.get("lang.common.acknowledge_time")
+            session.get("lang.common.acknowledge_time"),
+            session.get("lang.common.is_recovery")
         ]
 
     def before_update(self):

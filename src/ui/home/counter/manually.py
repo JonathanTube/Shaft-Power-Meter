@@ -88,8 +88,6 @@ class ManuallyCounter(ft.Container):
             text=self.page.session.get('lang.counter.start'),
             icon=ft.icons.PLAY_CIRCLE_OUTLINED,
             bgcolor=ft.Colors.GREEN,
-            width=220,
-            height=40,
             visible=False,
             on_click=lambda e: self.__on_start(e)
         )
@@ -98,8 +96,6 @@ class ManuallyCounter(ft.Container):
             text=self.page.session.get('lang.counter.stop'),
             icon=ft.icons.STOP_CIRCLE_OUTLINED,
             bgcolor=ft.Colors.RED,
-            width=220,
-            height=40,
             visible=False,
             on_click=lambda e: self.__on_stop(e)
         )
@@ -108,8 +104,6 @@ class ManuallyCounter(ft.Container):
             text=self.page.session.get('lang.counter.resume'),
             bgcolor=ft.Colors.ORANGE,
             icon=ft.icons.RESTART_ALT_OUTLINED,
-            width=220,
-            height=40,
             visible=False,
             on_click=lambda e: e.page.open(self.dlg_modal)
         )

@@ -103,11 +103,6 @@ class AlarmList(ft.Container):
         if ControlManager.alarm_button:
             ControlManager.alarm_button.update_alarm()
 
-        # 如果全部已确认，则关闭plc-alarm
-        cnt: int = AlarmLog.select().where(AlarmLog.acknowledge_time.is_null()).count()
-        if cnt == 0:
-            self.page.run_task(plc_util.write_alarm, False)
-
         self.table.search()
         Toast.show_success(self.page)
 

@@ -25,12 +25,16 @@ class AlarmButton(ft.TextButton):
         self.text = self.page.session.get("lang.home.tab.alarm")
 
     def update_alarm(self):
-        count = AlarmLog.select().where(AlarmLog.acknowledge_time.is_null()).count()
-        if count > 0:
-            self.badge = ft.Badge(text=str(count), bgcolor=ft.Colors.RED, text_color=ft.Colors.WHITE, label_visible=True)
-            self.start_blink()
+        alarm_count = AlarmLog.select().where(AlarmLog.is_recovery == False).count() 
+        if alarm_count > 0:
+            self.badge = ft.Badge(text=str(alarm_count), bgcolor=ft.Colors.RED, text_color=ft.Colors.WHITE, label_visible=True)
         else:
             self.badge = None
+
+        ack_count = AlarmLog.select().where(AlarmLog.acknowledge_time.is_null()).count()
+        if ack_count > 0:
+            self.start_blink()
+        else:
             self.stop_blink()
         self.update()
 
