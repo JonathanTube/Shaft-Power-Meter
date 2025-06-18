@@ -45,12 +45,12 @@ class PermissionCheck(ft.AlertDialog):
             can_reveal_password=True
         )
 
-        self.number_keys = [ft.OutlinedButton(str(i), col={"xs": 4}, on_click=self.__on_key_click) for i in range(1, 10)]
-        self.number_keys.append(ft.OutlinedButton(str(0), col={"xs": 4}, on_click=self.__on_key_click))
-        self.number_keys.append(ft.OutlinedButton(icon=ft.Icons.BACKSPACE_OUTLINED, col={"xs": 4}, on_click=self.__on_delete_one))
+        self.number_keys = [ft.OutlinedButton(str(i), col={"xs": 3}, on_click=self.__on_key_click) for i in range(1, 10)]
+        self.number_keys.append(ft.OutlinedButton(str(0), col={"xs": 3}, on_click=self.__on_key_click))
+        self.number_keys.append(ft.OutlinedButton(icon=ft.Icons.BACKSPACE_OUTLINED, col={"xs": 3}, on_click=self.__on_delete_one))
 
         self.content = ft.Column(
-            height=280,
+            height=220,
             controls=[
                 self.user_name, 
                 self.user_pwd,

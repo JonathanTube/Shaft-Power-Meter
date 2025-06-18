@@ -9,7 +9,6 @@ from ui.home.alarm.alarm_table import AlarmTable
 from common.global_data import gdata
 from common.const_alarm_type import AlarmType
 from common.control_manager import ControlManager
-from utils.plc_util import plc_util
 
 
 class AlarmList(ft.Container):

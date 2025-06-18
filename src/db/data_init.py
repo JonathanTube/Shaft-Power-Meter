@@ -443,9 +443,9 @@ class DataInit:
                 },
 
                 {
-                    "code": "lang.common.is_recovery",
-                    "chinese": "恢复",
-                    "english": "Recovery"
+                    "code": "lang.common.recovery_status",
+                    "chinese": "状态",
+                    "english": "Status"
                 },
 
                 {

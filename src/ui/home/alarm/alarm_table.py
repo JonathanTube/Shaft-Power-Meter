@@ -68,9 +68,10 @@ class AlarmTable(AbstractTable):
                 item.utc_date_time.strftime(self.date_time_format),
                 self.get_event_name(item.alarm_type),
                 item.acknowledge_time.strftime(self.date_time_format) if item.acknowledge_time else "",
-                'Y' if item.is_recovery else 'N'
+                '✔️'if item.is_recovery else '❌'
             ] for item in data
         ]
+    
 
     def create_columns(self):
         return self.get_columns()
@@ -82,7 +83,7 @@ class AlarmTable(AbstractTable):
             session.get("lang.common.utc_date_time"),
             session.get("lang.common.event_name"),
             session.get("lang.common.acknowledge_time"),
-            session.get("lang.common.is_recovery")
+            session.get("lang.common.recovery_status")
         ]
 
     def before_update(self):
