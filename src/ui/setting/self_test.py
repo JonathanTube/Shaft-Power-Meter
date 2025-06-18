@@ -1,4 +1,5 @@
 import asyncio
+import logging
 import flet as ft
 from db.models.io_conf import IOConf
 from db.models.system_settings import SystemSettings
@@ -89,43 +90,55 @@ class SelfTest(ft.Tabs):
 
     async def __read_sps1_data(self):
         while True:
-            sps1_data = f'ad0={gdata.sps1_ad0}, ad1={gdata.sps1_ad1}, speed={gdata.sps1_speed}'
-            if gdata.sps1_offline:
-                self.sps1_log.controls.append(ft.Text('Disconnected from SPS-1'))
-            else:
-                self.sps1_log.controls.append(ft.Text(f"SPS-1 Data: {sps1_data}"))
-            self.sps1_log.update()
+            try:
+                sps1_data = f'ad0={gdata.sps1_ad0}, ad1={gdata.sps1_ad1}, speed={gdata.sps1_speed}'
+                if gdata.sps1_offline:
+                    self.sps1_log.controls.append(ft.Text('Disconnected from SPS-1'))
+                else:
+                    self.sps1_log.controls.append(ft.Text(f"SPS-1 Data: {sps1_data}"))
+                self.sps1_log.update()
+            except Exception as e:
+                logging.exception(e)
             await asyncio.sleep(1)
 
     async def __read_sps2_data(self):
         while True:
-            sps2_data = f'ad0={gdata.sps2_ad0}, ad1={gdata.sps2_ad1}, speed={gdata.sps2_speed}'
-            if gdata.sps2_offline:
-                self.sps2_log.controls.append(ft.Text('Disconnected from SPS-2'))
-            else:
-                self.sps2_log.controls.append(ft.Text(f"SPS-2 Data: {sps2_data}"))
-            self.sps2_log.update()
+            try:
+                sps2_data = f'ad0={gdata.sps2_ad0}, ad1={gdata.sps2_ad1}, speed={gdata.sps2_speed}'
+                if gdata.sps2_offline:
+                    self.sps2_log.controls.append(ft.Text('Disconnected from SPS-2'))
+                else:
+                    self.sps2_log.controls.append(ft.Text(f"SPS-2 Data: {sps2_data}"))
+                self.sps2_log.update()
+            except Exception as e:
+                logging.exception(e)
             await asyncio.sleep(1)
 
     async def __read_hmi_server_data(self):
         while True:
-            if gdata.connected_to_hmi_server:
-                sps1_data = f'sps1: torque={gdata.sps1_torque}, thrust={gdata.sps1_thrust}, speed={gdata.sps1_speed}'
-                self.hmi_server_log.controls.append(ft.Text(f"HMI Server Data: {sps1_data}"))
-                if gdata.amount_of_propeller == 2:
-                    sps2_data = f'sps2: torque={gdata.sps2_torque}, thrust={gdata.sps2_thrust}, speed={gdata.sps2_speed}'
-                    self.hmi_server_log.controls.append(ft.Text(f"HMI Server Data: {sps2_data}"))
-            else:
-                self.hmi_server_log.controls.append(ft.Text(f"Disconnected from HMI Server."))
-            self.hmi_server_log.update()
+            try:
+                if gdata.connected_to_hmi_server:
+                    sps1_data = f'sps1: torque={gdata.sps1_torque}, thrust={gdata.sps1_thrust}, speed={gdata.sps1_speed}'
+                    self.hmi_server_log.controls.append(ft.Text(f"HMI Server Data: {sps1_data}"))
+                    if gdata.amount_of_propeller == 2:
+                        sps2_data = f'sps2: torque={gdata.sps2_torque}, thrust={gdata.sps2_thrust}, speed={gdata.sps2_speed}'
+                        self.hmi_server_log.controls.append(ft.Text(f"HMI Server Data: {sps2_data}"))
+                else:
+                    self.hmi_server_log.controls.append(ft.Text(f"Disconnected from HMI Server."))
+                self.hmi_server_log.update()
+            except Exception as e:
+                logging.exception(e)
             await asyncio.sleep(1)
 
 
     async def __read_gps_data(self):
         while True:
-            if gdata.connected_to_gps:
-                self.gps_log.controls.append(ft.Text(f"GPS Data: {gdata.gps_raw_data}"))
-            else:
-                self.gps_log.controls.append(ft.Text("Disconnected from GPS"))
-            self.gps_log.update()
+            try:
+                if gdata.connected_to_gps:
+                    self.gps_log.controls.append(ft.Text(f"GPS Data: {gdata.gps_raw_data}"))
+                else:
+                    self.gps_log.controls.append(ft.Text("Disconnected from GPS"))
+                self.gps_log.update()
+            except Exception as e:
+                logging.exception(e)
             await asyncio.sleep(1)

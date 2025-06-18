@@ -57,7 +57,7 @@ class JM3846AsyncClient:
                 await asyncio.sleep(2)
                 await self.start()
         except Exception:
-            logging.error(f'{self.name} start JM3846 client failed')
+            logging.exception(f'{self.name} start JM3846 client failed')
             if only_once:
                 return False
             await asyncio.sleep(5)
@@ -77,7 +77,7 @@ class JM3846AsyncClient:
                 logging.info(f'{self.name} JM3846 Connected successfully')
                 return True
             except Exception:
-                logging.error(f'{self.name} JM3846 Connection error')
+                logging.exception(f'{self.name} JM3846 Connection error')
                 self.set_offline(True)
             return False
 
@@ -134,7 +134,7 @@ class JM3846AsyncClient:
             await self.writer.drain()
 
         except asyncio.TimeoutError:
-            logging.error(f'{self.name} JM3846 0x44 request timeout')
+            logging.exception(f'{self.name} JM3846 0x44 request timeout')
         except Exception:
             logging.exception(f'{self.name} JM3846 0x44 error')
 
@@ -159,7 +159,7 @@ class JM3846AsyncClient:
 
                 # 基本头长度检查
                 if len(response) < 8:
-                    logging.error(f'{self.name} the length of return is invalid.')
+                    logging.exception(f'{self.name} the length of return is invalid.')
                     continue
 
                 # 解析功能码
@@ -168,7 +168,7 @@ class JM3846AsyncClient:
                 # 异常响应处理
                 if func_code & 0x80:
                     error_code = response[8] if len(response) >= 9 else 0
-                    logging.error(f'{self.name} SPS return errors, error_code is {error_code}')
+                    logging.exception(f'{self.name} SPS return errors, error_code is {error_code}')
                     continue
 
                 if func_code == 0x03:
@@ -212,12 +212,12 @@ class JM3846AsyncClient:
                     continue
 
             except asyncio.TimeoutError:
-                logging.error(f'{self.name} JM3846 0x44 receive timeout, retrying...')
+                logging.exception(f'{self.name} JM3846 0x44 receive timeout, retrying...')
                 # 发送0x45,断开数据流
                 await self.async_handle_0x45()
                 await self.async_handle_0x44()
             except ConnectionResetError as e:
-                logging.error(f'{self.name} JM3846 Connection reset: {e}')
+                logging.exception(f'{self.name} JM3846 Connection reset: {e}')
                 self.set_offline(True)
                 await asyncio.sleep(5)
                 connected = await self.async_connect()
@@ -228,67 +228,70 @@ class JM3846AsyncClient:
                 logging.exception(f'{self.name} JM3846 0x44 Receive error')
 
     async def save_0x44_result(self, result: dict):
-        # logging.info('result=', result)
-        if gdata.test_mode_running:
-            logging.info('test mode is running, skip save 0x44 result from JM3456.')
-            return
-        """数据存储方法"""
-        torque = 0
-        thrust = 0
-        speed = 0
+        try:
+            # logging.info('result=', result)
+            if gdata.test_mode_running:
+                logging.info('test mode is running, skip save 0x44 result from JM3456.')
+                return
+            """数据存储方法"""
+            torque = 0
+            thrust = 0
+            speed = 0
 
-        json_data = {
-            'type': 'sps_data',
-            'name': self.name
-        }
-        if 'ch0_ad' in result:
-            ad0 = round(result['ch0_ad'], 2)
-            ad0_mv_per_v = self.jm3846Calculator.calculate_mv_per_v(ad0, self.gain_0)
+            json_data = {
+                'type': 'sps_data',
+                'name': self.name
+            }
+            if 'ch0_ad' in result:
+                ad0 = round(result['ch0_ad'], 2)
+                ad0_mv_per_v = self.jm3846Calculator.calculate_mv_per_v(ad0, self.gain_0)
 
-            if self.name == 'sps1':
-                gdata.sps1_ad0 = ad0
-                gdata.sps1_mv_per_v_for_torque = ad0_mv_per_v
-            else:
-                gdata.sps2_ad0 = ad0
-                gdata.sps2_mv_per_v_for_torque = ad0_mv_per_v
+                if self.name == 'sps1':
+                    gdata.sps1_ad0 = ad0
+                    gdata.sps1_mv_per_v_for_torque = ad0_mv_per_v
+                else:
+                    gdata.sps2_ad0 = ad0
+                    gdata.sps2_mv_per_v_for_torque = ad0_mv_per_v
 
-            # 加上偏移量
-            torque_offset = gdata.sps1_torque_offset if self.name == 'sps1' else gdata.sps2_torque_offset
-            ad0_microstrain = self.jm3846Calculator.calculate_microstrain(ad0_mv_per_v + torque_offset)
-            torque = self.jm3846Calculator.calculate_torque(ad0_microstrain)
-            logging.info(f'name={self.name},ad0={ad0}, ad0_mv_per_v={ad0_mv_per_v}, torque_offset={torque_offset}, microstrain={ad0_microstrain}, torque={torque}')
-            json_data['torque'] = torque
-        if 'ch1_ad' in result:
-            ad1 = round(result['ch1_ad'], 2)
-            ad1_mv_per_v = self.jm3846Calculator.calculate_mv_per_v(ad1, self.gain_1)
+                # 加上偏移量
+                torque_offset = gdata.sps1_torque_offset if self.name == 'sps1' else gdata.sps2_torque_offset
+                ad0_microstrain = self.jm3846Calculator.calculate_microstrain(ad0_mv_per_v + torque_offset)
+                torque = self.jm3846Calculator.calculate_torque(ad0_microstrain)
+                logging.info(f'name={self.name},ad0={ad0}, ad0_mv_per_v={ad0_mv_per_v}, torque_offset={torque_offset}, microstrain={ad0_microstrain}, torque={torque}')
+                json_data['torque'] = torque
+            if 'ch1_ad' in result:
+                ad1 = round(result['ch1_ad'], 2)
+                ad1_mv_per_v = self.jm3846Calculator.calculate_mv_per_v(ad1, self.gain_1)
 
-            if self.name == 'sps1':
-                gdata.sps1_ad1 = ad1
-                gdata.sps1_mv_per_v_for_thrust = ad1_mv_per_v
-            else:
-                gdata.sps2_ad1 = ad1
-                gdata.sps2_mv_per_v_for_thrust = ad1_mv_per_v
+                if self.name == 'sps1':
+                    gdata.sps1_ad1 = ad1
+                    gdata.sps1_mv_per_v_for_thrust = ad1_mv_per_v
+                else:
+                    gdata.sps2_ad1 = ad1
+                    gdata.sps2_mv_per_v_for_thrust = ad1_mv_per_v
 
-            # 加上偏移量
-            thrust_offset = gdata.sps1_thrust_offset if self.name == 'sps1' else gdata.sps2_thrust_offset
-            thrust = self.jm3846Calculator.calculate_thrust(ad1_mv_per_v + thrust_offset)
-            logging.info(f'name={self.name},ad1={ad1},ad1_mv_per_v={ad1_mv_per_v}, thrust_offset={thrust_offset}, thrust={thrust}')
-            json_data['thrust'] = thrust
-        if 'rpm' in result:
-            rpm = round(result['rpm'], 2)
-            if self.name == 'sps1':
-                gdata.sps1_speed = rpm
-            else:
-                gdata.sps2_speed = rpm
+                # 加上偏移量
+                thrust_offset = gdata.sps1_thrust_offset if self.name == 'sps1' else gdata.sps2_thrust_offset
+                thrust = self.jm3846Calculator.calculate_thrust(ad1_mv_per_v + thrust_offset)
+                logging.info(f'name={self.name},ad1={ad1},ad1_mv_per_v={ad1_mv_per_v}, thrust_offset={thrust_offset}, thrust={thrust}')
+                json_data['thrust'] = thrust
+            if 'rpm' in result:
+                rpm = round(result['rpm'], 2)
+                if self.name == 'sps1':
+                    gdata.sps1_speed = rpm
+                else:
+                    gdata.sps2_speed = rpm
 
-            speed = round(rpm / 10, 1)
-            logging.info(f'name={self.name},rpm={rpm}, speed={speed}')
-            json_data['rpm'] = rpm
-        DataSaver.save(self.name, torque, thrust, speed)
+                speed = round(rpm / 10, 1)
+                logging.info(f'name={self.name},rpm={rpm}, speed={speed}')
+                json_data['rpm'] = rpm
+            DataSaver.save(self.name, torque, thrust, speed)
 
-        # 如果作为服务端，那需要向外发送数据
-        if gdata.hmi_server_started:
-            await ws_server.broadcast(json_data)
+            # 如果作为服务端，那需要向外发送数据
+            if gdata.hmi_server_started:
+                await ws_server.broadcast(json_data)
+        except Exception as e:
+            logging.exception(e)
 
     async def async_handle_0x45(self):
         """异步处理功能码0x45"""
@@ -303,9 +306,9 @@ class JM3846AsyncClient:
             self.writer.write(request)
             await self.writer.drain()
         except asyncio.TimeoutError:
-            logging.error(f'{self.name} JM3846 0x45 request timeout')
+            logging.exception(f'{self.name} JM3846 0x45 request timeout')
         except Exception:
-            logging.error(f'{self.name} JM3846 0x45 error')
+            logging.exception(f'{self.name} JM3846 0x45 error')
 
     def set_offline(self, is_offline: bool):
         if self.name == 'sps1':

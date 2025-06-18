@@ -69,4 +69,4 @@ class SystemConf(ft.Container):
                 control.build()
                 control.update()
         except:
-            logging.error('refresh controls of page failed.')
+            logging.exception('refresh controls of page failed.')

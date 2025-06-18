@@ -238,11 +238,14 @@ class IOSettingPLC(CustomCard):
         self.page.run_task(self.__start_plc_task)
 
     async def __start_plc_task(self):
-        self.connect_to_plc.text = self.page.session.get("lang.common.connecting")
-        self.connect_to_plc.disabled = True
-        self.connect_to_plc.update()
-        await plc_util.auto_reconnect(only_once=True)
-        self.__handle_plc_connection_status()
+        try:
+            self.connect_to_plc.text = self.page.session.get("lang.common.connecting")
+            self.connect_to_plc.disabled = True
+            self.connect_to_plc.update()
+            await plc_util.auto_reconnect(only_once=True)
+            self.__handle_plc_connection_status()
+        except Exception as e:
+            logging.exception(e)
 
     def __on_disconnect(self, user:User):
         OperationLog.create(
@@ -254,8 +257,11 @@ class IOSettingPLC(CustomCard):
         self.page.run_task(self.__stop_plc_task)
 
     async def __stop_plc_task(self):
-        plc_util.close()
-        self.__handle_plc_connection_status()
+        try:
+            plc_util.close()
+            self.__handle_plc_connection_status()
+        except Exception as e:
+            logging.exception(e)
 
     def __on_fetch_data_from_plc(self):
         self.page.run_task(self.load_range_data)
@@ -291,7 +297,7 @@ class IOSettingPLC(CustomCard):
             self.txt_speed_range_offset.value = plc_4_20_ma_data["speed_range_offset"] // 10
             self.txt_speed_range_offset.update()
         except Exception as e:
-            pass
+            logging.exception(e)
 
     def save_data(self):
         try:
@@ -407,9 +413,12 @@ class IOSettingPLC(CustomCard):
     async def __handle_connection_status(self):
         while True:
             await asyncio.sleep(1)
-            
-            if not self.plc_enabled.value:
-                continue
 
-            if not self.connect_to_plc.disabled:
-                self.__handle_plc_connection_status()
+            try:
+                if not self.plc_enabled.value:
+                    continue
+
+                if not self.connect_to_plc.disabled:
+                    self.__handle_plc_connection_status()
+            except Exception as e:
+                logging.exception(e)

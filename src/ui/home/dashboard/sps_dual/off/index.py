@@ -1,4 +1,5 @@
 import asyncio
+import logging
 import flet as ft
 from db.models.preference import Preference
 from ui.home.dashboard.sps_dual.off.dual_meters import DualMeters
@@ -31,8 +32,11 @@ class DualShaPoLiOff(ft.Container):
         preference: Preference = Preference.get()
         interval = preference.data_refresh_interval
         while True:
-            self.sps1_meters.reload()
-            self.sps2_meters.reload()
+            try:
+                self.sps1_meters.reload()
+                self.sps2_meters.reload()
+            except Exception as e:
+                logging.exception(e)
             await asyncio.sleep(interval)
 
     def did_mount(self):

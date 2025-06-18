@@ -1,5 +1,6 @@
 import asyncio
 from asyncio.log import logger
+import logging
 from pymodbus.server import StartAsyncSerialServer
 from pymodbus.datastore import ModbusSlaveContext, ModbusServerContext, ModbusSequentialDataBlock
 from db.models.io_conf import IOConf
@@ -18,51 +19,58 @@ class ModbusOutput:
         self.io_conf: IOConf | None = None
 
     async def start_modbus_server(self)->bool:
-        if self.running:
-            logger.info("Modbus server is already running")
+        try:
+            if self.running:
+                logger.info("Modbus server is already running")
+                gdata.modbus_server_started = True
+                return True
+
+            self.io_conf: IOConf = IOConf().get()
+            port = self.io_conf.output_com_port
+            if not port:
+                logger.info("Modbus output port is not set, skip starting Modbus server.")
+                gdata.modbus_server_started = False
+                return False
+
+            system_settings: SystemSettings = SystemSettings().get()
+            self.amount_of_propeller = system_settings.amount_of_propeller
+
+            # 直接100，方便后续追加变量
+            register_size = 100
+
+            self.running = True
+            store = ModbusSlaveContext(hr=ModbusSequentialDataBlock(0, [0] * register_size))
+            self.context = ModbusServerContext(slaves={self.slave_id: store}, single=False)
+
+            # 启动服务器（异步任务）
+            self.server_task = asyncio.create_task(
+                StartAsyncSerialServer(
+                    context=self.context,
+                    port=port,
+                    framer="rtu",
+                    baudrate=9600,
+                    bytesize=8,
+                    parity="N",
+                    stopbits=1
+                )
+            )
+            logger.info(f"Modbus server started on {port}")
             gdata.modbus_server_started = True
             return True
-
-        self.io_conf: IOConf = IOConf().get()
-        port = self.io_conf.output_com_port
-        if not port:
-            logger.info("Modbus output port is not set, skip starting Modbus server.")
-            gdata.modbus_server_started = False
-            return False
-
-        system_settings: SystemSettings = SystemSettings().get()
-        self.amount_of_propeller = system_settings.amount_of_propeller
-
-        # 直接100，方便后续追加变量
-        register_size = 100
-
-        self.running = True
-        store = ModbusSlaveContext(hr=ModbusSequentialDataBlock(0, [0] * register_size))
-        self.context = ModbusServerContext(slaves={self.slave_id: store}, single=False)
-
-        # 启动服务器（异步任务）
-        self.server_task = asyncio.create_task(
-            StartAsyncSerialServer(
-                context=self.context,
-                port=port,
-                framer="rtu",
-                baudrate=9600,
-                bytesize=8,
-                parity="N",
-                stopbits=1
-            )
-        )
-        logger.info(f"Modbus server started on {port}")
-        gdata.modbus_server_started = True
-        return True
+        except Exception as e:
+            logging.exception(e)
+        return False
 
     async def stop_modbus_server(self):
-        if self.server_task and not self.server_task.done():
-            self.server_task.cancel()
-            self.running = False
-            logger.info("Modbus server stopped")
-            gdata.connected_to_hmi_server = True
-            return True
+        try:
+            if self.server_task and not self.server_task.done():
+                self.server_task.cancel()
+                self.running = False
+                logger.info("Modbus server stopped")
+                gdata.connected_to_hmi_server = True
+                return True
+        except Exception as e:
+            logging.exception(e)
 
         gdata.connected_to_hmi_server = False
         return False

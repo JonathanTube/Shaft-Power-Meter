@@ -1,4 +1,5 @@
 import asyncio
+import logging
 import flet as ft
 from typing import Callable
 
@@ -36,23 +37,26 @@ class AlarmButton(ft.TextButton):
     async def __blink(self):
         cnt = 0
         while self.blinking:
-            if cnt % 2 == 0:
-                self.style = ft.ButtonStyle(
-                    shape=ft.RoundedRectangleBorder(radius=ft.border_radius.all(10)),
-                    color=ft.Colors.WHITE,
-                    bgcolor=ft.Colors.RED
-                )
-                self.icon_color = ft.Colors.WHITE
-            else:
-                self.style = ft.ButtonStyle(
-                    shape=ft.RoundedRectangleBorder(radius=ft.border_radius.all(10)),
-                    color=ft.Colors.INVERSE_SURFACE,
-                    bgcolor=ft.Colors.SURFACE
-                )
-                self.icon_color = ft.Colors.INVERSE_SURFACE
-            self.update()
+            try:
+                if cnt % 2 == 0:
+                    self.style = ft.ButtonStyle(
+                        shape=ft.RoundedRectangleBorder(radius=ft.border_radius.all(10)),
+                        color=ft.Colors.WHITE,
+                        bgcolor=ft.Colors.RED
+                    )
+                    self.icon_color = ft.Colors.WHITE
+                else:
+                    self.style = ft.ButtonStyle(
+                        shape=ft.RoundedRectangleBorder(radius=ft.border_radius.all(10)),
+                        color=ft.Colors.INVERSE_SURFACE,
+                        bgcolor=ft.Colors.SURFACE
+                    )
+                    self.icon_color = ft.Colors.INVERSE_SURFACE
+                self.update()
+                cnt += 1
+            except Exception as e:
+                logging.exception(e)
             await asyncio.sleep(1)
-            cnt += 1
 
     def start_blink(self):
         if not self.blinking:

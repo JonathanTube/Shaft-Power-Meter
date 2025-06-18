@@ -20,6 +20,7 @@ from utils.alarm_saver import AlarmSaver
 from utils.auto_startup import add_to_startup
 from utils.logger import Logger
 from utils.modbus_output import modbus_output
+import logging
 
 Logger(show_sql=False)
 
@@ -58,6 +59,8 @@ def check_single_instance(mutex_name: str = "shaft-power-meter"):
         ctypes.windll.user32.MessageBoxW(0, "The Software is already running!", "Notice", 0x40)
         sys.exit(0)
 
+def handle_error(e):
+    logging.exception('page error:', e)
 
 async def handle_unexpected_exit():
     await asyncio.sleep(5)
@@ -75,6 +78,8 @@ async def main(page: ft.Page):
     load_language(page, preference)
 
     await modbus_output.start_modbus_server()
+
+    page.on_error = handle_error
 
     page.title = page.session.get("lang.lang.app.name")
     page.padding = 0

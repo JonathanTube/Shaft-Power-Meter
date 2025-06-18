@@ -1,3 +1,4 @@
+import logging
 import flet as ft
 import asyncio
 from db.models.system_settings import SystemSettings
@@ -71,37 +72,40 @@ class TestModeInstant(ft.ResponsiveRow):
 
     async def __refresh_instant(self):
         while True:
-            self.sps1_speed.value = f'{gdata.sps1_speed} rpm'
-            self.sps1_speed.update()
+            try:
+                self.sps1_speed.value = f'{gdata.sps1_speed} rpm'
+                self.sps1_speed.update()
 
-            sps1_torque_value, sps1_torque_unit = UnitParser.parse_torque(gdata.sps1_torque, self.system_unit)
-            self.sps1_torque.value = f'{sps1_torque_value} {sps1_torque_unit}'
-            self.sps1_torque.update()
+                sps1_torque_value, sps1_torque_unit = UnitParser.parse_torque(gdata.sps1_torque, self.system_unit)
+                self.sps1_torque.value = f'{sps1_torque_value} {sps1_torque_unit}'
+                self.sps1_torque.update()
 
-            sps1_thrust_value, sps1_thrust_unit = UnitParser.parse_thrust(gdata.sps1_thrust, self.system_unit)
-            self.sps1_thrust.value = f'{sps1_thrust_value} {sps1_thrust_unit}'
-            self.sps1_thrust.update()
+                sps1_thrust_value, sps1_thrust_unit = UnitParser.parse_thrust(gdata.sps1_thrust, self.system_unit)
+                self.sps1_thrust.value = f'{sps1_thrust_value} {sps1_thrust_unit}'
+                self.sps1_thrust.update()
 
-            sps1_power_value, sps1_power_unit = UnitParser.parse_power(gdata.sps1_power, self.system_unit)
-            self.sps1_power.value = f'{sps1_power_value} {sps1_power_unit}'
-            self.sps1_power.update()
+                sps1_power_value, sps1_power_unit = UnitParser.parse_power(gdata.sps1_power, self.system_unit)
+                self.sps1_power.value = f'{sps1_power_value} {sps1_power_unit}'
+                self.sps1_power.update()
 
-            if self.system_settings.amount_of_propeller == 2:
-                self.sps2_speed.value = f'{gdata.sps2_speed} rpm'
-                self.sps2_speed.update()
+                if self.system_settings.amount_of_propeller == 2:
+                    self.sps2_speed.value = f'{gdata.sps2_speed} rpm'
+                    self.sps2_speed.update()
 
-                sps2_torque_value, sps2_torque_unit = UnitParser.parse_torque(gdata.sps2_torque, self.system_unit)
+                    sps2_torque_value, sps2_torque_unit = UnitParser.parse_torque(gdata.sps2_torque, self.system_unit)
 
-                self.sps2_torque.value = f'{sps2_torque_value} {sps2_torque_unit}'
-                self.sps2_torque.update()
+                    self.sps2_torque.value = f'{sps2_torque_value} {sps2_torque_unit}'
+                    self.sps2_torque.update()
 
-                sps2_thrust_value, sps2_thrust_unit = UnitParser.parse_thrust(gdata.sps2_thrust, self.system_unit)
-                self.sps2_thrust.value = f'{sps2_thrust_value} {sps2_thrust_unit}'
-                self.sps2_thrust.update()
+                    sps2_thrust_value, sps2_thrust_unit = UnitParser.parse_thrust(gdata.sps2_thrust, self.system_unit)
+                    self.sps2_thrust.value = f'{sps2_thrust_value} {sps2_thrust_unit}'
+                    self.sps2_thrust.update()
 
-                sps2_power_value, sps2_power_unit = UnitParser.parse_power(gdata.sps2_power, self.system_unit)
-                self.sps2_power.value = f'{sps2_power_value} {sps2_power_unit}'
-                self.sps2_power.update()
+                    sps2_power_value, sps2_power_unit = UnitParser.parse_power(gdata.sps2_power, self.system_unit)
+                    self.sps2_power.value = f'{sps2_power_value} {sps2_power_unit}'
+                    self.sps2_power.update()
+            except Exception as e:
+                logging.exception(e)
 
             await asyncio.sleep(1)
 

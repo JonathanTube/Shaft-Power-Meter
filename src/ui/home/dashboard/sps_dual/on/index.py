@@ -1,4 +1,5 @@
 import asyncio
+import logging
 import flet as ft
 
 from db.models.preference import Preference
@@ -31,9 +32,12 @@ class DualShaPoLiOn(ft.Container):
         preference: Preference = Preference.get()
         interval = preference.data_refresh_interval
         while True:
-            self.instant_grid.reload()
-            self.eexi_limited_power.reload()
-            self.power_chart.reload()
+            try:
+                self.instant_grid.reload()
+                self.eexi_limited_power.reload()
+                self.power_chart.reload()
+            except Exception as e:
+                logging.exception(e)
             await asyncio.sleep(interval)
 
     def did_mount(self):

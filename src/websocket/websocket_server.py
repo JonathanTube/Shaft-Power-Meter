@@ -33,7 +33,7 @@ class WebSocketServer:
                     if response:
                         await self.send_to_client(websocket, response)
         except websockets.ConnectionClosed:
-            logging.error(f"client {websocket.remote_address} disconnected")
+            logging.exception(f"client {websocket.remote_address} disconnected")
             AlarmSaver.create(alarm_type=AlarmType.HMI_SERVER_CLOSED)
         finally:
             self.clients.remove(websocket)
@@ -76,14 +76,14 @@ class WebSocketServer:
             )
             return True
         except websockets.ConnectionClosed:
-            logging.error("broadcast to all clients failed: connection closed")
+            logging.exception("broadcast to all clients failed: connection closed")
             AlarmSaver.create(alarm_type=AlarmType.HMI_SERVER_CLOSED)
             gdata.hmi_server_started = False
             self.clients.clear()
             await self.start()
             return False
         except Exception:
-            logging.error("broadcast to all clients failed")
+            logging.exception("broadcast to all clients failed")
             gdata.hmi_server_started = False
             return False
 

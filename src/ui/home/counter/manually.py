@@ -1,3 +1,4 @@
+import logging
 import flet as ft
 import asyncio
 from typing import Literal
@@ -157,7 +158,10 @@ class ManuallyCounter(ft.Container):
 
     async def __running(self):
         while True:
-            self.__calculate()
+            try:
+                self.__calculate()
+            except Exception as e:
+                logging.exception(e)
             await asyncio.sleep(self.interval)
 
     def __calculate(self):

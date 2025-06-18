@@ -38,18 +38,24 @@ class TestModeTask:
     async def generate_random_data(self):
         self.is_running = True
 
-        system_settings: SystemSettings = SystemSettings.get()
-        amount_of_propeller = system_settings.amount_of_propeller
+        try:
+            system_settings: SystemSettings = SystemSettings.get()
+            amount_of_propeller = system_settings.amount_of_propeller
 
-        while self.is_running:
-            await self.save_generated_data('sps1')
-            if amount_of_propeller == 2:
-                await self.save_generated_data('sps2')
-            await asyncio.sleep(1)
+            while self.is_running:
+                await self.save_generated_data('sps1')
+                if amount_of_propeller == 2:
+                    await self.save_generated_data('sps2')
+                await asyncio.sleep(1)
+        except Exception as e:
+            logging.exception(e)
 
     async def start(self):
-        gdata.test_mode_start_time = gdata.utc_date_time
-        asyncio.create_task(self.generate_random_data())
+        try:
+            gdata.test_mode_start_time = gdata.utc_date_time
+            asyncio.create_task(self.generate_random_data())
+        except Exception as e:
+            logging.exception(e)
 
     def stop(self):
         try:
@@ -91,20 +97,23 @@ class TestModeTask:
         self.is_running = False
 
     async def save_generated_data(self, name):
-        instant_torque = int(random.uniform(self.min_torque, self.max_torque))
-        instant_speed = int(random.uniform(self.min_speed, self.max_speed))
-        instant_thrust = int(random.uniform(self.min_thrust, self.max_thrust))
-        DataSaver.save(name, instant_torque, instant_thrust, instant_speed)
-        # 如果作为服务端，那需要向外发送数据
-        if gdata.hmi_server_started:
-            json_data = {
-                'type': 'sps_data',
-                'name': name,
-                'torque': instant_torque,
-                'thrust': instant_thrust,
-                'rpm': instant_speed * 10
-            }
-            await ws_server.broadcast(json_data)
+        try:
+            instant_torque = int(random.uniform(self.min_torque, self.max_torque))
+            instant_speed = int(random.uniform(self.min_speed, self.max_speed))
+            instant_thrust = int(random.uniform(self.min_thrust, self.max_thrust))
+            DataSaver.save(name, instant_torque, instant_thrust, instant_speed)
+            # 如果作为服务端，那需要向外发送数据
+            if gdata.hmi_server_started:
+                json_data = {
+                    'type': 'sps_data',
+                    'name': name,
+                    'torque': instant_torque,
+                    'thrust': instant_thrust,
+                    'rpm': instant_speed * 10
+                }
+                await ws_server.broadcast(json_data)
+        except Exception as e:
+            logging.exception(e)
 
 
 testModeTask: TestModeTask = TestModeTask()

@@ -1,4 +1,5 @@
 import asyncio
+import logging
 import flet as ft
 from typing import Literal
 from db.models.counter_log import CounterLog
@@ -68,7 +69,10 @@ class TotalCounter(ft.Container):
 
     async def __running(self):
         while True:
-            self.__calculate()
+            try:
+                self.__calculate()
+            except Exception as e:
+                logging.exception(e)
             await asyncio.sleep(self.interval)
 
     def __calculate(self):

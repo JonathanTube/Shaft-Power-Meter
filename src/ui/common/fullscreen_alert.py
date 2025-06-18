@@ -1,4 +1,5 @@
 import asyncio
+import logging
 import flet as ft
 
 
@@ -66,10 +67,13 @@ class FullscreenAlert(ft.Container):
             self.task.cancel()
 
     async def blink(self):
-        while self.running:
-            await asyncio.sleep(1)
-            self.visible = not self.visible
+        try:
+            while self.running:
+                await asyncio.sleep(1)
+                self.visible = not self.visible
+                self.update()
+            # 退出时，设置为不可见
+            self.visible = False
             self.update()
-        # 退出时，设置为不可见
-        self.visible = False
-        self.update()
+        except Exception as e:
+            logging.exception(e)

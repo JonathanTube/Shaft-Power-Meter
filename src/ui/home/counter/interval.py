@@ -1,5 +1,6 @@
 import asyncio
 from datetime import datetime, timedelta
+import logging
 from typing import Literal
 import flet as ft
 from db.models.data_log import DataLog
@@ -110,7 +111,10 @@ class IntervalCounter(ft.Container):
 
     async def __running(self):
         while True:
-            self.__calculate()
+            try:
+                self.__calculate()
+            except Exception as e:
+                logging.exception(e)
             await asyncio.sleep(self.interval)
 
     def __calculate(self):

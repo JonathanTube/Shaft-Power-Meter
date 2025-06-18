@@ -91,7 +91,7 @@ class PLCUtil:
                 "speed_range_offset": await self._safe_read_register(12330)
             }
         except ConnectionException:
-            logging.error(f"{self.ip}:{self.port} PLC connection error")
+            logging.exception(f"{self.ip}:{self.port} PLC connection error")
             self.save_alarm()
             gdata.connected_to_plc = False
             await self.auto_reconnect()
@@ -122,7 +122,7 @@ class PLCUtil:
             await self.plc_client.write_register(12330, int(data["speed_range_offset"]))
             return True
         except ConnectionException:
-            logging.error(f"{self.ip}:{self.port} PLC connection error")
+            logging.exception(f"{self.ip}:{self.port} PLC connection error")
             self.save_alarm()
             gdata.connected_to_plc = False
             await self.auto_reconnect()
@@ -152,7 +152,7 @@ class PLCUtil:
             await self.plc_client.write_register(12331, scaled_values[3])
             return True
         except ConnectionException:
-            logging.error(f"{self.ip}:{self.port} PLC connection error")
+            logging.exception(f"{self.ip}:{self.port} PLC connection error")
             self.save_alarm()
             gdata.connected_to_plc = False
             await self.auto_reconnect()
@@ -170,7 +170,7 @@ class PLCUtil:
                 "speed": await self._safe_read_register(12331)
             }
         except ConnectionException:
-            logging.error(f"{self.ip}:{self.port} PLC connection error")
+            logging.exception(f"{self.ip}:{self.port} PLC connection error")
             self.save_alarm()
             gdata.connected_to_plc = False
             await self.auto_reconnect()
@@ -196,7 +196,7 @@ class PLCUtil:
             logging.info(f"PLC write alarm: {occured}")
             return True
         except ConnectionException:
-            logging.error(f"{self.ip}:{self.port} PLC connection error")
+            logging.exception(f"{self.ip}:{self.port} PLC connection error")
             self.save_alarm()
             gdata.connected_to_plc = False
             await self.auto_reconnect()
@@ -214,7 +214,7 @@ class PLCUtil:
             logging.info(f"PLC write power overload: {occured}")
             return True
         except ConnectionException:
-            logging.error(f"{self.ip}:{self.port} PLC connection error")
+            logging.exception(f"{self.ip}:{self.port} PLC connection error")
             self.save_alarm()
             gdata.connected_to_plc = False
             await self.auto_reconnect()
@@ -227,7 +227,7 @@ class PLCUtil:
         try:
             return await self._safe_read_coil(12288)
         except ConnectionException:
-            logging.error(f"{self.ip}:{self.port} PLC connection error")
+            logging.exception(f"{self.ip}:{self.port} PLC connection error")
             self.save_alarm()
             gdata.connected_to_plc = False
             await self.auto_reconnect()
@@ -240,7 +240,7 @@ class PLCUtil:
         try:
             return await self._safe_read_coil(12289)
         except ConnectionException:
-            logging.error(f"{self.ip}:{self.port} PLC connection error")
+            logging.exception(f"{self.ip}:{self.port} PLC connection error")
             self.save_alarm()
             gdata.connected_to_plc = False
             await self.auto_reconnect()

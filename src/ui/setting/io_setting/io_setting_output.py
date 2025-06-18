@@ -1,3 +1,4 @@
+import logging
 import flet as ft
 import serial.tools.list_ports
 from db.models.io_conf import IOConf
@@ -130,15 +131,21 @@ class IOSettingOutput(CustomCard):
         self.conf.output_com_port = self.serial_port.value
 
     async def __start_modbus_server(self):
-        succ = await modbus_output.start_modbus_server()
-        self.connect_button.visible = not succ
-        self.connect_button.update()
-        self.disconnect_button.visible = succ
-        self.disconnect_button.update()
+        try:
+            succ = await modbus_output.start_modbus_server()
+            self.connect_button.visible = not succ
+            self.connect_button.update()
+            self.disconnect_button.visible = succ
+            self.disconnect_button.update()
+        except Exception as e:
+            logging.exception(e)
     
     async def __end_modbus_server(self):
-        succ = await modbus_output.stop_modbus_server()
-        self.connect_button.visible = succ
-        self.connect_button.update()
-        self.disconnect_button.visible = not succ
-        self.disconnect_button.update()
+        try:
+            succ = await modbus_output.stop_modbus_server()
+            self.connect_button.visible = succ
+            self.connect_button.update()
+            self.disconnect_button.visible = not succ
+            self.disconnect_button.update()
+        except Exception as e:
+            logging.exception(e)

@@ -1,4 +1,5 @@
 import asyncio
+import logging
 import flet as ft
 from db.models.preference import Preference
 from ui.home.dashboard.sps_single.off.single_meters import SingleMeters
@@ -29,8 +30,11 @@ class SingleShaPoLiOff(ft.Stack):
         preference: Preference = Preference.get()
         interval = preference.data_refresh_interval
         while True:
-            self.single_meters.reload()
-            self.thrust_power.reload()
+            try:
+                self.single_meters.reload()
+                self.thrust_power.reload()
+            except Exception as e:
+                logging.exception(e)
             await asyncio.sleep(interval)
 
     def did_mount(self):

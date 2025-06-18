@@ -1,5 +1,6 @@
 import asyncio
 import ipaddress
+import logging
 import flet as ft
 from common.operation_type import OperationType
 from db.models.io_conf import IOConf
@@ -72,12 +73,15 @@ class IOSettingGPS(CustomCard):
         
     
     async def __start_gps_task(self):
-        self.connect_to_gps.text = self.page.session.get("lang.common.connecting")
-        self.connect_to_gps.disabled = True
-        self.connect_to_gps.update()
-    
-        await gps_sync_task.start(retry_once=True)
-        self.__handle_gps_connection_status()
+        try:
+            self.connect_to_gps.text = self.page.session.get("lang.common.connecting")
+            self.connect_to_gps.disabled = True
+            self.connect_to_gps.update()
+        
+            await gps_sync_task.start(retry_once=True)
+            self.__handle_gps_connection_status()
+        except Exception as e:
+            logging.exception(e)
     
     def __on_disconnect(self, user:User):
         OperationLog.create(
@@ -89,8 +93,11 @@ class IOSettingGPS(CustomCard):
         self.page.run_task(self.__stop_gps_task)
 
     async def __stop_gps_task(self):
-        await gps_sync_task.close_connection()
-        self.__handle_gps_connection_status()
+        try:
+            await gps_sync_task.close_connection()
+            self.__handle_gps_connection_status()
+        except Exception as e:
+            logging.exception(e)
 
     def save_data(self):
         try:
@@ -117,8 +124,11 @@ class IOSettingGPS(CustomCard):
     async def __handle_connection_status(self):
         while True:
             await asyncio.sleep(1)
-            if not self.connect_to_gps.disabled:
-                self.__handle_gps_connection_status()
+            try:
+                if not self.connect_to_gps.disabled:
+                    self.__handle_gps_connection_status()
+            except Exception as e:
+                logging.exception(e)
 
     def will_unmount(self):
         if self.loop_task:

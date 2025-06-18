@@ -1,3 +1,4 @@
+import logging
 import flet as ft
 import asyncio
 import hashlib
@@ -145,12 +146,15 @@ class Permission(ft.Container):
     async def __auto_lock(self):
         while True:
             if self.visible:
-                time_diff = gdata.utc_date_time - self.last_op_utc_date_time
-                # print(time_diff.total_seconds())
-                if time_diff.total_seconds() > 60 * 10:
-                    self.visible = False
-                    self.page.open(self.permission_check)
-                    self.update()
+                try:
+                    time_diff = gdata.utc_date_time - self.last_op_utc_date_time
+                    # print(time_diff.total_seconds())
+                    if time_diff.total_seconds() > 60 * 10:
+                        self.visible = False
+                        self.page.open(self.permission_check)
+                        self.update()
+                except Exception as e:
+                    logging.exception(e)
             await asyncio.sleep(1)
 
     def will_unmount(self):
