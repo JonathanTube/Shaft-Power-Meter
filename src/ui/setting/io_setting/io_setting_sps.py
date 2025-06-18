@@ -334,7 +334,7 @@ class IOSettingSPS(CustomCard):
             operation_type=OperationType.START_HMI_SERVER,
             operation_content=user.user_name
         )
-        self.page.run_task(self.handle_start_server)
+        self.handle_start_server()
 
     def handle_start_server(self):
         try:
@@ -430,16 +430,14 @@ class IOSettingSPS(CustomCard):
             self.conf.sps1_ip = self.sps1_ip.value
             self.conf.sps1_port = self.sps1_port.value
         except ValueError:
-            Toast.show_error(self.page, f'{self.page.session.get("lang.common.ip_address_format_error")}: {self.sps1_ip.value}')
-            return False
+            raise ValueError(f'{self.page.session.get("lang.common.ip_address_format_error")}: {self.sps1_ip.value}')
 
         try:
             ipaddress.ip_address(self.hmi_server_ip.value)
             self.conf.hmi_server_ip = self.hmi_server_ip.value
             self.conf.hmi_server_port = self.hmi_server_port.value
         except ValueError:
-            Toast.show_error(self.page, f'{self.page.session.get("lang.common.ip_address_format_error")}: {self.hmi_server_port.value}')
-            return False
+            raise ValueError(f'{self.page.session.get("lang.common.ip_address_format_error")}: {self.hmi_server_port.value}')
 
         if self.is_dual:
             try:
@@ -447,7 +445,7 @@ class IOSettingSPS(CustomCard):
                 self.conf.sps2_ip = self.sps2_ip.value
                 self.conf.sps2_port = self.sps2_port.value
             except ValueError:
-                Toast.show_error(self.page, f'{self.page.session.get("lang.common.ip_address_format_error")}: {self.sps2_ip.value}')
+                raise ValueError(f'{self.page.session.get("lang.common.ip_address_format_error")}: {self.sps2_ip.value}')
 
         self.save_factor()
         self.conf.connect_to_sps = self.connect_to_sps.value
@@ -459,8 +457,6 @@ class IOSettingSPS(CustomCard):
             self.page.run_task(ws_server.stop)
             self.page.run_task(sps1_read_task.async_disconnect)
             self.page.run_task(sps2_read_task.async_disconnect)
-        
-        return True
 
     def save_factor(self):
         self.factor_conf.bearing_outer_diameter_D = self.shaft_outer_diameter.value

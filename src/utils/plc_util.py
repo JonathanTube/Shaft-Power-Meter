@@ -23,7 +23,7 @@ class PLCUtil:
         async with self._lock:  # 确保单线程重连
             if self.plc_client and self.plc_client.connected:
                 gdata.connected_to_plc = True
-                self.recovery_alarm()
+                await self.recovery_alarm()
                 return True
 
             try_times = 1 if only_once else self._max_retries
@@ -42,7 +42,7 @@ class PLCUtil:
                     self.ip = io_conf.plc_ip
                     self.port = io_conf.plc_port
 
-                    logging.info(f'connect to plc {self.ip} {self.port}')
+                    logging.info(f'[***PLC***] connect to plc {self.ip} {self.port}')
 
                     self.plc_client = AsyncModbusTcpClient(
                         host=io_conf.plc_ip,
@@ -54,17 +54,17 @@ class PLCUtil:
 
                     await self.plc_client.connect()
                     if self.plc_client.connected:
-                        logging.info("PLC connected successfully")
+                        logging.info("[***PLC***] connected successfully")
                         self._is_connecting = False
                         gdata.connected_to_plc = True
-                        self.recovery_alarm()
+                        await self.recovery_alarm()
                         return True
 
                     self.save_alarm()
                     await asyncio.sleep(2 ** attempt)  # 指数退避
 
                 except Exception:
-                    logging.exception(f"PLC {attempt + 1}th reconnect failed")
+                    logging.error(f"[***PLC***] {attempt + 1}th reconnect failed")
                     await asyncio.sleep(2 ** attempt)  # 指数退避
                     gdata.connected_to_plc = False
                 finally:
@@ -94,12 +94,12 @@ class PLCUtil:
                 "speed_range_offset": await self._safe_read_register(12330)
             }
         except ConnectionException:
-            logging.exception(f"{self.ip}:{self.port} PLC connection error")
+            logging.error(f"[***PLC***] {self.ip}:{self.port} PLC connection error")
             self.save_alarm()
             gdata.connected_to_plc = False
             await self.auto_reconnect()
         except Exception:
-            logging.exception(f"{self.ip}:{self.port} PLC read data unknown error")
+            logging.error(f"[***PLC***] {self.ip}:{self.port} PLC read data unknown error")
             self.save_alarm()
         return self._empty_4_20ma_data()
 
@@ -125,12 +125,12 @@ class PLCUtil:
             await self.plc_client.write_register(12330, int(data["speed_range_offset"]))
             return True
         except ConnectionException:
-            logging.exception(f"{self.ip}:{self.port} PLC connection error")
+            logging.error(f"[***PLC***] {self.ip}:{self.port} PLC connection error")
             self.save_alarm()
             gdata.connected_to_plc = False
             await self.auto_reconnect()
         except Exception:
-            logging.exception("PLC write data failed")
+            logging.error("[***PLC***] PLC write data failed")
 
         return False
 
@@ -146,7 +146,7 @@ class PLCUtil:
             int(speed * 10)  # 速度 rpm * 10
         )
 
-        logging.info(f"write real time data to plc: {scaled_values}")
+        logging.info(f"[***PLC***] write real time data to plc: {scaled_values}")
 
         try:
             await self.plc_client.write_register(12301, scaled_values[0])
@@ -155,12 +155,12 @@ class PLCUtil:
             await self.plc_client.write_register(12331, scaled_values[3])
             return True
         except ConnectionException:
-            logging.exception(f"{self.ip}:{self.port} PLC connection error")
+            logging.error(f"[***PLC***] {self.ip}:{self.port} connection error")
             self.save_alarm()
             gdata.connected_to_plc = False
             await self.auto_reconnect()
         except Exception:
-            logging.exception("PLC write data failed")
+            logging.error("[***PLC***] write data failed")
             self.save_alarm()
             return False
 
@@ -173,12 +173,12 @@ class PLCUtil:
                 "speed": await self._safe_read_register(12331)
             }
         except ConnectionException:
-            logging.exception(f"{self.ip}:{self.port} PLC connection error")
+            logging.error(f"[***PLC***] {self.ip}:{self.port} PLC connection error")
             self.save_alarm()
             gdata.connected_to_plc = False
             await self.auto_reconnect()
         except Exception:
-            logging.exception(f"{self.ip}:{self.port} PLC read data failed")
+            logging.error(f"[***PLC***] {self.ip}:{self.port} PLC read data failed")
             self.save_alarm()
             return self._empty_instant_data()
 
@@ -197,15 +197,15 @@ class PLCUtil:
 
         try:
             await self.plc_client.write_coil(address=12288, value=occured)
-            logging.info(f"[***PLC**]PLC write alarm: {occured}")
+            logging.info(f"[***PLC**] PLC write alarm: {occured}")
             return True
         except ConnectionException:
-            logging.error(f"[***PLC**]{self.ip}:{self.port} PLC connection error")
+            logging.error(f"[***PLC**] {self.ip}:{self.port} PLC connection error")
             self.save_alarm()
             gdata.connected_to_plc = False
             await self.auto_reconnect()
         except Exception:
-            logging.error("[***PLC**]PLC write alarm failed")
+            logging.error("[***PLC**] write alarm failed")
             self.save_alarm()
         return False
 
@@ -215,15 +215,15 @@ class PLCUtil:
 
         try:
             await self.plc_client.write_coil(address=12289, value=occured)
-            logging.info(f"PLC write power overload: {occured}")
+            logging.info(f"[***PLC***] write power overload: {occured}")
             return True
         except ConnectionException:
-            logging.exception(f"{self.ip}:{self.port} PLC connection error")
+            logging.error(f"[***PLC***] {self.ip}:{self.port} PLC connection error")
             self.save_alarm()
             gdata.connected_to_plc = False
             await self.auto_reconnect()
         except Exception:
-            logging.exception("PLC write power overload failed")
+            logging.error("[***PLC***] write power overload failed")
             self.save_alarm()
         return False
 
@@ -231,12 +231,12 @@ class PLCUtil:
         try:
             return await self._safe_read_coil(12288)
         except ConnectionException:
-            logging.exception(f"{self.ip}:{self.port} PLC connection error")
+            logging.error(f"[***PLC***] {self.ip}:{self.port} PLC connection error")
             self.save_alarm()
             gdata.connected_to_plc = False
             await self.auto_reconnect()
         except Exception:
-            logging.exception("PLC read alarm failed")
+            logging.error("[***PLC***] read alarm failed")
             self.save_alarm()
             return False
 
@@ -244,12 +244,12 @@ class PLCUtil:
         try:
             return await self._safe_read_coil(12289)
         except ConnectionException:
-            logging.exception(f"{self.ip}:{self.port} PLC connection error")
+            logging.error(f"[***PLC***] {self.ip}:{self.port} PLC connection error")
             self.save_alarm()
             gdata.connected_to_plc = False
             await self.auto_reconnect()
         except Exception:
-            logging.exception("PLC read power overload failed")
+            logging.error("[***PLC***] read power overload failed")
             self.save_alarm()
             return False
 
@@ -260,7 +260,7 @@ class PLCUtil:
             response = await self.plc_client.read_holding_registers(address)
             return response.registers[0] if not response.isError() else None
         except Exception:
-            logging.exception(f"PLC address {address} read failed")
+            logging.error(f"[***PLC***] address {address} read failed")
             self.save_alarm()
             return None
 
@@ -271,7 +271,7 @@ class PLCUtil:
             response = await self.plc_client.read_coils(address=address, count=1)
             return response.bits[0] if not response.isError() else None
         except Exception:
-            logging.exception(f"PLC address {address} read failed")
+            logging.error(f"[***PLC***] address {address} read failed")
             self.save_alarm()
             return None
 
@@ -285,23 +285,31 @@ class PLCUtil:
 
     def close(self):
         try:
+            logging.info('[***PLC***] close plc connection')
             if self.plc_client and self.plc_client.connected:
                 self.plc_client.close()
                 gdata.connected_to_plc = False
+                self.save_alarm()
         except Exception:
-            logging.exception("close plc error occured")
+            logging.error("[***PLC***] close plc error occured")
             return False
         return True        
 
     def save_alarm(self):
         cnt: int = AlarmLog.select().where(AlarmLog.alarm_type == AlarmType.PLC_DISCONNECTED, AlarmLog.is_recovery == False).count()
         if cnt == 0:
+            logging.info('[***PLC***] create alarm')
             AlarmLog.create(utc_date_time=gdata.utc_date_time, alarm_type=AlarmType.PLC_DISCONNECTED)
+        else:
+            logging.info('[***PLC***] alarm exists, skip')
 
     async def recovery_alarm(self):
-        AlarmLog.update(is_recovery = True).where(AlarmLog.alarm_type == AlarmType.PLC_DISCONNECTED)
-        await self.write_alarm(False)
-
+        logging.info('[***PLC***] recovery PLC Alarm')
+        AlarmLog.update(is_recovery = True).where(AlarmLog.alarm_type == AlarmType.PLC_DISCONNECTED).execute()
+        cnt: int = AlarmLog.select().where(AlarmLog.is_recovery == False).count()
+        if cnt == 0:
+            logging.info(f'[***PLC***], check none of alarm, clear all plc alarm.')
+            await plc_util.write_alarm(False)
 
 
 # 全局单例

@@ -303,8 +303,7 @@ class IOSettingPLC(CustomCard):
         try:
             ipaddress.ip_address(self.plc_ip.value)
         except ValueError:
-            Toast.show_error(self.page, f'{self.page.session.get("lang.common.ip_address_format_error")}: {self.plc_ip.value}')
-            return False
+            raise ValueError(f'{self.page.session.get("lang.common.ip_address_format_error")}: {self.plc_ip.value}')
 
         self.conf.plc_ip = self.plc_ip.value
         self.conf.plc_port = self.plc_port.value
@@ -316,8 +315,6 @@ class IOSettingPLC(CustomCard):
             
         if self.conf.plc_enabled:
             self.page.run_task(self.__write_to_plc)
-        
-        return True
 
     def __plc_enabled_change(self, e):
         plc_enabled = e.data

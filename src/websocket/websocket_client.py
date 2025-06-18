@@ -28,13 +28,13 @@ class WebSocketClient:
             uri = f"ws://{io_conf.hmi_server_ip}:{io_conf.hmi_server_port}"
             self.websocket = await websockets.connect(uri)
             self._running = True
-            logging.info(f"connected to {uri} successfully")
+            logging.info(f"[***HMI client***] connected to {uri} successfully")
             gdata.connected_to_hmi_server = True
             AlarmSaver.recovery(alarm_type=AlarmType.HMI_CLIENT_DISCONNECTED)
             # 启动后台接收任务
             asyncio.create_task(self._receive_loop())
         except Exception:
-            logging.exception(f"failed to connect to {uri}")
+            logging.error(f"[***HMI client***] failed to connect to {uri}")
             self._running = False
             AlarmSaver.create(alarm_type=AlarmType.HMI_CLIENT_DISCONNECTED)
             await asyncio.sleep(2)
@@ -61,7 +61,7 @@ class WebSocketClient:
                 gdata.sps1_offline = False
                 gdata.sps2_offline = False
         except websockets.ConnectionClosed:
-            logging.exception("server connection closed")
+            logging.error("[***HMI client***] server connection closed")
             self._running = False
             gdata.connected_to_hmi_server = False
             AlarmSaver.create(alarm_type=AlarmType.HMI_CLIENT_DISCONNECTED)
@@ -80,7 +80,7 @@ class WebSocketClient:
     def __handle_jm3846_data(self, data):
         """处理从服务端接收到的数据"""
         if gdata.test_mode_running:
-            logging.info('test mode is running, skip handle jm3846 data from websocket.')
+            logging.info('[***HMI client***] test mode is running, skip handle jm3846 data from websocket.')
             return
 
         name = data['name']
@@ -137,7 +137,7 @@ class WebSocketClient:
                 await self.websocket.close()
                 AlarmSaver.create(alarm_type=AlarmType.HMI_CLIENT_DISCONNECTED)
         except Exception:
-            logging.exception("failed to close websocket connection")
+            logging.error("[***HMI client***] failed to close websocket connection")
             return False
         return True
 

@@ -99,12 +99,10 @@ class IOSettingGPS(CustomCard):
         try:
             ipaddress.ip_address(self.gps_ip.value)
         except ValueError:
-            Toast.show_error(self.page, f'{self.page.session.get("lang.common.ip_address_format_error")}: {self.gps_ip.value}')
-            return False
+            raise ValueError(self.page, f'{self.page.session.get("lang.common.ip_address_format_error")}: {self.gps_ip.value}')
 
         self.conf.gps_ip = self.gps_ip.value
         self.conf.gps_port = self.gps_port.value
-        return True
 
 
     def __handle_gps_connection_status(self):

@@ -28,9 +28,9 @@ class AlarmSaver:
         AlarmLog.update(is_recovery=True).where(AlarmLog.alarm_type == alarm_type).execute()
         # if it doesn't exist any errors. set the alarm false.
         cnt: int = AlarmLog.select().where(AlarmLog.is_recovery == False).count()
-        logging.info(f'[***recovery alarm***], exists alarm records = {cnt}')
+        logging.info(f'[***recovery alarm***], exists alarm records = {cnt}, skip clear plc alarm.')
         if cnt == 0:
-            logging.info(f'[***recovery alarm***], set plc alarm all to false')
+            logging.info(f'[***recovery alarm***], clear all plc alarm.')
             asyncio.create_task(plc_util.write_alarm(False))
 
         if ControlManager.alarm_button:

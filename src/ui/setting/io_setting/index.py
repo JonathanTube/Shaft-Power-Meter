@@ -52,12 +52,10 @@ class IOSetting(ft.Container):
     def __save_data(self, user: User):
         try:
             keyboard.close()
-            plc_conf_result = self.plc_conf.save_data()
-            gps_conf_result = self.gps_conf.save_data()
-            sps_conf_result = self.sps_conf.save_data()
-            sps_conf_result = self.output_conf.save_data()
-            if not plc_conf_result or not gps_conf_result or not sps_conf_result or not sps_conf_result:
-                return
+            self.plc_conf.save_data()
+            self.gps_conf.save_data()
+            self.sps_conf.save_data()
+            self.output_conf.save_data()
             
             OperationLog.create(
                 user_id=user.id,
@@ -67,9 +65,8 @@ class IOSetting(ft.Container):
             )
             self.conf.save()
             Toast.show_success(self.page)
-        except Exception:
-            logging.exception("io setting save data error")
-            Toast.show_error(self.page)
+        except Exception as e:
+            Toast.show_error(self.page ,e)
 
     def __reset_data(self, e):
         keyboard.close()
