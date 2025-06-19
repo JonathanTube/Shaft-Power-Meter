@@ -35,7 +35,7 @@ class LogGpsTable(AbstractTable):
         return [
             [
                 item.id,
-                item.utc_date_time.strftime(f'{self.dtc.date_format} %H:%M:%S'),
+                item.utc_date_time,
                 item.location
             ] for item in data
         ]

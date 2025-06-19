@@ -5,7 +5,6 @@ import pynmea2
 from common.const_alarm_type import AlarmType
 from db.models.gps_log import GpsLog
 import asyncio
-import random
 from common.global_data import gdata
 from db.models.io_conf import IOConf
 from utils.alarm_saver import AlarmSaver
@@ -53,8 +52,7 @@ class GpsSyncTask:
                         (self.retry_backoff ** self.retries)
 
                     io_conf: IOConf = IOConf.get()
-                    logging.info(
-                        f'[***GPS***]connecting to gps, ip={io_conf.gps_ip}, port={io_conf.gps_port}')
+                    logging.info(f'[***GPS***]connecting to gps, ip={io_conf.gps_ip}, port={io_conf.gps_port}')
 
                     self.reader, self.writer = await asyncio.wait_for(
                         asyncio.open_connection(io_conf.gps_ip, io_conf.gps_port),
@@ -88,14 +86,15 @@ class GpsSyncTask:
             except asyncio.TimeoutError:
                 timeout_count += 1
                 if timeout_count > 3:  # 连续3次超时视为断连
-                    logging.error(
-                        f"[***GPS***] after 3 times timeout, reconnect...")
+                    logging.error(f"[***GPS***] after 3 times timeout, reconnect...")
                     self.running = False
+                    gdata.connected_to_gps = False
                     AlarmSaver.create(AlarmType.GPS_DISCONNECTED)
                     raise ConnectionAbortedError()
             except (ConnectionResetError, ConnectionAbortedError) as e:
                 logging.error(f"[***GPS***] Connection lost: {e}")
                 AlarmSaver.create(AlarmType.GPS_DISCONNECTED)
+                gdata.connected_to_gps = False
                 raise ConnectionAbortedError()  # 触发重连
             except Exception:
                 logging.error("[***GPS***]gps data receive error")
