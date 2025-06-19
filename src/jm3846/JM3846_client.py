@@ -150,10 +150,10 @@ class JM3846AsyncClient:
             logging.error(f'[***{self.name}***] JM3846 0x44 error')
 
     async def async_receive_looping(self):
+        timeout_times = 0
         """持续接收0x44数据"""
         while self.running:
             try:
-                await asyncio.sleep(5)
                 if self.name == 'sps2' and int(gdata.amount_of_propeller) == 1:
                     logging.info('exit running since single propeller')
                     gdata.sps2_offline = True
@@ -224,12 +224,16 @@ class JM3846AsyncClient:
                     continue
 
             except asyncio.TimeoutError:
+                if timeout_times > 5:
+                    self.running = False
+                    await self.async_connect()
                 logging.error(f'[***{self.name}***] JM3846 0x44 receive timeout, retrying...')
                 self.set_offline(True)
                 if self.name == 'sps1':
                     AlarmSaver.create(alarm_type=AlarmType.SPS1_DISCONNECTED)
                 elif self.name == 'sps2':
                     AlarmSaver.create(alarm_type=AlarmType.SPS2_DISCONNECTED)
+                timeout_times += 1
             except ConnectionResetError as e:
                 logging.error(f'[***{self.name}***] JM3846 Connection reset: {e}')
                 self.set_offline(True)
