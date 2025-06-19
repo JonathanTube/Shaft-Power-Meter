@@ -77,6 +77,7 @@ class WebSocketServer:
             await asyncio.gather(
                 *[client.send(packed_data) for client in self.clients]
             )
+            AlarmSaver.recovery(alarm_type=AlarmType.HMI_CLIENT_DISCONNECTED)
             return True
         except websockets.ConnectionClosed:
             logging.error("[***HMI server***] broadcast to all clients failed: connection closed")
