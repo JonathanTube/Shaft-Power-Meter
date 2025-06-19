@@ -30,15 +30,17 @@ class GpsSyncTask:
                 if gdata.connected_to_gps:
                     # 数据接收循环
                     await self.receive_data()
-                if retry_once:
-                    return
             except (TimeoutError, ConnectionRefusedError, ConnectionResetError) as e:
                 logging.error(f"[***GPS***]gps connection error")
                 await self.handle_connection_error()
                 gdata.connected_to_gps = False
+                if retry_once:
+                    return
             except Exception as e:
                 logging.error(f"[***GPS***]gps unknown error")
                 await self.handle_connection_error()
+                if retry_once:
+                    return
             finally:
                 gdata.connected_to_gps = False
 
@@ -98,6 +100,7 @@ class GpsSyncTask:
                 raise ConnectionAbortedError()  # 触发重连
             except Exception:
                 logging.error("[***GPS***]gps data receive error")
+                await asyncio.sleep(5)
 
     async def handle_connection_error(self):
         # 重置重试计数

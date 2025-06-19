@@ -121,7 +121,7 @@ class IOSettingGPS(CustomCard):
 
     async def __handle_connection_status(self):
         while True:
-            await asyncio.sleep(1)
+            await asyncio.sleep(2)
             try:
                 if not self.connect_to_gps.disabled:
                     self.__handle_gps_connection_status()

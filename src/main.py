@@ -62,7 +62,7 @@ def check_single_instance(mutex_name: str = "shaft-power-meter"):
         sys.exit(0)
 
 def handle_error(e):
-    logging.exception(e.data)
+    logging.exception(e)
 
 def init_audio(page:ft.Page) -> ft.Audio:
     # create audio alarm
