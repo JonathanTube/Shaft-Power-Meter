@@ -1,4 +1,6 @@
 import ctypes
+import os
+from pathlib import Path
 import sys
 import flet as ft
 import asyncio
@@ -62,6 +64,14 @@ def check_single_instance(mutex_name: str = "shaft-power-meter"):
 def handle_error(e):
     logging.exception(e.data)
 
+def init_audio(page:ft.Page) -> ft.Audio:
+    # create audio alarm
+    src = os.path.join(Path(__file__).parent,"assets","TF001.WAV")
+    logging.info(src)
+    audio = ft.Audio(src=src, autoplay=False, release_mode=ft.audio.ReleaseMode.LOOP)
+    page.overlay.append(audio)
+    return audio
+
 async def main(page: ft.Page):
     preference: Preference = Preference.get()
 
@@ -92,7 +102,9 @@ async def main(page: ft.Page):
     page.window.prevent_close = True
     ControlManager.fullscreen_alert = FullscreenAlert()
     logging.info('add fullscreen alert')
-    ControlManager.audio_alarm = AudioAlarm()
+
+    audio : ft.Audio = init_audio(page)
+    ControlManager.audio_alarm = AudioAlarm(audio)
     logging.info('add audio alert')
     ControlManager.home = Home()
 

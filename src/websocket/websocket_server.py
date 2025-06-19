@@ -71,7 +71,7 @@ class WebSocketServer:
         try:
             if not self.clients:
                 AlarmSaver.create(alarm_type=AlarmType.HMI_CLIENT_DISCONNECTED)
-                asyncio.sleep(5)
+                await asyncio.sleep(5)
                 return False
             packed_data = msgpack.packb(data)
             await asyncio.gather(

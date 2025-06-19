@@ -1,7 +1,4 @@
-import logging
-import os
 import flet as ft
-from pathlib import Path
 from db.models.event_log import EventLog
 from db.models.user import User
 from ui.common.permission_check import PermissionCheck
@@ -9,19 +6,13 @@ from task.utc_timer_task import gdata
 
 
 class AudioAlarm(ft.Container):
-    def __init__(self):
+    def __init__(self,audio : ft.Audio):
         super().__init__()
         self.right = 10
         self.top = 4
+        self.audio = audio
 
     def build(self):
-        # create audio alarm
-        audit_src = os.path.join(
-            Path(__file__).parent.parent.parent,
-            "assets",
-            "TF001.WAV"
-        )
-        logging.info(audit_src)
         self.content: ft.FilledButton = ft.FilledButton(
             text="Override",
             icon=ft.Icons.NOTIFICATIONS_ON_OUTLINED,
@@ -30,24 +21,13 @@ class AudioAlarm(ft.Container):
             visible=False,
             color=ft.Colors.WHITE,
             on_click=self.__on_override_button_click
-        )
-
-        self.audio_alarm = ft.Audio(
-            src=audit_src,
-            autoplay=False,
-            release_mode=ft.audio.ReleaseMode.LOOP
-        )
-        logging.info('create ft.Audio ok')
-
-    def did_mount(self):
-        self.page.overlay.append(self.audio_alarm)
-        logging.info('audio was added into page overlay.')
+        )       
 
     def __on_override_button_click(self, e):
         self.page.open(PermissionCheck(self.__on_mute, 1))
 
     def play(self):
-        self.audio_alarm.play()
+        self.audio.play()
         self.content.visible = True
         self.content.disabled = False
         self.content.icon = ft.Icons.NOTIFICATIONS_ON_OUTLINED
@@ -55,12 +35,12 @@ class AudioAlarm(ft.Container):
         self.content.update()
 
     def stop(self):
-        self.audio_alarm.pause()
+        self.audio.pause()
         self.content.visible = False
         self.content.update()
 
     def __on_mute(self, user: User):
-        self.audio_alarm.pause()
+        self.audio.pause()
         self.content.icon = ft.Icons.NOTIFICATIONS_OFF_OUTLINED
         self.content.disabled = True
         self.content.bgcolor = ft.Colors.RED_400
