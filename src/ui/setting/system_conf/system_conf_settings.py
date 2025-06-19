@@ -138,9 +138,9 @@ class SystemConfSettings(CustomCard):
 
         gdata.shapoli = self.system_settings.sha_po_li
 
-        gdata.eexi_breach_checking_duration = self.system_settings.eexi_breach_checking_duration
+        gdata.eexi_breach_checking_duration = int(self.system_settings.eexi_breach_checking_duration)
 
-        gdata.eexi_limited_power = self.system_settings.eexi_limited_power
+        gdata.eexi_limited_power = float(self.system_settings.eexi_limited_power)
 
         OperationLog.create(
             user_id=user_id,

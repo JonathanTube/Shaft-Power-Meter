@@ -141,8 +141,7 @@ class GpsSyncTask:
                 if gdata.enable_utc_time_sync_with_gps:
                     dt = datetime.fromisoformat(time_str)
                     # UTC标准化+去除微秒
-                    dt_utc = dt.astimezone(ZoneInfo("UTC")).replace(
-                        microsecond=0, tzinfo=None)
+                    dt_utc = dt.astimezone(ZoneInfo("UTC")).replace(microsecond=0, tzinfo=None)
                     gdata.utc_date_time = dt_utc
 
         except pynmea2.ParseError:
