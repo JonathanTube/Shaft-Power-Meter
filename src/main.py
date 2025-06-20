@@ -88,7 +88,7 @@ async def main(page: ft.Page):
         page.theme_mode = get_theme_mode(preference)
         page.window.resizable = False
         page.window.alignment = ft.alignment.center
-        # page.window.frameless = True
+        page.window.frameless = True
         page.window.always_on_top = False
         page.window.alignment = ft.alignment.center
         if page.window.width <= 1200:
