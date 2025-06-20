@@ -1,3 +1,4 @@
+import logging
 import flet as ft
 from ui.common.meter_half import MeterHalf
 from db.models.system_settings import SystemSettings
@@ -57,14 +58,18 @@ class EEXILimitedPower(ft.Container):
         )
 
     def reload(self):
-        active_value = gdata.sps1_power
+        try:
+            if self.page:
+                active_value = gdata.sps1_power
 
-        if self.amount_of_propeller == 2:
-            active_value += gdata.sps2_power
+                if self.amount_of_propeller == 2:
+                    active_value += gdata.sps2_power
 
-        inactive_value = self.unlimited_power - active_value
-        self.meter_half.set_outer_value(active_value, inactive_value)
-        self.update_mode()
+                inactive_value = self.unlimited_power - active_value
+                self.meter_half.set_outer_value(active_value, inactive_value)
+                self.update_mode()
+        except:
+            logging.exception('exception occured at EEXILimitedPower.reload')
 
     def update_mode(self):
         instant_power = gdata.sps1_power

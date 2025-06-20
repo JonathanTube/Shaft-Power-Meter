@@ -53,19 +53,29 @@ class TestMode(ft.Container):
         self.start_button = ft.FilledButton(
             width=120,
             height=40,
-            text=self.page.session.get('lang.button.start'),
+            text=self.page.session.get('lang.button.start_test_mode'),
             bgcolor=ft.Colors.GREEN,
             visible=not self.running,
+            color=ft.Colors.WHITE,
             on_click=lambda e: self.__on_start_button_click(e)
         )
 
         self.stop_button = ft.FilledButton(
             width=120,
             height=40,
-            text=self.page.session.get('lang.button.stop'),
+            text=self.page.session.get('lang.button.stop_test_mode'),
             bgcolor=ft.Colors.RED,
             visible=self.running,
+            color=ft.Colors.WHITE,
             on_click=lambda e: e.page.open(self.dlg_stop_modal)
+        )
+
+        self.auto_test_button = ft.FilledButton(
+            height=40,
+            text=self.page.session.get('lang.button.stop_fatigue_testing') if gdata.auto_testing else self.page.session.get('lang.button.start_fatigue_testing'),
+            bgcolor=ft.Colors.RED if gdata.auto_testing else ft.Colors.GREEN,
+            color=ft.Colors.WHITE,
+            on_click=lambda e: self.__on_toggle_auto_test()
         )
 
         self.content = ft.Column(
@@ -74,10 +84,22 @@ class TestMode(ft.Container):
                 self.instant_card,
                 ft.Row(
                     alignment=ft.MainAxisAlignment.CENTER,
-                    controls=[self.start_button, self.stop_button]
+                    controls=[self.start_button, self.stop_button, self.auto_test_button]
                 )
             ]
         )
+
+    def __on_toggle_auto_test(self):
+        if gdata.auto_testing:
+            self.auto_test_button.bgcolor = ft.Colors.GREEN
+            self.auto_test_button.text = self.page.session.get('lang.button.start_fatigue_testing')
+        else:
+            self.auto_test_button.bgcolor = ft.Colors.RED
+            self.auto_test_button.text = self.page.session.get('lang.button.stop_fatigue_testing')
+            
+        self.auto_test_button.update()
+        gdata.auto_testing = not gdata.auto_testing
+
 
     def convert_torque(self, torque):
         value = float(torque)

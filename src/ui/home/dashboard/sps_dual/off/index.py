@@ -10,6 +10,7 @@ class DualShaPoLiOff(ft.Container):
     def __init__(self):
         super().__init__()
         self.expand = True
+        self.task_running = False
 
     def build(self):
         self.sps1_meters = DualMeters(name="sps1")
@@ -31,17 +32,21 @@ class DualShaPoLiOff(ft.Container):
     async def load_data(self):
         preference: Preference = Preference.get()
         interval = preference.data_refresh_interval
-        while True:
+        while self.task_running:
             try:
                 self.sps1_meters.reload()
                 self.sps2_meters.reload()
-            except Exception as e:
-                logging.exception(e)
-            await asyncio.sleep(interval)
+            except:
+                logging.exception('exception occured at DualShaPoLiOff.load_data')
+            finally:
+                await asyncio.sleep(interval)
+            
 
     def did_mount(self):
+        self.task_running = True
         self.task = self.page.run_task(self.load_data)
 
     def will_unmount(self):
+        self.task_running = False
         if self.task:
             self.task.cancel()

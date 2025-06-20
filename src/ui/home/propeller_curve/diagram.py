@@ -20,6 +20,8 @@ class PropellerCurveDiagram(ft.Container):
         super().__init__()
         self.expand = True
 
+        self.task_running = False
+
         ps: PropellerSetting = PropellerSetting.get()
 
         # MCR点
@@ -61,36 +63,42 @@ class PropellerCurveDiagram(ft.Container):
 
     def build(self):
         self.chart = self.create_chart()
-        self.content = self.chart
+        if self.chart:
+            self.content = self.chart
 
     def update_style(self):
-        # 清除当前图形缓存
-        plt.close('all')
-        # 重新应用样式
-        self.set_style()
         # 重建图表对象
         self.chart = self.create_chart()
-        # 替换容器内容
-        self.content = self.chart
-        self.update()
+        if self.chart:
+            # 清除当前图形缓存
+            plt.close('all')
+            # 重新应用样式
+            self.set_style()
+            # 替换容器内容
+            self.content = self.chart
+            self.update()
 
     def create_chart(self) -> MatplotlibChart:
-        self.set_style()
-        fig, ax = plt.subplots(figsize=(10, 6))
-        self.handle_mcr_point(ax)
-        self.handle_normal_propeller_curve(ax)
-        self.handle_speed_limit(ax)
-        self.handle_light_load_propeller_curve(ax)
-        self.handle_torque_or_speed_limit_curve(ax)
-        self.handle_overload_curve(ax)
-        self.handle_style(ax)
-        # 优化布局
-        fig.tight_layout()
-        self.sps1_point = ax.scatter(0, 0, color='orange', zorder=10, label='SPS1 Operating Point', s=40)
-        self.sps1_text = ax.text(0, 0, 'SPS1', ha='center', va='bottom', fontsize=8)
-        self.sps2_point = ax.scatter(0, 0, color='purple', zorder=10, label='SPS2 Operating Point', s=40)
-        self.sps2_text = ax.text(0, 0, 'SPS2', ha='center', va='bottom', fontsize=8)
-        return MatplotlibChart(fig, isolated=True, expand=True, transparent=True)
+        try:
+            self.set_style()
+            fig, ax = plt.subplots(figsize=(10, 6))
+            self.handle_mcr_point(ax)
+            self.handle_normal_propeller_curve(ax)
+            self.handle_speed_limit(ax)
+            self.handle_light_load_propeller_curve(ax)
+            self.handle_torque_or_speed_limit_curve(ax)
+            self.handle_overload_curve(ax)
+            self.handle_style(ax)
+            # 优化布局
+            fig.tight_layout()
+            self.sps1_point = ax.scatter(0, 0, color='orange', zorder=10, label='SPS1 Operating Point', s=40)
+            self.sps1_text = ax.text(0, 0, 'SPS1', ha='center', va='bottom', fontsize=8)
+            self.sps2_point = ax.scatter(0, 0, color='purple', zorder=10, label='SPS2 Operating Point', s=40)
+            self.sps2_text = ax.text(0, 0, 'SPS2', ha='center', va='bottom', fontsize=8)
+            return MatplotlibChart(fig, isolated=True, expand=True, transparent=True)
+        except:
+            logging.exception("exception occured at PropellerCurveDiagram.create_chart")
+            return None
 
     def set_style(self):
         # 重新应用样式
@@ -193,10 +201,9 @@ class PropellerCurveDiagram(ft.Container):
         ax.plot(rpm_points, power_points, color=color, linewidth=1, linestyle='--', label=self.page.session.get('lang.propeller_curve.overload_curve'))
 
     async def update_sps_points(self):
-        await asyncio.sleep(5)
         preference: Preference = Preference.get()
         interval = preference.data_refresh_interval
-        while True:
+        while self.task_running:
             try:
                 if self.rpm_of_mcr == 0 or self.power_of_mcr == 0:
                     return
@@ -215,15 +222,20 @@ class PropellerCurveDiagram(ft.Container):
 
                 logging.info(f'update_sps1_points: sps1_percent_rpm_of_mcr={sps1_percent_rpm_of_mcr}%, sps1_percent_power_of_mcr={sps1_percent_power_of_mcr}%')
                 logging.info(f'update_sps2_points: sps2_percent_rpm_of_mcr={sps2_percent_rpm_of_mcr}%, sps2_percent_power_of_mcr={sps2_percent_power_of_mcr}%')
-                if self.chart:
+                if self.chart and self.chart.page:
                     self.chart.update()
-            except Exception as e:
-                logging.exception(e)
-            await asyncio.sleep(interval)
+            except:
+                logging.exception("exception occured at update_sps_points")
+            finally:
+                await asyncio.sleep(interval)
 
     def did_mount(self):
+        self.task_running = True
         self.task = self.page.run_task(self.update_sps_points)
 
     def will_unmount(self):
+        self.task_running = False
+        plt.close('all')
         if self.task:
             self.task.cancel()
+            

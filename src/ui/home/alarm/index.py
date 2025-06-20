@@ -1,4 +1,5 @@
 import asyncio
+import logging
 import flet as ft
 import pandas as pd
 import random
@@ -19,6 +20,8 @@ class AlarmList(ft.Container):
         self.expand = True
         self.padding = 10
         self.table = None
+
+        self.task_running = False
 
     def build(self):
         self.search = DatetimeSearch(self.__on_search)
@@ -110,15 +113,25 @@ class AlarmList(ft.Container):
     def __on_search(self, start_date: str, end_date: str):
         self.table.search(start_date=start_date, end_date=end_date)
 
-    def did_mount(self):
-        self.__task = self.page.run_task(self.__loop)
-
-    async def __loop(self):
-        while True:
-            if self.table:
-                self.table.search()
-            await asyncio.sleep(5)
+    async def __loop(self, table : AlarmTable):
+        while self.task_running:
+            try:
+                selected_rows = [item for item in table.data_table.rows if item.selected]
+                # 只有当没有选中复选框的时候
+                if len(selected_rows) == 0:
+                    # 才去更新表格
+                    if self.table and self.table.page:
+                        self.table.search()
+            except:
+                logging.exception("exception occured at AlarmList")
+            finally:
+                await asyncio.sleep(5)
     
+    def did_mount(self):
+        self.task_running = True
+        self.__task = self.page.run_task(self.__loop, self.table)
+
     def will_unmount(self):
+        self.task_running = False
         if self.__task:
             self.__task.cancel()

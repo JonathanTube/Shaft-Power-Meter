@@ -11,6 +11,7 @@ from ui.home.dashboard.chart.single_power_line import SinglePowerLine
 class DualShaPoLiOn(ft.Container):
     def __init__(self):
         super().__init__()
+        self.task_running = True
 
     def build(self):
         w = self.page.window.width * 0.5
@@ -31,18 +32,21 @@ class DualShaPoLiOn(ft.Container):
     async def load_data(self):
         preference: Preference = Preference.get()
         interval = preference.data_refresh_interval
-        while True:
+        while self.task_running:
             try:
                 self.instant_grid.reload()
                 self.eexi_limited_power.reload()
                 self.power_chart.reload()
-            except Exception as e:
-                logging.exception(e)
-            await asyncio.sleep(interval)
+            except:
+                logging.exception("exception occured at DualShaPoLiOn.load_data")
+            finally:
+                await asyncio.sleep(interval)
 
     def did_mount(self):
+        self.task_running = True
         self.task = self.page.run_task(self.load_data)
 
     def will_unmount(self):
+        self.task_running = False
         if self.task:
             self.task.cancel()

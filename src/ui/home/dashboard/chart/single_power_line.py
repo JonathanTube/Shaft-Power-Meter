@@ -93,11 +93,15 @@ class SinglePowerLine(ft.Container):
         )
 
     def reload(self):
-        self.__handle_bottom_axis()
-        self.__handle_data_line()
-        self.threshold_filled.data_points = self.get_threshold_data()
-        self.threshold_line.data_points = self.get_threshold_data()
-        self.chart.update()
+        try:
+            if self.page:
+                self.__handle_bottom_axis()
+                self.__handle_data_line()
+                self.threshold_filled.data_points = self.get_threshold_data()
+                self.threshold_line.data_points = self.get_threshold_data()
+                self.chart.update()
+        except:
+            logging.exception('exception occured at SinglePowerLine.reload')
 
     def __handle_bottom_axis(self):
         labels = []

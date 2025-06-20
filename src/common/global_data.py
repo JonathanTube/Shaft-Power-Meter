@@ -10,7 +10,9 @@ from db.models.zero_cal_info import ZeroCalInfo
 
 class GlobalData:
     def __init__(self):
-        self.default_table_width = 1010
+        self.auto_testing = False
+
+        self.default_table_width = 1002
         self.utc_date_time: datetime = None
         self.system_date_time: datetime = None
 

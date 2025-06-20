@@ -263,6 +263,30 @@ class DataInit:
                     "chinese": "删除",
                     "english": "Delete"
                 },
+
+                {
+                    "code": "lang.button.start_test_mode",
+                    "chinese": "开始测试模式",
+                    "english": "Start Test Mode"
+                },
+                {
+                    "code": "lang.button.stop_test_mode",
+                    "chinese": "停止测试模式",
+                    "english": "Stop Test Mode"
+                },
+
+                {
+                    "code": "lang.button.start_fatigue_testing",
+                    "chinese": "开始疲劳测试",
+                    "english": "Start Fatigue Testing"
+                },
+
+                {
+                    "code": "lang.button.stop_fatigue_testing",
+                    "chinese": "停止疲劳测试",
+                    "english": "Stop Fatigue Testing"
+                },
+
                 {
                     "code": "lang.common.app_name",
                     "chinese": "轴功率仪",

@@ -48,7 +48,8 @@ class SingleInstantGrid(ft.Container):
         )
 
     def reload(self):
-        self.power_card.reload()
-        self.thrust_card.reload()
-        self.torque_card.reload()
-        self.speed_card.reload()
+        if self.page:
+            self.power_card.reload()
+            self.thrust_card.reload()
+            self.torque_card.reload()
+            self.speed_card.reload()

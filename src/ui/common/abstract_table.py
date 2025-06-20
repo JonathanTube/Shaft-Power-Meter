@@ -1,4 +1,5 @@
 from abc import abstractmethod
+import logging
 import flet as ft
 from ui.common.pagination import Pagination
 
@@ -90,25 +91,38 @@ class AbstractTable(ft.Container):
         for items in data:
             rows.append(ft.DataRow(cells=self.__create_cells(items), selected=False,
                         on_select_changed=lambda e: self.__on_select_changed(e)))
-        self.data_table.rows = rows
-        self.data_table.update()
+        if self.data_table and self.data_table.page:
+            self.data_table.rows = rows
+            self.data_table.update()
 
     def __on_select_changed(self, e):
         e.control.selected = not e.control.selected
         e.control.update()
 
     def did_mount(self):
-        self.__create_table_columns()
-        self.__create_table_rows()
-        total = self.load_total()
-        self.data_table.update()
-        self.pg.update_pagination(total)
+        if self.page is None:
+            logging.error('abstract table has not been added to page.')
+            return
+        try :
+            self.__create_table_columns()
+            self.__create_table_rows()
+            total = self.load_total()
+            if self.data_table and self.data_table.page:
+                self.data_table.update()
+            if self.pg and self.pg.page:
+                self.pg.update_pagination(total)
+        except:
+            logging.exception('data_table has not been added to page')
 
     def search(self, **kwargs):
-        self.kwargs = kwargs
-        self.__create_table_rows()
-        total = self.load_total()
-        self.pg.update_pagination(total)
+        try:
+            self.kwargs = kwargs
+            self.__create_table_rows()
+            total = self.load_total()
+            if self.page and self.pg.page:
+                self.pg.update_pagination(total)
+        except:
+            logging.exception('exception occured at abstract_table.search')
 
     @abstractmethod
     def load_data(self):
