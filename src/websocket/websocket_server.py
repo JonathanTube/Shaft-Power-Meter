@@ -106,23 +106,3 @@ class WebSocketServer:
 
 
 ws_server = WebSocketServer()
-# # 服务端消息处理器
-# def server_message_handler(data):
-#     print(f"服务端处理消息: {data}")
-
-#     # 主动向客户端发送响应
-#     return "已处理"
-
-
-# async def main_server():
-#     server = WebSocketServer(port=8765)
-#     server.set_message_handler(server_message_handler)
-#     await server.start()
-
-#     # 服务端主动广播消息（每5秒一次）
-#     while True:
-#         await server.broadcast('hello world 22222')
-#         await asyncio.sleep(5)
-
-# # 启动服务端
-# asyncio.run(main_server())

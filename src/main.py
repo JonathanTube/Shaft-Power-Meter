@@ -110,7 +110,7 @@ async def main(page: ft.Page):
 
         main_content = ft.Container(expand=True, content=ControlManager.home, padding=0)
 
-        header = Header(main_content)
+        header:Header = Header(main_content)
         ControlManager.app_bar = header
         page.appbar = header
 

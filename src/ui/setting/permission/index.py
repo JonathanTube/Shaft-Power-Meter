@@ -21,6 +21,9 @@ class Permission(ft.Container):
         self.op_user = None
         self.last_op_utc_date_time = gdata.utc_date_time
         self.on_click = self.__on_click
+        
+        self.task = None
+        self.task_running = False
 
     def __on_click(self, e):
         self.last_op_utc_date_time = gdata.utc_date_time
@@ -139,12 +142,8 @@ class Permission(ft.Container):
         self.permission_table.search(role=e.control.value)
         self.permission_table.update()
 
-    def did_mount(self):
-        self.page.open(self.permission_check)
-        self.task = self.page.run_task(self.__auto_lock)
-
     async def __auto_lock(self):
-        while True:
+        while self.task_running:
             if self.visible:
                 try:
                     time_diff = gdata.utc_date_time - self.last_op_utc_date_time
@@ -157,6 +156,13 @@ class Permission(ft.Container):
                     logging.exception(e)
             await asyncio.sleep(1)
 
+    def did_mount(self):
+        self.task_running = True
+        if not gdata.auto_testing:
+            self.page.open(self.permission_check)
+        self.task = self.page.run_task(self.__auto_lock)
+
     def will_unmount(self):
+        self.task_running = False
         if self.task is not None:
             self.task.cancel()

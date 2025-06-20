@@ -29,6 +29,9 @@ class IntervalCounter(ft.Container):
         self.system_unit = preference.system_unit
         self.interval = preference.data_refresh_interval
 
+        self.task = None
+        self.task_running = False
+
     def build(self):
         self.display = CounterDisplay()
 
@@ -105,19 +108,22 @@ class IntervalCounter(ft.Container):
         Toast.show_success(e.page, self.page.session.get('lang.counter.interval_has_been_changed'))
 
     def did_mount(self):
+        self.task_running = True
         self.task = self.page.run_task(self.__running)
 
     def will_unmount(self):
+        self.task_running = False
         if self.task:
             self.task.cancel()
 
     async def __running(self):
-        while True:
+        while self.task_running:
             try:
                 self.__calculate()
-            except Exception as e:
-                logging.exception(e)
-            await asyncio.sleep(self.interval)
+            except:
+                logging.exception("exception occured at IntervalCounter.__running")
+            finally:
+                await asyncio.sleep(self.interval)
 
     def __calculate(self):
         param_end_time = gdata.utc_date_time

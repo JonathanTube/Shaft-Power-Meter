@@ -7,11 +7,14 @@ from common.global_data import gdata
 
 
 class UtcTimer:
+    def __init__(self) -> None:
+        self.task_running = True
+
     async def start(self):
         date_time_conf: DateTimeConf = DateTimeConf.get()
         gdata.utc_date_time = date_time_conf.utc_date_time
 
-        while True:
+        while self.task_running:
             try:
                 # add 1 second
                 gdata.utc_date_time = gdata.utc_date_time + timedelta(seconds=1)

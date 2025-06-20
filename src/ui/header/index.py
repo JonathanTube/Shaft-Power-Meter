@@ -1,5 +1,6 @@
 import asyncio
 import logging
+from random import random
 import flet as ft
 from common.global_data import gdata
 from common.control_manager import ControlManager
@@ -24,6 +25,7 @@ from websocket.websocket_server import ws_server
 from utils.plc_util import plc_util
 from task.gps_sync_task import gps_sync_task
 
+
 class Header(ft.AppBar):
     def __init__(self, main_content: ft.Container):
         super().__init__()
@@ -37,6 +39,12 @@ class Header(ft.AppBar):
 
         self.active_name = "HOME"
         self.main_content = main_content
+
+        self.task = None
+        self.task_running = False
+
+        self._auto_run_task = None
+        self._auto_run_running = False
 
     def build(self):
         self.system_settings = SystemSettings.get()
@@ -76,6 +84,8 @@ class Header(ft.AppBar):
             on_click=lambda e: self.__close_app(e)
         )
 
+        self.theme = Theme()
+
         self.actions = [
             self.utc_date_time,
             ft.Container(
@@ -84,7 +94,7 @@ class Header(ft.AppBar):
             ),
             self.shapoli,
             ft.VerticalDivider(width=.5, thickness=.5),
-            Theme(),
+            self.theme,
             ft.VerticalDivider(width=.5, thickness=.5),
             self.close_button
         ]
@@ -167,7 +177,7 @@ class Header(ft.AppBar):
     async def sync_utc_date_time(self):
         datetime_conf: DateTimeConf = DateTimeConf.get()
         date_format = datetime_conf.date_format
-        while True:
+        while self.task_running:
             try:
                 if gdata.utc_date_time:
                     self.utc_date_time.value = gdata.utc_date_time.strftime(f"{date_format} %H:%M:%S")
@@ -177,8 +187,35 @@ class Header(ft.AppBar):
             await asyncio.sleep(1)
 
     def did_mount(self):
+        self.task_running = True
         self.task = self.page.run_task(self.sync_utc_date_time)
 
+        # 因为是60s多的切换时间，所以有足够时间，切换到testmode下，关闭或者打开自动化测试，所以这里一直开着
+        self._auto_run_running = True
+        self._auto_run_task = self.page.run_task(self.test_auto_run)
+
     def will_unmount(self):
+        self.task_running = False
         if self.task:
             self.task.cancel()
+
+        self._auto_run_running = False
+        if self._auto_run_task:
+            self._auto_run_task.cancel()
+
+    async def test_auto_run(self):
+        arr = ['HOME', 'REPORT', 'SETTING']
+        idx = 0
+        while self._auto_run_running:
+            if gdata.auto_testing:
+                self.on_click(arr[idx % 3])
+                self.theme.toggle_theme()
+                idx += 1
+                # report没东西，2s够了
+                if self.active_name == 'REPORT':
+                    await asyncio.sleep(2)
+                else:
+                    await asyncio.sleep(random() * 20)
+            else:
+                # 如果没有启动测试，自动间隔5s
+                await asyncio.sleep(5)

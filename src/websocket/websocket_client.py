@@ -143,21 +143,3 @@ class WebSocketClient:
 
 
 ws_client = WebSocketClient()
-# # 客户端消息处理器
-# def client_message_handler(data):
-#     print(f"客户端处理消息: {data}")
-
-# async def main_client():
-#     client = WebSocketClient("ws://localhost:8765")
-#     client.set_message_handler(client_message_handler)
-#     await client.connect()
-
-#     # 客户端主动发送消息（每3秒一次）
-#     counter = 0
-#     while True:
-#         await client.send('hello world')
-#         counter += 1
-#         await asyncio.sleep(3)
-
-# # 启动客户端
-# asyncio.run(main_client())

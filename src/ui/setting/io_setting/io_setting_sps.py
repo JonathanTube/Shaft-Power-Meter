@@ -32,6 +32,9 @@ class IOSettingSPS(CustomCard):
 
         self.loop_task = None
 
+        self.task = None
+        self.task_running = False
+
     def build(self):
         self.connect_to_sps = ft.Checkbox(
             label=self.page.session.get("lang.setting.connect_to_sps"),
@@ -506,11 +509,8 @@ class IOSettingSPS(CustomCard):
         self.start_hmi_server.update()
         self.stop_hmi_server.update()
 
-    def did_mount(self):
-        self.loop_task = self.page.run_task(self.__handle_connection_status)
-
     async def __handle_connection_status(self):
-        while True:
+        while self.task_running:
             try:
                 if not self.sps1_connect.disabled:
                     self.__handle_sps1_connection()
@@ -523,6 +523,11 @@ class IOSettingSPS(CustomCard):
                 logging.exception(e)
             await asyncio.sleep(1)
 
+    def did_mount(self):
+        self.task_running = True
+        self.loop_task = self.page.run_task(self.__handle_connection_status)
+
     def will_unmount(self):
+        self.task_running = False
         if self.loop_task:
             self.loop_task.cancel()

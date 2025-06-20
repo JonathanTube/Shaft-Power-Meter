@@ -21,6 +21,9 @@ class IOSettingPLC(CustomCard):
         super().__init__()
         self.conf = conf
 
+        self.task = None
+        self.task_running = False
+
     def build(self):
         self.plc_enabled = ft.Checkbox(
             label=self.page.session.get("lang.setting.plc_enabled"), 
@@ -407,21 +410,24 @@ class IOSettingPLC(CustomCard):
         self.fetch_data_from_plc.update()
 
     def did_mount(self):
+        self.task_running = True
         self.loop_task = self.page.run_task(self.__handle_connection_status)
 
     def will_unmount(self):
+        self.task_running = False
         if self.loop_task:
             self.loop_task.cancel()
     
     async def __handle_connection_status(self):
-        while True:
-            await asyncio.sleep(1)
-
+        while self.task_running:
             try:
                 if not self.plc_enabled.value:
                     continue
 
                 if not self.connect_to_plc.disabled:
                     self.__handle_plc_connection_status()
+
             except Exception as e:
-                logging.exception(e)
+                logging.exception('exception occured at IOSettingPLC.__handle_connection_status')
+            finally:
+                await asyncio.sleep(1)

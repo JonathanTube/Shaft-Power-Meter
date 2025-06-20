@@ -1,6 +1,7 @@
+import asyncio
 import logging
 import flet as ft
-from common.control_manager import ControlManager
+from random import random
 from ui.setting.general.index import General
 from ui.setting.propeller_conf.index import PropellerConf
 from ui.setting.self_test import SelfTest
@@ -10,7 +11,7 @@ from ui.setting.zero_cal.index import ZeroCal
 from ui.setting.permission.index import Permission
 from ui.setting.io_setting.index import IOSetting
 from ui.common.keyboard import keyboard
-
+from common.global_data import gdata
 
 class Setting(ft.Container):
     def __init__(self):
@@ -18,10 +19,17 @@ class Setting(ft.Container):
         self.margin = ft.margin.all(10)
         self.idx = 0
 
-    def __set_content(self, e):
-        try:
-            idx = e.control.selected_index
+        self.task = None
+        self.task_running = False
 
+    def __set_content(self, e):
+        idx = e.control.selected_index
+        self.__switch_content(idx)
+        if idx == 7:
+            self.task_running = False
+
+    def __switch_content(self, idx:int):
+        try:
             if idx == self.idx:
                 return
 
@@ -49,6 +57,7 @@ class Setting(ft.Container):
             self.right_content.update()
         except Exception:
             logging.exception("error occured while switch the button, please try it lately.")
+
 
     def build(self):
         self.right_content = ft.Container(
@@ -122,5 +131,21 @@ class Setting(ft.Container):
             expand=True
         )
 
+    def did_mount(self):
+        self.task_running = True
+        self.task = self.page.run_task(self.test_auto_run)
+    
     def will_unmount(self):
-        ControlManager.zero_cal = None
+        self.task_running = False
+        if self.task:
+            self.task.cancel()
+
+    async def test_auto_run(self):
+        while self.task_running and gdata.auto_testing:
+            idx = int(random() * 10) % len(self.rail.destinations)
+            logging.info(f'&&&&&&&&&&&&&&-Setting.test_auto_run, idx = {idx}')
+            self.__switch_content(idx=idx)
+            self.rail.selected_index = idx
+            self.rail.update()
+            await asyncio.sleep(random())
+        self.task_running = False

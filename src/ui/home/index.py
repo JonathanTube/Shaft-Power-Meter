@@ -170,3 +170,4 @@ class Home(ft.Container):
         while self.task_running and gdata.auto_testing:
             self.__on_click(int(random() * 10) % 7)
             await asyncio.sleep(random())
+        self.task_running = False

@@ -28,6 +28,9 @@ class TotalCounter(ft.Container):
         self.standard_date_time_format = '%Y-%m-%d %H:%M:%S'
         self.date_format = datetime_conf.date_format
 
+        self.task = None
+        self.task_running = False
+
     def build(self):
         self.display = CounterDisplay()
         self.time_elapsed = ft.Text("")
@@ -63,14 +66,16 @@ class TotalCounter(ft.Container):
         self.txt_started_at = self.page.session.get("lang.counter.started_at")
 
     def did_mount(self):
+        self.task_running = True
         self.task = self.page.run_task(self.__running)
 
     def will_unmount(self):
+        self.task_running = False
         if self.task:
             self.task.cancel()
 
     async def __running(self):
-        while True:
+        while self.task_running:
             try:
                 self.__calculate()
             except Exception as e:

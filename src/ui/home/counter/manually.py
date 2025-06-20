@@ -15,6 +15,9 @@ class ManuallyCounter(ft.Container):
         self.expand = True
         self.name = name
 
+        self.task = None
+        self.task_running = False
+
         self.height = 280
 
         self.border_radius = ft.border_radius.all(10)
@@ -149,19 +152,22 @@ class ManuallyCounter(ft.Container):
         )
 
     def did_mount(self):
+        self.task_running = True
         self._task = self.page.run_task(self.__running)
 
     def will_unmount(self):
+        self.task_running = False
         if self._task:
             self._task.cancel()
 
     async def __running(self):
-        while True:
+        while self.task_running:
             try:
                 self.__calculate()
-            except Exception as e:
-                logging.exception(e)
-            await asyncio.sleep(self.interval)
+            except:
+                logging.exception("exception occured at ManuallyCounter.__running")
+            finally:
+                await asyncio.sleep(self.interval)
 
     def __calculate(self):
         average_power = 0

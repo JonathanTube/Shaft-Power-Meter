@@ -17,11 +17,11 @@ class Theme(ft.Container):
 
     def build(self):
         self.content = ft.Row([
-            ft.IconButton(icon=ft.Icons.LIGHT_MODE, on_click=self.toggle_theme),
+            ft.IconButton(icon=ft.Icons.LIGHT_MODE, on_click=lambda e: self.toggle_theme()),
             ft.IconButton(icon=ft.icons.SETTINGS_BRIGHTNESS, on_click=self.show_dlg)
         ])
 
-    def toggle_theme(self, e):
+    def toggle_theme(self):
         if self.page.theme_mode == ft.ThemeMode.LIGHT:
             self.page.theme_mode = ft.ThemeMode.DARK
             self.icon = ft.Icons.DARK_MODE

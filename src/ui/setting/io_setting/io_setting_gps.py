@@ -19,6 +19,9 @@ class IOSettingGPS(CustomCard):
         self.conf = conf
         self.loop_task = None
 
+        self.task = None
+        self.task_running = False
+
     def build(self):
         self.gps_ip = ft.TextField(
             label=self.page.session.get("lang.setting.ip"),
@@ -116,11 +119,8 @@ class IOSettingGPS(CustomCard):
             self.disconnect_from_gps.visible = gdata.connected_to_gps
             self.disconnect_from_gps.update()
 
-    def did_mount(self):
-        self.loop_task = self.page.run_task(self.__handle_connection_status)
-
     async def __handle_connection_status(self):
-        while True:
+        while self.task_running:
             await asyncio.sleep(2)
             try:
                 if not self.connect_to_gps.disabled:
@@ -128,6 +128,11 @@ class IOSettingGPS(CustomCard):
             except Exception as e:
                 logging.exception(e)
 
+    def did_mount(self):
+        self.task_running = True
+        self.loop_task = self.page.run_task(self.__handle_connection_status)
+
     def will_unmount(self):
+        self.task_running = False
         if self.loop_task:
             self.loop_task.cancel()

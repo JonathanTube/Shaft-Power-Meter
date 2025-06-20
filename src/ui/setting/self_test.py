@@ -18,6 +18,8 @@ class SelfTest(ft.Tabs):
         self.hmi_server_task = None
         self.gps_task = None
 
+        self.task_running = False
+
     def build(self):
         self.plc_log = ft.ListView(
             padding=10, auto_scroll=True, height=500, spacing=5, expand=True)
@@ -43,6 +45,8 @@ class SelfTest(ft.Tabs):
         ]
 
     def did_mount(self):
+        self.task_running = True
+
         if self.conf.plc_enabled:
             self.plc_task = self.page.run_task(self.__read_plc_data)
 
@@ -56,6 +60,8 @@ class SelfTest(ft.Tabs):
         self.gps_task = self.page.run_task(self.__read_gps_data)
 
     def will_unmount(self):
+        self.task_running = False
+
         if self.conf.plc_enabled and self.plc_task:
             self.plc_task.cancel()
 
@@ -72,7 +78,7 @@ class SelfTest(ft.Tabs):
             self.gps_task.cancel()
 
     async def __read_plc_data(self):
-        while True:
+        while self.task_running:
             try:
                 if gdata.connected_to_plc:
                     plc_4_20_ma_data = await plc_util.read_4_20_ma_data()
@@ -89,7 +95,7 @@ class SelfTest(ft.Tabs):
             await asyncio.sleep(2)
 
     async def __read_sps1_data(self):
-        while True:
+        while self.task_running:
             try:
                 sps1_data = f'ad0={gdata.sps1_ad0}, ad1={gdata.sps1_ad1}, speed={gdata.sps1_speed}'
                 if gdata.sps1_offline:
@@ -102,7 +108,7 @@ class SelfTest(ft.Tabs):
             await asyncio.sleep(1)
 
     async def __read_sps2_data(self):
-        while True:
+        while self.task_running:
             try:
                 sps2_data = f'ad0={gdata.sps2_ad0}, ad1={gdata.sps2_ad1}, speed={gdata.sps2_speed}'
                 if gdata.sps2_offline:
@@ -115,7 +121,7 @@ class SelfTest(ft.Tabs):
             await asyncio.sleep(1)
 
     async def __read_hmi_server_data(self):
-        while True:
+        while self.task_running:
             try:
                 if gdata.connected_to_hmi_server:
                     sps1_data = f'sps1: torque={gdata.sps1_torque}, thrust={gdata.sps1_thrust}, speed={gdata.sps1_speed}'
@@ -132,7 +138,7 @@ class SelfTest(ft.Tabs):
 
 
     async def __read_gps_data(self):
-        while True:
+        while self.task_running:
             try:
                 if gdata.connected_to_gps:
                     self.gps_log.controls.append(ft.Text(f"GPS Data: {gdata.gps_raw_data}"))

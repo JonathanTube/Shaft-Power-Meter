@@ -15,6 +15,9 @@ class TestModeInstant(ft.ResponsiveRow):
         preference: Preference = Preference.get()
         self.system_unit = preference.system_unit
 
+        self.task = None
+        self.task_running = False
+
     def build(self):
         self.sps1_torque = self.__get_uniform_text("0")
         self.sps1_speed = self.__get_uniform_text("0")
@@ -71,7 +74,7 @@ class TestModeInstant(ft.ResponsiveRow):
         return ft.Text(value=f"{label}", weight=ft.FontWeight.BOLD, col={"sm": 12, "md": 6})
 
     async def __refresh_instant(self):
-        while True:
+        while self.task_running:
             try:
                 self.sps1_speed.value = f'{gdata.sps1_speed} rpm'
                 self.sps1_speed.update()
@@ -110,8 +113,10 @@ class TestModeInstant(ft.ResponsiveRow):
             await asyncio.sleep(1)
 
     def did_mount(self):
+        self.task_running = True
         self.task = self.page.run_task(self.__refresh_instant)
 
     def will_unmount(self):
+        self.task_running = False
         if self.task:
             self.task.cancel()
