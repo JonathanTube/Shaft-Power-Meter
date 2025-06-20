@@ -27,6 +27,14 @@ class PropellerConf(ft.Container):
         self.ps: PropellerSetting = PropellerSetting.get()
 
     def build(self):
+        if not self.system_settings.is_master:
+            self.content = ft.Text(value=self.page.session.get('lang.propeller_curve.disabled_under_slave_mode'), size=20)
+            return
+        
+        if not self.system_settings.display_propeller_curve:
+            self.content = ft.Text(self.page.session.get('lang.propeller_curve.propeller_curve_disabled'))
+            return
+
         self.mcr_operating_point_card = PropellerConfMcr(self.ps)
         self.normal_propeller_curve_card = PropellerConfNormalCurve(self.ps)
         self.torque_load_limit_curve_card = PropellerConfLimitCurve(self.ps)
@@ -48,31 +56,28 @@ class PropellerConf(ft.Container):
             on_click=lambda e: self.__reset_data(e)
         )
 
-        if self.system_settings.display_propeller_curve:
-            self.content = ft.Column(
-                scroll=ft.ScrollMode.ADAPTIVE,
-                controls=[
-                    ft.ResponsiveRow(
-                        controls=[
-                            self.mcr_operating_point_card,
-                            self.normal_propeller_curve_card,
-                            self.torque_load_limit_curve_card,
-                            self.light_propeller_curve_card,
-                            self.speed_limit_curve_card,
-                            self.overload_curve_card,
-                            ft.Row(
-                                alignment=ft.MainAxisAlignment.CENTER,
-                                controls=[
-                                    self.save_button,
-                                    self.reset_button
-                                ]
-                            )
-                        ]
-                    )
-                ]
-            )
-        else:
-            self.content = ft.Text(self.page.session.get('lang.propeller_curve.propeller_curve_disabled'))
+        self.content = ft.Column(
+            scroll=ft.ScrollMode.ADAPTIVE,
+            controls=[
+                ft.ResponsiveRow(
+                    controls=[
+                        self.mcr_operating_point_card,
+                        self.normal_propeller_curve_card,
+                        self.torque_load_limit_curve_card,
+                        self.light_propeller_curve_card,
+                        self.speed_limit_curve_card,
+                        self.overload_curve_card,
+                        ft.Row(
+                            alignment=ft.MainAxisAlignment.CENTER,
+                            controls=[
+                                self.save_button,
+                                self.reset_button
+                            ]
+                        )
+                    ]
+                )
+            ]
+        )
 
     def __on_save_button_click(self, e):
         self.page.open(PermissionCheck(self.__save_data, 2))

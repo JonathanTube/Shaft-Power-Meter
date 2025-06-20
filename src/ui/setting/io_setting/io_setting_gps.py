@@ -46,6 +46,9 @@ class IOSettingGPS(CustomCard):
             bgcolor=ft.Colors.GREEN,
             color=ft.Colors.WHITE,
             visible=not gdata.connected_to_gps,
+            style=ft.ButtonStyle(
+                shape=ft.RoundedRectangleBorder(radius=5)
+            ),
             on_click=lambda e: self.page.open(PermissionCheck(self.__on_connect, 2))
         )
 
@@ -54,6 +57,9 @@ class IOSettingGPS(CustomCard):
             bgcolor=ft.Colors.RED,
             color=ft.Colors.WHITE,
             visible=gdata.connected_to_gps,
+            style=ft.ButtonStyle(
+                shape=ft.RoundedRectangleBorder(radius=5)
+            ),
             on_click=lambda e: self.page.open(PermissionCheck(self.__on_disconnect, 2))
         )
 

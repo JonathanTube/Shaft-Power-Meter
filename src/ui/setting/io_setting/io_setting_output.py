@@ -30,6 +30,9 @@ class IOSettingOutput(CustomCard):
             bgcolor=ft.Colors.GREEN,
             color=ft.Colors.WHITE,
             visible=not gdata.modbus_server_started,
+            style=ft.ButtonStyle(
+                shape=ft.RoundedRectangleBorder(radius=5)
+            ),
             on_click=lambda e : self.__on_connect(e)
         )
 
@@ -38,6 +41,9 @@ class IOSettingOutput(CustomCard):
             bgcolor=ft.Colors.RED,
             color=ft.Colors.WHITE,
             visible=gdata.modbus_server_started,
+            style=ft.ButtonStyle(
+                shape=ft.RoundedRectangleBorder(radius=5)
+            ),
             on_click=lambda e: self.__on_disconnect(e)
         )
 

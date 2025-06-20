@@ -22,7 +22,7 @@ class Home(ft.Container):
         self.task_running = False
         self.task = None
 
-        self.system_settings = SystemSettings.get()
+        self.system_settings:SystemSettings = SystemSettings.get()
         self.current_index = 0
 
         self.default_button_style = ft.ButtonStyle(
@@ -63,7 +63,7 @@ class Home(ft.Container):
             icon=ft.Icons.STACKED_LINE_CHART_OUTLINED,
             icon_color=ft.Colors.INVERSE_SURFACE,
             style=self.default_button_style,
-            visible=gdata.display_propeller_curve,
+            visible=self.system_settings.is_master and self.system_settings.display_propeller_curve,
             on_click=lambda e: self.__on_click(3)
         )
         self.alarm_button = AlarmButton(on_click=lambda e: self.__on_click(4))

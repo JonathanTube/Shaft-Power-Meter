@@ -36,6 +36,9 @@ class IOSettingPLC(CustomCard):
             bgcolor=ft.Colors.GREEN,
             color=ft.Colors.WHITE,
             visible=self.conf.plc_enabled and not gdata.connected_to_plc,
+            style=ft.ButtonStyle(
+                shape=ft.RoundedRectangleBorder(radius=5)
+            ),
             on_click=lambda e: self.page.open(PermissionCheck(self.__on_connect, 2))
         )
 
@@ -44,6 +47,9 @@ class IOSettingPLC(CustomCard):
             bgcolor=ft.Colors.RED,
             color=ft.Colors.WHITE,
             visible=self.conf.plc_enabled and gdata.connected_to_plc,
+            style=ft.ButtonStyle(
+                shape=ft.RoundedRectangleBorder(radius=5)
+            ),
             on_click=lambda e: self.page.open(PermissionCheck(self.__on_disconnect, 2))
         )
 
@@ -52,6 +58,9 @@ class IOSettingPLC(CustomCard):
             bgcolor=ft.Colors.BLUE,
             color=ft.Colors.WHITE,
             visible=self.conf.plc_enabled and gdata.connected_to_plc,
+            style=ft.ButtonStyle(
+                shape=ft.RoundedRectangleBorder(radius=5)
+            ),
             on_click=lambda e: self.__on_fetch_data_from_plc()
         )
 
@@ -227,19 +236,20 @@ class IOSettingPLC(CustomCard):
         super().build()
 
     def __on_connect(self, user: User):
-        if not self.conf.plc_enabled:
-            Toast.show_warning(self.page, self.page.session.get('lang.setting.save_conf_before_operations'))
-            return
+        try:
+            ipaddress.ip_address(self.plc_ip.value)
+        except ValueError:
+            raise ValueError(f'{self.page.session.get("lang.common.ip_address_format_error")}: {self.plc_ip.value}')
+
+        self.conf.plc_ip = self.plc_ip.value
+        self.conf.plc_port = self.plc_port.value
+        self.conf.save()
         OperationLog.create(
             user_id=user.id,
             utc_date_time=gdata.utc_date_time,
             operation_type=OperationType.CONNECT_TO_PLC,
             operation_content=user.user_name
         )
-        self.conf.plc_ip = self.plc_ip.value
-        self.conf.plc_port = self.plc_port.value
-        self.conf.save()
-
         self.__start_plc_task()
 
     def __start_plc_task(self):
@@ -263,7 +273,7 @@ class IOSettingPLC(CustomCard):
 
     def __stop_plc_task(self):
         try:
-            plc_util.close()
+            self.page.run_task(plc_util.close)
             self.__handle_plc_connection_status()
         except Exception as e:
             logging.exception(e)
@@ -316,7 +326,7 @@ class IOSettingPLC(CustomCard):
         gdata.plc_enabled = self.plc_enabled.value
 
         if not self.conf.plc_enabled:
-            plc_util.close()
+            self.page.run_task(plc_util.close)
             AlarmSaver.recovery(alarm_type=AlarmType.PLC_DISCONNECTED)
             
         if self.conf.plc_enabled:

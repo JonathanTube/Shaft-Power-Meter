@@ -12,7 +12,7 @@ class GlobalData:
     def __init__(self):
         self.auto_testing = False
 
-        self.default_table_width = 1002
+        self.default_table_width = 990
         self.utc_date_time: datetime = None
         self.system_date_time: datetime = None
 
@@ -101,7 +101,6 @@ class GlobalData:
 
     def set_default_value(self):
         systemSettings: SystemSettings = SystemSettings.get()
-        self.display_propeller_curve = systemSettings.display_propeller_curve
 
         self.amount_of_propeller = systemSettings.amount_of_propeller
 

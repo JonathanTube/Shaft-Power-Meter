@@ -36,7 +36,7 @@ class PLCUtil:
                         return False
 
                     self._is_connecting = True
-                    self.close()
+                    await self.close()
                     # 重新创建客户端
                     io_conf:IOConf = IOConf.get()
                     self.ip = io_conf.plc_ip
@@ -283,11 +283,11 @@ class PLCUtil:
             "speed_range_min", "speed_range_max", "speed_range_offset"
         ]}
 
-    def close(self):
+    async def close(self):
         try:
             logging.info('[***PLC***] close plc connection')
             if self.plc_client and self.plc_client.connected:
-                self.plc_client.close()
+                await self.plc_client.close()
                 gdata.connected_to_plc = False
                 self.save_alarm()
         except Exception:

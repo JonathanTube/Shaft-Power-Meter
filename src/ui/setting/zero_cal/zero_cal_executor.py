@@ -2,7 +2,6 @@ import flet as ft
 from dateutil.relativedelta import relativedelta
 from common.operation_type import OperationType
 from db.models.date_time_conf import DateTimeConf
-from db.models.io_conf import IOConf
 from db.models.operation_log import OperationLog
 from db.models.user import User
 from db.models.zero_cal_info import ZeroCalInfo
@@ -17,8 +16,6 @@ class ZeroCalExecutor(ft.Container):
         super().__init__()
         self.name = name
         self.__load_data()
-        io_conf: IOConf = IOConf.get()
-        self.connect_to_sps = io_conf.connect_to_sps
 
     def __load_data(self):
         # 查询最近一次[接受]的调零记录
@@ -333,7 +330,7 @@ class ZeroCalExecutor(ft.Container):
         self.__create_instant_records()
 
         if self.latest_zero_cal is None:
-            self.start_button.visible = self.connect_to_sps
+            self.start_button.visible = True
             self.accept_button.visible = False
             self.abort_button.visible = False
             self.fetch_button.visible = False
@@ -345,7 +342,7 @@ class ZeroCalExecutor(ft.Container):
             self.fetch_button.visible = len(self.latest_zero_cal.records) < 8
 
         elif self.latest_zero_cal.state in (1, 2):  # 已接受 # 已废弃
-            self.start_button.visible = self.connect_to_sps
+            self.start_button.visible = True
             self.accept_button.visible = False
             self.abort_button.visible = False
             self.fetch_button.visible = False

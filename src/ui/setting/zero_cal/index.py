@@ -1,6 +1,5 @@
 import flet as ft
 
-from db.models.io_conf import IOConf
 from ui.setting.zero_cal.zero_cal_executor_sps1 import ZeroCalExecutorSPS1
 from ui.setting.zero_cal.zero_cal_executor_sps2 import ZeroCalExecutorSPS2
 from ui.setting.zero_cal.zero_cal_his import ZeroCalHis
@@ -12,9 +11,7 @@ class ZeroCal(ft.Container):
         super().__init__()
         self.expand = True
         self.alignment=ft.alignment.center
-        system_settings: SystemSettings = SystemSettings.get()
-        self.amount_of_propeller = system_settings.amount_of_propeller
-        self.io_conf: IOConf = IOConf.get()
+        self.system_settings: SystemSettings = SystemSettings.get()
 
     def __on_change(self, e):
         data = int(e.data)
@@ -22,6 +19,11 @@ class ZeroCal(ft.Container):
             self.his.table.search()
 
     def build(self):
+        if not self.system_settings.is_master:
+            self.content = ft.Text(value=self.page.session.get('lang.setting.zero_cal.disabled'), size=20)
+            return
+
+
         self.executor_sps1 = ft.Tab(
             text=f'{self.page.session.get("lang.zero_cal.executor")} SPS1',
             content=ft.Container(
@@ -47,16 +49,14 @@ class ZeroCal(ft.Container):
             ),
             self.executor_sps1
         ]
-        if self.amount_of_propeller > 1:
+
+        if self.system_settings.amount_of_propeller > 1:
             tabs.append(self.executor_sps2)
 
-        if self.io_conf.connect_to_sps:
-            self.content = ft.Tabs(
-                selected_index=0,
-                animation_duration=300,
-                on_change=lambda e: self.__on_change(e),
-                tabs=tabs,
-                expand=True
-            )
-        else:
-            self.content = ft.Text(value=self.page.session.get('lang.setting.zero_cal.disabled'))
+        self.content = ft.Tabs(
+            selected_index=0,
+            animation_duration=300,
+            on_change=lambda e: self.__on_change(e),
+            tabs=tabs,
+            expand=True
+        )

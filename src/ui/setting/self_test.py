@@ -37,9 +37,9 @@ class SelfTest(ft.Tabs):
             padding=10, auto_scroll=True, height=500, spacing=5, expand=True)
         
         self.tabs = [
-            ft.Tab(text="SPS-1", content=self.sps1_log, visible=self.conf.connect_to_sps),
-            ft.Tab(text="SPS-2", content=self.sps2_log, visible=self.conf.connect_to_sps and self.system_settings.amount_of_propeller == 2),
-            ft.Tab(text="HMI Server", content=self.hmi_server_log, visible=not self.conf.connect_to_sps),
+            ft.Tab(text="SPS-1", content=self.sps1_log, visible=self.system_settings.is_master),
+            ft.Tab(text="SPS-2", content=self.sps2_log, visible=self.system_settings.is_master and self.system_settings.amount_of_propeller == 2),
+            ft.Tab(text="HMI Server", content=self.hmi_server_log, visible=not self.system_settings.is_master),
             ft.Tab(text="GPS", content=self.gps_log),
             ft.Tab(text="PLC", content=self.plc_log, visible=self.conf.plc_enabled)
         ]
@@ -50,7 +50,7 @@ class SelfTest(ft.Tabs):
         if self.conf.plc_enabled:
             self.plc_task = self.page.run_task(self.__read_plc_data)
 
-        if self.conf.connect_to_sps:
+        if self.system_settings.is_master:
             self.sps1_task = self.page.run_task(self.__read_sps1_data)
             if gdata.amount_of_propeller == 2:
                 self.sps2_task = self.page.run_task(self.__read_sps2_data)
@@ -65,7 +65,7 @@ class SelfTest(ft.Tabs):
         if self.conf.plc_enabled and self.plc_task:
             self.plc_task.cancel()
 
-        if self.conf.connect_to_sps:
+        if self.system_settings.is_master:
             if self.sps1_task:
                 self.sps1_task.cancel()
 

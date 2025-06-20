@@ -13,8 +13,6 @@ class IOConf(BaseModel):
     gps_ip = CharField(verbose_name="GPS IP address", default="")
     gps_port = IntegerField(verbose_name="GPS port", default=0)
 
-    connect_to_sps = BooleanField(verbose_name="connect to sps or get sps data from another HMI server", default=False)
-
     hmi_server_ip = CharField(verbose_name="HMI server IP address", default="127.0.0.1")
     hmi_server_port = IntegerField(verbose_name="HMI server port", default=8000)
 

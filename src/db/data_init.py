@@ -153,7 +153,6 @@ class DataInit:
                 sps1_port=6800,
                 sps2_ip='192.168.1.6',
                 sps2_port=6800,
-                connect_to_sps=False,
                 hmi_server_ip='192.168.1.150',
                 hmi_server_port=8000
             )
@@ -601,7 +600,7 @@ class DataInit:
                 {
                     "code": "lang.setting.zero_cal.disabled",
                     "chinese": "此HMI运行在从机模式，无需配置调零。",
-                    "english": "This HMI is running as a slaver mode without zero cal."
+                    "english": "This HMI is running as a slave mode without zero cal."
                 },
                 {
                     "code": "lang.setting.io_conf.title",
@@ -730,6 +729,24 @@ class DataInit:
                     "code": "lang.setting.setting",
                     "chinese": "设置",
                     "english": "Setting"
+                },
+
+                {
+                    "code": "lang.setting.running_mode",
+                    "chinese": "运行模式",
+                    "english": "Running Mode"
+                },
+
+                {
+                    "code": "lang.setting.master",
+                    "chinese": "主机",
+                    "english": "Master"
+                },
+
+                {
+                    "code": "lang.setting.slave",
+                    "chinese": "从机",
+                    "english": "Slave"
                 },
 
                 {
@@ -1126,12 +1143,6 @@ class DataInit:
                 },
 
                 {
-                    "code": "lang.setting.connect_to_sps",
-                    "chinese": "连接到SPS",
-                    "english": "Connect to SPS"
-                },
-
-                {
                     "code": "lang.setting.hmi_server_ip",
                     "chinese": "HMI 服务器IP",
                     "english": "HMI Server IP"
@@ -1156,9 +1167,9 @@ class DataInit:
                 },
 
                 {
-                    "code": "lang.setting.connect_to_hmi_server",
-                    "chinese": "连接到HMI服务器",
-                    "english": "Connect to HMI Server"
+                    "code": "lang.setting.connect_to_master",
+                    "chinese": "连接到主机",
+                    "english": "Connect to Master"
                 },
 
                 {
@@ -1216,15 +1227,15 @@ class DataInit:
                 },
 
                 {
-                    "code": "lang.setting.plc_enabled",
-                    "chinese": "启用PLC",
-                    "english": "PLC Enabled"
+                    "code": "lang.setting.interface_conf",
+                    "chinese": "接口配置",
+                    "english": "Interface Conf."
                 },
 
                 {
-                    "code": "lang.setting.save_conf_before_operations",
-                    "chinese": "请先保存配置后再操作。",
-                    "english": "Please save configuration before your operations."
+                    "code": "lang.setting.plc_enabled",
+                    "chinese": "启用PLC",
+                    "english": "PLC Enabled"
                 },
 
                 {
@@ -1395,7 +1406,13 @@ class DataInit:
                     "chinese": "不能搜索超过90天",
                     "english": "Cannot search more than 90 days"
                 },
-                
+
+                {
+                    "code": "lang.propeller_curve.disabled_under_slave_mode",
+                    "chinese": "此HMI运行在从机模式，无需配置螺旋桨曲线。",
+                    "english": "This HMI is running as a slave mode without propeller setting."
+                },
+
                 {
                     "code": "lang.propeller_curve.propeller_curve_disabled",
                     "chinese": "螺旋线曲线被禁用",
