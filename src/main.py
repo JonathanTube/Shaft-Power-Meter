@@ -18,6 +18,7 @@ from common.global_data import gdata
 from utils.auto_startup import add_to_startup
 from utils.logger import Logger
 from utils.modbus_output import modbus_output
+from db.base import db
 import logging
 
 Logger(show_sql=False)
@@ -25,8 +26,11 @@ Logger(show_sql=False)
 # 加入开机启动
 add_to_startup()
 
-TableInit.init()
-DataInit.init()
+
+is_db_empty = len(db.get_tables()) == 0
+if is_db_empty:
+    TableInit.init()
+    DataInit.init()
 
 gdata.set_default_value()
 
@@ -84,7 +88,7 @@ async def main(page: ft.Page):
         page.theme_mode = get_theme_mode(preference)
         page.window.resizable = False
         page.window.alignment = ft.alignment.center
-        page.window.frameless = True
+        # page.window.frameless = True
         page.window.always_on_top = False
         page.window.alignment = ft.alignment.center
         if page.window.width <= 1200:
@@ -129,8 +133,7 @@ async def main(page: ft.Page):
 
         page.update()
 
-        TaskManager().start_all()
-
+        TaskManager().start_all(is_db_empty)
     except:
         logging.exception('exception occured at main')
 

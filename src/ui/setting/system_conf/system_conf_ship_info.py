@@ -1,3 +1,4 @@
+import logging
 import flet as ft
 from ui.common.custom_card import CustomCard
 from db.models.ship_info import ShipInfo
@@ -45,14 +46,17 @@ class SystemConfShipInfo(CustomCard):
         super().build()
 
     def save(self, user_id: int):
-        self.ship_info.ship_type = self.ship_type.value
-        self.ship_info.ship_name = self.ship_name.value
-        self.ship_info.imo_number = self.imo_number.value
-        self.ship_info.ship_size = self.ship_size.value
-        self.ship_info.save()
-        OperationLog.create(
-            user_id=user_id,
-            utc_date_time=gdata.utc_date_time,
-            operation_type=OperationType.SYSTEM_CONF_SHIP_INFO,
-            operation_content=model_to_dict(self.ship_info)
-        )
+        try:
+            self.ship_info.ship_type = self.ship_type.value
+            self.ship_info.ship_name = self.ship_name.value
+            self.ship_info.imo_number = self.imo_number.value
+            self.ship_info.ship_size = self.ship_size.value
+            self.ship_info.save()
+            OperationLog.create(
+                user_id=user_id,
+                utc_date_time=gdata.utc_date_time,
+                operation_type=OperationType.SYSTEM_CONF_SHIP_INFO,
+                operation_content=model_to_dict(self.ship_info)
+            )
+        except:
+            logging.exception('exception occured at SystemConfShipInfo.save')

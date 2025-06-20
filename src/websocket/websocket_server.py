@@ -34,9 +34,9 @@ class WebSocketServer:
                         await self.send_to_client(websocket, response)
         except websockets.ConnectionClosed:
             logging.error(f"[***HMI server***] {websocket.remote_address} disconnected")
-            AlarmSaver.create(alarm_type=AlarmType.HMI_SERVER_CLOSED)
+            AlarmSaver.create(alarm_type=AlarmType.MASTER_SERVER_STOPPED)
         finally:
-            AlarmSaver.create(alarm_type=AlarmType.HMI_CLIENT_DISCONNECTED)
+            AlarmSaver.create(alarm_type=AlarmType.SLAVE_DISCONNECTED)
             self.clients.remove(websocket)
 
     async def start(self):
@@ -50,9 +50,9 @@ class WebSocketServer:
             self.server = await websockets.serve(self._client_handler, host, port)
             logging.info(f"[***HMI server***] websocket server started at ws://{host}:{port}")
             gdata.hmi_server_started = True
-            AlarmSaver.recovery(alarm_type=AlarmType.HMI_SERVER_CLOSED)
+            AlarmSaver.recovery(alarm_type=AlarmType.MASTER_SERVER_STOPPED)
         except Exception:
-            AlarmSaver.create(alarm_type=AlarmType.HMI_SERVER_CLOSED)
+            AlarmSaver.create(alarm_type=AlarmType.MASTER_SERVER_STOPPED)
             gdata.hmi_server_started = False
             return False
 
@@ -70,14 +70,14 @@ class WebSocketServer:
         """向所有客户端广播数据"""
         try:
             if not self.clients:
-                AlarmSaver.create(alarm_type=AlarmType.HMI_CLIENT_DISCONNECTED)
+                AlarmSaver.create(alarm_type=AlarmType.SLAVE_DISCONNECTED)
                 await asyncio.sleep(5)
                 return False
             packed_data = msgpack.packb(data)
             await asyncio.gather(
                 *[client.send(packed_data) for client in self.clients]
             )
-            AlarmSaver.recovery(alarm_type=AlarmType.HMI_CLIENT_DISCONNECTED)
+            AlarmSaver.recovery(alarm_type=AlarmType.SLAVE_DISCONNECTED)
             return True
         except websockets.ConnectionClosed:
             logging.error("[***HMI server***] broadcast to all clients failed: connection closed")
@@ -97,7 +97,7 @@ class WebSocketServer:
                 await self.server.wait_closed()
                 gdata.hmi_server_started = False
                 logging.info('[***HMI server***] websocket server has been closed')
-                AlarmSaver.create(alarm_type=AlarmType.HMI_SERVER_CLOSED)
+                AlarmSaver.create(alarm_type=AlarmType.MASTER_SERVER_STOPPED)
                 return True
         except Exception:
             logging.error('[***HMI server***] stop websocket server failed')

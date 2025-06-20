@@ -67,7 +67,7 @@ class DataInit:
             DateTimeConf.create(
                 utc_date_time=datetime.now(timezone.utc).strftime(standard_date_time_format),
                 system_date_time=datetime.now().strftime(standard_date_time_format),
-                sync_with_gps=False,
+                sync_with_gps=True,
                 date_format="%Y-%m-%d",
             )
 
@@ -1163,7 +1163,7 @@ class DataInit:
                 {
                     "code": "lang.setting.stop_hmi_server",
                     "chinese": "停止HMI服务器",
-                    "english": "Stop HMI Server"
+                    "english": "Stop Master Server"
                 },
 
                 {
@@ -1482,12 +1482,12 @@ class DataInit:
                 {
                     "code": "lang.alarm.hmi_server_closed",
                     "chinese": "HMI 服务端已停止",
-                    "english": "HMI Server Stopped"
+                    "english": "Master Server Stopped"
                 },
                 {
                     "code": "lang.alarm.hmi_client_disconnected",
-                    "chinese": "HMI 客户端已断开连接",
-                    "english": "HMI Client Disconnected"
+                    "chinese": "从机已断开连接",
+                    "english": "Slave-Master Disconnected"
                 },
                 {
                     "code": "lang.alarm.app_unexpected_exit",

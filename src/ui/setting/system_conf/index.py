@@ -12,6 +12,7 @@ from ui.setting.system_conf.system_conf_ship_info import SystemConfShipInfo
 class SystemConf(ft.Container):
     def __init__(self):
         super().__init__()
+        self.is_saving = False
 
     def build(self):
         self.system_conf_settings = SystemConfSettings()
@@ -40,7 +41,16 @@ class SystemConf(ft.Container):
         self.page.open(PermissionCheck(self.__save_data, 0))
 
     def __save_data(self, user: User):
+        if self.is_saving:
+            return
         try:
+            self.is_saving = True
+            self.save_button.disabled = True
+            self.save_button.update()
+
+            self.reset_button.disabled = True
+            self.reset_button.update()
+
             keyboard.close()
             self.system_conf_settings.save(user.id)
             self.system_conf_ship_info.save(user.id)
@@ -49,6 +59,13 @@ class SystemConf(ft.Container):
         except:
             logging.exception("system conf save data error")
             Toast.show_error(self.page)
+        finally:
+            self.is_saving = False
+            self.save_button.disabled = False
+            self.save_button.update()
+
+            self.reset_button.disabled = False
+            self.reset_button.update()
 
     def __reset_data(self, e):
         keyboard.close()

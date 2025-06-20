@@ -1,3 +1,4 @@
+import logging
 import flet as ft
 from common.const_alarm_type import AlarmType
 from db.models.operation_log import OperationLog
@@ -168,51 +169,54 @@ class SystemConfSettings(CustomCard):
             return (UnitConverter.w_to_shp(_eexi_limited_power), "sHp")
 
     def save(self, user_id: int):
-        self.system_settings.is_master = True if self.running_mode.value == 'master' else False
-        self.system_settings.amount_of_propeller = self.amount_of_propeller_radios.value
-        self.system_settings.display_thrust = self.display_thrust.value
-        self.system_settings.sha_po_li = self.sha_po_li.value
-        self.system_settings.display_propeller_curve = self.display_propeller_curve.value
-        self.system_settings.hide_admin_account = self.chk_hide_admin_account.value
+        try:
+            self.system_settings.is_master = True if self.running_mode.value == 'master' else False
+            self.system_settings.amount_of_propeller = self.amount_of_propeller_radios.value
+            self.system_settings.display_thrust = self.display_thrust.value
+            self.system_settings.sha_po_li = self.sha_po_li.value
+            self.system_settings.display_propeller_curve = self.display_propeller_curve.value
+            self.system_settings.hide_admin_account = self.chk_hide_admin_account.value
 
-        unit = self.preference.system_unit
-        if unit == 0:
-            self.system_settings.eexi_limited_power = float(self.eexi_limited_power.value) * 1000
-        else:
-            self.system_settings.eexi_limited_power = UnitConverter.shp_to_w(float(self.eexi_limited_power.value))
+            unit = self.preference.system_unit
+            if unit == 0:
+                self.system_settings.eexi_limited_power = float(self.eexi_limited_power.value) * 1000
+            else:
+                self.system_settings.eexi_limited_power = UnitConverter.shp_to_w(float(self.eexi_limited_power.value))
 
-        self.system_settings.eexi_breach_checking_duration = self.eexi_breach_checking_duration.value
+            self.system_settings.eexi_breach_checking_duration = self.eexi_breach_checking_duration.value
 
-        self.system_settings.save()
+            self.system_settings.save()
 
-        gdata.amount_of_propeller = self.system_settings.amount_of_propeller
-        
-        gdata.shapoli = self.system_settings.sha_po_li
+            gdata.amount_of_propeller = self.system_settings.amount_of_propeller
+            
+            gdata.shapoli = self.system_settings.sha_po_li
 
-        gdata.eexi_breach_checking_duration = int(self.system_settings.eexi_breach_checking_duration)
+            gdata.eexi_breach_checking_duration = int(self.system_settings.eexi_breach_checking_duration)
 
-        gdata.eexi_limited_power = float(self.system_settings.eexi_limited_power)
+            gdata.eexi_limited_power = float(self.system_settings.eexi_limited_power)
 
-        OperationLog.create(
-            user_id=user_id,
-            utc_date_time=gdata.utc_date_time,
-            operation_type=OperationType.SYSTEM_CONF_SETTING,
-            operation_content=model_to_dict(self.system_settings)
-        )
+            OperationLog.create(
+                user_id=user_id,
+                utc_date_time=gdata.utc_date_time,
+                operation_type=OperationType.SYSTEM_CONF_SETTING,
+                operation_content=model_to_dict(self.system_settings)
+            )
 
-        if self.system_settings.is_master:
-            # 关闭websocket客户端连接
-            self.page.run_task(ws_client.close)
-            AlarmSaver.recovery(alarm_type=AlarmType.HMI_CLIENT_DISCONNECTED)
-        else:
-            self.page.run_task(plc_util.close)
-            AlarmSaver.recovery(alarm_type=AlarmType.PLC_DISCONNECTED)
+            if self.system_settings.is_master:
+                # 关闭websocket客户端连接
+                self.page.run_task(ws_client.close)
+                AlarmSaver.recovery(alarm_type=AlarmType.SLAVE_DISCONNECTED)
+            else:
+                self.page.run_task(plc_util.close)
+                AlarmSaver.recovery(alarm_type=AlarmType.PLC_DISCONNECTED)
 
-            self.page.run_task(ws_server.stop)
-            AlarmSaver.recovery(alarm_type=AlarmType.HMI_SERVER_CLOSED)
+                self.page.run_task(ws_server.stop)
+                AlarmSaver.recovery(alarm_type=AlarmType.MASTER_SERVER_STOPPED)
 
-            self.page.run_task(sps1_read_task.async_disconnect)
-            AlarmSaver.recovery(alarm_type=AlarmType.SPS1_DISCONNECTED)
+                self.page.run_task(sps1_read_task.async_disconnect)
+                AlarmSaver.recovery(alarm_type=AlarmType.SPS1_DISCONNECTED)
 
-            self.page.run_task(sps2_read_task.async_disconnect)
-            AlarmSaver.recovery(alarm_type=AlarmType.SPS2_DISCONNECTED)
+                self.page.run_task(sps2_read_task.async_disconnect)
+                AlarmSaver.recovery(alarm_type=AlarmType.SPS2_DISCONNECTED)
+        except:
+            logging.exception('exception occured at SystemConfSettings.save')
