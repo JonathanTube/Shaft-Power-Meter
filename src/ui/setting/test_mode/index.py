@@ -57,7 +57,7 @@ class TestMode(ft.Container):
             title=ft.Text(s.get("lang.setting.test_mode.please_confirm")),
             content=None,
             actions=[
-                ft.TextButton(s.get("lang.button.confirm"), on_click=lambda e: self.stop_test_mode),
+                ft.TextButton(s.get("lang.button.confirm"), on_click=self.stop_test_mode),
                 ft.TextButton(s.get("lang.button.cancel"), on_click=lambda e: e.page.close(self.dlg_stop_modal))
             ]
         )

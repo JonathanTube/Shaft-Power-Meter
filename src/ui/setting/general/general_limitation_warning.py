@@ -39,10 +39,19 @@ class GeneralLimitationWarning(ft.Container):
                                           can_request_focus=False,
                                           on_click=lambda e: keyboard.open(e.control))
 
-        self.content = CustomCard(
+        self.custom_card = CustomCard(
             self.page.session.get("lang.setting.warning_limitations"),
             ft.Column(controls=[self.speed_warning, self.torque_warning, self.power_warning])
         )
+
+        self.content = self.custom_card
+
+    def before_update(self):
+        s = self.page.session
+        self.torque_warning.label = s.get("lang.common.torque")
+        self.speed_warning.label = s.get("lang.common.speed")
+        self.power_warning.label = s.get("lang.common.power")
+        self.custom_card.set_title(s.get("lang.setting.warning_limitations"))
 
     def update_unit(self, system_unit: int):
         self.system_unit = system_unit

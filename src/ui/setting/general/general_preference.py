@@ -61,7 +61,7 @@ class GeneralPreference(ft.Container):
             on_click=lambda e: keyboard.open(e.control, 'int')
         )
 
-        self.content = CustomCard(
+        self.custom_card = CustomCard(
             self.page.session.get("lang.setting.preference"),
             ft.ResponsiveRow(controls=[
                 ft.Row(controls=[self.theme_label, self.default_theme], col={"md": 6}),
@@ -71,6 +71,33 @@ class GeneralPreference(ft.Container):
                 self.data_refresh_interval
             ]),
             col={"xs": 12})
+        self.content = self.custom_card
+
+    def before_update(self):
+        s = self.page.session
+        # 更新主题设置部分
+        self.theme_label.value = s.get("lang.setting.theme")
+        self.theme_light.label = s.get("lang.setting.theme.light")
+        self.theme_dark.label = s.get("lang.setting.theme.dark")
+        
+        # 更新语言设置部分
+        self.language_label.value = s.get("lang.setting.language")
+        
+        # 更新单位设置部分
+        self.system_unit_label.value = s.get("lang.setting.unit")
+        self.system_unit_si.label = s.get("lang.setting.unit.si")
+        self.system_unit_metric.label = s.get("lang.setting.unit.metric")
+        
+        # 更新其他设置
+        self.fullscreen.label = s.get("lang.setting.fullscreen")
+        self.data_refresh_interval_label.value = s.get("lang.setting.data_refresh_interval")
+        
+        # 确保更新界面
+        self.custom_card.set_title(s.get("lang.setting.preference"))
+
+
+        
+
 
     def __handle_system_unit_change(self, e):
         self.on_system_unit_change(int(self.system_unit.value))
@@ -107,4 +134,3 @@ class GeneralPreference(ft.Container):
         theme = int(self.preference.theme)
         self.page.theme_mode = ft.ThemeMode.LIGHT if theme == 0 else ft.ThemeMode.DARK
         self.page.update()
-        self.page.appbar.update()

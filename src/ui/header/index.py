@@ -41,7 +41,8 @@ class Header(ft.AppBar):
         self._auto_run_running = False
 
     def build(self):
-        self.title = ft.Text(value=self.page.session.get("lang.common.app_name"), weight=ft.FontWeight.W_700, size=20)
+        self.app_name = ft.Text(value=self.page.session.get("lang.common.app_name"), weight=ft.FontWeight.W_700, size=20)
+        self.title = self.app_name
 
         self.utc_date_time = ft.TextButton(
             text="",
@@ -187,10 +188,14 @@ class Header(ft.AppBar):
             await asyncio.sleep(1)
 
     def before_update(self):
-        system_setting : SystemSettings = SystemSettings.get()
+        system_setting: SystemSettings = SystemSettings.get()
         self.report.visible = system_setting.sha_po_li
         self.shapoli.visible = system_setting.sha_po_li
-        
+        self.app_name.value = self.page.session.get("lang.common.app_name")
+        self.home.text = self.page.session.get("lang.header.home")
+        self.report.text = self.page.session.get("lang.header.report")
+        self.setting.text = self.page.session.get("lang.header.setting")
+
     def did_mount(self):
         self.task_running = True
         self.task = self.page.run_task(self.sync_utc_date_time)
@@ -224,4 +229,3 @@ class Header(ft.AppBar):
             else:
                 # 如果没有启动测试，自动间隔5s
                 await asyncio.sleep(5)
-    

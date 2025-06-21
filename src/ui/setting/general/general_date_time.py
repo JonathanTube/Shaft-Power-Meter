@@ -53,7 +53,7 @@ class GeneralDateTime(ft.Container):
 
         self.sync_with_gps = ft.Checkbox(label=s.get("lang.setting.sync_with_gps"), col={"md": 6}, value=self.date_time_conf.sync_with_gps)
 
-        self.content = CustomCard(
+        self.custom_card = CustomCard(
             s.get("lang.setting.utc_date_time_conf"),
             ft.ResponsiveRow(
                 controls=[
@@ -65,6 +65,15 @@ class GeneralDateTime(ft.Container):
             ),
             col={"xs": 12}
         )
+        self.content = self.custom_card
+
+    def before_update(self):
+        s = self.page.session
+        self.utc_date.label = s.get("lang.setting.date")
+        self.utc_time.label = s.get("lang.setting.time")
+        self.date_format.label = s.get("lang.setting.date_format")
+        self.sync_with_gps.label = s.get("lang.setting.sync_with_gps")
+        self.custom_card.set_title(s.get("lang.setting.utc_date_time_conf"))
 
     def __handle_date_change(self, e):
         utc_date = e.control.value.strftime('%Y-%m-%d')

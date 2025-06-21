@@ -131,12 +131,15 @@ class TrendViewDiagram(ft.Container):
         plt.rcParams['axes.unicode_minus'] = False  # 解决负号 '-' 显示为方块的问题
 
     def before_update(self):
+        # 清除当前图形缓存
+        plt.close('all')
+        # 重新应用样式
+        self.set_style()
         # 重建图表对象
         self.chart = self.create_chart()
         if self.chart:
-            # 清除当前图形缓存
-            plt.close('all')
-            # 重新应用样式
-            self.set_style()
             # 替换容器内容
             self.content = self.chart
+
+    def will_unmount(self):
+        plt.close('all')

@@ -13,6 +13,7 @@ from ui.setting.io_setting.index import IOSetting
 from ui.common.keyboard import keyboard
 from common.global_data import gdata
 
+
 class Setting(ft.Container):
     def __init__(self):
         super().__init__()
@@ -28,7 +29,7 @@ class Setting(ft.Container):
         if idx == 7:
             self.task_running = False
 
-    def __switch_content(self, idx:int):
+    def __switch_content(self, idx: int):
         try:
             if idx == self.idx:
                 return
@@ -53,60 +54,59 @@ class Setting(ft.Container):
                 self.right_content.content = Permission()
             elif idx == 7:
                 self.right_content.content = TestMode()
-            
+
             self.right_content.update()
         except Exception:
             logging.exception("error occured while switch the button, please try it lately.")
 
-
     def build(self):
         self.right_content = ft.Container(
             expand=True,
-            padding=ft.padding.only(left=10),
+            padding=ft.padding.only(left=10, bottom=10, top=10, right=10),
             alignment=ft.alignment.top_left,
             content=SystemConf()
         )
 
         s = self.page.session
         self.system_conf = ft.NavigationRailDestination(
-            icon=ft.Icons.SETTINGS_OUTLINED, 
-            selected_icon=ft.Icons.SETTINGS, 
+            icon=ft.Icons.SETTINGS_OUTLINED,
+            selected_icon=ft.Icons.SETTINGS,
             label=s.get("lang.setting.system_conf.title")
         )
         self.general = ft.NavigationRailDestination(
-            icon=ft.Icon(ft.Icons.TUNE_OUTLINED), 
-            selected_icon=ft.Icon(ft.Icons.TUNE), 
+            icon=ft.Icon(ft.Icons.TUNE_OUTLINED),
+            selected_icon=ft.Icon(ft.Icons.TUNE),
             label=s.get("lang.setting.general.title")
         )
         self.propeller_conf = ft.NavigationRailDestination(
-            icon=ft.Icons.INSIGHTS_OUTLINED, 
-            selected_icon=ft.Icon(ft.Icons.INSIGHTS), 
+            icon=ft.Icons.INSIGHTS_OUTLINED,
+            selected_icon=ft.Icon(ft.Icons.INSIGHTS),
             label=s.get("lang.setting.propeller_setting.title")
         )
 
         self.zero_cal = ft.NavigationRailDestination(
-            icon=ft.Icons.SWITCH_ACCESS_SHORTCUT_OUTLINED, 
-            selected_icon=ft.Icon(ft.Icons.SWITCH_ACCESS_SHORTCUT), 
+            icon=ft.Icons.SWITCH_ACCESS_SHORTCUT_OUTLINED,
+            selected_icon=ft.Icon(ft.Icons.SWITCH_ACCESS_SHORTCUT),
             label=s.get("lang.setting.zero_cal.title")
         )
         self.io_conf = ft.NavigationRailDestination(
-            icon=ft.Icons.USB_OUTLINED, 
-            selected_icon=ft.Icon(ft.Icons.USB), 
+            icon=ft.Icons.USB_OUTLINED,
+            selected_icon=ft.Icon(ft.Icons.USB),
             label=s.get("lang.setting.io_conf.title")
         )
         self.self_test = ft.NavigationRailDestination(
-            icon=ft.Icons.ASSIGNMENT_OUTLINED, 
-            selected_icon=ft.Icon(ft.Icons.ASSIGNMENT), 
+            icon=ft.Icons.ASSIGNMENT_OUTLINED,
+            selected_icon=ft.Icon(ft.Icons.ASSIGNMENT),
             label=s.get("lang.setting.self_test.title")
         )
         self.permission_conf = ft.NavigationRailDestination(
-            icon=ft.Icons.MANAGE_ACCOUNTS_OUTLINED, 
-            selected_icon=ft.Icon(ft.Icons.MANAGE_ACCOUNTS), 
+            icon=ft.Icons.MANAGE_ACCOUNTS_OUTLINED,
+            selected_icon=ft.Icon(ft.Icons.MANAGE_ACCOUNTS),
             label=s.get("lang.setting.permission_conf.title")
         )
         self.test_mode = ft.NavigationRailDestination(
-            icon=ft.Icons.OUTLINED_FLAG, 
-            selected_icon=ft.Icon(ft.Icons.FLAG), 
+            icon=ft.Icons.OUTLINED_FLAG,
+            selected_icon=ft.Icon(ft.Icons.FLAG),
             label=s.get("lang.setting.test_mode.title")
         )
 
@@ -131,10 +131,21 @@ class Setting(ft.Container):
             expand=True
         )
 
+    def before_update(self):
+        s = self.page.session
+        self.system_conf.label = s.get("lang.setting.system_conf.title")
+        self.general.label = s.get("lang.setting.general.title")
+        self.propeller_conf.label = s.get("lang.setting.propeller_setting.title")
+        self.zero_cal.label = s.get("lang.setting.zero_cal.title")
+        self.io_conf.label = s.get("lang.setting.io_conf.title")
+        self.self_test.label = s.get("lang.setting.self_test.title")
+        self.permission_conf.label = s.get("lang.setting.permission_conf.title")
+        self.test_mode.label = s.get("lang.setting.test_mode.title")
+
     def did_mount(self):
         self.task_running = True
         self.task = self.page.run_task(self.test_auto_run)
-    
+
     def will_unmount(self):
         self.task_running = False
         if self.task:

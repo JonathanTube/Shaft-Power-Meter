@@ -62,13 +62,13 @@ class PropellerCurveDiagram(ft.Container):
         self.sps2_text = None
 
     def before_update(self):
+        #  清除当前图形缓存
+        plt.close('all')
+        # 重新应用样式
+        self.set_style()
         # 重建图表对象
         self.chart = self.create_chart()
         if self.chart:
-            # 清除当前图形缓存
-            plt.close('all')
-            # 重新应用样式
-            self.set_style()
             # 替换容器内容
             self.content = self.chart
 

@@ -9,6 +9,7 @@ from common.operation_type import OperationType
 from common.global_data import gdata
 from playhouse.shortcuts import model_to_dict
 
+
 class GeneralLimitationMax(ft.Container):
     def __init__(self, system_unit: int):
         super().__init__()
@@ -39,10 +40,18 @@ class GeneralLimitationMax(ft.Container):
                                       can_request_focus=False,
                                       on_click=lambda e: keyboard.open(e.control))
 
-        self.content = CustomCard(
+        self.custom_card = CustomCard(
             self.page.session.get("lang.setting.maximum_limitations"),
             ft.Column(controls=[self.speed_max, self.torque_max, self.power_max])
         )
+        self.content = self.custom_card
+
+    def before_update(self):
+        s = self.page.session
+        self.speed_max.label = s.get("lang.common.speed")
+        self.torque_max.label = s.get("lang.common.torque")
+        self.power_max.label = s.get("lang.common.power")
+        self.custom_card.set_title(s.get("lang.setting.maximum_limitations"))
 
     def update_unit(self, system_unit: int):
         self.system_unit = system_unit
@@ -93,5 +102,6 @@ class GeneralLimitationMax(ft.Container):
             operation_type=OperationType.GENERAL_LIMITATION_MAX,
             operation_content=model_to_dict(self.limitations)
         )
+
     def did_mount(self):
         self.update_unit(self.system_unit)

@@ -13,6 +13,11 @@ class CustomCard(ft.Card):
         self.height = height
 
     def build(self):
+        self.heading_title = ft.Text(
+            self.heading,
+            weight=ft.FontWeight.BOLD,
+            size=16
+        )
         self.content = ft.Container(
             padding=ft.padding.symmetric(10, 10),
             expand=self.expand,
@@ -27,11 +32,7 @@ class CustomCard(ft.Card):
                             expand=False,
                             controls=[
                                 ft.Icon(name=ft.Icons.CYCLONE),
-                                ft.Text(
-                                    self.heading,
-                                    weight=ft.FontWeight.BOLD,
-                                    size=16
-                                )
+                                self.heading_title
                             ]
                         )
                     ),
@@ -43,6 +44,9 @@ class CustomCard(ft.Card):
                 ]
             )
         )
+
+    def before_update(self):
+        self.heading_title.value = self.heading
 
     def set_title(self, title: str):
         self.heading = title

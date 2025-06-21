@@ -41,7 +41,7 @@ class GeneralOflineDefaultValue(ft.Container):
                                                 can_request_focus=False,
                                                 on_click=lambda e: keyboard.open(e.control))
 
-        self.content = CustomCard(
+        self.custom_card = CustomCard(
             self.page.session.get("lang.setting.offline_default_value"),
             ft.ResponsiveRow(
                 controls=[
@@ -51,6 +51,15 @@ class GeneralOflineDefaultValue(ft.Container):
                 ]
             )
         )
+
+        self.content = self.custom_card
+    
+    def before_update(self):
+        s = self.page.session
+        self.torque_default_value.label = s.get("lang.common.torque")
+        self.thrust_default_value.label = s.get("lang.common.thrust")
+        self.speed_default_value.label = s.get("lang.common.speed")
+        self.custom_card.set_title(s.get("lang.setting.offline_default_value"))
 
     def save_data(self, user_id: int):
         self.odv.torque_default_value = float(self.torque_default_value.value or 0)
