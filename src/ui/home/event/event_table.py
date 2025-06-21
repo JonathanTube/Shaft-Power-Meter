@@ -101,6 +101,3 @@ class EventTable(AbstractTable):
 
     def __update_table(self):
         self.search(**self.kwargs)
-
-    def before_update(self):
-        self.update_columns(self.get_columns())

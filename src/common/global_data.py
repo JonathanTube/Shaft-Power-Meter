@@ -99,6 +99,8 @@ class GlobalData:
 
         self.alarm_enabled_of_overload_curve = False
 
+        self.eexi_breach = False
+
     def set_default_value(self):
         systemSettings: SystemSettings = SystemSettings.get()
 

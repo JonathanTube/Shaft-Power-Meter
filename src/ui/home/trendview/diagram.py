@@ -26,12 +26,8 @@ class TrendViewDiagram(ft.Container):
         self.date_format = datetime_conf.date_format
         self.system_unit = preference.system_unit
 
-    def build(self):
+    def create_chart(self):
         self.set_style()
-        self.chart = self._create_initial_chart()
-        self.content = self.chart
-
-    def _create_initial_chart(self):
         """创建初始图表结构"""
         self.fig, self.ax_rpm = plt.subplots(figsize=(10, 5.5))
         self.fig.subplots_adjust(left=0.08, right=0.92, top=0.95, bottom=0.1)
@@ -135,7 +131,12 @@ class TrendViewDiagram(ft.Container):
         plt.rcParams['axes.unicode_minus'] = False  # 解决负号 '-' 显示为方块的问题
 
     def before_update(self):
-        self.set_style()
-        plt.close(self.fig)
-        self.chart = self._create_initial_chart()
-        self.content = self.chart
+        # 重建图表对象
+        self.chart = self.create_chart()
+        if self.chart:
+            # 清除当前图形缓存
+            plt.close('all')
+            # 重新应用样式
+            self.set_style()
+            # 替换容器内容
+            self.content = self.chart

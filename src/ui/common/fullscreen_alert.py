@@ -55,16 +55,20 @@ class FullscreenAlert(ft.Container):
             ]
         )
 
-    def start(self):
+    def show(self):
         self.running = True
         self.task = self.page.run_task(self.blink)
 
-    def stop(self):
-        self.running = False
-        self.visible = False
-        self.update()
-        if self.task:
-            self.task.cancel()
+    def hide(self):
+        try:
+            self.visible = False
+            self.update()
+            if self.task:
+                self.task.cancel()
+        except:
+            pass
+        finally:
+            self.running = False
 
     async def blink(self):
         try:
@@ -75,5 +79,5 @@ class FullscreenAlert(ft.Container):
             # 退出时，设置为不可见
             self.visible = False
             self.update()
-        except Exception as e:
-            logging.exception(e)
+        except:
+            logging.exception('exception occured at FullscreenAlert.blink')

@@ -3,11 +3,11 @@ import ctypes
 import sys
 import logging
 import flet as ft
-from common.control_manager import ControlManager
 from db.models.system_settings import SystemSettings
 from task.utc_timer_task import UtcTimer
 from ui.common.fullscreen_alert import FullscreenAlert
 from ui.common.keyboard import keyboard
+from ui.common.windows_sound_player import WindowsSoundPlayer
 from ui.header.index import Header
 from ui.home.index import Home
 from ui.report.index import Report
@@ -44,6 +44,8 @@ if is_db_empty:
     DataInit.init()
 
 gdata.set_default_value()
+
+sound_player = WindowsSoundPlayer()
 
 
 def get_theme_mode(preference: Preference):
@@ -125,25 +127,31 @@ def set_appearance(page: ft.Page, preference: Preference):
     page.window.prevent_close = True
 
 
-def set_content(page: ft.Page):
-    ControlManager.fullscreen_alert = FullscreenAlert()
-    ControlManager.audio_alarm = AudioAlarm()
+def on_mute():
+    sound_player.stop()
 
+
+def set_content(page: ft.Page):
     page.appbar = Header()
 
     main_content = ft.Container(padding=0, margin=0, content=Home())
 
+    fullscreen_alert = FullscreenAlert()
+
+    audio_alarm_btn = AudioAlarm(on_mute=on_mute)
+
     main_stack = ft.Stack(
         controls=[
-            ControlManager.fullscreen_alert,
+            fullscreen_alert,
             main_content,
-            ControlManager.audio_alarm
+            audio_alarm_btn
         ],
         expand=True
     )
     page.add(main_stack)
     page.overlay.append(keyboard)
 
+    # 主菜单切换
     def change_main_menu(topic, message):
         if message == 'HOME':
             main_content.content = Home()
@@ -154,6 +162,31 @@ def set_content(page: ft.Page):
         main_content.update()
 
     page.pubsub.subscribe_topic('__change_main_menu', change_main_menu)
+
+    # 监听EEXI breach
+
+    async def watch_eexi_breach():
+        is_running = False
+        while True:
+            try:
+                if gdata.eexi_breach:
+                    if not is_running:
+                        fullscreen_alert.show()
+                        audio_alarm_btn.show()
+                        sound_player.play()
+                        is_running = True
+                else:
+                    if is_running:
+                        fullscreen_alert.hide()
+                        audio_alarm_btn.hide()
+                        sound_player.stop()
+                        is_running = False
+            except:
+                logging.exception('exception occured at FullscreenAlert.__watch_eexi_breach')
+            finally:
+                await asyncio.sleep(1)
+
+    page.run_task(watch_eexi_breach)
 
 
 async def main(page: ft.Page):
@@ -170,6 +203,7 @@ async def main(page: ft.Page):
         page.update()
 
         start_all_task()
+
     except:
         logging.exception('exception occured at main')
 

@@ -99,6 +99,3 @@ class ReportInfoTable(AbstractTable):
             session.get("lang.report.report_name"),
             session.get("lang.common.created_at")
         ]
-
-    def before_update(self):
-        self.update_columns(self.__get_language())

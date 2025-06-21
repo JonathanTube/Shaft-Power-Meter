@@ -196,6 +196,3 @@ class PermissionTable(AbstractTable):
             session.get("lang.permission.user_pwd"),
             session.get("lang.permission.user_role")
         ]
-
-    def before_update(self):
-        self.update_columns(self.__get_language())

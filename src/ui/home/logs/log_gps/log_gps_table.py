@@ -50,6 +50,3 @@ class LogGpsTable(AbstractTable):
             session.get("lang.common.utc_date_time"),
             session.get("lang.common.location")
         ]
-
-    def before_update(self):
-        self.update_columns(self.get_columns())

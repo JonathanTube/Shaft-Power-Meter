@@ -64,6 +64,3 @@ class LogDataTable(AbstractTable):
             f'{session.get("lang.common.power")}(W)',
             session.get("lang.common.is_overload")
         ]
-
-    def before_update(self):
-        self.update_columns(self.get_columns())

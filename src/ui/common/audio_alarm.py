@@ -1,20 +1,19 @@
 import logging
-import os
-from anyio import Path
 import flet as ft
+from typing import Callable
 from db.models.event_log import EventLog
 from db.models.user import User
 from ui.common.permission_check import PermissionCheck
 from task.utc_timer_task import gdata
-from ui.common.windows_sound_player import WindowsSoundPlayer
 
 
 class AudioAlarm(ft.Container):
-    def __init__(self):
+    def __init__(self, on_mute: Callable):
         super().__init__()
         self.right = 10
         self.top = 4
-        self.player = WindowsSoundPlayer()
+
+        self.callback = on_mute
 
     def build(self):
         self.content: ft.FilledButton = ft.FilledButton(
@@ -24,10 +23,10 @@ class AudioAlarm(ft.Container):
             bgcolor=ft.Colors.RED,
             visible=False,
             color=ft.Colors.WHITE,
-            on_click=lambda e : self.page.open(PermissionCheck(self.__on_mute, 1))
+            on_click=lambda e: self.page.open(PermissionCheck(self.__on_mute, 1))
         )
 
-    def play(self):
+    def show(self):
         try:
             if self.content and self.content.page:
                 self.content.visible = True
@@ -36,19 +35,15 @@ class AudioAlarm(ft.Container):
                 self.content.bgcolor = ft.Colors.RED
                 self.content.update()
         except:
-            logging.exception('exception occured at AudioAlarm.play')
-        finally:
-            self.player.play()
+            logging.exception('exception occured at AudioAlarm.show')
 
-    def stop(self):
+    def hide(self):
         try:
             if self.content and self.content.page:
                 self.content.visible = False
                 self.content.update()
         except:
-            logging.exception('exception occured at AudioAlarm.stop')
-        finally:
-            self.player.stop()
+            logging.exception('exception occured at AudioAlarm.hide')
 
     def __on_mute(self, user: User):
         try:
@@ -62,7 +57,6 @@ class AudioAlarm(ft.Container):
                 self.content.disabled = True
                 self.content.bgcolor = ft.Colors.RED_400
                 self.content.update()
+            self.callback()
         except:
             logging.exception('exception occured at AudioAlarm.__on_mute')
-        finally:
-            self.player.stop()

@@ -62,6 +62,3 @@ class LogOperationTable(AbstractTable):
             session.get("lang.operation_log.operation_type"),
             session.get("lang.operation_log.operation_content")
         ]
-
-    def before_update(self):
-        self.update_columns(self.get_columns())

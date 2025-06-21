@@ -85,6 +85,3 @@ class AlarmTable(AbstractTable):
             session.get("lang.common.acknowledge_time"),
             session.get("lang.common.recovery_status")
         ]
-
-    def before_update(self):
-        self.update_columns(self.get_columns())

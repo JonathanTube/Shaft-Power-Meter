@@ -10,7 +10,6 @@ from utils.unit_converter import UnitConverter
 from db.models.preference import Preference
 from task.test_mode_task import testModeTask
 from ui.common.toast import Toast
-from common.control_manager import ControlManager
 from common.global_data import gdata
 from db.models.operation_log import OperationLog
 from common.operation_type import OperationType
@@ -41,7 +40,7 @@ class TestMode(ft.Container):
                 icon_size=100,
                 icon_color=ft.Colors.INVERSE_SURFACE
             ),
-            on_click=lambda e : self.page.open(self.permission_check)
+            on_click=lambda e: self.page.open(self.permission_check)
         )
         self.permission_check = PermissionCheck(on_confirm=self.create_controls, user_role=0)
 
@@ -158,68 +157,71 @@ class TestMode(ft.Container):
             return UnitConverter.t_to_n(value)
 
     def start_test_mode(self, e):
-        if self.running:
-            return
+        try:
+            if self.running:
+                return
 
-        self.page.run_task(testModeTask.start)
+            self.page.run_task(testModeTask.start)
 
-        self.running = True
-        gdata.test_mode_running = True
-        self.range_card.enable()
+            self.range_card.enable()
 
-        self.start_button.visible = False
-        self.start_button.update()
-        self.stop_button.visible = True
-        self.stop_button.update()
+            self.start_button.visible = False
+            self.start_button.update()
+            self.stop_button.visible = True
+            self.stop_button.update()
 
-        OperationLog.create(
-            user_id=self.op_user.id,
-            utc_date_time=gdata.utc_date_time,
-            operation_type=OperationType.TEST_MODE_CONF,
-            operation_content='started test mode'
-        )
-        Toast.show_success(self.page)
-        # 将sps设备设置为在线，防止offline_task 写入默认值
-        gdata.sps1_offline = False
-        gdata.sps2_offline = False
+            OperationLog.create(
+                user_id=self.op_user.id,
+                utc_date_time=gdata.utc_date_time,
+                operation_type=OperationType.TEST_MODE_CONF,
+                operation_content='started test mode'
+            )
+            # 将sps设备设置为在线，防止offline_task 写入默认值
+            gdata.sps1_offline = False
+            gdata.sps2_offline = False
+            self.running = True
+            gdata.test_mode_running = True
+            Toast.show_success(self.page)
+        except:
+            Toast.show_error(self.page, "start test mode failed.")
 
     def stop_test_mode(self, e):
-        if not self.running:
-            return
+        try:
+            if not self.running:
+                return
 
-        gdata.test_mode_running = False
-        self.range_card.disable()
+            testModeTask.stop()
+            self.range_card.disable()
+            self.page.close(self.dlg_stop_modal)
+            self.running = False
+            self.start_button.visible = True
+            self.start_button.update()
+            self.stop_button.visible = False
+            self.stop_button.update()
 
-        testModeTask.stop()
-        self.page.close(self.dlg_stop_modal)
-        self.running = False
-        self.start_button.visible = True
-        self.start_button.update()
-        self.stop_button.visible = False
-        self.stop_button.update()
-        # 恢复现场
-        gdata.sps1_offline = True
-        gdata.sps2_offline = True
+            OperationLog.create(
+                user_id=self.op_user.id,
+                utc_date_time=gdata.utc_date_time,
+                operation_type=OperationType.TEST_MODE_CONF,
+                operation_content='stopped test mode'
+            )
 
-        OperationLog.create(
-            user_id=self.op_user.id,
-            utc_date_time=gdata.utc_date_time,
-            operation_type=OperationType.TEST_MODE_CONF,
-            operation_content='stopped test mode'
-        )
-
-        ControlManager.audio_alarm.stop()
-        ControlManager.fullscreen_alert.stop()
-        self.page.run_task(plc_util.write_alarm, False)
-        self.page.run_task(plc_util.write_power_overload, False)
-        Toast.show_success(self.page)
+            # 恢复现场
+            gdata.test_mode_running = False
+            gdata.eexi_breach = False
+            gdata.sps1_offline = True
+            gdata.sps2_offline = True
+            self.page.run_task(plc_util.write_alarm, False)
+            self.page.run_task(plc_util.write_power_overload, False)
+            Toast.show_success(self.page)
+        except:
+            Toast.show_error(self.page, "stop test mode failed.")
 
     async def __auto_lock(self):
         while self.task_running:
             if self.visible:
                 try:
                     time_diff = gdata.utc_date_time - self.last_op_utc_date_time
-                    # print(time_diff.total_seconds())
                     if time_diff.total_seconds() > 60 * 10:
                         self.visible = False
                         self.page.open(self.permission_check)
@@ -236,6 +238,9 @@ class TestMode(ft.Container):
 
     def will_unmount(self):
         self.task_running = False
-        self.player.stop()
+
+        if self.sound_testing:
+            self.player.stop()
+
         if self.task is not None:
             self.task.cancel()

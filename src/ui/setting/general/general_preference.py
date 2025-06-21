@@ -1,7 +1,4 @@
-import logging
 import flet as ft
-
-from common.control_manager import ControlManager
 from db.models.language import Language
 from ui.common.custom_card import CustomCard
 from db.models.preference import Preference

@@ -1,5 +1,4 @@
 from common.global_data import gdata
-from common.control_manager import ControlManager
 from db.models.event_log import EventLog
 from db.models.report_detail import ReportDetail
 from db.models.report_info import ReportInfo
@@ -92,11 +91,7 @@ class EEXIBreach:
     def __handle_breach_event(start_time: datetime):
         # 如果还没有创建报告，则创建报告
         if EEXIBreach.report_id is None:
-
-            ControlManager.audio_alarm.play()
-            ControlManager.fullscreen_alert.start()
-            if ControlManager.event_button is not None:
-                ControlManager.event_button.update_event()
+            gdata.eexi_breach = True
 
             event_log: EventLog = EventLog.create(started_at=start_time, started_position=gdata.gps_location)
 
@@ -119,8 +114,7 @@ class EEXIBreach:
     @staticmethod
     def __handle_recovery_event(start_time: datetime):
         if EEXIBreach.report_id is not None:
-            ControlManager.audio_alarm.stop()
-            ControlManager.fullscreen_alert.stop()
+            gdata.eexi_breach = False
             event_log: EventLog = EventLog.select().where(EventLog.ended_at == None).order_by(EventLog.id.asc()).first()
 
             if event_log is not None:

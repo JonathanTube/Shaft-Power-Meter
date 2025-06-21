@@ -7,9 +7,6 @@ class HeaderLogo(ft.Container):
         super().__init__()
         self.expand = True
 
-    def build(self):       
-        self.content = ft.Image(src=self.get_src(), fit=ft.ImageFit.FILL)
-
     def get_src(self):
         # Get absolute path to ensure reliability
         base_dir = Path(__file__).parent.parent.parent

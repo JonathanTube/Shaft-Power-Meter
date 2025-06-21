@@ -10,7 +10,6 @@ from ui.common.toast import Toast
 from ui.home.alarm.alarm_table import AlarmTable
 from common.global_data import gdata
 from common.const_alarm_type import AlarmType
-from common.control_manager import ControlManager
 
 
 class AlarmList(ft.Container):
@@ -103,9 +102,6 @@ class AlarmList(ft.Container):
 
         for row in selected_rows:
             AlarmLog.update(acknowledge_time=gdata.utc_date_time).where(AlarmLog.id == row.cells[0].data).execute()
-
-        if ControlManager.alarm_button:
-            ControlManager.alarm_button.update_alarm()
 
         self.table.search()
         Toast.show_success(self.page)

@@ -61,11 +61,6 @@ class PropellerCurveDiagram(ft.Container):
         self.sps1_text = None
         self.sps2_text = None
 
-    def build(self):
-        self.chart = self.create_chart()
-        if self.chart:
-            self.content = self.chart
-
     def before_update(self):
         # 重建图表对象
         self.chart = self.create_chart()

@@ -2,7 +2,6 @@ import logging
 from common.const_alarm_type import AlarmType
 from db.models.alarm_log import AlarmLog
 from common.global_data import gdata
-from common.control_manager import ControlManager
 from utils.plc_util import plc_util
 import asyncio
 
@@ -19,9 +18,6 @@ class AlarmSaver:
         else:
             logging.info(f'[***save alarm***]alarm_type={alarm_type}, skip since record exists.')
 
-        if ControlManager.alarm_button:
-            ControlManager.alarm_button.update_alarm()
-
     @staticmethod
     def recovery(alarm_type: AlarmType):
         logging.info(f'[***recovery alarm***]alarm_type={alarm_type}')
@@ -32,6 +28,3 @@ class AlarmSaver:
         if cnt == 0:
             logging.info(f'[***recovery alarm***], clear all plc alarm.')
             asyncio.create_task(plc_util.write_alarm(False))
-
-        if ControlManager.alarm_button:
-            ControlManager.alarm_button.update_alarm()

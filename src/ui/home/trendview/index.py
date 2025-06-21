@@ -3,7 +3,6 @@ from datetime import datetime
 from db.models.data_log import DataLog
 from ui.common.datetime_search import DatetimeSearch
 from ui.home.trendview.diagram import TrendViewDiagram
-from common.control_manager import ControlManager
 from ui.common.toast import Toast
 from db.models.system_settings import SystemSettings
 from db.models.date_time_conf import DateTimeConf

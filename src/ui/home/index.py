@@ -2,7 +2,6 @@ import asyncio
 import logging
 from random import random
 import flet as ft
-from common.control_manager import ControlManager
 from common.global_data import gdata
 from ui.home.alarm.alarm_button import AlarmButton
 from ui.home.alarm.index import AlarmList
@@ -12,7 +11,7 @@ from ui.home.event.event_button import EventButton
 from ui.home.logs.index import Logs
 from ui.home.propeller_curve.index import PropellerCurve
 from ui.home.trendview.index import TrendView
-from ui.home.event.event_list import EventList
+from ui.home.event.index import EventList
 from db.models.system_settings import SystemSettings
 
 
@@ -22,7 +21,7 @@ class Home(ft.Container):
         self.task_running = False
         self.task = None
 
-        self.system_settings:SystemSettings = SystemSettings.get()
+        self.system_settings: SystemSettings = SystemSettings.get()
         self.current_index = 0
 
         self.default_button_style = ft.ButtonStyle(
@@ -66,10 +65,8 @@ class Home(ft.Container):
             visible=self.system_settings.is_master and self.system_settings.display_propeller_curve,
             on_click=lambda e: self.__on_click(3)
         )
-        self.alarm_button = AlarmButton(on_click=lambda e: self.__on_click(4))
-        ControlManager.alarm_button = self.alarm_button
-        self.event_button = EventButton(on_click=lambda e: self.__on_click(5))
-        ControlManager.event_button = self.event_button
+        self.alarm_button = AlarmButton(style=self.default_button_style, on_click=lambda e: self.__on_click(4))
+        self.event_button = EventButton(style=self.default_button_style, on_click=lambda e: self.__on_click(5))
 
         self.logs = ft.TextButton(
             text=self.page.session.get("lang.home.tab.logs"),
@@ -151,20 +148,11 @@ class Home(ft.Container):
     def did_mount(self):
         self.task_running = True
         self.task = self.page.run_task(self.test_auto_run)
-        if ControlManager.event_button and ControlManager.event_button.page:
-            ControlManager.event_button.update_event()
-
-        if ControlManager.alarm_button and ControlManager.alarm_button.page:
-            ControlManager.alarm_button.update_alarm()
 
     def will_unmount(self):
         self.task_running = False
         if self.task:
             self.task.cancel()
-
-        ControlManager.event_button = None
-        ControlManager.alarm_button = None
-
 
     async def test_auto_run(self):
         while self.task_running and gdata.auto_testing:

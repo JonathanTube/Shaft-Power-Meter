@@ -75,6 +75,3 @@ class ZeroCalTable(AbstractTable):
             session.get("lang.zero_cal.thrust_offset"),
             session.get("lang.zero_cal.state")
         ]
-
-    def before_update(self):
-        self.update_columns(self.get_columns())
