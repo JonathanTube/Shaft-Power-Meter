@@ -169,6 +169,9 @@ class SystemConfSettings(CustomCard):
             return (UnitConverter.w_to_shp(_eexi_limited_power), "sHp")
 
     def save(self, user_id: int):
+        if self.page is None:
+            return
+
         try:
             self.system_settings.is_master = True if self.running_mode.value == 'master' else False
             self.system_settings.amount_of_propeller = self.amount_of_propeller_radios.value

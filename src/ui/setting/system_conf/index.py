@@ -45,11 +45,13 @@ class SystemConf(ft.Container):
             return
         try:
             self.is_saving = True
-            self.save_button.disabled = True
-            self.save_button.update()
+            if self.save_button and self.save_button.page:
+                self.save_button.disabled = True
+                self.save_button.update()
 
-            self.reset_button.disabled = True
-            self.reset_button.update()
+            if self.reset_button and self.reset_button.page:
+                self.reset_button.disabled = True
+                self.reset_button.update()
 
             keyboard.close()
             self.system_conf_settings.save(user.id)
@@ -61,11 +63,13 @@ class SystemConf(ft.Container):
             Toast.show_error(self.page)
         finally:
             self.is_saving = False
-            self.save_button.disabled = False
-            self.save_button.update()
+            if self.save_button and self.save_button.page:
+                self.save_button.disabled = False
+                self.save_button.update()
 
-            self.reset_button.disabled = False
-            self.reset_button.update()
+            if self.reset_button and self.reset_button.page:
+                self.reset_button.disabled = False
+                self.reset_button.update()
 
     def __reset_data(self, e):
         keyboard.close()

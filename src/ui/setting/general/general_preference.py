@@ -79,6 +79,9 @@ class GeneralPreference(ft.Container):
         self.on_system_unit_change(int(self.system_unit.value))
 
     def save_data(self, user_id: int):
+        if self.page is None:
+            return
+
         # save preference
         new_theme = int(self.default_theme.value)
         old_theme = self.preference.theme
@@ -114,6 +117,9 @@ class GeneralPreference(ft.Container):
 
 
     def __change_theme(self):
+        if self.page is None:
+            return
+
         theme = int(self.preference.theme)
         self.page.theme_mode = ft.ThemeMode.LIGHT if theme == 0 else ft.ThemeMode.DARK
 
