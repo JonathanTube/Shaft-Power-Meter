@@ -1,6 +1,4 @@
 import ctypes
-import os
-from pathlib import Path
 import sys
 import flet as ft
 from common.control_manager import ControlManager
@@ -65,14 +63,6 @@ def handle_error(e):
     logging.error('============global exception occured===========')
     logging.exception(e)
 
-def init_audio(page:ft.Page) -> ft.Audio:
-    # create audio alarm
-    src = os.path.join(Path(__file__).parent,"assets","TF001.WAV")
-    logging.info(src)
-    audio = ft.Audio(src=src, autoplay=False, release_mode=ft.audio.ReleaseMode.LOOP)
-    page.overlay.append(audio)
-    return audio
-
 async def main(page: ft.Page):
     try:
         preference: Preference = Preference.get()
@@ -105,8 +95,7 @@ async def main(page: ft.Page):
         ControlManager.fullscreen_alert = FullscreenAlert()
         logging.info('add fullscreen alert')
 
-        audio : ft.Audio = init_audio(page)
-        ControlManager.audio_alarm = AudioAlarm(audio)
+        ControlManager.audio_alarm = AudioAlarm()
         logging.info('add audio alert')
         ControlManager.home = Home()
 

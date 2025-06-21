@@ -287,6 +287,18 @@ class DataInit:
                 },
 
                 {
+                    "code": "lang.button.start_sound_testing",
+                    "chinese": "开始测试声音",
+                    "english": "Start Sound Testing"
+                },
+
+                {
+                    "code": "lang.button.stop_sound_testing",
+                    "chinese": "停止测试声音",
+                    "english": "Stop Sound Testing"
+                },
+
+                {
                     "code": "lang.common.app_name",
                     "chinese": "轴功率仪",
                     "english": "Shaft Power Meter"

@@ -78,10 +78,10 @@ class TestModeRange(CustomCard):
         super().build()
 
     def __create_range_start_text(self, lang, value, unit):
-        return ft.Text(color=ft.Colors.GREEN, width=150, value=f'{self.page.session.get(lang)}: {value} {unit}')
+        return ft.Text(color=ft.Colors.GREEN, width=160, value=f'{self.page.session.get(lang)}: {value} {unit}')
 
     def __create_range_end_text(self, lang, value, unit):
-        return ft.Text(color=ft.Colors.RED, width=150, value=f'{self.page.session.get(lang)}: {value} {unit}')
+        return ft.Text(color=ft.Colors.RED, width=160, value=f'{self.page.session.get(lang)}: {value} {unit}')
 
     def __on_torque_change(self, e):
         min_torque_value, min_torque_unit = self.__get_torque_and_unit(e.control.start_value)

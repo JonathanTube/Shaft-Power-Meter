@@ -16,7 +16,7 @@ class Permission(ft.Container):
     def __init__(self):
         super().__init__()
         self.expand = True
-        self.visible = False
+        self.alignment = ft.alignment.center
         self.padding = 10
         self.op_user = None
         self.last_op_utc_date_time = gdata.utc_date_time
@@ -30,9 +30,22 @@ class Permission(ft.Container):
 
     def build(self):
         self.permission_check = PermissionCheck(on_confirm=self.__on_permission_checked, user_role=0)
+        self.content = ft.TextButton(
+            icon=ft.Icons.LOCK_ROUNDED,
+            text="",
+            style=ft.ButtonStyle(
+                icon_size=100,
+                icon_color=ft.Colors.INVERSE_SURFACE
+            ),
+            on_click=lambda e : self.page.open(self.permission_check)
+        )
 
     def __on_permission_checked(self, user: User):
-        self.visible = True
+        if not self.page:
+            return
+        
+        self.alignment = ft.alignment.center
+
         self.op_user = user
 
         self.last_op_utc_date_time = gdata.utc_date_time

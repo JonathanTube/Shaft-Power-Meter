@@ -50,7 +50,12 @@ class Header(ft.AppBar):
         self.system_settings = SystemSettings.get()
         self.title = ft.Text(value=self.page.session.get("lang.common.app_name"), weight=ft.FontWeight.W_700, size=20)
 
-        self.utc_date_time = ft.Text()
+        self.utc_date_time = ft.TextButton(
+            text="",
+            width=150,
+            style=ft.ButtonStyle(alignment=ft.alignment.center_left),
+            on_click=self.__stop_auto_testing
+        )
 
         self.home = ft.ElevatedButton(
             text=self.page.session.get("lang.header.home"),
@@ -98,6 +103,9 @@ class Header(ft.AppBar):
             ft.VerticalDivider(width=.5, thickness=.5),
             self.close_button
         ]
+
+    def __stop_auto_testing(self, e):
+        gdata.auto_testing = False
 
     def __close_app(self, e):
         self.page.open(PermissionCheck(self.__exit_app, 1))
@@ -180,7 +188,7 @@ class Header(ft.AppBar):
         while self.task_running:
             try:
                 if gdata.utc_date_time:
-                    self.utc_date_time.value = gdata.utc_date_time.strftime(f"{date_format} %H:%M:%S")
+                    self.utc_date_time.text = gdata.utc_date_time.strftime(f"{date_format} %H:%M:%S")
                     self.utc_date_time.update()
             except Exception as e:
                 logging.exception(e)
