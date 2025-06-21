@@ -28,7 +28,7 @@ class GlobalData:
         self.enable_utc_time_sync_with_gps = False
 
         # 作为服务端, 是否已启动
-        self.hmi_server_started = False
+        self.master_server_started = False
         # 作为客户端，是否已连接
         self.connected_to_hmi_server = False
         # modbus output服务是否已经打开

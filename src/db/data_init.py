@@ -1167,14 +1167,14 @@ class DataInit:
                 },
 
                 {
-                    "code": "lang.setting.start_hmi_server",
-                    "chinese": "启动HMI服务器",
-                    "english": "Start HMI Server"
+                    "code": "lang.setting.start_master_server",
+                    "chinese": "启动主机服务",
+                    "english": "Start Server"
                 },
 
                 {
-                    "code": "lang.setting.stop_hmi_server",
-                    "chinese": "停止HMI服务器",
+                    "code": "lang.setting.stop_master_server",
+                    "chinese": "停止主机服务器",
                     "english": "Stop Master Server"
                 },
 
@@ -1236,6 +1236,12 @@ class DataInit:
                     "code": "lang.setting.sps_conf",
                     "chinese": "SPS 配置",
                     "english": "SPS Conf."
+                },
+
+                {
+                    "code": "lang.setting.master_server_conf",
+                    "chinese": "主机服务配置",
+                    "english": "Master Server Conf."
                 },
 
                 {

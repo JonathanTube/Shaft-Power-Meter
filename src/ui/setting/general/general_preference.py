@@ -84,22 +84,18 @@ class GeneralPreference(ft.Container):
 
         # save preference
         new_theme = int(self.default_theme.value)
-        old_theme = self.preference.theme
         self.preference.theme = new_theme
 
         new_language = int(self.language.value)
-        old_language = self.preference.language
         self.preference.language = new_language
 
         new_fullscreen = self.fullscreen.value
-        old_fullscreen = self.preference.fullscreen
         self.preference.fullscreen = new_fullscreen
 
         self.preference.system_unit = int(self.system_unit.value)
         self.preference.data_refresh_interval = int(self.data_refresh_interval.value)
         self.preference.save()
-        self.__change_theme()
-        self.__refresh_language()
+
         OperationLog.create(
             user_id=user_id,
             utc_date_time=gdata.utc_date_time,
@@ -107,38 +103,11 @@ class GeneralPreference(ft.Container):
             operation_content=model_to_dict(self.preference)
         )
 
-        if old_fullscreen != new_fullscreen:
-            self.page.window.full_screen = new_fullscreen
-            self.page.update()
-            return
+        for item in Language.select():
+            self.page.session.set(item.code, item.english if self.preference.language == 0 else item.chinese)
 
-        if old_theme != new_theme or old_language != new_language:
-            self.__refresh_page()
-
-
-    def __change_theme(self):
-        if self.page is None:
-            return
-
+        self.page.window.full_screen = new_fullscreen
         theme = int(self.preference.theme)
         self.page.theme_mode = ft.ThemeMode.LIGHT if theme == 0 else ft.ThemeMode.DARK
-
-    def __refresh_language(self):
-        preference: Preference = Preference.get()
-        language_items = Language.select()
-        for item in language_items:
-            self.page.session.set(item.code, item.english if preference.language == 0 else item.chinese)
-
-    def __refresh_page(self):
-        if ControlManager.app_bar:
-            ControlManager.app_bar.clean()
-            ControlManager.app_bar.build()
-            ControlManager.app_bar.update()
-
-        try:
-            for control in self.page.controls:
-                control.clean()
-                control.build()
-                control.update()
-        except:
-            logging.exception('refresh controls of page failed.')
+        self.page.update()
+        self.page.appbar.update()

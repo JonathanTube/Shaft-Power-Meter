@@ -25,11 +25,9 @@ class TrendView(ft.Container):
     def build(self):
         self.search = DatetimeSearch(self.__on_search)
         self.sps1_chart = TrendViewDiagram()
-        ControlManager.trend_view_sps1 = self.sps1_chart
 
         if self.is_twins:
             self.sps2_chart = TrendViewDiagram()
-            ControlManager.trend_view_sps2 = self.sps2_chart
             self.content = ft.Column(
                 expand=True,
                 spacing=0,
@@ -85,10 +83,6 @@ class TrendView(ft.Container):
             self.sps1_chart.update_chart(data_logs)
         elif name == 'sps2':
             self.sps2_chart.update_chart(data_logs)
-
-    def will_unmount(self):
-        ControlManager.trend_view_sps1 = None
-        ControlManager.trend_view_sps2 = None
 
     def did_mount(self):
         start_date: str = self.page.session.get('trendview_start_date')

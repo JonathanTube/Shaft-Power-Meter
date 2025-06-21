@@ -11,7 +11,6 @@ from db.models.user import User
 from ui.common.custom_card import CustomCard
 from ui.common.keyboard import keyboard
 from ui.common.permission_check import PermissionCheck
-from websocket.websocket_server import ws_server
 from common.global_data import gdata
 from task.sps1_read_task import sps1_read_task
 from task.sps2_read_task import sps2_read_task
@@ -30,42 +29,6 @@ class IOSettingSPS(CustomCard):
         self.task_running = False
 
     def build(self):
-        # working as a websocket client start
-        self.websocket_server_ip = ft.TextField(
-            label=f'HMI {self.page.session.get("lang.setting.ip")}',
-            value='0.0.0.0',
-            read_only=True
-        )
-
-        self.websocket_server_port = ft.TextField(
-            label=f'HMI {self.page.session.get("lang.setting.port")}',
-            value='8000',
-            read_only=True
-        )
-
-        self.start_hmi_server = ft.FilledButton(
-            text=self.page.session.get("lang.setting.start_hmi_server"),
-            bgcolor=ft.Colors.GREEN,
-            color=ft.Colors.WHITE,
-            visible=not gdata.hmi_server_started,
-            style=ft.ButtonStyle(
-                shape=ft.RoundedRectangleBorder(radius=5)
-            ),
-            on_click=lambda e: self.page.open(PermissionCheck(self.__start_hmi_server,2))
-        )
-
-        self.stop_hmi_server = ft.FilledButton(
-            text=self.page.session.get("lang.setting.stop_hmi_server"),
-            bgcolor=ft.Colors.RED,
-            color=ft.Colors.WHITE,
-            visible=gdata.hmi_server_started,
-            style=ft.ButtonStyle(
-                shape=ft.RoundedRectangleBorder(radius=5)
-            ),
-            on_click=lambda e: self.page.open(PermissionCheck(self.__stop_hmi_server,2))
-        )
-        # working as a websocket end.
-
         # sps conf. start
         self.sps1_ip = ft.TextField(
             label=f'{self.page.session.get("lang.setting.ip")} SPS1',
@@ -200,10 +163,6 @@ class IOSettingSPS(CustomCard):
             visible=self.is_dual
         )
 
-        self.row_websocket_server = ft.Row(
-            controls=[self.websocket_server_ip, self.websocket_server_port, self.start_hmi_server, self.stop_hmi_server]
-        )
-
         self.column_factor = ft.Column(
             controls=[
                 ft.Row(controls=[self.shaft_outer_diameter, self.shaft_inner_diameter]),
@@ -215,7 +174,6 @@ class IOSettingSPS(CustomCard):
         self.body = ft.Column(controls=[
             self.row_sps1,
             self.row_sps2,
-            self.row_websocket_server,
             self.column_factor
         ])
         self.col = {"sm": 12}
@@ -251,7 +209,7 @@ class IOSettingSPS(CustomCard):
             operation_type=OperationType.DISCONNECT_FROM_SPS1,
             operation_content=user.user_name
         )
-        self.page.run(sps1_read_task.async_disconnect)
+        self.page.run(sps1_read_task.close)
         self.__handle_sps1_connection()
 
     def __connect_to_sps2(self, user: User):
@@ -284,40 +242,8 @@ class IOSettingSPS(CustomCard):
             operation_type=OperationType.DISCONNECT_FROM_SPS2,
             operation_content=user.user_name
         )
-        self.page.run(sps2_read_task.async_disconnect)
+        self.page.run(sps2_read_task.close)
         self.__handle_sps2_connection()
-
-    def __start_hmi_server(self, user:User):
-        OperationLog.create(
-            user_id=user.id,
-            utc_date_time=gdata.utc_date_time,
-            operation_type=OperationType.START_HMI_SERVER,
-            operation_content=user.user_name
-        )
-        self.handle_start_server()
-
-    def handle_start_server(self):
-        try:
-            self.page.run_task(ws_server.start)
-            self.__handle_hmi_server_connection()
-        except Exception as e:
-            logging.exception(e)
-
-    def __stop_hmi_server(self, user:User):
-        OperationLog.create(
-            user_id=user.id,
-            utc_date_time=gdata.utc_date_time,
-            operation_type=OperationType.STOP_HMI_SERVER,
-            operation_content=user.user_name
-        )
-        self.handle_stop_server()
-
-    def handle_stop_server(self):
-        try:
-            self.page.run_task(ws_server.stop)
-            self.__handle_hmi_server_connection()
-        except Exception as e:
-            logging.exception(e)
 
     def save_data(self):
         try:
@@ -326,13 +252,6 @@ class IOSettingSPS(CustomCard):
             self.conf.sps1_port = self.sps1_port.value
         except ValueError:
             raise ValueError(f'{self.page.session.get("lang.common.ip_address_format_error")}: {self.sps1_ip.value}')
-
-        try:
-            ipaddress.ip_address(self.hmi_server_ip.value)
-            self.conf.hmi_server_ip = self.hmi_server_ip.value
-            self.conf.hmi_server_port = self.hmi_server_port.value
-        except ValueError:
-            raise ValueError(f'{self.page.session.get("lang.common.ip_address_format_error")}: {self.hmi_server_port.value}')
 
         if self.is_dual:
             try:
@@ -378,12 +297,6 @@ class IOSettingSPS(CustomCard):
         self.sps2_disconnect.visible = not gdata.sps2_offline
         self.sps2_disconnect.update()
 
-    def __handle_hmi_server_connection(self):
-        self.start_hmi_server.visible = not gdata.hmi_server_started
-        self.stop_hmi_server.visible = gdata.hmi_server_started
-        self.start_hmi_server.update()
-        self.stop_hmi_server.update()
-
     async def __handle_connection_status(self):
         while self.task_running:
             try:
@@ -392,8 +305,6 @@ class IOSettingSPS(CustomCard):
                     
                 if not self.sps2_connect.disabled:
                     self.__handle_sps2_connection()
-
-                self.__handle_hmi_server_connection()
             except Exception as e:
                 logging.exception(e)
             await asyncio.sleep(1)

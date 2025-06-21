@@ -28,5 +28,5 @@ class UtcTimer:
                 ).execute()
             except Exception as e:
                 logging.exception(e)
-
-            await asyncio.sleep(1)
+            finally:
+                await asyncio.sleep(1)

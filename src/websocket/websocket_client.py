@@ -21,7 +21,7 @@ class WebSocketClient:
         self._running = False
         self.jm3846Calculator = JM3846Calculator()
 
-    async def connect(self, only_once: bool = False):
+    async def start(self, only_once: bool = False):
         """连接服务端"""
         try:
             io_conf: IOConf = IOConf.get()
@@ -40,7 +40,7 @@ class WebSocketClient:
             await asyncio.sleep(2)
             if only_once:
                 return False
-            return await self.connect()
+            return await self.start()
 
         return True
 
@@ -49,7 +49,7 @@ class WebSocketClient:
         try:
             while self._running:
                 # if running as a server, exit client immediately.
-                if gdata.hmi_server_started:
+                if gdata.master_server_started:
                     return
                 raw_data = await self.websocket.recv()
                 data = msgpack.unpackb(raw_data)
@@ -67,7 +67,7 @@ class WebSocketClient:
             AlarmSaver.create(alarm_type=AlarmType.SLAVE_DISCONNECTED)
             gdata.sps1_offline = True
             gdata.sps2_offline = True
-            await self.connect()
+            await self.start()
 
     async def send(self, data):
         """向服务端发送数据"""

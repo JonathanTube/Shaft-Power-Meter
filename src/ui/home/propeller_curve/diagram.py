@@ -66,7 +66,7 @@ class PropellerCurveDiagram(ft.Container):
         if self.chart:
             self.content = self.chart
 
-    def update_style(self):
+    def before_update(self):
         # 重建图表对象
         self.chart = self.create_chart()
         if self.chart:
@@ -76,7 +76,6 @@ class PropellerCurveDiagram(ft.Container):
             self.set_style()
             # 替换容器内容
             self.content = self.chart
-            self.update()
 
     def create_chart(self) -> MatplotlibChart:
         try:
@@ -124,7 +123,7 @@ class PropellerCurveDiagram(ft.Container):
         # 隐藏上边框和右边框
         ax.spines['top'].set_visible(False)
         ax.spines['right'].set_visible(False)
-    
+
     def get_left_rpm_point(self):
         rpm_point = min(self.left_rpm_of_normal, self.left_rpm_of_torque_limit)
         return 5 * math.floor(rpm_point / 5)
@@ -238,4 +237,3 @@ class PropellerCurveDiagram(ft.Container):
         plt.close('all')
         if self.task:
             self.task.cancel()
-            

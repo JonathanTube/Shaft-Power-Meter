@@ -101,7 +101,7 @@ class IOSettingGPS(CustomCard):
         self.__stop_gps_task()
 
     def __stop_gps_task(self):
-        self.page.run_task(gps_sync_task.close_connection)
+        self.page.run_task(gps_sync_task.close)
         self.__handle_gps_connection_status()
 
     def save_data(self):

@@ -213,13 +213,13 @@ class SystemConfSettings(CustomCard):
                 self.page.run_task(plc_util.close)
                 AlarmSaver.recovery(alarm_type=AlarmType.PLC_DISCONNECTED)
 
-                self.page.run_task(ws_server.stop)
+                self.page.run_task(ws_server.close)
                 AlarmSaver.recovery(alarm_type=AlarmType.MASTER_SERVER_STOPPED)
 
-                self.page.run_task(sps1_read_task.async_disconnect)
+                self.page.run_task(sps1_read_task.close)
                 AlarmSaver.recovery(alarm_type=AlarmType.SPS1_DISCONNECTED)
 
-                self.page.run_task(sps2_read_task.async_disconnect)
+                self.page.run_task(sps2_read_task.close)
                 AlarmSaver.recovery(alarm_type=AlarmType.SPS2_DISCONNECTED)
         except:
             logging.exception('exception occured at SystemConfSettings.save')

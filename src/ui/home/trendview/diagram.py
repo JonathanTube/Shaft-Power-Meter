@@ -134,9 +134,8 @@ class TrendViewDiagram(ft.Container):
         plt.rcParams['font.sans-serif'] = ['Microsoft YaHei', 'SimHei',  'WenQuanYi Zen Hei']  # 指定常用中文字体
         plt.rcParams['axes.unicode_minus'] = False  # 解决负号 '-' 显示为方块的问题
 
-    def update_style(self):
+    def before_update(self):
         self.set_style()
         plt.close(self.fig)
         self.chart = self._create_initial_chart()
         self.content = self.chart
-        self.update()

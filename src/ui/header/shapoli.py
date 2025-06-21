@@ -8,12 +8,11 @@ class ShaPoLi(ft.Container):
         self.padding = ft.padding.only(right=10)
 
     def build(self):
-        self.system_settings = SystemSettings.get()
-        self.sha_po_li = self.system_settings.sha_po_li
+        self.system_settings: SystemSettings = SystemSettings.get()
+        self.visible = self.system_settings.sha_po_li
 
         self.content = ft.TextButton(
             text="ShaPoLi",
-            visible=self.sha_po_li,
             style=ft.ButtonStyle(
                 color=ft.Colors.INVERSE_SURFACE,
                 text_style=ft.TextStyle(

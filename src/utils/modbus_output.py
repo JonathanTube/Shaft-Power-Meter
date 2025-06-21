@@ -18,7 +18,7 @@ class ModbusOutput:
         self.running = False     # 服务器运行状态
         self.io_conf: IOConf | None = None
 
-    async def start_modbus_server(self)->bool:
+    async def start(self)->bool:
         try:
             if self.running:
                 logger.info("Modbus server is already running")

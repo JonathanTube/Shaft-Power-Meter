@@ -92,7 +92,7 @@ class JM3846AsyncClient:
 
             return False
 
-    async def async_disconnect(self) -> bool:
+    async def close(self) -> bool:
         """断开连接"""
         try:
             self.running = False

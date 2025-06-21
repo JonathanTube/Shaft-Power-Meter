@@ -21,3 +21,6 @@ class HeaderLogo(ft.Container):
     def update_style(self):
         self.content.src = self.get_src()
         self.content.update()
+
+    def before_update(self):
+        self.content = ft.Image(src=self.get_src(), fit=ft.ImageFit.FILL)

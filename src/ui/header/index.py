@@ -1,9 +1,8 @@
 import asyncio
 import logging
-from random import random
 import flet as ft
+from random import random
 from common.global_data import gdata
-from common.control_manager import ControlManager
 from common.operation_type import OperationType
 from db.models.date_time_conf import DateTimeConf
 from db.models.operation_log import OperationLog
@@ -13,9 +12,6 @@ from ui.common.toast import Toast
 from ui.header.shapoli import ShaPoLi
 from ui.header.logo import HeaderLogo
 from ui.header.theme import Theme
-from ui.home.index import Home
-from ui.report.report_info_list import ReportInfoList
-from ui.setting.index import Setting
 from db.models.system_settings import SystemSettings
 from ui.common.keyboard import keyboard
 from task.sps1_read_task import sps1_read_task
@@ -27,18 +23,16 @@ from task.gps_sync_task import gps_sync_task
 
 
 class Header(ft.AppBar):
-    def __init__(self, main_content: ft.Container):
+    def __init__(self):
         super().__init__()
         self.leading = HeaderLogo()
         self.toolbar_height = 70
         self.leading_width = 70
-        ControlManager.header_logo = self.leading
 
         self.center_title = False
         self.bgcolor = ft.Colors.ON_INVERSE_SURFACE
 
         self.active_name = "HOME"
-        self.main_content = main_content
 
         self.task = None
         self.task_running = False
@@ -47,7 +41,6 @@ class Header(ft.AppBar):
         self._auto_run_running = False
 
     def build(self):
-        self.system_settings = SystemSettings.get()
         self.title = ft.Text(value=self.page.session.get("lang.common.app_name"), weight=ft.FontWeight.W_700, size=20)
 
         self.utc_date_time = ft.TextButton(
@@ -71,7 +64,6 @@ class Header(ft.AppBar):
             icon_color=ft.Colors.GREY_800,
             color=ft.Colors.GREY_800,
             bgcolor=ft.Colors.LIGHT_BLUE_100,
-            visible=self.system_settings.sha_po_li,
             on_click=lambda e: self.on_click("REPORT"))
 
         self.setting = ft.ElevatedButton(
@@ -86,7 +78,7 @@ class Header(ft.AppBar):
 
         self.close_button = ft.IconButton(
             icon=ft.Icons.CLOSE_ROUNDED,
-            on_click=lambda e: self.__close_app(e)
+            on_click=lambda e: self.page.open(PermissionCheck(self.__exit_app, 1))
         )
 
         self.theme = Theme()
@@ -107,27 +99,31 @@ class Header(ft.AppBar):
     def __stop_auto_testing(self, e):
         gdata.auto_testing = False
 
-    def __close_app(self, e):
-        self.page.open(PermissionCheck(self.__exit_app, 1))
-
     async def __close_all_connects(self):
-        logging.info('start closing all of the connections...')
-        # 关闭sps
-        await sps1_read_task.async_disconnect()
-        await sps2_read_task.async_disconnect()
+        try:
+            logging.info('start closing all of the connections...')
+            # 关闭sps
+            await sps1_read_task.close()
+            await sps2_read_task.close()
 
-        # 关闭websocket
-        await ws_server.stop()
-        await ws_client.close()
+            # 关闭websocket
+            await ws_server.close()
+            await ws_client.close()
 
-        # 关闭PLC
-        await plc_util.close()
+            # 关闭PLC
+            await plc_util.close()
 
-        # 关闭GPS
-        await gps_sync_task.close_connection()
-        logging.info('all of the connections were closed.')
+            # 关闭GPS
+            await gps_sync_task.close()
+            logging.info('all of the connections were closed.')
+        except:
+            logging.exception('exception occured while app exits')
+        finally:
+            self.page.window.destroy()
 
     def __exit_app(self, user: User):
+        Toast.show_error(self.page, self.page.session.get("lang.toast.system_exit"))
+
         user_id = user.id
         OperationLog.create(
             user_id=user_id,
@@ -137,9 +133,6 @@ class Header(ft.AppBar):
         )
 
         self.page.run_task(self.__close_all_connects)
-
-        Toast.show_error(self.page, self.page.session.get("lang.toast.system_exit"))
-        self.page.window.destroy()
 
     def __set_active(self, button: ft.ElevatedButton):
         button.bgcolor = ft.Colors.BLUE_800
@@ -154,33 +147,32 @@ class Header(ft.AppBar):
         button.update()
 
     def on_click(self, name):
+        if self.page is None:
+            return
+
+        page: ft.Page = self.page
+
         if self.active_name == name:
             return
 
         keyboard.close()
 
         if name == "HOME":
-            self.main_content.content = Home()
             self.__set_active(self.home)
             self.__set_inactive(self.report)
             self.__set_inactive(self.setting)
-            ControlManager.home = self.main_content.content
         elif name == "REPORT":
-            self.main_content.content = ReportInfoList()
             self.__set_inactive(self.home)
             self.__set_active(self.report)
             self.__set_inactive(self.setting)
-            ControlManager.home = None
         else:
-            self.main_content.content = Setting()
             self.__set_inactive(self.home)
             self.__set_inactive(self.report)
             self.__set_active(self.setting)
-            ControlManager.home = None
 
         self.active_name = name
 
-        self.main_content.update()
+        page.pubsub.send_all_on_topic("__change_main_menu", name)
 
     async def sync_utc_date_time(self):
         datetime_conf: DateTimeConf = DateTimeConf.get()
@@ -194,6 +186,11 @@ class Header(ft.AppBar):
                 logging.exception(e)
             await asyncio.sleep(1)
 
+    def before_update(self):
+        system_setting : SystemSettings = SystemSettings.get()
+        self.report.visible = system_setting.sha_po_li
+        self.shapoli.visible = system_setting.sha_po_li
+        
     def did_mount(self):
         self.task_running = True
         self.task = self.page.run_task(self.sync_utc_date_time)
@@ -227,3 +224,4 @@ class Header(ft.AppBar):
             else:
                 # 如果没有启动测试，自动间隔5s
                 await asyncio.sleep(5)
+    

@@ -138,7 +138,7 @@ class IOSettingOutput(CustomCard):
 
     async def __start_modbus_server(self):
         try:
-            succ = await modbus_output.start_modbus_server()
+            succ = await modbus_output.start()
             self.connect_button.visible = not succ
             self.connect_button.update()
             self.disconnect_button.visible = succ

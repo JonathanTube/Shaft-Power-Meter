@@ -90,7 +90,7 @@ class InterfaceConf(CustomCard):
             self.connect_server.text = self.page.session.get("lang.common.connecting")
             self.connect_server.disabled = True
             self.connect_server.update()
-            connected = await ws_client.connect(only_once=True)
+            connected = await ws_client.start(only_once=True)
             # recovery
             self.connect_server.text = self.page.session.get("lang.setting.connect_to_master")
             self.connect_server.disabled = False

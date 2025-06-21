@@ -40,7 +40,7 @@ class DataSaver:
             DataSaver.save_counter_interval(name, speed, power)
             # 广播给客户端数据
 
-            if gdata.hmi_server_started:
+            if gdata.master_server_started:
                 asyncio.create_task(
                     ws_server.broadcast({
                         'type': 'sps_data',

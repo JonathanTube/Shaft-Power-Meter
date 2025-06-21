@@ -40,55 +40,39 @@ class SystemConf(ft.Container):
     def __on_save_button_click(self, e):
         self.page.open(PermissionCheck(self.__save_data, 0))
 
+    def __change_buttons(self):
+        if self.save_button and self.save_button.page:
+            self.save_button.disabled = self.is_saving
+            self.save_button.update()
+
+        if self.reset_button and self.reset_button.page:
+            self.reset_button.disabled = self.is_saving
+            self.reset_button.update()
+
     def __save_data(self, user: User):
+        if self.page is None:
+            return
+
         if self.is_saving:
             return
+
         try:
             self.is_saving = True
-            if self.save_button and self.save_button.page:
-                self.save_button.disabled = True
-                self.save_button.update()
-
-            if self.reset_button and self.reset_button.page:
-                self.reset_button.disabled = True
-                self.reset_button.update()
+            self.__change_buttons()
 
             keyboard.close()
             self.system_conf_settings.save(user.id)
             self.system_conf_ship_info.save(user.id)
             Toast.show_success(self.page)
-            self.__refresh_page()
         except:
             logging.exception("system conf save data error")
             Toast.show_error(self.page)
         finally:
             self.is_saving = False
-            if self.save_button and self.save_button.page:
-                self.save_button.disabled = False
-                self.save_button.update()
-
-            if self.reset_button and self.reset_button.page:
-                self.reset_button.disabled = False
-                self.reset_button.update()
+            self.__change_buttons()
 
     def __reset_data(self, e):
         keyboard.close()
         self.content.clean()
         self.build()
         Toast.show_success(e.page)
-
-
-    def __refresh_page(self):
-        try:
-            if ControlManager.app_bar:
-                ControlManager.app_bar.clean()
-                ControlManager.app_bar.build()
-                ControlManager.app_bar.update()
-
-            if self.page:
-                for control in self.page.controls:
-                    control.clean()
-                    control.build()
-                    control.update()
-        except:
-            logging.exception('refresh controls of page failed.')

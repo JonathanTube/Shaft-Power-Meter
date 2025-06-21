@@ -107,7 +107,7 @@ class GpsSyncTask:
         self.retries = 0
         await asyncio.sleep(1)
 
-    async def close_connection(self):
+    async def close(self):
         self.running = False
         logging.info(f'[***GPS***]disconnected from GPS')
         if self.writer:

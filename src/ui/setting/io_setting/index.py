@@ -5,6 +5,7 @@ from db.models.user import User
 from ui.common.toast import Toast
 from ui.common.permission_check import PermissionCheck
 from ui.setting.io_setting.io_setting_interface import InterfaceConf
+from ui.setting.io_setting.io_setting_master_server import IOSettingMasterServer
 from ui.setting.io_setting.io_setting_plc import IOSettingPLC
 from ui.setting.io_setting.io_setting_gps import IOSettingGPS
 from ui.setting.io_setting.io_setting_sps import IOSettingSPS
@@ -19,7 +20,7 @@ from ui.common.keyboard import keyboard
 class IOSetting(ft.Container):
     def __init__(self):
         super().__init__()
-        self.system_settings:SystemSettings = SystemSettings.get()
+        self.system_settings: SystemSettings = SystemSettings.get()
         self.conf: IOConf = IOConf.get()
 
     def build(self):
@@ -33,7 +34,7 @@ class IOSetting(ft.Container):
             self.gps_conf,
             self.output_conf,
             ft.Row(
-                alignment=ft.MainAxisAlignment.CENTER, 
+                alignment=ft.MainAxisAlignment.CENTER,
                 controls=[self.save_button, self.reset_button]
             )
         ]
@@ -43,10 +44,12 @@ class IOSetting(ft.Container):
             controls.insert(1, self.plc_conf)
             self.sps_conf = IOSettingSPS(self.conf)
             controls.insert(2, self.sps_conf)
+            self.master_server_conf = IOSettingMasterServer()
+            controls.insert(3, self.master_server_conf)
         else:
             self.interface_conf = InterfaceConf(self.conf)
             controls.insert(1, self.interface_conf)
-        
+
         self.content = ft.Column(
             scroll=ft.ScrollMode.ADAPTIVE,
             expand=True,
@@ -69,7 +72,7 @@ class IOSetting(ft.Container):
 
             self.gps_conf.save_data()
             self.output_conf.save_data()
-            
+
             OperationLog.create(
                 user_id=user.id,
                 utc_date_time=gdata.utc_date_time,
@@ -79,7 +82,7 @@ class IOSetting(ft.Container):
             self.conf.save()
             Toast.show_success(self.page)
         except Exception as e:
-            Toast.show_error(self.page ,e)
+            Toast.show_error(self.page, e)
 
     def __reset_data(self, e):
         keyboard.close()

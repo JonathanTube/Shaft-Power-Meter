@@ -49,11 +49,11 @@ class WebSocketServer:
         try:
             self.server = await websockets.serve(self._client_handler, host, port)
             logging.info(f"[***HMI server***] websocket server started at ws://{host}:{port}")
-            gdata.hmi_server_started = True
+            gdata.master_server_started = True
             AlarmSaver.recovery(alarm_type=AlarmType.MASTER_SERVER_STOPPED)
         except Exception:
             AlarmSaver.create(alarm_type=AlarmType.MASTER_SERVER_STOPPED)
-            gdata.hmi_server_started = False
+            gdata.master_server_started = False
             return False
 
         return True
@@ -89,13 +89,13 @@ class WebSocketServer:
             return False
 
 
-    async def stop(self):
+    async def close(self):
         """停止服务端"""
         try:
             if self.server:
                 self.server.close()
                 await self.server.wait_closed()
-                gdata.hmi_server_started = False
+                gdata.master_server_started = False
                 logging.info('[***HMI server***] websocket server has been closed')
                 AlarmSaver.create(alarm_type=AlarmType.MASTER_SERVER_STOPPED)
                 return True
