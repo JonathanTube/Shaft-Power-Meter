@@ -48,7 +48,7 @@ class IOSettingMasterServer(ft.Container):
 
             self.custom_card = CustomCard(
                 self.page.session.get("lang.setting.master_server_conf"),
-                ft.ResponsiveRow(controls=[
+                ft.Row(controls=[
                     self.ip,
                     self.port,
                     self.start_hmi_server,

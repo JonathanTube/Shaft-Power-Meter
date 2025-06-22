@@ -66,7 +66,7 @@ class IOSettingGPS(ft.Container):
 
             self.custom_card = CustomCard(
                 self.page.session.get("lang.setting.gps_conf"),
-                ft.ResponsiveRow(controls=[
+                ft.Row(controls=[
                     self.gps_ip,
                     self.gps_port,
                     self.connect_to_gps,

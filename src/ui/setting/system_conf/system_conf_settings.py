@@ -192,6 +192,8 @@ class SystemConfSettings(ft.Container):
 
         self.system_settings.save()
 
+        gdata.is_master = self.system_settings.is_master
+
         gdata.amount_of_propeller = self.system_settings.amount_of_propeller
         
         gdata.shapoli = self.system_settings.sha_po_li

@@ -32,8 +32,9 @@ class DataSaver:
                 is_overload=is_overload
             )
             # 保存瞬时数据
-            if gdata.plc_enabled:
+            if gdata.is_master and plc_util.is_connected:
                 asyncio.create_task(plc_util.write_instant_data(power, torque, thrust, speed))
+
             # save counter log of total
             DataSaver.save_counter_total(name, speed, power)
             # save counter log of interval

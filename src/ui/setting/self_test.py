@@ -80,14 +80,11 @@ class SelfTest(ft.Tabs):
     async def __read_plc_data(self):
         while self.task_running:
             try:
-                if gdata.connected_to_plc:
-                    plc_4_20_ma_data = await plc_util.read_4_20_ma_data()
-                    self.plc_log.controls.append(ft.Text(f"4-20mA: {plc_4_20_ma_data}"))
-                    self.plc_log.controls.append(ft.Text(f"alarm: {await plc_util.read_alarm()}"))
-                    self.plc_log.controls.append(ft.Text(f"overload: {await plc_util.read_power_overload()}"))
-                    self.plc_log.controls.append(ft.Text(f"instant data: {await plc_util.read_instant_data()}"))
-                else:
-                    self.plc_log.controls.append(ft.Text('Disconnected from PLC'))
+                plc_4_20_ma_data = await plc_util.read_4_20_ma_data()
+                self.plc_log.controls.append(ft.Text(f"4-20mA: {plc_4_20_ma_data}"))
+                self.plc_log.controls.append(ft.Text(f"alarm: {await plc_util.read_alarm()}"))
+                self.plc_log.controls.append(ft.Text(f"overload: {await plc_util.read_power_overload()}"))
+                self.plc_log.controls.append(ft.Text(f"instant data: {await plc_util.read_instant_data()}"))
                 self.plc_log.update()
             except Exception as e:
                 logging.exception('exception occured at SelfTest.__read_plc_data')

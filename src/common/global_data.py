@@ -1,6 +1,5 @@
 from datetime import datetime
 from db.models.factor_conf import FactorConf
-from db.models.io_conf import IOConf
 from db.models.offline_default_value import OfflineDefaultValue
 from db.models.system_settings import SystemSettings
 from db.models.propeller_setting import PropellerSetting
@@ -10,6 +9,8 @@ from db.models.zero_cal_info import ZeroCalInfo
 
 class GlobalData:
     def __init__(self):
+        self.is_master = False
+
         self.auto_testing = False
 
         self.default_table_width = 990
@@ -33,12 +34,8 @@ class GlobalData:
         self.connected_to_hmi_server = False
         # modbus output服务是否已经打开
         self.modbus_server_started = False
-        # 是否连上PLC
-        self.connected_to_plc = False
         # 是否连上gps
         self.connected_to_gps = False
-
-        self.plc_enabled = False
 
         self.sps1_speed = 0
         self.sps1_power = 0
@@ -104,6 +101,8 @@ class GlobalData:
     def set_default_value(self):
         systemSettings: SystemSettings = SystemSettings.get()
 
+        self.is_master = systemSettings.is_master
+
         self.amount_of_propeller = systemSettings.amount_of_propeller
 
         self.shapoli = systemSettings.sha_po_li
@@ -114,20 +113,6 @@ class GlobalData:
 
         dateTimeConf: DateTimeConf = DateTimeConf.get()
         self.enable_utc_time_sync_with_gps = dateTimeConf.sync_with_gps
-
-        io_conf: IOConf = IOConf.get()
-        self.gps_ip = io_conf.gps_ip
-        self.gps_port = io_conf.gps_port
-        self.plc_enabled = io_conf.plc_enabled
-
-        self.sps1_ip = io_conf.sps1_ip
-        self.sps1_port = io_conf.sps1_port
-
-        self.sps2_ip = io_conf.sps2_ip
-        self.sps2_port = io_conf.sps2_port
-
-        self.plc_ip = io_conf.plc_ip
-        self.plc_port = io_conf.plc_port
 
         propellerSetting: PropellerSetting = PropellerSetting.get()
         self.speed_of_mcr = propellerSetting.rpm_of_mcr_operating_point

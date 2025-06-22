@@ -3,6 +3,7 @@ import ctypes
 import sys
 import logging
 import flet as ft
+from db.models.io_conf import IOConf
 from db.models.system_settings import SystemSettings
 from task.utc_timer_task import UtcTimer
 from ui.common.fullscreen_alert import FullscreenAlert
@@ -93,7 +94,9 @@ def start_all_task():
 
         # 如果是主机
         if system_settings.is_master:
-            asyncio.create_task(plc_util.auto_reconnect())
+            io_conf: IOConf = IOConf.get()
+            if io_conf.plc_enabled:
+                asyncio.create_task(plc_util.connect())
             asyncio.create_task(sps1_read_task.start())
             asyncio.create_task(ws_server.start())
             # start sps2 JM3846 if dual propellers.

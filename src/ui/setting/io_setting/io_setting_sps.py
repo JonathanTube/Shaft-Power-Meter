@@ -173,10 +173,9 @@ class IOSettingSPS(ft.Container):
             self.custom_card = CustomCard(
                 self.page.session.get("lang.setting.sps_conf"),
                 ft.ResponsiveRow(controls=[
-                    self.ip,
-                    self.port,
-                    self.start_hmi_server,
-                    self.stop_hmi_server
+                    self.row_sps1,
+                    self.row_sps2,
+                    self.column_factor
                 ]),
                 col={"xs": 12})
             self.content = self.custom_card
