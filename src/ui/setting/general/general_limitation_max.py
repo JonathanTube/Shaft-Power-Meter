@@ -1,3 +1,4 @@
+import logging
 import flet as ft
 
 from db.models.limitations import Limitations
@@ -19,59 +20,74 @@ class GeneralLimitationMax(ft.Container):
         self.limitations: Limitations = Limitations.get()
 
     def build(self):
-        self.speed_max = ft.TextField(suffix_text="rpm",
-                                      label=self.page.session.get("lang.common.speed"),
-                                      value=self.limitations.speed_max,
-                                      read_only=True,
-                                      can_request_focus=False,
-                                      on_click=lambda e: keyboard.open(e.control))
+        try:
+            if self.page:
+                self.speed_max = ft.TextField(
+                    suffix_text="rpm",
+                    label=self.page.session.get("lang.common.speed"),
+                    value=self.limitations.speed_max,
+                    read_only=True,
+                    can_request_focus=False,
+                    on_click=lambda e: keyboard.open(e.control))
 
-        self.torque_max = ft.TextField(suffix_text="kNm",
-                                       label=self.page.session.get("lang.common.torque"),
-                                       value=self.limitations.torque_max,
-                                       read_only=True,
-                                       can_request_focus=False,
-                                       on_click=lambda e: keyboard.open(e.control))
+                self.torque_max = ft.TextField(
+                    suffix_text="kNm",
+                    label=self.page.session.get("lang.common.torque"),
+                    value=self.limitations.torque_max,
+                    read_only=True,
+                    can_request_focus=False,
+                    on_click=lambda e: keyboard.open(e.control))
 
-        self.power_max = ft.TextField(suffix_text="kW",
-                                      label=self.page.session.get("lang.common.power"),
-                                      value=self.limitations.power_max,
-                                      read_only=True,
-                                      can_request_focus=False,
-                                      on_click=lambda e: keyboard.open(e.control))
+                self.power_max = ft.TextField(
+                    suffix_text="kW",
+                    label=self.page.session.get("lang.common.power"),
+                    value=self.limitations.power_max,
+                    read_only=True,
+                    can_request_focus=False,
+                    on_click=lambda e: keyboard.open(e.control))
 
-        self.custom_card = CustomCard(
-            self.page.session.get("lang.setting.maximum_limitations"),
-            ft.Column(controls=[self.speed_max, self.torque_max, self.power_max])
-        )
-        self.content = self.custom_card
+                self.custom_card = CustomCard(
+                    self.page.session.get("lang.setting.maximum_limitations"),
+                    ft.Column(controls=[self.speed_max, self.torque_max, self.power_max])
+                )
+                self.content = self.custom_card
+        except:
+            logging.exception('exception occured at GeneralLimitationMax.build')
 
     def before_update(self):
-        s = self.page.session
-        self.speed_max.label = s.get("lang.common.speed")
-        self.torque_max.label = s.get("lang.common.torque")
-        self.power_max.label = s.get("lang.common.power")
-        self.custom_card.set_title(s.get("lang.setting.maximum_limitations"))
+        try:
+            if self.page:
+                s = self.page.session
+                self.speed_max.label = s.get("lang.common.speed")
+                self.torque_max.label = s.get("lang.common.torque")
+                self.power_max.label = s.get("lang.common.power")
+                self.custom_card.set_title(s.get("lang.setting.maximum_limitations"))
+        except:
+            logging.exception('exception occured at GeneralLimitationMax.before_update')
 
     def update_unit(self, system_unit: int):
-        self.system_unit = system_unit
-        torque_limit = self.limitations.torque_max
-        power_limit = self.limitations.power_max
-        if self.system_unit == 0:
-            self.torque_max.suffix_text = "kNm"
-            self.torque_max.value = round(torque_limit / 1000, 1)
+        try:
+            if self.page:
+                self.system_unit = system_unit
+                torque_limit = self.limitations.torque_max
+                power_limit = self.limitations.power_max
+                if self.system_unit == 0:
+                    self.torque_max.suffix_text = "kNm"
+                    self.torque_max.value = round(torque_limit / 1000, 1)
 
-            self.power_max.suffix_text = "kW"
-            self.power_max.value = round(power_limit / 1000, 1)
+                    self.power_max.suffix_text = "kW"
+                    self.power_max.value = round(power_limit / 1000, 1)
 
-        elif self.system_unit == 1:
-            self.torque_max.suffix_text = "Tm"
-            self.torque_max.value = UnitConverter.nm_to_tm(torque_limit)
+                elif self.system_unit == 1:
+                    self.torque_max.suffix_text = "Tm"
+                    self.torque_max.value = UnitConverter.nm_to_tm(torque_limit)
 
-            self.power_max.suffix_text = "sHp"
-            self.power_max.value = UnitConverter.w_to_shp(power_limit)
+                    self.power_max.suffix_text = "sHp"
+                    self.power_max.value = UnitConverter.w_to_shp(power_limit)
 
-        self.content.update()
+                self.content.update()
+        except:
+            logging.exception('exception occured at GeneralLimitationMax.update_unit')
 
     def save_data(self, user_id: int):
         # save limitations

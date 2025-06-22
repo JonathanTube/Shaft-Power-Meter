@@ -1,4 +1,5 @@
 from datetime import datetime
+import logging
 import flet as ft
 from common.global_data import gdata
 from ui.common.custom_card import CustomCard
@@ -15,75 +16,91 @@ class GeneralDateTime(ft.Container):
         self.date_time_conf: DateTimeConf = DateTimeConf.get()
 
     def build(self):
-        s = self.page.session
+        try:
+            if self.page:
+                s = self.page.session
 
-        self.utc_date = ft.TextField(
-            label=s.get("lang.setting.date"),
-            col={"md": 6},
-            can_request_focus=False,
-            value=self.date_time_conf.utc_date_time.strftime('%Y-%m-%d'),
-            on_click=lambda e: e.page.open(
-                ft.DatePicker(
-                    on_change=self.__handle_date_change,
-                    current_date=self.date_time_conf.utc_date_time.date()
+                self.utc_date = ft.TextField(
+                    label=s.get("lang.setting.date"),
+                    col={"md": 6},
+                    can_request_focus=False,
+                    value=self.date_time_conf.utc_date_time.strftime('%Y-%m-%d'),
+                    on_click=lambda e: e.page.open(
+                        ft.DatePicker(
+                            on_change=self.__handle_date_change,
+                            current_date=self.date_time_conf.utc_date_time.date()
+                        )
+                    )
                 )
-            )
-        )
 
-        self.utc_time = ft.TextField(
-            label=s.get("lang.setting.time"),
-            col={"md": 6},
-            can_request_focus=False,
-            value=self.date_time_conf.utc_date_time.strftime('%H:%M'),
-            on_click=lambda e: e.page.open(
-                ft.TimePicker(
-                    on_change=self.__handle_time_change
+                self.utc_time = ft.TextField(
+                    label=s.get("lang.setting.time"),
+                    col={"md": 6},
+                    can_request_focus=False,
+                    value=self.date_time_conf.utc_date_time.strftime('%H:%M'),
+                    on_click=lambda e: e.page.open(
+                        ft.TimePicker(
+                            on_change=self.__handle_time_change
+                        )
+                    )
                 )
-            )
-        )
 
-        self.date_format = ft.Dropdown(
-            label=s.get("lang.setting.date_format"), col={"md": 6},
-            value=self.date_time_conf.date_format,
-            options=[ft.DropdownOption(text="YYYY-MM-dd", key="%Y-%m-%d"),
-                     ft.DropdownOption(text="YYYY/MM/dd", key="%Y/%m/%d"),
-                     ft.DropdownOption(text="dd/MM/YYYY", key="%d/%m/%Y"),
-                     ft.DropdownOption(text="MM/dd/YYYY", key="%m/%d/%Y")]
-        )
+                self.date_format = ft.Dropdown(
+                    label=s.get("lang.setting.date_format"), col={"md": 6},
+                    value=self.date_time_conf.date_format,
+                    options=[ft.DropdownOption(text="YYYY-MM-dd", key="%Y-%m-%d"),
+                             ft.DropdownOption(text="YYYY/MM/dd", key="%Y/%m/%d"),
+                             ft.DropdownOption(text="dd/MM/YYYY", key="%d/%m/%Y"),
+                             ft.DropdownOption(text="MM/dd/YYYY", key="%m/%d/%Y")]
+                )
 
-        self.sync_with_gps = ft.Checkbox(label=s.get("lang.setting.sync_with_gps"), col={"md": 6}, value=self.date_time_conf.sync_with_gps)
+                self.sync_with_gps = ft.Checkbox(label=s.get("lang.setting.sync_with_gps"), col={"md": 6}, value=self.date_time_conf.sync_with_gps)
 
-        self.custom_card = CustomCard(
-            s.get("lang.setting.utc_date_time_conf"),
-            ft.ResponsiveRow(
-                controls=[
-                    self.utc_date,
-                    self.utc_time,
-                    self.date_format,
-                    self.sync_with_gps
-                ]
-            ),
-            col={"xs": 12}
-        )
-        self.content = self.custom_card
+                self.custom_card = CustomCard(
+                    s.get("lang.setting.utc_date_time_conf"),
+                    ft.ResponsiveRow(
+                        controls=[
+                            self.utc_date,
+                            self.utc_time,
+                            self.date_format,
+                            self.sync_with_gps
+                        ]
+                    ),
+                    col={"xs": 12}
+                )
+                self.content = self.custom_card
+        except:
+            logging.exception('exception occured at GeneralDateTime.build')
 
     def before_update(self):
-        s = self.page.session
-        self.utc_date.label = s.get("lang.setting.date")
-        self.utc_time.label = s.get("lang.setting.time")
-        self.date_format.label = s.get("lang.setting.date_format")
-        self.sync_with_gps.label = s.get("lang.setting.sync_with_gps")
-        self.custom_card.set_title(s.get("lang.setting.utc_date_time_conf"))
+        try:
+            if self.page:
+                s = self.page.session
+                self.utc_date.label = s.get("lang.setting.date")
+                self.utc_time.label = s.get("lang.setting.time")
+                self.date_format.label = s.get("lang.setting.date_format")
+                self.sync_with_gps.label = s.get("lang.setting.sync_with_gps")
+                self.custom_card.set_title(s.get("lang.setting.utc_date_time_conf"))
+        except:
+            logging.exception('exception occured at GeneralDateTime.build')
 
     def __handle_date_change(self, e):
-        utc_date = e.control.value.strftime('%Y-%m-%d')
-        self.utc_date.value = utc_date
-        self.utc_date.update()
+        try:
+            utc_date = e.control.value.strftime('%Y-%m-%d')
+            if self.utc_date and self.utc_date.page:
+                self.utc_date.value = utc_date
+                self.utc_date.update()
+        except:
+            logging.exception('exception occured at GeneralDateTime.__handle_date_change')
 
     def __handle_time_change(self, e):
-        utc_time = e.control.value.strftime('%H:%M')
-        self.utc_time.value = utc_time
-        self.utc_time.update()
+        try:
+            utc_time = e.control.value.strftime('%H:%M')
+            if self.utc_time and self.utc_time.page:
+                self.utc_time.value = utc_time
+                self.utc_time.update()
+        except:
+            logging.exception('exception occured at GeneralDateTime.__handle_time_change')
 
     def save_data(self, user_id: int):
         standard_date_time_format = '%Y-%m-%d %H:%M:%S'

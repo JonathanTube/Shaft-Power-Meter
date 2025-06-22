@@ -16,7 +16,7 @@ from task.sps1_read_task import sps1_read_task
 from task.sps2_read_task import sps2_read_task
 
 
-class IOSettingSPS(CustomCard):
+class IOSettingSPS(ft.Container):
     def __init__(self, conf: IOConf):
         super().__init__()
         self.conf: IOConf = conf
@@ -29,155 +29,160 @@ class IOSettingSPS(CustomCard):
         self.task_running = False
 
     def build(self):
-        # sps conf. start
-        self.sps1_ip = ft.TextField(
-            label=f'{self.page.session.get("lang.setting.ip")} SPS1',
-            value=self.conf.sps1_ip,
-            read_only=True,
-            can_request_focus=False,
-            on_click=lambda e: keyboard.open(e.control, 'ip')
-        )
+        try:
+            # sps conf. start
+            self.sps1_ip = ft.TextField(
+                label=f'{self.page.session.get("lang.setting.ip")} SPS1',
+                value=self.conf.sps1_ip,
+                read_only=True,
+                can_request_focus=False,
+                on_click=lambda e: keyboard.open(e.control, 'ip')
+            )
 
-        self.sps1_port = ft.TextField(
-            label=f'{self.page.session.get("lang.setting.port")} SPS1',
-            value=self.conf.sps1_port,
-            read_only=True,
-            can_request_focus=False,
-            on_click=lambda e: keyboard.open(e.control, 'int')
-        )
+            self.sps1_port = ft.TextField(
+                label=f'{self.page.session.get("lang.setting.port")} SPS1',
+                value=self.conf.sps1_port,
+                read_only=True,
+                can_request_focus=False,
+                on_click=lambda e: keyboard.open(e.control, 'int')
+            )
 
-        self.sps1_connect = ft.FilledButton(
-            text=self.page.session.get("lang.setting.connect"),
-            bgcolor=ft.Colors.GREEN,
-            color=ft.Colors.WHITE,
-            visible=gdata.sps1_offline,
-            style=ft.ButtonStyle(
-                shape=ft.RoundedRectangleBorder(radius=5)
-            ),
-            on_click=lambda e: self.page.open(PermissionCheck(self.__connect_to_sps1, 2))
-        )
+            self.sps1_connect = ft.FilledButton(
+                text=self.page.session.get("lang.setting.connect"),
+                bgcolor=ft.Colors.GREEN,
+                color=ft.Colors.WHITE,
+                visible=gdata.sps1_offline,
+                style=ft.ButtonStyle(
+                    shape=ft.RoundedRectangleBorder(radius=5)
+                ),
+                on_click=lambda e: self.page.open(PermissionCheck(self.__connect_to_sps1, 2))
+            )
 
-        self.sps1_disconnect = ft.FilledButton(
-            text=self.page.session.get("lang.setting.disconnect"),
-            bgcolor=ft.Colors.RED,
-            color=ft.Colors.WHITE,
-            visible=not gdata.sps1_offline,
-            style=ft.ButtonStyle(
-                shape=ft.RoundedRectangleBorder(radius=5)
-            ),
-            on_click=lambda e: self.page.open(PermissionCheck(self.__disconnect_from_sps1, 2))
-        )
+            self.sps1_disconnect = ft.FilledButton(
+                text=self.page.session.get("lang.setting.disconnect"),
+                bgcolor=ft.Colors.RED,
+                color=ft.Colors.WHITE,
+                visible=not gdata.sps1_offline,
+                style=ft.ButtonStyle(
+                    shape=ft.RoundedRectangleBorder(radius=5)
+                ),
+                on_click=lambda e: self.page.open(PermissionCheck(self.__disconnect_from_sps1, 2))
+            )
 
-        self.sps2_ip = ft.TextField(
-            label=f'{self.page.session.get("lang.setting.ip")} SPS2',
-            value=self.conf.sps2_ip,
-            read_only=True,
-            can_request_focus=False,
-            on_click=lambda e: keyboard.open(e.control, 'ip')
-        )
+            self.sps2_ip = ft.TextField(
+                label=f'{self.page.session.get("lang.setting.ip")} SPS2',
+                value=self.conf.sps2_ip,
+                read_only=True,
+                can_request_focus=False,
+                on_click=lambda e: keyboard.open(e.control, 'ip')
+            )
 
-        self.sps2_port = ft.TextField(
-            label=f'{self.page.session.get("lang.setting.port")} SPS2',
-            value=self.conf.sps2_port,
-            read_only=True,
-            can_request_focus=False,
-            on_click=lambda e: keyboard.open(e.control, 'int')
-        )
+            self.sps2_port = ft.TextField(
+                label=f'{self.page.session.get("lang.setting.port")} SPS2',
+                value=self.conf.sps2_port,
+                read_only=True,
+                can_request_focus=False,
+                on_click=lambda e: keyboard.open(e.control, 'int')
+            )
 
-        self.sps2_connect = ft.FilledButton(
-            text=self.page.session.get("lang.setting.connect"),
-            bgcolor=ft.Colors.GREEN,
-            color=ft.Colors.WHITE,
-            visible=gdata.sps2_offline,
-            style=ft.ButtonStyle(
-                shape=ft.RoundedRectangleBorder(radius=5)
-            ),
-            on_click=lambda e: self.page.open(PermissionCheck(self.__connect_to_sps2, 2))
-        )
+            self.sps2_connect = ft.FilledButton(
+                text=self.page.session.get("lang.setting.connect"),
+                bgcolor=ft.Colors.GREEN,
+                color=ft.Colors.WHITE,
+                visible=gdata.sps2_offline,
+                style=ft.ButtonStyle(
+                    shape=ft.RoundedRectangleBorder(radius=5)
+                ),
+                on_click=lambda e: self.page.open(PermissionCheck(self.__connect_to_sps2, 2))
+            )
 
-        self.sps2_disconnect = ft.FilledButton(
-            text=self.page.session.get("lang.setting.disconnect"),
-            bgcolor=ft.Colors.RED,
-            color=ft.Colors.WHITE,
-            visible=not gdata.sps2_offline,
-            style=ft.ButtonStyle(
-                shape=ft.RoundedRectangleBorder(radius=5)
-            ),
-            on_click=lambda e: self.page.open(PermissionCheck(self.__disconnect_from_sps2,2))
-        )
-        # sps conf. end
+            self.sps2_disconnect = ft.FilledButton(
+                text=self.page.session.get("lang.setting.disconnect"),
+                bgcolor=ft.Colors.RED,
+                color=ft.Colors.WHITE,
+                visible=not gdata.sps2_offline,
+                style=ft.ButtonStyle(
+                    shape=ft.RoundedRectangleBorder(radius=5)
+                ),
+                on_click=lambda e: self.page.open(PermissionCheck(self.__disconnect_from_sps2, 2))
+            )
+            # sps conf. end
 
-        # factor conf. start
-        self.shaft_outer_diameter = ft.TextField(
-            label=self.page.session.get("lang.setting.bearing_outer_diameter_D"), suffix_text="m",
-            value=self.factor_conf.bearing_outer_diameter_D,
-            read_only=True,
-            can_request_focus=False,
-            on_click=lambda e: keyboard.open(e.control)
-        )
+            # factor conf. start
+            self.shaft_outer_diameter = ft.TextField(
+                label=self.page.session.get("lang.setting.bearing_outer_diameter_D"), suffix_text="m",
+                value=self.factor_conf.bearing_outer_diameter_D,
+                read_only=True,
+                can_request_focus=False,
+                on_click=lambda e: keyboard.open(e.control)
+            )
 
-        self.shaft_inner_diameter = ft.TextField(
-            label=self.page.session.get(
-                "lang.setting.bearing_inner_diameter_d"),
-            suffix_text="m",
-            value=self.factor_conf.bearing_inner_diameter_d,
-            read_only=True,
-            can_request_focus=False,
-            on_click=lambda e: keyboard.open(e.control)
-        )
+            self.shaft_inner_diameter = ft.TextField(
+                label=self.page.session.get(
+                    "lang.setting.bearing_inner_diameter_d"),
+                suffix_text="m",
+                value=self.factor_conf.bearing_inner_diameter_d,
+                read_only=True,
+                can_request_focus=False,
+                on_click=lambda e: keyboard.open(e.control)
+            )
 
-        self.sensitivity_factor_k = ft.TextField(
-            label=self.page.session.get("lang.setting.sensitivity_factor_k"),
-            value=self.factor_conf.sensitivity_factor_k,
-            read_only=True,
-            can_request_focus=False,
-            on_click=lambda e: keyboard.open(e.control)
-        )
+            self.sensitivity_factor_k = ft.TextField(
+                label=self.page.session.get("lang.setting.sensitivity_factor_k"),
+                value=self.factor_conf.sensitivity_factor_k,
+                read_only=True,
+                can_request_focus=False,
+                on_click=lambda e: keyboard.open(e.control)
+            )
 
-        self.elastic_modulus_E = ft.TextField(
-            label=self.page.session.get("lang.setting.elastic_modulus_E"),
-            value=self.factor_conf.elastic_modulus_E,
-            suffix_text="Mpa",
-            read_only=True,
-            can_request_focus=False,
-            on_click=lambda e: keyboard.open(e.control)
-        )
+            self.elastic_modulus_E = ft.TextField(
+                label=self.page.session.get("lang.setting.elastic_modulus_E"),
+                value=self.factor_conf.elastic_modulus_E,
+                suffix_text="Mpa",
+                read_only=True,
+                can_request_focus=False,
+                on_click=lambda e: keyboard.open(e.control)
+            )
 
-        self.poisson_ratio_mu = ft.TextField(
-            label=self.page.session.get("lang.setting.poisson_ratio_mu"),
-            value=self.factor_conf.poisson_ratio_mu,
-            read_only=True,
-            can_request_focus=False,
-            on_click=lambda e: keyboard.open(e.control)
-        )
-        # factor conf. end
+            self.poisson_ratio_mu = ft.TextField(
+                label=self.page.session.get("lang.setting.poisson_ratio_mu"),
+                value=self.factor_conf.poisson_ratio_mu,
+                read_only=True,
+                can_request_focus=False,
+                on_click=lambda e: keyboard.open(e.control)
+            )
+            # factor conf. end
 
-        self.heading = self.page.session.get("lang.setting.sps_conf")
+            self.row_sps1 = ft.Row(
+                controls=[self.sps1_ip, self.sps1_port, self.sps1_connect, self.sps1_disconnect]
+            )
 
-        self.row_sps1 = ft.Row(
-            controls=[self.sps1_ip, self.sps1_port, self.sps1_connect, self.sps1_disconnect]
-        )
+            self.row_sps2 = ft.Row(
+                controls=[self.sps2_ip, self.sps2_port, self.sps2_connect, self.sps2_disconnect],
+                visible=self.is_dual
+            )
 
-        self.row_sps2 = ft.Row(
-            controls=[self.sps2_ip, self.sps2_port, self.sps2_connect, self.sps2_disconnect],
-            visible=self.is_dual
-        )
+            self.column_factor = ft.Column(
+                controls=[
+                    ft.Row(controls=[self.shaft_outer_diameter, self.shaft_inner_diameter]),
+                    ft.Row(controls=[self.sensitivity_factor_k, self.elastic_modulus_E]),
+                    ft.Row(controls=[self.poisson_ratio_mu])
+                ]
+            )
 
-        self.column_factor = ft.Column(
-            controls=[
-                ft.Row(controls=[self.shaft_outer_diameter, self.shaft_inner_diameter]),
-                ft.Row(controls=[self.sensitivity_factor_k, self.elastic_modulus_E]),
-                ft.Row(controls=[self.poisson_ratio_mu])
-            ]
-        )
+            self.custom_card = CustomCard(
+                self.page.session.get("lang.setting.sps_conf"),
+                ft.ResponsiveRow(controls=[
+                    self.ip,
+                    self.port,
+                    self.start_hmi_server,
+                    self.stop_hmi_server
+                ]),
+                col={"xs": 12})
+            self.content = self.custom_card
+        except:
+            logging.exception('exception occured at IOSettingSPS.build')
 
-        self.body = ft.Column(controls=[
-            self.row_sps1,
-            self.row_sps2,
-            self.column_factor
-        ])
-        self.col = {"sm": 12}
-        super().build()
 
     def __connect_to_sps1(self, user: User):
         OperationLog.create(
@@ -202,7 +207,7 @@ class IOSettingSPS(CustomCard):
         except Exception as e:
             logging.exception(e)
 
-    def __disconnect_from_sps1(self, user:User):
+    def __disconnect_from_sps1(self, user: User):
         OperationLog.create(
             user_id=user.id,
             utc_date_time=gdata.utc_date_time,
@@ -229,13 +234,13 @@ class IOSettingSPS(CustomCard):
             self.sps2_connect.text = self.page.session.get("lang.common.connecting")
             self.sps2_connect.disabled = True
             self.sps2_connect.update()
-        
+
             self.page.run(sps2_read_task.start, only_once=True)
             self.__handle_sps2_connection()
         except Exception as e:
             logging.exception(e)
 
-    def __disconnect_from_sps2(self, user:User):
+    def __disconnect_from_sps2(self, user: User):
         OperationLog.create(
             user_id=user.id,
             utc_date_time=gdata.utc_date_time,
@@ -287,7 +292,7 @@ class IOSettingSPS(CustomCard):
 
         self.sps1_disconnect.visible = not gdata.sps1_offline
         self.sps1_disconnect.update()
-    
+
     def __handle_sps2_connection(self):
         self.sps2_connect.text = self.page.session.get("lang.setting.connect")
         self.sps2_connect.visible = gdata.sps2_offline
@@ -302,7 +307,7 @@ class IOSettingSPS(CustomCard):
             try:
                 if not self.sps1_connect.disabled:
                     self.__handle_sps1_connection()
-                    
+
                 if not self.sps2_connect.disabled:
                     self.__handle_sps2_connection()
             except Exception as e:

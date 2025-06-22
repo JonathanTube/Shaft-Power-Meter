@@ -31,36 +31,40 @@ class General(ft.Container):
         self.general_ofline_default_value.update_unit(system_unit)
 
     def build(self):
-        self.general_preference = GeneralPreference(self.__on_system_unit_change)
-        self.limitation_max = GeneralLimitationMax(self.system_unit)
-        self.limitation_warning = GeneralLimitationWarning(self.system_unit)
-        self.general_date_time = GeneralDateTime()
-        self.general_ofline_default_value = GeneralOflineDefaultValue(self.system_unit)
+        try:
+            if self.page:
+                self.general_preference = GeneralPreference(self.__on_system_unit_change)
+                self.limitation_max = GeneralLimitationMax(self.system_unit)
+                self.limitation_warning = GeneralLimitationWarning(self.system_unit)
+                self.general_date_time = GeneralDateTime()
+                self.general_ofline_default_value = GeneralOflineDefaultValue(self.system_unit)
 
-        self.save_btn = ft.FilledButton(self.page.session.get("lang.button.save"), width=120, height=40, on_click=lambda e: self.__on_save_button_click(e))
-        self.reset_btn = ft.OutlinedButton(self.page.session.get("lang.button.reset"), width=120, height=40, on_click=lambda e: self.__reset_data(e))
+                self.save_btn = ft.FilledButton(self.page.session.get("lang.button.save"), width=120, height=40, on_click=lambda e: self.__on_save_button_click(e))
+                self.reset_btn = ft.OutlinedButton(self.page.session.get("lang.button.reset"), width=120, height=40, on_click=lambda e: self.__reset_data(e))
 
-        self.content = ft.Column(
-            scroll=ft.ScrollMode.ADAPTIVE,
-            expand=True,
-            controls=[
-                ft.ResponsiveRow(
+                self.content = ft.Column(
+                    scroll=ft.ScrollMode.ADAPTIVE,
+                    expand=True,
                     controls=[
-                        self.general_preference,
-                        self.limitation_max,
-                        self.limitation_warning,
-                        self.general_ofline_default_value,
-                        self.general_date_time,
-                        ft.Row(
-                            alignment=ft.MainAxisAlignment.CENTER,
+                        ft.ResponsiveRow(
                             controls=[
-                                self.save_btn,
-                                self.reset_btn
-                            ])
+                                self.general_preference,
+                                self.limitation_max,
+                                self.limitation_warning,
+                                self.general_ofline_default_value,
+                                self.general_date_time,
+                                ft.Row(
+                                    alignment=ft.MainAxisAlignment.CENTER,
+                                    controls=[
+                                        self.save_btn,
+                                        self.reset_btn
+                                    ])
+                            ]
+                        )
                     ]
                 )
-            ]
-        )
+        except:
+            logging.exception('exception occured at General.build')
 
     def __change_buttons(self):
         if self.save_btn and self.save_btn.page:

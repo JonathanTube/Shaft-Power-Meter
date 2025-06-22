@@ -9,52 +9,55 @@ from websocket.websocket_server import ws_server
 from common.global_data import gdata
 
 
-class IOSettingMasterServer(CustomCard):
+class IOSettingMasterServer(ft.Container):
     def build(self):
-        self.ip = ft.TextField(
-            label=f'HMI {self.page.session.get("lang.setting.ip")}',
-            value='0.0.0.0',
-            read_only=True
-        )
+        try:
+            self.ip = ft.TextField(
+                label=f'HMI {self.page.session.get("lang.setting.ip")}',
+                value='0.0.0.0',
+                read_only=True
+            )
 
-        self.port = ft.TextField(
-            label=f'HMI {self.page.session.get("lang.setting.port")}',
-            value='8000',
-            read_only=True
-        )
+            self.port = ft.TextField(
+                label=f'HMI {self.page.session.get("lang.setting.port")}',
+                value='8000',
+                read_only=True
+            )
 
-        self.start_hmi_server = ft.FilledButton(
-            text=self.page.session.get("lang.setting.start_master_server"),
-            bgcolor=ft.Colors.GREEN,
-            color=ft.Colors.WHITE,
-            visible=not gdata.master_server_started,
-            style=ft.ButtonStyle(
-                shape=ft.RoundedRectangleBorder(radius=5)
-            ),
-            on_click=lambda e: self.page.open(PermissionCheck(self.__start_server, 2))
-        )
+            self.start_hmi_server = ft.FilledButton(
+                text=self.page.session.get("lang.setting.start_master_server"),
+                bgcolor=ft.Colors.GREEN,
+                color=ft.Colors.WHITE,
+                visible=not gdata.master_server_started,
+                style=ft.ButtonStyle(
+                    shape=ft.RoundedRectangleBorder(radius=5)
+                ),
+                on_click=lambda e: self.page.open(PermissionCheck(self.__start_server, 2))
+            )
 
-        self.stop_hmi_server = ft.FilledButton(
-            text=self.page.session.get("lang.setting.stop_master_server"),
-            bgcolor=ft.Colors.RED,
-            color=ft.Colors.WHITE,
-            visible=gdata.master_server_started,
-            style=ft.ButtonStyle(
-                shape=ft.RoundedRectangleBorder(radius=5)
-            ),
-            on_click=lambda e: self.page.open(PermissionCheck(self.__stop_server, 2))
-        )
+            self.stop_hmi_server = ft.FilledButton(
+                text=self.page.session.get("lang.setting.stop_master_server"),
+                bgcolor=ft.Colors.RED,
+                color=ft.Colors.WHITE,
+                visible=gdata.master_server_started,
+                style=ft.ButtonStyle(
+                    shape=ft.RoundedRectangleBorder(radius=5)
+                ),
+                on_click=lambda e: self.page.open(PermissionCheck(self.__stop_server, 2))
+            )
 
-        self.heading = self.page.session.get("lang.setting.master_server_conf")
-
-        self.body = ft.Row(controls=[
-            self.ip,
-            self.port,
-            self.start_hmi_server,
-            self.stop_hmi_server
-        ])
-        self.col = {"sm": 12}
-        super().build()
+            self.custom_card = CustomCard(
+                self.page.session.get("lang.setting.master_server_conf"),
+                ft.ResponsiveRow(controls=[
+                    self.ip,
+                    self.port,
+                    self.start_hmi_server,
+                    self.stop_hmi_server
+                ]),
+                col={"xs": 12})
+            self.content = self.custom_card
+        except:
+            logging.exception('exception occured at IOSettingMasterServer.build')
 
     def __start_server(self, user: User):
         try:

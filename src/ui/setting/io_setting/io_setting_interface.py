@@ -12,66 +12,63 @@ from websocket.websocket_client import ws_client
 from common.global_data import gdata
 
 
-class InterfaceConf(CustomCard):
+class InterfaceConf(ft.Container):
     def __init__(self, conf: IOConf):
         super().__init__()
         self.conf: IOConf = conf
 
     def build(self):
-        self.connect_server = ft.FilledButton(
-            text=self.page.session.get("lang.setting.connect_to_master"),
-            bgcolor=ft.Colors.GREEN,
-            color=ft.Colors.WHITE,
-            visible=not gdata.connected_to_hmi_server,
-            style=ft.ButtonStyle(
-                shape=ft.RoundedRectangleBorder(radius=5)
-            ),
-            on_click=lambda e: self.page.open(PermissionCheck(self.__connect_to_master,2))
-        )
+        try:
+            self.connect_server = ft.FilledButton(
+                text=self.page.session.get("lang.setting.connect_to_master"),
+                bgcolor=ft.Colors.GREEN,
+                color=ft.Colors.WHITE,
+                visible=not gdata.connected_to_hmi_server,
+                style=ft.ButtonStyle(
+                    shape=ft.RoundedRectangleBorder(radius=5)
+                ),
+                on_click=lambda e: self.page.open(PermissionCheck(self.__connect_to_master, 2))
+            )
 
-        self.disconnect_server = ft.FilledButton(
-            text=self.page.session.get("lang.setting.disconnect_from_hmi_server"),
-            bgcolor=ft.Colors.RED,
-            color=ft.Colors.WHITE,
-            visible=gdata.connected_to_hmi_server,
-            style=ft.ButtonStyle(
-                shape=ft.RoundedRectangleBorder(radius=5)
-            ),
-            on_click=lambda e: self.page.open(PermissionCheck(self.__disconnect_from_hmi_server ,2))
-        )
+            self.disconnect_server = ft.FilledButton(
+                text=self.page.session.get("lang.setting.disconnect_from_hmi_server"),
+                bgcolor=ft.Colors.RED,
+                color=ft.Colors.WHITE,
+                visible=gdata.connected_to_hmi_server,
+                style=ft.ButtonStyle(
+                    shape=ft.RoundedRectangleBorder(radius=5)
+                ),
+                on_click=lambda e: self.page.open(PermissionCheck(self.__disconnect_from_hmi_server, 2))
+            )
 
-        self.hmi_server_ip = ft.TextField(
-            label=self.page.session.get("lang.setting.hmi_server_ip"),
-            value=self.conf.hmi_server_ip,
-            read_only=True,
-            can_request_focus=False,
-            on_click=lambda e: keyboard.open(e.control, 'ip')
-        )
+            self.hmi_server_ip = ft.TextField(
+                label=self.page.session.get("lang.setting.hmi_server_ip"),
+                value=self.conf.hmi_server_ip,
+                read_only=True,
+                can_request_focus=False,
+                on_click=lambda e: keyboard.open(e.control, 'ip')
+            )
 
-        self.hmi_server_port = ft.TextField(
-            label=self.page.session.get("lang.setting.hmi_server_port"),
-            value=self.conf.hmi_server_port,
-            read_only=True,
-            can_request_focus=False,
-            on_click=lambda e: keyboard.open(e.control, 'int')
-        )
+            self.hmi_server_port = ft.TextField(
+                label=self.page.session.get("lang.setting.hmi_server_port"),
+                value=self.conf.hmi_server_port,
+                read_only=True,
+                can_request_focus=False,
+                on_click=lambda e: keyboard.open(e.control, 'int')
+            )
 
-        self.heading = self.page.session.get("lang.setting.interface_conf")
-
-        self.row_websocket_client = ft.Row(
-            controls=[
-                self.hmi_server_ip, 
-                self.hmi_server_port, 
-                self.connect_server, 
-                self.disconnect_server
-            ]
-        )
-
-        self.body = ft.Column(controls=[
-            self.row_websocket_client
-        ])
-        self.col = {"sm": 12}
-        super().build()
+            self.custom_card = CustomCard(
+                self.page.session.get("lang.setting.interface_conf"),
+                ft.ResponsiveRow(controls=[
+                    self.hmi_server_ip,
+                    self.hmi_server_port,
+                    self.connect_server,
+                    self.disconnect_server
+                ]),
+                col={"xs": 12})
+            self.content = self.custom_card
+        except:
+            logging.exception('exception occured at InterfaceConf.build')
 
     def __connect_to_master(self, user: User):
         OperationLog.create(
@@ -102,8 +99,7 @@ class InterfaceConf(CustomCard):
         except Exception as e:
             logging.exception(e)
 
-
-    def __disconnect_from_hmi_server(self, user:User):
+    def __disconnect_from_hmi_server(self, user: User):
         OperationLog.create(
             user_id=user.id,
             utc_date_time=gdata.utc_date_time,

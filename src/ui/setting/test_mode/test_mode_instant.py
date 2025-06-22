@@ -19,56 +19,60 @@ class TestModeInstant(ft.ResponsiveRow):
         self.task_running = False
 
     def build(self):
-        self.sps1_torque = self.__get_uniform_text("0")
-        self.sps1_speed = self.__get_uniform_text("0")
-        self.sps1_thrust = self.__get_uniform_text("0")
-        self.sps1_power = self.__get_uniform_text("0")
-        self.sps1_instant_data_card = ft.ResponsiveRow(
-            alignment=ft.alignment.center,
-            controls=[
-                self.__get_uniform_text(self.page.session.get('lang.common.torque')),
-                self.sps1_torque,
-                self.__get_uniform_text(self.page.session.get('lang.common.speed')),
-                self.sps1_speed,
-                self.__get_uniform_text(self.page.session.get('lang.common.thrust')),
-                self.sps1_thrust,
-                self.__get_uniform_text(self.page.session.get('lang.common.power')),
-                self.sps1_power
-            ]
-        )
-        if self.system_settings.amount_of_propeller == 1:
-            self.controls = [
-                CustomCard(f'sps1 {self.page.session.get('lang.setting.test_mode.instant_mock_data')}', self.sps1_instant_data_card)
-            ]
-        else:
-            self.sps2_torque = self.__get_uniform_text("0")
-            self.sps2_speed = self.__get_uniform_text("0")
-            self.sps2_thrust = self.__get_uniform_text("0")
-            self.sps2_power = self.__get_uniform_text("0")
-            self.sps2_instant_data_card = ft.ResponsiveRow(
-                alignment=ft.alignment.center,
-                controls=[
-                    self.__get_uniform_text(self.page.session.get('lang.common.torque')),
-                    self.sps2_torque,
-                    self.__get_uniform_text(self.page.session.get('lang.common.speed')),
-                    self.sps2_speed,
-                    self.__get_uniform_text(self.page.session.get('lang.common.thrust')),
-                    self.sps2_thrust,
-                    self.__get_uniform_text(self.page.session.get('lang.common.power')),
-                    self.sps2_power
-                ]
-            )
-
-            self.controls = [
-                CustomCard(
-                    f'sps1 {self.page.session.get('lang.setting.test_mode.instant_mock_data')}',
-                    self.sps1_instant_data_card
-                ),
-                CustomCard(
-                    f'sps2 {self.page.session.get('lang.setting.test_mode.instant_mock_data')}',
-                    self.sps2_instant_data_card
+        try:
+            if self.page:
+                self.sps1_torque = self.__get_uniform_text("0")
+                self.sps1_speed = self.__get_uniform_text("0")
+                self.sps1_thrust = self.__get_uniform_text("0")
+                self.sps1_power = self.__get_uniform_text("0")
+                self.sps1_instant_data_card = ft.ResponsiveRow(
+                    alignment=ft.alignment.center,
+                    controls=[
+                        self.__get_uniform_text(self.page.session.get('lang.common.torque')),
+                        self.sps1_torque,
+                        self.__get_uniform_text(self.page.session.get('lang.common.speed')),
+                        self.sps1_speed,
+                        self.__get_uniform_text(self.page.session.get('lang.common.thrust')),
+                        self.sps1_thrust,
+                        self.__get_uniform_text(self.page.session.get('lang.common.power')),
+                        self.sps1_power
+                    ]
                 )
-            ]
+                if self.system_settings.amount_of_propeller == 1:
+                    self.controls = [
+                        CustomCard(f'sps1 {self.page.session.get('lang.setting.test_mode.instant_mock_data')}', self.sps1_instant_data_card)
+                    ]
+                else:
+                    self.sps2_torque = self.__get_uniform_text("0")
+                    self.sps2_speed = self.__get_uniform_text("0")
+                    self.sps2_thrust = self.__get_uniform_text("0")
+                    self.sps2_power = self.__get_uniform_text("0")
+                    self.sps2_instant_data_card = ft.ResponsiveRow(
+                        alignment=ft.alignment.center,
+                        controls=[
+                            self.__get_uniform_text(self.page.session.get('lang.common.torque')),
+                            self.sps2_torque,
+                            self.__get_uniform_text(self.page.session.get('lang.common.speed')),
+                            self.sps2_speed,
+                            self.__get_uniform_text(self.page.session.get('lang.common.thrust')),
+                            self.sps2_thrust,
+                            self.__get_uniform_text(self.page.session.get('lang.common.power')),
+                            self.sps2_power
+                        ]
+                    )
+
+                    self.controls = [
+                        CustomCard(
+                            f'sps1 {self.page.session.get('lang.setting.test_mode.instant_mock_data')}',
+                            self.sps1_instant_data_card
+                        ),
+                        CustomCard(
+                            f'sps2 {self.page.session.get('lang.setting.test_mode.instant_mock_data')}',
+                            self.sps2_instant_data_card
+                        )
+                    ]
+        except:
+            logging.exception('exception occured at TestModeInstant.build')
 
     def __get_uniform_text(self, label):
         return ft.Text(value=f"{label}", weight=ft.FontWeight.BOLD, col={"sm": 12, "md": 6})
@@ -107,10 +111,10 @@ class TestModeInstant(ft.ResponsiveRow):
                     sps2_power_value, sps2_power_unit = UnitParser.parse_power(gdata.sps2_power, self.system_unit)
                     self.sps2_power.value = f'{sps2_power_value} {sps2_power_unit}'
                     self.sps2_power.update()
-            except Exception as e:
-                logging.exception(e)
-
-            await asyncio.sleep(1)
+            except:
+                logging.exception('exception occured at TestModeInstant.__refresh_instant')
+            finally:
+                await asyncio.sleep(1)
 
     def did_mount(self):
         self.task_running = True

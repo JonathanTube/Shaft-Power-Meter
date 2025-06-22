@@ -120,27 +120,33 @@ class TestMode(ft.Container):
         self.update()
 
     def __on_toggle_sound_test(self):
-        if self.sound_testing:
-            self.sound_test_button.text = self.page.session.get('lang.button.start_sound_testing')
-            self.sound_test_button.bgcolor = ft.Colors.GREEN
-            self.player.stop()
-        else:
-            self.sound_test_button.text = self.page.session.get('lang.button.stop_sound_testing')
-            self.sound_test_button.bgcolor = ft.Colors.RED
-            self.player.play()
-        self.sound_testing = not self.sound_testing
-        self.sound_test_button.update()
+        try:
+            if self.sound_testing:
+                self.sound_test_button.text = self.page.session.get('lang.button.start_sound_testing')
+                self.sound_test_button.bgcolor = ft.Colors.GREEN
+                self.player.stop()
+            else:
+                self.sound_test_button.text = self.page.session.get('lang.button.stop_sound_testing')
+                self.sound_test_button.bgcolor = ft.Colors.RED
+                self.player.play()
+            self.sound_testing = not self.sound_testing
+            self.sound_test_button.update()
+        except:
+            Toast.show_error(self.page, "__on_toggle_sound_test failed.")
 
     def __on_toggle_auto_test(self):
-        if gdata.auto_testing:
-            self.auto_test_button.bgcolor = ft.Colors.GREEN
-            self.auto_test_button.text = self.page.session.get('lang.button.start_fatigue_testing')
-        else:
-            self.auto_test_button.bgcolor = ft.Colors.RED
-            self.auto_test_button.text = self.page.session.get('lang.button.stop_fatigue_testing')
+        try:
+            if gdata.auto_testing:
+                self.auto_test_button.bgcolor = ft.Colors.GREEN
+                self.auto_test_button.text = self.page.session.get('lang.button.start_fatigue_testing')
+            else:
+                self.auto_test_button.bgcolor = ft.Colors.RED
+                self.auto_test_button.text = self.page.session.get('lang.button.stop_fatigue_testing')
 
-        self.auto_test_button.update()
-        gdata.auto_testing = not gdata.auto_testing
+            self.auto_test_button.update()
+            gdata.auto_testing = not gdata.auto_testing
+        except:
+            Toast.show_error(self.page, "__on_toggle_auto_test failed.")
 
     def convert_torque(self, torque):
         value = float(torque)

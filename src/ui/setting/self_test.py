@@ -90,9 +90,9 @@ class SelfTest(ft.Tabs):
                     self.plc_log.controls.append(ft.Text('Disconnected from PLC'))
                 self.plc_log.update()
             except Exception as e:
-                self.plc_log.controls.append(ft.Text(f"error: {e}"))
-                self.plc_log.update()
-            await asyncio.sleep(2)
+                logging.exception('exception occured at SelfTest.__read_plc_data')
+            finally:
+                await asyncio.sleep(2)
 
     async def __read_sps1_data(self):
         while self.task_running:
@@ -103,9 +103,10 @@ class SelfTest(ft.Tabs):
                 else:
                     self.sps1_log.controls.append(ft.Text(f"SPS-1 Data: {sps1_data}"))
                 self.sps1_log.update()
-            except Exception as e:
-                logging.exception(e)
-            await asyncio.sleep(1)
+            except:
+                logging.exception('exception occured at SelfTest.__read_sps1_data')
+            finally:
+                await asyncio.sleep(2)
 
     async def __read_sps2_data(self):
         while self.task_running:
@@ -116,9 +117,10 @@ class SelfTest(ft.Tabs):
                 else:
                     self.sps2_log.controls.append(ft.Text(f"SPS-2 Data: {sps2_data}"))
                 self.sps2_log.update()
-            except Exception as e:
-                logging.exception(e)
-            await asyncio.sleep(1)
+            except:
+                logging.exception('exception occured at SelfTest.__read_sps2_data')
+            finally:
+                await asyncio.sleep(2)
 
     async def __read_hmi_server_data(self):
         while self.task_running:
@@ -132,9 +134,10 @@ class SelfTest(ft.Tabs):
                 else:
                     self.hmi_server_log.controls.append(ft.Text(f"Disconnected from HMI Server."))
                 self.hmi_server_log.update()
-            except Exception as e:
-                logging.exception(e)
-            await asyncio.sleep(1)
+            except:
+                logging.exception('exception occured at SelfTest.__read_hmi_server_data')
+            finally:
+                await asyncio.sleep(2)
 
 
     async def __read_gps_data(self):
@@ -145,6 +148,7 @@ class SelfTest(ft.Tabs):
                 else:
                     self.gps_log.controls.append(ft.Text("Disconnected from GPS"))
                 self.gps_log.update()
-            except Exception as e:
-                logging.exception(e)
-            await asyncio.sleep(1)
+            except:
+                logging.exception('exception occured at SelfTest.__read_gps_data')
+            finally:
+                await asyncio.sleep(2)

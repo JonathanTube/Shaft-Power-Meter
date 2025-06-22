@@ -1,3 +1,4 @@
+import logging
 import flet as ft
 
 from ui.common.keyboard import keyboard
@@ -17,49 +18,60 @@ class GeneralOflineDefaultValue(ft.Container):
         self.odv: OfflineDefaultValue = OfflineDefaultValue.get()
 
     def build(self):
-        self.torque_default_value = ft.TextField(suffix_text="Nm",
-                                                 label=self.page.session.get("lang.common.torque"),
-                                                 value=self.odv.torque_default_value,
-                                                 col={"xs": 6},
-                                                 read_only=True,
-                                                 can_request_focus=False,
-                                                 on_click=lambda e: keyboard.open(e.control))
+        try:
+            if self.page:
+                self.torque_default_value = ft.TextField(
+                    suffix_text="Nm",
+                    label=self.page.session.get("lang.common.torque"),
+                    value=self.odv.torque_default_value,
+                    col={"xs": 6},
+                    read_only=True,
+                    can_request_focus=False,
+                    on_click=lambda e: keyboard.open(e.control))
 
-        self.thrust_default_value = ft.TextField(suffix_text="N",
-                                                 label=self.page.session.get("lang.common.thrust"),
-                                                 value=self.odv.thrust_default_value,
-                                                 col={"xs": 6},
-                                                 read_only=True,
-                                                 can_request_focus=False,
-                                                 on_click=lambda e: keyboard.open(e.control))
+                self.thrust_default_value = ft.TextField(
+                    suffix_text="N",
+                    label=self.page.session.get("lang.common.thrust"),
+                    value=self.odv.thrust_default_value,
+                    col={"xs": 6},
+                    read_only=True,
+                    can_request_focus=False,
+                    on_click=lambda e: keyboard.open(e.control))
 
-        self.speed_default_value = ft.TextField(suffix_text="rpm",
-                                                label=self.page.session.get("lang.common.speed"),
-                                                value=self.odv.speed_default_value,
-                                                col={"xs": 6},
-                                                read_only=True,
-                                                can_request_focus=False,
-                                                on_click=lambda e: keyboard.open(e.control))
+                self.speed_default_value = ft.TextField(
+                    suffix_text="rpm",
+                    label=self.page.session.get("lang.common.speed"),
+                    value=self.odv.speed_default_value,
+                    col={"xs": 6},
+                    read_only=True,
+                    can_request_focus=False,
+                    on_click=lambda e: keyboard.open(e.control))
 
-        self.custom_card = CustomCard(
-            self.page.session.get("lang.setting.offline_default_value"),
-            ft.ResponsiveRow(
-                controls=[
-                    self.torque_default_value,
-                    self.thrust_default_value,
-                    self.speed_default_value
-                ]
-            )
-        )
+                self.custom_card = CustomCard(
+                    self.page.session.get("lang.setting.offline_default_value"),
+                    ft.ResponsiveRow(
+                        controls=[
+                            self.torque_default_value,
+                            self.thrust_default_value,
+                            self.speed_default_value
+                        ]
+                    )
+                )
 
-        self.content = self.custom_card
-    
+                self.content = self.custom_card
+        except:
+            logging.exception('exception occured at GeneralOflineDefaultValue.build')
+
     def before_update(self):
-        s = self.page.session
-        self.torque_default_value.label = s.get("lang.common.torque")
-        self.thrust_default_value.label = s.get("lang.common.thrust")
-        self.speed_default_value.label = s.get("lang.common.speed")
-        self.custom_card.set_title(s.get("lang.setting.offline_default_value"))
+        try:
+            if self.page:
+                s = self.page.session
+                self.torque_default_value.label = s.get("lang.common.torque")
+                self.thrust_default_value.label = s.get("lang.common.thrust")
+                self.speed_default_value.label = s.get("lang.common.speed")
+                self.custom_card.set_title(s.get("lang.setting.offline_default_value"))
+        except:
+            logging.exception('exception occured at GeneralOflineDefaultValue.before_update')
 
     def save_data(self, user_id: int):
         self.odv.torque_default_value = float(self.torque_default_value.value or 0)
@@ -87,32 +99,35 @@ class GeneralOflineDefaultValue(ft.Container):
         operation_log.save()
 
     def update_unit(self, system_unit: int):
-        self.system_unit = system_unit
-        torque_default_value = float(self.odv.torque_default_value or 0)
-        thrust_default_value = float(self.odv.thrust_default_value or 0)
-        speed_default_value = float(self.odv.speed_default_value or 0)
+        try:
+            self.system_unit = system_unit
+            torque_default_value = float(self.odv.torque_default_value or 0)
+            thrust_default_value = float(self.odv.thrust_default_value or 0)
+            speed_default_value = float(self.odv.speed_default_value or 0)
 
-        if self.system_unit == 0:
-            self.torque_default_value.suffix_text = "kNm"
-            self.torque_default_value.value = round(torque_default_value / 1000, 1)
+            if self.system_unit == 0:
+                self.torque_default_value.suffix_text = "kNm"
+                self.torque_default_value.value = round(torque_default_value / 1000, 1)
 
-            self.thrust_default_value.suffix_text = "kN"
-            self.thrust_default_value.value = round(thrust_default_value / 1000, 1)
+                self.thrust_default_value.suffix_text = "kN"
+                self.thrust_default_value.value = round(thrust_default_value / 1000, 1)
 
-            self.speed_default_value.suffix_text = "rpm"
-            self.speed_default_value.value = round(speed_default_value, 1)
+                self.speed_default_value.suffix_text = "rpm"
+                self.speed_default_value.value = round(speed_default_value, 1)
 
-        elif self.system_unit == 1:
-            self.torque_default_value.suffix_text = "Tm"
-            self.torque_default_value.value = UnitConverter.nm_to_tm(torque_default_value)
+            elif self.system_unit == 1:
+                self.torque_default_value.suffix_text = "Tm"
+                self.torque_default_value.value = UnitConverter.nm_to_tm(torque_default_value)
 
-            self.thrust_default_value.suffix_text = "T"
-            self.thrust_default_value.value = UnitConverter.n_to_t(thrust_default_value)
+                self.thrust_default_value.suffix_text = "T"
+                self.thrust_default_value.value = UnitConverter.n_to_t(thrust_default_value)
 
-            self.speed_default_value.suffix_text = "rpm"
-            self.speed_default_value.value = round(speed_default_value, 1)
+                self.speed_default_value.suffix_text = "rpm"
+                self.speed_default_value.value = round(speed_default_value, 1)
 
-        self.content.update()
+            self.content.update()
+        except:
+            logging.exception('exception occured at GeneralOflineDefaultValue.update_unit')
 
     def did_mount(self):
         self.update_unit(self.system_unit)

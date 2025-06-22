@@ -10,7 +10,7 @@ from utils.unit_parser import UnitParser
 from task.test_mode_task import testModeTask
 
 
-class TestModeRange(CustomCard):
+class TestModeRange(ft.Container):
     def __init__(self):
         super().__init__()
         self.conf: TestModeConf = TestModeConf.get()
@@ -25,57 +25,63 @@ class TestModeRange(CustomCard):
         self.max_thrust: float = 4000 * 1000
 
     def build(self):
-        disabled = not gdata.test_mode_running
-        min_torque_value, min_torque_unit = self.__get_torque_and_unit(self.conf.min_torque)
-        max_torque_value, max_torque_unit = self.__get_torque_and_unit(self.conf.max_torque)
-        self.start_torque_text = self.__create_range_start_text('lang.setting.test_mode.min_torque', min_torque_value, min_torque_unit)
-        self.end_torque_text = self.__create_range_end_text('lang.setting.test_mode.max_torque', max_torque_value, max_torque_unit)
-        self.torque_range = ft.RangeSlider(
-            disabled=disabled,
-            expand=True,
-            min=0,
-            max=self.max_torque,
-            start_value=self.conf.min_torque,
-            end_value=self.conf.max_torque,
-            on_change=lambda e: self.__on_torque_change(e)
-        )
-        self.torque_row = ft.Row(col={"sm": 12}, expand=True, controls=[self.start_torque_text, self.torque_range, self.end_torque_text])
+        try:
+            if self.page:
+                disabled = not gdata.test_mode_running
+                min_torque_value, min_torque_unit = self.__get_torque_and_unit(self.conf.min_torque)
+                max_torque_value, max_torque_unit = self.__get_torque_and_unit(self.conf.max_torque)
+                self.start_torque_text = self.__create_range_start_text('lang.setting.test_mode.min_torque', min_torque_value, min_torque_unit)
+                self.end_torque_text = self.__create_range_end_text('lang.setting.test_mode.max_torque', max_torque_value, max_torque_unit)
+                self.torque_range = ft.RangeSlider(
+                    disabled=disabled,
+                    expand=True,
+                    min=0,
+                    max=self.max_torque,
+                    start_value=self.conf.min_torque,
+                    end_value=self.conf.max_torque,
+                    on_change=lambda e: self.__on_torque_change(e)
+                )
+                self.torque_row = ft.Row(col={"sm": 12}, expand=True, controls=[self.start_torque_text, self.torque_range, self.end_torque_text])
 
-        self.start_speed_text = self.__create_range_start_text('lang.setting.test_mode.min_speed', self.conf.min_speed, 'rpm')
-        self.end_speed_text = self.__create_range_end_text('lang.setting.test_mode.max_speed', self.conf.max_speed, 'rpm')
-        self.speed_range = ft.RangeSlider(
-            disabled=disabled,
-            expand=True,
-            min=0,
-            max=self.max_rpm,
-            start_value=self.conf.min_speed,
-            end_value=self.conf.max_speed,
-            on_change=lambda e: self.__on_speed_change(e)
-        )
-        self.speed_row = ft.Row(col={"sm": 12}, expand=True, controls=[self.start_speed_text, self.speed_range, self.end_speed_text])
+                self.start_speed_text = self.__create_range_start_text('lang.setting.test_mode.min_speed', self.conf.min_speed, 'rpm')
+                self.end_speed_text = self.__create_range_end_text('lang.setting.test_mode.max_speed', self.conf.max_speed, 'rpm')
+                self.speed_range = ft.RangeSlider(
+                    disabled=disabled,
+                    expand=True,
+                    min=0,
+                    max=self.max_rpm,
+                    start_value=self.conf.min_speed,
+                    end_value=self.conf.max_speed,
+                    on_change=lambda e: self.__on_speed_change(e)
+                )
+                self.speed_row = ft.Row(col={"sm": 12}, expand=True, controls=[self.start_speed_text, self.speed_range, self.end_speed_text])
 
-        min_thrust_value, min_thrust_unit = self.__get_thrust_and_unit(self.conf.min_thrust)
-        max_thrust_value, max_thrust_unit = self.__get_thrust_and_unit(self.conf.max_thrust)
-        self.start_thrust_text = self.__create_range_start_text('lang.setting.test_mode.min_thrust', min_thrust_value, min_thrust_unit)
-        self.end_thrust_text = self.__create_range_end_text('lang.setting.test_mode.max_thrust', max_thrust_value, max_thrust_unit)
-        self.thrust_range = ft.RangeSlider(
-            disabled=disabled,
-            expand=True,
-            min=0,
-            max=self.max_thrust,
-            start_value=self.conf.min_thrust,
-            end_value=self.conf.max_thrust,
-            on_change=lambda e: self.__on_thrust_change(e)
-        )
-        self.thrust_row = ft.Row(col={"sm": 12}, expand=True, controls=[self.start_thrust_text, self.thrust_range, self.end_thrust_text])
+                min_thrust_value, min_thrust_unit = self.__get_thrust_and_unit(self.conf.min_thrust)
+                max_thrust_value, max_thrust_unit = self.__get_thrust_and_unit(self.conf.max_thrust)
+                self.start_thrust_text = self.__create_range_start_text('lang.setting.test_mode.min_thrust', min_thrust_value, min_thrust_unit)
+                self.end_thrust_text = self.__create_range_end_text('lang.setting.test_mode.max_thrust', max_thrust_value, max_thrust_unit)
+                self.thrust_range = ft.RangeSlider(
+                    disabled=disabled,
+                    expand=True,
+                    min=0,
+                    max=self.max_thrust,
+                    start_value=self.conf.min_thrust,
+                    end_value=self.conf.max_thrust,
+                    on_change=lambda e: self.__on_thrust_change(e)
+                )
+                self.thrust_row = ft.Row(col={"sm": 12}, expand=True, controls=[self.start_thrust_text, self.thrust_range, self.end_thrust_text])
 
-        self.heading = self.page.session.get('lang.setting.test_mode.customize_data_range')
-        self.body = ft.ResponsiveRow([
-            self.torque_row,
-            self.speed_row,
-            self.thrust_row
-        ])
-        super().build()
+                self.custom_card = CustomCard(
+                    self.page.session.get("lang.setting.test_mode.customize_data_range"),
+                    ft.ResponsiveRow(controls=[
+                        self.torque_row,
+                        self.speed_row,
+                        self.thrust_row
+                    ]),
+                    col={"xs": 12})
+                self.content = self.custom_card
+        except:
+            logging.exception('exception occured at TestModeRange.build')
 
     def __create_range_start_text(self, lang, value, unit):
         return ft.Text(color=ft.Colors.GREEN, width=160, value=f'{self.page.session.get(lang)}: {value} {unit}')
@@ -84,34 +90,43 @@ class TestModeRange(CustomCard):
         return ft.Text(color=ft.Colors.RED, width=160, value=f'{self.page.session.get(lang)}: {value} {unit}')
 
     def __on_torque_change(self, e):
-        min_torque_value, min_torque_unit = self.__get_torque_and_unit(e.control.start_value)
-        max_torque_value, max_torque_unit = self.__get_torque_and_unit(e.control.end_value)
-        self.start_torque_text.value = f'{self.page.session.get('lang.setting.test_mode.min_torque')}: {min_torque_value} {min_torque_unit}'
-        self.start_torque_text.update()
-        self.end_torque_text.value = f'{self.page.session.get('lang.setting.test_mode.max_torque')}: {max_torque_value} {max_torque_unit}'
-        self.end_torque_text.update()
-        self.__save_data()
-        testModeTask.set_torque_range(e.control.start_value, e.control.end_value)
+        try:
+            min_torque_value, min_torque_unit = self.__get_torque_and_unit(e.control.start_value)
+            max_torque_value, max_torque_unit = self.__get_torque_and_unit(e.control.end_value)
+            self.start_torque_text.value = f'{self.page.session.get('lang.setting.test_mode.min_torque')}: {min_torque_value} {min_torque_unit}'
+            self.start_torque_text.update()
+            self.end_torque_text.value = f'{self.page.session.get('lang.setting.test_mode.max_torque')}: {max_torque_value} {max_torque_unit}'
+            self.end_torque_text.update()
+            self.__save_data()
+            testModeTask.set_torque_range(e.control.start_value, e.control.end_value)
+        except:
+            logging.exception('exception occured at TestModeRange.__on_torque_change')
 
     def __on_speed_change(self, e):
-        start_speed_percentage = round(e.control.start_value * 100 / gdata.speed_of_mcr, 2)
-        end_speed_percentage = round(e.control.end_value * 100 / gdata.speed_of_mcr, 2)
-        self.start_speed_text.value = f'{self.page.session.get('lang.setting.test_mode.min_speed')}: {int(e.control.start_value)} rpm, {start_speed_percentage}% MCR'
-        self.start_speed_text.update()
-        self.end_speed_text.value = f'{self.page.session.get('lang.setting.test_mode.max_speed')}: {int(e.control.end_value)} rpm, {end_speed_percentage}% MCR'
-        self.end_speed_text.update()
-        self.__save_data()
-        testModeTask.set_speed_range(e.control.start_value, e.control.end_value)
+        try:
+            start_speed_percentage = round(e.control.start_value * 100 / gdata.speed_of_mcr, 2)
+            end_speed_percentage = round(e.control.end_value * 100 / gdata.speed_of_mcr, 2)
+            self.start_speed_text.value = f'{self.page.session.get('lang.setting.test_mode.min_speed')}: {int(e.control.start_value)} rpm, {start_speed_percentage}% MCR'
+            self.start_speed_text.update()
+            self.end_speed_text.value = f'{self.page.session.get('lang.setting.test_mode.max_speed')}: {int(e.control.end_value)} rpm, {end_speed_percentage}% MCR'
+            self.end_speed_text.update()
+            self.__save_data()
+            testModeTask.set_speed_range(e.control.start_value, e.control.end_value)
+        except:
+            logging.exception('exception occured at TestModeRange.__on_speed_change')
 
     def __on_thrust_change(self, e):
-        min_thrust_value, min_thrust_unit = self.__get_thrust_and_unit(e.control.start_value)
-        max_thrust_value, max_thrust_unit = self.__get_thrust_and_unit(e.control.end_value)
-        self.start_thrust_text.value = f'{self.page.session.get('lang.setting.test_mode.min_thrust')}: {min_thrust_value} {min_thrust_unit}'
-        self.start_thrust_text.update()
-        self.end_thrust_text.value = f'{self.page.session.get('lang.setting.test_mode.max_thrust')}: {max_thrust_value} {max_thrust_unit}'
-        self.end_thrust_text.update()
-        self.__save_data()
-        testModeTask.set_thrust_range(e.control.start_value, e.control.end_value)
+        try:
+            min_thrust_value, min_thrust_unit = self.__get_thrust_and_unit(e.control.start_value)
+            max_thrust_value, max_thrust_unit = self.__get_thrust_and_unit(e.control.end_value)
+            self.start_thrust_text.value = f'{self.page.session.get('lang.setting.test_mode.min_thrust')}: {min_thrust_value} {min_thrust_unit}'
+            self.start_thrust_text.update()
+            self.end_thrust_text.value = f'{self.page.session.get('lang.setting.test_mode.max_thrust')}: {max_thrust_value} {max_thrust_unit}'
+            self.end_thrust_text.update()
+            self.__save_data()
+            testModeTask.set_thrust_range(e.control.start_value, e.control.end_value)
+        except:
+            logging.exception('exception occured at TestModeRange.__on_thrust_change')
 
     def __get_torque_and_unit(self, value) -> tuple[float, str]:
         if self.system_unit == 0:
@@ -127,24 +142,25 @@ class TestModeRange(CustomCard):
 
     def __save_data(self):
         try:
-            min_torque = self.torque_range.start_value
-            max_torque = self.torque_range.end_value
-            min_thrust = self.thrust_range.start_value
-            max_thrust = self.thrust_range.end_value
-            min_speed = self.speed_range.start_value
-            max_speed = self.speed_range.end_value
+            if self.page:
+                min_torque = self.torque_range.start_value
+                max_torque = self.torque_range.end_value
+                min_thrust = self.thrust_range.start_value
+                max_thrust = self.thrust_range.end_value
+                min_speed = self.speed_range.start_value
+                max_speed = self.speed_range.end_value
 
-            TestModeConf.update(
-                min_torque=min_torque,
-                max_torque=max_torque,
-                min_speed=min_speed,
-                max_speed=max_speed,
-                min_thrust=min_thrust,
-                max_thrust=max_thrust
-            ).where(TestModeConf.id == self.conf.id).execute()
-        except Exception:
+                TestModeConf.update(
+                    min_torque=min_torque,
+                    max_torque=max_torque,
+                    min_speed=min_speed,
+                    max_speed=max_speed,
+                    min_thrust=min_thrust,
+                    max_thrust=max_thrust
+                ).where(TestModeConf.id == self.conf.id).execute()
+        except:
             logging.exception("test mode range save data error")
-            Toast.show_error(self.page, str(e))
+            Toast.show_error(self.page)
 
     def enable(self):
         self.torque_range.disabled = False

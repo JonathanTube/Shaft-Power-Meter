@@ -132,15 +132,19 @@ class Setting(ft.Container):
         )
 
     def before_update(self):
-        s = self.page.session
-        self.system_conf.label = s.get("lang.setting.system_conf.title")
-        self.general.label = s.get("lang.setting.general.title")
-        self.propeller_conf.label = s.get("lang.setting.propeller_setting.title")
-        self.zero_cal.label = s.get("lang.setting.zero_cal.title")
-        self.io_conf.label = s.get("lang.setting.io_conf.title")
-        self.self_test.label = s.get("lang.setting.self_test.title")
-        self.permission_conf.label = s.get("lang.setting.permission_conf.title")
-        self.test_mode.label = s.get("lang.setting.test_mode.title")
+        try:
+            if self.page:
+                s = self.page.session
+                self.system_conf.label = s.get("lang.setting.system_conf.title")
+                self.general.label = s.get("lang.setting.general.title")
+                self.propeller_conf.label = s.get("lang.setting.propeller_setting.title")
+                self.zero_cal.label = s.get("lang.setting.zero_cal.title")
+                self.io_conf.label = s.get("lang.setting.io_conf.title")
+                self.self_test.label = s.get("lang.setting.self_test.title")
+                self.permission_conf.label = s.get("lang.setting.permission_conf.title")
+                self.test_mode.label = s.get("lang.setting.test_mode.title")
+        except:
+            logging.exception('exception occured at Setting.before_update')
 
     def did_mount(self):
         self.task_running = True

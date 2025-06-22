@@ -23,61 +23,64 @@ class PropellerConf(ft.Container):
         super().__init__()
         self.expand = True
         self.alignment = ft.alignment.center
-        self.system_settings:SystemSettings = SystemSettings.get()
+        self.system_settings: SystemSettings = SystemSettings.get()
         self.ps: PropellerSetting = PropellerSetting.get()
 
     def build(self):
-        if not self.system_settings.is_master:
-            self.content = ft.Text(value=self.page.session.get('lang.propeller_curve.disabled_under_slave_mode'), size=20)
-            return
-        
-        if not self.system_settings.display_propeller_curve:
-            self.content = ft.Text(self.page.session.get('lang.propeller_curve.propeller_curve_disabled'))
-            return
+        try:
+            if not self.system_settings.is_master:
+                self.content = ft.Text(value=self.page.session.get('lang.propeller_curve.disabled_under_slave_mode'), size=20)
+                return
 
-        self.mcr_operating_point_card = PropellerConfMcr(self.ps)
-        self.normal_propeller_curve_card = PropellerConfNormalCurve(self.ps)
-        self.torque_load_limit_curve_card = PropellerConfLimitCurve(self.ps)
-        self.light_propeller_curve_card = PropellerConfLightCurve(self.ps)
-        self.speed_limit_curve_card = PropellerConfSpeedLimitCurve(self.ps)
-        self.overload_curve_card = PropellerConfOverloadCurve(self.ps)
+            if not self.system_settings.display_propeller_curve:
+                self.content = ft.Text(self.page.session.get('lang.propeller_curve.propeller_curve_disabled'))
+                return
 
-        self.save_button = ft.FilledButton(
-            self.page.session.get("lang.button.save"),
-            width=120,
-            height=40,
-            on_click=lambda e: self.__on_save_button_click(e)
-        )
+            self.mcr_operating_point_card = PropellerConfMcr(self.ps)
+            self.normal_propeller_curve_card = PropellerConfNormalCurve(self.ps)
+            self.torque_load_limit_curve_card = PropellerConfLimitCurve(self.ps)
+            self.light_propeller_curve_card = PropellerConfLightCurve(self.ps)
+            self.speed_limit_curve_card = PropellerConfSpeedLimitCurve(self.ps)
+            self.overload_curve_card = PropellerConfOverloadCurve(self.ps)
 
-        self.reset_button = ft.OutlinedButton(
-            self.page.session.get("lang.button.reset"),
-            width=120,
-            height=40,
-            on_click=lambda e: self.__reset_data(e)
-        )
+            self.save_button = ft.FilledButton(
+                self.page.session.get("lang.button.save"),
+                width=120,
+                height=40,
+                on_click=lambda e: self.__on_save_button_click(e)
+            )
 
-        self.content = ft.Column(
-            scroll=ft.ScrollMode.ADAPTIVE,
-            controls=[
-                ft.ResponsiveRow(
-                    controls=[
-                        self.mcr_operating_point_card,
-                        self.normal_propeller_curve_card,
-                        self.torque_load_limit_curve_card,
-                        self.light_propeller_curve_card,
-                        self.speed_limit_curve_card,
-                        self.overload_curve_card,
-                        ft.Row(
-                            alignment=ft.MainAxisAlignment.CENTER,
-                            controls=[
-                                self.save_button,
-                                self.reset_button
-                            ]
-                        )
-                    ]
-                )
-            ]
-        )
+            self.reset_button = ft.OutlinedButton(
+                self.page.session.get("lang.button.reset"),
+                width=120,
+                height=40,
+                on_click=lambda e: self.__reset_data(e)
+            )
+
+            self.content = ft.Column(
+                scroll=ft.ScrollMode.ADAPTIVE,
+                controls=[
+                    ft.ResponsiveRow(
+                        controls=[
+                            self.mcr_operating_point_card,
+                            self.normal_propeller_curve_card,
+                            self.torque_load_limit_curve_card,
+                            self.light_propeller_curve_card,
+                            self.speed_limit_curve_card,
+                            self.overload_curve_card,
+                            ft.Row(
+                                alignment=ft.MainAxisAlignment.CENTER,
+                                controls=[
+                                    self.save_button,
+                                    self.reset_button
+                                ]
+                            )
+                        ]
+                    )
+                ]
+            )
+        except:
+            logging.exception('exception occured at PropellerConf.build')
 
     def __on_save_button_click(self, e):
         self.page.open(PermissionCheck(self.__save_data, 2))

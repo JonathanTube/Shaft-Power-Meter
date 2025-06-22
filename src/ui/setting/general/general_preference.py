@@ -1,3 +1,4 @@
+import logging
 import flet as ft
 from db.models.language import Language
 from ui.common.custom_card import CustomCard
@@ -17,86 +18,93 @@ class GeneralPreference(ft.Container):
         self.on_system_unit_change = on_system_unit_change
 
     def build(self):
-        s = self.page.session
-        self.theme_label = ft.Text(s.get("lang.setting.theme"))
-        self.theme_light = ft.Radio(value=0, label=s.get("lang.setting.theme.light"))
-        self.theme_dark = ft.Radio(value=1, label=s.get("lang.setting.theme.dark"))
+        try:
+            if self.page:
+                s = self.page.session
+                self.theme_label = ft.Text(s.get("lang.setting.theme"))
+                self.theme_light = ft.Radio(value=0, label=s.get("lang.setting.theme.light"))
+                self.theme_dark = ft.Radio(value=1, label=s.get("lang.setting.theme.dark"))
 
-        self.language_label = ft.Text(s.get("lang.setting.language"))
-        self.system_unit_label = ft.Text(s.get("lang.setting.unit"))
-        self.data_refresh_interval_label = ft.Text(s.get("lang.setting.data_refresh_interval"))
+                self.language_label = ft.Text(s.get("lang.setting.language"))
+                self.system_unit_label = ft.Text(s.get("lang.setting.unit"))
+                self.data_refresh_interval_label = ft.Text(s.get("lang.setting.data_refresh_interval"))
 
-        self.default_theme = ft.RadioGroup(
-            content=ft.Row([self.theme_light, self.theme_dark]),
-            value=self.preference.theme
-        )
+                self.default_theme = ft.RadioGroup(
+                    content=ft.Row([self.theme_light, self.theme_dark]),
+                    value=self.preference.theme
+                )
 
-        self.system_unit_si = ft.Radio(value="0", label=s.get("lang.setting.unit.si"))
-        self.system_unit_metric = ft.Radio(value="1", label=s.get("lang.setting.unit.metric"))
+                self.system_unit_si = ft.Radio(value="0", label=s.get("lang.setting.unit.si"))
+                self.system_unit_metric = ft.Radio(value="1", label=s.get("lang.setting.unit.metric"))
 
-        self.system_unit = ft.RadioGroup(
-            content=ft.Row([self.system_unit_si, self.system_unit_metric]),
-            value=self.preference.system_unit,
-            on_change=lambda e: self.__handle_system_unit_change(e)
-        )
+                self.system_unit = ft.RadioGroup(
+                    content=ft.Row([self.system_unit_si, self.system_unit_metric]),
+                    value=self.preference.system_unit,
+                    on_change=lambda e: self.__handle_system_unit_change(e)
+                )
 
-        self.language = ft.RadioGroup(
-            content=ft.Row([ft.Radio(value="0", label="English"), ft.Radio(value="1", label="中文")]),
-            value=self.preference.language
-        )
+                self.language = ft.RadioGroup(
+                    content=ft.Row([ft.Radio(value="0", label="English"), ft.Radio(value="1", label="中文")]),
+                    value=self.preference.language
+                )
 
-        self.fullscreen = ft.Checkbox(
-            col={"md": 6}, label=self.page.session.get("lang.setting.fullscreen"),
-            label_position=ft.LabelPosition.LEFT,
-            value=self.preference.fullscreen
-        )
+                self.fullscreen = ft.Checkbox(
+                    col={"md": 6}, label=self.page.session.get("lang.setting.fullscreen"),
+                    label_position=ft.LabelPosition.LEFT,
+                    value=self.preference.fullscreen
+                )
 
-        self.data_refresh_interval = ft.TextField(
-            label=self.data_refresh_interval_label,
-            suffix_text="seconds",
-            value=self.preference.data_refresh_interval,
-            col={"md": 6},
-            read_only=True,
-            can_request_focus=False,
-            on_click=lambda e: keyboard.open(e.control, 'int')
-        )
+                self.data_refresh_interval = ft.TextField(
+                    label=self.data_refresh_interval_label,
+                    suffix_text="seconds",
+                    value=self.preference.data_refresh_interval,
+                    col={"md": 6},
+                    read_only=True,
+                    can_request_focus=False,
+                    on_click=lambda e: keyboard.open(e.control, 'int')
+                )
 
-        self.custom_card = CustomCard(
-            self.page.session.get("lang.setting.preference"),
-            ft.ResponsiveRow(controls=[
-                ft.Row(controls=[self.theme_label, self.default_theme], col={"md": 6}),
-                ft.Row(controls=[self.language_label, self.language], col={"md": 6}),
-                ft.Row(controls=[self.system_unit_label, self.system_unit], col={"md": 6}),
-                self.fullscreen,
-                self.data_refresh_interval
-            ]),
-            col={"xs": 12})
-        self.content = self.custom_card
+                self.custom_card = CustomCard(
+                    self.page.session.get("lang.setting.preference"),
+                    ft.ResponsiveRow(controls=[
+                        ft.Row(controls=[self.theme_label, self.default_theme], col={"md": 6}),
+                        ft.Row(controls=[self.language_label, self.language], col={"md": 6}),
+                        ft.Row(controls=[self.system_unit_label, self.system_unit], col={"md": 6}),
+                        self.fullscreen,
+                        self.data_refresh_interval
+                    ]),
+                    col={"xs": 12})
+                self.content = self.custom_card
+        except:
+            logging.exception('exception occured at GeneralPreference.build')
+
 
     def before_update(self):
-        s = self.page.session
-        # 更新主题设置部分
-        self.theme_label.value = s.get("lang.setting.theme")
-        self.theme_light.label = s.get("lang.setting.theme.light")
-        self.theme_dark.label = s.get("lang.setting.theme.dark")
-        
-        # 更新语言设置部分
-        self.language_label.value = s.get("lang.setting.language")
-        
-        # 更新单位设置部分
-        self.system_unit_label.value = s.get("lang.setting.unit")
-        self.system_unit_si.label = s.get("lang.setting.unit.si")
-        self.system_unit_metric.label = s.get("lang.setting.unit.metric")
-        
-        # 更新其他设置
-        self.fullscreen.label = s.get("lang.setting.fullscreen")
-        self.data_refresh_interval_label.value = s.get("lang.setting.data_refresh_interval")
-        
-        # 确保更新界面
-        self.custom_card.set_title(s.get("lang.setting.preference"))
+        try:
+            if self.page:
+                s = self.page.session
+                # 更新主题设置部分
+                self.theme_label.value = s.get("lang.setting.theme")
+                self.theme_light.label = s.get("lang.setting.theme.light")
+                self.theme_dark.label = s.get("lang.setting.theme.dark")
+                
+                # 更新语言设置部分
+                self.language_label.value = s.get("lang.setting.language")
+                
+                # 更新单位设置部分
+                self.system_unit_label.value = s.get("lang.setting.unit")
+                self.system_unit_si.label = s.get("lang.setting.unit.si")
+                self.system_unit_metric.label = s.get("lang.setting.unit.metric")
+                
+                # 更新其他设置
+                self.fullscreen.label = s.get("lang.setting.fullscreen")
+                self.data_refresh_interval_label.value = s.get("lang.setting.data_refresh_interval")
+                
+                # 确保更新界面
+                self.custom_card.set_title(s.get("lang.setting.preference"))
+        except:
+            logging.exception('exception occured at GeneralPreference.before_update')
 
-
-        
 
 
     def __handle_system_unit_change(self, e):

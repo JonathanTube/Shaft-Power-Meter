@@ -11,9 +11,9 @@ from ui.common.custom_card import CustomCard
 from ui.common.keyboard import keyboard
 from ui.common.permission_check import PermissionCheck
 from common.global_data import gdata
-from ui.common.toast import Toast
 
-class IOSettingGPS(CustomCard):
+
+class IOSettingGPS(ft.Container):
     def __init__(self, conf: IOConf):
         super().__init__()
         self.conf = conf
@@ -23,53 +23,62 @@ class IOSettingGPS(CustomCard):
         self.task_running = False
 
     def build(self):
-        self.gps_ip = ft.TextField(
-            label=self.page.session.get("lang.setting.ip"),
-            value=self.conf.gps_ip,
-            read_only=True,
-            col={"sm": 6},
-            can_request_focus=False,
-            on_click=lambda e: keyboard.open(e.control, 'ip')
-        )
+        try:
+            self.gps_ip = ft.TextField(
+                label=self.page.session.get("lang.setting.ip"),
+                value=self.conf.gps_ip,
+                read_only=True,
+                col={"sm": 6},
+                can_request_focus=False,
+                on_click=lambda e: keyboard.open(e.control, 'ip')
+            )
 
-        self.gps_port = ft.TextField(
-            label=self.page.session.get("lang.setting.port"),
-            value=self.conf.gps_port,
-            read_only=True,
-            col={"sm": 6},
-            can_request_focus=False,
-            on_click=lambda e: keyboard.open(e.control, 'int')
-        )
+            self.gps_port = ft.TextField(
+                label=self.page.session.get("lang.setting.port"),
+                value=self.conf.gps_port,
+                read_only=True,
+                col={"sm": 6},
+                can_request_focus=False,
+                on_click=lambda e: keyboard.open(e.control, 'int')
+            )
 
-        self.connect_to_gps = ft.FilledButton(
-            text=self.page.session.get("lang.setting.connect"),
-            bgcolor=ft.Colors.GREEN,
-            color=ft.Colors.WHITE,
-            visible=not gdata.connected_to_gps,
-            style=ft.ButtonStyle(
-                shape=ft.RoundedRectangleBorder(radius=5)
-            ),
-            on_click=lambda e: self.page.open(PermissionCheck(self.__on_connect, 2))
-        )
+            self.connect_to_gps = ft.FilledButton(
+                text=self.page.session.get("lang.setting.connect"),
+                bgcolor=ft.Colors.GREEN,
+                color=ft.Colors.WHITE,
+                visible=not gdata.connected_to_gps,
+                style=ft.ButtonStyle(
+                    shape=ft.RoundedRectangleBorder(radius=5)
+                ),
+                on_click=lambda e: self.page.open(PermissionCheck(self.__on_connect, 2))
+            )
 
-        self.disconnect_from_gps = ft.FilledButton(
-            text=self.page.session.get("lang.setting.disconnect"),
-            bgcolor=ft.Colors.RED,
-            color=ft.Colors.WHITE,
-            visible=gdata.connected_to_gps,
-            style=ft.ButtonStyle(
-                shape=ft.RoundedRectangleBorder(radius=5)
-            ),
-            on_click=lambda e: self.page.open(PermissionCheck(self.__on_disconnect, 2))
-        )
+            self.disconnect_from_gps = ft.FilledButton(
+                text=self.page.session.get("lang.setting.disconnect"),
+                bgcolor=ft.Colors.RED,
+                color=ft.Colors.WHITE,
+                visible=gdata.connected_to_gps,
+                style=ft.ButtonStyle(
+                    shape=ft.RoundedRectangleBorder(radius=5)
+                ),
+                on_click=lambda e: self.page.open(PermissionCheck(self.__on_disconnect, 2))
+            )
 
-        self.heading = self.page.session.get("lang.setting.gps_conf")
-        self.body = ft.Row(controls=[self.gps_ip, self.gps_port, self.connect_to_gps, self.disconnect_from_gps])
-        self.col = {"sm": 12}
+            self.custom_card = CustomCard(
+                self.page.session.get("lang.setting.gps_conf"),
+                ft.ResponsiveRow(controls=[
+                    self.gps_ip,
+                    self.gps_port,
+                    self.connect_to_gps,
+                    self.disconnect_from_gps
+                ]),
+                col={"xs": 12})
+            self.content = self.custom_card
 
-        super().build()
+        except:
+            logging.exception('exception occured at IOSettingGPS.build')
 
-    def __on_connect(self, user : User):
+    def __on_connect(self, user: User):
         OperationLog.create(
             user_id=user.id,
             utc_date_time=gdata.utc_date_time,
@@ -81,17 +90,16 @@ class IOSettingGPS(CustomCard):
         self.conf.save()
 
         self.__start_gps_task()
-        
-    
+
     def __start_gps_task(self):
         self.connect_to_gps.text = self.page.session.get("lang.common.connecting")
         self.connect_to_gps.disabled = True
         self.connect_to_gps.update()
-    
+
         self.page.run_task(gps_sync_task.start, retry_once=True)
         self.__handle_gps_connection_status()
-    
-    def __on_disconnect(self, user:User):
+
+    def __on_disconnect(self, user: User):
         OperationLog.create(
             user_id=user.id,
             utc_date_time=gdata.utc_date_time,
@@ -112,7 +120,6 @@ class IOSettingGPS(CustomCard):
 
         self.conf.gps_ip = self.gps_ip.value
         self.conf.gps_port = self.gps_port.value
-
 
     def __handle_gps_connection_status(self):
         if self.connect_to_gps:

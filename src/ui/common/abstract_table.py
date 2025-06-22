@@ -23,32 +23,36 @@ class AbstractTable(ft.Container):
         self.__create_table_rows()
 
     def build(self):
-        # self.default_width = self.page.window.width - \
-        #     35 if self.table_width is None else self.table_width
-        self.__create_table()
+        try:
+            # self.default_width = self.page.window.width - \
+            #     35 if self.table_width is None else self.table_width
+            self.__create_table()
 
-        col = ft.Column(
-            controls=[self.data_table],
-            expand=True,
-            scroll=ft.ScrollMode.ADAPTIVE
-        )
+            col = ft.Column(
+                controls=[self.data_table],
+                expand=True,
+                scroll=ft.ScrollMode.ADAPTIVE
+            )
 
-        row = ft.Row(
-            controls=[col],
-            scroll=ft.ScrollMode.ADAPTIVE,
-            alignment=ft.MainAxisAlignment.START,
-            vertical_alignment=ft.CrossAxisAlignment.START,
-            expand=True
-        )
+            row = ft.Row(
+                controls=[col],
+                scroll=ft.ScrollMode.ADAPTIVE,
+                alignment=ft.MainAxisAlignment.START,
+                vertical_alignment=ft.CrossAxisAlignment.START,
+                expand=True
+            )
 
-        self.content = ft.Column(
-            expand=True,
-            spacing=0,
-            controls=[
-                row,
-                self.pg
-            ]
-        )
+            self.content = ft.Column(
+                expand=True,
+                spacing=0,
+                controls=[
+                    row,
+                    self.pg
+                ]
+            )
+        except:
+            logging.exception('exception occured at AbstractTable.build')
+
 
     def __create_table(self):
         self.data_table = ft.DataTable(

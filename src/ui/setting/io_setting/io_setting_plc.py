@@ -10,13 +10,12 @@ from db.models.user import User
 from ui.common.custom_card import CustomCard
 from ui.common.keyboard import keyboard
 from ui.common.permission_check import PermissionCheck
-from ui.common.toast import Toast
 from utils.alarm_saver import AlarmSaver
 from utils.plc_util import plc_util
 from common.global_data import gdata
 
 
-class IOSettingPLC(CustomCard):
+class IOSettingPLC(ft.Container):
     def __init__(self, conf: IOConf):
         super().__init__()
         self.conf = conf
@@ -25,215 +24,217 @@ class IOSettingPLC(CustomCard):
         self.task_running = False
 
     def build(self):
-        self.plc_enabled = ft.Checkbox(
-            label=self.page.session.get("lang.setting.plc_enabled"), 
-            value=self.conf.plc_enabled, col={'sm':12},
-            on_change=lambda e : self.__plc_enabled_change(e)
-        )
+        try:
+            self.plc_enabled = ft.Checkbox(
+                label=self.page.session.get("lang.setting.plc_enabled"),
+                value=self.conf.plc_enabled, col={'sm': 12},
+                on_change=lambda e: self.__plc_enabled_change(e)
+            )
 
-        self.connect_to_plc = ft.FilledButton(
-            text = self.page.session.get("lang.setting.connect"),
-            bgcolor=ft.Colors.GREEN,
-            color=ft.Colors.WHITE,
-            visible=self.conf.plc_enabled and not gdata.connected_to_plc,
-            style=ft.ButtonStyle(
-                shape=ft.RoundedRectangleBorder(radius=5)
-            ),
-            on_click=lambda e: self.page.open(PermissionCheck(self.__on_connect, 2))
-        )
+            self.connect_to_plc = ft.FilledButton(
+                text=self.page.session.get("lang.setting.connect"),
+                bgcolor=ft.Colors.GREEN,
+                color=ft.Colors.WHITE,
+                visible=self.conf.plc_enabled and not gdata.connected_to_plc,
+                style=ft.ButtonStyle(
+                    shape=ft.RoundedRectangleBorder(radius=5)
+                ),
+                on_click=lambda e: self.page.open(PermissionCheck(self.__on_connect, 2))
+            )
 
-        self.disconnect_from_plc = ft.FilledButton(
-            text = self.page.session.get("lang.setting.disconnect"),
-            bgcolor=ft.Colors.RED,
-            color=ft.Colors.WHITE,
-            visible=self.conf.plc_enabled and gdata.connected_to_plc,
-            style=ft.ButtonStyle(
-                shape=ft.RoundedRectangleBorder(radius=5)
-            ),
-            on_click=lambda e: self.page.open(PermissionCheck(self.__on_disconnect, 2))
-        )
+            self.disconnect_from_plc = ft.FilledButton(
+                text=self.page.session.get("lang.setting.disconnect"),
+                bgcolor=ft.Colors.RED,
+                color=ft.Colors.WHITE,
+                visible=self.conf.plc_enabled and gdata.connected_to_plc,
+                style=ft.ButtonStyle(
+                    shape=ft.RoundedRectangleBorder(radius=5)
+                ),
+                on_click=lambda e: self.page.open(PermissionCheck(self.__on_disconnect, 2))
+            )
 
-        self.fetch_data_from_plc = ft.FilledButton(
-            text = self.page.session.get("lang.setting.fetch_data"),
-            bgcolor=ft.Colors.BLUE,
-            color=ft.Colors.WHITE,
-            visible=self.conf.plc_enabled and gdata.connected_to_plc,
-            style=ft.ButtonStyle(
-                shape=ft.RoundedRectangleBorder(radius=5)
-            ),
-            on_click=lambda e: self.__on_fetch_data_from_plc()
-        )
+            self.fetch_data_from_plc = ft.FilledButton(
+                text=self.page.session.get("lang.setting.fetch_data"),
+                bgcolor=ft.Colors.BLUE,
+                color=ft.Colors.WHITE,
+                visible=self.conf.plc_enabled and gdata.connected_to_plc,
+                style=ft.ButtonStyle(
+                    shape=ft.RoundedRectangleBorder(radius=5)
+                ),
+                on_click=lambda e: self.__on_fetch_data_from_plc()
+            )
 
-        self.plc_ip = ft.TextField(
-            label=self.page.session.get("lang.setting.ip"), value=self.conf.plc_ip,
-            can_request_focus=False,
-            read_only=True, on_click=lambda e: keyboard.open(e.control, 'ip'), 
-            visible=self.conf.plc_enabled
-        )
+            self.plc_ip = ft.TextField(
+                label=self.page.session.get("lang.setting.ip"), value=self.conf.plc_ip,
+                can_request_focus=False,
+                read_only=True, on_click=lambda e: keyboard.open(e.control, 'ip'),
+                visible=self.conf.plc_enabled
+            )
 
-        self.plc_port = ft.TextField(
-            label=self.page.session.get("lang.setting.port"), value=self.conf.plc_port,
-            can_request_focus=False,
-            read_only=True, on_click=lambda e: keyboard.open(e.control, 'int'), 
-            visible=self.conf.plc_enabled
-        )
+            self.plc_port = ft.TextField(
+                label=self.page.session.get("lang.setting.port"), value=self.conf.plc_port,
+                can_request_focus=False,
+                read_only=True, on_click=lambda e: keyboard.open(e.control, 'int'),
+                visible=self.conf.plc_enabled
+            )
 
-        self.txt_power_range_min = ft.TextField(
-            label=self.page.session.get("lang.setting.4_20_ma_power_min"),
-            suffix_text='kW',
-            col={'sm': 6},
-            read_only=True,
-            value=0,
-            can_request_focus=False,
-            on_click=lambda e: keyboard.open(e.control, 'int'),
-            visible=self.conf.plc_enabled
-        )
-        self.txt_power_range_max = ft.TextField(
-            label=self.page.session.get("lang.setting.4_20_ma_power_max"),
-            suffix_text='kW',
-            col={'sm': 6},
-            read_only=True,
-            value=0,
-            visible=self.conf.plc_enabled,
-            can_request_focus=False,
-            on_click=lambda e: keyboard.open(e.control, 'int')
-        )
-        self.txt_power_range_offset = ft.TextField(
-            label=self.page.session.get("lang.setting.4_20_ma_power_offset"),
-            suffix_text='kW',
-            col={'sm': 6},
-            read_only=True,
-            value=0,
-            visible=self.conf.plc_enabled,
-            can_request_focus=False,
-            on_click=lambda e: keyboard.open(e.control, 'int')
-        )
+            self.txt_power_range_min = ft.TextField(
+                label=self.page.session.get("lang.setting.4_20_ma_power_min"),
+                suffix_text='kW',
+                col={'sm': 6},
+                read_only=True,
+                value=0,
+                can_request_focus=False,
+                on_click=lambda e: keyboard.open(e.control, 'int'),
+                visible=self.conf.plc_enabled
+            )
+            self.txt_power_range_max = ft.TextField(
+                label=self.page.session.get("lang.setting.4_20_ma_power_max"),
+                suffix_text='kW',
+                col={'sm': 6},
+                read_only=True,
+                value=0,
+                visible=self.conf.plc_enabled,
+                can_request_focus=False,
+                on_click=lambda e: keyboard.open(e.control, 'int')
+            )
+            self.txt_power_range_offset = ft.TextField(
+                label=self.page.session.get("lang.setting.4_20_ma_power_offset"),
+                suffix_text='kW',
+                col={'sm': 6},
+                read_only=True,
+                value=0,
+                visible=self.conf.plc_enabled,
+                can_request_focus=False,
+                on_click=lambda e: keyboard.open(e.control, 'int')
+            )
 
-        self.txt_torque_range_min = ft.TextField(
-            label=self.page.session.get("lang.setting.4_20_ma_torque_min"),
-            suffix_text='kNm',
-            col={'sm': 6},
-            read_only=True,
-            value=0,
-            visible=self.conf.plc_enabled,
-            can_request_focus=False,
-            on_click=lambda e: keyboard.open(e.control, 'int')
-        )
-        self.txt_torque_range_max = ft.TextField(
-            label=self.page.session.get("lang.setting.4_20_ma_torque_max"),
-            suffix_text='kNm',
-            col={'sm': 6},
-            read_only=True,
-            value=0,
-            visible=self.conf.plc_enabled,
-            can_request_focus=False,
-            on_click=lambda e: keyboard.open(e.control, 'int')
-        )
-        self.txt_torque_range_offset = ft.TextField(
-            label=self.page.session.get("lang.setting.4_20_ma_torque_offset"),
-            suffix_text='kNm',
-            col={'sm': 6},
-            read_only=True,
-            value=0,
-            visible=self.conf.plc_enabled,
-            can_request_focus=False,
-            on_click=lambda e: keyboard.open(e.control, 'int')
-        )
+            self.txt_torque_range_min = ft.TextField(
+                label=self.page.session.get("lang.setting.4_20_ma_torque_min"),
+                suffix_text='kNm',
+                col={'sm': 6},
+                read_only=True,
+                value=0,
+                visible=self.conf.plc_enabled,
+                can_request_focus=False,
+                on_click=lambda e: keyboard.open(e.control, 'int')
+            )
+            self.txt_torque_range_max = ft.TextField(
+                label=self.page.session.get("lang.setting.4_20_ma_torque_max"),
+                suffix_text='kNm',
+                col={'sm': 6},
+                read_only=True,
+                value=0,
+                visible=self.conf.plc_enabled,
+                can_request_focus=False,
+                on_click=lambda e: keyboard.open(e.control, 'int')
+            )
+            self.txt_torque_range_offset = ft.TextField(
+                label=self.page.session.get("lang.setting.4_20_ma_torque_offset"),
+                suffix_text='kNm',
+                col={'sm': 6},
+                read_only=True,
+                value=0,
+                visible=self.conf.plc_enabled,
+                can_request_focus=False,
+                on_click=lambda e: keyboard.open(e.control, 'int')
+            )
 
-        self.txt_thrust_range_min = ft.TextField(
-            label=self.page.session.get("lang.setting.4_20_ma_thrust_min"),
-            suffix_text='kN',
-            col={'sm': 6},
-            read_only=True,
-            value=0,
-            visible=self.conf.plc_enabled,
-            can_request_focus=False,
-            on_click=lambda e: keyboard.open(e.control, 'int')
-        )
-        self.txt_thrust_range_max = ft.TextField(
-            label=self.page.session.get("lang.setting.4_20_ma_thrust_max"),
-            suffix_text='kN',
-            col={'sm': 6},
-            read_only=True,
-            value=0,
-            visible=self.conf.plc_enabled,
-            can_request_focus=False,
-            on_click=lambda e: keyboard.open(e.control, 'int')
-        )
-        self.txt_thrust_range_offset = ft.TextField(
-            label=self.page.session.get("lang.setting.4_20_ma_thrust_offset"),
-            suffix_text='kN',
-            col={'sm': 6},
-            read_only=True,
-            value=0,
-            visible=self.conf.plc_enabled,
-            can_request_focus=False,
-            on_click=lambda e: keyboard.open(e.control, 'int')
-        )
+            self.txt_thrust_range_min = ft.TextField(
+                label=self.page.session.get("lang.setting.4_20_ma_thrust_min"),
+                suffix_text='kN',
+                col={'sm': 6},
+                read_only=True,
+                value=0,
+                visible=self.conf.plc_enabled,
+                can_request_focus=False,
+                on_click=lambda e: keyboard.open(e.control, 'int')
+            )
+            self.txt_thrust_range_max = ft.TextField(
+                label=self.page.session.get("lang.setting.4_20_ma_thrust_max"),
+                suffix_text='kN',
+                col={'sm': 6},
+                read_only=True,
+                value=0,
+                visible=self.conf.plc_enabled,
+                can_request_focus=False,
+                on_click=lambda e: keyboard.open(e.control, 'int')
+            )
+            self.txt_thrust_range_offset = ft.TextField(
+                label=self.page.session.get("lang.setting.4_20_ma_thrust_offset"),
+                suffix_text='kN',
+                col={'sm': 6},
+                read_only=True,
+                value=0,
+                visible=self.conf.plc_enabled,
+                can_request_focus=False,
+                on_click=lambda e: keyboard.open(e.control, 'int')
+            )
 
-        self.txt_speed_range_min = ft.TextField(
-            label=self.page.session.get("lang.setting.4_20_ma_speed_min"),
-            suffix_text='rpm',
-            col={'sm': 6},
-            read_only=True,
-            value=0,
-            visible=self.conf.plc_enabled,
-            can_request_focus=False,
-            on_click=lambda e: keyboard.open(e.control, 'int')
-        )
-        self.txt_speed_range_max = ft.TextField(
-            label=self.page.session.get("lang.setting.4_20_ma_speed_max"),
-            suffix_text='rpm',
-            col={'sm': 6},
-            read_only=True,
-            value=0,
-            visible=self.conf.plc_enabled,
-            can_request_focus=False,
-            on_click=lambda e: keyboard.open(e.control, 'int')
-        )
-        self.txt_speed_range_offset = ft.TextField(
-            label=self.page.session.get("lang.setting.4_20_ma_speed_offset"),
-            suffix_text='rpm',
-            col={'sm': 6},
-            read_only=True,
-            value=0,
-            visible=self.conf.plc_enabled,
-            can_request_focus=False,
-            on_click=lambda e: keyboard.open(e.control, 'int')
-        )
+            self.txt_speed_range_min = ft.TextField(
+                label=self.page.session.get("lang.setting.4_20_ma_speed_min"),
+                suffix_text='rpm',
+                col={'sm': 6},
+                read_only=True,
+                value=0,
+                visible=self.conf.plc_enabled,
+                can_request_focus=False,
+                on_click=lambda e: keyboard.open(e.control, 'int')
+            )
+            self.txt_speed_range_max = ft.TextField(
+                label=self.page.session.get("lang.setting.4_20_ma_speed_max"),
+                suffix_text='rpm',
+                col={'sm': 6},
+                read_only=True,
+                value=0,
+                visible=self.conf.plc_enabled,
+                can_request_focus=False,
+                on_click=lambda e: keyboard.open(e.control, 'int')
+            )
+            self.txt_speed_range_offset = ft.TextField(
+                label=self.page.session.get("lang.setting.4_20_ma_speed_offset"),
+                suffix_text='rpm',
+                col={'sm': 6},
+                read_only=True,
+                value=0,
+                visible=self.conf.plc_enabled,
+                can_request_focus=False,
+                on_click=lambda e: keyboard.open(e.control, 'int')
+            )
 
-        self.heading = self.page.session.get("lang.setting.plc_conf")
-        
-        self.body = ft.ResponsiveRow(controls=[
-            self.plc_enabled,
-            ft.Row(
-                col={'sm':12},
-                controls=[
-                    self.plc_ip,
-                    self.plc_port,
-                    self.connect_to_plc,
-                    self.disconnect_from_plc,
-                    self.fetch_data_from_plc
-                ]
-            ),
-            self.txt_power_range_min,
-            self.txt_power_range_max,
-            self.txt_power_range_offset,
+            self.custom_card = CustomCard(
+                self.page.session.get("lang.setting.plc_conf"),
+                ft.ResponsiveRow(controls=[
+                    self.plc_enabled,
+                    ft.Row(
+                        col={'sm': 12},
+                        controls=[
+                            self.plc_ip,
+                            self.plc_port,
+                            self.connect_to_plc,
+                            self.disconnect_from_plc,
+                            self.fetch_data_from_plc
+                        ]
+                    ),
+                    self.txt_power_range_min,
+                    self.txt_power_range_max,
+                    self.txt_power_range_offset,
 
-            self.txt_torque_range_min,
-            self.txt_torque_range_max,
-            self.txt_torque_range_offset,
+                    self.txt_torque_range_min,
+                    self.txt_torque_range_max,
+                    self.txt_torque_range_offset,
 
-            self.txt_thrust_range_min,
-            self.txt_thrust_range_max,
-            self.txt_thrust_range_offset,
+                    self.txt_thrust_range_min,
+                    self.txt_thrust_range_max,
+                    self.txt_thrust_range_offset,
 
-            self.txt_speed_range_min,
-            self.txt_speed_range_max,
-            self.txt_speed_range_offset,
-        ])
-        self.col = {'sm': 12}
-        super().build()
+                    self.txt_speed_range_min,
+                    self.txt_speed_range_max,
+                    self.txt_speed_range_offset,
+                ]))
+            self.content = self.custom_card
+        except:
+            logging.exception('exception occured at IOSettingPLC.build')
 
     def __on_connect(self, user: User):
         try:
@@ -262,7 +263,7 @@ class IOSettingPLC(CustomCard):
         except Exception as e:
             logging.exception(e)
 
-    def __on_disconnect(self, user:User):
+    def __on_disconnect(self, user: User):
         OperationLog.create(
             user_id=user.id,
             utc_date_time=gdata.utc_date_time,
@@ -328,7 +329,7 @@ class IOSettingPLC(CustomCard):
         if not self.conf.plc_enabled:
             self.page.run_task(plc_util.close)
             AlarmSaver.recovery(alarm_type=AlarmType.PLC_DISCONNECTED)
-            
+
         if self.conf.plc_enabled:
             self.page.run_task(self.__write_to_plc)
 
@@ -406,7 +407,6 @@ class IOSettingPLC(CustomCard):
         except Exception:
             logging.exception("plc save data error")
 
-    
     def __handle_plc_connection_status(self):
         self.connect_to_plc.text = self.page.session.get("lang.setting.connect")
         self.connect_to_plc.visible = not gdata.connected_to_plc
@@ -427,7 +427,7 @@ class IOSettingPLC(CustomCard):
         self.task_running = False
         if self.loop_task:
             self.loop_task.cancel()
-    
+
     async def __handle_connection_status(self):
         while self.task_running:
             try:
