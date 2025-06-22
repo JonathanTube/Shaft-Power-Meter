@@ -17,6 +17,8 @@ class GpsSyncTask:
 
         self._lock = asyncio.Lock()
 
+        self._retry = 0
+
         self._max_retries = 20  # 最大重连次数
 
         self._is_connected = False
@@ -28,9 +30,8 @@ class GpsSyncTask:
         return self._is_connected
 
     async def connect(self):
-        retry = 0
         async with self._lock:  # 确保单线程重连
-            while retry < self._max_retries:
+            while self._retry < self._max_retries:
                 if self._is_canceled:
                     break
 
@@ -56,18 +57,20 @@ class GpsSyncTask:
 
                     logging.info(f'[***GPS***]disconnected from gps, ip={io_conf.gps_ip}, port={io_conf.gps_port}')
                     # 执行到这了，说明已经退出了
+                    self._is_connected = False
+                    AlarmSaver.create(alarm_type=AlarmType.GPS_DISCONNECTED)
                     # 如果是手动取消，直接跳出
                     if self._is_canceled:
                         break
                     # 否则进入下一次循环
                 except:
-                    logging.error(f"[***GPS***]connect to gps timeout, retry times={retry + 1}")
+                    logging.error(f"[***GPS***]connect to gps timeout, retry times={self._retry + 1}")
                     self._is_connected = False
                     AlarmSaver.create(alarm_type=AlarmType.GPS_DISCONNECTED)
                 finally:
                     #  指数退避
-                    await asyncio.sleep(2 ** retry)
-                    retry += 1
+                    await asyncio.sleep(2 ** self._retry)
+                    self._retry += 1
 
             # 重新设置为未取消，准备下一次链接
             self._is_canceled = False
@@ -84,6 +87,7 @@ class GpsSyncTask:
 
                 str_data = data.decode('utf-8').strip()
                 self.parse_nmea_sentence(str_data)
+                self._retry = 0
             except:
                 self._is_connected = False
                 AlarmSaver.create(AlarmType.GPS_DISCONNECTED)
