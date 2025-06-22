@@ -86,7 +86,7 @@ class IOSetting(ft.Container):
             self.conf.save()
             Toast.show_success(self.page)
         except Exception as e:
-            Toast.show_error(self.page, e)
+            Toast.show_error(self.page, str(e))
 
     def __reset_data(self, e):
         keyboard.close()

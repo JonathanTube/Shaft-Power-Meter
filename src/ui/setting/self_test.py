@@ -4,6 +4,7 @@ import flet as ft
 from db.models.io_conf import IOConf
 from db.models.system_settings import SystemSettings
 from task.plc_sync_task import plc
+from task.gps_sync_task import gps
 from common.global_data import gdata
 
 
@@ -80,14 +81,30 @@ class SelfTest(ft.Tabs):
     async def __read_plc_data(self):
         while self.task_running:
             try:
-                plc_4_20_ma_data = await plc.read_4_20_ma_data()
-                self.plc_log.controls.append(ft.Text(f"4-20mA: {plc_4_20_ma_data}"))
-                self.plc_log.controls.append(ft.Text(f"alarm: {await plc.read_alarm()}"))
-                self.plc_log.controls.append(ft.Text(f"overload: {await plc.read_power_overload()}"))
-                self.plc_log.controls.append(ft.Text(f"instant data: {await plc.read_instant_data()}"))
+                if plc.is_connected:
+                    plc_4_20_ma_data = await plc.read_4_20_ma_data()
+                    self.plc_log.controls.append(ft.Text(f"4-20mA: {plc_4_20_ma_data}"))
+                    self.plc_log.controls.append(ft.Text(f"alarm: {await plc.read_alarm()}"))
+                    self.plc_log.controls.append(ft.Text(f"overload: {await plc.read_power_overload()}"))
+                    self.plc_log.controls.append(ft.Text(f"instant data: {await plc.read_instant_data()}"))
+                else:
+                    self.plc_log.controls.append(ft.Text("disconnected from PLC"))
                 self.plc_log.update()
             except Exception as e:
                 logging.exception('exception occured at SelfTest.__read_plc_data')
+            finally:
+                await asyncio.sleep(2)
+
+    async def __read_gps_data(self):
+        while self.task_running:
+            try:
+                if gps.is_connected:
+                    self.gps_log.controls.append(ft.Text(f"GPS Data: {gdata.gps_raw_data}"))
+                else:
+                    self.gps_log.controls.append(ft.Text("Disconnected from GPS"))
+                self.gps_log.update()
+            except:
+                logging.exception('exception occured at SelfTest.__read_gps_data')
             finally:
                 await asyncio.sleep(2)
 
@@ -137,15 +154,3 @@ class SelfTest(ft.Tabs):
                 await asyncio.sleep(2)
 
 
-    async def __read_gps_data(self):
-        while self.task_running:
-            try:
-                if gdata.connected_to_gps:
-                    self.gps_log.controls.append(ft.Text(f"GPS Data: {gdata.gps_raw_data}"))
-                else:
-                    self.gps_log.controls.append(ft.Text("Disconnected from GPS"))
-                self.gps_log.update()
-            except:
-                logging.exception('exception occured at SelfTest.__read_gps_data')
-            finally:
-                await asyncio.sleep(2)

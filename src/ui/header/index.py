@@ -19,7 +19,7 @@ from task.sps2_read_task import sps2_read_task
 from websocket.websocket_client import ws_client
 from websocket.websocket_server import ws_server
 from task.plc_sync_task import plc
-from task.gps_sync_task import gps_sync_task
+from task.gps_sync_task import gps
 
 
 class Header(ft.AppBar):
@@ -108,14 +108,14 @@ class Header(ft.AppBar):
             await sps2_read_task.close()
 
             # 关闭websocket
-            await ws_server.close()
+            await ws_server.stop()
             await ws_client.close()
 
             # 关闭PLC
             await plc.close()
 
             # 关闭GPS
-            await gps_sync_task.close()
+            await gps.close()
             logging.info('all of the connections were closed.')
         except:
             logging.exception('exception occured while app exits')

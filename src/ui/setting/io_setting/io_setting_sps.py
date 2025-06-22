@@ -35,6 +35,7 @@ class IOSettingSPS(ft.Container):
                 label=f'{self.page.session.get("lang.setting.ip")} SPS1',
                 value=self.conf.sps1_ip,
                 read_only=True,
+                col={'sm': 4},
                 can_request_focus=False,
                 on_click=lambda e: keyboard.open(e.control, 'ip')
             )
@@ -43,6 +44,7 @@ class IOSettingSPS(ft.Container):
                 label=f'{self.page.session.get("lang.setting.port")} SPS1',
                 value=self.conf.sps1_port,
                 read_only=True,
+                col={'sm': 4},
                 can_request_focus=False,
                 on_click=lambda e: keyboard.open(e.control, 'int')
             )
@@ -51,6 +53,7 @@ class IOSettingSPS(ft.Container):
                 text=self.page.session.get("lang.setting.connect"),
                 bgcolor=ft.Colors.GREEN,
                 color=ft.Colors.WHITE,
+                col={'sm': 4},
                 visible=gdata.sps1_offline,
                 style=ft.ButtonStyle(
                     shape=ft.RoundedRectangleBorder(radius=5)
@@ -62,6 +65,7 @@ class IOSettingSPS(ft.Container):
                 text=self.page.session.get("lang.setting.disconnect"),
                 bgcolor=ft.Colors.RED,
                 color=ft.Colors.WHITE,
+                col={'sm': 4},
                 visible=not gdata.sps1_offline,
                 style=ft.ButtonStyle(
                     shape=ft.RoundedRectangleBorder(radius=5)
@@ -73,6 +77,7 @@ class IOSettingSPS(ft.Container):
                 label=f'{self.page.session.get("lang.setting.ip")} SPS2',
                 value=self.conf.sps2_ip,
                 read_only=True,
+                col={'sm': 4},
                 can_request_focus=False,
                 on_click=lambda e: keyboard.open(e.control, 'ip')
             )
@@ -81,6 +86,7 @@ class IOSettingSPS(ft.Container):
                 label=f'{self.page.session.get("lang.setting.port")} SPS2',
                 value=self.conf.sps2_port,
                 read_only=True,
+                col={'sm': 4},
                 can_request_focus=False,
                 on_click=lambda e: keyboard.open(e.control, 'int')
             )
@@ -89,6 +95,7 @@ class IOSettingSPS(ft.Container):
                 text=self.page.session.get("lang.setting.connect"),
                 bgcolor=ft.Colors.GREEN,
                 color=ft.Colors.WHITE,
+                col={'sm': 4},
                 visible=gdata.sps2_offline,
                 style=ft.ButtonStyle(
                     shape=ft.RoundedRectangleBorder(radius=5)
@@ -100,6 +107,7 @@ class IOSettingSPS(ft.Container):
                 text=self.page.session.get("lang.setting.disconnect"),
                 bgcolor=ft.Colors.RED,
                 color=ft.Colors.WHITE,
+                col={'sm': 4},
                 visible=not gdata.sps2_offline,
                 style=ft.ButtonStyle(
                     shape=ft.RoundedRectangleBorder(radius=5)
@@ -113,6 +121,7 @@ class IOSettingSPS(ft.Container):
                 label=self.page.session.get("lang.setting.bearing_outer_diameter_D"), suffix_text="m",
                 value=self.factor_conf.bearing_outer_diameter_D,
                 read_only=True,
+                col={'sm': 4},
                 can_request_focus=False,
                 on_click=lambda e: keyboard.open(e.control)
             )
@@ -123,6 +132,7 @@ class IOSettingSPS(ft.Container):
                 suffix_text="m",
                 value=self.factor_conf.bearing_inner_diameter_d,
                 read_only=True,
+                col={'sm': 4},
                 can_request_focus=False,
                 on_click=lambda e: keyboard.open(e.control)
             )
@@ -131,6 +141,7 @@ class IOSettingSPS(ft.Container):
                 label=self.page.session.get("lang.setting.sensitivity_factor_k"),
                 value=self.factor_conf.sensitivity_factor_k,
                 read_only=True,
+                col={'sm': 4},
                 can_request_focus=False,
                 on_click=lambda e: keyboard.open(e.control)
             )
@@ -140,6 +151,7 @@ class IOSettingSPS(ft.Container):
                 value=self.factor_conf.elastic_modulus_E,
                 suffix_text="Mpa",
                 read_only=True,
+                col={'sm': 4},
                 can_request_focus=False,
                 on_click=lambda e: keyboard.open(e.control)
             )
@@ -148,36 +160,54 @@ class IOSettingSPS(ft.Container):
                 label=self.page.session.get("lang.setting.poisson_ratio_mu"),
                 value=self.factor_conf.poisson_ratio_mu,
                 read_only=True,
+                col={'sm': 4},
                 can_request_focus=False,
                 on_click=lambda e: keyboard.open(e.control)
             )
             # factor conf. end
 
-            self.row_sps1 = ft.Row(
-                controls=[self.sps1_ip, self.sps1_port, self.sps1_connect, self.sps1_disconnect]
-            )
-
-            self.row_sps2 = ft.Row(
-                controls=[self.sps2_ip, self.sps2_port, self.sps2_connect, self.sps2_disconnect],
-                visible=self.is_dual
-            )
-
-            self.column_factor = ft.Column(
+            self.row_sps1 = ft.ResponsiveRow(
                 controls=[
-                    ft.Row(controls=[self.shaft_outer_diameter, self.shaft_inner_diameter]),
-                    ft.Row(controls=[self.sensitivity_factor_k, self.elastic_modulus_E]),
-                    ft.Row(controls=[self.poisson_ratio_mu])
+                    self.sps1_ip, 
+                    self.sps1_port, 
+                    ft.Row(
+                        col={'sm': 4},
+                        alignment=ft.alignment.center_left,
+                        controls=[
+                            self.sps1_connect, 
+                            self.sps1_disconnect
+                        ]
+                    )
                 ]
+            )
+
+            self.row_sps2 = ft.ResponsiveRow(
+                controls=[
+                    self.sps2_ip, 
+                    self.sps2_port, 
+                    ft.Row(
+                        col={'sm': 4},
+                        alignment=ft.alignment.center_left,
+                        controls=[
+                            self.sps2_connect, 
+                            self.sps2_disconnect
+                        ])
+                ],
+                visible=self.is_dual
             )
 
             self.custom_card = CustomCard(
                 self.page.session.get("lang.setting.sps_conf"),
-                ft.ResponsiveRow(controls=[
-                    self.row_sps1,
-                    self.row_sps2,
-                    self.column_factor
-                ]),
-                col={"xs": 12})
+                ft.ResponsiveRow(
+                    controls=[
+                        self.row_sps1,
+                        self.row_sps2,
+                        self.shaft_outer_diameter, 
+                        self.shaft_inner_diameter,
+                        self.sensitivity_factor_k, 
+                        self.elastic_modulus_E,
+                        self.poisson_ratio_mu
+                    ]))
             self.content = self.custom_card
         except:
             logging.exception('exception occured at IOSettingSPS.build')

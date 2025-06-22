@@ -4,7 +4,7 @@ import time
 import flet as ft
 
 
-class Toast:
+class Toast:    
     @staticmethod
     def show_success(page: ft.Page, message: str = None):
         if page is None or page.session is None:
@@ -58,5 +58,5 @@ class Toast:
             page.update()
             page.overlay.remove(toast)
             page.update()
-        except Exception:
+        except:
             logging.exception("toast error")

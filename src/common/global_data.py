@@ -28,14 +28,10 @@ class GlobalData:
         #  是否开启自动从GPS同步UTC时间
         self.enable_utc_time_sync_with_gps = False
 
-        # 作为服务端, 是否已启动
-        self.master_server_started = False
         # 作为客户端，是否已连接
         self.connected_to_hmi_server = False
         # modbus output服务是否已经打开
         self.modbus_server_started = False
-        # 是否连上gps
-        self.connected_to_gps = False
 
         self.sps1_speed = 0
         self.sps1_power = 0

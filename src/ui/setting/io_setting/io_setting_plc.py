@@ -10,6 +10,7 @@ from db.models.user import User
 from ui.common.custom_card import CustomCard
 from ui.common.keyboard import keyboard
 from ui.common.permission_check import PermissionCheck
+from ui.common.toast import Toast
 from utils.alarm_saver import AlarmSaver
 from task.plc_sync_task import plc
 from common.global_data import gdata
@@ -20,7 +21,7 @@ class IOSettingPLC(ft.Container):
         super().__init__()
         self.conf = conf
 
-        self.task = None
+        self.loop_task = None
         self.task_running = False
 
     def build(self):
@@ -31,7 +32,7 @@ class IOSettingPLC(ft.Container):
                 on_change=lambda e: self.__plc_enabled_change(e)
             )
 
-            self.connect_to_plc = ft.FilledButton(
+            self.connect_btn = ft.FilledButton(
                 text=self.page.session.get("lang.setting.connect"),
                 bgcolor=ft.Colors.GREEN,
                 color=ft.Colors.WHITE,
@@ -43,19 +44,18 @@ class IOSettingPLC(ft.Container):
                 )
             )
 
-            self.disconnect_from_plc = ft.FilledButton(
+            self.close_btn = ft.FilledButton(
                 text=self.page.session.get("lang.setting.disconnect"),
                 bgcolor=ft.Colors.RED,
                 color=ft.Colors.WHITE,
                 style=ft.ButtonStyle(
                     shape=ft.RoundedRectangleBorder(radius=5)
                 ),
-                on_click=lambda e: self.page.open(
-                    PermissionCheck(self.__on_disconnect, 2)
+                on_click=lambda e: self.page.open(PermissionCheck(self.__on_close, 2)
                 )
             )
 
-            self.fetch_data_from_plc = ft.FilledButton(
+            self.fetch_btn = ft.FilledButton(
                 text=self.page.session.get("lang.setting.fetch_data"),
                 bgcolor=ft.Colors.BLUE,
                 color=ft.Colors.WHITE,
@@ -66,21 +66,25 @@ class IOSettingPLC(ft.Container):
             )
 
             self.plc_ip = ft.TextField(
-                label=self.page.session.get("lang.setting.ip"), value=self.conf.plc_ip,
+                label=self.page.session.get("lang.setting.ip"), 
+                value=self.conf.plc_ip,
+                col={'sm': 4},
                 can_request_focus=False,
                 read_only=True, on_click=lambda e: keyboard.open(e.control, 'ip')
             )
 
             self.plc_port = ft.TextField(
-                label=self.page.session.get("lang.setting.port"), value=self.conf.plc_port,
+                label=self.page.session.get("lang.setting.port"), 
+                value=self.conf.plc_port,
                 can_request_focus=False,
+                col={'sm': 4},
                 read_only=True, on_click=lambda e: keyboard.open(e.control, 'int')
             )
 
             self.txt_power_range_min = ft.TextField(
                 label=self.page.session.get("lang.setting.4_20_ma_power_min"),
                 suffix_text='kW',
-                col={'sm': 6},
+                col={'sm': 4},
                 read_only=True,
                 value=0,
                 can_request_focus=False,
@@ -89,17 +93,16 @@ class IOSettingPLC(ft.Container):
             self.txt_power_range_max = ft.TextField(
                 label=self.page.session.get("lang.setting.4_20_ma_power_max"),
                 suffix_text='kW',
-                col={'sm': 6},
+                col={'sm': 4},
                 read_only=True,
                 value=0,
                 can_request_focus=False,
                 on_click=lambda e: keyboard.open(e.control, 'int')
             )
             self.txt_power_range_offset = ft.TextField(
-                label=self.page.session.get(
-                    "lang.setting.4_20_ma_power_offset"),
+                label=self.page.session.get("lang.setting.4_20_ma_power_offset"),
                 suffix_text='kW',
-                col={'sm': 6},
+                col={'sm': 4},
                 read_only=True,
                 value=0,
                 can_request_focus=False,
@@ -109,7 +112,7 @@ class IOSettingPLC(ft.Container):
             self.txt_torque_range_min = ft.TextField(
                 label=self.page.session.get("lang.setting.4_20_ma_torque_min"),
                 suffix_text='kNm',
-                col={'sm': 6},
+                col={'sm': 4},
                 read_only=True,
                 value=0,
                 can_request_focus=False,
@@ -118,17 +121,16 @@ class IOSettingPLC(ft.Container):
             self.txt_torque_range_max = ft.TextField(
                 label=self.page.session.get("lang.setting.4_20_ma_torque_max"),
                 suffix_text='kNm',
-                col={'sm': 6},
+                col={'sm': 4},
                 read_only=True,
                 value=0,
                 can_request_focus=False,
                 on_click=lambda e: keyboard.open(e.control, 'int')
             )
             self.txt_torque_range_offset = ft.TextField(
-                label=self.page.session.get(
-                    "lang.setting.4_20_ma_torque_offset"),
+                label=self.page.session.get("lang.setting.4_20_ma_torque_offset"),
                 suffix_text='kNm',
-                col={'sm': 6},
+                col={'sm': 4},
                 read_only=True,
                 value=0,
                 can_request_focus=False,
@@ -138,7 +140,7 @@ class IOSettingPLC(ft.Container):
             self.txt_thrust_range_min = ft.TextField(
                 label=self.page.session.get("lang.setting.4_20_ma_thrust_min"),
                 suffix_text='kN',
-                col={'sm': 6},
+                col={'sm': 4},
                 read_only=True,
                 value=0,
                 can_request_focus=False,
@@ -147,17 +149,16 @@ class IOSettingPLC(ft.Container):
             self.txt_thrust_range_max = ft.TextField(
                 label=self.page.session.get("lang.setting.4_20_ma_thrust_max"),
                 suffix_text='kN',
-                col={'sm': 6},
+                col={'sm': 4},
                 read_only=True,
                 value=0,
                 can_request_focus=False,
                 on_click=lambda e: keyboard.open(e.control, 'int')
             )
             self.txt_thrust_range_offset = ft.TextField(
-                label=self.page.session.get(
-                    "lang.setting.4_20_ma_thrust_offset"),
+                label=self.page.session.get("lang.setting.4_20_ma_thrust_offset"),
                 suffix_text='kN',
-                col={'sm': 6},
+                col={'sm': 4},
                 read_only=True,
                 value=0,
                 can_request_focus=False,
@@ -167,7 +168,7 @@ class IOSettingPLC(ft.Container):
             self.txt_speed_range_min = ft.TextField(
                 label=self.page.session.get("lang.setting.4_20_ma_speed_min"),
                 suffix_text='rpm',
-                col={'sm': 6},
+                col={'sm': 4},
                 read_only=True,
                 value=0,
                 can_request_focus=False,
@@ -176,17 +177,16 @@ class IOSettingPLC(ft.Container):
             self.txt_speed_range_max = ft.TextField(
                 label=self.page.session.get("lang.setting.4_20_ma_speed_max"),
                 suffix_text='rpm',
-                col={'sm': 6},
+                col={'sm': 4},
                 read_only=True,
                 value=0,
                 can_request_focus=False,
                 on_click=lambda e: keyboard.open(e.control, 'int')
             )
             self.txt_speed_range_offset = ft.TextField(
-                label=self.page.session.get(
-                    "lang.setting.4_20_ma_speed_offset"),
+                label=self.page.session.get("lang.setting.4_20_ma_speed_offset"),
                 suffix_text='rpm',
-                col={'sm': 6},
+                col={'sm': 4},
                 read_only=True,
                 value=0,
                 can_request_focus=False,
@@ -197,14 +197,15 @@ class IOSettingPLC(ft.Container):
                 visible=self.conf.plc_enabled,
                 content=ft.ResponsiveRow(
                     controls=[
+                        self.plc_ip,
+                        self.plc_port,
                         ft.Row(
-                            col={'sm': 12},
+                            alignment=ft.alignment.center_left,
+                            col={'sm': 4},
                             controls=[
-                                self.plc_ip,
-                                self.plc_port,
-                                self.connect_to_plc,
-                                self.disconnect_from_plc,
-                                self.fetch_data_from_plc
+                                self.connect_btn,
+                                self.close_btn,
+                                self.fetch_btn
                             ]
                         ),
                         self.txt_power_range_min,
@@ -221,7 +222,7 @@ class IOSettingPLC(ft.Container):
 
                         self.txt_speed_range_min,
                         self.txt_speed_range_max,
-                        self.txt_speed_range_offset,
+                        self.txt_speed_range_offset
                     ])
             )
             self.custom_card = CustomCard(
@@ -238,21 +239,35 @@ class IOSettingPLC(ft.Container):
             logging.exception('exception occured at IOSettingPLC.build')
 
     def before_update(self):
-        self.connect_to_plc.visible = not plc.is_connected
-        self.disconnect_from_plc.visible = plc.is_connected
-        self.fetch_data_from_plc.visible = plc.is_connected
-    
+        self.connect_btn.text = self.page.session.get("lang.setting.connect")
+        self.connect_btn.visible = not plc.is_connected
+        self.connect_btn.disabled = False
+        self.connect_btn.bgcolor = ft.Colors.GREEN
+
+        self.close_btn.text = self.page.session.get("lang.setting.disconnect")
+        self.close_btn.visible = plc.is_connected
+        self.close_btn.disabled = False
+        self.close_btn.bgcolor = ft.Colors.RED
+
+        self.fetch_btn.text = self.page.session.get("lang.setting.fetch_data")
+        self.fetch_btn.visible = plc.is_connected
+        self.fetch_btn.disabled = False
+        self.fetch_btn.bgcolor = ft.Colors.BLUE
+
     def __on_connect(self, user: User):
         try:
-            ipaddress.ip_address(self.plc_ip.value)
-        except ValueError:
-            raise ValueError(
-                f'{self.page.session.get("lang.common.ip_address_format_error")}: {self.plc_ip.value}')
+            self.save_data()
+            self.conf.save()
+        except Exception as e:
+            Toast.show_error(self.page, str(e))
+            return
 
         try:
-            self.conf.plc_ip = self.plc_ip.value
-            self.conf.plc_port = self.plc_port.value
-            self.conf.save()
+            self.connect_btn.text = 'loading...'
+            self.connect_btn.disabled = True
+            self.connect_btn.bgcolor = ft.Colors.GREY
+            self.connect_btn.update()
+        
             OperationLog.create(
                 user_id=user.id,
                 utc_date_time=gdata.utc_date_time,
@@ -262,12 +277,17 @@ class IOSettingPLC(ft.Container):
             self.page.run_task(plc.connect)
         except:
             logging.exception("exception occured at io_setting_plc.__start_plc_task")
-        finally:
-            self.update()
-        
 
-    def __on_disconnect(self, user: User):
+    def __on_close(self, user: User):
         try:
+            self.close_btn.text = 'loading...'
+            self.close_btn.disabled = True
+            self.close_btn.bgcolor = ft.Colors.GREY
+            self.close_btn.update()
+
+            self.fetch_btn.visible = False
+            self.fetch_btn.update()
+
             OperationLog.create(
                 user_id=user.id,
                 utc_date_time=gdata.utc_date_time,
@@ -277,9 +297,6 @@ class IOSettingPLC(ft.Container):
             self.page.run_task(plc.close)
         except:
             logging.exception('exception occured at __stop_plc_task')
-        finally:
-            self.update()
-        
 
     async def load_range_data(self):
         try:
@@ -318,8 +335,7 @@ class IOSettingPLC(ft.Container):
         try:
             ipaddress.ip_address(self.plc_ip.value)
         except ValueError:
-            raise ValueError(
-                f'{self.page.session.get("lang.common.ip_address_format_error")}: {self.plc_ip.value}')
+            raise ValueError(f'{self.page.session.get("lang.common.ip_address_format_error")}: {self.plc_ip.value}')
 
         self.conf.plc_ip = self.plc_ip.value
         self.conf.plc_port = self.plc_port.value
@@ -360,7 +376,6 @@ class IOSettingPLC(ft.Container):
         except Exception:
             logging.exception("plc save data error")
 
-
     def did_mount(self):
         self.task_running = True
         self.loop_task = self.page.run_task(self.__loop)
@@ -379,4 +394,4 @@ class IOSettingPLC(ft.Container):
                 logging.exception('exception occured at IOSettingPLC.__handle_connection_status')
                 return
             finally:
-                await asyncio.sleep(1)
+                await asyncio.sleep(5)

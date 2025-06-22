@@ -217,7 +217,7 @@ class SystemConfSettings(ft.Container):
             self.page.run_task(plc.close)
             AlarmSaver.recovery(alarm_type=AlarmType.PLC_DISCONNECTED)
 
-            self.page.run_task(ws_server.close)
+            self.page.run_task(ws_server.stop)
             AlarmSaver.recovery(alarm_type=AlarmType.MASTER_SERVER_STOPPED)
 
             self.page.run_task(sps1_read_task.close)

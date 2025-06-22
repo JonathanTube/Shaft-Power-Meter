@@ -7,40 +7,33 @@ from db.models.alarm_log import AlarmLog
 from db.models.io_conf import IOConf
 from common.global_data import gdata
 
+
 class PlcSyncTask:
     def __init__(self):
         self._lock = asyncio.Lock()  # 线程安全锁
         self.plc_client: Optional[AsyncModbusTcpClient] = None
 
-        self.__is_connected = False
-
-        self.__force_close = False
-
-        self._max_retries = 100  # 最大重连次数
+        self._max_retries = 20  # 最大重连次数
+        self._is_connected = False
+        self._is_canceled = False
 
         self.ip = None
         self.port = None
 
     @property
-    def is_connected(self):        
-        return self.__is_connected
-    
+    def is_connected(self):
+        return self._is_connected
+
     async def connect(self):
-        self.__force_close = False
-        await self.auto_connect()
-            
-    async def auto_connect(self):
-        if self.__force_close:
-            return
         async with self._lock:  # 确保单线程重连
-            if self.plc_client and self.plc_client.connected:
-                await self.close()
-
             for attempt in range(self._max_retries):
-                try:
-                    if self.__is_connected:
-                        break
+                if self._is_canceled:
+                    break
 
+                if self._is_connected:
+                    break
+
+                try:
                     # 重新创建客户端
                     io_conf: IOConf = IOConf.get()
                     self.ip = io_conf.plc_ip
@@ -52,7 +45,7 @@ class PlcSyncTask:
                     self.plc_client = AsyncModbusTcpClient(
                         host=io_conf.plc_ip,
                         port=io_conf.plc_port,
-                        timeout=5,
+                        timeout=10,
                         retries=3,
                         reconnect_delay=5  # 自动重连间隔
                     )
@@ -61,7 +54,7 @@ class PlcSyncTask:
 
                     if self.plc_client and self.plc_client.connected:
                         logging.info("[***PLC***] connected successfully")
-                        self.__is_connected = True
+                        self._is_connected = True
                         await self.recovery_alarm()
                         # 连接成功，调出循环
                         break
@@ -74,8 +67,10 @@ class PlcSyncTask:
                     #  指数退避
                     await asyncio.sleep(2 ** attempt)
 
+            self._is_canceled = False
+
     async def read_4_20_ma_data(self) -> dict:
-        if not self.__is_connected:
+        if not self._is_connected:
             return self._empty_4_20ma_data()
 
         try:
@@ -102,7 +97,7 @@ class PlcSyncTask:
         return self._empty_4_20ma_data()
 
     async def write_4_20_ma_data(self, data: dict):
-        if not self.__is_connected:
+        if not self._is_connected:
             return
 
         try:
@@ -124,12 +119,10 @@ class PlcSyncTask:
         except:
             raise f"[***PLC***] {self.ip}:{self.port} PLC write data failed"
 
-
-
     async def write_instant_data(self, power: float, torque: float, thrust: float, speed: float):
-        if not self.__is_connected:
+        if not self._is_connected:
             # reconnect to plc server.
-            await self.auto_connect()
+            await self.connect()
 
         try:
             # power的单位是kw，保留一位小数，plc无法显示小数，所以除以1000 再乘以 10，也就是除以100
@@ -151,16 +144,16 @@ class PlcSyncTask:
             # if exception occured, we need to judge wether the plc connectection is ok
             if self.plc_client is None or not self.plc_client.connected:
                 # disconnected from plc
-                self.__is_connected = False
+                self._is_connected = False
                 # save alarm.
                 self.save_alarm()
                 # rebuild connection.
-                await self.auto_connect()
+                await self.connect()
 
     async def read_instant_data(self) -> dict:
-        if not self.__is_connected:
-            return { "power": None, "torque": None, "thrust": None, "speed": None }
-        
+        if not self._is_connected:
+            return {"power": None, "torque": None, "thrust": None, "speed": None}
+
         try:
             return {
                 "power": await self._safe_read_register(12301),
@@ -171,10 +164,10 @@ class PlcSyncTask:
         except Exception:
             logging.error(f"[***PLC***] {self.ip}:{self.port} PLC read data failed")
 
-        return { "power": None, "torque": None, "thrust": None, "speed": None }
-        
+        return {"power": None, "torque": None, "thrust": None, "speed": None}
+
     async def write_alarm(self, occured: bool):
-        if not self.__is_connected:
+        if not self._is_connected:
             return
 
         try:
@@ -184,7 +177,7 @@ class PlcSyncTask:
             logging.error(f"[***PLC**] {self.ip}:{self.port} write alarm failed")
 
     async def write_power_overload(self, occured: bool):
-        if not self.__is_connected:
+        if not self._is_connected:
             return
 
         try:
@@ -194,7 +187,7 @@ class PlcSyncTask:
             logging.error(f"[***PLC***] {self.ip}:{self.port} write power overload failed")
 
     async def read_alarm(self) -> bool:
-        if not self.__is_connected:
+        if not self._is_connected:
             return
 
         try:
@@ -202,11 +195,10 @@ class PlcSyncTask:
         except:
             logging.error(f"[***PLC***] {self.ip}:{self.port} read alarm failed")
 
-
     async def read_power_overload(self) -> bool:
-        if not self.__is_connected:
+        if not self._is_connected:
             return
-        
+
         try:
             return await self._safe_read_coil(12289)
         except:
@@ -215,12 +207,10 @@ class PlcSyncTask:
     async def _safe_read_register(self, address: int) -> Optional[int]:
         response = await self.plc_client.read_holding_registers(address)
         return response.registers[0] if not response.isError() else None
-        
 
     async def _safe_read_coil(self, address: int) -> Optional[int]:
         response = await self.plc_client.read_coils(address=address, count=1)
         return response.bits[0] if not response.isError() else None
-        
 
     def _empty_4_20ma_data(self) -> dict:
         return {key: None for key in [
@@ -235,12 +225,11 @@ class PlcSyncTask:
             logging.info('[***PLC***] close plc connection')
             if self.plc_client and self.plc_client.connected:
                 await self.plc_client.close()
-                self.__is_connected = False
+                self._is_connected = False
                 self.save_alarm()
         except Exception:
             logging.error("[***PLC***] close plc error occured")
-        finally:
-            self.__force_close = True
+            self._is_canceled = True
 
     def save_alarm(self):
         try:

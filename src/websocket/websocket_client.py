@@ -48,9 +48,6 @@ class WebSocketClient:
         """持续接收消息的循环"""
         try:
             while self._running:
-                # if running as a server, exit client immediately.
-                if gdata.master_server_started:
-                    return
                 raw_data = await self.websocket.recv()
                 data = msgpack.unpackb(raw_data)
                 # logging.info(f"client received: {data}")

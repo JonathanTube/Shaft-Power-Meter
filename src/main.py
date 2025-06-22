@@ -23,7 +23,7 @@ from utils.modbus_output import modbus_output
 from utils.auto_startup import add_to_startup
 from utils.logger import Logger
 from db.base import db
-from task.gps_sync_task import gps_sync_task
+from task.gps_sync_task import gps
 from task.sps_offline_task import sps_offline_task
 from task.utc_timer_task import UtcTimer
 from task.sps1_read_task import sps1_read_task
@@ -89,7 +89,7 @@ def start_all_task():
     # 如果不是第一次装机，启动设备连接
     if not is_db_empty:
         # GSP 不管主机从机都有
-        asyncio.create_task(gps_sync_task.start())
+        asyncio.create_task(gps.connect())
         asyncio.create_task(modbus_output.start())
 
         # 如果是主机

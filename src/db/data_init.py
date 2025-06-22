@@ -1175,7 +1175,7 @@ class DataInit:
                 {
                     "code": "lang.setting.stop_master_server",
                     "chinese": "停止主机服务器",
-                    "english": "Stop Master Server"
+                    "english": "Stop Server"
                 },
 
                 {

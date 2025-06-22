@@ -1,108 +1,75 @@
 import asyncio
 import websockets
-from typing import Callable, Set
+from typing import Set
 import logging
 from common.const_alarm_type import AlarmType
 from db.models.io_conf import IOConf
 import msgpack
-from common.global_data import gdata
 from utils.alarm_saver import AlarmSaver
-# ====================== 服务端类 ======================
-
 
 class WebSocketServer:
     def __init__(self):
+        self._lock = asyncio.Lock()  # 线程安全锁
         self.clients: Set[websockets.WebSocketServerProtocol] = set()
         self.server = None
-        self.message_handler: Callable = None
 
-    def set_message_handler(self, handler: Callable):
-        """设置消息处理回调函数"""
-        self.message_handler = handler
+        self._max_retries = 20  # 最大重连次数
+        
+        self._is_started = False
+
+    @property
+    def is_started(self):
+        return self._is_started
 
     async def _client_handler(self, websocket):
-        """处理客户端连接"""
         self.clients.add(websocket)
-        logging.info(f"[***HMI server***] {websocket.remote_address} connected")
-
-        try:
-            async for data in websocket:
-                # 调用自定义消息处理器
-                if self.message_handler:
-                    response = self.message_handler(data)
-                    if response:
-                        await self.send_to_client(websocket, response)
-        except websockets.ConnectionClosed:
-            logging.error(f"[***HMI server***] {websocket.remote_address} disconnected")
-            AlarmSaver.create(alarm_type=AlarmType.MASTER_SERVER_STOPPED)
-        finally:
-            AlarmSaver.create(alarm_type=AlarmType.SLAVE_DISCONNECTED)
-            self.clients.remove(websocket)
 
     async def start(self):
-        """启动服务端"""
-        io_conf: IOConf = IOConf.get()
+        async with self._lock:  # 确保单线程
+            for attempt in range(self._max_retries):
+                if self._is_started:
+                    return
 
-        host = '0.0.0.0'
+                try:
+                    io_conf: IOConf = IOConf.get()
+                    host = '0.0.0.0'
+                    port = io_conf.hmi_server_port
+                    self.server = await websockets.serve(self._client_handler, host, port)
+                    logging.info(f"[***HMI server***] websocket server started at ws://{host}:{port}")
+                    self._is_started = True
+                    AlarmSaver.recovery(alarm_type=AlarmType.MASTER_SERVER_STOPPED)
+                except:
+                    self._is_started = False
+                    AlarmSaver.create(alarm_type=AlarmType.MASTER_SERVER_STOPPED)
+                finally:
+                    #  指数退避
+                    await asyncio.sleep(2 ** attempt)
 
-        port = io_conf.hmi_server_port
-        try:
-            self.server = await websockets.serve(self._client_handler, host, port)
-            logging.info(f"[***HMI server***] websocket server started at ws://{host}:{port}")
-            gdata.master_server_started = True
-            AlarmSaver.recovery(alarm_type=AlarmType.MASTER_SERVER_STOPPED)
-        except Exception:
-            AlarmSaver.create(alarm_type=AlarmType.MASTER_SERVER_STOPPED)
-            gdata.master_server_started = False
-            return False
-
-        return True
-
-    async def send_to_client(self, client, data):
-        """向指定客户端发送数据"""
-        packed_data = msgpack.packb(data)
-        if client in self.clients:
-            await client.send(packed_data)
-            return True
-        return False
-
-    async def broadcast(self, data):
-        """向所有客户端广播数据"""
-        try:
-            if not self.clients:
-                AlarmSaver.create(alarm_type=AlarmType.SLAVE_DISCONNECTED)
-                await asyncio.sleep(5)
-                return False
-            packed_data = msgpack.packb(data)
-            await asyncio.gather(
-                *[client.send(packed_data) for client in self.clients]
-            )
-            AlarmSaver.recovery(alarm_type=AlarmType.SLAVE_DISCONNECTED)
-            return True
-        except websockets.ConnectionClosed:
-            logging.error("[***HMI server***] broadcast to all clients failed: connection closed")
-            self.clients.clear()
-            await self.start()
-            return False
-        except Exception:
-            logging.error("[***HMI server***] broadcast to all clients failed")
-            return False
-
-
-    async def close(self):
-        """停止服务端"""
+    async def stop(self):
         try:
             if self.server:
                 self.server.close()
                 await self.server.wait_closed()
-                gdata.master_server_started = False
-                logging.info('[***HMI server***] websocket server has been closed')
                 AlarmSaver.create(alarm_type=AlarmType.MASTER_SERVER_STOPPED)
-                return True
-        except Exception:
+                logging.info('[***HMI server***] websocket server has been stopped')
+        except:
             logging.error('[***HMI server***] stop websocket server failed')
+        finally:
+            self._is_started = False
 
-        return False
+    async def broadcast(self, data):
+        if not self._is_started:
+            return
+
+        try:
+            if len(self.clients) > 0:
+                packed_data = msgpack.packb(data)
+                await asyncio.gather(*[client.send(packed_data) for client in self.clients])
+                AlarmSaver.recovery(alarm_type=AlarmType.SLAVE_DISCONNECTED)
+            else:
+                AlarmSaver.create(alarm_type=AlarmType.SLAVE_DISCONNECTED)
+        except:
+            logging.error("[***HMI server***] broadcast to all clients failed")
 
 
 ws_server = WebSocketServer()
