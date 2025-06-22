@@ -34,12 +34,12 @@ class PermissionCheck(ft.AlertDialog):
         self.user_name = ft.Dropdown(
             width=300,
             label=self.page.session.get("lang.permission.user_name"),
-            value=None,
+            value=1,
             options=[]
         )
         self.user_pwd = ft.TextField(
             width=300,
-            value="",
+            value="123456",
             label=s.get("lang.permission.user_pwd"),
             read_only=True,
             password=True,
