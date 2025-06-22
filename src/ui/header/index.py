@@ -18,7 +18,7 @@ from task.sps1_read_task import sps1_read_task
 from task.sps2_read_task import sps2_read_task
 from websocket.websocket_client import ws_client
 from websocket.websocket_server import ws_server
-from utils.plc_util import plc_util
+from task.plc_sync_task import plc
 from task.gps_sync_task import gps_sync_task
 
 
@@ -112,7 +112,7 @@ class Header(ft.AppBar):
             await ws_client.close()
 
             # 关闭PLC
-            await plc_util.close()
+            await plc.close()
 
             # 关闭GPS
             await gps_sync_task.close()

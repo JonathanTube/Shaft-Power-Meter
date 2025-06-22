@@ -8,7 +8,7 @@ from utils.unit_converter import UnitConverter
 from ui.common.keyboard import keyboard
 
 
-class PropellerConfMcr(CustomCard):
+class PropellerConfMcr(ft.Container):
     def __init__(self, ps: PropellerSetting):
         super().__init__()
         self.ps = ps
@@ -20,7 +20,7 @@ class PropellerConfMcr(CustomCard):
             self.rpm_of_mcr_operating_point = ft.TextField(
                 label=self.page.session.get("lang.common.speed"),
                 suffix_text='rpm',
-                col={"md": 6},
+                col={"xs": 6},
                 value=self.ps.rpm_of_mcr_operating_point,
                 read_only=True,
                 can_request_focus=False,
@@ -30,7 +30,7 @@ class PropellerConfMcr(CustomCard):
             shaft_power_value, shaft_power_unit = self.__get_shaft_power()
             self.shaft_power_of_mcr_operating_point = ft.TextField(
                 label=self.page.session.get("lang.common.power"),
-                col={"md": 6},
+                col={"xs": 6},
                 value=shaft_power_value,
                 suffix_text=shaft_power_unit,
                 read_only=True,

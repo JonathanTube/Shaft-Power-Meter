@@ -3,7 +3,7 @@ import logging
 import flet as ft
 from db.models.io_conf import IOConf
 from db.models.system_settings import SystemSettings
-from utils.plc_util import plc_util
+from task.plc_sync_task import plc
 from common.global_data import gdata
 
 
@@ -80,11 +80,11 @@ class SelfTest(ft.Tabs):
     async def __read_plc_data(self):
         while self.task_running:
             try:
-                plc_4_20_ma_data = await plc_util.read_4_20_ma_data()
+                plc_4_20_ma_data = await plc.read_4_20_ma_data()
                 self.plc_log.controls.append(ft.Text(f"4-20mA: {plc_4_20_ma_data}"))
-                self.plc_log.controls.append(ft.Text(f"alarm: {await plc_util.read_alarm()}"))
-                self.plc_log.controls.append(ft.Text(f"overload: {await plc_util.read_power_overload()}"))
-                self.plc_log.controls.append(ft.Text(f"instant data: {await plc_util.read_instant_data()}"))
+                self.plc_log.controls.append(ft.Text(f"alarm: {await plc.read_alarm()}"))
+                self.plc_log.controls.append(ft.Text(f"overload: {await plc.read_power_overload()}"))
+                self.plc_log.controls.append(ft.Text(f"instant data: {await plc.read_instant_data()}"))
                 self.plc_log.update()
             except Exception as e:
                 logging.exception('exception occured at SelfTest.__read_plc_data')

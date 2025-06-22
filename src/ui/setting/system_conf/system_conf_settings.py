@@ -6,7 +6,7 @@ from db.models.preference import Preference
 from db.models.system_settings import SystemSettings
 from ui.common.custom_card import CustomCard
 from utils.alarm_saver import AlarmSaver
-from utils.plc_util import plc_util
+from task.plc_sync_task import plc
 from utils.unit_converter import UnitConverter
 from ui.common.keyboard import keyboard
 from common.operation_type import OperationType
@@ -214,7 +214,7 @@ class SystemConfSettings(ft.Container):
             self.page.run_task(ws_client.close)
             AlarmSaver.recovery(alarm_type=AlarmType.SLAVE_DISCONNECTED)
         else:
-            self.page.run_task(plc_util.close)
+            self.page.run_task(plc.close)
             AlarmSaver.recovery(alarm_type=AlarmType.PLC_DISCONNECTED)
 
             self.page.run_task(ws_server.close)

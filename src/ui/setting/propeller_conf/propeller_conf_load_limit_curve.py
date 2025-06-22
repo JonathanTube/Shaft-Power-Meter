@@ -18,6 +18,7 @@ class PropellerConfLimitCurve(ft.Container):
                 label=self.page.session.get("lang.setting.rpm_left"), suffix_text='[%]',
                 value=self.ps.rpm_left_of_torque_load_limit_curve,
                 read_only=True,
+                col = {"xs": 6},
                 can_request_focus=False,
                 on_click=lambda e: keyboard.open(e.control)
             )
@@ -25,6 +26,7 @@ class PropellerConfLimitCurve(ft.Container):
                 label=self.page.session.get("lang.setting.power_left"), suffix_text='[%]',
                 value=self.ps.bhp_left_of_torque_load_limit_curve,
                 read_only=True,
+                col = {"xs": 6},
                 can_request_focus=False,
                 on_click=lambda e: keyboard.open(e.control)
             )
@@ -32,6 +34,7 @@ class PropellerConfLimitCurve(ft.Container):
                 label=self.page.session.get("lang.setting.rpm_right"), suffix_text='[%]',
                 value=self.ps.rpm_right_of_torque_load_limit_curve,
                 read_only=True,
+                col = {"xs": 6},
                 can_request_focus=False,
                 on_click=lambda e: keyboard.open(e.control)
             )
@@ -39,6 +42,7 @@ class PropellerConfLimitCurve(ft.Container):
                 label=self.page.session.get("lang.setting.power_right"), suffix_text='[%]',
                 value=self.ps.bhp_right_of_torque_load_limit_curve,
                 read_only=True,
+                col = {"xs": 6},
                 can_request_focus=False,
                 on_click=lambda e: keyboard.open(e.control)
             )

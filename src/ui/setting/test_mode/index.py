@@ -5,7 +5,7 @@ import flet as ft
 from ui.common.permission_check import PermissionCheck
 from ui.setting.test_mode.test_mode_instant import TestModeInstant
 from ui.setting.test_mode.test_mode_range import TestModeRange
-from utils.plc_util import plc_util
+from task.plc_sync_task import plc
 from utils.unit_converter import UnitConverter
 from db.models.preference import Preference
 from task.test_mode_task import testModeTask
@@ -217,8 +217,8 @@ class TestMode(ft.Container):
             gdata.eexi_breach = False
             gdata.sps1_offline = True
             gdata.sps2_offline = True
-            self.page.run_task(plc_util.write_alarm, False)
-            self.page.run_task(plc_util.write_power_overload, False)
+            self.page.run_task(plc.write_alarm, False)
+            self.page.run_task(plc.write_power_overload, False)
             Toast.show_success(self.page)
         except:
             Toast.show_error(self.page, "stop test mode failed.")

@@ -7,7 +7,7 @@ from db.models.alarm_log import AlarmLog
 from db.models.io_conf import IOConf
 from common.global_data import gdata
 
-class PLCUtil:
+class PlcSyncTask:
     def __init__(self):
         self._lock = asyncio.Lock()  # 线程安全锁
         self.plc_client: Optional[AsyncModbusTcpClient] = None
@@ -261,10 +261,10 @@ class PLCUtil:
             cnt: int = AlarmLog.select().where(AlarmLog.is_recovery == False).count()
             if cnt == 0:
                 logging.info(f'[***PLC***], check none of alarm, clear all plc alarm.')
-                await plc_util.write_alarm(False)
+                await plc.write_alarm(False)
         except:
             logging.error('recovery PLC alarm failed.')
 
 
 # 全局单例
-plc_util: PLCUtil = PLCUtil()
+plc: PlcSyncTask = PlcSyncTask()

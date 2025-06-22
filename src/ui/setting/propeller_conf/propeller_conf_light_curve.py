@@ -17,6 +17,7 @@ class PropellerConfLightCurve(ft.Container):
                 suffix_text="[% below (1)]",
                 value=self.ps.value_of_light_propeller_curve,
                 read_only=True,
+                col = {"xs": 6},
                 can_request_focus=False,
                 on_click=lambda e: keyboard.open(e.control)
             )

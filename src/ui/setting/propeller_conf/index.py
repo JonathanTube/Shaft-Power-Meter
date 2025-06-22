@@ -59,14 +59,15 @@ class PropellerConf(ft.Container):
 
             self.content = ft.Column(
                 scroll=ft.ScrollMode.ADAPTIVE,
+                expand=True,
                 controls=[
                     ft.ResponsiveRow(
                         controls=[
                             self.mcr_operating_point_card,
                             self.normal_propeller_curve_card,
-                            self.torque_load_limit_curve_card,
                             self.light_propeller_curve_card,
                             self.speed_limit_curve_card,
+                            self.torque_load_limit_curve_card,
                             self.overload_curve_card,
                             ft.Row(
                                 alignment=ft.MainAxisAlignment.CENTER,

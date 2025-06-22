@@ -12,6 +12,8 @@ class ColorDialog(ft.IconButton):
         self.color = color
         self.icon_size = 30
         self.on_click = self.__open_color_picker
+        self.col = {"xs": 6}
+        self.alignment = ft.alignment.center_left
 
     def build(self):
         self.color_picker = ColorPicker(color=self.color, width=300)

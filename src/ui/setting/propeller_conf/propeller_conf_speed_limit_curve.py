@@ -17,6 +17,7 @@ class PropellerConfSpeedLimitCurve(ft.Container):
                 suffix_text="[% MCR rpm]",
                 value=self.ps.value_of_speed_limit_curve,
                 read_only=True,
+                col = {"xs": 6},
                 can_request_focus=False,
                 on_click=lambda e: keyboard.open(e.control)
             )

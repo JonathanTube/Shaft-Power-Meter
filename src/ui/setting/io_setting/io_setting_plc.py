@@ -11,7 +11,7 @@ from ui.common.custom_card import CustomCard
 from ui.common.keyboard import keyboard
 from ui.common.permission_check import PermissionCheck
 from utils.alarm_saver import AlarmSaver
-from utils.plc_util import plc_util
+from task.plc_sync_task import plc
 from common.global_data import gdata
 
 
@@ -51,7 +51,8 @@ class IOSettingPLC(ft.Container):
                     shape=ft.RoundedRectangleBorder(radius=5)
                 ),
                 on_click=lambda e: self.page.open(
-                    PermissionCheck(self.__on_disconnect, 2))
+                    PermissionCheck(self.__on_disconnect, 2)
+                )
             )
 
             self.fetch_data_from_plc = ft.FilledButton(
@@ -237,9 +238,9 @@ class IOSettingPLC(ft.Container):
             logging.exception('exception occured at IOSettingPLC.build')
 
     def before_update(self):
-        self.connect_to_plc.visible = not plc_util.is_connected
-        self.disconnect_from_plc.visible = plc_util.is_connected
-        self.fetch_data_from_plc.visible = plc_util.is_connected
+        self.connect_to_plc.visible = not plc.is_connected
+        self.disconnect_from_plc.visible = plc.is_connected
+        self.fetch_data_from_plc.visible = plc.is_connected
     
     def __on_connect(self, user: User):
         try:
@@ -258,7 +259,7 @@ class IOSettingPLC(ft.Container):
                 operation_type=OperationType.CONNECT_TO_PLC,
                 operation_content=user.user_name
             )
-            self.page.run_task(plc_util.connect)
+            self.page.run_task(plc.connect)
         except:
             logging.exception("exception occured at io_setting_plc.__start_plc_task")
         finally:
@@ -273,7 +274,7 @@ class IOSettingPLC(ft.Container):
                 operation_type=OperationType.DISCONNECT_FROM_PLC,
                 operation_content=user.user_name
             )
-            self.page.run_task(plc_util.close)
+            self.page.run_task(plc.close)
         except:
             logging.exception('exception occured at __stop_plc_task')
         finally:
@@ -282,7 +283,7 @@ class IOSettingPLC(ft.Container):
 
     async def load_range_data(self):
         try:
-            plc_4_20_ma_data = await plc_util.read_4_20_ma_data()
+            plc_4_20_ma_data = await plc.read_4_20_ma_data()
             self.txt_power_range_min.value = plc_4_20_ma_data["power_range_min"] // 10
             self.txt_power_range_min.update()
             self.txt_power_range_max.value = plc_4_20_ma_data["power_range_max"] // 10
@@ -327,7 +328,7 @@ class IOSettingPLC(ft.Container):
         if self.conf.plc_enabled:
             self.page.run_task(self.__write_to_plc)
         else:
-            self.page.run_task(plc_util.close)
+            self.page.run_task(plc.close)
             AlarmSaver.recovery(alarm_type=AlarmType.PLC_DISCONNECTED)
 
     def __plc_enabled_change(self, e):
@@ -354,7 +355,7 @@ class IOSettingPLC(ft.Container):
                 "speed_range_max": int(self.txt_speed_range_max.value) * 10,
                 "speed_range_offset": int(self.txt_speed_range_offset.value) * 10
             }
-            await plc_util.write_4_20_ma_data(data)
+            await plc.write_4_20_ma_data(data)
 
         except Exception:
             logging.exception("plc save data error")

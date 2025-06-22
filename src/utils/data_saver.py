@@ -5,7 +5,7 @@ from common.const_alarm_type import AlarmType
 from db.models.counter_log import CounterLog
 from db.models.data_log import DataLog
 from common.global_data import gdata
-from utils.plc_util import plc_util
+from task.plc_sync_task import plc
 from utils.eexi_breach import EEXIBreach
 from utils.formula_cal import FormulaCalculator
 from utils.alarm_saver import AlarmSaver
@@ -32,8 +32,8 @@ class DataSaver:
                 is_overload=is_overload
             )
             # 保存瞬时数据
-            if gdata.is_master and plc_util.is_connected:
-                asyncio.create_task(plc_util.write_instant_data(power, torque, thrust, speed))
+            if gdata.is_master and plc.is_connected:
+                asyncio.create_task(plc.write_instant_data(power, torque, thrust, speed))
 
             # save counter log of total
             DataSaver.save_counter_total(name, speed, power)
@@ -94,11 +94,11 @@ class DataSaver:
             if overload:  # 处理功率过载
                 AlarmSaver.create(AlarmType.POWER_OVERLOAD)
                 # 写入plc-overload
-                asyncio.create_task(plc_util.write_power_overload(True))
+                asyncio.create_task(plc.write_power_overload(True))
             else:  # 功率恢复
                 # 写入plc-overload
                 AlarmSaver.recovery(AlarmType.POWER_OVERLOAD)
-                asyncio.create_task(plc_util.write_power_overload(False))
+                asyncio.create_task(plc.write_power_overload(False))
 
         return overload
 
