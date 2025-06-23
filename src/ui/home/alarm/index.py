@@ -104,7 +104,7 @@ class AlarmList(ft.Container):
             AlarmLog.update(acknowledge_time=gdata.utc_date_time, is_sync = False).where(
                 AlarmLog.id == row.cells[0].data,
                 AlarmLog.is_from_master == False,
-                AlarmLog.acknowledge_time is None
+                AlarmLog.acknowledge_time == None
             ).execute()
 
         self.table.search()

@@ -84,6 +84,7 @@ class WebSocketServer:
                     AlarmSaver.recovery(alarm_type=AlarmType.SLAVE_DISCONNECTED)
 
                     alarm_logs: list[AlarmLog] = AlarmLog.select(
+                        AlarmLog.id,
                         AlarmLog.alarm_type,
                         AlarmLog.is_recovery,
                         AlarmLog.acknowledge_time
@@ -100,8 +101,7 @@ class WebSocketServer:
                         is_success = await self.broadcast({'type': 'alarm_data', "alarm_logs": alarm_logs_dict})
                         if is_success:
                             for alarm_log in alarm_logs:
-                                alarm_log.is_sync = True
-                                alarm_log.update()
+                                AlarmLog.update(is_sync=True).where(AlarmLog.id == alarm_log.id).execute()
 
                 else:
                     AlarmSaver.create(alarm_type=AlarmType.SLAVE_DISCONNECTED)
