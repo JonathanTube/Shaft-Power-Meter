@@ -11,5 +11,7 @@ class AlarmLog(BaseModel):
 
     is_recovery = BooleanField(verbose_name="是否恢复", default=False)
 
+    is_sync = BooleanField(verbose_name="是否同步", default=False)
+
     class Meta:
         table_name = 'alarm_log'

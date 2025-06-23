@@ -1,14 +1,12 @@
 
 # ====================== 客户端类 ======================
 import asyncio
-from datetime import datetime
 import websockets
 import logging
 import msgpack
 from common.const_alarm_type import AlarmType
+from db.models.alarm_log import AlarmLog
 from db.models.io_conf import IOConf
-from db.models.zero_cal_info import ZeroCalInfo
-from db.models.zero_cal_record import ZeroCalRecord
 from jm3846.JM3846_calculator import JM3846Calculator
 from utils.alarm_saver import AlarmSaver
 from utils.data_saver import DataSaver
@@ -83,7 +81,7 @@ class WebSocketClient:
                 if data['type'] == 'sps_data':
                     self.__handle_jm3846_data(data)
                 elif data['type'] == 'alarm_data':
-                    self.__handle_alarm_data(data)
+                    self.__handle_alarm_logs(data)
 
                 gdata.sps1_offline = False
                 gdata.sps2_offline = False
@@ -114,37 +112,16 @@ class WebSocketClient:
 
         DataSaver.save(name, ad0_torque, ad1_thrust, speed)
 
-    def __handle_alarm_data(self, data):
-        """处理零点校准数据"""
-        id = data['id']
-        zero_cal_info: ZeroCalInfo = ZeroCalInfo.get_or_none(ZeroCalInfo.id == id)
-        if zero_cal_info is not None:
-            zero_cal_info.delete_instance()
-
-        new_zero_cal_info = ZeroCalInfo.create(
-            id=data['id'],
-            name=data['name'],
-            utc_date_time=datetime.strptime(data['utc_date_time'], '%Y-%m-%d %H:%M:%S'),
-            torque_offset=data['torque_offset'],
-            thrust_offset=data['thrust_offset'],
-            state=data['state']
-        )
-
-        for record in data['records']:
-            ZeroCalRecord.create(
-                zero_cal_info=new_zero_cal_info,
-                name=record['name'],
-                mv_per_v_for_torque=record['mv_per_v_for_torque'],
-                mv_per_v_for_thrust=record['mv_per_v_for_thrust'],
-            )
-
-        if data['state'] == 1:
-            if data['name'] == 'sps1':
-                gdata.sps1_torque_offset = data['torque_offset']
-                gdata.sps1_thrust_offset = data['thrust_offset']
-            elif data['name'] == 'sps2':
-                gdata.sps2_torque_offset = data['torque_offset']
-                gdata.sps2_thrust_offset = data['thrust_offset']
+    def __handle_alarm_logs(self, data):
+        """处理alarm数据"""
+        alarm_logs = data['alarm_logs']
+        for alarm_log in alarm_logs:
+            alarm_type = alarm_log['alarm_type']
+            is_recovery = alarm_log['is_recovery']
+            if is_recovery:
+                AlarmSaver.recovery(alarm_type)
+            else:
+                AlarmSaver.create(alarm_type)
 
     async def close(self):
         try:

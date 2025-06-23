@@ -3,9 +3,11 @@ import websockets
 from typing import Set
 import logging
 from common.const_alarm_type import AlarmType
+from db.models.alarm_log import AlarmLog
 from db.models.io_conf import IOConf
 import msgpack
 from utils.alarm_saver import AlarmSaver
+
 
 class WebSocketServer:
     def __init__(self):
@@ -14,8 +16,9 @@ class WebSocketServer:
         self.server = None
 
         self._max_retries = 20  # 最大重连次数
-        
+
         self._is_started = False
+        self._is_canceled = False
 
     @property
     def is_started(self):
@@ -27,8 +30,11 @@ class WebSocketServer:
     async def start(self):
         async with self._lock:  # 确保单线程
             for attempt in range(self._max_retries):
+                if self._is_canceled:
+                    break
+
                 if self._is_started:
-                    return
+                    break
 
                 try:
                     io_conf: IOConf = IOConf.get()
@@ -38,12 +44,51 @@ class WebSocketServer:
                     logging.info(f"[***HMI server***] websocket server started at ws://{host}:{port}")
                     self._is_started = True
                     AlarmSaver.recovery(alarm_type=AlarmType.MASTER_SERVER_STOPPED)
+
+                    await self.send_alarms()
                 except:
+                    logging.exception('exception occured at WebSocketServer.start')
                     self._is_started = False
                     AlarmSaver.create(alarm_type=AlarmType.MASTER_SERVER_STOPPED)
                 finally:
                     #  指数退避
                     await asyncio.sleep(2 ** attempt)
+
+            # 执行到这了，说明已经退出了
+            self._is_started = False
+            AlarmSaver.create(alarm_type=AlarmType.MASTER_SERVER_STOPPED)
+            # 重新设置为未取消，准备下一次链接
+            self._is_canceled = False
+
+    async def send_alarms(self):
+        while self._is_started:
+
+            if self._is_canceled:
+                break
+
+            try:
+                if len(self.clients) > 0:
+                    AlarmSaver.recovery(alarm_type=AlarmType.SLAVE_DISCONNECTED)
+
+                    alarm_logs: list[AlarmLog] = AlarmLog.select(
+                        AlarmLog.alarm_type,
+                        AlarmLog.is_recovery
+                    ).where(AlarmLog.is_sync == False)
+
+                    if len(alarm_logs) > 0:
+                        is_success = await self.broadcast({'type': 'alarm_data', "alarm_logs": alarm_logs})
+                        if is_success:
+                            for alarm_log in alarm_logs:
+                                alarm_log.is_sync = True
+                                alarm_log.update()
+
+                else:
+                    AlarmSaver.create(alarm_type=AlarmType.SLAVE_DISCONNECTED)
+            except:
+                logging.error("[***HMI server***] exception occured at send_alarms")
+                break
+            finally:
+                await asyncio.sleep(5)
 
     async def stop(self):
         try:
@@ -56,20 +101,24 @@ class WebSocketServer:
         finally:
             AlarmSaver.create(alarm_type=AlarmType.MASTER_SERVER_STOPPED)
             self._is_started = False
+            self._is_canceled = True
 
-    async def broadcast(self, data):
+    async def broadcast(self, data) -> bool:
         if not self._is_started:
-            return
+            return False
+
+        if self._is_canceled:
+            return False
 
         try:
             if len(self.clients) > 0:
                 packed_data = msgpack.packb(data)
                 await asyncio.gather(*[client.send(packed_data) for client in self.clients])
-                AlarmSaver.recovery(alarm_type=AlarmType.SLAVE_DISCONNECTED)
-            else:
-                AlarmSaver.create(alarm_type=AlarmType.SLAVE_DISCONNECTED)
+                return True
         except:
             logging.error("[***HMI server***] broadcast to all clients failed")
+
+        return False
 
 
 ws_server = WebSocketServer()
