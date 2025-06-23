@@ -26,6 +26,7 @@ class InterfaceConf(ft.Container):
                 style=ft.ButtonStyle(
                     shape=ft.RoundedRectangleBorder(radius=5)
                 ),
+                col={"sm": 4},
                 on_click=lambda e: self.page.open(PermissionCheck(self.__connect_to_master, 2))
             )
 
@@ -36,6 +37,7 @@ class InterfaceConf(ft.Container):
                 style=ft.ButtonStyle(
                     shape=ft.RoundedRectangleBorder(radius=5)
                 ),
+                col={"sm": 4},
                 on_click=lambda e: self.page.open(PermissionCheck(self.__disconnect_from_hmi_server, 2))
             )
 
@@ -44,6 +46,7 @@ class InterfaceConf(ft.Container):
                 value=self.conf.hmi_server_ip,
                 read_only=True,
                 can_request_focus=False,
+                col={"sm": 4},
                 on_click=lambda e: keyboard.open(e.control, 'ip')
             )
 
@@ -52,18 +55,18 @@ class InterfaceConf(ft.Container):
                 value=self.conf.hmi_server_port,
                 read_only=True,
                 can_request_focus=False,
+                col={"sm": 4},
                 on_click=lambda e: keyboard.open(e.control, 'int')
             )
 
             self.custom_card = CustomCard(
                 self.page.session.get("lang.setting.interface_conf"),
-                ft.ResponsiveRow(controls=[
+                ft.Row(controls=[
                     self.hmi_server_ip,
                     self.hmi_server_port,
                     self.connect_btn,
                     self.close_btn
-                ]),
-                col={"xs": 12})
+                ]))
             self.content = self.custom_card
         except:
             logging.exception('exception occured at InterfaceConf.build')
@@ -82,12 +85,14 @@ class InterfaceConf(ft.Container):
 
     async def handle_connect_to_master(self):
         try:
-            self.connect_btn.text = self.page.session.get("lang.common.connecting")
+            self.connect_btn.text = self.page.session.get(
+                "lang.common.connecting")
             self.connect_btn.disabled = True
             self.connect_btn.update()
             connected = await ws_client.connect()
             # recovery
-            self.connect_btn.text = self.page.session.get("lang.setting.connect_to_master")
+            self.connect_btn.text = self.page.session.get(
+                "lang.setting.connect_to_master")
             self.connect_btn.disabled = False
             self.connect_btn.visible = not connected
             self.connect_btn.update()
@@ -122,15 +127,18 @@ class InterfaceConf(ft.Container):
             self.conf.hmi_server_ip = self.hmi_server_ip.value
             self.conf.hmi_server_port = self.hmi_server_port.value
         except ValueError:
-            raise ValueError(f'{self.page.session.get("lang.common.ip_address_format_error")}: {self.hmi_server_port.value}')
+            raise ValueError(
+                f'{self.page.session.get("lang.common.ip_address_format_error")}: {self.hmi_server_port.value}')
 
     def before_update(self):
         self.connect_btn.visible = not ws_client.is_connected
-        self.connect_btn.text = self.page.session.get("lang.setting.connect_to_master")
+        self.connect_btn.text = self.page.session.get(
+            "lang.setting.connect_to_master")
         self.connect_btn.bgcolor = ft.Colors.GREEN
         self.connect_btn.disabled = False
 
         self.close_btn.visible = ws_client.is_connected
-        self.close_btn.text = self.page.session.get("lang.setting.disconnect_from_master")
+        self.close_btn.text = self.page.session.get(
+            "lang.setting.disconnect_from_master")
         self.close_btn.bgcolor = ft.Colors.RED
         self.close_btn.disabled = False
