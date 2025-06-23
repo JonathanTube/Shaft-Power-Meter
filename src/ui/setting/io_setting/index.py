@@ -1,3 +1,4 @@
+import asyncio
 import logging
 import flet as ft
 from db.models.io_conf import IOConf
@@ -23,14 +24,25 @@ class IOSetting(ft.Container):
         super().__init__()
         self.system_settings: SystemSettings = SystemSettings.get()
         self.conf: IOConf = IOConf.get()
+        self.is_saving = False
+        self.task_running = False
+        self.loop_task = None
 
     def build(self):
         try:
             self.gps_conf = IOSettingGPS(self.conf)
             self.output_conf = IOSettingOutput(self.conf)
 
-            self.save_button = ft.FilledButton(self.page.session.get("lang.button.save"), width=120, height=40, on_click=lambda e: self.__on_save_button_click(e))
-            self.reset_button = ft.OutlinedButton(self.page.session.get("lang.button.reset"), width=120, height=40, on_click=self.__reset_data)
+            self.save_button = ft.FilledButton(
+                self.page.session.get("lang.button.save"),
+                width=120, height=40,
+                on_click=lambda e: self.page.open(PermissionCheck(self.__save_data, 0))
+            )
+            self.reset_button = ft.OutlinedButton(
+                self.page.session.get("lang.button.reset"),
+                width=120, height=40,
+                on_click=self.__reset_data
+            )
 
             controls = [
                 self.gps_conf,
@@ -60,13 +72,15 @@ class IOSetting(ft.Container):
         except:
             logging.exception('exception occured at IOSetting.build')
 
-    def __on_save_button_click(self, e):
-        keyboard.close()
-        self.page.open(PermissionCheck(self.__save_data, 0))
-
     def __save_data(self, user: User):
+        if self.is_saving:
+            return
+
         try:
             keyboard.close()
+
+            self.is_saving = True
+            self.__change_buttons()
 
             if self.system_settings.is_master:
                 self.plc_conf.save_data()
@@ -87,6 +101,9 @@ class IOSetting(ft.Container):
             Toast.show_success(self.page)
         except Exception as e:
             Toast.show_error(self.page, str(e))
+        finally:
+            self.is_saving = False
+            self.__change_buttons()
 
     def __reset_data(self, e):
         keyboard.close()
@@ -94,3 +111,31 @@ class IOSetting(ft.Container):
         self.content.clean()
         self.build()
         Toast.show_success(e.page)
+
+    def __change_buttons(self):
+        if self.save_button and self.save_button.page:
+            self.save_button.disabled = self.is_saving
+            self.save_button.update()
+
+        if self.reset_button and self.reset_button.page:
+            self.reset_button.disabled = self.is_saving
+            self.reset_button.update()
+
+    async def __loop(self):
+        while self.task_running:
+            try:
+                self.update()
+            except:
+                logging.exception("exception occured at IOSetting.__loop")
+                return
+            finally:
+                await asyncio.sleep(5)
+
+    def did_mount(self):
+        self.task_running = True
+        self.loop_task = self.page.run_task(self.__loop)
+
+    def will_unmount(self):
+        self.task_running = False
+        if self.loop_task:
+            self.loop_task.cancel()

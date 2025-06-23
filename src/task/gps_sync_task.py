@@ -32,6 +32,7 @@ class GpsSyncTask:
     async def connect(self):
         async with self._lock:  # 确保单线程重连
             while self._retry < self._max_retries:
+                # 如果是手动取消，直接跳出
                 if self._is_canceled:
                     break
 
@@ -41,56 +42,61 @@ class GpsSyncTask:
                 try:
                     io_conf: IOConf = IOConf.get()
 
-                    logging.info(f'[***GPS***]connecting to gps, ip={io_conf.gps_ip}, port={io_conf.gps_port}')
+                    logging.info(f'[***GPS***]connecting to gps, retry times = {self._retry + 1}, ip={io_conf.gps_ip}, port={io_conf.gps_port}')
                     self.reader, self.writer = await asyncio.wait_for(
                         asyncio.open_connection(io_conf.gps_ip, io_conf.gps_port),
-                        timeout=10
+                        timeout=2
                     )
 
                     logging.info(f'[***GPS***]connected to gps, ip={io_conf.gps_ip}, port={io_conf.gps_port}')
 
-                    # 连接成功
-                    self._is_connected = True
-                    AlarmSaver.recovery(alarm_type=AlarmType.GPS_DISCONNECTED)
-
                     await self.receive_data()
 
                     logging.info(f'[***GPS***]disconnected from gps, ip={io_conf.gps_ip}, port={io_conf.gps_port}')
-                    # 执行到这了，说明已经退出了
-                    self._is_connected = False
-                    AlarmSaver.create(alarm_type=AlarmType.GPS_DISCONNECTED)
-                    # 如果是手动取消，直接跳出
-                    if self._is_canceled:
-                        break
-                    # 否则进入下一次循环
                 except:
                     logging.error(f"[***GPS***]connect to gps timeout, retry times={self._retry + 1}")
-                    self._is_connected = False
-                    AlarmSaver.create(alarm_type=AlarmType.GPS_DISCONNECTED)
                 finally:
                     #  指数退避
                     await asyncio.sleep(2 ** self._retry)
                     self._retry += 1
 
+            # 执行到这了，说明已经退出了
+            self._is_connected = False
+            AlarmSaver.create(alarm_type=AlarmType.GPS_DISCONNECTED)
             # 重新设置为未取消，准备下一次链接
             self._is_canceled = False
 
     async def receive_data(self):
+        no_data_times = 0
+        has_data_times = 0
         while not self.reader.at_eof():
             if self._is_canceled:
                 break
 
             try:
-                data = await asyncio.wait_for(self.reader.readline(), timeout=10)
+
+                data = await asyncio.wait_for(self.reader.readline(), timeout=5)
                 if not data:
-                    continue
+                    # 超过5次没有拿到数据，直接认为断线
+                    if no_data_times > 5:
+                        break
+                    else:
+                        no_data_times += 1
+                        continue
+                else:
+                    no_data_times = 0
+                    # 减少更新DB的次数
+                    self._is_connected = True
+                    if has_data_times % 5 == 0:
+                        # 连接成功
+                        AlarmSaver.recovery(alarm_type=AlarmType.GPS_DISCONNECTED)
+
 
                 str_data = data.decode('utf-8').strip()
                 self.parse_nmea_sentence(str_data)
                 self._retry = 0
             except:
-                self._is_connected = False
-                AlarmSaver.create(AlarmType.GPS_DISCONNECTED)
+                logging.error(f"[***GPS***] exception occured at receive_data")
                 break
 
     async def close(self):

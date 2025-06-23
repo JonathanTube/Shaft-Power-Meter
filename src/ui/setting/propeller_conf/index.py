@@ -25,15 +25,21 @@ class PropellerConf(ft.Container):
         self.alignment = ft.alignment.center
         self.system_settings: SystemSettings = SystemSettings.get()
         self.ps: PropellerSetting = PropellerSetting.get()
+        self.is_saving = False
 
     def build(self):
         try:
             if not self.system_settings.is_master:
-                self.content = ft.Text(value=self.page.session.get('lang.propeller_curve.disabled_under_slave_mode'), size=20)
+                self.content = ft.Text(
+                    value=self.page.session.get('lang.propeller_curve.disabled_under_slave_mode'),
+                    size=20
+                )
                 return
 
             if not self.system_settings.display_propeller_curve:
-                self.content = ft.Text(self.page.session.get('lang.propeller_curve.propeller_curve_disabled'))
+                self.content = ft.Text(
+                    self.page.session.get('lang.propeller_curve.propeller_curve_disabled')
+                )
                 return
 
             self.mcr_operating_point_card = PropellerConfMcr(self.ps)
@@ -47,7 +53,7 @@ class PropellerConf(ft.Container):
                 self.page.session.get("lang.button.save"),
                 width=120,
                 height=40,
-                on_click=lambda e: self.__on_save_button_click(e)
+                on_click=lambda e: self.page.open(PermissionCheck(self.__save_data, 2))
             )
 
             self.reset_button = ft.OutlinedButton(
@@ -83,11 +89,23 @@ class PropellerConf(ft.Container):
         except:
             logging.exception('exception occured at PropellerConf.build')
 
-    def __on_save_button_click(self, e):
-        self.page.open(PermissionCheck(self.__save_data, 2))
+    def __change_buttons(self):
+        if self.save_button and self.save_button.page:
+            self.save_button.disabled = self.is_saving
+            self.save_button.update()
+
+        if self.reset_button and self.reset_button.page:
+            self.reset_button.disabled = self.is_saving
+            self.reset_button.update()
 
     def __save_data(self, user: User):
+        if self.is_saving:
+            return
+
         try:
+            self.is_saving = True
+            self.__change_buttons()
+
             keyboard.close()
             self.mcr_operating_point_card.save_data()
             self.normal_propeller_curve_card.save_data()
@@ -102,11 +120,13 @@ class PropellerConf(ft.Container):
                 operation_type=OperationType.PROPELLER_SETTING,
                 operation_content=model_to_dict(self.ps)
             )
+            Toast.show_success(self.page)
         except Exception:
             logging.exception("propeller conf save data error")
             Toast.show_error(self.page)
-        else:
-            Toast.show_success(self.page)
+        finally:
+            self.is_saving = False
+            self.__change_buttons()
 
     def __reset_data(self, e):
         keyboard.close()

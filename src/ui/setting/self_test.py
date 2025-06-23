@@ -5,7 +5,9 @@ from db.models.io_conf import IOConf
 from db.models.system_settings import SystemSettings
 from task.plc_sync_task import plc
 from task.gps_sync_task import gps
+from websocket.websocket_client import ws_client
 from common.global_data import gdata
+
 
 
 class SelfTest(ft.Tabs):
@@ -139,7 +141,7 @@ class SelfTest(ft.Tabs):
     async def __read_hmi_server_data(self):
         while self.task_running:
             try:
-                if gdata.connected_to_hmi_server:
+                if ws_client.is_connected:
                     sps1_data = f'sps1: torque={gdata.sps1_torque}, thrust={gdata.sps1_thrust}, speed={gdata.sps1_speed}'
                     self.hmi_server_log.controls.append(ft.Text(f"HMI Server Data: {sps1_data}"))
                     if gdata.amount_of_propeller == 2:

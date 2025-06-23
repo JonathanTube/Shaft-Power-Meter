@@ -9,7 +9,7 @@ from db.models.counter_log import CounterLog
 from common.global_data import gdata
 
 
-class ModbusOutput:
+class ModbusOutputTask:
     def __init__(self):
         self.slave_id = 1
         self.context = None
@@ -18,19 +18,27 @@ class ModbusOutput:
         self.running = False     # 服务器运行状态
         self.io_conf: IOConf | None = None
 
-    async def start(self)->bool:
+        self._is_started = False
+    
+    @property
+    def is_started(self):
+        return self._is_started
+
+    def update_conf(self):
+        self.io_conf = IOConf.get()
+
+    async def start(self):
         try:
             if self.running:
                 logger.info("Modbus server is already running")
-                gdata.modbus_server_started = True
-                return True
+                self._is_started = True
 
             self.io_conf: IOConf = IOConf().get()
             port = self.io_conf.output_com_port
             if not port:
                 logger.info("Modbus output port is not set, skip starting Modbus server.")
-                gdata.modbus_server_started = False
-                return False
+                self._is_started = False
+                return
 
             system_settings: SystemSettings = SystemSettings().get()
             self.amount_of_propeller = system_settings.amount_of_propeller
@@ -55,11 +63,9 @@ class ModbusOutput:
                 )
             )
             logger.info(f"Modbus server started on {port}")
-            gdata.modbus_server_started = True
-            return True
+            self._is_started = True
         except Exception as e:
             logging.exception(e)
-        return False
 
     async def stop_modbus_server(self):
         try:
@@ -67,17 +73,14 @@ class ModbusOutput:
                 self.server_task.cancel()
                 self.running = False
                 logger.info("Modbus server stopped")
-                gdata.connected_to_hmi_server = True
-                return True
-        except Exception as e:
-            logging.exception(e)
-
-        gdata.connected_to_hmi_server = False
-        return False
+        except:
+            logging.exception("exception occured at stop_modbus_server")
+        finally:
+            self._is_started = False
 
     async def update_registers(self):
         if not self.running:
-            return False
+            return
 
         try:
             sps1_torque = int(gdata.sps1_torque / 100) if self.io_conf.output_torque else 0
@@ -97,10 +100,8 @@ class ModbusOutput:
 
             self.context[self.slave_id].setValues(3, 0, values)
             logger.info(f"Registers updated: {values}")
-            return True
-        except Exception:
-            logger.exception("更新寄存器失败")
-            return False
+        except:
+            logger.exception("update registers failed")
 
     def get_average_power_and_total_energy(self, sps_name: str):
         counter_log: CounterLog = CounterLog.get_or_none(CounterLog.sps_name == sps_name, CounterLog.counter_type == 2)
@@ -124,5 +125,4 @@ class ModbusOutput:
 
         return average_power, total_energy
 
-
-modbus_output: ModbusOutput = ModbusOutput()
+modbus_output: ModbusOutputTask = ModbusOutputTask()

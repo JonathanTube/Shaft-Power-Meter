@@ -19,7 +19,7 @@ from db.models.preference import Preference
 from db.models.language import Language
 from ui.common.audio_alarm import AudioAlarm
 from common.global_data import gdata
-from utils.modbus_output import modbus_output
+from task.modbus_output_task import modbus_output
 from utils.auto_startup import add_to_startup
 from utils.logger import Logger
 from db.base import db
@@ -104,7 +104,7 @@ def start_all_task():
                 asyncio.create_task(sps2_read_task.start())
         else:
             # 从机只需要启动，客户端
-            asyncio.create_task(ws_client.start())
+            asyncio.create_task(ws_client.connect())
 
 
 def set_appearance(page: ft.Page, preference: Preference):

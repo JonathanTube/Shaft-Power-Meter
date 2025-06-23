@@ -19,22 +19,20 @@ class InterfaceConf(ft.Container):
 
     def build(self):
         try:
-            self.connect_server = ft.FilledButton(
+            self.connect_btn = ft.FilledButton(
                 text=self.page.session.get("lang.setting.connect_to_master"),
                 bgcolor=ft.Colors.GREEN,
                 color=ft.Colors.WHITE,
-                visible=not gdata.connected_to_hmi_server,
                 style=ft.ButtonStyle(
                     shape=ft.RoundedRectangleBorder(radius=5)
                 ),
                 on_click=lambda e: self.page.open(PermissionCheck(self.__connect_to_master, 2))
             )
 
-            self.disconnect_server = ft.FilledButton(
-                text=self.page.session.get("lang.setting.disconnect_from_hmi_server"),
+            self.close_btn = ft.FilledButton(
+                text=self.page.session.get("lang.setting.disconnect_from_master"),
                 bgcolor=ft.Colors.RED,
                 color=ft.Colors.WHITE,
-                visible=gdata.connected_to_hmi_server,
                 style=ft.ButtonStyle(
                     shape=ft.RoundedRectangleBorder(radius=5)
                 ),
@@ -62,8 +60,8 @@ class InterfaceConf(ft.Container):
                 ft.ResponsiveRow(controls=[
                     self.hmi_server_ip,
                     self.hmi_server_port,
-                    self.connect_server,
-                    self.disconnect_server
+                    self.connect_btn,
+                    self.close_btn
                 ]),
                 col={"xs": 12})
             self.content = self.custom_card
@@ -84,18 +82,18 @@ class InterfaceConf(ft.Container):
 
     async def handle_connect_to_master(self):
         try:
-            self.connect_server.text = self.page.session.get("lang.common.connecting")
-            self.connect_server.disabled = True
-            self.connect_server.update()
-            connected = await ws_client.start(only_once=True)
+            self.connect_btn.text = self.page.session.get("lang.common.connecting")
+            self.connect_btn.disabled = True
+            self.connect_btn.update()
+            connected = await ws_client.connect()
             # recovery
-            self.connect_server.text = self.page.session.get("lang.setting.connect_to_master")
-            self.connect_server.disabled = False
-            self.connect_server.visible = not connected
-            self.connect_server.update()
+            self.connect_btn.text = self.page.session.get("lang.setting.connect_to_master")
+            self.connect_btn.disabled = False
+            self.connect_btn.visible = not connected
+            self.connect_btn.update()
 
-            self.disconnect_server.visible = connected
-            self.disconnect_server.update()
+            self.close_btn.visible = connected
+            self.close_btn.update()
         except Exception as e:
             logging.exception(e)
 
@@ -111,10 +109,10 @@ class InterfaceConf(ft.Container):
     async def handle_disconnect_from_hmi_server(self):
         try:
             closed = await ws_client.close()
-            self.connect_server.visible = closed
-            self.disconnect_server.visible = not closed
-            self.connect_server.update()
-            self.disconnect_server.update()
+            self.connect_btn.visible = closed
+            self.close_btn.visible = not closed
+            self.connect_btn.update()
+            self.close_btn.update()
         except Exception as e:
             logging.exception(e)
 
@@ -125,3 +123,14 @@ class InterfaceConf(ft.Container):
             self.conf.hmi_server_port = self.hmi_server_port.value
         except ValueError:
             raise ValueError(f'{self.page.session.get("lang.common.ip_address_format_error")}: {self.hmi_server_port.value}')
+
+    def before_update(self):
+        self.connect_btn.visible = not ws_client.is_connected
+        self.connect_btn.text = self.page.session.get("lang.setting.connect_to_master")
+        self.connect_btn.bgcolor = ft.Colors.GREEN
+        self.connect_btn.disabled = False
+
+        self.close_btn.visible = ws_client.is_connected
+        self.close_btn.text = self.page.session.get("lang.setting.disconnect_from_master")
+        self.close_btn.bgcolor = ft.Colors.RED
+        self.close_btn.disabled = False

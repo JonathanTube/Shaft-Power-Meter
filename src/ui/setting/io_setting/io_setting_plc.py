@@ -1,4 +1,3 @@
-import asyncio
 import ipaddress
 import logging
 import flet as ft
@@ -375,23 +374,3 @@ class IOSettingPLC(ft.Container):
 
         except Exception:
             logging.exception("plc save data error")
-
-    def did_mount(self):
-        self.task_running = True
-        self.loop_task = self.page.run_task(self.__loop)
-
-    def will_unmount(self):
-        self.task_running = False
-        if self.loop_task:
-            self.loop_task.cancel()
-
-    async def __loop(self):
-        while self.task_running:
-            try:
-                if self.plc_enabled.value:
-                    self.update()
-            except:
-                logging.exception('exception occured at IOSettingPLC.__handle_connection_status')
-                return
-            finally:
-                await asyncio.sleep(5)

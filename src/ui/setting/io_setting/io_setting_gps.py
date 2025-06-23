@@ -1,4 +1,3 @@
-import asyncio
 import ipaddress
 import logging
 import flet as ft
@@ -18,9 +17,6 @@ class IOSettingGPS(ft.Container):
     def __init__(self, conf: IOConf):
         super().__init__()
         self.conf = conf
-        
-        self.loop_task = None
-        self.task_running = False
 
     def build(self):
         try:
@@ -136,22 +132,3 @@ class IOSettingGPS(ft.Container):
         self.close_btn.text = self.page.session.get("lang.setting.disconnect")
         self.close_btn.bgcolor = ft.Colors.RED
         self.close_btn.disabled = False
-
-    async def __loop(self):
-        while self.task_running:
-            try:
-                self.update()
-            except:
-                logging.exception("exception occured at IOSettingGPS.__loop")
-                return
-            finally:
-                await asyncio.sleep(5)
-
-    def did_mount(self):
-        self.task_running = True
-        self.loop_task = self.page.run_task(self.__loop)
-
-    def will_unmount(self):
-        self.task_running = False
-        if self.loop_task:
-            self.loop_task.cancel()

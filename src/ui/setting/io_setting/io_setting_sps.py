@@ -1,4 +1,3 @@
-import asyncio
 import ipaddress
 import logging
 import flet as ft
@@ -168,13 +167,13 @@ class IOSettingSPS(ft.Container):
 
             self.row_sps1 = ft.ResponsiveRow(
                 controls=[
-                    self.sps1_ip, 
-                    self.sps1_port, 
+                    self.sps1_ip,
+                    self.sps1_port,
                     ft.Row(
                         col={'sm': 4},
                         alignment=ft.alignment.center_left,
                         controls=[
-                            self.sps1_connect, 
+                            self.sps1_connect,
                             self.sps1_disconnect
                         ]
                     )
@@ -183,13 +182,13 @@ class IOSettingSPS(ft.Container):
 
             self.row_sps2 = ft.ResponsiveRow(
                 controls=[
-                    self.sps2_ip, 
-                    self.sps2_port, 
+                    self.sps2_ip,
+                    self.sps2_port,
                     ft.Row(
                         col={'sm': 4},
                         alignment=ft.alignment.center_left,
                         controls=[
-                            self.sps2_connect, 
+                            self.sps2_connect,
                             self.sps2_disconnect
                         ])
                 ],
@@ -202,9 +201,9 @@ class IOSettingSPS(ft.Container):
                     controls=[
                         self.row_sps1,
                         self.row_sps2,
-                        self.shaft_outer_diameter, 
+                        self.shaft_outer_diameter,
                         self.shaft_inner_diameter,
-                        self.sensitivity_factor_k, 
+                        self.sensitivity_factor_k,
                         self.elastic_modulus_E,
                         self.poisson_ratio_mu
                     ]))
@@ -212,72 +211,66 @@ class IOSettingSPS(ft.Container):
         except:
             logging.exception('exception occured at IOSettingSPS.build')
 
-
     def __connect_to_sps1(self, user: User):
-        OperationLog.create(
-            user_id=user.id,
-            utc_date_time=gdata.utc_date_time,
-            operation_type=OperationType.CONNECT_TO_SPS1,
-            operation_content=user.user_name
-        )
-        self.conf.sps1_ip = self.sps1_ip.value
-        self.conf.sps1_port = self.sps1_port.value
-        self.conf.save()
-        self.__start_sps1_task()
-
-    def __start_sps1_task(self):
         try:
             self.sps1_connect.text = self.page.session.get("lang.common.connecting")
             self.sps1_connect.disabled = True
             self.sps1_connect.update()
 
+            OperationLog.create(
+                user_id=user.id,
+                utc_date_time=gdata.utc_date_time,
+                operation_type=OperationType.CONNECT_TO_SPS1,
+                operation_content=user.user_name
+            )
+            self.conf.sps1_ip = self.sps1_ip.value
+            self.conf.sps1_port = self.sps1_port.value
+            self.conf.save()
             self.page.run_task(sps1_read_task.start, only_once=True)
-            self.__handle_sps1_connection()
-        except Exception as e:
-            logging.exception(e)
+        except:
+            logging.exception("exception occured at __connect_to_sps1")
 
     def __disconnect_from_sps1(self, user: User):
-        OperationLog.create(
-            user_id=user.id,
-            utc_date_time=gdata.utc_date_time,
-            operation_type=OperationType.DISCONNECT_FROM_SPS1,
-            operation_content=user.user_name
-        )
-        self.page.run(sps1_read_task.close)
-        self.__handle_sps1_connection()
+        try:
+            OperationLog.create(
+                user_id=user.id,
+                utc_date_time=gdata.utc_date_time,
+                operation_type=OperationType.DISCONNECT_FROM_SPS1,
+                operation_content=user.user_name
+            )
+            self.page.run_task(sps1_read_task.close)
+        except:
+            logging.exception("exception occured at __disconnect_from_sps1")
 
     def __connect_to_sps2(self, user: User):
-        OperationLog.create(
-            user_id=user.id,
-            utc_date_time=gdata.utc_date_time,
-            operation_type=OperationType.CONNECT_TO_SPS2,
-            operation_content=user.user_name
-        )
-        self.conf.sps2_ip = self.sps2_ip.value
-        self.conf.sps2_port = self.sps2_port.value
-        self.conf.save()
-        self.__start_sps2_task()
-
-    def __start_sps2_task(self):
         try:
             self.sps2_connect.text = self.page.session.get("lang.common.connecting")
             self.sps2_connect.disabled = True
             self.sps2_connect.update()
-
-            self.page.run(sps2_read_task.start, only_once=True)
-            self.__handle_sps2_connection()
-        except Exception as e:
-            logging.exception(e)
+            OperationLog.create(
+                user_id=user.id,
+                utc_date_time=gdata.utc_date_time,
+                operation_type=OperationType.CONNECT_TO_SPS2,
+                operation_content=user.user_name
+            )
+            self.conf.sps2_ip = self.sps2_ip.value
+            self.conf.sps2_port = self.sps2_port.value
+            self.conf.save()
+            self.page.run_task(sps2_read_task.start, only_once=True)
+        except:
+            logging.exception("exception occured at __connect_to_sps2")
 
     def __disconnect_from_sps2(self, user: User):
-        OperationLog.create(
-            user_id=user.id,
-            utc_date_time=gdata.utc_date_time,
-            operation_type=OperationType.DISCONNECT_FROM_SPS2,
-            operation_content=user.user_name
-        )
-        self.page.run(sps2_read_task.close)
-        self.__handle_sps2_connection()
+        try:
+            OperationLog.create(
+                user_id=user.id,
+                utc_date_time=gdata.utc_date_time,
+                operation_type=OperationType.DISCONNECT_FROM_SPS2,
+                operation_content=user.user_name
+            )
+            self.page.run_task(sps2_read_task.close)
+        except:
+            logging.exception("exception occured at __disconnect_from_sps2")
 
     def save_data(self):
         try:
@@ -313,41 +306,14 @@ class IOSettingSPS(ft.Container):
         gdata.poisson_ratio_mu = float(self.poisson_ratio_mu.value)
         logging.info('factor of gdata was refreshed.')
 
-    def __handle_sps1_connection(self):
+    def before_update(self):
         self.sps1_connect.text = self.page.session.get("lang.setting.connect")
         self.sps1_connect.visible = gdata.sps1_offline
         self.sps1_connect.disabled = False
-        self.sps1_connect.update()
-
         self.sps1_disconnect.visible = not gdata.sps1_offline
-        self.sps1_disconnect.update()
 
-    def __handle_sps2_connection(self):
-        self.sps2_connect.text = self.page.session.get("lang.setting.connect")
-        self.sps2_connect.visible = gdata.sps2_offline
-        self.sps2_connect.disabled = False
-        self.sps2_connect.update()
-
-        self.sps2_disconnect.visible = not gdata.sps2_offline
-        self.sps2_disconnect.update()
-
-    async def __handle_connection_status(self):
-        while self.task_running:
-            try:
-                if not self.sps1_connect.disabled:
-                    self.__handle_sps1_connection()
-
-                if not self.sps2_connect.disabled:
-                    self.__handle_sps2_connection()
-            except Exception as e:
-                logging.exception(e)
-            await asyncio.sleep(1)
-
-    def did_mount(self):
-        self.task_running = True
-        self.task = self.page.run_task(self.__handle_connection_status)
-
-    def will_unmount(self):
-        self.task_running = False
-        if self.task:
-            self.task.cancel()
+        if self.is_dual:
+            self.sps2_connect.text = self.page.session.get("lang.setting.connect")
+            self.sps2_connect.visible = gdata.sps2_offline
+            self.sps2_connect.disabled = False
+            self.sps2_disconnect.visible = not gdata.sps2_offline

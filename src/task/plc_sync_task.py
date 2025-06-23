@@ -29,6 +29,7 @@ class PlcSyncTask:
         async with self._lock:  # 确保单线程重连
             self._retry = 0
             while self._retry < self._max_retries:
+                # 如果是手动取消，直接跳出
                 if self._is_canceled:
                     break
 
@@ -47,9 +48,9 @@ class PlcSyncTask:
                     self.plc_client = AsyncModbusTcpClient(
                         host=io_conf.plc_ip,
                         port=io_conf.plc_port,
-                        timeout=10,
-                        retries=3,
-                        reconnect_delay=5  # 自动重连间隔
+                        timeout=5,
+                        retries=5,
+                        reconnect_delay=5
                     )
 
                     await self.plc_client.connect()
@@ -57,11 +58,6 @@ class PlcSyncTask:
                     logging.info("[***PLC***] connected successfully")
 
                     await self.heart_beat()
-                    
-                    # 如果是手动取消，直接跳出
-                    if self._is_canceled:
-                        break
-                    # 否则进入下一次循环
                 except:
                     logging.error(f"[***PLC***] {self._retry + 1}th reconnect failed")
                     self.save_alarm()

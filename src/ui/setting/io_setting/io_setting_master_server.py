@@ -1,4 +1,3 @@
-import asyncio
 import logging
 import flet as ft
 from common.operation_type import OperationType
@@ -13,8 +12,6 @@ from common.global_data import gdata
 class IOSettingMasterServer(ft.Container):
     def __init__(self):
         super().__init__()
-        self.loop_task = None
-        self.task_running = False
 
     def build(self):
         try:
@@ -65,7 +62,7 @@ class IOSettingMasterServer(ft.Container):
 
     def on_start(self, user: User):
         try:
-            self.start_btn.text = "loading"
+            self.start_btn.text = "loading..."
             self.start_btn.bgcolor = ft.Colors.GREY
             self.start_btn.disabled = True
             self.start_btn.update()
@@ -82,7 +79,7 @@ class IOSettingMasterServer(ft.Container):
 
     def on_stop(self, user: User):
         try:
-            self.stop_btn.text = "loading"
+            self.stop_btn.text = "loading..."
             self.stop_btn.bgcolor = ft.Colors.GREY
             self.stop_btn.disabled = True
             self.stop_btn.update()
@@ -107,22 +104,3 @@ class IOSettingMasterServer(ft.Container):
         self.stop_btn.text = self.page.session.get("lang.setting.stop_master_server")
         self.stop_btn.bgcolor = ft.Colors.RED
         self.stop_btn.disabled = False
-
-    async def __loop(self):
-        while self.task_running:
-            try:
-                self.update()
-            except:
-                logging.exception("exception occured at IOSettingMasterServer.__loop")
-                return
-            finally:
-                await asyncio.sleep(5)
-
-    def did_mount(self):
-        self.task_running = True
-        self.loop_task = self.page.run_task(self.__loop)
-
-    def will_unmount(self):
-        self.task_running = False
-        if self.loop_task:
-            self.loop_task.cancel()

@@ -17,62 +17,82 @@ from common.global_data import gdata
 
 class WebSocketClient:
     def __init__(self):
+        self._lock = asyncio.Lock()
+
         self.websocket = None
-        self._running = False
+
+        self._retry = 0
+
+        self._is_connected = False
+
+        self._is_canceled = False
+
+        self._max_retries = 20  # 最大重连次数
+
         self.jm3846Calculator = JM3846Calculator()
 
-    async def start(self, only_once: bool = False):
-        """连接服务端"""
-        try:
-            io_conf: IOConf = IOConf.get()
-            uri = f"ws://{io_conf.hmi_server_ip}:{io_conf.hmi_server_port}"
-            self.websocket = await websockets.connect(uri)
-            self._running = True
-            logging.info(f"[***HMI client***] connected to {uri} successfully")
-            gdata.connected_to_hmi_server = True
-            AlarmSaver.recovery(alarm_type=AlarmType.SLAVE_DISCONNECTED)
-            # 启动后台接收任务
-            asyncio.create_task(self._receive_loop())
-        except Exception:
-            logging.error(f"[***HMI client***] failed to connect to {uri}")
-            self._running = False
+    @property
+    def is_connected(self):
+        return self._is_connected
+
+    async def connect(self):
+        async with self._lock:  # 确保单线程重连
+            while self._retry < self._max_retries:
+                # 如果是手动取消，直接跳出
+                if self._is_canceled:
+                    break
+
+                if self._is_connected:
+                    break
+                try:
+                    io_conf: IOConf = IOConf.get()
+                    uri = f"ws://{io_conf.hmi_server_ip}:{io_conf.hmi_server_port}"
+                    self.websocket = await websockets.connect(uri)
+                    logging.info(f"[***HMI client***] connected to {uri}")
+
+                    self._is_connected = True
+                    AlarmSaver.recovery(alarm_type=AlarmType.SLAVE_DISCONNECTED)
+
+                    # 启动后台接收任务
+                    await self.receive_data()
+
+                    logging.info(f"[***HMI client***] disconnected from {uri}")
+                except:
+                    logging.error(f"[***HMI client***] failed to connect to {uri}")
+                finally:
+                    #  指数退避
+                    await asyncio.sleep(2 ** self._retry)
+                    self._retry += 1
+
+            # 执行到这了，说明已经退出了
+            self._is_connected = False
             AlarmSaver.create(alarm_type=AlarmType.SLAVE_DISCONNECTED)
-            await asyncio.sleep(2)
-            if only_once:
-                return False
-            return await self.start()
+            # 重新设置为未取消，准备下一次链接
+            self._is_canceled = False
 
-        return True
+    async def receive_data(self):
+        while self._is_connected:
 
-    async def _receive_loop(self):
-        """持续接收消息的循环"""
-        try:
-            while self._running:
+            if self._is_canceled:
+                break
+
+            try:
                 raw_data = await self.websocket.recv()
                 data = msgpack.unpackb(raw_data)
-                # logging.info(f"client received: {data}")
+
                 if data['type'] == 'sps_data':
                     self.__handle_jm3846_data(data)
-                elif data['type'] == 'zero_cal':
-                    self.__handle_zero_cal(data)
+                elif data['type'] == 'alarm_data':
+                    self.__handle_alarm_data(data)
+
                 gdata.sps1_offline = False
                 gdata.sps2_offline = False
-        except websockets.ConnectionClosed:
-            logging.error("[***HMI client***] server connection closed")
-            self._running = False
-            gdata.connected_to_hmi_server = False
-            AlarmSaver.create(alarm_type=AlarmType.SLAVE_DISCONNECTED)
-            gdata.sps1_offline = True
-            gdata.sps2_offline = True
-            await self.start()
-
-    async def send(self, data):
-        """向服务端发送数据"""
-        if self.websocket:
-            packed_data = msgpack.packb(data)
-            await self.websocket.send(packed_data)
-            return True
-        return False
+                self._retry = 0
+            except:
+                logging.error("[***HMI client***] exception occured at _receive_loop")
+                gdata.sps1_offline = True
+                gdata.sps2_offline = True
+                break
 
     def __handle_jm3846_data(self, data):
         """处理从服务端接收到的数据"""
@@ -94,7 +114,7 @@ class WebSocketClient:
 
         DataSaver.save(name, ad0_torque, ad1_thrust, speed)
 
-    def __handle_zero_cal(self, data):
+    def __handle_alarm_data(self, data):
         """处理零点校准数据"""
         id = data['id']
         zero_cal_info: ZeroCalInfo = ZeroCalInfo.get_or_none(ZeroCalInfo.id == id)
@@ -127,16 +147,16 @@ class WebSocketClient:
                 gdata.sps2_thrust_offset = data['thrust_offset']
 
     async def close(self):
-        """关闭连接"""
         try:
-            self._running = False
             if self.websocket:
                 await self.websocket.close()
-                AlarmSaver.create(alarm_type=AlarmType.SLAVE_DISCONNECTED)
+                await self.websocket.wait_closed()
         except Exception:
             logging.error("[***HMI client***] failed to close websocket connection")
-            return False
-        return True
+        finally:
+            self._is_connected = False
+            self._is_canceled = True
+            AlarmSaver.create(alarm_type=AlarmType.SLAVE_DISCONNECTED)
 
 
 ws_client = WebSocketClient()

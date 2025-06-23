@@ -1185,9 +1185,9 @@ class DataInit:
                 },
 
                 {
-                    "code": "lang.setting.disconnect_from_hmi_server",
+                    "code": "lang.setting.disconnect_from_master",
                     "chinese": "断开HMI服务器",
-                    "english": "Disconnect from HMI Server"
+                    "english": "Disconnect from Master"
                 },
 
                 {

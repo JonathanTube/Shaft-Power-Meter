@@ -9,7 +9,7 @@ from task.plc_sync_task import plc
 from utils.eexi_breach import EEXIBreach
 from utils.formula_cal import FormulaCalculator
 from utils.alarm_saver import AlarmSaver
-from utils.modbus_output import modbus_output
+from task.modbus_output_task import modbus_output
 from websocket.websocket_server import ws_server
 
 class DataSaver:

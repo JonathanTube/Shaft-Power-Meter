@@ -50,11 +50,11 @@ class WebSocketServer:
             if self.server:
                 self.server.close()
                 await self.server.wait_closed()
-                AlarmSaver.create(alarm_type=AlarmType.MASTER_SERVER_STOPPED)
                 logging.info('[***HMI server***] websocket server has been stopped')
         except:
             logging.error('[***HMI server***] stop websocket server failed')
         finally:
+            AlarmSaver.create(alarm_type=AlarmType.MASTER_SERVER_STOPPED)
             self._is_started = False
 
     async def broadcast(self, data):
