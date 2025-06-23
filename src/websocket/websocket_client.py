@@ -117,7 +117,7 @@ class WebSocketClient:
         for alarm_log in alarm_logs:
             alarm_type = alarm_log['alarm_type']
             is_recovery = alarm_log['is_recovery']
-            if is_recovery:
+            if is_recovery == 1:
                 AlarmSaver.recovery(alarm_type)
             else:
                 AlarmSaver.create(alarm_type)
