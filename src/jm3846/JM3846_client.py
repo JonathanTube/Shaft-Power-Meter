@@ -10,7 +10,6 @@ from jm3846.JM3846_calculator import JM3846Calculator
 from utils.alarm_saver import AlarmSaver
 from utils.data_saver import DataSaver
 from common.global_data import gdata
-from websocket.websocket_server import ws_server
 
 
 class JM3846AsyncClient:
@@ -20,9 +19,6 @@ class JM3846AsyncClient:
         self.name = name
         self.frame_size = 120
         self.total_frames = 0xFFFF
-
-        self.timeout = 5
-        self.running = False
 
         self.transaction_id = 0
         self.reader: Optional[asyncio.StreamReader] = None
@@ -38,64 +34,65 @@ class JM3846AsyncClient:
         self.jm3846Calculator = JM3846Calculator()
         self._lock = asyncio.Lock()
 
+        self._retry = 0
+        self._max_retries = 20
+
+        self._is_connected = False
+        self._is_canceled = False
+
+    @property
+    def is_connected(self):
+        return self._is_connected
+
     @abstractmethod
     def get_ip_port() -> tuple[str, int]:
         pass
 
-    async def start(self, only_once=False) -> bool:
-        """启动客户端"""
-        try:
-            self.running = True
-            connected = await self.async_connect()
-            if connected:
-                await self.async_handle_0x44()
-                # 异步接受数据
-                asyncio.create_task(self.async_receive_looping())
-            # return directly if only once.
-            if only_once:
-                return connected
-            # if not, we need to retry.
-            if not connected:
-                await asyncio.sleep(2)
-                await self.start()
-        except Exception:
-            logging.error(f'[***{self.name}***] start JM3846 client failed')
-            if only_once:
-                return False
-            await asyncio.sleep(5)
-            await self.start()
-        return False
-
-    async def async_connect(self) -> bool:
+    async def connect(self):
         async with self._lock:  # 确保单线程重连
-            """建立异步连接"""
-            try:
-                host, port = self.get_ip_port()
-                logging.info(f'[***{self.name}***] JM3846 Connecting, host={host}, port={port}...')
-                self.reader, self.writer = await asyncio.wait_for(
-                    asyncio.open_connection(host, port),
-                    timeout=self.timeout
-                )
-                logging.info(f'[***{self.name}***] JM3846 Connected successfully')
-                if self.name == 'sps1':
-                    AlarmSaver.recovery(alarm_type=AlarmType.SPS1_DISCONNECTED)
-                elif self.name == 'sps2':
-                    AlarmSaver.recovery(alarm_type=AlarmType.SPS2_DISCONNECTED)
-                return True
-            except Exception:
-                logging.error(f'[***{self.name}***] JM3846 Connection error')
-                self.set_offline(True)
-                if self.name == 'sps1':
-                    AlarmSaver.create(alarm_type=AlarmType.SPS1_DISCONNECTED)
-                elif self.name == 'sps2':
-                    AlarmSaver.create(alarm_type=AlarmType.SPS2_DISCONNECTED)
+            while self._retry < self._max_retries:
+                if self._is_canceled:
+                    break
 
-            return False
+                try:
+                    host, port = self.get_ip_port()
 
-    async def close(self) -> bool:
-        """断开连接"""
+                    logging.info(f'[***{self.name}***] JM3846 Connecting, host={host}, port={port}...')
+
+                    self.reader, self.writer = await asyncio.wait_for(
+                        asyncio.open_connection(host, port),
+                        timeout=10
+                    )
+
+                    logging.info(f'[***{self.name}***] JM3846 Connected successfully')
+
+                    await self.async_handle_0x44()
+                    
+                    self._retry = 0
+                    self.recovery_alarm()
+                    self._is_connected = True
+                    
+                    await self.async_receive_looping()
+                except TimeoutError:
+                    logging.exception(f'[***{self.name}***] start JM3846 client timeout')
+                except:
+                    logging.exception(f'[***{self.name}***] start JM3846 client failed')
+                    self._is_connected = False
+                    self.create_alarm()
+                finally:
+                    #  指数退避
+                    await asyncio.sleep(2 ** self._retry)
+                    self._retry += 1
+
+            self._is_canceled = False
+
+    async def close(self):
+        self._is_canceled = True
+
+        if not self._is_connected:
+            return
+
         try:
-            self.running = False
             if self.writer:
                 # 发送0x45,断开数据流
                 await self.async_handle_0x45()
@@ -103,10 +100,11 @@ class JM3846AsyncClient:
                 await self.writer.wait_closed()
                 logging.info(f'[***{self.name}***] JM3846 Connection closed')
                 self.set_offline(True)
-                return True
-        except Exception:
-            logging.error(f'[***{self.name}***] JM3846 disconnect from sps failed')
-        return False
+        except:
+            logging.exception(f'[***{self.name}***] JM3846 disconnect from sps failed')
+        finally:
+            self._is_connected = False
+            AlarmSaver.create(AlarmType.GPS_DISCONNECTED)
 
     async def async_handle_0x03(self):
         """异步处理功能码0x03"""
@@ -116,7 +114,7 @@ class JM3846AsyncClient:
             request = JM38460x03Async.build_request(self.transaction_id)
             self.writer.write(request)
             await self.writer.drain()
-        except asyncio.TimeoutError:
+        except TimeoutError:
             logging.error(f'[***{self.name}***] JM3846 0x03 request timeout')
         except Exception:
             logging.error(f'[***{self.name}***] JM3846 0x03 error')
@@ -143,16 +141,12 @@ class JM3846AsyncClient:
             logging.info(f'[***{self.name}***] send 0x44 req={request}')
             self.writer.write(request)
             await self.writer.drain()
-
-        except asyncio.TimeoutError:
-            logging.error(f'[***{self.name}***] JM3846 0x44 request timeout')
-        except Exception:
-            logging.error(f'[***{self.name}***] JM3846 0x44 error')
+        except:
+            logging.exception(f'[***{self.name}***] JM3846 0x44 error')
 
     async def async_receive_looping(self):
-        timeout_times = 0
         """持续接收0x44数据"""
-        while self.running:
+        while self._is_connected:
             try:
                 if self.name == 'sps2' and int(gdata.amount_of_propeller) == 1:
                     logging.info('exit running since single propeller')
@@ -160,10 +154,7 @@ class JM3846AsyncClient:
                     return
 
                 # 接收响应
-                response = await asyncio.wait_for(
-                    self.reader.read(256),
-                    timeout=self.timeout * 2
-                )
+                response = await asyncio.wait_for(self.reader.read(256), timeout=5)
 
                 if not response:
                     await asyncio.sleep(2)
@@ -223,24 +214,15 @@ class JM3846AsyncClient:
                     logging.info(f'[***{self.name}***] JM3846 0x45 Response: {res}')
                     continue
 
-            except asyncio.TimeoutError:
-                if timeout_times > 5:
-                    self.running = False
-                    await self.async_connect()
+            except TimeoutError:
                 logging.error(f'[***{self.name}***] JM3846 0x44 receive timeout, retrying...')
                 self.set_offline(True)
-                if self.name == 'sps1':
-                    AlarmSaver.create(alarm_type=AlarmType.SPS1_DISCONNECTED)
-                elif self.name == 'sps2':
-                    AlarmSaver.create(alarm_type=AlarmType.SPS2_DISCONNECTED)
-                timeout_times += 1
             except ConnectionResetError as e:
                 logging.error(f'[***{self.name}***] JM3846 Connection reset: {e}')
-                self.set_offline(True)
-                self.running = False
-                await self.async_connect()
+                return
             except Exception:
                 logging.error(f'[***{self.name}***] JM3846 0x44 Receive error')
+                return
 
     async def save_0x44_result(self, result: dict):
         try:
@@ -320,3 +302,15 @@ class JM3846AsyncClient:
             gdata.sps1_offline = is_offline
         elif self.name == 'sps2':
             gdata.sps2_offline = is_offline
+
+    def create_alarm(self):
+        if self.name == 'sps1':
+            AlarmSaver.create(alarm_type=AlarmType.SPS1_DISCONNECTED)
+        elif self.name == 'sps2':
+            AlarmSaver.create(alarm_type=AlarmType.SPS2_DISCONNECTED)
+
+    def recovery_alarm(self):
+        if self.name == 'sps1':
+            AlarmSaver.recovery(alarm_type=AlarmType.SPS1_DISCONNECTED)
+        elif self.name == 'sps2':
+            AlarmSaver.recovery(alarm_type=AlarmType.SPS2_DISCONNECTED)

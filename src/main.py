@@ -97,11 +97,11 @@ def start_all_task():
             io_conf: IOConf = IOConf.get()
             if io_conf.plc_enabled:
                 asyncio.create_task(plc.connect())
-            asyncio.create_task(sps1_read_task.start())
+            asyncio.create_task(sps1_read_task.connect())
             asyncio.create_task(ws_server.start())
             # start sps2 JM3846 if dual propellers.
             if system_settings.amount_of_propeller > 1:
-                asyncio.create_task(sps2_read_task.start())
+                asyncio.create_task(sps2_read_task.connect())
         else:
             # 从机只需要启动，客户端
             asyncio.create_task(ws_client.connect())

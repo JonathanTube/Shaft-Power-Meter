@@ -45,7 +45,7 @@ class GpsSyncTask:
                     logging.info(f'[***GPS***]connecting to gps, retry times = {self._retry + 1}, ip={io_conf.gps_ip}, port={io_conf.gps_port}')
                     self.reader, self.writer = await asyncio.wait_for(
                         asyncio.open_connection(io_conf.gps_ip, io_conf.gps_port),
-                        timeout=2
+                        timeout=5
                     )
 
                     logging.info(f'[***GPS***]connected to gps, ip={io_conf.gps_ip}, port={io_conf.gps_port}')
