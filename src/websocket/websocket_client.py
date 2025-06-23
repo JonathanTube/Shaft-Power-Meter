@@ -1,6 +1,7 @@
 
 # ====================== 客户端类 ======================
 import asyncio
+from datetime import datetime
 import websockets
 import logging
 import msgpack
@@ -13,6 +14,7 @@ from utils.data_saver import DataSaver
 from common.global_data import gdata
 
 
+standard_date_time_format = '%Y-%m-%d %H:%M:%S'
 class WebSocketClient:
     def __init__(self):
         self._lock = asyncio.Lock()
@@ -34,14 +36,15 @@ class WebSocketClient:
         return self._is_connected
 
     async def connect(self):
+        if self._is_connected:
+            return
+
         async with self._lock:  # 确保单线程重连
             while self._retry < self._max_retries:
                 # 如果是手动取消，直接跳出
                 if self._is_canceled:
                     break
 
-                if self._is_connected:
-                    break
                 try:
                     io_conf: IOConf = IOConf.get()
                     uri = f"ws://{io_conf.hmi_server_ip}:{io_conf.hmi_server_port}"
@@ -57,6 +60,8 @@ class WebSocketClient:
                     logging.info(f"[***HMI client***] disconnected from {uri}")
                 except:
                     logging.error(f"[***HMI client***] failed to connect to {uri}")
+                    self._is_connected = False
+                    AlarmSaver.create(alarm_type=AlarmType.SLAVE_DISCONNECTED)
                 finally:
                     #  指数退避
                     await asyncio.sleep(2 ** self._retry)
@@ -90,6 +95,8 @@ class WebSocketClient:
                 logging.exception("[***HMI client***] exception occured at _receive_loop")
                 gdata.sps1_offline = True
                 gdata.sps2_offline = True
+                self._is_connected = False
+                AlarmSaver.create(alarm_type=AlarmType.SLAVE_DISCONNECTED)
                 break
 
     def __handle_jm3846_data(self, data):
@@ -118,15 +125,19 @@ class WebSocketClient:
         for alarm_log in alarm_logs:
             alarm_type = alarm_log['alarm_type']
             acknowledge_time = alarm_log['acknowledge_time']
+
+            ack_time = None
+            if acknowledge_time:
+                ack_time = datetime.strptime(acknowledge_time, standard_date_time_format)
+
             is_recovery = alarm_log['is_recovery']
             if is_recovery == 1:
                 AlarmLog.update(
                     is_recovery=True, 
                     is_from_master=True, 
-                    acknowledge_time=acknowledge_time
+                    acknowledge_time=ack_time
                 ).where(
-                    AlarmLog.alarm_type == alarm_type,
-                    AlarmLog.is_recovery == False
+                    AlarmLog.alarm_type == alarm_type
                 ).execute()
             else:
                 cnt: int = AlarmLog.select().where(
@@ -136,7 +147,7 @@ class WebSocketClient:
                 if cnt == 0:
                     AlarmLog.create(
                         utc_date_time=gdata.utc_date_time,
-                        acknowledge_time = acknowledge_time, 
+                        acknowledge_time = ack_time, 
                         is_from_master=True, 
                         alarm_type=alarm_type
                     )

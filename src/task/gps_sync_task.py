@@ -30,13 +30,13 @@ class GpsSyncTask:
         return self._is_connected
 
     async def connect(self):
+        if self._is_connected:
+            return
+
         async with self._lock:  # 确保单线程重连
             while self._retry < self._max_retries:
                 # 如果是手动取消，直接跳出
                 if self._is_canceled:
-                    break
-
-                if self._is_connected:
                     break
 
                 try:
@@ -55,6 +55,8 @@ class GpsSyncTask:
                     logging.info(f'[***GPS***]disconnected from gps, ip={io_conf.gps_ip}, port={io_conf.gps_port}')
                 except:
                     logging.error(f"[***GPS***]connect to gps timeout, retry times={self._retry + 1}")
+                    self._is_connected = False
+                    AlarmSaver.create(alarm_type=AlarmType.GPS_DISCONNECTED)
                 finally:
                     #  指数退避
                     await asyncio.sleep(2 ** self._retry)
@@ -97,6 +99,8 @@ class GpsSyncTask:
                 self._retry = 0
             except:
                 logging.error(f"[***GPS***] exception occured at receive_data")
+                self._is_connected = False
+                AlarmSaver.create(alarm_type=AlarmType.GPS_DISCONNECTED)
                 break
 
     async def close(self):

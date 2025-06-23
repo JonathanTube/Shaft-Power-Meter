@@ -64,8 +64,8 @@ class ModbusOutputTask:
             )
             logger.info(f"Modbus server started on {port}")
             self._is_started = True
-        except Exception as e:
-            logging.exception(e)
+        except:
+            logging.exception("exception occured at ModbusOutputTask.start")
 
     async def stop(self):
         if not self._is_started:
