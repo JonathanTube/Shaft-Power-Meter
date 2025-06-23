@@ -15,13 +15,6 @@ class AbstractTable(ft.Container):
         self.show_checkbox_column = False
         self.kwargs = {}  # 其他传入的参数
 
-        self.pg = Pagination(self.page_size, self.__on_page_change)
-
-    def __on_page_change(self, current_page: int, page_size: int):
-        self.current_page = current_page
-        self.page_size = page_size
-        self.__create_table_rows()
-
     def build(self):
         try:
             # self.default_width = self.page.window.width - \
@@ -42,6 +35,9 @@ class AbstractTable(ft.Container):
                 expand=True
             )
 
+            total = self.load_total()
+            self.pg = Pagination(total, self.page_size, self.__on_page_change)
+
             self.content = ft.Column(
                 expand=True,
                 spacing=0,
@@ -53,6 +49,15 @@ class AbstractTable(ft.Container):
         except:
             logging.exception('exception occured at AbstractTable.build')
 
+    def __on_page_change(self, current_page: int, page_size: int):
+        try:
+            self.current_page = current_page
+            self.page_size = page_size
+            total = self.load_total()
+            self.pg.update_total(total=total)
+            self.__create_table_rows()
+        except:
+            logging.exception('exception occured at AbstractTable.__on_page_change')
 
     def __create_table(self):
         self.data_table = ft.DataTable(
@@ -93,8 +98,13 @@ class AbstractTable(ft.Container):
         data = self.load_data()
         rows = []
         for items in data:
-            rows.append(ft.DataRow(cells=self.__create_cells(items), selected=False,
-                        on_select_changed=lambda e: self.__on_select_changed(e)))
+            rows.append(
+                ft.DataRow(
+                    cells=self.__create_cells(items),
+                    selected=False,
+                    on_select_changed=lambda e: self.__on_select_changed(e)
+                )
+            )
         if self.data_table and self.data_table.page:
             self.data_table.rows = rows
             self.data_table.update()
@@ -107,24 +117,27 @@ class AbstractTable(ft.Container):
         if self.page is None:
             logging.error('abstract table has not been added to page.')
             return
-        try :
+
+        try:
             self.__create_table_columns()
             self.__create_table_rows()
-            total = self.load_total()
+
             if self.data_table and self.data_table.page:
                 self.data_table.update()
-            if self.pg and self.pg.page:
-                self.pg.update_pagination(total)
         except:
             logging.exception('data_table has not been added to page')
 
     def search(self, **kwargs):
         try:
             self.kwargs = kwargs
+            self.current_page = 1
             self.__create_table_rows()
-            total = self.load_total()
-            if self.page and self.pg.page:
-                self.pg.update_pagination(total)
+            if self.pg and self.pg.page:
+                self.pg.go_first_page()
+
+                total = self.load_total()
+                self.pg.update_total(total)
+                self.pg.update()
         except:
             logging.exception('exception occured at abstract_table.search')
 

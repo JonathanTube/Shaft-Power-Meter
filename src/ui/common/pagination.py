@@ -4,13 +4,13 @@ import flet as ft
 
 
 class Pagination(ft.Container):
-    def __init__(self, page_size: int, on_change: Callable[[int, int], None]):
+    def __init__(self, total_items: int, page_size: int, on_change: Callable[[int, int], None]):
         super().__init__()
         self.page_size = page_size
+        self.total = total_items
         self.total_pages = 0
         self.current_page = 1
-        self.total_items = 0
-        
+
         self.on_change = on_change
 
     def build(self):
@@ -49,34 +49,38 @@ class Pagination(ft.Container):
 
     def on_first_page_click(self, e):
         self.current_page = 1
+        self.on_change(self.current_page, self.page_size)
         self.update()
 
     def on_previous_page_click(self, e):
         self.current_page = max(1, self.current_page - 1)
+        self.on_change(self.current_page, self.page_size)
         self.update()
 
     def on_next_page_click(self, e):
         self.current_page = min(self.total_pages, self.current_page + 1)
+        self.on_change(self.current_page, self.page_size)
         self.update()
 
     def on_last_page_click(self, e):
         self.current_page = self.total_pages
+        self.on_change(self.current_page, self.page_size)
         self.update()
 
-    def update_pagination(self, total_items):
-        self.total_items = total_items
-        self.total_pages = (self.total_items +
-                            self.page_size - 1) // self.page_size
+    def go_first_page(self):
+        self.current_page = 1
 
-        self.page_number.value = f"{self.current_page} of {self.total_pages}"
-        self.visible = total_items > self.page_size
-
-        self.update()
+    def update_total(self, total: int):
+        self.total = total
 
     def before_update(self):
         try:
             if self.page:
-                self.on_change(self.current_page, self.page_size)
+                self.total_pages = (self.total + self.page_size - 1) // self.page_size
+
+                self.page_number.value = f"{self.current_page} of {self.total_pages}"
+                self.visible = self.total > self.page_size
+
                 self.page_number.value = f"{self.current_page} of {self.total_pages}"
 
                 if self.current_page <= 1:
