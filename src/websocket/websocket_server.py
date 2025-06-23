@@ -41,12 +41,12 @@ class WebSocketServer:
             self.clients.remove(websocket)
 
     async def start(self):
+        if self._is_started:
+            return
+
         async with self._lock:  # 确保单线程
             for attempt in range(self._max_retries):
                 if self._is_canceled:
-                    break
-
-                if self._is_started:
                     break
 
                 try:
@@ -83,11 +83,15 @@ class WebSocketServer:
                 if len(self.clients) > 0:
                     AlarmSaver.recovery(alarm_type=AlarmType.SLAVE_DISCONNECTED)
 
+                    # GPS不同步
                     alarm_logs: list[AlarmLog] = AlarmLog.select(
                         AlarmLog.alarm_type,
                         AlarmLog.is_recovery,
                         AlarmLog.acknowledge_time
-                    ).where(AlarmLog.is_sync == False)
+                    ).where(
+                        AlarmLog.is_sync == False,
+                        AlarmLog.alarm_type != AlarmType.GPS_DISCONNECTED
+                    )
                     
                     alarm_logs_dict = []
                     for alarm_log in alarm_logs:

@@ -26,14 +26,14 @@ class PlcSyncTask:
         return self._is_connected
 
     async def connect(self):
+        if self._is_connected:
+            return
+
         async with self._lock:  # 确保单线程重连
             self._retry = 0
             while self._retry < self._max_retries:
                 # 如果是手动取消，直接跳出
                 if self._is_canceled:
-                    break
-
-                if self._is_connected:
                     break
 
                 try:
