@@ -8,6 +8,8 @@ from db.models.io_conf import IOConf
 import msgpack
 from utils.alarm_saver import AlarmSaver
 
+date_time_format = '%Y-%m-%d %H:%M:%S'
+
 class WebSocketServer:
     def __init__(self):
         self._lock = asyncio.Lock()  # 线程安全锁
@@ -83,13 +85,15 @@ class WebSocketServer:
 
                     alarm_logs: list[AlarmLog] = AlarmLog.select(
                         AlarmLog.alarm_type,
-                        AlarmLog.is_recovery
+                        AlarmLog.is_recovery,
+                        AlarmLog.acknowledge_time
                     ).where(AlarmLog.is_sync == False)
                     
                     alarm_logs_dict = []
                     for alarm_log in alarm_logs:
                         alarm_logs_dict.append({
                             'alarm_type':alarm_log.alarm_type,
+                            'acknowledge_time':alarm_log.acknowledge_time.strftime(date_time_format) if alarm_log.acknowledge_time else "",
                             'is_recovery': 1 if alarm_log.is_recovery else 0
                         })
                     if len(alarm_logs) > 0:
