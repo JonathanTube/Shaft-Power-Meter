@@ -142,7 +142,7 @@ class IOSettingOutput(ft.Container):
             self.stop_btn.disabled = True
             self.stop_btn.update()
 
-            self.page.run_task(modbus_output.stop_modbus_server)
+            self.page.run_task(modbus_output.stop)
         except:
             logging.exception('exception occured at IOSettingOutput.on_start')
 

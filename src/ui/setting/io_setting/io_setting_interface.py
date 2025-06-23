@@ -8,6 +8,7 @@ from db.models.user import User
 from ui.common.custom_card import CustomCard
 from ui.common.keyboard import keyboard
 from ui.common.permission_check import PermissionCheck
+from ui.common.toast import Toast
 from websocket.websocket_client import ws_client
 from common.global_data import gdata
 
@@ -27,7 +28,7 @@ class InterfaceConf(ft.Container):
                     shape=ft.RoundedRectangleBorder(radius=5)
                 ),
                 col={"sm": 4},
-                on_click=lambda e: self.page.open(PermissionCheck(self.__connect_to_master, 2))
+                on_click=lambda e: self.page.open(PermissionCheck(self.__on_connect, 2))
             )
 
             self.close_btn = ft.FilledButton(
@@ -38,7 +39,7 @@ class InterfaceConf(ft.Container):
                     shape=ft.RoundedRectangleBorder(radius=5)
                 ),
                 col={"sm": 4},
-                on_click=lambda e: self.page.open(PermissionCheck(self.__disconnect_from_hmi_server, 2))
+                on_click=lambda e: self.page.open(PermissionCheck(self.__on_close, 2))
             )
 
             self.hmi_server_ip = ft.TextField(
@@ -71,55 +72,48 @@ class InterfaceConf(ft.Container):
         except:
             logging.exception('exception occured at InterfaceConf.build')
 
-    def __connect_to_master(self, user: User):
-        OperationLog.create(
-            user_id=user.id,
-            utc_date_time=gdata.utc_date_time,
-            operation_type=OperationType.CONNECT_TO_MASTER,
-            operation_content=user.user_name
-        )
-        self.hmi_server_ip = self.hmi_server_ip.value
-        self.hmi_server_port = self.hmi_server_port.value
-        self.conf.save()
-        self.page.run_task(self.handle_connect_to_master)
-
-    async def handle_connect_to_master(self):
+    def __on_connect(self, user: User):
         try:
-            self.connect_btn.text = self.page.session.get(
-                "lang.common.connecting")
+            self.save_data()
+            self.conf.save()
+        except Exception as e:
+            Toast.show_error(self.page, str(e))
+            return
+
+        try:
+            self.connect_btn.text = 'loading...'
             self.connect_btn.disabled = True
-            self.connect_btn.update()
-            connected = await ws_client.connect()
-            # recovery
-            self.connect_btn.text = self.page.session.get(
-                "lang.setting.connect_to_master")
-            self.connect_btn.disabled = False
-            self.connect_btn.visible = not connected
+            self.connect_btn.bgcolor = ft.Colors.GREY
             self.connect_btn.update()
 
-            self.close_btn.visible = connected
-            self.close_btn.update()
-        except Exception as e:
-            logging.exception(e)
+            OperationLog.create(
+                user_id=user.id,
+                utc_date_time=gdata.utc_date_time,
+                operation_type=OperationType.CONNECT_TO_MASTER,
+                operation_content=user.user_name
+            )
 
-    def __disconnect_from_hmi_server(self, user: User):
-        OperationLog.create(
-            user_id=user.id,
-            utc_date_time=gdata.utc_date_time,
-            operation_type=OperationType.DISCONNECT_FROM_HMI_SERVER,
-            operation_content=user.user_name
-        )
-        self.page.run_task(self.handle_disconnect_from_hmi_server)
+            self.page.run_task(ws_client.connect)
+        except:
+            logging.exception("exception occured at InterfaceConf.__on_connect")
 
-    async def handle_disconnect_from_hmi_server(self):
+    def __on_close(self, user: User):
         try:
-            closed = await ws_client.close()
-            self.connect_btn.visible = closed
-            self.close_btn.visible = not closed
-            self.connect_btn.update()
+            self.close_btn.text = 'loading...'
+            self.close_btn.disabled = True
+            self.close_btn.bgcolor = ft.Colors.GREY
             self.close_btn.update()
-        except Exception as e:
-            logging.exception(e)
+
+            OperationLog.create(
+                user_id=user.id,
+                utc_date_time=gdata.utc_date_time,
+                operation_type=OperationType.DISCONNECT_FROM_HMI_SERVER,
+                operation_content=user.user_name
+            )
+            self.page.run_task(ws_client.close)
+        except: 
+            logging.exception("exception occured at InterfaceConf.__on_close")
+
 
     def save_data(self):
         try:
@@ -127,18 +121,15 @@ class InterfaceConf(ft.Container):
             self.conf.hmi_server_ip = self.hmi_server_ip.value
             self.conf.hmi_server_port = self.hmi_server_port.value
         except ValueError:
-            raise ValueError(
-                f'{self.page.session.get("lang.common.ip_address_format_error")}: {self.hmi_server_port.value}')
+            raise ValueError(f'{self.page.session.get("lang.common.ip_address_format_error")}: {self.hmi_server_port.value}')
 
     def before_update(self):
         self.connect_btn.visible = not ws_client.is_connected
-        self.connect_btn.text = self.page.session.get(
-            "lang.setting.connect_to_master")
+        self.connect_btn.text = self.page.session.get("lang.setting.connect_to_master")
         self.connect_btn.bgcolor = ft.Colors.GREEN
         self.connect_btn.disabled = False
 
         self.close_btn.visible = ws_client.is_connected
-        self.close_btn.text = self.page.session.get(
-            "lang.setting.disconnect_from_master")
+        self.close_btn.text = self.page.session.get("lang.setting.disconnect_from_master")
         self.close_btn.bgcolor = ft.Colors.RED
         self.close_btn.disabled = False

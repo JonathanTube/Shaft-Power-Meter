@@ -67,7 +67,6 @@ class PlcSyncTask:
                     self._retry += 1
 
             self._is_canceled = False
-    
 
     async def heart_beat(self):
         while self.plc_client is not None and self.plc_client.connected:
@@ -155,14 +154,6 @@ class PlcSyncTask:
             await self.plc_client.write_register(12331, scaled_values[3])
         except:
             logging.error(f"[***PLC***] {self.ip}:{self.port} write data failed")
-            # if exception occured, we need to judge wether the plc connectection is ok
-            # if self.plc_client is None or not self.plc_client.connected:
-            #     # disconnected from plc
-            #     self._is_connected = False
-            #     # save alarm.
-            #     self.save_alarm()
-            #     # rebuild connection.
-            #     await self.connect()
 
     async def read_instant_data(self) -> dict:
         if not self._is_connected:
@@ -235,15 +226,20 @@ class PlcSyncTask:
         ]}
 
     async def close(self):
+        self._is_canceled = True
+
+        if not self._is_connected:
+            return
+
         try:
             logging.info('[***PLC***] close plc connection')
             if self.plc_client and self.plc_client.connected:
                 await self.plc_client.close()
-                self._is_connected = False
-                self.save_alarm()
-        except Exception:
+        except:
             logging.error("[***PLC***] close plc error occured")
-            self._is_canceled = True
+        finally:
+            self._is_connected = False
+            self.save_alarm()
 
     def save_alarm(self):
         try:

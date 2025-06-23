@@ -37,9 +37,9 @@ class AlarmTable(AbstractTable):
             case AlarmType.SPS2_DISCONNECTED:
                 return session.get("lang.alarm.sps2_disconnected")
             case AlarmType.MASTER_SERVER_STOPPED:
-                return session.get("lang.alarm.hmi_server_closed")
+                return session.get("lang.alarm.master_server_stopped")
             case AlarmType.SLAVE_DISCONNECTED:
-                return session.get("lang.alarm.hmi_client_disconnected")
+                return session.get("lang.alarm.slave_master_disconnected")
             case AlarmType.APP_UNEXPECTED_EXIT:
                 return session.get("lang.alarm.app_unexpected_exit")
             case AlarmType.POWER_OVERLOAD:

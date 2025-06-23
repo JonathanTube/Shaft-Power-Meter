@@ -5,7 +5,6 @@ import websockets
 import logging
 import msgpack
 from common.const_alarm_type import AlarmType
-from db.models.alarm_log import AlarmLog
 from db.models.io_conf import IOConf
 from jm3846.JM3846_calculator import JM3846Calculator
 from utils.alarm_saver import AlarmSaver
@@ -87,7 +86,7 @@ class WebSocketClient:
                 gdata.sps2_offline = False
                 self._retry = 0
             except:
-                logging.error("[***HMI client***] exception occured at _receive_loop")
+                logging.exception("[***HMI client***] exception occured at _receive_loop")
                 gdata.sps1_offline = True
                 gdata.sps2_offline = True
                 break
@@ -124,6 +123,11 @@ class WebSocketClient:
                 AlarmSaver.create(alarm_type)
 
     async def close(self):
+        self._is_canceled = True
+
+        if not self._is_connected:
+            return
+    
         try:
             if self.websocket:
                 await self.websocket.close()
@@ -132,7 +136,6 @@ class WebSocketClient:
             logging.error("[***HMI client***] failed to close websocket connection")
         finally:
             self._is_connected = False
-            self._is_canceled = True
             AlarmSaver.create(alarm_type=AlarmType.SLAVE_DISCONNECTED)
 
 

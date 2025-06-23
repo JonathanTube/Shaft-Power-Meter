@@ -25,7 +25,21 @@ class WebSocketServer:
         return self._is_started
 
     async def _client_handler(self, websocket):
-        self.clients.add(websocket)
+        async with self._lock:
+            self.clients.add(websocket)
+        try:
+            while True:
+                if self._is_canceled:
+                    return
+
+                # 每30秒发送一次心跳
+                await asyncio.sleep(30)
+                await websocket.ping()
+        except websockets.exceptions.ConnectionClosed:
+            pass
+        finally:
+            async with self._lock:
+                self.clients.remove(websocket)
 
     async def start(self):
         async with self._lock:  # 确保单线程
@@ -40,7 +54,7 @@ class WebSocketServer:
                     io_conf: IOConf = IOConf.get()
                     host = '0.0.0.0'
                     port = io_conf.hmi_server_port
-                    self.server = await websockets.serve(self._client_handler, host, port)
+                    self.server = await websockets.serve(self._client_handler, host, port, ping_interval=30, ping_timeout=10)
                     logging.info(f"[***HMI server***] websocket server started at ws://{host}:{port}")
                     self._is_started = True
                     AlarmSaver.recovery(alarm_type=AlarmType.MASTER_SERVER_STOPPED)
@@ -91,6 +105,11 @@ class WebSocketServer:
                 await asyncio.sleep(5)
 
     async def stop(self):
+        self._is_canceled = True
+
+        if not self._is_started:
+            return
+        
         try:
             if self.server:
                 self.server.close()
@@ -101,7 +120,6 @@ class WebSocketServer:
         finally:
             AlarmSaver.create(alarm_type=AlarmType.MASTER_SERVER_STOPPED)
             self._is_started = False
-            self._is_canceled = True
 
     async def broadcast(self, data) -> bool:
         if not self._is_started:
@@ -111,10 +129,14 @@ class WebSocketServer:
             return False
 
         try:
-            if len(self.clients) > 0:
-                packed_data = msgpack.packb(data)
-                await asyncio.gather(*[client.send(packed_data) for client in self.clients])
-                return True
+            valid_clients = [c for c in self.clients if c.open]
+            if not valid_clients:
+                return False
+            
+            packed_data = msgpack.packb(data)
+            await asyncio.gather(*[client.send(packed_data) for client in self.clients])
+            return True
+
         except:
             logging.error("[***HMI server***] broadcast to all clients failed")
 

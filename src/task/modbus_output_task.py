@@ -67,7 +67,10 @@ class ModbusOutputTask:
         except Exception as e:
             logging.exception(e)
 
-    async def stop_modbus_server(self):
+    async def stop(self):
+        if not self._is_started:
+            return
+        
         try:
             if self.server_task and not self.server_task.done():
                 self.server_task.cancel()

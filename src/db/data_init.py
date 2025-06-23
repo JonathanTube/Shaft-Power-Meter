@@ -1498,12 +1498,12 @@ class DataInit:
                     "english": "SPS2 Disconnected"
                 },
                 {
-                    "code": "lang.alarm.hmi_server_closed",
-                    "chinese": "HMI 服务端已停止",
+                    "code": "lang.alarm.master_server_stopped",
+                    "chinese": "Master服务端已停止",
                     "english": "Master Server Stopped"
                 },
                 {
-                    "code": "lang.alarm.hmi_client_disconnected",
+                    "code": "lang.alarm.slave_master_disconnected",
                     "chinese": "从机已断开连接",
                     "english": "Slave-Master Disconnected"
                 },

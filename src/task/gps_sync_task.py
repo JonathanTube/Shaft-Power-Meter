@@ -101,6 +101,10 @@ class GpsSyncTask:
 
     async def close(self):
         logging.info(f'[***GPS***] disconnected from GPS')
+        self._is_canceled = True
+        if not self._is_connected:
+            return
+        
         try:
             if not self.writer.is_closing():
                 self.writer.close()
@@ -111,7 +115,6 @@ class GpsSyncTask:
             self.writer = None
             self.reader = None
             self._is_connected = False
-            self._is_canceled = True
             AlarmSaver.create(AlarmType.GPS_DISCONNECTED)
 
     def parse_nmea_sentence(self, sentence):
