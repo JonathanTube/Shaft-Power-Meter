@@ -5,6 +5,7 @@ import websockets
 import logging
 import msgpack
 from common.const_alarm_type import AlarmType
+from db.models.alarm_log import AlarmLog
 from db.models.io_conf import IOConf
 from jm3846.JM3846_calculator import JM3846Calculator
 from utils.alarm_saver import AlarmSaver
@@ -116,11 +117,29 @@ class WebSocketClient:
         alarm_logs = data['alarm_logs']
         for alarm_log in alarm_logs:
             alarm_type = alarm_log['alarm_type']
+            acknowledge_time = alarm_log['acknowledge_time']
             is_recovery = alarm_log['is_recovery']
             if is_recovery == 1:
-                AlarmSaver.recovery(alarm_type)
+                AlarmLog.update(
+                    is_recovery=True, 
+                    is_from_master=True, 
+                    acknowledge_time=acknowledge_time
+                ).where(
+                    AlarmLog.alarm_type == alarm_type,
+                    AlarmLog.is_recovery == False
+                ).execute()
             else:
-                AlarmSaver.create(alarm_type, is_from_master=True)
+                cnt: int = AlarmLog.select().where(
+                                AlarmLog.alarm_type == alarm_type, 
+                                AlarmLog.is_recovery == False
+                            ).count()
+                if cnt == 0:
+                    AlarmLog.create(
+                        utc_date_time=gdata.utc_date_time,
+                        acknowledge_time = acknowledge_time, 
+                        is_from_master=True, 
+                        alarm_type=alarm_type
+                    )
 
     async def close(self):
         self._is_canceled = True
