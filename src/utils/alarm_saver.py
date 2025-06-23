@@ -8,11 +8,11 @@ import asyncio
 
 class AlarmSaver:
     @staticmethod
-    def create(alarm_type: AlarmType):
+    def create(alarm_type: AlarmType, is_from_master:bool = False):
         cnt: int = AlarmLog.select().where(AlarmLog.alarm_type == alarm_type, AlarmLog.is_recovery == False).count()
         logging.info(f'[***save alarm***] alarm_type={alarm_type}, exists alarm records = {cnt}')
         if cnt == 0:
-            AlarmLog.create(utc_date_time=gdata.utc_date_time, alarm_type=alarm_type)
+            AlarmLog.create(utc_date_time=gdata.utc_date_time, alarm_type=alarm_type, is_from_master=is_from_master)
             logging.info(f'[***save alarm***] alarm_type={alarm_type}, save alarm log')
             asyncio.create_task(plc.write_alarm(True))
 

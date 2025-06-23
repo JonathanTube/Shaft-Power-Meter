@@ -101,7 +101,7 @@ class AlarmList(ft.Container):
             return
 
         for row in selected_rows:
-            AlarmLog.update(acknowledge_time=gdata.utc_date_time).where(AlarmLog.id == row.cells[0].data).execute()
+            AlarmLog.update(acknowledge_time=gdata.utc_date_time, is_sync = False).where(AlarmLog.id == row.cells[0].data).execute()
 
         self.table.search()
         Toast.show_success(self.page)

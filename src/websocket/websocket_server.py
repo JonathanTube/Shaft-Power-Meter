@@ -8,7 +8,6 @@ from db.models.io_conf import IOConf
 import msgpack
 from utils.alarm_saver import AlarmSaver
 
-
 class WebSocketServer:
     def __init__(self):
         self._lock = asyncio.Lock()  # 线程安全锁
@@ -25,8 +24,7 @@ class WebSocketServer:
         return self._is_started
 
     async def _client_handler(self, websocket):
-        async with self._lock:
-            self.clients.add(websocket)
+        self.clients.add(websocket)
         try:
             while True:
                 if self._is_canceled:
@@ -38,8 +36,7 @@ class WebSocketServer:
         except websockets.exceptions.ConnectionClosed:
             pass
         finally:
-            async with self._lock:
-                self.clients.remove(websocket)
+            self.clients.remove(websocket)
 
     async def start(self):
         async with self._lock:  # 确保单线程
@@ -88,9 +85,15 @@ class WebSocketServer:
                         AlarmLog.alarm_type,
                         AlarmLog.is_recovery
                     ).where(AlarmLog.is_sync == False)
-
+                    
+                    alarm_logs_dict = []
+                    for alarm_log in alarm_logs:
+                        alarm_logs_dict.append({
+                            'alarm_type':alarm_log.alarm_type,
+                            'is_recovery': 1 if alarm_log.is_recovery else 0
+                        })
                     if len(alarm_logs) > 0:
-                        is_success = await self.broadcast({'type': 'alarm_data', "alarm_logs": alarm_logs})
+                        is_success = await self.broadcast({'type': 'alarm_data', "alarm_logs": alarm_logs_dict})
                         if is_success:
                             for alarm_log in alarm_logs:
                                 alarm_log.is_sync = True
@@ -99,8 +102,7 @@ class WebSocketServer:
                 else:
                     AlarmSaver.create(alarm_type=AlarmType.SLAVE_DISCONNECTED)
             except:
-                logging.error("[***HMI server***] exception occured at send_alarms")
-                break
+                logging.exception("[***HMI server***] exception occured at send_alarms")
             finally:
                 await asyncio.sleep(5)
 
@@ -129,16 +131,12 @@ class WebSocketServer:
             return False
 
         try:
-            valid_clients = [c for c in self.clients if c.open]
-            if not valid_clients:
-                return False
-            
             packed_data = msgpack.packb(data)
             await asyncio.gather(*[client.send(packed_data) for client in self.clients])
             return True
 
         except:
-            logging.error("[***HMI server***] broadcast to all clients failed")
+            logging.exception("[***HMI server***] broadcast to all clients failed")
 
         return False
 

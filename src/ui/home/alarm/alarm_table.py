@@ -53,24 +53,33 @@ class AlarmTable(AbstractTable):
             AlarmLog.utc_date_time,
             AlarmLog.alarm_type,
             AlarmLog.acknowledge_time,
-            AlarmLog.is_recovery
+            AlarmLog.is_recovery,
+            AlarmLog.is_from_master
         )
         start_date = self.kwargs.get('start_date')
         end_date = self.kwargs.get('end_date')
         if start_date and end_date:
             sql = sql.where(AlarmLog.utc_date_time >= start_date, AlarmLog.utc_date_time <= end_date)
-        data = sql.order_by(AlarmLog.id.desc()).paginate(
-            self.current_page, self.page_size)
+        data = sql.order_by(AlarmLog.id.desc()).paginate(self.current_page, self.page_size)
 
-        return [
-            [
+        
+    
+        data_list = []
+
+        for item in data:
+            status_column = '✔️'if item.is_recovery else '❌'
+            if item.is_from_master:
+                status_column += '🔒'
+
+            data_list.append([
                 item.id,
                 item.utc_date_time.strftime(self.date_time_format),
                 self.get_event_name(item.alarm_type),
                 item.acknowledge_time.strftime(self.date_time_format) if item.acknowledge_time else "",
-                '✔️'if item.is_recovery else '❌'
-            ] for item in data
-        ]
+                status_column   
+            ])
+
+        return data_list
     
 
     def create_columns(self):
