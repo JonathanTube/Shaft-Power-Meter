@@ -13,5 +13,7 @@ class AlarmLog(BaseModel):
 
     is_sync = BooleanField(verbose_name="是否同步", default=False)
 
+    is_from_master = BooleanField(verbose_name="是否来自于master", default=False)
+
     class Meta:
         table_name = 'alarm_log'

@@ -120,14 +120,14 @@ class WebSocketClient:
             if is_recovery:
                 AlarmSaver.recovery(alarm_type)
             else:
-                AlarmSaver.create(alarm_type)
+                AlarmSaver.create(alarm_type, is_from_master=True)
 
     async def close(self):
         self._is_canceled = True
 
         if not self._is_connected:
             return
-    
+
         try:
             if self.websocket:
                 await self.websocket.close()
