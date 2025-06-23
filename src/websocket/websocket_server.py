@@ -47,7 +47,7 @@ class WebSocketServer:
         async with self._lock:  # 确保单线程
             for attempt in range(self._max_retries):
                 if self._is_canceled:
-                    break
+                    return
 
                 try:
                     io_conf: IOConf = IOConf.get()
@@ -68,16 +68,13 @@ class WebSocketServer:
                     await asyncio.sleep(2 ** attempt)
 
             # 执行到这了，说明已经退出了
-            self._is_started = False
-            AlarmSaver.create(alarm_type=AlarmType.MASTER_SERVER_STOPPED)
-            # 重新设置为未取消，准备下一次链接
             self._is_canceled = False
 
     async def send_alarms(self):
         while self._is_started:
 
             if self._is_canceled:
-                break
+                return
 
             try:
                 if len(self.clients) > 0:

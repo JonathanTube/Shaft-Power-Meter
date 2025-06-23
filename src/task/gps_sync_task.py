@@ -62,10 +62,6 @@ class GpsSyncTask:
                     await asyncio.sleep(2 ** self._retry)
                     self._retry += 1
 
-            # 执行到这了，说明已经退出了
-            self._is_connected = False
-            AlarmSaver.create(alarm_type=AlarmType.GPS_DISCONNECTED)
-            # 重新设置为未取消，准备下一次链接
             self._is_canceled = False
 
     async def receive_data(self):
@@ -73,7 +69,7 @@ class GpsSyncTask:
         has_data_times = 0
         while not self.reader.at_eof():
             if self._is_canceled:
-                break
+                return
 
             try:
 

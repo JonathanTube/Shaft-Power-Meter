@@ -68,16 +68,13 @@ class WebSocketClient:
                     self._retry += 1
 
             # 执行到这了，说明已经退出了
-            self._is_connected = False
-            AlarmSaver.create(alarm_type=AlarmType.SLAVE_DISCONNECTED)
-            # 重新设置为未取消，准备下一次链接
             self._is_canceled = False
 
     async def receive_data(self):
         while self._is_connected:
 
             if self._is_canceled:
-                break
+                return
 
             try:
                 raw_data = await self.websocket.recv()

@@ -71,7 +71,7 @@ class PlcSyncTask:
     async def heart_beat(self):
         while self.plc_client is not None and self.plc_client.connected:
             if self._is_canceled:
-                break
+                return
 
             try:
                 self._is_connected = True
