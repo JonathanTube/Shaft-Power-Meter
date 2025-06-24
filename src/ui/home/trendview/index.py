@@ -86,14 +86,3 @@ class TrendView(ft.Container):
             self.sps1_chart.update_chart(data_logs)
         elif name == 'sps2':
             self.sps2_chart.update_chart(data_logs)
-
-    def did_mount(self):
-        if start_date and end_date:
-            self.__on_search(start_date, end_date)
-
-            start_date = start_date.split(' ')[0]
-            end_date = end_date.split(' ')[0]
-            print(f"start_date: {start_date}, end_date: {end_date}")
-            self.search.date_time_range.start_date.value = start_date
-            self.search.date_time_range.end_date.value = end_date
-            self.search.update()
