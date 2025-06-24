@@ -27,65 +27,40 @@ class EEXIBreach:
                 EEXIBreach.__save_report_detail('sps2', gdata.utc_date_time, gdata.sps2_speed, gdata.sps2_torque, gdata.sps2_power)
 
         seconds = gdata.eexi_breach_checking_duration
-        eexi_limited_power = gdata.eexi_limited_power
         start_time = gdata.utc_date_time - timedelta(seconds=seconds)
 
         # 再减去数据刷新间隔，类似滑动窗口，因为下位机数据采集间隔是1s，所以需要减去1s
         start_time = start_time - timedelta(seconds=1)
 
-        # 查找时间窗口内的功率记录
-        data: list[DataLog] = EEXIBreach.__query_data_in_time_window(start_time)
 
-        if len(data) == 0:
+        print(f'==============start_time={start_time}')
+
+        # 查询在时间窗口内，功率小于等于eexi的记录
+        count_power_below_eexi = DataLog.select().where(
+            DataLog.utc_date_time >= start_time,
+            DataLog.power <= gdata.eexi_limited_power
+        ).count()
+
+        
+       # 查询在时间窗口内，功率大于eexi的记录数
+        count_power_above_eexi = DataLog.select().where(
+            DataLog.utc_date_time >= start_time,
+            DataLog.power > gdata.eexi_limited_power
+        ).count()
+
+        # 如果相等，说明没有数据，跳过所有判断，保持原样
+        if count_power_below_eexi == count_power_above_eexi:
             return
 
-        if EEXIBreach.__is_invalid_seconds_diff(data, seconds):
-            return
-
-        # 计算过载次数
-        breach_times = sum(1 for item in data if item.power > eexi_limited_power)
-        if breach_times == len(data):
-            logging.info(f"eexi_breach_checking_duration = {seconds}s")
-            logging.info(f"start_time = {gdata.utc_date_time} - {seconds}s = {start_time}")
-            logging.info(f"start_time = {gdata.utc_date_time} - {seconds}s - 1s = {start_time}")
-            logging.info(f"breach_times = {breach_times}")
+        # 功率小于eexi的0条，说明突破
+        if count_power_below_eexi == 0:
             EEXIBreach.__handle_breach_event(start_time)
 
-        # 计算恢复次数
-        recovery_times = sum(1 for item in data if item.power <= eexi_limited_power)
-        if recovery_times == len(data):
-            # logging.info(f"eexi_breach_checking_duration = {seconds}s")
-            # logging.info(f"start_time = {gdata.utc_date_time} - {seconds}s = {start_time}")
-            # logging.info(f"start_time = {gdata.utc_date_time} - {seconds}s - 1s = {start_time}")
-            logging.info(f"eexi recovery_times = {recovery_times}")
+        # 功率大于eexi的0条，说明已经恢复
+        if count_power_above_eexi == 0:
             EEXIBreach.__handle_recovery_event(start_time)
-        # logging.info('==================eexi_breach_task: end==================\n')
 
-    @staticmethod
-    def __is_invalid_seconds_diff(data, seconds) -> bool:
-        # 计算时间差，如果时间差小于60s，则不进行处理
-        start_time: datetime = data[0].utc_date_time
-        # logging.info(f"start_time of data list = {start_time}")
-        end_time: datetime = data[-1].utc_date_time
-        # logging.info(f"end_time of data list = {end_time}")
-        time_diff = abs(end_time - start_time)
-        # logging.info(f"time_diff = {time_diff.total_seconds()}s")
-        return time_diff.total_seconds() < seconds
 
-    @staticmethod
-    def __query_data_in_time_window(start_time: datetime) -> list[DataLog]:
-        data = DataLog.select(
-            DataLog.utc_date_time,
-            fn.sum(DataLog.power).alias("power")
-        ).where(
-            DataLog.utc_date_time >= start_time
-        ).group_by(
-            DataLog.utc_date_time
-        ).order_by(
-            DataLog.utc_date_time.asc()
-        )
-        # logging.info(f"data.length = {len(data)}")
-        return data
 
     @staticmethod
     def __handle_breach_event(start_time: datetime):
