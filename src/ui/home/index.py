@@ -36,78 +36,81 @@ class Home(ft.Container):
         )
 
     def build(self):
-        self.dashboard = ft.TextButton(
-            text=self.page.session.get("lang.home.tab.dashboard"),
-            icon=ft.Icons.DASHBOARD_OUTLINED,
-            icon_color=ft.Colors.PRIMARY,
-            style=self.active_button_style,
-            on_click=lambda e: self.__on_click(0)
-        )
-        self.counter = ft.TextButton(
-            text=self.page.session.get("lang.home.tab.counter"),
-            icon=ft.Icons.TIMER_OUTLINED,
-            icon_color=ft.Colors.INVERSE_SURFACE,
-            style=self.default_button_style,
-            on_click=lambda e: self.__on_click(1)
-        )
-        self.trendview = ft.TextButton(
-            text=self.page.session.get("lang.home.tab.trendview"),
-            icon=ft.Icons.TRENDING_UP_OUTLINED,
-            icon_color=ft.Colors.INVERSE_SURFACE,
-            style=self.default_button_style,
-            on_click=lambda e: self.__on_click(2)
-        )
-        self.propeller_curve = ft.TextButton(
-            text=self.page.session.get("lang.home.tab.propeller_curve"),
-            icon=ft.Icons.STACKED_LINE_CHART_OUTLINED,
-            icon_color=ft.Colors.INVERSE_SURFACE,
-            style=self.default_button_style,
-            visible=self.system_settings.is_master and self.system_settings.display_propeller_curve,
-            on_click=lambda e: self.__on_click(3)
-        )
-        self.alarm_button = AlarmButton(style=self.default_button_style, on_click=lambda e: self.__on_click(4))
-        self.event_button = EventButton(style=self.default_button_style, on_click=lambda e: self.__on_click(5))
+        try:
+            self.dashboard = ft.TextButton(
+                text=self.page.session.get("lang.home.tab.dashboard"),
+                icon=ft.Icons.DASHBOARD_OUTLINED,
+                icon_color=ft.Colors.PRIMARY,
+                style=self.active_button_style,
+                on_click=lambda e: self.__on_click(0)
+            )
+            self.counter = ft.TextButton(
+                text=self.page.session.get("lang.home.tab.counter"),
+                icon=ft.Icons.TIMER_OUTLINED,
+                icon_color=ft.Colors.INVERSE_SURFACE,
+                style=self.default_button_style,
+                on_click=lambda e: self.__on_click(1)
+            )
+            self.trendview = ft.TextButton(
+                text=self.page.session.get("lang.home.tab.trendview"),
+                icon=ft.Icons.TRENDING_UP_OUTLINED,
+                icon_color=ft.Colors.INVERSE_SURFACE,
+                style=self.default_button_style,
+                on_click=lambda e: self.__on_click(2)
+            )
+            self.propeller_curve = ft.TextButton(
+                text=self.page.session.get("lang.home.tab.propeller_curve"),
+                icon=ft.Icons.STACKED_LINE_CHART_OUTLINED,
+                icon_color=ft.Colors.INVERSE_SURFACE,
+                style=self.default_button_style,
+                visible=self.system_settings.is_master and self.system_settings.display_propeller_curve,
+                on_click=lambda e: self.__on_click(3)
+            )
+            self.alarm_button = AlarmButton(style=self.default_button_style, on_click=lambda e: self.__on_click(4))
+            self.event_button = EventButton(style=self.default_button_style, on_click=lambda e: self.__on_click(5))
 
-        self.logs = ft.TextButton(
-            text=self.page.session.get("lang.home.tab.logs"),
-            icon=ft.Icons.HISTORY_OUTLINED,
-            icon_color=ft.Colors.INVERSE_SURFACE,
-            style=self.default_button_style,
-            on_click=lambda e: self.__on_click(6)
-        )
+            self.logs = ft.TextButton(
+                text=self.page.session.get("lang.home.tab.logs"),
+                icon=ft.Icons.HISTORY_OUTLINED,
+                icon_color=ft.Colors.INVERSE_SURFACE,
+                style=self.default_button_style,
+                on_click=lambda e: self.__on_click(6)
+            )
 
-        self.row_items = ft.Row(
-            spacing=5,
-            controls=[
-                self.dashboard,
-                self.counter,
-                self.trendview,
-                self.propeller_curve,
-                self.alarm_button,
-                self.event_button,
-                self.logs
-            ]
-        )
+            self.row_items = ft.Row(
+                spacing=5,
+                controls=[
+                    self.dashboard,
+                    self.counter,
+                    self.trendview,
+                    self.propeller_curve,
+                    self.alarm_button,
+                    self.event_button,
+                    self.logs
+                ]
+            )
 
-        self.main_container = ft.Container(
-            expand=True,
-            content=Dashboard()
-        )
+            self.main_container = ft.Container(
+                expand=True,
+                content=Dashboard()
+            )
 
-        self.content = ft.Column(
-            expand=True,
-            spacing=0,
-            controls=[
-                ft.Container(
-                    padding=ft.padding.only(left=10),
-                    content=self.row_items,
-                    height=40,
-                    alignment=ft.alignment.center
-                ),
-                ft.Divider(thickness=1, height=1),
-                self.main_container
-            ]
-        )
+            self.content = ft.Column(
+                expand=True,
+                spacing=0,
+                controls=[
+                    ft.Container(
+                        padding=ft.padding.only(left=10),
+                        content=self.row_items,
+                        height=40,
+                        alignment=ft.alignment.center
+                    ),
+                    ft.Divider(thickness=1, height=1),
+                    self.main_container
+                ]
+            )
+        except:
+            logging.error('exception occured at Home.build')
 
     def __on_click(self, index: int):
         try:

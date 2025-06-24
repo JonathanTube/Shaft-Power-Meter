@@ -228,7 +228,7 @@ class PropellerCurveDiagram(ft.Container):
         self.task = self.page.run_task(self.update_sps_points)
 
     def will_unmount(self):
-        self.task_running = False
         plt.close('all')
+        self.task_running = False
         if self.task:
             self.task.cancel()

@@ -32,12 +32,13 @@ class EventButton(ft.TextButton):
     async def __loop(self):
         while self.task_running:
             try:
-                count = EventLog.select().where(EventLog.breach_reason == None).count()
-                if count > 0:
-                    self.badge = ft.Badge(text=str(count), bgcolor=ft.Colors.RED, text_color=ft.Colors.WHITE, label_visible=True)
-                else:
-                    self.badge = None
-                self.update()
+                if self.page:
+                    count = EventLog.select().where(EventLog.breach_reason == None).count()
+                    if count > 0:
+                        self.badge = ft.Badge(text=str(count), bgcolor=ft.Colors.RED, text_color=ft.Colors.WHITE, label_visible=True)
+                    else:
+                        self.badge = None
+                    self.update()
             except:
                 logging.exception("exception occured at EventButton.__loop")
                 self.task_running = False

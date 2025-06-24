@@ -1,3 +1,4 @@
+import logging
 import flet as ft
 import matplotlib.backends.backend_svg
 from matplotlib import pyplot as plt
@@ -8,7 +9,10 @@ from matplotlib import dates as mdates
 from db.models.preference import Preference
 from utils.unit_converter import UnitConverter
 from typing import List
+
 matplotlib.use('Agg')  # 使用非GUI后端
+plt.rcParams['font.sans-serif'] = ['Microsoft YaHei', 'SimHei']  # 指定常用中文字体
+plt.rcParams['axes.unicode_minus'] = False  # 解决负号 '-' 显示为方块的问题
 
 
 class TrendViewDiagram(ft.Container):
@@ -16,30 +20,48 @@ class TrendViewDiagram(ft.Container):
         super().__init__()
         self.expand = True
         self.data_list = []
-        self._init_configurations()
 
-    def _init_configurations(self):
         """初始化配置参数"""
-        datetime_conf = DateTimeConf.get()
-        preference = Preference.get()
+        datetime_conf: DateTimeConf = DateTimeConf.get()
+        preference: Preference = Preference.get()
 
         self.date_format = datetime_conf.date_format
         self.system_unit = preference.system_unit
 
-    def create_chart(self):
+    def before_update(self):
+        # 清除当前图形缓存
+        plt.close('all')
+        # 重新应用样式
         self.set_style()
-        """创建初始图表结构"""
-        self.fig, self.ax_rpm = plt.subplots(figsize=(10, 5.5))
-        self.fig.subplots_adjust(left=0.08, right=0.92, top=0.95, bottom=0.1)
-        self._configure_axes()
-        self._setup_power_axis()
-        self.handle_update_chart()
-        return MatplotlibChart(
-            self.fig,
-            isolated=True,
-            expand=True,
-            transparent=True
-        )
+        # 重建图表对象
+        self.chart = self.create_chart()
+        if self.chart:
+            # 替换容器内容
+            self.content = self.chart
+
+    def create_chart(self) -> MatplotlibChart:
+        try:
+            self.set_style()
+            """创建初始图表结构"""
+            self.fig, self.ax_rpm = plt.subplots(figsize=(10, 5.5))
+            self.fig.subplots_adjust(left=0.08, right=0.92, top=0.95, bottom=0.1)
+            self._configure_axes()
+            self._setup_power_axis()
+            self.handle_update_chart()
+            return MatplotlibChart(self.fig, isolated=True, expand=True, transparent=True)
+        except:
+            logging.exception("exception occured at PropellerCurveDiagram.create_chart")
+            return None
+
+    def set_style(self):
+        # 重新应用样式
+        if self.page.theme_mode == ft.ThemeMode.DARK:
+            plt.style.use('dark_background')
+        else:
+            plt.style.use('default')
+        """更新主题样式"""
+        plt.rcParams['font.sans-serif'] = ['Microsoft YaHei', 'SimHei',  'WenQuanYi Zen Hei']  # 指定常用中文字体
+        plt.rcParams['axes.unicode_minus'] = False  # 解决负号 '-' 显示为方块的问题
 
     def _configure_axes(self):
         """配置主轴参数"""
@@ -119,27 +141,6 @@ class TrendViewDiagram(ft.Container):
                 power_data.append(UnitConverter.w_to_shp(data.power))
 
         return date_times, rpm_data, power_data
-
-    def set_style(self):
-        # 重新应用样式
-        if self.page.theme_mode == ft.ThemeMode.DARK:
-            plt.style.use('dark_background')
-        else:
-            plt.style.use('default')
-        """更新主题样式"""
-        plt.rcParams['font.sans-serif'] = ['Microsoft YaHei', 'SimHei',  'WenQuanYi Zen Hei']  # 指定常用中文字体
-        plt.rcParams['axes.unicode_minus'] = False  # 解决负号 '-' 显示为方块的问题
-
-    def before_update(self):
-        # 清除当前图形缓存
-        plt.close('all')
-        # 重新应用样式
-        self.set_style()
-        # 重建图表对象
-        self.chart = self.create_chart()
-        if self.chart:
-            # 替换容器内容
-            self.content = self.chart
 
     def will_unmount(self):
         plt.close('all')

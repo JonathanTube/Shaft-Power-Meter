@@ -22,46 +22,52 @@ class TrendView(ft.Container):
         self.date_format = datetime_conf.date_format
 
     def build(self):
-        self.search = DatetimeSearch(self.__on_search)
-        self.sps1_chart = TrendViewDiagram()
+        try:
+            self.search = DatetimeSearch(self.__on_search)
+            self.sps1_chart = TrendViewDiagram()
 
-        if self.is_twins:
-            self.sps2_chart = TrendViewDiagram()
-            self.content = ft.Column(
-                expand=True,
-                spacing=0,
-                controls=[
-                    self.search,
-                    ft.Tabs(
-                        expand=True,
-                        tabs=[
-                            ft.Tab(text='SPS1', content=self.sps1_chart),
-                            ft.Tab(text='SPS2', content=self.sps2_chart)
-                        ]
-                    )
-                ]
-            )
-        else:
-            self.content = ft.Column(
-                expand=True,
-                spacing=0,
-                controls=[self.search, self.sps1_chart]
-            )
+            if self.is_twins:
+                self.sps2_chart = TrendViewDiagram()
+                self.content = ft.Column(
+                    expand=True,
+                    spacing=0,
+                    controls=[
+                        self.search,
+                        ft.Tabs(
+                            expand=True,
+                            tabs=[
+                                ft.Tab(text='SPS1', content=self.sps1_chart),
+                                ft.Tab(text='SPS2', content=self.sps2_chart)
+                            ]
+                        )
+                    ]
+                )
+            else:
+                self.content = ft.Column(
+                    expand=True,
+                    spacing=0,
+                    controls=[self.search, self.sps1_chart]
+                )
+        except:
+            logging.exception('exception occured at TrendView.build')
 
     def __on_search(self, start_date: str, end_date: str):
         if not start_date or not end_date:
             return
-
-        date_time_format = f"{self.date_format} %H:%M:%S"
-        days_diff = (datetime.strptime(end_date, date_time_format) - datetime.strptime(start_date, date_time_format)).days
-        if days_diff > 90:
-            Toast.show_error(self.page, self.page.session.get('lang.trendview.cannot_search_more_than_90_days'))
-            return
-        self.handle_data(start_date, end_date, 'sps1')
-        if self.is_twins:
-            self.handle_data(start_date, end_date, 'sps2')
-        self.page.session.set('trendview_start_date', start_date)
-        self.page.session.set('trendview_end_date', end_date)
+        try:
+            if self.page and self.page.session:
+                date_time_format = f"{self.date_format} %H:%M:%S"
+                days_diff = (datetime.strptime(end_date, date_time_format) - datetime.strptime(start_date, date_time_format)).days
+                if days_diff > 90:
+                    Toast.show_error(self.page, self.page.session.get('lang.trendview.cannot_search_more_than_90_days'))
+                    return
+                self.handle_data(start_date, end_date, 'sps1')
+                if self.is_twins:
+                    self.handle_data(start_date, end_date, 'sps2')
+                self.page.session.set('trendview_start_date', start_date)
+                self.page.session.set('trendview_end_date', end_date)
+        except:
+            pass
 
     def handle_data(self, start_date: str, end_date: str, name: Literal['sps1', 'sps2']):
         cnt = DataLog.select().where(DataLog.utc_date_time >= start_date, DataLog.utc_date_time <= end_date).where(DataLog.name == name).count()

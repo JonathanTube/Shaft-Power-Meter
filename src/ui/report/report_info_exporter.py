@@ -1,3 +1,4 @@
+import logging
 from fpdf import FPDF
 from db.models.event_log import EventLog
 from db.models.report_info import ReportInfo
@@ -22,32 +23,39 @@ class ReportInfoExporter(FPDF):
         self.add_page()
 
     def __load_data(self, id: int):
-        self.ship_info: ShipInfo = ShipInfo.get()
-        self.propeller_setting: PropellerSetting = PropellerSetting.get()
-        self.preference: Preference = Preference.get()
-        self.system_settings: SystemSettings = SystemSettings.get()
+        try:
+            self.ship_info: ShipInfo = ShipInfo.get()
+            self.propeller_setting: PropellerSetting = PropellerSetting.get()
+            self.preference: Preference = Preference.get()
+            self.system_settings: SystemSettings = SystemSettings.get()
 
-        self.is_dual = self.system_settings.amount_of_propeller == 2
-        self.report_info: ReportInfo = ReportInfo.get_by_id(id)
-        self.event_log: EventLog = self.report_info.event_log
-        self.report_details: list[ReportDetail] = ReportDetail.select().where(
-            ReportDetail.report_info == self.report_info.id
-        ).order_by(
-            ReportDetail.id.asc()
-        )
+            self.is_dual = self.system_settings.amount_of_propeller == 2
+            self.report_info: ReportInfo = ReportInfo.get_by_id(id)
+            self.event_log: EventLog = self.report_info.event_log
+            self.report_details: list[ReportDetail] = ReportDetail.select().where(
+                ReportDetail.report_info == self.report_info.id
+            ).order_by(
+                ReportDetail.id.asc()
+            )
+        except:
+            logging.exception('exception occured at ReportInfoExporter.__load_data')
 
     def generate_pdf(self, path, id: int):
-        self.__load_data(id)
+        try:
+            self.__load_data(id)
 
-        self.__handle_report_title()
+            self.__handle_report_title()
 
-        self.__handle_basic_info()
+            self.__handle_basic_info()
 
-        self.__handle_event_log()
+            self.__handle_event_log()
 
-        self.__handle_data_log()
+            self.__handle_data_log()
 
-        self.output(path)
+            self.output(path)
+        except:
+            logging.exception('exception occured at ReportInfoExporter.__load_data')
+
 
     # 设置标题
     def __handle_report_title(self):

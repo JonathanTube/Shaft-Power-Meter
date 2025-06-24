@@ -1,3 +1,4 @@
+import logging
 import flet as ft
 from db.models.event_log import EventLog
 from db.models.report_info import ReportInfo
@@ -42,26 +43,30 @@ class ReportInfoDialog(ft.AlertDialog):
         self.__load_data()
 
     def __load_data(self):
-        self.ship_info: ShipInfo = ShipInfo.get()
-        self.propeller_setting: PropellerSetting = PropellerSetting.get()
-        self.preference: Preference = Preference.get()
-        self.system_settings: SystemSettings = SystemSettings.get()
-        self.report_info: ReportInfo = ReportInfo.get_by_id(self.id)
-        self.event_log: EventLog = self.report_info.event_log
-        # limit the max report details to 200 otherwise the database will be locked
-        if self.is_dual:
-            self.report_details: list[ReportDetail] = ReportDetail.select().where(
-                ReportDetail.report_info == self.report_info.id
-            ).order_by(
-                ReportDetail.id.asc()
-            ).limit(250)
-        else:
-            self.report_details: list[ReportDetail] = ReportDetail.select().where(
-                ReportDetail.report_info == self.report_info.id,
-                ReportDetail.name == 'sps1'
-            ).order_by(
-                ReportDetail.id.asc()
-            ).limit(250)
+        try:
+            self.ship_info: ShipInfo = ShipInfo.get()
+            self.propeller_setting: PropellerSetting = PropellerSetting.get()
+            self.preference: Preference = Preference.get()
+            self.system_settings: SystemSettings = SystemSettings.get()
+            self.report_info: ReportInfo = ReportInfo.get_by_id(self.id)
+            self.event_log: EventLog = self.report_info.event_log
+            # limit the max report details to 200 otherwise the database will be locked
+            if self.is_dual:
+                self.report_details: list[ReportDetail] = ReportDetail.select().where(
+                    ReportDetail.report_info == self.report_info.id
+                ).order_by(
+                    ReportDetail.id.asc()
+                ).limit(250)
+            else:
+                self.report_details: list[ReportDetail] = ReportDetail.select().where(
+                    ReportDetail.report_info == self.report_info.id,
+                    ReportDetail.name == 'sps1'
+                ).order_by(
+                    ReportDetail.id.asc()
+                ).limit(250)
+        except:
+            logging.exception('exception occured at ReportInfoDialog.__load_data')
+
 
     def __create_label(self, text, col=4):
         return ft.Text(text, col=col, text_align=ft.TextAlign.LEFT, weight=ft.FontWeight.W_500)
@@ -334,11 +339,14 @@ class ReportInfoDialog(ft.AlertDialog):
         self.data_log_container = self.__create_container(data_log)
 
     def build(self):
-        self.__create_basic_info()
-        self.__create_event_log()
-        self.__create_data_log()
+        try:
+            self.__create_basic_info()
+            self.__create_event_log()
+            self.__create_data_log()
 
-        self.content = ft.Column(
-            expand=True,
-            controls=[self.basic_info_container, self.event_log_container, self.data_log_container]
-        )
+            self.content = ft.Column(
+                expand=True,
+                controls=[self.basic_info_container, self.event_log_container, self.data_log_container]
+            )
+        except:
+            logging.exception('exception occured at ReportInfoDialog.build')
