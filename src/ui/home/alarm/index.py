@@ -24,21 +24,22 @@ class AlarmList(ft.Container):
 
     def build(self):
         try:
-            self.search = DatetimeSearch(self.__on_search)
-            export_button = ft.OutlinedButton(text=self.page.session.get("lang.common.export"), height=40, icon=ft.Icons.DOWNLOAD_OUTLINED, on_click=self.__on_export)
+            if self.page and self.page.session:
+                self.search = DatetimeSearch(self.__on_search)
+                export_button = ft.OutlinedButton(text=self.page.session.get("lang.common.export"), height=40, icon=ft.Icons.DOWNLOAD_OUTLINED, on_click=self.__on_export)
 
-            self.table = AlarmTable()
+                self.table = AlarmTable()
 
-            ack_button = ft.OutlinedButton(text=self.page.session.get("lang.alarm.acknowledge"), height=40, icon=ft.Icons.CHECK_CIRCLE_OUTLINED, on_click=self.__on_acknowledge)
+                ack_button = ft.OutlinedButton(text=self.page.session.get("lang.alarm.acknowledge"), height=40, icon=ft.Icons.CHECK_CIRCLE_OUTLINED, on_click=self.__on_acknowledge)
 
-            self.content = ft.Column(
-                expand=False,
-                spacing=5,
-                controls=[
-                    ft.Row([self.search, export_button, ack_button]),
-                    self.table
-                ]
-            )
+                self.content = ft.Column(
+                    expand=False,
+                    spacing=5,
+                    controls=[
+                        ft.Row([self.search, export_button, ack_button]),
+                        self.table
+                    ]
+                )
         except:
             logging.exception('exception occured at AlarmList.build')
 

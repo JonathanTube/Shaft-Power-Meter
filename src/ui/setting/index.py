@@ -62,7 +62,8 @@ class Setting(ft.Container):
                 elif idx == 7:
                     self.right_content.content = TestMode()
 
-                self.right_content.update()
+                if self.right_content and self.right_content.page:
+                    self.right_content.update()
         except:
             logging.exception("error occured while switch the button, please try it lately.")
         finally:

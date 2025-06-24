@@ -32,9 +32,6 @@ class EEXIBreach:
         # 再减去数据刷新间隔，类似滑动窗口，因为下位机数据采集间隔是1s，所以需要减去1s
         start_time = start_time - timedelta(seconds=1)
 
-
-        print(f'==============start_time={start_time}')
-
         # 查询在时间窗口内，功率小于等于eexi的记录
         count_power_below_eexi = DataLog.select().where(
             DataLog.utc_date_time >= start_time,

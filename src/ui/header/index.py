@@ -246,7 +246,7 @@ class Header(ft.AppBar):
         while self._auto_run_running:
             try:
                 if gdata.auto_testing:
-                    print(f"==============main menu auto testing.....idx={idx}")
+                    logging.info(f"&&&&&&&&&&&&&&-main menu auto testing, idx={idx}")
                     self.on_click(arr[idx % 3])
                     self.theme.toggle_theme()
                     idx += 1
@@ -254,7 +254,7 @@ class Header(ft.AppBar):
                     if self.active_name == 'REPORT':
                         await asyncio.sleep(1)
                     else:
-                        await asyncio.sleep(random() * 10)
+                        await asyncio.sleep(random() * 5)
                 else:
                     # 如果没有启动测试，自动间隔5s
                     await asyncio.sleep(5)

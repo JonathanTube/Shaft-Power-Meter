@@ -151,8 +151,9 @@ class Home(ft.Container):
                     self.main_container.content = EventList()
                 elif index == 6:
                     self.main_container.content = Logs()
-
-                self.main_container.update()
+                
+                if self.main_container and self.main_container.page:
+                    self.main_container.update()
         except:
             logging.exception("exception occured at Home.__on_click")
         finally:
@@ -171,7 +172,7 @@ class Home(ft.Container):
         idx = 0
         while self.task_running and gdata.auto_testing:
             try:
-                print(f'home.test_auto_run,idx={idx}')
+                logging.info(f'&&&&&&&&&&&&&&-home.test_auto_run, idx={idx}')
                 idx += 1
                 self.__on_click(int(random() * 10) % 7)
             except:
