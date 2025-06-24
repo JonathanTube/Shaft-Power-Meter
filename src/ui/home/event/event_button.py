@@ -25,9 +25,13 @@ class EventButton(ft.TextButton):
         self.on_click = on_click
 
     def build(self):
-        system_settings: SystemSettings = SystemSettings.get()
-        self.text = self.page.session.get("lang.home.tab.event")
-        self.visible = system_settings.sha_po_li
+        try:
+            system_settings: SystemSettings = SystemSettings.get()
+            self.text = self.page.session.get("lang.home.tab.event")
+            self.visible = system_settings.sha_po_li
+        except:
+            logging.exception('exception occured at EventButton.build')
+
 
     async def __loop(self):
         while self.task_running:

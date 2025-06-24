@@ -1,3 +1,4 @@
+import logging
 import flet as ft
 from ui.home.dashboard.sps_single.on.single_instant_power import SingleInstantPower
 from ui.home.dashboard.sps_single.on.single_instant_thrust import SingleInstantThrust
@@ -15,41 +16,50 @@ class SingleInstantGrid(ft.Container):
         self.height = height
 
     def build(self):
-        self.power_limited_card = PowerLimited()
-        self.power_unlimited_card = PowerUnlimited()
-        self.power_card = SingleInstantPower()
-        self.thrust_card = SingleInstantThrust()
-        self.torque_card = SingleInstantTorque()
-        self.speed_card = SingleInstantSpeed()
+        try:
+            self.power_limited_card = PowerLimited()
+            self.power_unlimited_card = PowerUnlimited()
+            self.power_card = SingleInstantPower()
+            self.thrust_card = SingleInstantThrust()
+            self.torque_card = SingleInstantTorque()
+            self.speed_card = SingleInstantSpeed()
 
-        self.content = ft.Column(
-            expand=True,
-            controls=[
-                ft.Row(
-                    controls=[
-                        self.power_limited_card,
-                        self.power_unlimited_card
-                    ]
-                ),
-                ft.Row(
-                    expand=True,
-                    controls=[
-                        self.power_card,
-                        self.thrust_card
-                    ]
-                ),
-                ft.Row(
-                    expand=True,
-                    controls=[
-                        self.torque_card,
-                        self.speed_card
-                    ])
-            ]
-        )
+            self.content = ft.Column(
+                expand=True,
+                controls=[
+                    ft.Row(
+                        controls=[
+                            self.power_limited_card,
+                            self.power_unlimited_card
+                        ]
+                    ),
+                    ft.Row(
+                        expand=True,
+                        controls=[
+                            self.power_card,
+                            self.thrust_card
+                        ]
+                    ),
+                    ft.Row(
+                        expand=True,
+                        controls=[
+                            self.torque_card,
+                            self.speed_card
+                        ])
+                ]
+            )
+        except:
+            logging.exception('exception occured at SingleInstantGrid.build')
+
+
 
     def reload(self):
-        if self.page:
-            self.power_card.reload()
-            self.thrust_card.reload()
-            self.torque_card.reload()
-            self.speed_card.reload()
+        try:
+            if self.page:
+                self.power_card.reload()
+                self.thrust_card.reload()
+                self.torque_card.reload()
+                self.speed_card.reload()
+        except:
+            logging.exception('exception occured at SingleInstantGrid.reload')
+

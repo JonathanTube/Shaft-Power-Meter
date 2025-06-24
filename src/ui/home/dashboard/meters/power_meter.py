@@ -1,3 +1,4 @@
+import logging
 import flet as ft
 from db.models.preference import Preference
 from db.models.limitations import Limitations
@@ -17,22 +18,30 @@ class PowerMeter(ft.Container):
         self.system_unit = preference.system_unit
 
     def build(self):
-        limitations: Limitations = Limitations.get()
-        max = limitations.power_max
-        limit = limitations.power_warning
+        try:
+            limitations: Limitations = Limitations.get()
+            max = limitations.power_max
+            limit = limitations.power_warning
 
-        heading = self.page.session.get("lang.common.power")
-        self.content = MeterRound(
-            heading=heading, radius=self.radius, unit="W", max=max, limit=limit)
+            heading = self.page.session.get("lang.common.power")
+            self.content = MeterRound(
+                heading=heading, radius=self.radius, unit="W", max=max, limit=limit)
+        except:
+            logging.exception('exception occured at PowerMeter.build')
+
 
     def reload(self):
-        if self.name == "sps1":
-            power_and_unit = UnitParser.parse_power(
-                gdata.sps1_power, self.system_unit)
-            self.content.set_data(
-                gdata.sps1_power, power_and_unit[0], power_and_unit[1])
-        else:
-            power_and_unit = UnitParser.parse_power(
-                gdata.sps2_power, self.system_unit)
-            self.content.set_data(
-                gdata.sps2_power, power_and_unit[0], power_and_unit[1])
+        try:
+            if self.name == "sps1":
+                power_and_unit = UnitParser.parse_power(
+                    gdata.sps1_power, self.system_unit)
+                self.content.set_data(
+                    gdata.sps1_power, power_and_unit[0], power_and_unit[1])
+            else:
+                power_and_unit = UnitParser.parse_power(
+                    gdata.sps2_power, self.system_unit)
+                self.content.set_data(
+                    gdata.sps2_power, power_and_unit[0], power_and_unit[1])
+        except:
+            logging.exception('exception occured at PowerMeter.reload')
+

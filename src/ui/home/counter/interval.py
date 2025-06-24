@@ -33,64 +33,68 @@ class IntervalCounter(ft.Container):
         self.task_running = False
 
     def build(self):
-        self.display = CounterDisplay()
+        try:
+            self.display = CounterDisplay()
 
-        self.hours_field = ft.TextField(
-            label=self.page.session.get('lang.counter.interval_setting'),
-            suffix_text=self.page.session.get('lang.counter.hours'),
-            width=220,
-            height=40,
-            text_size=14,
-            read_only=True,
-            can_request_focus=False,
-            on_click=lambda e: keyboard.open(e.control),
-            value=self.hours,
-            border_color=ft.Colors.ON_SURFACE,
-            size_constraints=ft.BoxConstraints(max_height=40)
-        )
+            self.hours_field = ft.TextField(
+                label=self.page.session.get('lang.counter.interval_setting'),
+                suffix_text=self.page.session.get('lang.counter.hours'),
+                width=220,
+                height=40,
+                text_size=14,
+                read_only=True,
+                can_request_focus=False,
+                on_click=lambda e: keyboard.open(e.control),
+                value=self.hours,
+                border_color=ft.Colors.ON_SURFACE,
+                size_constraints=ft.BoxConstraints(max_height=40)
+            )
 
-        self.hours_confirm = ft.FilledButton(
-            text=self.page.session.get('lang.button.confirm'),
-            bgcolor=ft.Colors.GREEN,
-            color=ft.Colors.WHITE,
-            on_click=lambda e: self.on_hours_change(e)
-        )
+            self.hours_confirm = ft.FilledButton(
+                text=self.page.session.get('lang.button.confirm'),
+                bgcolor=ft.Colors.GREEN,
+                color=ft.Colors.WHITE,
+                on_click=lambda e: self.on_hours_change(e)
+            )
 
-        self.status_container = ft.Container(
-            content=ft.Text(value=self.page.session.get('lang.counter.running'),color=ft.Colors.WHITE, size=12),
-            alignment=ft.alignment.center,
-            bgcolor=ft.Colors.GREEN_500,
-            border_radius=ft.border_radius.all(40),
-            padding=ft.padding.only(top=0, bottom=4, left=10, right=10)
-        )
+            self.status_container = ft.Container(
+                content=ft.Text(value=self.page.session.get('lang.counter.running'),color=ft.Colors.WHITE, size=12),
+                alignment=ft.alignment.center,
+                bgcolor=ft.Colors.GREEN_500,
+                border_radius=ft.border_radius.all(40),
+                padding=ft.padding.only(top=0, bottom=4, left=10, right=10)
+            )
 
-        self.title = ft.Text(
-            self.page.session.get('lang.counter.interval'),
-            weight=ft.FontWeight.BOLD,
-            size=16
-        )
+            self.title = ft.Text(
+                self.page.session.get('lang.counter.interval'),
+                weight=ft.FontWeight.BOLD,
+                size=16
+            )
 
-        self.content = ft.Column(
-            expand=True,
-            horizontal_alignment=ft.CrossAxisAlignment.CENTER,
-            spacing=5 if self.page.window.height <= 600 else 20,
-            controls=[
-                ft.Row(alignment=ft.MainAxisAlignment.SPACE_BETWEEN, controls=[self.title, self.status_container]),
-                self.display,
-                ft.Column(
-                    alignment=ft.MainAxisAlignment.END,
-                    expand=True,
-                    controls=[
-                        ft.Row(
-                            alignment=ft.alignment.center,
-                            controls=[
-                                self.hours_field,
-                                self.hours_confirm
-                            ]
-                        )
-                    ]
-                )
-            ])
+            self.content = ft.Column(
+                expand=True,
+                horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+                spacing=5 if self.page.window.height <= 600 else 20,
+                controls=[
+                    ft.Row(alignment=ft.MainAxisAlignment.SPACE_BETWEEN, controls=[self.title, self.status_container]),
+                    self.display,
+                    ft.Column(
+                        alignment=ft.MainAxisAlignment.END,
+                        expand=True,
+                        controls=[
+                            ft.Row(
+                                alignment=ft.alignment.center,
+                                controls=[
+                                    self.hours_field,
+                                    self.hours_confirm
+                                ]
+                            )
+                        ]
+                    )
+                ])
+        except:
+            logging.exception('exception occured at IntervalCounter.build')
+
 
     def on_hours_change(self, e):
         hours = self.hours_field.value

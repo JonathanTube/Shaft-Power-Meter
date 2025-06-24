@@ -29,39 +29,43 @@ class PermissionCheck(ft.AlertDialog):
             return "User"
 
     def build(self):
-        s = self.page.session
-        self.title = ft.Text(f"{self.get_role_name()}-{s.get('lang.permission.authentication')}")
-        self.user_name = ft.Dropdown(
-            width=300,
-            label=self.page.session.get("lang.permission.user_name"),
-            value=1,
-            options=[]
-        )
-        self.user_pwd = ft.TextField(
-            width=300,
-            value="123456",
-            label=s.get("lang.permission.user_pwd"),
-            read_only=True,
-            password=True,
-            can_reveal_password=True
-        )
+        try:
+            s = self.page.session
+            self.title = ft.Text(f"{self.get_role_name()}-{s.get('lang.permission.authentication')}")
+            self.user_name = ft.Dropdown(
+                width=300,
+                label=self.page.session.get("lang.permission.user_name"),
+                value=1,
+                options=[]
+            )
+            self.user_pwd = ft.TextField(
+                width=300,
+                value="123456",
+                label=s.get("lang.permission.user_pwd"),
+                read_only=True,
+                password=True,
+                can_reveal_password=True
+            )
 
-        self.number_keys = [ft.OutlinedButton(str(i), col={"xs": 3}, on_click=self.__on_key_click) for i in range(1, 10)]
-        self.number_keys.append(ft.OutlinedButton(str(0), col={"xs": 3}, on_click=self.__on_key_click))
-        self.number_keys.append(ft.OutlinedButton(icon=ft.Icons.BACKSPACE_OUTLINED, col={"xs": 3}, on_click=self.__on_delete_one))
+            self.number_keys = [ft.OutlinedButton(str(i), col={"xs": 3}, on_click=self.__on_key_click) for i in range(1, 10)]
+            self.number_keys.append(ft.OutlinedButton(str(0), col={"xs": 3}, on_click=self.__on_key_click))
+            self.number_keys.append(ft.OutlinedButton(icon=ft.Icons.BACKSPACE_OUTLINED, col={"xs": 3}, on_click=self.__on_delete_one))
 
-        self.content = ft.Column(
-            height=220,
-            controls=[
-                self.user_name, 
-                self.user_pwd,
-                ft.ResponsiveRow(controls=self.number_keys)
+            self.content = ft.Column(
+                height=220,
+                controls=[
+                    self.user_name, 
+                    self.user_pwd,
+                    ft.ResponsiveRow(controls=self.number_keys)
+                ]
+            )
+            self.actions = [
+                ft.TextButton(s.get("lang.button.confirm"), on_click=self.__on_confirm),
+                ft.TextButton(s.get("lang.button.cancel"), visible=self.closable, on_click=self.__on_cancel)
             ]
-        )
-        self.actions = [
-            ft.TextButton(s.get("lang.button.confirm"), on_click=self.__on_confirm),
-            ft.TextButton(s.get("lang.button.cancel"), visible=self.closable, on_click=self.__on_cancel)
-        ]
+        except:
+            logging.exception('exception occured at PermissionCheck.build')
+
 
     def __on_key_click(self, e):
         txt = e.control.text
@@ -74,14 +78,18 @@ class PermissionCheck(ft.AlertDialog):
             self.user_pwd.update()
 
     def before_update(self):
-        users = []
-        if self.user_role == 0: # admin rights
-            users = User.select().where(User.user_role == 0).execute()
-        elif self.system_settings.hide_admin_account:
-            users = User.select().where(User.user_role <= self.user_role, User.user_role > 0).execute()
-        else:
-            users = User.select().where(User.user_role <= self.user_role).execute()
-        self.user_name.options = [ft.dropdown.Option(text=user.user_name, key=user.id) for user in users]
+        try:
+            users = []
+            if self.user_role == 0: # admin rights
+                users = User.select().where(User.user_role == 0).execute()
+            elif self.system_settings.hide_admin_account:
+                users = User.select().where(User.user_role <= self.user_role, User.user_role > 0).execute()
+            else:
+                users = User.select().where(User.user_role <= self.user_role).execute()
+            self.user_name.options = [ft.dropdown.Option(text=user.user_name, key=user.id) for user in users]
+        except:
+            logging.exception('exception occured at PermissionCheck.before_update')
+
 
     def __on_cancel(self, e):
         self.page.close(self)

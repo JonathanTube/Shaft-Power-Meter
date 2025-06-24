@@ -1,3 +1,4 @@
+import logging
 import flet as ft
 from ui.home.dashboard.meters.speed_meter import SpeedMeter
 from ui.home.dashboard.meters.power_meter import PowerMeter
@@ -20,42 +21,52 @@ class SingleMeters(ft.Container):
         return radius
 
     def build(self):
-        self.speed_meter = SpeedMeter("sps1", self.get_radius(0.16))
-        self.power_meter = PowerMeter("sps1", self.get_radius(0.22))
-        self.torque_meter = TorqueMeter("sps1", self.get_radius(0.16))
+        try:
+            self.speed_meter = SpeedMeter("sps1", self.get_radius(0.16))
+            self.power_meter = PowerMeter("sps1", self.get_radius(0.22))
+            self.torque_meter = TorqueMeter("sps1", self.get_radius(0.16))
 
-        row = ft.Row(
-            alignment=ft.MainAxisAlignment.CENTER,
-            vertical_alignment=ft.CrossAxisAlignment.CENTER,
-            spacing=20,
-            controls=[
-                SimpleCard(
-                    body=self.speed_meter,
-                    body_bottom_right=False,
-                    expand=False
-                ),
-                SimpleCard(
-                    body=self.power_meter,
-                    body_bottom_right=False,
-                    expand=False
-                ),
-                SimpleCard(
-                    body=self.torque_meter,
-                    body_bottom_right=False,
-                    expand=False
-                )
-            ]
-        )
+            row = ft.Row(
+                alignment=ft.MainAxisAlignment.CENTER,
+                vertical_alignment=ft.CrossAxisAlignment.CENTER,
+                spacing=20,
+                controls=[
+                    SimpleCard(
+                        body=self.speed_meter,
+                        body_bottom_right=False,
+                        expand=False
+                    ),
+                    SimpleCard(
+                        body=self.power_meter,
+                        body_bottom_right=False,
+                        expand=False
+                    ),
+                    SimpleCard(
+                        body=self.torque_meter,
+                        body_bottom_right=False,
+                        expand=False
+                    )
+                ]
+            )
 
-        self.content = ft.Column(
-            expand=True,
-            run_alignment=ft.MainAxisAlignment.CENTER,
-            horizontal_alignment=ft.CrossAxisAlignment.CENTER,
-            alignment=ft.MainAxisAlignment.CENTER,
-            controls=[row]
-        )
+            self.content = ft.Column(
+                expand=True,
+                run_alignment=ft.MainAxisAlignment.CENTER,
+                horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+                alignment=ft.MainAxisAlignment.CENTER,
+                controls=[row]
+            )
+        except:
+            logging.exception('exception occured at SingleMeters.build')
+
+
 
     def reload(self):
-        self.speed_meter.reload()
-        self.power_meter.reload()
-        self.torque_meter.reload()
+        try:
+            self.speed_meter.reload()
+            self.power_meter.reload()
+            self.torque_meter.reload()
+        except:
+            logging.exception('exception occured at SingleMeters.reload')
+
+

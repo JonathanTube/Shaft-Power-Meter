@@ -1,3 +1,4 @@
+import logging
 import flet as ft
 
 from ui.common.simple_card import SimpleCard
@@ -19,38 +20,46 @@ class DualInstantPower(ft.Container):
         self.unit = preference.system_unit
 
     def build(self):
-        self.__create_power_sps1()
-        self.__create_power_sps2()
-        self.__create_power_total()
+        try:
+            self.__create_power_sps1()
+            self.__create_power_sps2()
+            self.__create_power_total()
 
-        content = ft.Column(
-            expand=True,
-            horizontal_alignment=ft.CrossAxisAlignment.END,
-            alignment=ft.MainAxisAlignment.END,
-            spacing=0,
-            controls=[
-                self.power_total,
-                self.power_sps1,
-                self.power_sps2
-            ]
-        )
-        self.content = SimpleCard(title=self.page.session.get("lang.common.power"), body=content)  
+            content = ft.Column(
+                expand=True,
+                horizontal_alignment=ft.CrossAxisAlignment.END,
+                alignment=ft.MainAxisAlignment.END,
+                spacing=0,
+                controls=[
+                    self.power_total,
+                    self.power_sps1,
+                    self.power_sps2
+                ]
+            )
+            self.content = SimpleCard(title=self.page.session.get("lang.common.power"), body=content)  
+        except:
+            logging.exception('exception occured at DualInstantPower.build')
 
-    def reload(self):   
-        power_sps1 = UnitParser.parse_power(gdata.sps1_power, self.unit)
-        power_sps2 = UnitParser.parse_power(gdata.sps2_power, self.unit)
-        power_total = UnitParser.parse_power(gdata.sps1_power + gdata.sps2_power, self.unit)
 
-        self.power_sps1_value.value = power_sps1[0]
-        self.power_sps1_unit.value = power_sps1[1]
+    def reload(self): 
+        try:  
+            power_sps1 = UnitParser.parse_power(gdata.sps1_power, self.unit)
+            power_sps2 = UnitParser.parse_power(gdata.sps2_power, self.unit)
+            power_total = UnitParser.parse_power(gdata.sps1_power + gdata.sps2_power, self.unit)
 
-        self.power_sps2_value.value = power_sps2[0]
-        self.power_sps2_unit.value = power_sps2[1]
+            self.power_sps1_value.value = power_sps1[0]
+            self.power_sps1_unit.value = power_sps1[1]
 
-        self.power_total_value.value = power_total[0]
-        self.power_total_unit.value = power_total[1]
+            self.power_sps2_value.value = power_sps2[0]
+            self.power_sps2_unit.value = power_sps2[1]
 
-        self.content.update()
+            self.power_total_value.value = power_total[0]
+            self.power_total_unit.value = power_total[1]
+
+            self.content.update()
+        except:
+            logging.exception('exception occured at DualInstantGrid.reload')
+
 
     def __create_power_sps1(self):
         self.sps1_label = ft.Text(

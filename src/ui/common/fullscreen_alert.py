@@ -20,40 +20,44 @@ class FullscreenAlert(ft.Container):
         )
 
     def build(self):
-        left_border = ft.Container(
-            left=0,
-            top=0,
-            bottom=0,
-            expand=True,
-            shadow=self.build_blur_border()
-        )
-        top_border = ft.Container(
-            left=0,
-            right=0,
-            top=0,
-            shadow=self.build_blur_border()
-        )
-        right_border = ft.Container(
-            right=0,
-            top=0,
-            bottom=0,
-            shadow=self.build_blur_border()
-        )
-        bottom_border = ft.Container(
-            left=0,
-            right=0,
-            bottom=0,
-            shadow=self.build_blur_border()
-        )
-        self.content = ft.Stack(
-            expand=True,
-            controls=[
-                left_border,
-                top_border,
-                right_border,
-                bottom_border
-            ]
-        )
+        try:
+            left_border = ft.Container(
+                left=0,
+                top=0,
+                bottom=0,
+                expand=True,
+                shadow=self.build_blur_border()
+            )
+            top_border = ft.Container(
+                left=0,
+                right=0,
+                top=0,
+                shadow=self.build_blur_border()
+            )
+            right_border = ft.Container(
+                right=0,
+                top=0,
+                bottom=0,
+                shadow=self.build_blur_border()
+            )
+            bottom_border = ft.Container(
+                left=0,
+                right=0,
+                bottom=0,
+                shadow=self.build_blur_border()
+            )
+            self.content = ft.Stack(
+                expand=True,
+                controls=[
+                    left_border,
+                    top_border,
+                    right_border,
+                    bottom_border
+                ]
+            )
+        except:
+            logging.exception('exception occured at FullscreenAlert.build')
+
 
     def show(self):
         self.running = True

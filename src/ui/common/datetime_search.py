@@ -1,3 +1,4 @@
+import logging
 from typing import Callable
 import flet as ft
 from ui.common.date_time_range import DateTimeRange
@@ -9,19 +10,25 @@ class DatetimeSearch(ft.Container):
         self.on_search = on_search
 
     def build(self):
-        self.date_time_range = DateTimeRange()
+        try:
+            
+            self.date_time_range = DateTimeRange()
 
-        self.search_button = ft.OutlinedButton(
-            icon=ft.Icons.SEARCH_OUTLINED,
-            height=40,
-            text=self.page.session.get("lang.button.search"),
-            on_click=self.__handle_search
-        )
+            self.search_button = ft.OutlinedButton(
+                icon=ft.Icons.SEARCH_OUTLINED,
+                height=40,
+                text=self.page.session.get("lang.button.search"),
+                on_click=self.__handle_search
+            )
 
-        self.content = ft.Row(controls=[
-            self.date_time_range,
-            self.search_button
-        ])
+            self.content = ft.Row(controls=[
+                self.date_time_range,
+                self.search_button
+            ])
+
+        except:
+            logging.exception('exception occured at DatetimeSearch.build')
+
 
     def __handle_search(self, e):
         start_date, end_date = self.date_time_range.get_date_range()

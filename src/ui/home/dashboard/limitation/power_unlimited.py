@@ -1,3 +1,4 @@
+import logging
 import flet as ft
 from utils.unit_parser import UnitParser
 from db.models.preference import Preference
@@ -18,26 +19,30 @@ class PowerUnlimited(ft.Container):
         self.power = propeller_settings.shaft_power_of_mcr_operating_point
 
     def build(self):
-        self.title = ft.Text(self.page.session.get("lang.common.unlimited_power"), weight=ft.FontWeight.W_600)
-        power = self.power * 2 if self.is_dual else self.power
-        power_and_unit = UnitParser.parse_power(power, self.system_unit)
-        self.unlimited_power_value = ft.Text(power_and_unit[0])
-        self.unlimited_power_unit = ft.Text(power_and_unit[1])
+        try:
+            self.title = ft.Text(self.page.session.get("lang.common.unlimited_power"), weight=ft.FontWeight.W_600)
+            power = self.power * 2 if self.is_dual else self.power
+            power_and_unit = UnitParser.parse_power(power, self.system_unit)
+            self.unlimited_power_value = ft.Text(power_and_unit[0])
+            self.unlimited_power_unit = ft.Text(power_and_unit[1])
 
-        self.content = ft.Container(
-            border=ft.border.all(
-                width=0.5,
-                color=ft.Colors.with_opacity(0.15, ft.Colors.INVERSE_SURFACE)
-            ),
-            border_radius=10,
-            padding=ft.padding.all(10),
-            content=ft.Row(
-                alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
-                controls=[
-                    self.title,
-                    ft.Row(controls=[
-                        self.unlimited_power_value,
-                        self.unlimited_power_unit
-                    ])
-                ]
-            ))
+            self.content = ft.Container(
+                border=ft.border.all(
+                    width=0.5,
+                    color=ft.Colors.with_opacity(0.15, ft.Colors.INVERSE_SURFACE)
+                ),
+                border_radius=10,
+                padding=ft.padding.all(10),
+                content=ft.Row(
+                    alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
+                    controls=[
+                        self.title,
+                        ft.Row(controls=[
+                            self.unlimited_power_value,
+                            self.unlimited_power_unit
+                        ])
+                    ]
+                ))
+        except:
+            logging.exception('exception occured at PowerUnlimited.build')
+

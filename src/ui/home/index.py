@@ -146,7 +146,7 @@ class Home(ft.Container):
             if self.main_container and self.main_container.page:
                 self.main_container.update()
         except:
-            logging.exception("exception occured at Home")
+            logging.exception("exception occured at Home.__on_click")
 
     def did_mount(self):
         self.task_running = True

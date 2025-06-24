@@ -23,39 +23,44 @@ class EEXILimitedPower(ft.Container):
         self.normal_power = self.eexi_power * 0.9
 
     def build(self):
-        if self.page.window.height <= 600:
-            meter_radius = self.container_height * 0.6
-        else:
-            meter_radius = self.container_height * 0.56
-        green = self.normal_power
-        orange = self.eexi_power - self.normal_power
-        red = self.unlimited_power - self.eexi_power
-        self.meter_half = MeterHalf(radius=meter_radius, green=green, orange=orange, red=red)
-        self.title = ft.Text(f"{self.page.session.get('lang.common.eexi_limited_power')}(%)", size=16, weight=ft.FontWeight.W_600)
-        self.unlimited_mode = ft.Text(f"{self.page.session.get('lang.common.power_unlimited_mode')}:", weight=ft.FontWeight.W_400)
-        self.unlimited_mode_icon = ft.Icon(ft.icons.INFO_OUTLINED, color=ft.Colors.GREEN, size=18)
+        try:
+            if self.page.window.height <= 600:
+                meter_radius = self.container_height * 0.6
+            else:
+                meter_radius = self.container_height * 0.56
+            green = self.normal_power
+            orange = self.eexi_power - self.normal_power
+            red = self.unlimited_power - self.eexi_power
+            self.meter_half = MeterHalf(radius=meter_radius, green=green, orange=orange, red=red)
+            self.title = ft.Text(f"{self.page.session.get('lang.common.eexi_limited_power')}(%)", size=16, weight=ft.FontWeight.W_600)
+            self.unlimited_mode = ft.Text(f"{self.page.session.get('lang.common.power_unlimited_mode')}:", weight=ft.FontWeight.W_400)
+            self.unlimited_mode_icon = ft.Icon(ft.icons.INFO_OUTLINED, color=ft.Colors.GREEN, size=18)
 
-        self.unlimited_mode_row = ft.Row(
-            vertical_alignment=ft.CrossAxisAlignment.CENTER,
-            visible=False,
-            controls=[self.unlimited_mode, self.unlimited_mode_icon]
-        )
-
-        row = ft.Row(alignment=ft.MainAxisAlignment.SPACE_BETWEEN, controls=[self.title, self.unlimited_mode_row])
-
-        self.content = ft.Container(
-            border=ft.border.all(
-                width=0.5,
-                color=ft.Colors.with_opacity(0.15, ft.Colors.INVERSE_SURFACE)
-            ),
-            border_radius=10,
-            padding=ft.padding.all(10),
-            content=ft.Column(
-                spacing=20,
-                horizontal_alignment=ft.CrossAxisAlignment.CENTER,
-                controls=[row, self.meter_half]
+            self.unlimited_mode_row = ft.Row(
+                vertical_alignment=ft.CrossAxisAlignment.CENTER,
+                visible=False,
+                controls=[self.unlimited_mode, self.unlimited_mode_icon]
             )
-        )
+
+            row = ft.Row(alignment=ft.MainAxisAlignment.SPACE_BETWEEN, controls=[self.title, self.unlimited_mode_row])
+
+            self.content = ft.Container(
+                border=ft.border.all(
+                    width=0.5,
+                    color=ft.Colors.with_opacity(0.15, ft.Colors.INVERSE_SURFACE)
+                ),
+                border_radius=10,
+                padding=ft.padding.all(10),
+                content=ft.Column(
+                    spacing=20,
+                    horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+                    controls=[row, self.meter_half]
+                )
+            )
+        except:
+            logging.exception('exception occured at EEXILimitedPower.reload')
+
+
 
     def reload(self):
         try:

@@ -30,67 +30,71 @@ class SinglePowerLine(ft.Container):
             self.threshold_power = limitations.power_warning
 
     def build(self):
-        self.data_line = ft.LineChartData(
-            above_line_bgcolor=ft.Colors.SURFACE,
-            curved=False,
-            stroke_width=1,
-            color=ft.Colors.LIGHT_GREEN,
-            data_points=[]
-        )
+        try:
+            self.data_line = ft.LineChartData(
+                above_line_bgcolor=ft.Colors.SURFACE,
+                curved=False,
+                stroke_width=1,
+                color=ft.Colors.LIGHT_GREEN,
+                data_points=[]
+            )
 
-        self.threshold_filled = ft.LineChartData(
-            visible=self.sha_po_li,
-            above_line_bgcolor=ft.Colors.RED,
-            color=ft.Colors.TRANSPARENT,
-            data_points=[]
-        )
+            self.threshold_filled = ft.LineChartData(
+                visible=self.sha_po_li,
+                above_line_bgcolor=ft.Colors.RED,
+                color=ft.Colors.TRANSPARENT,
+                data_points=[]
+            )
 
-        self.threshold_line = ft.LineChartData(
-            visible=self.sha_po_li,
-            color=ft.Colors.RED,
-            stroke_width=1,
-            data_points=[]
-        )
+            self.threshold_line = ft.LineChartData(
+                visible=self.sha_po_li,
+                color=ft.Colors.RED,
+                stroke_width=1,
+                data_points=[]
+            )
 
-        border = ft.BorderSide(width=.5, color=ft.Colors.with_opacity(0.15, ft.Colors.INVERSE_SURFACE))
+            border = ft.BorderSide(width=.5, color=ft.Colors.with_opacity(0.15, ft.Colors.INVERSE_SURFACE))
 
-        power_and_unit = UnitParser.parse_power(self.max_power, self.system_unit)
-        left_max = math.ceil(power_and_unit[0])
-        left_unit = power_and_unit[1]
-        width = self.page.window.width - 80
-        self.chart = ft.LineChart(
-            width=width,
-            min_y=0,
-            max_y=left_max,
-            bgcolor=ft.Colors.translate,
-            tooltip_fit_inside_horizontally=True,
-            tooltip_fit_inside_vertically=True,
-            expand=True,
-            border=ft.Border(left=border, bottom=border),
-            left_axis=ft.ChartAxis(
-                title=ft.Text(left_unit),
-                labels_interval=left_max / 5,
-                labels_size=len(str(left_max)) * 15,
-                labels=[
-                    ft.ChartAxisLabel(value=0),
-                    ft.ChartAxisLabel(value=left_max)
-                ]),
-            bottom_axis=ft.ChartAxis(labels_size=30, show_labels=True),
-            data_series=[
-                self.threshold_filled,
-                self.data_line,
-                self.threshold_line
-            ]
-        )
+            power_and_unit = UnitParser.parse_power(self.max_power, self.system_unit)
+            left_max = math.ceil(power_and_unit[0])
+            left_unit = power_and_unit[1]
+            width = self.page.window.width - 80
+            self.chart = ft.LineChart(
+                width=width,
+                min_y=0,
+                max_y=left_max,
+                bgcolor=ft.Colors.translate,
+                tooltip_fit_inside_horizontally=True,
+                tooltip_fit_inside_vertically=True,
+                expand=True,
+                border=ft.Border(left=border, bottom=border),
+                left_axis=ft.ChartAxis(
+                    title=ft.Text(left_unit),
+                    labels_interval=left_max / 5,
+                    labels_size=len(str(left_max)) * 15,
+                    labels=[
+                        ft.ChartAxisLabel(value=0),
+                        ft.ChartAxisLabel(value=left_max)
+                    ]),
+                bottom_axis=ft.ChartAxis(labels_size=30, show_labels=True),
+                data_series=[
+                    self.threshold_filled,
+                    self.data_line,
+                    self.threshold_line
+                ]
+            )
 
-        self.content = SimpleCard(
-            title=self.page.session.get("lang.common.power"),
-            body=ft.Container(
-                content=self.chart,
-                padding=ft.padding.only(right=30)
-            ),
-            text_center=True
-        )
+            self.content = SimpleCard(
+                title=self.page.session.get("lang.common.power"),
+                body=ft.Container(
+                    content=self.chart,
+                    padding=ft.padding.only(right=30)
+                ),
+                text_center=True
+            )
+        except:
+            logging.exception('exception occured at SinglePowerLine.reload')
+
 
     def reload(self):
         try:

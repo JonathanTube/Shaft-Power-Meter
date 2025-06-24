@@ -1,3 +1,4 @@
+import logging
 import flet as ft
 
 
@@ -24,29 +25,33 @@ class SimpleCard(ft.Container):
         self._text_center = text_center
 
     def build(self):
-        title_container = ft.Container(
-            visible=self._title != "",
-            expand=False,
-            alignment=ft.alignment.center if self._text_center else ft.alignment.top_left,
-            content=ft.Text(
-                value=self._title,
-                weight=ft.FontWeight.W_500,
-                size=16
-            )
-        )
-
-        self.content = ft.Column(
-            expand=True,
-            spacing=10,
-            controls=[
-                title_container,
-                ft.Container(
-                    expand=True,
-                    alignment=ft.alignment.bottom_right if self._body_bottom_right else ft.alignment.center,
-                    content=self._body
+        try:
+            title_container = ft.Container(
+                visible=self._title != "",
+                expand=False,
+                alignment=ft.alignment.center if self._text_center else ft.alignment.top_left,
+                content=ft.Text(
+                    value=self._title,
+                    weight=ft.FontWeight.W_500,
+                    size=16
                 )
-            ]
-        )
+            )
+
+            self.content = ft.Column(
+                expand=True,
+                spacing=10,
+                controls=[
+                    title_container,
+                    ft.Container(
+                        expand=True,
+                        alignment=ft.alignment.bottom_right if self._body_bottom_right else ft.alignment.center,
+                        content=self._body
+                    )
+                ]
+            )
+        except:
+            logging.exception('exception occured at SimpleCard.build')
+
 
     def set_title(self, title: str):
         self._title = title

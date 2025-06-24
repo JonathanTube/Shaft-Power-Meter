@@ -1,3 +1,4 @@
+import logging
 import flet as ft
 
 from ui.common.simple_card import SimpleCard
@@ -20,33 +21,41 @@ class DualInstantTorque(ft.Container):
         self.unit = preference.system_unit
 
     def build(self):
-        self.__create_torque_sps1()
-        self.__create_torque_sps2()
+        try:
+            self.__create_torque_sps1()
+            self.__create_torque_sps2()
 
-        content = ft.Column(
-            expand=True,
-            horizontal_alignment=ft.CrossAxisAlignment.END,
-            alignment=ft.MainAxisAlignment.END,
-            spacing=0,
-            controls=[
-                self.torque_sps1,
-                self.torque_sps2
-            ]
-        )
+            content = ft.Column(
+                expand=True,
+                horizontal_alignment=ft.CrossAxisAlignment.END,
+                alignment=ft.MainAxisAlignment.END,
+                spacing=0,
+                controls=[
+                    self.torque_sps1,
+                    self.torque_sps2
+                ]
+            )
 
-        self.content = SimpleCard(title=self.page.session.get("lang.common.torque"), body=content)
+            self.content = SimpleCard(title=self.page.session.get("lang.common.torque"), body=content)
+        except:
+            logging.exception('exception occured at DualInstantTorque.build')
+
 
     def reload(self):
-        torque_sps1 = UnitParser.parse_torque(gdata.sps1_torque, self.unit)
-        torque_sps2 = UnitParser.parse_torque(gdata.sps2_torque, self.unit)
+        try:
+            torque_sps1 = UnitParser.parse_torque(gdata.sps1_torque, self.unit)
+            torque_sps2 = UnitParser.parse_torque(gdata.sps2_torque, self.unit)
 
-        self.torque_sps1_value.value = torque_sps1[0]
-        self.torque_sps1_unit.value = torque_sps1[1]
+            self.torque_sps1_value.value = torque_sps1[0]
+            self.torque_sps1_unit.value = torque_sps1[1]
 
-        self.torque_sps2_value.value = torque_sps2[0]
-        self.torque_sps2_unit.value = torque_sps2[1]
+            self.torque_sps2_value.value = torque_sps2[0]
+            self.torque_sps2_unit.value = torque_sps2[1]
 
-        self.content.update()
+            self.content.update()
+        except:
+            logging.exception('exception occured at DualInstantTorque.reload')
+
 
     def __create_torque_sps1(self):
         self.sps1_label = ft.Text(

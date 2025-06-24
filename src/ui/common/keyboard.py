@@ -1,3 +1,4 @@
+import logging
 import flet as ft
 from typing import Literal
 
@@ -14,84 +15,90 @@ class Keyboard(ft.Stack):
         self.tf: ft.TextField | None = None
 
     def build(self):
-        number_keys = [ft.OutlinedButton(str(i), col={"xs": 4}, on_click=self.__on_key_click) for i in range(1, 10)]
-        number_keys.append(ft.OutlinedButton(str(0), col={"xs": 4}, on_click=self.__on_key_click))
+        try:
+            number_keys = [ft.OutlinedButton(str(i), col={"xs": 4}, on_click=self.__on_key_click) for i in range(1, 10)]
+            number_keys.append(ft.OutlinedButton(str(0), col={"xs": 4}, on_click=self.__on_key_click))
 
-        self.point = ft.OutlinedButton('.', col={"xs": 4}, on_click=self.__on_key_click)
-        number_keys.append(self.point)
+            self.point = ft.OutlinedButton('.', col={"xs": 4}, on_click=self.__on_key_click)
+            number_keys.append(self.point)
 
-        number_keys.append(ft.OutlinedButton(icon=ft.Icons.BACKSPACE_OUTLINED, col={"xs": 4}, on_click=self.__on_delete_one, on_long_press=self.__on_delete_all))
+            number_keys.append(ft.OutlinedButton(icon=ft.Icons.BACKSPACE_OUTLINED, col={"xs": 4}, on_click=self.__on_delete_one, on_long_press=self.__on_delete_all))
 
-        kb_header = ft.Row(
-            alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
-            controls=[
-                ft.Container(content=ft.Icon(ft.Icons.KEYBOARD_OUTLINED, size=30), padding=ft.padding.only(left=10)),
-                ft.IconButton(icon=ft.Icons.CLOSE_ROUNDED, on_click=self.__on_close)
-            ]
-        )
-        self.kb = ft.Column(
-            spacing=0,
-            controls=[
-                kb_header,
-                ft.Divider(height=1),
-                ft.Container(content=ft.ResponsiveRow(number_keys), padding=10)
-            ]
-        )
-        self.kb_open = ft.Container(
-            width=200,
-            border_radius=10,
-            bgcolor=ft.Colors.SURFACE,
-            border=ft.border.all(1, ft.Colors.with_opacity(0.1, ft.Colors.ON_SURFACE)),
-            shadow=ft.BoxShadow(
-                color=ft.Colors.with_opacity(0.1, ft.Colors.ON_SURFACE),
-                blur_radius=20,
-                offset=ft.Offset(0, 5)
-            ),
-            content=self.kb
-        )
+            kb_header = ft.Row(
+                alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
+                controls=[
+                    ft.Container(content=ft.Icon(ft.Icons.KEYBOARD_OUTLINED, size=30), padding=ft.padding.only(left=10)),
+                    ft.IconButton(icon=ft.Icons.CLOSE_ROUNDED, on_click=self.__on_close)
+                ]
+            )
+            self.kb = ft.Column(
+                spacing=0,
+                controls=[
+                    kb_header,
+                    ft.Divider(height=1),
+                    ft.Container(content=ft.ResponsiveRow(number_keys), padding=10)
+                ]
+            )
+            self.kb_open = ft.Container(
+                width=200,
+                border_radius=10,
+                bgcolor=ft.Colors.SURFACE,
+                border=ft.border.all(1, ft.Colors.with_opacity(0.1, ft.Colors.ON_SURFACE)),
+                shadow=ft.BoxShadow(
+                    color=ft.Colors.with_opacity(0.1, ft.Colors.ON_SURFACE),
+                    blur_radius=20,
+                    offset=ft.Offset(0, 5)
+                ),
+                content=self.kb
+            )
 
-        self.kb_close = ft.IconButton(icon=ft.Icons.KEYBOARD_OUTLINED, on_click=self.__on_open)
+            self.kb_close = ft.IconButton(icon=ft.Icons.KEYBOARD_OUTLINED, on_click=self.__on_open)
 
-        self.gd = ft.GestureDetector(
-            right=10,
-            bottom=10,
-            expand=False,
-            mouse_cursor=ft.MouseCursor.MOVE,
-            drag_interval=10,
-            on_pan_update=self.__on_pan_update,
-            content=self.kb_close
-        )
+            self.gd = ft.GestureDetector(
+                right=10,
+                bottom=10,
+                expand=False,
+                mouse_cursor=ft.MouseCursor.MOVE,
+                drag_interval=10,
+                on_pan_update=self.__on_pan_update,
+                content=self.kb_close
+            )
 
-        self.controls = [self.gd]
+            self.controls = [self.gd]
+        except:
+            logging.exception('exception occured at Keyboard.build')
 
     def show(self):
-        self.visible = True
-        self.update()
+        if self.page:
+            self.visible = True
+            self.update()
 
     def open(self, text_field: ft.TextField, type: Literal['int', 'float', 'ip'] = 'float'):
-        self.show()
-        # recovery the border color of last text field
-        try:
-            self.tf.border_color = ft.Colors.BLACK
-            self.tf.update()
-        except:
-            pass
+        if self.page:
+            self.show()
+            # recovery the border color of last text field
+            try:
+                self.tf.border_color = ft.Colors.BLACK
+                self.tf.update()
 
-        if text_field is not None:
-            self.words = str(text_field.value)            
 
-        if not self.opened:
-            self.__on_open(None)
+                if text_field is not None:
+                    self.words = str(text_field.value)            
 
-        self.type = type
-        self.point.visible = self.type == 'float' or self.type == 'ip'
-        self.point.update()
+                if not self.opened:
+                    self.__on_open(None)
 
-        self.tf = text_field
-        # set the border color of current text field
-        if self.tf is not None:
-            self.tf.border_color = ft.Colors.PRIMARY
-            self.tf.update()
+                self.type = type
+                self.point.visible = self.type == 'float' or self.type == 'ip'
+                self.point.update()
+
+                self.tf = text_field
+                # set the border color of current text field
+                if self.tf is not None:
+                    self.tf.border_color = ft.Colors.PRIMARY
+                    self.tf.update()
+            except:
+                pass
 
     def close(self):
         self.visible = False

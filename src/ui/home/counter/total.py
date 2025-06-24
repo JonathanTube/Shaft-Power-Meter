@@ -32,38 +32,42 @@ class TotalCounter(ft.Container):
         self.task_running = False
 
     def build(self):
-        self.display = CounterDisplay()
-        self.time_elapsed = ft.Text("")
-        self.started_at = ft.Text("")
+        try:
+            self.display = CounterDisplay()
+            self.time_elapsed = ft.Text("")
+            self.started_at = ft.Text("")
 
-        self.title = ft.Text(self.page.session.get('lang.counter.total'), weight=ft.FontWeight.BOLD, size=16)
+            self.title = ft.Text(self.page.session.get('lang.counter.total'), weight=ft.FontWeight.BOLD, size=16)
 
-        self.status_container = ft.Container(
-            content=ft.Text(value=self.page.session.get('lang.counter.running'), color=ft.Colors.WHITE, size=12),
-            alignment=ft.alignment.center,
-            bgcolor=ft.Colors.GREEN_500,
-            border_radius=ft.border_radius.all(40),
-            padding=ft.padding.only(top=0, bottom=4, left=10, right=10)
-        )
+            self.status_container = ft.Container(
+                content=ft.Text(value=self.page.session.get('lang.counter.running'), color=ft.Colors.WHITE, size=12),
+                alignment=ft.alignment.center,
+                bgcolor=ft.Colors.GREEN_500,
+                border_radius=ft.border_radius.all(40),
+                padding=ft.padding.only(top=0, bottom=4, left=10, right=10)
+            )
 
-        self.content = ft.Column(
-            horizontal_alignment=ft.CrossAxisAlignment.CENTER,
-            spacing=5 if self.page.window.height <= 600 else 20,
-            controls=[
-                ft.Row(alignment=ft.MainAxisAlignment.SPACE_BETWEEN, controls=[self.title, self.status_container]),
-                self.display,
-                ft.Column(
-                    spacing=0,
-                    horizontal_alignment=ft.CrossAxisAlignment.CENTER,
-                    controls=[
-                        self.time_elapsed,
-                        self.started_at
-                    ]
-                )
-            ])
+            self.content = ft.Column(
+                horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+                spacing=5 if self.page.window.height <= 600 else 20,
+                controls=[
+                    ft.Row(alignment=ft.MainAxisAlignment.SPACE_BETWEEN, controls=[self.title, self.status_container]),
+                    self.display,
+                    ft.Column(
+                        spacing=0,
+                        horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+                        controls=[
+                            self.time_elapsed,
+                            self.started_at
+                        ]
+                    )
+                ])
 
-        self.txt_measured = self.page.session.get("lang.counter.measured")
-        self.txt_started_at = self.page.session.get("lang.counter.started_at")
+            self.txt_measured = self.page.session.get("lang.counter.measured")
+            self.txt_started_at = self.page.session.get("lang.counter.started_at")
+        except:
+            logging.exception('exception occured at TotalCounter.build')
+
 
     def did_mount(self):
         self.task_running = True

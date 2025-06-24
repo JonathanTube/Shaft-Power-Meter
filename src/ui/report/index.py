@@ -27,4 +27,7 @@ class Report(ft.Container):
             logging.exception('exception occured at Report.build')
 
     def __on_search(self, start_date: str, end_date: str):
-        self.table.search(start_date=start_date, end_date=end_date)
+        try:
+            self.table.search(start_date=start_date, end_date=end_date)
+        except:
+            logging.exception('exception occured at Report.__on_search')

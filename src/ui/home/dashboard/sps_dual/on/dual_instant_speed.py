@@ -1,3 +1,4 @@
+import logging
 import flet as ft
 from common.global_data import gdata
 from ui.common.simple_card import SimpleCard
@@ -15,30 +16,37 @@ class DualInstantSpeed(ft.Container):
         self.font_size_of_unit = 12
 
     def build(self):
-        self.__create_speed_sps1()
-        self.__create_speed_sps2()
+        try:
+            self.__create_speed_sps1()
+            self.__create_speed_sps2()
 
-        content = ft.Column(
-            expand=True,
-            horizontal_alignment=ft.CrossAxisAlignment.END,
-            alignment=ft.MainAxisAlignment.END,
-            spacing=0,
-            controls=[self.speed_sps1, self.speed_sps2]
-        )
+            content = ft.Column(
+                expand=True,
+                horizontal_alignment=ft.CrossAxisAlignment.END,
+                alignment=ft.MainAxisAlignment.END,
+                spacing=0,
+                controls=[self.speed_sps1, self.speed_sps2]
+            )
 
-        self.content = SimpleCard(title=self.page.session.get("lang.common.speed"), body=content)
+            self.content = SimpleCard(title=self.page.session.get("lang.common.speed"), body=content)
+        except:
+            logging.exception('exception occured at DualInstantSpeed.build')
+
 
     def reload(self):
-        speed_sps1 = UnitParser.parse_speed(gdata.sps1_speed)
-        speed_sps2 = UnitParser.parse_speed(gdata.sps2_speed)
+        try:
+            speed_sps1 = UnitParser.parse_speed(gdata.sps1_speed)
+            speed_sps2 = UnitParser.parse_speed(gdata.sps2_speed)
 
-        self.speed_sps1_value.value = speed_sps1[0]
-        self.speed_sps1_unit.value = speed_sps1[1]
+            self.speed_sps1_value.value = speed_sps1[0]
+            self.speed_sps1_unit.value = speed_sps1[1]
 
-        self.speed_sps2_value.value = speed_sps2[0]
-        self.speed_sps2_unit.value = speed_sps2[1]
+            self.speed_sps2_value.value = speed_sps2[0]
+            self.speed_sps2_unit.value = speed_sps2[1]
 
-        self.content.update()
+            self.content.update()
+        except:
+            logging.exception('exception occured at DualInstantSpeed.reload')
 
     def __create_speed_sps1(self):
         self.sps1_label = ft.Text(

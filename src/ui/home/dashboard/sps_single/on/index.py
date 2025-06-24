@@ -47,6 +47,7 @@ class SingleShaPoLiOn(ft.Container):
                 self.power_line_chart.reload()
             except:
                 logging.exception("exception occured at SingleShaPoLiOn.load_data")
+                break
             finally:
                 await asyncio.sleep(interval)
 

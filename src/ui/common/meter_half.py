@@ -1,3 +1,4 @@
+import logging
 import flet as ft
 
 
@@ -15,39 +16,46 @@ class MeterHalf(ft.Container):
         self.inner_center_space_radius = (self.outer_center_space_radius - self.inner_radius) * 0.9
 
     def build(self):
-        self.__create_outer()
-        self.__create_inner()
-        self.__create_center()
-        meter = ft.Stack(
-            controls=[self.outer, self.inner, self.center],
-            width=self.max_radius * 2,
-            height=self.max_radius * 2,
-            clip_behavior=ft.ClipBehavior.HARD_EDGE
-        )
-        # 搞这么复杂就是为了隐藏下半圆
-        self.content = ft.Stack(
-            width=self.max_radius * 2,
-            height=self.max_radius,
-            controls=[ft.Container(content=meter, top=0)]
-        )
+        try:
+            self.__create_outer()
+            self.__create_inner()
+            self.__create_center()
+            meter = ft.Stack(
+                controls=[self.outer, self.inner, self.center],
+                width=self.max_radius * 2,
+                height=self.max_radius * 2,
+                clip_behavior=ft.ClipBehavior.HARD_EDGE
+            )
+            # 搞这么复杂就是为了隐藏下半圆
+            self.content = ft.Stack(
+                width=self.max_radius * 2,
+                height=self.max_radius,
+                controls=[ft.Container(content=meter, top=0)]
+            )
+        except:
+            logging.exception('exception occured at MeterHalf.build')
+
 
     def set_outer_value(self, active_value: int, inactive_value: int):
-        _active_value = round(active_value, 2)
-        _inactive_value = round(inactive_value, 2)
-        total = _active_value + _inactive_value
-        if total > 0:
-            self.active_part.value = _active_value / total * 180
-            self.inactive_part.value = _inactive_value / total * 180
+        try:
+            _active_value = round(active_value, 2)
+            _inactive_value = round(inactive_value, 2)
+            total = _active_value + _inactive_value
+            if total > 0:
+                self.active_part.value = _active_value / total * 180
+                self.inactive_part.value = _inactive_value / total * 180
 
-            center_value = int(_active_value / total * 100)
-            self.__set_center_value(center_value)
-            if center_value > 100:
-                self.active_part.value = 180
-                self.inactive_part.value = 0
+                center_value = int(_active_value / total * 100)
+                self.__set_center_value(center_value)
+                if center_value > 100:
+                    self.active_part.value = 180
+                    self.inactive_part.value = 0
 
-        # set outer color
-        self.__set_outer_color()
-        self.outer.update()
+            # set outer color
+            self.__set_outer_color()
+            self.outer.update()
+        except:
+            logging.exception('exception occured at MeterHalf.set_outer_value')
 
     def __set_outer_color(self):
         if self.active_part.value <= self.inner_green.value:

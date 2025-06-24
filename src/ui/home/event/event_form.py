@@ -1,3 +1,4 @@
+import logging
 import flet as ft
 from common.operation_type import OperationType
 from db.models.breach_reason import BreachReason
@@ -22,97 +23,74 @@ class EventForm(ft.AlertDialog):
         self.__load_data()
 
     def __load_data(self):
-        self.breach_reasons = BreachReason.select()
-        self.event_log: EventLog = EventLog.select().where(EventLog.id == self.event_id).first()
+        try:
+            self.breach_reasons = BreachReason.select()
+            self.event_log: EventLog = EventLog.select().where(EventLog.id == self.event_id).first()
+        except:
+            logging.exception('exception occured at EventForm.__load_data')
+
 
     def build(self):
-        self.title = ft.Text(self.page.session.get("lang.log.event_log"))
-        started_at = ft.TextField(
-            label=self.page.session.get("lang.event.date_time_of_power_reserve_breach"),
-            value=self.event_log.started_at,
-            read_only=True,
-            disabled=True
-        )
+        try:
+            self.title = ft.Text(self.page.session.get("lang.log.event_log"))
+        
+            self.breach_reason = ft.Dropdown(
+                expand=True,
+                width=500,
+                label=self.page.session.get("lang.event.reason_for_power_reserve_breach"),
+                options=[ft.dropdown.Option(key=reason.id, text=reason.reason) for reason in self.breach_reasons],
+                value=self.event_log.breach_reason
+            )
 
-        start_position = ft.TextField(
-            label=self.page.session.get("lang.event.ship_position_of_power_reserve_breach"),
-            value=self.event_log.started_position,
-            read_only=True,
-            disabled=True
-        )
+            self.note = ft.TextField(
+                label=self.page.session.get("lang.event.note"),
+                multiline=True,
+                value=self.event_log.note
+            )
 
-        ended_at = ft.TextField(
-            label=self.page.session.get("lang.event.date_time_when_returning_to_limited_power"),
-            value=self.event_log.started_at,
-            read_only=True,
-            disabled=True
-        )
+            self.beaufort_number = ft.TextField(
+                label=self.page.session.get("lang.event.beaufort_number"),
+                value=self.event_log.beaufort_number
+            )
 
-        ended_position = ft.TextField(
-            label=self.page.session.get("lang.event.ship_position_when_returning_to_limited_power"),
-            value=self.event_log.ended_position,
-            read_only=True,
-            disabled=True
-        )
+            self.wave_height = ft.TextField(
+                label=self.page.session.get("lang.event.wave_height"),
+                value=self.event_log.wave_height
+            )
 
-        self.breach_reason = ft.Dropdown(
-            expand=True,
-            width=500,
-            label=self.page.session.get("lang.event.reason_for_power_reserve_breach"),
-            options=[ft.dropdown.Option(key=reason.id, text=reason.reason) for reason in self.breach_reasons],
-            value=self.event_log.breach_reason
-        )
+            self.ice_condition = ft.TextField(
+                label=self.page.session.get("lang.event.ice_condition"),
+                value=self.event_log.ice_condition
+            )
 
-        self.note = ft.TextField(
-            label=self.page.session.get("lang.event.note"),
-            multiline=True,
-            value=self.event_log.note
-        )
+            cols = ft.Column(
+                controls=[
+                    self.breach_reason,
+                    self.note,
+                    self.beaufort_number,
+                    self.wave_height,
+                    self.ice_condition
+                ]
+            )
 
-        self.beaufort_number = ft.TextField(
-            label=self.page.session.get("lang.event.beaufort_number"),
-            value=self.event_log.beaufort_number
-        )
+            self.content = ft.Column(
+                scroll=ft.ScrollMode.ADAPTIVE,
+                height=400,
+                controls=[
+                    ft.Container(
+                        width=500,
+                        padding=30,
+                        content=cols
+                    )
+                ])
 
-        self.wave_height = ft.TextField(
-            label=self.page.session.get("lang.event.wave_height"),
-            value=self.event_log.wave_height
-        )
-
-        self.ice_condition = ft.TextField(
-            label=self.page.session.get("lang.event.ice_condition"),
-            value=self.event_log.ice_condition
-        )
-
-        cols = ft.Column(
-            controls=[
-                # started_at,
-                # start_position,
-                # ended_at,
-                # ended_position,
-                self.breach_reason,
-                self.note,
-                self.beaufort_number,
-                self.wave_height,
-                self.ice_condition
+            self.actions = [
+                ft.ElevatedButton(text=self.page.session.get("lang.button.save"), on_click=self.__on_click_save),
+                ft.TextButton(text=self.page.session.get("lang.button.cancel"), on_click=self.__on_close)
             ]
-        )
+        except:
+            logging.exception('exception occured at EventForm.build')
 
-        self.content = ft.Column(
-            scroll=ft.ScrollMode.ADAPTIVE,
-            height=400,
-            controls=[
-                ft.Container(
-                    width=500,
-                    padding=30,
-                    content=cols
-                )
-            ])
-
-        self.actions = [
-            ft.ElevatedButton(text=self.page.session.get("lang.button.save"), on_click=self.__on_click_save),
-            ft.TextButton(text=self.page.session.get("lang.button.cancel"), on_click=self.__on_close)
-        ]
 
     def __on_close(self, e):
         e.page.close(self)

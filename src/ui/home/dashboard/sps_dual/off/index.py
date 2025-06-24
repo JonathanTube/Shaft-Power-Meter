@@ -13,21 +13,25 @@ class DualShaPoLiOff(ft.Container):
         self.task_running = False
 
     def build(self):
-        self.sps1_meters = DualMeters(name="sps1")
-        self.sps2_meters = DualMeters(name="sps2")
-        self.dual_power_line = DualPowerLine()
+        try:
+            self.sps1_meters = DualMeters(name="sps1")
+            self.sps2_meters = DualMeters(name="sps2")
+            self.dual_power_line = DualPowerLine()
 
-        self.content = ft.Column(
-            expand=True,
-            spacing=10,
-            controls=[
-                ft.Row(
-                    expand=True,
-                    spacing=10,
-                    controls=[self.sps1_meters, self.sps2_meters]
-                )
-            ]
-        )
+            self.content = ft.Column(
+                expand=True,
+                spacing=10,
+                controls=[
+                    ft.Row(
+                        expand=True,
+                        spacing=10,
+                        controls=[self.sps1_meters, self.sps2_meters]
+                    )
+                ]
+            )
+        except:
+            logging.exception('exception occured at DualShaPoLiOff.build')
+
 
     async def load_data(self):
         preference: Preference = Preference.get()
@@ -38,6 +42,7 @@ class DualShaPoLiOff(ft.Container):
                 self.sps2_meters.reload()
             except:
                 logging.exception('exception occured at DualShaPoLiOff.load_data')
+                break
             finally:
                 await asyncio.sleep(interval)
             

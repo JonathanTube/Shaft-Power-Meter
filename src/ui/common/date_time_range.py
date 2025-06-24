@@ -1,3 +1,4 @@
+import logging
 import flet as ft
 
 from db.models.date_time_conf import DateTimeConf
@@ -10,26 +11,30 @@ class DateTimeRange(ft.Row):
         self.date_format = datetime_conf.date_format
 
     def build(self):
-        self.start_date = ft.TextField(
-            expand=True,
-            label=self.page.session.get("lang.common.start_date"),
-            size_constraints=ft.BoxConstraints(max_width=200),
-            can_request_focus=False,
-            enable_interactive_selection=False,
-            on_click=lambda e: e.page.open(ft.DatePicker(on_change=self.__handle_start_date_change)))
+        try:
+            self.start_date = ft.TextField(
+                expand=True,
+                label=self.page.session.get("lang.common.start_date"),
+                size_constraints=ft.BoxConstraints(max_width=200),
+                can_request_focus=False,
+                enable_interactive_selection=False,
+                on_click=lambda e: e.page.open(ft.DatePicker(on_change=self.__handle_start_date_change)))
 
-        self.end_date = ft.TextField(
-            expand=True,
-            label=self.page.session.get("lang.common.end_date"),
-            size_constraints=ft.BoxConstraints(max_width=200),
-            can_request_focus=False,
-            enable_interactive_selection=False,
-            on_click=lambda e: e.page.open(ft.DatePicker(on_change=self.__handle_end_date_change)))
+            self.end_date = ft.TextField(
+                expand=True,
+                label=self.page.session.get("lang.common.end_date"),
+                size_constraints=ft.BoxConstraints(max_width=200),
+                can_request_focus=False,
+                enable_interactive_selection=False,
+                on_click=lambda e: e.page.open(ft.DatePicker(on_change=self.__handle_end_date_change)))
 
-        self.controls = [
-            self.start_date,
-            self.end_date
-        ]
+            self.controls = [
+                self.start_date,
+                self.end_date
+            ]
+        except:
+            logging.exception('exception occured at DateTimeRange.build')
+
 
     def __handle_start_date_change(self, e):
         self.start_date.value = e.control.value.strftime(self.date_format)

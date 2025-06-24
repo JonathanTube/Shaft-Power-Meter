@@ -1,3 +1,4 @@
+import logging
 import flet as ft
 
 from ui.common.simple_card import SimpleCard
@@ -23,30 +24,37 @@ class DualInstantThrust(ft.Container):
         self.unit = preference.system_unit
 
     def build(self):
-        self.__create_thrust_sps1()
-        self.__create_thrust_sps2()
+        try:
+            self.__create_thrust_sps1()
+            self.__create_thrust_sps2()
 
-        content = ft.Column(
-            expand=True,
-            horizontal_alignment=ft.CrossAxisAlignment.END,
-            alignment=ft.MainAxisAlignment.END,
-            spacing=0,
-            controls=[self.thrust_sps1, self.thrust_sps2]
-        )
+            content = ft.Column(
+                expand=True,
+                horizontal_alignment=ft.CrossAxisAlignment.END,
+                alignment=ft.MainAxisAlignment.END,
+                spacing=0,
+                controls=[self.thrust_sps1, self.thrust_sps2]
+            )
 
-        self.content = SimpleCard(title=self.page.session.get("lang.common.thrust"), body=content)
+            self.content = SimpleCard(title=self.page.session.get("lang.common.thrust"), body=content)
+        except:
+            logging.exception('exception occured at DualInstantThrust.build')
 
     def reload(self):
-        thrust_sps1 = UnitParser.parse_thrust(gdata.sps1_thrust, self.unit)
-        thrust_sps2 = UnitParser.parse_thrust(gdata.sps2_thrust, self.unit)
+        try:
+            thrust_sps1 = UnitParser.parse_thrust(gdata.sps1_thrust, self.unit)
+            thrust_sps2 = UnitParser.parse_thrust(gdata.sps2_thrust, self.unit)
 
-        self.thrust_sps1_value.value = thrust_sps1[0]
-        self.thrust_sps1_unit.value = thrust_sps1[1]
+            self.thrust_sps1_value.value = thrust_sps1[0]
+            self.thrust_sps1_unit.value = thrust_sps1[1]
 
-        self.thrust_sps2_value.value = thrust_sps2[0]
-        self.thrust_sps2_unit.value = thrust_sps2[1]
+            self.thrust_sps2_value.value = thrust_sps2[0]
+            self.thrust_sps2_unit.value = thrust_sps2[1]
 
-        self.content.update()
+            self.content.update()
+        except:
+            logging.exception('exception occured at DualInstantThrust.reload')
+
 
     def __create_thrust_sps1(self):
         self.sps1_label = ft.Text(

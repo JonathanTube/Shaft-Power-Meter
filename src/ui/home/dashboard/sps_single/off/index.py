@@ -12,20 +12,24 @@ class SingleShaPoLiOff(ft.Stack):
         self.task_running = False
 
     def build(self):
-        self.thrust_power = ThrustBlock("sps1")
-        self.single_meters = SingleMeters()
+        try:
+            self.thrust_power = ThrustBlock("sps1")
+            self.single_meters = SingleMeters()
 
-        self.controls = [
-            self.thrust_power,
-            ft.Column(
-                expand=True,
-                spacing=10,
-                alignment=ft.alignment.center,
-                controls=[
-                    self.single_meters
-                ]
-            )
-        ]
+            self.controls = [
+                self.thrust_power,
+                ft.Column(
+                    expand=True,
+                    spacing=10,
+                    alignment=ft.alignment.center,
+                    controls=[
+                        self.single_meters
+                    ]
+                )
+            ]
+        except:
+            logging.exception('exception occured at SingleShaPoLiOff.build')
+
 
     async def load_data(self):
         preference: Preference = Preference.get()
@@ -36,6 +40,7 @@ class SingleShaPoLiOff(ft.Stack):
                 self.thrust_power.reload()
             except:
                 logging.exception("exception occured at SingleShaPoLiOff.load_data")
+                break
             finally:
                 await asyncio.sleep(interval)
 

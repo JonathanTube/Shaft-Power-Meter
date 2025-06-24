@@ -14,20 +14,25 @@ class DualShaPoLiOn(ft.Container):
         self.task_running = True
 
     def build(self):
-        w = self.page.window.width * 0.5
-        h = self.page.window.height * 0.5
+        try:
+            w = self.page.window.width * 0.5
+            h = self.page.window.height * 0.5
 
-        self.eexi_limited_power = EEXILimitedPower(w, h)
-        self.instant_grid = DualInstantGrid()
-        self.power_chart = SinglePowerLine()
+            self.eexi_limited_power = EEXILimitedPower(w, h)
+            self.instant_grid = DualInstantGrid()
+            self.power_chart = SinglePowerLine()
 
-        self.content = ft.Column(
-            expand=True,
-            controls=[
-                ft.Row(expand=True, controls=[self.eexi_limited_power, self.instant_grid]),
-                ft.Row(expand=True, controls=[self.power_chart])
-            ]
-        )
+            self.content = ft.Column(
+                expand=True,
+                controls=[
+                    ft.Row(expand=True, controls=[self.eexi_limited_power, self.instant_grid]),
+                    ft.Row(expand=True, controls=[self.power_chart])
+                ]
+            )
+        except:
+            logging.exception('exception occured at DualShaPoLiOn.build')
+
+
 
     async def load_data(self):
         preference: Preference = Preference.get()
@@ -39,6 +44,7 @@ class DualShaPoLiOn(ft.Container):
                 self.power_chart.reload()
             except:
                 logging.exception("exception occured at DualShaPoLiOn.load_data")
+                break
             finally:
                 await asyncio.sleep(interval)
 

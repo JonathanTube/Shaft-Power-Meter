@@ -74,91 +74,95 @@ class ManuallyCounter(ft.Container):
         )
 
     def build(self):
-        self.__create_dlg_modal()
+        try:
+            self.__create_dlg_modal()
 
-        self.display = CounterDisplay()
+            self.display = CounterDisplay()
 
-        self.started_at = ft.Text("", visible=False)
-        self.time_elapsed = ft.Text("", visible=False)
-        self.stopped_at = ft.Text("", visible=False)
+            self.started_at = ft.Text("", visible=False)
+            self.time_elapsed = ft.Text("", visible=False)
+            self.stopped_at = ft.Text("", visible=False)
 
-        self.status_text = ft.Text(value=self.page.session.get('lang.counter.stopped'), color=ft.Colors.WHITE, size=12)
+            self.status_text = ft.Text(value=self.page.session.get('lang.counter.stopped'), color=ft.Colors.WHITE, size=12)
 
-        self.status_container = ft.Container(
-            content=self.status_text,
-            alignment=ft.alignment.center,
-            bgcolor=ft.Colors.RED_500,
-            border_radius=ft.border_radius.all(40),
-            padding=ft.padding.only(top=0, bottom=4, left=10, right=10)
-        )
+            self.status_container = ft.Container(
+                content=self.status_text,
+                alignment=ft.alignment.center,
+                bgcolor=ft.Colors.RED_500,
+                border_radius=ft.border_radius.all(40),
+                padding=ft.padding.only(top=0, bottom=4, left=10, right=10)
+            )
 
-        self.start_button = ft.FilledButton(
-            text=self.page.session.get('lang.counter.start'),
-            icon=ft.icons.PLAY_CIRCLE_OUTLINED,
-            icon_color=ft.Colors.WHITE,
-            bgcolor=ft.Colors.GREEN,
-            color=ft.Colors.WHITE,
-            width=220,
-            visible=False,
-            on_click=lambda e: self.__on_start(e)
-        )
+            self.start_button = ft.FilledButton(
+                text=self.page.session.get('lang.counter.start'),
+                icon=ft.icons.PLAY_CIRCLE_OUTLINED,
+                icon_color=ft.Colors.WHITE,
+                bgcolor=ft.Colors.GREEN,
+                color=ft.Colors.WHITE,
+                width=220,
+                visible=False,
+                on_click=lambda e: self.__on_start(e)
+            )
 
-        self.stop_button = ft.FilledButton(
-            text=self.page.session.get('lang.counter.stop'),
-            icon=ft.icons.STOP_CIRCLE_OUTLINED,
-            icon_color=ft.Colors.WHITE,
-            bgcolor=ft.Colors.RED,
-            color=ft.Colors.WHITE,
-            width=220,
-            visible=False,
-            on_click=lambda e: self.__on_stop(e)
-        )
+            self.stop_button = ft.FilledButton(
+                text=self.page.session.get('lang.counter.stop'),
+                icon=ft.icons.STOP_CIRCLE_OUTLINED,
+                icon_color=ft.Colors.WHITE,
+                bgcolor=ft.Colors.RED,
+                color=ft.Colors.WHITE,
+                width=220,
+                visible=False,
+                on_click=lambda e: self.__on_stop(e)
+            )
 
-        self.resume_button = ft.FilledButton(
-            text=self.page.session.get('lang.counter.resume'),
-            bgcolor=ft.Colors.ORANGE,
-            icon_color=ft.Colors.WHITE,
-            color=ft.Colors.WHITE,
-            icon=ft.icons.RESTART_ALT_OUTLINED,
-            width=220,
-            visible=False,
-            on_click=lambda e: e.page.open(self.dlg_modal)
-        )
+            self.resume_button = ft.FilledButton(
+                text=self.page.session.get('lang.counter.resume'),
+                bgcolor=ft.Colors.ORANGE,
+                icon_color=ft.Colors.WHITE,
+                color=ft.Colors.WHITE,
+                icon=ft.icons.RESTART_ALT_OUTLINED,
+                width=220,
+                visible=False,
+                on_click=lambda e: e.page.open(self.dlg_modal)
+            )
 
-        self.title = ft.Text(self.page.session.get('lang.counter.manually'), weight=ft.FontWeight.BOLD, size=16)
+            self.title = ft.Text(self.page.session.get('lang.counter.manually'), weight=ft.FontWeight.BOLD, size=16)
 
-        self.infos = ft.Column(
-            expand=True,
-            spacing=0,
-            horizontal_alignment=ft.CrossAxisAlignment.CENTER,
-            alignment=ft.MainAxisAlignment.CENTER,
-            controls=[
-                self.time_elapsed,
-                self.started_at,
-                self.stopped_at
-            ]
-        )
-        self.buttons = ft.Column(
-            expand=True,
-            horizontal_alignment=ft.CrossAxisAlignment.CENTER,
-            alignment=ft.MainAxisAlignment.CENTER,
-            controls=[
-                self.start_button,
-                self.stop_button,
-                self.resume_button
-            ]
-        )
-        self.content = ft.Column(
-            horizontal_alignment=ft.CrossAxisAlignment.CENTER,
-            alignment=ft.MainAxisAlignment.CENTER,
-            spacing=5 if self.page.window.height <= 600 else 20,
-            controls=[
-                ft.Row(alignment=ft.MainAxisAlignment.SPACE_BETWEEN, controls=[self.title, self.status_container]),
-                self.display,
-                self.infos,
-                self.buttons
-            ]
-        )
+            self.infos = ft.Column(
+                expand=True,
+                spacing=0,
+                horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+                alignment=ft.MainAxisAlignment.CENTER,
+                controls=[
+                    self.time_elapsed,
+                    self.started_at,
+                    self.stopped_at
+                ]
+            )
+            self.buttons = ft.Column(
+                expand=True,
+                horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+                alignment=ft.MainAxisAlignment.CENTER,
+                controls=[
+                    self.start_button,
+                    self.stop_button,
+                    self.resume_button
+                ]
+            )
+            self.content = ft.Column(
+                horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+                alignment=ft.MainAxisAlignment.CENTER,
+                spacing=5 if self.page.window.height <= 600 else 20,
+                controls=[
+                    ft.Row(alignment=ft.MainAxisAlignment.SPACE_BETWEEN, controls=[self.title, self.status_container]),
+                    self.display,
+                    self.infos,
+                    self.buttons
+                ]
+            )
+        except:
+            logging.exception('exception occured at ManuallyCounter.build')
+
 
     def did_mount(self):
         self.task_running = True

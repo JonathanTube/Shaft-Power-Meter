@@ -1,3 +1,4 @@
+import logging
 import flet as ft
 
 from ui.home.dashboard.meters.speed_meter import SpeedMeter
@@ -24,34 +25,42 @@ class DualMeters(ft.Container):
         return radius
 
     def build(self):
-        self.speed_meter = SpeedMeter(self.name, self.get_radius(0.22))
-        self.power_meter = PowerMeter(self.name, self.get_radius(0.32))
-        self.torque_meter = TorqueMeter(self.name, self.get_radius(0.22))
-        self.thrust_meter = ThrustBlock(self.name)
+        try:
+            self.speed_meter = SpeedMeter(self.name, self.get_radius(0.22))
+            self.power_meter = PowerMeter(self.name, self.get_radius(0.32))
+            self.torque_meter = TorqueMeter(self.name, self.get_radius(0.22))
+            self.thrust_meter = ThrustBlock(self.name)
 
-        title = self.page.session.get("lang.common.sps1")
-        if self.name == "sps2":
-            title = self.page.session.get("lang.common.sps2")
+            title = self.page.session.get("lang.common.sps1")
+            if self.name == "sps2":
+                title = self.page.session.get("lang.common.sps2")
 
-        self.content = ft.Stack(
-            controls=[
-                ft.Text(value=title, size=18, weight=ft.FontWeight.BOLD, left=10, top=10),
-                self.thrust_meter,
-                SimpleCard(
-                    body_bottom_right=False,
-                    body=ft.Stack(
-                        expand=True,
-                        alignment=ft.alignment.center,
-                        controls=[
-                            ft.Container(content=self.speed_meter, bottom=10, left=10),
-                            ft.Container(content=self.power_meter, top=10),
-                            ft.Container(content=self.torque_meter, bottom=10, right=10)
-                        ])
-                )
-            ])
+            self.content = ft.Stack(
+                controls=[
+                    ft.Text(value=title, size=18, weight=ft.FontWeight.BOLD, left=10, top=10),
+                    self.thrust_meter,
+                    SimpleCard(
+                        body_bottom_right=False,
+                        body=ft.Stack(
+                            expand=True,
+                            alignment=ft.alignment.center,
+                            controls=[
+                                ft.Container(content=self.speed_meter, bottom=10, left=10),
+                                ft.Container(content=self.power_meter, top=10),
+                                ft.Container(content=self.torque_meter, bottom=10, right=10)
+                            ])
+                    )
+                ])
+        except:
+            logging.exception('exception occured at DualMeters.build')
+
 
     def reload(self):
-        self.power_meter.reload()
-        self.torque_meter.reload()
-        self.speed_meter.reload()
-        self.thrust_meter.reload()
+        try:
+            self.power_meter.reload()
+            self.torque_meter.reload()
+            self.speed_meter.reload()
+            self.thrust_meter.reload()
+        except:
+            logging.exception('exception occured at DualMeters.reload')
+

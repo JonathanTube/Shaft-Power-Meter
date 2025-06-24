@@ -53,11 +53,16 @@ class AlarmButton(ft.TextButton):
         self.update()
 
     def toggle_button(self, blink: bool):
-        if blink:
-            self.set_red_button()
-        else:
-            self.set_normal_button()
-        self.update()
+        try:
+            if self.page:
+                if blink:
+                    self.set_red_button()
+                else:
+                    self.set_normal_button()
+                self.update()
+        except:
+            logging.exception('exception occured at AlarmButton.toggle_button')
+
 
     async def __loop(self):
         cnt = 0

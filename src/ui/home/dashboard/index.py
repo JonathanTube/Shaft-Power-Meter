@@ -1,3 +1,4 @@
+import logging
 import flet as ft
 
 from ui.home.dashboard.sps_dual.off.index import DualShaPoLiOff
@@ -14,20 +15,23 @@ class Dashboard(ft.Container):
         self.system_settings = SystemSettings.get_or_none()
 
     def build(self):
-        if self.system_settings is None:
-            sha_po_li = False
-            amount_of_power = 1
-        else:
-            sha_po_li = self.system_settings.sha_po_li
-            amount_of_power = self.system_settings.amount_of_propeller
+        try:
+            if self.system_settings is None:
+                sha_po_li = False
+                amount_of_power = 1
+            else:
+                sha_po_li = self.system_settings.sha_po_li
+                amount_of_power = self.system_settings.amount_of_propeller
 
-        if amount_of_power == 1:
-            if sha_po_li:
-                self.content = SingleShaPoLiOn()
-            else:
-                self.content = SingleShaPoLiOff()
-        elif amount_of_power == 2:
-            if sha_po_li:
-                self.content = DualShaPoLiOn()
-            else:
-                self.content = DualShaPoLiOff()
+            if amount_of_power == 1:
+                if sha_po_li:
+                    self.content = SingleShaPoLiOn()
+                else:
+                    self.content = SingleShaPoLiOff()
+            elif amount_of_power == 2:
+                if sha_po_li:
+                    self.content = DualShaPoLiOn()
+                else:
+                    self.content = DualShaPoLiOff()
+        except:
+            logging.exception('exception occured at Dashboard.build')

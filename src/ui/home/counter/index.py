@@ -1,3 +1,4 @@
+import logging
 import flet as ft
 
 from db.models.system_settings import SystemSettings
@@ -19,28 +20,32 @@ class Counter(ft.Container):
         self.dual = system_settings.amount_of_propeller == 2
 
     def build(self):
-        interval_counter_sps1 = IntervalCounter('sps1')
-        manually_counter_sps1 = ManuallyCounter('sps1')
-        total_counter_sps1 = TotalCounter('sps1')
+        try:
+            interval_counter_sps1 = IntervalCounter('sps1')
+            manually_counter_sps1 = ManuallyCounter('sps1')
+            total_counter_sps1 = TotalCounter('sps1')
 
-        if self.dual:
-            interval_counter_sps2 = IntervalCounter('sps2')
-            manually_counter_sps2 = ManuallyCounter('sps2')
-            total_counter_sps2 = TotalCounter('sps2')
+            if self.dual:
+                interval_counter_sps2 = IntervalCounter('sps2')
+                manually_counter_sps2 = ManuallyCounter('sps2')
+                total_counter_sps2 = TotalCounter('sps2')
+
+                self.content = ft.Column(
+                    scroll=ft.ScrollMode.AUTO,
+                    controls=[
+                        ft.Text('sps1', weight=ft.FontWeight.BOLD, size=16),
+                        ft.Row(expand=True, controls=[interval_counter_sps1, manually_counter_sps1, total_counter_sps1]),
+                        ft.Text('sps2', weight=ft.FontWeight.BOLD, size=16),
+                        ft.Row(expand=True, controls=[interval_counter_sps2, manually_counter_sps2, total_counter_sps2])
+                    ])
+                return
 
             self.content = ft.Column(
                 scroll=ft.ScrollMode.AUTO,
                 controls=[
-                    ft.Text('sps1', weight=ft.FontWeight.BOLD, size=16),
                     ft.Row(expand=True, controls=[interval_counter_sps1, manually_counter_sps1, total_counter_sps1]),
-                    ft.Text('sps2', weight=ft.FontWeight.BOLD, size=16),
-                    ft.Row(expand=True, controls=[interval_counter_sps2, manually_counter_sps2, total_counter_sps2])
+                    ft.Text('', expand=True)
                 ])
-            return
+        except:
+            logging.exception('exception occured at Counter.build')
 
-        self.content = ft.Column(
-            scroll=ft.ScrollMode.AUTO,
-            controls=[
-                ft.Row(expand=True, controls=[interval_counter_sps1, manually_counter_sps1, total_counter_sps1]),
-                ft.Text('', expand=True)
-            ])

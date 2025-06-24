@@ -1,3 +1,4 @@
+import logging
 import flet as ft
 
 from ui.common.datetime_search import DatetimeSearch
@@ -9,20 +10,22 @@ class EventList(ft.Container):
         super().__init__()
         self.expand = True
         self.padding = 10
-        self.content = self.__create()
 
-    def __create(self):
-        search = DatetimeSearch(self.on_search)
-        self.table = EventTable()
+    def build(self):
+        try:
+            search = DatetimeSearch(self.on_search)
+            self.table = EventTable()
 
-        return ft.Column(
-            expand=True,
-            spacing=5,
-            controls=[
-                search,
-                self.table
-            ]
-        )
+            self.content = ft.Column(
+                expand=True,
+                spacing=5,
+                controls=[
+                    search,
+                    self.table
+                ]
+            )
+        except:
+            logging.exception('exception occured at EventList.build')
 
     def on_search(self, start_date: str, end_date: str):
         self.table.search(start_date=start_date, end_date=end_date)

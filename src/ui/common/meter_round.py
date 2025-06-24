@@ -1,3 +1,4 @@
+import logging
 import math
 
 import flet as ft
@@ -20,29 +21,33 @@ class MeterRound(ft.Container):
         self.color = color
 
     def set_data(self, actual_value: int, display_value: int, display_unit: str):
-        if self.max_value == 0:
-            return
-        # update unit
-        self.center_unit.value = display_unit
-        self.center_unit.update()
+        try:
+            if self.max_value == 0:
+                return
+            # update unit
+            self.center_unit.value = display_unit
+            self.center_unit.update()
 
-        # update active section
-        active_val = (360 - self.__hide_section) * actual_value / self.max_value
-        # 如果value大于max_value，则active_val为360 - self.__hide_section
-        if actual_value > self.max_value:
-            active_val = 360 - self.__hide_section
+            # update active section
+            active_val = (360 - self.__hide_section) * actual_value / self.max_value
+            # 如果value大于max_value，则active_val为360 - self.__hide_section
+            if actual_value > self.max_value:
+                active_val = 360 - self.__hide_section
 
-        self.active_section.value = active_val
-        self.active_section.update()
+            self.active_section.value = active_val
+            self.active_section.update()
 
-        # update inactive section
-        inactive_val = (360 - self.__hide_section) - active_val
-        self.inactive_section.value = inactive_val
-        self.inactive_section.update()
+            # update inactive section
+            inactive_val = (360 - self.__hide_section) - active_val
+            self.inactive_section.value = inactive_val
+            self.inactive_section.update()
 
-        # update center text
-        self.center_text.value = display_value
-        self.center_text.update()
+            # update center text
+            self.center_text.value = display_value
+            self.center_text.update()
+        except:
+            logging.exception('exception occured at MeterRound.set_data')
+
 
     def __create_ring(self):
         self.active_section = ft.PieChartSection(
@@ -115,36 +120,40 @@ class MeterRound(ft.Container):
         )
 
     def build(self):
-        self.__create_warning_line()
-        self.__create_ring()
-        self.__create_center()
+        try:
+            self.__create_warning_line()
+            self.__create_ring()
+            self.__create_center()
 
-        main_content = ft.Stack(
-            controls=[
-                self.ring,
-                self.warning_line,
-                self.center
-            ],
-            width=self.max_radius * 2,
-            height=self.max_radius * 2
-        )
+            main_content = ft.Stack(
+                controls=[
+                    self.ring,
+                    self.warning_line,
+                    self.center
+                ],
+                width=self.max_radius * 2,
+                height=self.max_radius * 2
+            )
 
-        cutting_content = ft.Stack(
-            width=self.max_radius * 2,
-            height=self.max_radius * 2 * 0.85,
-            controls=[ft.Container(content=main_content, top=0)]
-        )
+            cutting_content = ft.Stack(
+                width=self.max_radius * 2,
+                height=self.max_radius * 2 * 0.85,
+                controls=[ft.Container(content=main_content, top=0)]
+            )
 
-        heading_content = ft.Text(
-            self.heading,
-            size=self.max_radius * 0.2,
-            weight=ft.FontWeight.W_600
-        )
+            heading_content = ft.Text(
+                self.heading,
+                size=self.max_radius * 0.2,
+                weight=ft.FontWeight.W_600
+            )
 
-        self.content = ft.Column(
-            horizontal_alignment=ft.CrossAxisAlignment.CENTER,
-            # expand=True,
-            controls=[
-                heading_content,
-                cutting_content
-            ])
+            self.content = ft.Column(
+                horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+                # expand=True,
+                controls=[
+                    heading_content,
+                    cutting_content
+                ])
+        except:
+            logging.exception('exception occured at MeterRound.build')
+

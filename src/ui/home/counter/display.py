@@ -1,3 +1,4 @@
+import logging
 import flet as ft
 
 from utils.unit_parser import UnitParser
@@ -94,18 +95,22 @@ class CounterDisplay(ft.Container):
         )
 
     def build(self):
-        self.__create_total_energy()
-        self.__create_average_power()
-        self.__create_average_speed()
-        self.content = ft.Column(
-            expand=True,
-            spacing=0 if self.page.window.height <= 600 else 10,
-            controls=[
-                self.total_energy,
-                self.average_power,
-                self.average_speed
-            ]
-        )
+        try:
+            self.__create_total_energy()
+            self.__create_average_power()
+            self.__create_average_speed()
+            self.content = ft.Column(
+                expand=True,
+                spacing=0 if self.page.window.height <= 600 else 10,
+                controls=[
+                    self.total_energy,
+                    self.average_power,
+                    self.average_speed
+                ]
+            )
+        except:
+            logging.exception('exception occured at CounterDisplay.build')
+
 
     def set_total_energy(self, total_energy: float, system_unit: int):
         value_and_unit = UnitParser.parse_energy(total_energy, system_unit)

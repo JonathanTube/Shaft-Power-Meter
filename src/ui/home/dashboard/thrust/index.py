@@ -1,3 +1,4 @@
+import logging
 import flet as ft
 from utils.unit_parser import UnitParser
 from db.models.preference import Preference
@@ -18,25 +19,32 @@ class ThrustBlock(ft.Container):
         self.visible = system_settings.display_thrust
 
     def build(self):
-        self.title = ft.Text(self.page.session.get("lang.common.thrust"), weight=ft.FontWeight.W_500, size=20)
-        self.thrust_value = ft.Text("0")
-        self.thrust_unit = ft.Text("N")
-        self.content = ft.Column(
-            horizontal_alignment=ft.CrossAxisAlignment.CENTER,
-            controls=[
-                self.title,
-                ft.Row(controls=[self.thrust_value, self.thrust_unit])
-            ],
-            expand=True
-        )
+        try:
+            self.title = ft.Text(self.page.session.get("lang.common.thrust"), weight=ft.FontWeight.W_500, size=20)
+            self.thrust_value = ft.Text("0")
+            self.thrust_unit = ft.Text("N")
+            self.content = ft.Column(
+                horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+                controls=[
+                    self.title,
+                    ft.Row(controls=[self.thrust_value, self.thrust_unit])
+                ],
+                expand=True
+            )
+        except:
+            logging.exception('exception occured at ThrustBlock.build')
+
 
     def reload(self):
-        if self.name == "sps1":
-            thrust_and_unit = UnitParser.parse_thrust(gdata.sps1_thrust, self.system_unit)
-            self.thrust_value.value = thrust_and_unit[0]
-            self.thrust_unit.value = thrust_and_unit[1]
-        else:
-            thrust_and_unit = UnitParser.parse_thrust(gdata.sps2_thrust, self.system_unit)
-            self.thrust_value.value = thrust_and_unit[0]
-            self.thrust_unit.value = thrust_and_unit[1]
-        self.content.update()
+        try:
+            if self.name == "sps1":
+                thrust_and_unit = UnitParser.parse_thrust(gdata.sps1_thrust, self.system_unit)
+                self.thrust_value.value = thrust_and_unit[0]
+                self.thrust_unit.value = thrust_and_unit[1]
+            else:
+                thrust_and_unit = UnitParser.parse_thrust(gdata.sps2_thrust, self.system_unit)
+                self.thrust_value.value = thrust_and_unit[0]
+                self.thrust_unit.value = thrust_and_unit[1]
+            self.content.update()
+        except:
+            logging.exception('exception occured at ThrustBlock.reload')

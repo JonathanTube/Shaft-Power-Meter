@@ -11,22 +11,25 @@ class WindowsSoundPlayer:
     支持循环播放和即时停止功能
     """
     def __init__(self):
-        # 加载 Windows 多媒体库
-        self.winmm = ctypes.WinDLL('winmm.dll')
-        
-        # 定义 PlaySound 函数原型
-        self.winmm.PlaySoundW.argtypes = [
-            wintypes.LPCWSTR,  # pszSound: 声音文件路径
-            wintypes.HMODULE,  # hmod: 模块句柄（通常为 NULL）
-            wintypes.DWORD     # fdwSound: 播放标志
-        ]
-        self.winmm.PlaySoundW.restype = wintypes.BOOL
-        
-        # 定义播放标志常量
-        self.SND_ASYNC = 0x0001  # 异步播放
-        self.SND_LOOP = 0x0008   # 循环播放
-        self.SND_FILENAME = 0x00020000  # 参数是文件名
-        self.SND_NODEFAULT = 0x0002  # 不播放默认声音
+        try:
+            # 加载 Windows 多媒体库
+            self.winmm = ctypes.WinDLL('winmm.dll')
+            
+            # 定义 PlaySound 函数原型
+            self.winmm.PlaySoundW.argtypes = [
+                wintypes.LPCWSTR,  # pszSound: 声音文件路径
+                wintypes.HMODULE,  # hmod: 模块句柄（通常为 NULL）
+                wintypes.DWORD     # fdwSound: 播放标志
+            ]
+            self.winmm.PlaySoundW.restype = wintypes.BOOL
+            
+            # 定义播放标志常量
+            self.SND_ASYNC = 0x0001  # 异步播放
+            self.SND_LOOP = 0x0008   # 循环播放
+            self.SND_FILENAME = 0x00020000  # 参数是文件名
+            self.SND_NODEFAULT = 0x0002  # 不播放默认声音
+        except:
+            logging.exception('exception occured at WindowsSoundPlayer.__init__')
     
     def play(self):
         """
