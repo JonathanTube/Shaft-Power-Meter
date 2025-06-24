@@ -157,10 +157,13 @@ class Setting(ft.Container):
 
     async def test_auto_run(self):
         while self.task_running and gdata.auto_testing:
-            idx = int(random() * 10) % len(self.rail.destinations)
-            logging.info(f'&&&&&&&&&&&&&&-Setting.test_auto_run, idx = {idx}')
-            self.__switch_content(idx=idx)
-            self.rail.selected_index = idx
-            self.rail.update()
-            await asyncio.sleep(random())
-        self.task_running = False
+            try:
+                idx = int(random() * 10) % len(self.rail.destinations)
+                logging.info(f'&&&&&&&&&&&&&&-Setting.test_auto_run, idx = {idx}')
+                self.__switch_content(idx=idx)
+                self.rail.selected_index = idx
+                self.rail.update()
+            except:
+                return
+            finally:
+                await asyncio.sleep(random())

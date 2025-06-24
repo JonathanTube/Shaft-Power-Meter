@@ -233,15 +233,18 @@ class Header(ft.AppBar):
         arr = ['HOME', 'REPORT', 'SETTING']
         idx = 0
         while self._auto_run_running:
-            if gdata.auto_testing:
-                self.on_click(arr[idx % 3])
-                self.theme.toggle_theme()
-                idx += 1
-                # report没东西，2s够了
-                if self.active_name == 'REPORT':
-                    await asyncio.sleep(2)
+            try:
+                if gdata.auto_testing:
+                    self.on_click(arr[idx % 3])
+                    self.theme.toggle_theme()
+                    idx += 1
+                    # report没东西，2s够了
+                    if self.active_name == 'REPORT':
+                        await asyncio.sleep(2)
+                    else:
+                        await asyncio.sleep(random() * 20)
                 else:
-                    await asyncio.sleep(random() * 20)
-            else:
-                # 如果没有启动测试，自动间隔5s
-                await asyncio.sleep(5)
+                    # 如果没有启动测试，自动间隔5s
+                    await asyncio.sleep(5)
+            except:
+                return
