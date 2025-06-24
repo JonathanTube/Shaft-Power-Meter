@@ -20,20 +20,26 @@ class Setting(ft.Container):
         self.margin = ft.margin.all(10)
         self.idx = 0
 
+        self.is_switching = False
+
         self.task = None
         self.task_running = False
 
     def __set_content(self, e):
         idx = e.control.selected_index
         self.__switch_content(idx)
-        if idx == 7:
-            self.task_running = False
 
     def __switch_content(self, idx: int):
-        if self.page and self.right_content and self.right_content.page:
-            try:
-                if idx == self.idx:
-                    return
+        if self.is_switching:
+            return
+
+        if idx == self.idx:
+            return
+
+        try:
+            self.is_switching = True
+
+            if self.page and self.right_content and self.right_content.page:
 
                 self.idx = idx
 
@@ -56,10 +62,11 @@ class Setting(ft.Container):
                 elif idx == 7:
                     self.right_content.content = TestMode()
 
-                if self.right_content and self.right_content.page:
-                    self.right_content.update()
-            except:
-                logging.exception("error occured while switch the button, please try it lately.")
+                self.right_content.update()
+        except:
+            logging.exception("error occured while switch the button, please try it lately.")
+        finally:
+            self.is_switching = False
 
     def build(self):
         try:

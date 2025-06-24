@@ -35,6 +35,7 @@ class IOSettingMasterServer(ft.Container):
                     style=ft.ButtonStyle(
                         shape=ft.RoundedRectangleBorder(radius=5)
                     ),
+                    visible=False,
                     on_click=lambda e: self.page.open(PermissionCheck(self.on_start, 2))
                 )
 
@@ -45,6 +46,7 @@ class IOSettingMasterServer(ft.Container):
                     style=ft.ButtonStyle(
                         shape=ft.RoundedRectangleBorder(radius=5)
                     ),
+                    visible=False,
                     on_click=lambda e: self.page.open(PermissionCheck(self.on_stop, 2))
                 )
 

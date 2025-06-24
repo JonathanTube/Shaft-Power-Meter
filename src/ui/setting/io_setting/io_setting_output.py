@@ -34,6 +34,7 @@ class IOSettingOutput(ft.Container):
                     style=ft.ButtonStyle(
                         shape=ft.RoundedRectangleBorder(radius=5)
                     ),
+                    visible=False,
                     col={'sm': 4},
                     on_click=lambda e: self.on_start()
                 )
@@ -45,6 +46,7 @@ class IOSettingOutput(ft.Container):
                     style=ft.ButtonStyle(
                         shape=ft.RoundedRectangleBorder(radius=5)
                     ),
+                    visible=False,
                     col={'sm': 4},
                     on_click=lambda e: self.on_stop()
                 )

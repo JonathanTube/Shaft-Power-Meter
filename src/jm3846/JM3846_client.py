@@ -75,6 +75,8 @@ class JM3846AsyncClient:
                     await self.async_receive_looping()
                 except TimeoutError:
                     logging.error(f'[***{self.name}***] start JM3846 client timeout')
+                    self._is_connected = False
+                    self.create_alarm()
                 except:
                     logging.error(f'[***{self.name}***] start JM3846 client failed')
                     self._is_connected = False

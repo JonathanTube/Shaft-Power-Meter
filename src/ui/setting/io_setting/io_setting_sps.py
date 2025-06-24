@@ -55,7 +55,7 @@ class IOSettingSPS(ft.Container):
                     bgcolor=ft.Colors.GREEN,
                     color=ft.Colors.WHITE,
                     col={'sm': 4},
-                    visible=gdata.sps1_offline,
+                    visible=False,
                     style=ft.ButtonStyle(
                         shape=ft.RoundedRectangleBorder(radius=5)
                     ),
@@ -67,7 +67,7 @@ class IOSettingSPS(ft.Container):
                     bgcolor=ft.Colors.RED,
                     color=ft.Colors.WHITE,
                     col={'sm': 4},
-                    visible=not gdata.sps1_offline,
+                    visible=False,
                     style=ft.ButtonStyle(
                         shape=ft.RoundedRectangleBorder(radius=5)
                     ),
@@ -97,7 +97,7 @@ class IOSettingSPS(ft.Container):
                     bgcolor=ft.Colors.GREEN,
                     color=ft.Colors.WHITE,
                     col={'sm': 4},
-                    visible=gdata.sps2_offline,
+                    visible=False,
                     style=ft.ButtonStyle(
                         shape=ft.RoundedRectangleBorder(radius=5)
                     ),
@@ -109,7 +109,7 @@ class IOSettingSPS(ft.Container):
                     bgcolor=ft.Colors.RED,
                     color=ft.Colors.WHITE,
                     col={'sm': 4},
-                    visible=not gdata.sps2_offline,
+                    visible=False,
                     style=ft.ButtonStyle(
                         shape=ft.RoundedRectangleBorder(radius=5)
                     ),

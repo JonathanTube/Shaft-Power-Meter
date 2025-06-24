@@ -43,6 +43,8 @@ class Header(ft.AppBar):
         self._auto_run_task = None
         self._auto_run_running = False
 
+        self.is_switching = False
+
     def build(self):
         try:
             self.app_name = ft.Text(value=self.page.session.get("lang.common.app_name"), weight=ft.FontWeight.W_700, size=20)
@@ -157,14 +159,17 @@ class Header(ft.AppBar):
         button.update()
 
     def on_click(self, name):
+        if self.is_switching:
+            return
+        
+        if self.page is None:
+            return
+
+        if self.active_name == name:
+            return
+        
         try:
-            if self.page is None:
-                return
-
-            page: ft.Page = self.page
-
-            if self.active_name == name:
-                return
+            self.is_switching = True
 
             keyboard.close()
 
@@ -188,6 +193,8 @@ class Header(ft.AppBar):
             
         except:
             logging.exception('exception occured at Header.on_click')
+        finally:
+            self.is_switching = False
 
     async def sync_utc_date_time(self):
         datetime_conf: DateTimeConf = DateTimeConf.get()

@@ -28,6 +28,7 @@ class InterfaceConf(ft.Container):
                     style=ft.ButtonStyle(
                         shape=ft.RoundedRectangleBorder(radius=5)
                     ),
+                    visible=False,
                     col={"sm": 4},
                     on_click=lambda e: self.page.open(PermissionCheck(self.__on_connect, 2))
                 )
@@ -39,6 +40,7 @@ class InterfaceConf(ft.Container):
                     style=ft.ButtonStyle(
                         shape=ft.RoundedRectangleBorder(radius=5)
                     ),
+                    visible=False,
                     col={"sm": 4},
                     on_click=lambda e: self.page.open(PermissionCheck(self.__on_close, 2))
                 )

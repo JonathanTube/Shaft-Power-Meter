@@ -22,6 +22,8 @@ class Home(ft.Container):
         self.task = None
         self.current_index = 0
 
+        self.is_switching = False
+
         self.system_settings: SystemSettings = SystemSettings.get()
 
         self.default_button_style = ft.ButtonStyle(
@@ -113,22 +115,28 @@ class Home(ft.Container):
             logging.error('exception occured at Home.build')
 
     def __on_click(self, index: int):
-        if self.page and self.main_container and self.main_container.page:
-            try:
-                if self.current_index == index:
-                    return
+        if self.is_switching:
+            return
 
-                self.current_index = index
-                for idx, item in enumerate(self.row_items.controls):
-                    if idx == index:
-                        item.style = self.active_button_style
-                        item.icon_color = ft.Colors.PRIMARY
-                    else:
-                        item.style = self.default_button_style
-                        item.icon_color = ft.Colors.INVERSE_SURFACE
-                    if item and item.page:
-                        item.update()
+        if self.current_index == index:
+            return
 
+        try:
+            self.is_switching = True
+
+            self.current_index = index
+
+            for idx, item in enumerate(self.row_items.controls):
+                if idx == index:
+                    item.style = self.active_button_style
+                    item.icon_color = ft.Colors.PRIMARY
+                else:
+                    item.style = self.default_button_style
+                    item.icon_color = ft.Colors.INVERSE_SURFACE
+                if item and item.page:
+                    item.update()
+
+            if self.page and self.main_container and self.main_container.page:
                 if index == 0:
                     self.main_container.content = Dashboard()
                 elif index == 1:
@@ -144,10 +152,11 @@ class Home(ft.Container):
                 elif index == 6:
                     self.main_container.content = Logs()
 
-                if self.main_container and self.main_container.page:
-                    self.main_container.update()
-            except:
-                logging.exception("exception occured at Home.__on_click")
+                self.main_container.update()
+        except:
+            logging.exception("exception occured at Home.__on_click")
+        finally:
+            self.is_switching = False
 
     def did_mount(self):
         self.task_running = True

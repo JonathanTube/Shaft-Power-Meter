@@ -78,7 +78,7 @@ class Keyboard(ft.Stack):
             self.show()
             # recovery the border color of last text field
             try:
-                if self.tf is not None:
+                if self.tf and self.tf.page:
                     self.tf.border_color = ft.Colors.BLACK
                     self.tf.update()
 
