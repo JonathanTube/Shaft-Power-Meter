@@ -202,7 +202,7 @@ class Header(ft.AppBar):
 
         # 因为是60s多的切换时间，所以有足够时间，切换到testmode下，关闭或者打开自动化测试，所以这里一直开着
         self._auto_run_running = True
-        self._auto_run_task = self.page.run_task(self.test_auto_run)
+        # self._auto_run_task = self.page.run_task(self.test_auto_run)
 
     def will_unmount(self):
         self.task_running = False
