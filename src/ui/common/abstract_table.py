@@ -85,29 +85,32 @@ class AbstractTable(ft.Container):
         self.page.set_clipboard(str(content))
 
     def __create_table_columns(self):
-        columns = self.create_columns()
-        if self.has_operations():
-            session = self.page.session
-            columns.append(session.get("lang.common.operation"))
+        if self.page and self.page.session:
+            columns = self.create_columns()
+            if self.has_operations():
+                session = self.page.session
+                columns.append(session.get("lang.common.operation"))
 
-        wrapped_columns = [ft.DataColumn(ft.Text(column))
-                           for column in columns]
-        self.data_table.columns = wrapped_columns
+            wrapped_columns = [ft.DataColumn(ft.Text(column))for column in columns]
+            self.data_table.columns = wrapped_columns
 
     def __create_table_rows(self):
-        data = self.load_data()
-        rows = []
-        for items in data:
-            rows.append(
-                ft.DataRow(
-                    cells=self.__create_cells(items),
-                    selected=False,
-                    on_select_changed=lambda e: self.__on_select_changed(e)
+        try:
+            data = self.load_data()
+            rows = []
+            for items in data:
+                rows.append(
+                    ft.DataRow(
+                        cells=self.__create_cells(items),
+                        selected=False,
+                        on_select_changed=lambda e: self.__on_select_changed(e)
+                    )
                 )
-            )
-        if self.data_table and self.data_table.page:
-            self.data_table.rows = rows
-            self.data_table.update()
+            if self.data_table and self.data_table.page:
+                self.data_table.rows = rows
+                self.data_table.update()
+        except:
+            logging.exception('exception occured at abstract_table.__create_table_rows')
 
     def __on_select_changed(self, e):
         e.control.selected = not e.control.selected
@@ -162,10 +165,10 @@ class AbstractTable(ft.Container):
         pass
 
     def update_columns(self, columns: list[str]):
-        wrapped_columns = [ft.DataColumn(ft.Text(column))
-                           for column in columns]
-        if self.has_operations():
-            session = self.page.session
-            wrapped_columns.append(ft.DataColumn(
-                ft.Text(session.get("lang.common.operation"))))
-        self.data_table.columns = wrapped_columns
+        if self.page and self.page.session:
+            wrapped_columns = [ft.DataColumn(ft.Text(column)) for column in columns]
+            if self.has_operations():
+                session = self.page.session
+                wrapped_columns.append(ft.DataColumn(ft.Text(session.get("lang.common.operation"))))
+
+            self.data_table.columns = wrapped_columns

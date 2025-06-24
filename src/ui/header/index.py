@@ -41,61 +41,64 @@ class Header(ft.AppBar):
         self._auto_run_running = False
 
     def build(self):
-        self.app_name = ft.Text(value=self.page.session.get("lang.common.app_name"), weight=ft.FontWeight.W_700, size=20)
-        self.title = self.app_name
+        try:
+            self.app_name = ft.Text(value=self.page.session.get("lang.common.app_name"), weight=ft.FontWeight.W_700, size=20)
+            self.title = self.app_name
 
-        self.utc_date_time = ft.TextButton(
-            text="",
-            width=150,
-            style=ft.ButtonStyle(alignment=ft.alignment.center_left),
-            on_click=self.__stop_auto_testing
-        )
+            self.utc_date_time = ft.TextButton(
+                text="",
+                width=150,
+                style=ft.ButtonStyle(alignment=ft.alignment.center_left),
+                on_click=self.__stop_auto_testing
+            )
 
-        self.home = ft.ElevatedButton(
-            text=self.page.session.get("lang.header.home"),
-            icon=ft.Icons.HOME_OUTLINED,
-            icon_color=ft.Colors.WHITE,
-            color=ft.Colors.WHITE,
-            bgcolor=ft.Colors.BLUE_800,
-            on_click=lambda e: self.on_click("HOME"))
+            self.home = ft.ElevatedButton(
+                text=self.page.session.get("lang.header.home"),
+                icon=ft.Icons.HOME_OUTLINED,
+                icon_color=ft.Colors.WHITE,
+                color=ft.Colors.WHITE,
+                bgcolor=ft.Colors.BLUE_800,
+                on_click=lambda e: self.on_click("HOME"))
 
-        self.report = ft.ElevatedButton(
-            text=self.page.session.get("lang.header.report"),
-            icon=ft.Icons.PICTURE_AS_PDF_OUTLINED,
-            icon_color=ft.Colors.GREY_800,
-            color=ft.Colors.GREY_800,
-            bgcolor=ft.Colors.LIGHT_BLUE_100,
-            on_click=lambda e: self.on_click("REPORT"))
+            self.report = ft.ElevatedButton(
+                text=self.page.session.get("lang.header.report"),
+                icon=ft.Icons.PICTURE_AS_PDF_OUTLINED,
+                icon_color=ft.Colors.GREY_800,
+                color=ft.Colors.GREY_800,
+                bgcolor=ft.Colors.LIGHT_BLUE_100,
+                on_click=lambda e: self.on_click("REPORT"))
 
-        self.setting = ft.ElevatedButton(
-            text=self.page.session.get("lang.header.setting"),
-            icon=ft.Icons.SETTINGS_OUTLINED,
-            icon_color=ft.Colors.GREY_800,
-            color=ft.Colors.GREY_800,
-            bgcolor=ft.Colors.LIGHT_BLUE_100,
-            on_click=lambda e: self.on_click("SETTING"))
+            self.setting = ft.ElevatedButton(
+                text=self.page.session.get("lang.header.setting"),
+                icon=ft.Icons.SETTINGS_OUTLINED,
+                icon_color=ft.Colors.GREY_800,
+                color=ft.Colors.GREY_800,
+                bgcolor=ft.Colors.LIGHT_BLUE_100,
+                on_click=lambda e: self.on_click("SETTING"))
 
-        self.shapoli = ShaPoLi()
+            self.shapoli = ShaPoLi()
 
-        self.close_button = ft.IconButton(
-            icon=ft.Icons.CLOSE_ROUNDED,
-            on_click=lambda e: self.page.open(PermissionCheck(self.__exit_app, 1))
-        )
+            self.close_button = ft.IconButton(
+                icon=ft.Icons.CLOSE_ROUNDED,
+                on_click=lambda e: self.page.open(PermissionCheck(self.__exit_app, 1))
+            )
 
-        self.theme = Theme()
+            self.theme = Theme()
 
-        self.actions = [
-            self.utc_date_time,
-            ft.Container(
-                content=ft.Row([self.home, self.report, self.setting]),
-                margin=ft.margin.symmetric(horizontal=20)
-            ),
-            self.shapoli,
-            ft.VerticalDivider(width=.5, thickness=.5),
-            self.theme,
-            ft.VerticalDivider(width=.5, thickness=.5),
-            self.close_button
-        ]
+            self.actions = [
+                self.utc_date_time,
+                ft.Container(
+                    content=ft.Row([self.home, self.report, self.setting]),
+                    margin=ft.margin.symmetric(horizontal=20)
+                ),
+                self.shapoli,
+                ft.VerticalDivider(width=.5, thickness=.5),
+                self.theme,
+                ft.VerticalDivider(width=.5, thickness=.5),
+                self.close_button
+            ]
+        except:
+            logging.exception('exception occured at Header.build')
 
     def __stop_auto_testing(self, e):
         gdata.auto_testing = False
@@ -123,17 +126,20 @@ class Header(ft.AppBar):
             self.page.window.destroy()
 
     def __exit_app(self, user: User):
-        Toast.show_error(self.page, self.page.session.get("lang.toast.system_exit"))
+        try:
+            Toast.show_error(self.page, self.page.session.get("lang.toast.system_exit"))
 
-        user_id = user.id
-        OperationLog.create(
-            user_id=user_id,
-            utc_date_time=gdata.utc_date_time,
-            operation_type=OperationType.SYSTEM_EXIT,
-            operation_content=user.user_name
-        )
+            user_id = user.id
+            OperationLog.create(
+                user_id=user_id,
+                utc_date_time=gdata.utc_date_time,
+                operation_type=OperationType.SYSTEM_EXIT,
+                operation_content=user.user_name
+            )
 
-        self.page.run_task(self.__close_all_connects)
+            self.page.run_task(self.__close_all_connects)
+        except:
+            logging.exception('exception occured at Header.__exit_app')
 
     def __set_active(self, button: ft.ElevatedButton):
         button.bgcolor = ft.Colors.BLUE_800
@@ -148,32 +154,35 @@ class Header(ft.AppBar):
         button.update()
 
     def on_click(self, name):
-        if self.page is None:
-            return
+        try:
+            if self.page is None:
+                return
 
-        page: ft.Page = self.page
+            page: ft.Page = self.page
 
-        if self.active_name == name:
-            return
+            if self.active_name == name:
+                return
 
-        keyboard.close()
+            keyboard.close()
 
-        if name == "HOME":
-            self.__set_active(self.home)
-            self.__set_inactive(self.report)
-            self.__set_inactive(self.setting)
-        elif name == "REPORT":
-            self.__set_inactive(self.home)
-            self.__set_active(self.report)
-            self.__set_inactive(self.setting)
-        else:
-            self.__set_inactive(self.home)
-            self.__set_inactive(self.report)
-            self.__set_active(self.setting)
+            if name == "HOME":
+                self.__set_active(self.home)
+                self.__set_inactive(self.report)
+                self.__set_inactive(self.setting)
+            elif name == "REPORT":
+                self.__set_inactive(self.home)
+                self.__set_active(self.report)
+                self.__set_inactive(self.setting)
+            else:
+                self.__set_inactive(self.home)
+                self.__set_inactive(self.report)
+                self.__set_active(self.setting)
 
-        self.active_name = name
+            self.active_name = name
 
-        page.pubsub.send_all_on_topic("__change_main_menu", name)
+            page.pubsub.send_all_on_topic("__change_main_menu", name)
+        except:
+            logging.exception('exception occured at Header.on_click')
 
     async def sync_utc_date_time(self):
         datetime_conf: DateTimeConf = DateTimeConf.get()
@@ -183,18 +192,20 @@ class Header(ft.AppBar):
                 if gdata.utc_date_time:
                     self.utc_date_time.text = gdata.utc_date_time.strftime(f"{date_format} %H:%M:%S")
                     self.utc_date_time.update()
-            except Exception as e:
-                logging.exception(e)
-            await asyncio.sleep(1)
+            except:
+                logging.exception('exception occured at Header.sync_utc_date_time')
+            finally:
+                await asyncio.sleep(1)
 
     def before_update(self):
-        system_setting: SystemSettings = SystemSettings.get()
-        self.report.visible = system_setting.sha_po_li
-        self.shapoli.visible = system_setting.sha_po_li
-        self.app_name.value = self.page.session.get("lang.common.app_name")
-        self.home.text = self.page.session.get("lang.header.home")
-        self.report.text = self.page.session.get("lang.header.report")
-        self.setting.text = self.page.session.get("lang.header.setting")
+        if self.page and self.page.session:
+            system_setting: SystemSettings = SystemSettings.get()
+            self.report.visible = system_setting.sha_po_li
+            self.shapoli.visible = system_setting.sha_po_li
+            self.app_name.value = self.page.session.get("lang.common.app_name")
+            self.home.text = self.page.session.get("lang.header.home")
+            self.report.text = self.page.session.get("lang.header.report")
+            self.setting.text = self.page.session.get("lang.header.setting")
 
     def did_mount(self):
         self.task_running = True

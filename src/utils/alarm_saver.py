@@ -13,7 +13,7 @@ class AlarmSaver:
                         AlarmLog.alarm_type == alarm_type, 
                         AlarmLog.is_recovery == False
                     ).count()
-        logging.info(f'[***save alarm***] alarm_type={alarm_type}, exists alarm records = {cnt}')
+        # logging.info(f'[***save alarm***] alarm_type={alarm_type}, exists alarm records = {cnt}')
         if cnt == 0:
             AlarmLog.create(utc_date_time=gdata.utc_date_time, alarm_type=alarm_type)
             logging.info(f'[***save alarm***] alarm_type={alarm_type}, save alarm log')
@@ -32,7 +32,7 @@ class AlarmSaver:
 
         # if it doesn't exist any errors. set the alarm false.
         cnt: int = AlarmLog.select().where(AlarmLog.is_recovery == False).count()
-        logging.info(f'[***recovery alarm***], exists alarm records = {cnt}, skip clear plc alarm.')
+        # logging.info(f'[***recovery alarm***], exists alarm records = {cnt}, skip clear plc alarm.')
 
         if cnt == 0:
             logging.info(f'[***recovery alarm***], clear all plc alarm.')

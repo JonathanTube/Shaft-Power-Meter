@@ -16,15 +16,19 @@ class AudioAlarm(ft.Container):
         self.callback = on_mute
 
     def build(self):
-        self.content: ft.FilledButton = ft.FilledButton(
-            text="Override",
-            icon=ft.Icons.NOTIFICATIONS_ON_OUTLINED,
-            icon_color=ft.Colors.WHITE,
-            bgcolor=ft.Colors.RED,
-            visible=False,
-            color=ft.Colors.WHITE,
-            on_click=lambda e: self.page.open(PermissionCheck(self.__on_mute, 1))
-        )
+        try:
+            self.content: ft.FilledButton = ft.FilledButton(
+                text="Override",
+                icon=ft.Icons.NOTIFICATIONS_ON_OUTLINED,
+                icon_color=ft.Colors.WHITE,
+                bgcolor=ft.Colors.RED,
+                visible=False,
+                color=ft.Colors.WHITE,
+                on_click=lambda e: self.page.open(PermissionCheck(self.__on_mute, 1))
+            )
+        except:
+            logging.exception('exception occured at AudioAlarm.build')
+
 
     def show(self):
         try:

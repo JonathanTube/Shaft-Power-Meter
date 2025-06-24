@@ -1,3 +1,4 @@
+import logging
 import flet as ft
 from flet_contrib.color_picker import ColorPicker
 
@@ -16,15 +17,18 @@ class ColorDialog(ft.IconButton):
         self.alignment = ft.alignment.center_left
 
     def build(self):
-        self.color_picker = ColorPicker(color=self.color, width=300)
-        self.alert_dialog = ft.AlertDialog(
-            content=self.color_picker,
-            actions=[
-                ft.TextButton("OK", on_click=self.__change_color),
-                ft.TextButton("Cancel", on_click=self.__close_dialog)
-            ],
-            actions_alignment=ft.MainAxisAlignment.END
-        )
+        try:
+            self.color_picker = ColorPicker(color=self.color, width=300)
+            self.alert_dialog = ft.AlertDialog(
+                content=self.color_picker,
+                actions=[
+                    ft.TextButton("OK", on_click=self.__change_color),
+                    ft.TextButton("Cancel", on_click=self.__close_dialog)
+                ],
+                actions_alignment=ft.MainAxisAlignment.END
+            )
+        except:
+            logging.exception('exception occured at ColorDialog.show')
 
     def __open_color_picker(self, e):
         self.page.open(self.alert_dialog)

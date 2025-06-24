@@ -14,20 +14,27 @@ class Theme(ft.Container):
         self.margin = ft.margin.symmetric(horizontal=20)
 
     def build(self):
-        self.content = ft.Row([
-            ft.IconButton(icon=ft.Icons.LIGHT_MODE, on_click=lambda e: self.toggle_theme()),
-            ft.IconButton(icon=ft.icons.SETTINGS_BRIGHTNESS, on_click=self.show_dlg)
-        ])
+        try:
+            self.content = ft.Row([
+                ft.IconButton(icon=ft.Icons.LIGHT_MODE, on_click=lambda e: self.toggle_theme()),
+                ft.IconButton(icon=ft.icons.SETTINGS_BRIGHTNESS, on_click=self.show_dlg)
+            ])
+        except:
+            logging.exception('exception occured at Theme.build')
 
     def toggle_theme(self):
-        if self.page.theme_mode == ft.ThemeMode.LIGHT:
-            self.page.theme_mode = ft.ThemeMode.DARK
-            self.icon = ft.Icons.DARK_MODE
-        else:
-            self.page.theme_mode = ft.ThemeMode.LIGHT
-            self.icon = ft.Icons.LIGHT_MODE
-        self.page.update()
-        self.page.appbar.update()
+        if self.page and self.page.session:
+            try:
+                if self.page.theme_mode == ft.ThemeMode.LIGHT:
+                    self.page.theme_mode = ft.ThemeMode.DARK
+                    self.icon = ft.Icons.DARK_MODE
+                else:
+                    self.page.theme_mode = ft.ThemeMode.LIGHT
+                    self.icon = ft.Icons.LIGHT_MODE
+                self.page.update()
+                self.page.appbar.update()
+            except:
+                logging.exception('exception occured at Theme.toggle_theme')
 
     def build_dlg(self):
         self.brightness = ft.Text(f"{100}%", size=30, weight=ft.FontWeight.W_500)
