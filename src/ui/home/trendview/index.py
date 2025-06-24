@@ -64,8 +64,6 @@ class TrendView(ft.Container):
                 self.handle_data(start_date, end_date, 'sps1')
                 if self.is_twins:
                     self.handle_data(start_date, end_date, 'sps2')
-                self.page.session.set('trendview_start_date', start_date)
-                self.page.session.set('trendview_end_date', end_date)
         except:
             pass
 
@@ -90,8 +88,6 @@ class TrendView(ft.Container):
             self.sps2_chart.update_chart(data_logs)
 
     def did_mount(self):
-        start_date: str = self.page.session.get('trendview_start_date')
-        end_date: str = self.page.session.get('trendview_end_date')
         if start_date and end_date:
             self.__on_search(start_date, end_date)
 

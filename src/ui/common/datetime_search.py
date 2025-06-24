@@ -31,13 +31,17 @@ class DatetimeSearch(ft.Container):
 
 
     def __handle_search(self, e):
-        start_date, end_date = self.date_time_range.get_date_range()
-        if start_date == "" or end_date == "":
-            self.on_search(None, None)
-            return
+        try:
+            if self.page:
+                start_date, end_date = self.date_time_range.get_date_range()
+                if start_date == "" or end_date == "":
+                    self.on_search(None, None)
+                    return
 
-        if start_date:
-            start_date = f"{start_date} 00:00:00"
-        if end_date:
-            end_date = f"{end_date} 23:59:59"
-        self.on_search(start_date, end_date)
+                if start_date:
+                    start_date = f"{start_date} 00:00:00"
+                if end_date:
+                    end_date = f"{end_date} 23:59:59"
+                self.on_search(start_date, end_date)
+        except:
+            logging.exception('exception occured at DatetimeSearch.__handle_search')

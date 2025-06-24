@@ -37,48 +37,57 @@ class Theme(ft.Container):
                 logging.exception('exception occured at Theme.toggle_theme')
 
     def build_dlg(self):
-        self.brightness = ft.Text(f"{100}%", size=30, weight=ft.FontWeight.W_500)
-        self.dlg = ft.AlertDialog(
-            alignment=ft.alignment.center,
-            content=ft.Container(
-                height=100,
-                expand=False,
-                content=ft.Column(
-                    horizontal_alignment=ft.CrossAxisAlignment.CENTER,
-                    controls=[
-                        self.brightness,
-                        ft.Row([
-                            ft.Icon(
-                                expand=False,
-                                name=ft.icons.DARK_MODE_ROUNDED
-                            ),
-                            ft.Slider(
-                                width=300,
-                                expand=False, min=0, max=100, value=90,
-                                on_change=self.__slider_changed
-                            ),
-                            ft.Icon(
-                                expand=False,
-                                name=ft.icons.LIGHT_MODE_ROUNDED
-                            )
+        try:
+            self.brightness = ft.Text(f"{100}%", size=30, weight=ft.FontWeight.W_500)
+            self.dlg = ft.AlertDialog(
+                alignment=ft.alignment.center,
+                content=ft.Container(
+                    height=100,
+                    expand=False,
+                    content=ft.Column(
+                        horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+                        controls=[
+                            self.brightness,
+                            ft.Row([
+                                ft.Icon(
+                                    expand=False,
+                                    name=ft.icons.DARK_MODE_ROUNDED
+                                ),
+                                ft.Slider(
+                                    width=300,
+                                    expand=False, min=0, max=100, value=90,
+                                    on_change=self.__slider_changed
+                                ),
+                                ft.Icon(
+                                    expand=False,
+                                    name=ft.icons.LIGHT_MODE_ROUNDED
+                                )
+                            ])
                         ])
-                    ])
-            ))
+                ))
+        except:
+            logging.exception('exception occured at Theme.build_dlg')
 
     def show_dlg(self, e):
         if os.path.exists(default_avd):
             try:
                 subprocess.Popen(default_avd)
-                self.page.window.minimized = True
-                self.page.update()
+                if self.page:
+                    self.page.window.minimized = True
+                    self.page.update()
             except:
                 logging.exception("AdvBrightnessUtility error")
                 Toast.show_error(self.page, f"the AdvBrightnessUtility.exe should be installed at {default_avd}")
         else:
-            self.build_dlg()
-            # brightness = sbc.get_brightness() 太卡，去掉
-            # self.brightness.value = f"{brightness}%"
-            e.page.open(self.dlg)
+            try:
+                self.build_dlg()
+                # brightness = sbc.get_brightness() 太卡，去掉
+                # self.brightness.value = f"{brightness}%"
+                if self.page:
+                    self.page.open(self.dlg)
+            except:
+                logging.exception('exception occured at Theme.show_dlg')
+            
 
     def __slider_changed(self, e):
         sbc.set_brightness(e.control.value)
