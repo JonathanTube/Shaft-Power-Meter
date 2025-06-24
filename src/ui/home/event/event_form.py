@@ -117,5 +117,5 @@ class EventForm(ft.AlertDialog):
             )
             self.page.close(self)
             self.callback()
-        except Exception:
+        except:
             Toast.show_error(self.page)

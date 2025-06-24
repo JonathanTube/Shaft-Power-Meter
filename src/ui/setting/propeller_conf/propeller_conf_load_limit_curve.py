@@ -14,53 +14,54 @@ class PropellerConfLimitCurve(ft.Container):
 
     def build(self):
         try:
-            self.rpm_left_of_torque_load_limit_curve = ft.TextField(
-                label=self.page.session.get("lang.setting.rpm_left"), suffix_text='[%]',
-                value=self.ps.rpm_left_of_torque_load_limit_curve,
-                read_only=True,
-                col = {"xs": 6},
-                can_request_focus=False,
-                on_click=lambda e: keyboard.open(e.control)
-            )
-            self.bhp_left_of_torque_load_limit_curve = ft.TextField(
-                label=self.page.session.get("lang.setting.power_left"), suffix_text='[%]',
-                value=self.ps.bhp_left_of_torque_load_limit_curve,
-                read_only=True,
-                col = {"xs": 6},
-                can_request_focus=False,
-                on_click=lambda e: keyboard.open(e.control)
-            )
-            self.rpm_right_of_torque_load_limit_curve = ft.TextField(
-                label=self.page.session.get("lang.setting.rpm_right"), suffix_text='[%]',
-                value=self.ps.rpm_right_of_torque_load_limit_curve,
-                read_only=True,
-                col = {"xs": 6},
-                can_request_focus=False,
-                on_click=lambda e: keyboard.open(e.control)
-            )
-            self.bhp_right_of_torque_load_limit_curve = ft.TextField(
-                label=self.page.session.get("lang.setting.power_right"), suffix_text='[%]',
-                value=self.ps.bhp_right_of_torque_load_limit_curve,
-                read_only=True,
-                col = {"xs": 6},
-                can_request_focus=False,
-                on_click=lambda e: keyboard.open(e.control)
-            )
-            self.line_color_of_torque_load_limit_curve = ColorDialog(
-                color=self.ps.line_color_of_torque_load_limit_curve
-            )
+            if self.page and self.page.session:
+                self.rpm_left_of_torque_load_limit_curve = ft.TextField(
+                    label=self.page.session.get("lang.setting.rpm_left"), suffix_text='[%]',
+                    value=self.ps.rpm_left_of_torque_load_limit_curve,
+                    read_only=True,
+                    col = {"xs": 6},
+                    can_request_focus=False,
+                    on_click=lambda e: keyboard.open(e.control)
+                )
+                self.bhp_left_of_torque_load_limit_curve = ft.TextField(
+                    label=self.page.session.get("lang.setting.power_left"), suffix_text='[%]',
+                    value=self.ps.bhp_left_of_torque_load_limit_curve,
+                    read_only=True,
+                    col = {"xs": 6},
+                    can_request_focus=False,
+                    on_click=lambda e: keyboard.open(e.control)
+                )
+                self.rpm_right_of_torque_load_limit_curve = ft.TextField(
+                    label=self.page.session.get("lang.setting.rpm_right"), suffix_text='[%]',
+                    value=self.ps.rpm_right_of_torque_load_limit_curve,
+                    read_only=True,
+                    col = {"xs": 6},
+                    can_request_focus=False,
+                    on_click=lambda e: keyboard.open(e.control)
+                )
+                self.bhp_right_of_torque_load_limit_curve = ft.TextField(
+                    label=self.page.session.get("lang.setting.power_right"), suffix_text='[%]',
+                    value=self.ps.bhp_right_of_torque_load_limit_curve,
+                    read_only=True,
+                    col = {"xs": 6},
+                    can_request_focus=False,
+                    on_click=lambda e: keyboard.open(e.control)
+                )
+                self.line_color_of_torque_load_limit_curve = ColorDialog(
+                    color=self.ps.line_color_of_torque_load_limit_curve
+                )
 
-            self.custom_card = CustomCard(
-                self.page.session.get("lang.setting.torque_load_limit_curve"),
-                ft.ResponsiveRow(controls=[
-                    self.rpm_left_of_torque_load_limit_curve,
-                    self.bhp_left_of_torque_load_limit_curve,
-                    self.rpm_right_of_torque_load_limit_curve,
-                    self.bhp_right_of_torque_load_limit_curve,
-                    self.line_color_of_torque_load_limit_curve
-                ]),
-                col={"xs": 12})
-            self.content = self.custom_card
+                self.custom_card = CustomCard(
+                    self.page.session.get("lang.setting.torque_load_limit_curve"),
+                    ft.ResponsiveRow(controls=[
+                        self.rpm_left_of_torque_load_limit_curve,
+                        self.bhp_left_of_torque_load_limit_curve,
+                        self.rpm_right_of_torque_load_limit_curve,
+                        self.bhp_right_of_torque_load_limit_curve,
+                        self.line_color_of_torque_load_limit_curve
+                    ]),
+                    col={"xs": 12})
+                self.content = self.custom_card
         except:
             logging.exception('exception occured at PropellerConfLimitCurve.build')
 

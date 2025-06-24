@@ -13,24 +13,25 @@ class PropellerConfLightCurve(ft.Container):
 
     def build(self):
         try:
-            self.light_propeller_curve = ft.TextField(
-                suffix_text="[% below (1)]",
-                value=self.ps.value_of_light_propeller_curve,
-                read_only=True,
-                col = {"xs": 6},
-                can_request_focus=False,
-                on_click=lambda e: keyboard.open(e.control)
-            )
-            self.line_color_of_light_propeller_curve = ColorDialog(color=self.ps.line_color_of_light_propeller_curve)
+            if self.page and self.page.session:
+                self.light_propeller_curve = ft.TextField(
+                    suffix_text="[% below (1)]",
+                    value=self.ps.value_of_light_propeller_curve,
+                    read_only=True,
+                    col = {"xs": 6},
+                    can_request_focus=False,
+                    on_click=lambda e: keyboard.open(e.control)
+                )
+                self.line_color_of_light_propeller_curve = ColorDialog(color=self.ps.line_color_of_light_propeller_curve)
 
-            self.custom_card = CustomCard(
-                self.page.session.get("lang.setting.light_propeller_curve"),
-                ft.ResponsiveRow(controls=[
-                    self.light_propeller_curve,
-                    self.line_color_of_light_propeller_curve
-                ]),
-                col={"xs": 12})
-            self.content = self.custom_card
+                self.custom_card = CustomCard(
+                    self.page.session.get("lang.setting.light_propeller_curve"),
+                    ft.ResponsiveRow(controls=[
+                        self.light_propeller_curve,
+                        self.line_color_of_light_propeller_curve
+                    ]),
+                    col={"xs": 12})
+                self.content = self.custom_card
         except:
             logging.exception('exception occured at PropellerConfLightCurve.build')
 

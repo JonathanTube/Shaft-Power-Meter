@@ -82,9 +82,10 @@ class TotalCounter(ft.Container):
         while self.task_running:
             try:
                 self.__calculate()
-            except Exception as e:
-                logging.exception(e)
-            await asyncio.sleep(self.interval)
+            except:
+                logging.exception('exception occured at TotalCounter.__running')
+            finally:
+                await asyncio.sleep(self.interval)
 
     def __calculate(self):
         counter_log = CounterLog.get_or_none(CounterLog.sps_name == self.name, CounterLog.counter_type == 2)

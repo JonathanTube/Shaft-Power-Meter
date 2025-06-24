@@ -73,7 +73,7 @@ class DataSaver:
             EEXIBreach.handle_breach_and_recovery()
             # 输出modbus数据
             asyncio.create_task(modbus_output.update_registers())
-        except Exception:
+        except:
             logging.exception("data saver error")
 
     @staticmethod

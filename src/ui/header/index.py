@@ -23,9 +23,12 @@ from task.gps_sync_task import gps
 
 
 class Header(ft.AppBar):
-    def __init__(self):
+    def __init__(self, on_menu_click: callable):
         super().__init__()
         self.leading = HeaderLogo()
+
+        self.on_menu_click = on_menu_click
+
         self.toolbar_height = 70
         self.leading_width = 70
 
@@ -180,7 +183,9 @@ class Header(ft.AppBar):
 
             self.active_name = name
 
-            page.pubsub.send_all_on_topic("__change_main_menu", name)
+            if self.on_menu_click:
+                self.on_menu_click(name)
+            
         except:
             logging.exception('exception occured at Header.on_click')
 
@@ -210,7 +215,6 @@ class Header(ft.AppBar):
                 self.setting.text = self.page.session.get("lang.header.setting")
         except:
             logging.exception('exception occured at Header.before_update')
-                
 
     def did_mount(self):
         self.task_running = True
@@ -218,7 +222,7 @@ class Header(ft.AppBar):
 
         # 因为是60s多的切换时间，所以有足够时间，切换到testmode下，关闭或者打开自动化测试，所以这里一直开着
         self._auto_run_running = True
-        # self._auto_run_task = self.page.run_task(self.test_auto_run)
+        self._auto_run_task = self.page.run_task(self.test_auto_run)
 
     def will_unmount(self):
         self.task_running = False
@@ -235,14 +239,15 @@ class Header(ft.AppBar):
         while self._auto_run_running:
             try:
                 if gdata.auto_testing:
+                    print(f"==============main menu auto testing.....idx={idx}")
                     self.on_click(arr[idx % 3])
                     self.theme.toggle_theme()
                     idx += 1
                     # report没东西，2s够了
                     if self.active_name == 'REPORT':
-                        await asyncio.sleep(2)
+                        await asyncio.sleep(1)
                     else:
-                        await asyncio.sleep(random() * 20)
+                        await asyncio.sleep(random() * 10)
                 else:
                     # 如果没有启动测试，自动间隔5s
                     await asyncio.sleep(5)

@@ -20,7 +20,11 @@ class AlarmButton(ft.TextButton):
         self.not_ack_count = 0
 
     def build(self):
-        self.text = self.page.session.get("lang.home.tab.alarm")
+        try:
+            if self.page and self.page.session:
+                self.text = self.page.session.get("lang.home.tab.alarm")
+        except:
+            logging.exception('exception occured at AlarmButton.build')
 
     def handle_data(self):
         self.alarm_count = AlarmLog.select().where(AlarmLog.is_recovery == False).count()
@@ -43,14 +47,15 @@ class AlarmButton(ft.TextButton):
         self.icon_color = ft.Colors.WHITE
 
     def toggle_badge(self):
-        if self.alarm_count > 0:
-            self.badge = ft.Badge(
-                text=str(self.alarm_count), label_visible=True,
-                bgcolor=ft.Colors.RED, text_color=ft.Colors.WHITE
-            )
-        else:
-            self.badge = None
-        self.update()
+        if self.page:
+            if self.alarm_count > 0:
+                self.badge = ft.Badge(
+                    text=str(self.alarm_count), label_visible=True,
+                    bgcolor=ft.Colors.RED, text_color=ft.Colors.WHITE
+                )
+            else:
+                self.badge = None
+            self.update()
 
     def toggle_button(self, blink: bool):
         try:

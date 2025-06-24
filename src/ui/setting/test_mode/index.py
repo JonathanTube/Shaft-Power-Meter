@@ -33,16 +33,20 @@ class TestMode(ft.Container):
         self.op_user = None
 
     def build(self):
-        self.content = ft.TextButton(
-            icon=ft.Icons.LOCK_ROUNDED,
-            text="",
-            style=ft.ButtonStyle(
-                icon_size=100,
-                icon_color=ft.Colors.INVERSE_SURFACE
-            ),
-            on_click=lambda e: self.page.open(self.permission_check)
-        )
-        self.permission_check = PermissionCheck(on_confirm=self.create_controls, user_role=0)
+            try:
+                if self.page and self.page.session:
+                    self.content = ft.TextButton(
+                        icon=ft.Icons.LOCK_ROUNDED,
+                        text="",
+                        style=ft.ButtonStyle(
+                            icon_size=100,
+                            icon_color=ft.Colors.INVERSE_SURFACE
+                        ),
+                        on_click=lambda e: self.page.open(self.permission_check)
+                    )
+                    self.permission_check = PermissionCheck(on_confirm=self.create_controls, user_role=0)
+            except:
+                logging.exception('exception occured at TestMode.build')
 
     def create_controls(self, user: User):
         self.op_user = user
@@ -232,9 +236,10 @@ class TestMode(ft.Container):
                         self.visible = False
                         self.page.open(self.permission_check)
                         self.update()
-                except Exception as e:
-                    logging.exception(e)
-            await asyncio.sleep(1)
+                except:
+                    return
+                finally:
+                    await asyncio.sleep(1)
 
     def did_mount(self):
         self.task_running = True

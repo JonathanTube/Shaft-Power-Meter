@@ -16,7 +16,7 @@ class SystemConfShipInfo(ft.Container):
 
     def build(self):
         try:
-            if self.page:
+            if self.page and self.page.session:
                 self.ship_type = ft.TextField(
                     label=self.page.session.get("lang.setting.ship_type"),
                     value=self.ship_info.ship_type,

@@ -26,126 +26,127 @@ class SystemConfSettings(ft.Container):
 
     def build(self):
         try:
-            self.mode_master = ft.Radio(value='master', label=self.page.session.get("lang.setting.master"))
-            self.mode_slave = ft.Radio(value='slave', label=self.page.session.get("lang.setting.slave"))
-            self.running_mode = ft.RadioGroup(
-                content=ft.Row([self.mode_master, self.mode_slave]),
-                value='master' if self.system_settings.is_master else 'slave'
-            )
-            self.running_mode_row = ft.Row(
-                col={"md": 6},
-                controls=[
-                    ft.Text(
-                        self.page.session.get("lang.setting.running_mode"),
-                        text_align=ft.TextAlign.RIGHT
-                    ),
-                    self.running_mode
-                ]
-            )
-            
+            if self.page and self.page.session:
+                self.mode_master = ft.Radio(value='master', label=self.page.session.get("lang.setting.master"))
+                self.mode_slave = ft.Radio(value='slave', label=self.page.session.get("lang.setting.slave"))
+                self.running_mode = ft.RadioGroup(
+                    content=ft.Row([self.mode_master, self.mode_slave]),
+                    value='master' if self.system_settings.is_master else 'slave'
+                )
+                self.running_mode_row = ft.Row(
+                    col={"md": 6},
+                    controls=[
+                        ft.Text(
+                            self.page.session.get("lang.setting.running_mode"),
+                            text_align=ft.TextAlign.RIGHT
+                        ),
+                        self.running_mode
+                    ]
+                )
+                
 
 
 
 
 
-            self.display_thrust = ft.Checkbox(
-                col={"md": 6}, label=self.page.session.get("lang.setting.display_thrust"),
-                value=self.system_settings.display_thrust
-            )
+                self.display_thrust = ft.Checkbox(
+                    col={"md": 6}, label=self.page.session.get("lang.setting.display_thrust"),
+                    value=self.system_settings.display_thrust
+                )
 
 
 
 
-            self.sha_po_li = ft.Checkbox(
-                col={"md": 6}, label=self.page.session.get("lang.setting.enable_sha_po_li"),
-                value=self.system_settings.sha_po_li,
-                on_change=self.__on_sha_po_li_change
-            )
+                self.sha_po_li = ft.Checkbox(
+                    col={"md": 6}, label=self.page.session.get("lang.setting.enable_sha_po_li"),
+                    value=self.system_settings.sha_po_li,
+                    on_change=self.__on_sha_po_li_change
+                )
 
 
 
 
-            self.display_propeller_curve = ft.Checkbox(
-                col={"md": 6}, label=self.page.session.get("lang.setting.display_propeller_curve"),
-                value=self.system_settings.display_propeller_curve
-            )
-
-
-
-
-
-
-            eexi_limited_power_value, eexi_limited_power_unit = self.__get_eexi_limited_power()
-            self.eexi_limited_power = ft.TextField(
-                col={"md": 6},
-                label=self.page.session.get("lang.setting.eexi_limited_power"),
-                value=eexi_limited_power_value,
-                suffix_text=eexi_limited_power_unit,
-                visible=self.system_settings.sha_po_li,
-                read_only=True,
-                can_request_focus=False,
-                on_click=lambda e: keyboard.open(e.control, 'float')
-            )
-
-
-
-
-
-            self.eexi_breach_checking_duration = ft.TextField(
-                col={"md": 6},
-                label=self.page.session.get("lang.setting.eexi_breach_checking_duration"),
-                value=self.system_settings.eexi_breach_checking_duration,
-                suffix_text="seconds",
-                visible=self.system_settings.sha_po_li,
-                read_only=True,
-                can_request_focus=False,
-                on_click=lambda e: keyboard.open(e.control, 'int')
-            )
-
-
-
-
-            self.chk_hide_admin_account = ft.Checkbox(
-                col={"md": 6}, label=self.page.session.get("lang.setting.hide_admin_account"),
-                value=self.system_settings.hide_admin_account
-            )
+                self.display_propeller_curve = ft.Checkbox(
+                    col={"md": 6}, label=self.page.session.get("lang.setting.display_propeller_curve"),
+                    value=self.system_settings.display_propeller_curve
+                )
 
 
 
 
 
 
-            self.single_propeller = ft.Radio(value="1", label=self.page.session.get("lang.setting.single_propeller"))
-            self.twins_propeller = ft.Radio(value="2", label=self.page.session.get("lang.setting.twins_propeller"))
-            self.amount_of_propeller_radios = ft.RadioGroup(
-                content=ft.Row([self.single_propeller, self.twins_propeller]),
-                value=self.system_settings.amount_of_propeller
-            )
-            self.amount_of_propeller_row = ft.Row(
-                col={"md": 6},
-                controls=[
-                    ft.Text(
-                        self.page.session.get("lang.setting.amount_of_propeller"),
-                        text_align=ft.TextAlign.RIGHT
-                    ),
-                    self.amount_of_propeller_radios
-                ]
-            )
+                eexi_limited_power_value, eexi_limited_power_unit = self.__get_eexi_limited_power()
+                self.eexi_limited_power = ft.TextField(
+                    col={"md": 6},
+                    label=self.page.session.get("lang.setting.eexi_limited_power"),
+                    value=eexi_limited_power_value,
+                    suffix_text=eexi_limited_power_unit,
+                    visible=self.system_settings.sha_po_li,
+                    read_only=True,
+                    can_request_focus=False,
+                    on_click=lambda e: keyboard.open(e.control, 'float')
+                )
 
-            self.custom_card = CustomCard(
-                self.page.session.get("lang.setting.setting"),
-                ft.ResponsiveRow(controls=[
-                    self.running_mode_row,
-                    self.amount_of_propeller_row,
-                    self.display_thrust,
-                    self.display_propeller_curve,
-                    self.sha_po_li,
-                    self.chk_hide_admin_account,
-                    self.eexi_limited_power,
-                    self.eexi_breach_checking_duration
-                ]),
-                col={"xs": 12})
-            self.content = self.custom_card
+
+
+
+
+                self.eexi_breach_checking_duration = ft.TextField(
+                    col={"md": 6},
+                    label=self.page.session.get("lang.setting.eexi_breach_checking_duration"),
+                    value=self.system_settings.eexi_breach_checking_duration,
+                    suffix_text="seconds",
+                    visible=self.system_settings.sha_po_li,
+                    read_only=True,
+                    can_request_focus=False,
+                    on_click=lambda e: keyboard.open(e.control, 'int')
+                )
+
+
+
+
+                self.chk_hide_admin_account = ft.Checkbox(
+                    col={"md": 6}, label=self.page.session.get("lang.setting.hide_admin_account"),
+                    value=self.system_settings.hide_admin_account
+                )
+
+
+
+
+
+
+                self.single_propeller = ft.Radio(value="1", label=self.page.session.get("lang.setting.single_propeller"))
+                self.twins_propeller = ft.Radio(value="2", label=self.page.session.get("lang.setting.twins_propeller"))
+                self.amount_of_propeller_radios = ft.RadioGroup(
+                    content=ft.Row([self.single_propeller, self.twins_propeller]),
+                    value=self.system_settings.amount_of_propeller
+                )
+                self.amount_of_propeller_row = ft.Row(
+                    col={"md": 6},
+                    controls=[
+                        ft.Text(
+                            self.page.session.get("lang.setting.amount_of_propeller"),
+                            text_align=ft.TextAlign.RIGHT
+                        ),
+                        self.amount_of_propeller_radios
+                    ]
+                )
+
+                self.custom_card = CustomCard(
+                    self.page.session.get("lang.setting.setting"),
+                    ft.ResponsiveRow(controls=[
+                        self.running_mode_row,
+                        self.amount_of_propeller_row,
+                        self.display_thrust,
+                        self.display_propeller_curve,
+                        self.sha_po_li,
+                        self.chk_hide_admin_account,
+                        self.eexi_limited_power,
+                        self.eexi_breach_checking_duration
+                    ]),
+                    col={"xs": 12})
+                self.content = self.custom_card
         except:
             logging.exception('exception occured at SystemConfSettings.build')
 

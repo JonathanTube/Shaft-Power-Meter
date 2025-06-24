@@ -74,9 +74,9 @@ class JM3846AsyncClient:
                     
                     await self.async_receive_looping()
                 except TimeoutError:
-                    logging.exception(f'[***{self.name}***] start JM3846 client timeout')
+                    logging.error(f'[***{self.name}***] start JM3846 client timeout')
                 except:
-                    logging.exception(f'[***{self.name}***] start JM3846 client failed')
+                    logging.error(f'[***{self.name}***] start JM3846 client failed')
                     self._is_connected = False
                     self.create_alarm()
                 finally:
@@ -116,7 +116,7 @@ class JM3846AsyncClient:
             await self.writer.drain()
         except TimeoutError:
             logging.error(f'[***{self.name}***] JM3846 0x03 request timeout')
-        except Exception:
+        except:
             logging.error(f'[***{self.name}***] JM3846 0x03 error')
 
     def _update_config(self, config: dict):
@@ -220,7 +220,7 @@ class JM3846AsyncClient:
             except ConnectionResetError as e:
                 logging.error(f'[***{self.name}***] JM3846 Connection reset: {e}')
                 return
-            except Exception:
+            except:
                 logging.error(f'[***{self.name}***] JM3846 0x44 Receive error')
                 return
 

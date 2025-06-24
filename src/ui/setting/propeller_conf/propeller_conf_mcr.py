@@ -17,35 +17,36 @@ class PropellerConfMcr(ft.Container):
 
     def build(self):
         try:
-            self.rpm_of_mcr_operating_point = ft.TextField(
-                label=self.page.session.get("lang.common.speed"),
-                suffix_text='rpm',
-                col={"xs": 6},
-                value=self.ps.rpm_of_mcr_operating_point,
-                read_only=True,
-                can_request_focus=False,
-                on_click=lambda e: keyboard.open(e.control, type='int')
-            )
+            if self.page and self.page.session:
+                self.rpm_of_mcr_operating_point = ft.TextField(
+                    label=self.page.session.get("lang.common.speed"),
+                    suffix_text='rpm',
+                    col={"xs": 6},
+                    value=self.ps.rpm_of_mcr_operating_point,
+                    read_only=True,
+                    can_request_focus=False,
+                    on_click=lambda e: keyboard.open(e.control, type='int')
+                )
 
-            shaft_power_value, shaft_power_unit = self.__get_shaft_power()
-            self.shaft_power_of_mcr_operating_point = ft.TextField(
-                label=self.page.session.get("lang.common.power"),
-                col={"xs": 6},
-                value=shaft_power_value,
-                suffix_text=shaft_power_unit,
-                read_only=True,
-                can_request_focus=False,
-                on_click=lambda e: keyboard.open(e.control)
-            )
+                shaft_power_value, shaft_power_unit = self.__get_shaft_power()
+                self.shaft_power_of_mcr_operating_point = ft.TextField(
+                    label=self.page.session.get("lang.common.power"),
+                    col={"xs": 6},
+                    value=shaft_power_value,
+                    suffix_text=shaft_power_unit,
+                    read_only=True,
+                    can_request_focus=False,
+                    on_click=lambda e: keyboard.open(e.control)
+                )
 
-            self.custom_card = CustomCard(
-                self.page.session.get("lang.setting.mcr_operating_point"),
-                ft.ResponsiveRow(controls=[
-                    self.rpm_of_mcr_operating_point,
-                    self.shaft_power_of_mcr_operating_point
-                ]),
-                col={"xs": 12})
-            self.content = self.custom_card
+                self.custom_card = CustomCard(
+                    self.page.session.get("lang.setting.mcr_operating_point"),
+                    ft.ResponsiveRow(controls=[
+                        self.rpm_of_mcr_operating_point,
+                        self.shaft_power_of_mcr_operating_point
+                    ]),
+                    col={"xs": 12})
+                self.content = self.custom_card
         except:
             logging.exception('exception occured at PropellerConfMcr.build')
 

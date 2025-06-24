@@ -15,48 +15,49 @@ class IOSettingMasterServer(ft.Container):
 
     def build(self):
         try:
-            self.ip = ft.TextField(
-                label=f'HMI {self.page.session.get("lang.setting.ip")}',
-                value='0.0.0.0',
-                read_only=True
-            )
+            if self.page and self.page.session:
+                self.ip = ft.TextField(
+                    label=f'HMI {self.page.session.get("lang.setting.ip")}',
+                    value='0.0.0.0',
+                    read_only=True
+                )
 
-            self.port = ft.TextField(
-                label=f'HMI {self.page.session.get("lang.setting.port")}',
-                value='8000',
-                read_only=True
-            )
+                self.port = ft.TextField(
+                    label=f'HMI {self.page.session.get("lang.setting.port")}',
+                    value='8000',
+                    read_only=True
+                )
 
-            self.start_btn = ft.FilledButton(
-                text=self.page.session.get("lang.setting.start_master_server"),
-                bgcolor=ft.Colors.GREEN,
-                color=ft.Colors.WHITE,
-                style=ft.ButtonStyle(
-                    shape=ft.RoundedRectangleBorder(radius=5)
-                ),
-                on_click=lambda e: self.page.open(PermissionCheck(self.on_start, 2))
-            )
+                self.start_btn = ft.FilledButton(
+                    text=self.page.session.get("lang.setting.start_master_server"),
+                    bgcolor=ft.Colors.GREEN,
+                    color=ft.Colors.WHITE,
+                    style=ft.ButtonStyle(
+                        shape=ft.RoundedRectangleBorder(radius=5)
+                    ),
+                    on_click=lambda e: self.page.open(PermissionCheck(self.on_start, 2))
+                )
 
-            self.stop_btn = ft.FilledButton(
-                text=self.page.session.get("lang.setting.stop_master_server"),
-                bgcolor=ft.Colors.RED,
-                color=ft.Colors.WHITE,
-                style=ft.ButtonStyle(
-                    shape=ft.RoundedRectangleBorder(radius=5)
-                ),
-                on_click=lambda e: self.page.open(PermissionCheck(self.on_stop, 2))
-            )
+                self.stop_btn = ft.FilledButton(
+                    text=self.page.session.get("lang.setting.stop_master_server"),
+                    bgcolor=ft.Colors.RED,
+                    color=ft.Colors.WHITE,
+                    style=ft.ButtonStyle(
+                        shape=ft.RoundedRectangleBorder(radius=5)
+                    ),
+                    on_click=lambda e: self.page.open(PermissionCheck(self.on_stop, 2))
+                )
 
-            self.custom_card = CustomCard(
-                self.page.session.get("lang.setting.master_server_conf"),
-                ft.Row(controls=[
-                    self.ip,
-                    self.port,
-                    self.start_btn,
-                    self.stop_btn
-                ])
-            )
-            self.content = self.custom_card
+                self.custom_card = CustomCard(
+                    self.page.session.get("lang.setting.master_server_conf"),
+                    ft.Row(controls=[
+                        self.ip,
+                        self.port,
+                        self.start_btn,
+                        self.stop_btn
+                    ])
+                )
+                self.content = self.custom_card
         except:
             logging.exception('exception occured at IOSettingMasterServer.build')
 

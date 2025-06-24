@@ -53,7 +53,8 @@ class MeterHalf(ft.Container):
 
             # set outer color
             self.__set_outer_color()
-            self.outer.update()
+            if self.outer and self.outer.page:
+                self.outer.update()
         except:
             logging.exception('exception occured at MeterHalf.set_outer_value')
 

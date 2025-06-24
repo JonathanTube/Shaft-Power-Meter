@@ -14,94 +14,95 @@ class IOSettingOutput(ft.Container):
 
     def build(self):
         try:
-            options = [
-                ft.dropdown.Option(key=port.name, text=f"{port.name} - {port.description}")
-                for port in serial.tools.list_ports.comports()
-            ]
+            if self.page and self.page.session:
+                options = [
+                    ft.dropdown.Option(key=port.name, text=f"{port.name} - {port.description}")
+                    for port in serial.tools.list_ports.comports()
+                ]
 
-            self.serial_port = ft.Dropdown(
-                label="Port",
-                value=self.conf.output_com_port,
-                col={'sm': 8},
-                options=options
-            )
+                self.serial_port = ft.Dropdown(
+                    label="Port",
+                    value=self.conf.output_com_port,
+                    col={'sm': 8},
+                    options=options
+                )
 
-            self.start_btn = ft.FilledButton(
-                text=self.page.session.get('lang.setting.connect'),
-                bgcolor=ft.Colors.GREEN,
-                color=ft.Colors.WHITE,
-                style=ft.ButtonStyle(
-                    shape=ft.RoundedRectangleBorder(radius=5)
-                ),
-                col={'sm': 4},
-                on_click=lambda e: self.on_start()
-            )
-
-            self.stop_btn = ft.FilledButton(
-                text=self.page.session.get('lang.setting.disconnect'),
-                bgcolor=ft.Colors.RED,
-                color=ft.Colors.WHITE,
-                style=ft.ButtonStyle(
-                    shape=ft.RoundedRectangleBorder(radius=5)
-                ),
-                col={'sm': 4},
-                on_click=lambda e: self.on_stop()
-            )
-
-            self.check_torque = ft.Checkbox(
-                label=self.page.session.get("lang.common.torque"),
-                value=self.conf.output_torque
-            )
-            self.check_thrust = ft.Checkbox(
-                label=self.page.session.get("lang.common.thrust"),
-                value=self.conf.output_thrust
-            )
-
-            self.check_power = ft.Checkbox(
-                label=self.page.session.get("lang.common.power"),
-                value=self.conf.output_power
-            )
-
-            self.check_speed = ft.Checkbox(
-                label=self.page.session.get("lang.common.speed"),
-                value=self.conf.output_speed
-            )
-
-            self.check_avg_power = ft.Checkbox(
-                label=self.page.session.get("lang.common.average_power"),
-                value=self.conf.output_avg_power
-            )
-
-            self.check_sum_power = ft.Checkbox(
-                label=self.page.session.get("lang.common.total_energy"),
-                value=self.conf.output_sum_power
-            )
-
-            self.custom_card = CustomCard(
-                self.page.session.get("lang.setting.output_conf"),
-                ft.Column(controls=[
-                    ft.Row(
-                        expand=True,
-                        controls=[
-                            self.check_torque,
-                            self.check_thrust,
-                            self.check_speed,
-                            self.check_power,
-                            self.check_avg_power,
-                            self.check_sum_power
-                        ]
+                self.start_btn = ft.FilledButton(
+                    text=self.page.session.get('lang.setting.connect'),
+                    bgcolor=ft.Colors.GREEN,
+                    color=ft.Colors.WHITE,
+                    style=ft.ButtonStyle(
+                        shape=ft.RoundedRectangleBorder(radius=5)
                     ),
-                    ft.Row(
-                        expand=True,
-                        alignment=ft.alignment.center,
-                        controls=[
-                            self.serial_port,
-                            self.start_btn,
-                            self.stop_btn
-                        ]
-                    )
-                ]))
-            self.content = self.custom_card
+                    col={'sm': 4},
+                    on_click=lambda e: self.on_start()
+                )
+
+                self.stop_btn = ft.FilledButton(
+                    text=self.page.session.get('lang.setting.disconnect'),
+                    bgcolor=ft.Colors.RED,
+                    color=ft.Colors.WHITE,
+                    style=ft.ButtonStyle(
+                        shape=ft.RoundedRectangleBorder(radius=5)
+                    ),
+                    col={'sm': 4},
+                    on_click=lambda e: self.on_stop()
+                )
+
+                self.check_torque = ft.Checkbox(
+                    label=self.page.session.get("lang.common.torque"),
+                    value=self.conf.output_torque
+                )
+                self.check_thrust = ft.Checkbox(
+                    label=self.page.session.get("lang.common.thrust"),
+                    value=self.conf.output_thrust
+                )
+
+                self.check_power = ft.Checkbox(
+                    label=self.page.session.get("lang.common.power"),
+                    value=self.conf.output_power
+                )
+
+                self.check_speed = ft.Checkbox(
+                    label=self.page.session.get("lang.common.speed"),
+                    value=self.conf.output_speed
+                )
+
+                self.check_avg_power = ft.Checkbox(
+                    label=self.page.session.get("lang.common.average_power"),
+                    value=self.conf.output_avg_power
+                )
+
+                self.check_sum_power = ft.Checkbox(
+                    label=self.page.session.get("lang.common.total_energy"),
+                    value=self.conf.output_sum_power
+                )
+
+                self.custom_card = CustomCard(
+                    self.page.session.get("lang.setting.output_conf"),
+                    ft.Column(controls=[
+                        ft.Row(
+                            expand=True,
+                            controls=[
+                                self.check_torque,
+                                self.check_thrust,
+                                self.check_speed,
+                                self.check_power,
+                                self.check_avg_power,
+                                self.check_sum_power
+                            ]
+                        ),
+                        ft.Row(
+                            expand=True,
+                            alignment=ft.alignment.center,
+                            controls=[
+                                self.serial_port,
+                                self.start_btn,
+                                self.stop_btn
+                            ]
+                        )
+                    ]))
+                self.content = self.custom_card
         except:
             logging.exception('exception occured at IOSettingOutput.build')
 

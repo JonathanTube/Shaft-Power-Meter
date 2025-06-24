@@ -159,7 +159,7 @@ class WebSocketClient:
             if self.websocket:
                 await self.websocket.close()
                 await self.websocket.wait_closed()
-        except Exception:
+        except:
             logging.error("[***HMI client***] failed to close websocket connection")
         finally:
             self._is_connected = False

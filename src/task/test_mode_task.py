@@ -2,7 +2,6 @@ import asyncio
 import random
 import logging
 from peewee import fn
-from websocket.websocket_server import ws_server
 from db.models.counter_log import CounterLog
 from db.models.data_log import DataLog
 from db.models.system_settings import SystemSettings
@@ -38,24 +37,28 @@ class TestModeTask:
     async def generate_random_data(self):
         self.is_running = True
 
-        try:
-            system_settings: SystemSettings = SystemSettings.get()
-            amount_of_propeller = system_settings.amount_of_propeller
+        system_settings: SystemSettings = SystemSettings.get()
+        amount_of_propeller = system_settings.amount_of_propeller
 
-            while self.is_running:
-                await self.save_generated_data('sps1')
+        while self.is_running:
+            try:
+                self.save_generated_data('sps1')
+
                 if amount_of_propeller == 2:
-                    await self.save_generated_data('sps2')
+                    self.save_generated_data('sps2')
+            except:
+                logging.exception('exception occured at TestModeTask.generate_random_data')
+                self.is_running = False
+                break
+            finally:
                 await asyncio.sleep(1)
-        except Exception as e:
-            logging.exception(e)
 
     async def start(self):
         try:
             gdata.test_mode_start_time = gdata.utc_date_time
             asyncio.create_task(self.generate_random_data())
-        except Exception as e:
-            logging.exception(e)
+        except:
+            logging.exception('exception occured at TestModeTask.start')
 
     def stop(self):
         try:
@@ -90,18 +93,18 @@ class TestModeTask:
 
             gdata.sps1_power_history = []
             gdata.sps2_power_history = []
-        except Exception:
+        except:
             logging.exception('test mode task error')
         self.is_running = False
 
-    async def save_generated_data(self, name):
+    def save_generated_data(self, name):
         try:
             instant_torque = int(random.uniform(self.min_torque, self.max_torque))
             instant_speed = int(random.uniform(self.min_speed, self.max_speed))
             instant_thrust = int(random.uniform(self.min_thrust, self.max_thrust))
             DataSaver.save(name, instant_torque, instant_thrust, instant_speed)
-        except Exception as e:
-            logging.exception(e)
+        except:
+            logging.exception('exception occured at save_generated_data')
 
 
 testModeTask: TestModeTask = TestModeTask()

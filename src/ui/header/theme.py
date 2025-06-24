@@ -71,7 +71,7 @@ class Theme(ft.Container):
                 subprocess.Popen(default_avd)
                 self.page.window.minimized = True
                 self.page.update()
-            except Exception:
+            except:
                 logging.exception("AdvBrightnessUtility error")
                 Toast.show_error(self.page, f"the AdvBrightnessUtility.exe should be installed at {default_avd}")
         else:

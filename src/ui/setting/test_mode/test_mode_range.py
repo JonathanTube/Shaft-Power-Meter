@@ -26,7 +26,7 @@ class TestModeRange(ft.Container):
 
     def build(self):
         try:
-            if self.page:
+            if self.page and self.page.session:
                 disabled = not gdata.test_mode_running
                 min_torque_value, min_torque_unit = self.__get_torque_and_unit(self.conf.min_torque)
                 max_torque_value, max_torque_unit = self.__get_torque_and_unit(self.conf.max_torque)

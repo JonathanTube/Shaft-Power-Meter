@@ -29,19 +29,20 @@ class Permission(ft.Container):
         self.last_op_utc_date_time = gdata.utc_date_time
 
     def build(self):
-        try:
-            self.permission_check = PermissionCheck(on_confirm=self.__on_permission_checked, user_role=0)
-            self.content = ft.TextButton(
-                icon=ft.Icons.LOCK_ROUNDED,
-                text="",
-                style=ft.ButtonStyle(
-                    icon_size=100,
-                    icon_color=ft.Colors.INVERSE_SURFACE
-                ),
-                on_click=lambda e: self.page.open(self.permission_check)
-            )
-        except:
-            logging.exception('exception occured at Permission.build')
+        if self.page and self.page.session:
+            try:
+                self.permission_check = PermissionCheck(on_confirm=self.__on_permission_checked, user_role=0)
+                self.content = ft.TextButton(
+                    icon=ft.Icons.LOCK_ROUNDED,
+                    text="",
+                    style=ft.ButtonStyle(
+                        icon_size=100,
+                        icon_color=ft.Colors.INVERSE_SURFACE
+                    ),
+                    on_click=lambda e: self.page.open(self.permission_check)
+                )
+            except:
+                logging.exception('exception occured at Permission.build')
 
     def __on_permission_checked(self, user: User):
         try:
@@ -164,8 +165,11 @@ class Permission(ft.Container):
         return value == None or value.strip() == ""
 
     def __on_dropdown_change(self, e):
-        self.permission_table.search(role=e.control.value)
-        self.permission_table.update()
+        try:
+            self.permission_table.search(role=e.control.value)
+            self.permission_table.update()
+        except:
+            logging.exception('exception occured at Permission.__on_dropdown_change')
 
     async def __auto_lock(self):
         while self.task_running:
@@ -177,9 +181,10 @@ class Permission(ft.Container):
                         self.visible = False
                         self.page.open(self.permission_check)
                         self.update()
-                except Exception as e:
-                    logging.exception(e)
-            await asyncio.sleep(1)
+                except:
+                    return
+                finally:
+                    await asyncio.sleep(1)
 
     def did_mount(self):
         self.task_running = True

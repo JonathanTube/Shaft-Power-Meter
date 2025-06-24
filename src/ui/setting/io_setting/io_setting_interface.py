@@ -20,55 +20,56 @@ class InterfaceConf(ft.Container):
 
     def build(self):
         try:
-            self.connect_btn = ft.FilledButton(
-                text=self.page.session.get("lang.setting.connect_to_master"),
-                bgcolor=ft.Colors.GREEN,
-                color=ft.Colors.WHITE,
-                style=ft.ButtonStyle(
-                    shape=ft.RoundedRectangleBorder(radius=5)
-                ),
-                col={"sm": 4},
-                on_click=lambda e: self.page.open(PermissionCheck(self.__on_connect, 2))
-            )
+            if self.page and self.page.session:
+                self.connect_btn = ft.FilledButton(
+                    text=self.page.session.get("lang.setting.connect_to_master"),
+                    bgcolor=ft.Colors.GREEN,
+                    color=ft.Colors.WHITE,
+                    style=ft.ButtonStyle(
+                        shape=ft.RoundedRectangleBorder(radius=5)
+                    ),
+                    col={"sm": 4},
+                    on_click=lambda e: self.page.open(PermissionCheck(self.__on_connect, 2))
+                )
 
-            self.close_btn = ft.FilledButton(
-                text=self.page.session.get("lang.setting.disconnect_from_master"),
-                bgcolor=ft.Colors.RED,
-                color=ft.Colors.WHITE,
-                style=ft.ButtonStyle(
-                    shape=ft.RoundedRectangleBorder(radius=5)
-                ),
-                col={"sm": 4},
-                on_click=lambda e: self.page.open(PermissionCheck(self.__on_close, 2))
-            )
+                self.close_btn = ft.FilledButton(
+                    text=self.page.session.get("lang.setting.disconnect_from_master"),
+                    bgcolor=ft.Colors.RED,
+                    color=ft.Colors.WHITE,
+                    style=ft.ButtonStyle(
+                        shape=ft.RoundedRectangleBorder(radius=5)
+                    ),
+                    col={"sm": 4},
+                    on_click=lambda e: self.page.open(PermissionCheck(self.__on_close, 2))
+                )
 
-            self.hmi_server_ip = ft.TextField(
-                label=self.page.session.get("lang.setting.hmi_server_ip"),
-                value=self.conf.hmi_server_ip,
-                read_only=True,
-                can_request_focus=False,
-                col={"sm": 4},
-                on_click=lambda e: keyboard.open(e.control, 'ip')
-            )
+                self.hmi_server_ip = ft.TextField(
+                    label=self.page.session.get("lang.setting.hmi_server_ip"),
+                    value=self.conf.hmi_server_ip,
+                    read_only=True,
+                    can_request_focus=False,
+                    col={"sm": 4},
+                    on_click=lambda e: keyboard.open(e.control, 'ip')
+                )
 
-            self.hmi_server_port = ft.TextField(
-                label=self.page.session.get("lang.setting.hmi_server_port"),
-                value=self.conf.hmi_server_port,
-                read_only=True,
-                can_request_focus=False,
-                col={"sm": 4},
-                on_click=lambda e: keyboard.open(e.control, 'int')
-            )
+                self.hmi_server_port = ft.TextField(
+                    label=self.page.session.get("lang.setting.hmi_server_port"),
+                    value=self.conf.hmi_server_port,
+                    read_only=True,
+                    can_request_focus=False,
+                    col={"sm": 4},
+                    on_click=lambda e: keyboard.open(e.control, 'int')
+                )
 
-            self.custom_card = CustomCard(
-                self.page.session.get("lang.setting.interface_conf"),
-                ft.Row(controls=[
-                    self.hmi_server_ip,
-                    self.hmi_server_port,
-                    self.connect_btn,
-                    self.close_btn
-                ]))
-            self.content = self.custom_card
+                self.custom_card = CustomCard(
+                    self.page.session.get("lang.setting.interface_conf"),
+                    ft.Row(controls=[
+                        self.hmi_server_ip,
+                        self.hmi_server_port,
+                        self.connect_btn,
+                        self.close_btn
+                    ]))
+                self.content = self.custom_card
         except:
             logging.exception('exception occured at InterfaceConf.build')
 

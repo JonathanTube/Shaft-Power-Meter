@@ -24,28 +24,32 @@ class SelfTest(ft.Tabs):
         self.task_running = False
 
     def build(self):
-        self.plc_log = ft.ListView(
-            padding=10, auto_scroll=True, height=500, spacing=5, expand=True)
-        
-        self.sps1_log = ft.ListView(
-            padding=10, auto_scroll=True, height=500, spacing=5, expand=True)
-        
-        self.sps2_log = ft.ListView(
-            padding=10, auto_scroll=True, height=500, spacing=5, expand=True)
-        
-        self.gps_log = ft.ListView(
-            padding=10, auto_scroll=True, height=500, spacing=5, expand=True)
-        
-        self.hmi_server_log = ft.ListView(
-            padding=10, auto_scroll=True, height=500, spacing=5, expand=True)
-        
-        self.tabs = [
-            ft.Tab(text="SPS-1", content=self.sps1_log, visible=self.system_settings.is_master),
-            ft.Tab(text="SPS-2", content=self.sps2_log, visible=self.system_settings.is_master and self.system_settings.amount_of_propeller == 2),
-            ft.Tab(text="HMI Server", content=self.hmi_server_log, visible=not self.system_settings.is_master),
-            ft.Tab(text="GPS", content=self.gps_log),
-            ft.Tab(text="PLC", content=self.plc_log, visible=self.conf.plc_enabled)
-        ]
+            try:
+                if self.page and self.page.session:
+                    self.plc_log = ft.ListView(
+                        padding=10, auto_scroll=True, height=500, spacing=5, expand=True)
+                    
+                    self.sps1_log = ft.ListView(
+                        padding=10, auto_scroll=True, height=500, spacing=5, expand=True)
+                    
+                    self.sps2_log = ft.ListView(
+                        padding=10, auto_scroll=True, height=500, spacing=5, expand=True)
+                    
+                    self.gps_log = ft.ListView(
+                        padding=10, auto_scroll=True, height=500, spacing=5, expand=True)
+                    
+                    self.hmi_server_log = ft.ListView(
+                        padding=10, auto_scroll=True, height=500, spacing=5, expand=True)
+                    
+                    self.tabs = [
+                        ft.Tab(text="SPS-1", content=self.sps1_log, visible=self.system_settings.is_master),
+                        ft.Tab(text="SPS-2", content=self.sps2_log, visible=self.system_settings.is_master and self.system_settings.amount_of_propeller == 2),
+                        ft.Tab(text="HMI Server", content=self.hmi_server_log, visible=not self.system_settings.is_master),
+                        ft.Tab(text="GPS", content=self.gps_log),
+                        ft.Tab(text="PLC", content=self.plc_log, visible=self.conf.plc_enabled)
+                    ]
+            except:
+                logging.exception('exception occured at SelfTest.build')
 
     def did_mount(self):
         self.task_running = True
@@ -92,7 +96,7 @@ class SelfTest(ft.Tabs):
                 else:
                     self.plc_log.controls.append(ft.Text("disconnected from PLC"))
                 self.plc_log.update()
-            except Exception as e:
+            except:
                 logging.exception('exception occured at SelfTest.__read_plc_data')
             finally:
                 await asyncio.sleep(2)

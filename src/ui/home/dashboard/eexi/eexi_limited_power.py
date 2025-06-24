@@ -77,20 +77,27 @@ class EEXILimitedPower(ft.Container):
             logging.exception('exception occured at EEXILimitedPower.reload')
 
     def update_mode(self):
-        instant_power = gdata.sps1_power
-        if self.amount_of_propeller == 2:
-            instant_power += gdata.sps2_power
+        try:
+            if self.page:
+                instant_power = gdata.sps1_power
+                if self.amount_of_propeller == 2:
+                    instant_power += gdata.sps2_power
 
-        if instant_power <= self.normal_power:
-            self.unlimited_mode_icon.visible = False
-        elif instant_power <= self.eexi_power:
-            self.unlimited_mode_icon.color = ft.Colors.ORANGE
-            self.unlimited_mode.color = ft.Colors.ORANGE
-            self.unlimited_mode_icon.visible = True
-        else:
-            self.unlimited_mode_icon.color = ft.Colors.RED
-            self.unlimited_mode.color = ft.Colors.RED
-            self.unlimited_mode_icon.visible = True
+                if instant_power <= self.normal_power:
+                    self.unlimited_mode_icon.visible = False
+                elif instant_power <= self.eexi_power:
+                    self.unlimited_mode_icon.color = ft.Colors.ORANGE
+                    self.unlimited_mode.color = ft.Colors.ORANGE
+                    self.unlimited_mode_icon.visible = True
+                else:
+                    self.unlimited_mode_icon.color = ft.Colors.RED
+                    self.unlimited_mode.color = ft.Colors.RED
+                    self.unlimited_mode_icon.visible = True
+                
+                if self.unlimited_mode_icon:
+                    self.unlimited_mode_icon.update()
 
-        self.unlimited_mode_icon.update()
-        self.unlimited_mode.update()
+                if self.unlimited_mode:
+                    self.unlimited_mode.update()
+        except:
+            logging.exception('exception occured at EEXILimitedPower.update_mode')

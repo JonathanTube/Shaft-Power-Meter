@@ -153,5 +153,5 @@ class EEXIBreach:
                     power=power,
                     total_power=total_power
                 )
-        except Exception:
+        except:
             logging.exception("save eexi breach report detail error")

@@ -14,31 +14,32 @@ class PropellerConfOverloadCurve(ft.Container):
 
     def build(self):
         try:
-            self.overload_curve = ft.TextField(
-                suffix_text="[% above (4)]",
-                value=self.ps.value_of_overload_curve,
-                read_only=True,
-                col = {"xs": 6},
-                can_request_focus=False,
-                on_click=lambda e: keyboard.open(e.control)
-            )
+            if self.page and self.page.session:
+                self.overload_curve = ft.TextField(
+                    suffix_text="[% above (4)]",
+                    value=self.ps.value_of_overload_curve,
+                    read_only=True,
+                    col = {"xs": 6},
+                    can_request_focus=False,
+                    on_click=lambda e: keyboard.open(e.control)
+                )
 
-            self.overload_alarm = ft.Checkbox(
-                label=self.page.session.get("lang.setting.enable_overload_alarm"), 
-                col={"xs": 6}, 
-                value=self.ps.alarm_enabled_of_overload_curve
-            )
+                self.overload_alarm = ft.Checkbox(
+                    label=self.page.session.get("lang.setting.enable_overload_alarm"), 
+                    col={"xs": 6}, 
+                    value=self.ps.alarm_enabled_of_overload_curve
+                )
 
-            self.line_color_of_overload_curve = ColorDialog(color=self.ps.line_color_of_overload_curve)
+                self.line_color_of_overload_curve = ColorDialog(color=self.ps.line_color_of_overload_curve)
 
-            self.custom_card = CustomCard(
-                self.page.session.get("lang.setting.overload_curve"),
-                ft.ResponsiveRow(controls=[
-                    self.overload_curve,
-                    self.line_color_of_overload_curve,
-                    self.overload_alarm,
-                ]))
-            self.content = self.custom_card
+                self.custom_card = CustomCard(
+                    self.page.session.get("lang.setting.overload_curve"),
+                    ft.ResponsiveRow(controls=[
+                        self.overload_curve,
+                        self.line_color_of_overload_curve,
+                        self.overload_alarm,
+                    ]))
+                self.content = self.custom_card
         except:
             logging.exception('exception occured at PropellerConfOverloadCurve.build')
 

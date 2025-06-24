@@ -17,6 +17,6 @@ def add_to_startup():
             shortcut.description = "Shaft Power Meter"
 
         return True
-    except Exception:
+    except:
         logging.exception("add to startup error")
         return False

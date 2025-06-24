@@ -166,7 +166,7 @@ class PlcSyncTask:
                 "thrust": await self._safe_read_register(12321),
                 "speed": await self._safe_read_register(12331)
             }
-        except Exception:
+        except:
             logging.error(f"[***PLC***] {self.ip}:{self.port} PLC read data failed")
 
         return {"power": None, "torque": None, "thrust": None, "speed": None}

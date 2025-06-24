@@ -20,55 +20,55 @@ class IOSettingGPS(ft.Container):
 
     def build(self):
         try:
-            self.gps_ip = ft.TextField(
-                label=self.page.session.get("lang.setting.ip"),
-                value=self.conf.gps_ip,
-                read_only=True,
-                col={"sm": 4},
-                can_request_focus=False,
-                on_click=lambda e: keyboard.open(e.control, 'ip')
-            )
+            if self.page and self.page.session:
+                self.gps_ip = ft.TextField(
+                    label=self.page.session.get("lang.setting.ip"),
+                    value=self.conf.gps_ip,
+                    read_only=True,
+                    col={"sm": 4},
+                    can_request_focus=False,
+                    on_click=lambda e: keyboard.open(e.control, 'ip')
+                )
 
-            self.gps_port = ft.TextField(
-                label=self.page.session.get("lang.setting.port"),
-                value=self.conf.gps_port,
-                read_only=True,
-                col={"sm": 4},
-                can_request_focus=False,
-                on_click=lambda e: keyboard.open(e.control, 'int')
-            )
+                self.gps_port = ft.TextField(
+                    label=self.page.session.get("lang.setting.port"),
+                    value=self.conf.gps_port,
+                    read_only=True,
+                    col={"sm": 4},
+                    can_request_focus=False,
+                    on_click=lambda e: keyboard.open(e.control, 'int')
+                )
 
-            self.connect_btn = ft.FilledButton(
-                text=self.page.session.get("lang.setting.connect"),
-                bgcolor=ft.Colors.GREEN,
-                color=ft.Colors.WHITE,
-                style=ft.ButtonStyle(
-                    shape=ft.RoundedRectangleBorder(radius=5)
-                ),
-                on_click=lambda e: self.page.open(PermissionCheck(self.__on_connect, 2))
-            )
+                self.connect_btn = ft.FilledButton(
+                    text=self.page.session.get("lang.setting.connect"),
+                    bgcolor=ft.Colors.GREEN,
+                    color=ft.Colors.WHITE,
+                    style=ft.ButtonStyle(
+                        shape=ft.RoundedRectangleBorder(radius=5)
+                    ),
+                    on_click=lambda e: self.page.open(PermissionCheck(self.__on_connect, 2))
+                )
 
-            self.close_btn = ft.FilledButton(
-                text=self.page.session.get("lang.setting.disconnect"),
-                bgcolor=ft.Colors.RED,
-                color=ft.Colors.WHITE,
-                style=ft.ButtonStyle(
-                    shape=ft.RoundedRectangleBorder(radius=5)
-                ),
-                on_click=lambda e: self.page.open(PermissionCheck(self.__on_close, 2))
-            )
+                self.close_btn = ft.FilledButton(
+                    text=self.page.session.get("lang.setting.disconnect"),
+                    bgcolor=ft.Colors.RED,
+                    color=ft.Colors.WHITE,
+                    style=ft.ButtonStyle(
+                        shape=ft.RoundedRectangleBorder(radius=5)
+                    ),
+                    on_click=lambda e: self.page.open(PermissionCheck(self.__on_close, 2))
+                )
 
-            self.custom_card = CustomCard(
-                self.page.session.get("lang.setting.gps_conf"),
-                ft.Row(controls=[
-                    self.gps_ip,
-                    self.gps_port,
-                    self.connect_btn,
-                    self.close_btn
-                ]),
-                col={"xs": 12})
-            self.content = self.custom_card
-
+                self.custom_card = CustomCard(
+                    self.page.session.get("lang.setting.gps_conf"),
+                    ft.Row(controls=[
+                        self.gps_ip,
+                        self.gps_port,
+                        self.connect_btn,
+                        self.close_btn
+                    ]),
+                    col={"xs": 12})
+                self.content = self.custom_card
         except:
             logging.exception('exception occured at IOSettingGPS.build')
 

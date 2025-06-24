@@ -32,7 +32,7 @@ class General(ft.Container):
 
     def build(self):
         try:
-            if self.page:
+            if self.page and self.page.session:
                 self.general_preference = GeneralPreference(self.__on_system_unit_change)
                 self.limitation_max = GeneralLimitationMax(self.system_unit)
                 self.limitation_warning = GeneralLimitationWarning(self.system_unit)

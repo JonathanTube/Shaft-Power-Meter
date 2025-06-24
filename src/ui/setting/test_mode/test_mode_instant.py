@@ -20,7 +20,7 @@ class TestModeInstant(ft.ResponsiveRow):
 
     def build(self):
         try:
-            if self.page:
+            if self.page and self.page.session:
                 self.sps1_torque = self.__get_uniform_text("0")
                 self.sps1_speed = self.__get_uniform_text("0")
                 self.sps1_thrust = self.__get_uniform_text("0")

@@ -1,3 +1,4 @@
+import logging
 import flet as ft
 from dateutil.relativedelta import relativedelta
 from common.operation_type import OperationType
@@ -12,7 +13,7 @@ from common.global_data import gdata
 
 
 class ZeroCalExecutor(ft.Container):
-    def __init__(self, name:str):
+    def __init__(self, name: str):
         super().__init__()
         self.name = name
         self.__load_data()
@@ -66,13 +67,13 @@ class ZeroCalExecutor(ft.Container):
         )
 
         self.tips_card = ft.Card(content=ft.Container(
-            padding=ft.padding.symmetric(0,10),
+            padding=ft.padding.symmetric(0, 10),
             content=row
         ))
 
     def __create_current_offset(self):
-        self.current_torque_offset = ft.Text(round(gdata.sps1_torque_offset if self.name == 'sps1' else gdata.sps2_torque_offset,10))
-        self.current_thrust_offset = ft.Text(round(gdata.sps1_thrust_offset if self.name == 'sps1' else gdata.sps2_thrust_offset,10))
+        self.current_torque_offset = ft.Text(round(gdata.sps1_torque_offset if self.name == 'sps1' else gdata.sps2_torque_offset, 10))
+        self.current_thrust_offset = ft.Text(round(gdata.sps1_thrust_offset if self.name == 'sps1' else gdata.sps2_thrust_offset, 10))
         row = ft.Row(
             height=40,
             spacing=20,
@@ -91,7 +92,7 @@ class ZeroCalExecutor(ft.Container):
         )
 
         self.current_offset = ft.Card(content=ft.Container(
-            padding=ft.padding.symmetric(0,10),
+            padding=ft.padding.symmetric(0, 10),
             content=row
         ))
 
@@ -102,8 +103,8 @@ class ZeroCalExecutor(ft.Container):
             for index, record in enumerate(records):
                 rows.append(ft.DataRow(cells=[
                     ft.DataCell(ft.Text(f'#{index + 1}')),
-                    ft.DataCell(ft.Text(round(record.mv_per_v_for_torque,10))),
-                    ft.DataCell(ft.Text(round(record.mv_per_v_for_thrust,10)))
+                    ft.DataCell(ft.Text(round(record.mv_per_v_for_torque, 10))),
+                    ft.DataCell(ft.Text(round(record.mv_per_v_for_thrust, 10)))
                 ]))
         return rows
 
@@ -148,23 +149,23 @@ class ZeroCalExecutor(ft.Container):
             ],
             rows=table_rows)
 
-        self.new_avg_torque = ft.Text(round(avg_torque,10))
-        self.new_avg_thrust = ft.Text(round(avg_thrust,10))
+        self.new_avg_torque = ft.Text(round(avg_torque, 10))
+        self.new_avg_thrust = ft.Text(round(avg_thrust, 10))
 
         self.table_card = ft.Card(content=self.table)
 
         self.result_card = ft.Card(
             visible=self.latest_zero_cal is not None,
             content=ft.Container(
-                    padding=ft.padding.symmetric(0,10),
-                    content=ft.Row(
-                        height=40,
-                        expand=True,
-                        controls=[
-                            ft.Text(self.page.session.get("lang.zero_cal.new_torque_offset")), self.new_avg_torque,
-                            ft.Text(self.page.session.get("lang.zero_cal.new_thrust_offset")), self.new_avg_thrust
-                        ]
-                    )
+                padding=ft.padding.symmetric(0, 10),
+                content=ft.Row(
+                    height=40,
+                    expand=True,
+                    controls=[
+                        ft.Text(self.page.session.get("lang.zero_cal.new_torque_offset")), self.new_avg_torque,
+                        ft.Text(self.page.session.get("lang.zero_cal.new_thrust_offset")), self.new_avg_thrust
+                    ]
+                )
             )
         )
 
@@ -179,9 +180,9 @@ class ZeroCalExecutor(ft.Container):
 
     def __on_start_permission(self, e):
         self.page.open(PermissionCheck(self.__on_start, 2))
-        
+
     def __on_start(self, user: User):
-        ZeroCalInfo.create(utc_date_time=gdata.utc_date_time, state=0, name = self.name)
+        ZeroCalInfo.create(utc_date_time=gdata.utc_date_time, state=0, name=self.name)
         self.__load_data()
         # 控制Tips过程label显示
         self.state_info.visible = True
@@ -205,7 +206,7 @@ class ZeroCalExecutor(ft.Container):
             operation_type=OperationType.ZERO_CAL,
             operation_content=""
         )
-        
+
         Toast.show_success(self.page, message=self.page.session.get("lang.zero_cal.started"))
 
     def __reset_to_start(self):
@@ -253,8 +254,8 @@ class ZeroCalExecutor(ft.Container):
             gdata.sps2_torque_offset = self.latest_accepted_zero_cal.torque_offset
             gdata.sps2_thrust_offset = self.latest_accepted_zero_cal.thrust_offset
 
-        self.current_torque_offset.value = round(self.latest_accepted_zero_cal.torque_offset,10)
-        self.current_thrust_offset.value = round(self.latest_accepted_zero_cal.thrust_offset,10)
+        self.current_torque_offset.value = round(self.latest_accepted_zero_cal.torque_offset, 10)
+        self.current_thrust_offset.value = round(self.latest_accepted_zero_cal.thrust_offset, 10)
         self.current_offset.update()
 
         Toast.show_success(e.page, message=self.page.session.get("lang.zero_cal.accepted"))
@@ -275,7 +276,7 @@ class ZeroCalExecutor(ft.Container):
             return
 
         ZeroCalRecord.create(
-            name = self.name,
+            name=self.name,
             zero_cal_info=self.latest_zero_cal.id,
             mv_per_v_for_torque=gdata.sps1_mv_per_v_for_torque if self.name == 'sps1' else gdata.sps2_mv_per_v_for_torque,
             mv_per_v_for_thrust=gdata.sps1_mv_per_v_for_thrust if self.name == 'sps1' else gdata.sps2_mv_per_v_for_thrust
@@ -307,58 +308,62 @@ class ZeroCalExecutor(ft.Container):
         query.execute()
 
         # 筛选平均值
-        self.new_avg_torque.value = round(avg_torque,10)
+        self.new_avg_torque.value = round(avg_torque, 10)
         self.new_avg_torque.update()
 
-        self.new_avg_thrust.value = round(avg_thrust,10)
+        self.new_avg_thrust.value = round(avg_thrust, 10)
         self.new_avg_thrust.update()
 
         Toast.show_success(e.page)
 
     def build(self):
-        self.start_button = ft.FilledButton(text=self.page.session.get("lang.zero_cal.start"), bgcolor=ft.Colors.GREEN_900,
-                                             color=ft.Colors.WHITE, width=120, height=40, on_click=self.__on_start_permission)
-        self.accept_button = ft.FilledButton(text=self.page.session.get("lang.zero_cal.accept"), bgcolor=ft.Colors.LIGHT_GREEN, 
-                                             color=ft.Colors.WHITE, width=120, height=40, on_click=self.__on_accept)
-        self.fetch_button = ft.FilledButton(text=self.page.session.get("lang.zero_cal.fetch_data"), bgcolor=ft.Colors.BLUE, 
-                                            color=ft.Colors.WHITE, width=120, height=40, on_click=self.__on_fetch)
-        self.abort_button = ft.FilledButton(text=self.page.session.get("lang.zero_cal.abort"), bgcolor=ft.Colors.RED, 
-                                            color=ft.Colors.WHITE, width=120, height=40, on_click=self.__on_abort)
+        try:
+            if self.page and self.page.session:
+                self.start_button = ft.FilledButton(text=self.page.session.get("lang.zero_cal.start"), bgcolor=ft.Colors.GREEN_900,
+                                                    color=ft.Colors.WHITE, width=120, height=40, on_click=self.__on_start_permission)
+                self.accept_button = ft.FilledButton(text=self.page.session.get("lang.zero_cal.accept"), bgcolor=ft.Colors.LIGHT_GREEN,
+                                                     color=ft.Colors.WHITE, width=120, height=40, on_click=self.__on_accept)
+                self.fetch_button = ft.FilledButton(text=self.page.session.get("lang.zero_cal.fetch_data"), bgcolor=ft.Colors.BLUE,
+                                                    color=ft.Colors.WHITE, width=120, height=40, on_click=self.__on_fetch)
+                self.abort_button = ft.FilledButton(text=self.page.session.get("lang.zero_cal.abort"), bgcolor=ft.Colors.RED,
+                                                    color=ft.Colors.WHITE, width=120, height=40, on_click=self.__on_abort)
 
-        self.__create_tips_card()
-        self.__create_current_offset()
-        self.__create_instant_records()
+                self.__create_tips_card()
+                self.__create_current_offset()
+                self.__create_instant_records()
 
-        if self.latest_zero_cal is None:
-            self.start_button.visible = True
-            self.accept_button.visible = False
-            self.abort_button.visible = False
-            self.fetch_button.visible = False
+                if self.latest_zero_cal is None:
+                    self.start_button.visible = True
+                    self.accept_button.visible = False
+                    self.abort_button.visible = False
+                    self.fetch_button.visible = False
 
-        elif self.latest_zero_cal.state == 0:  # 调零中
-            self.start_button.visible = False
-            self.accept_button.visible = len(self.latest_zero_cal.records) == 8
-            self.abort_button.visible = True
-            self.fetch_button.visible = len(self.latest_zero_cal.records) < 8
+                elif self.latest_zero_cal.state == 0:  # 调零中
+                    self.start_button.visible = False
+                    self.accept_button.visible = len(self.latest_zero_cal.records) == 8
+                    self.abort_button.visible = True
+                    self.fetch_button.visible = len(self.latest_zero_cal.records) < 8
 
-        elif self.latest_zero_cal.state in (1, 2):  # 已接受 # 已废弃
-            self.start_button.visible = True
-            self.accept_button.visible = False
-            self.abort_button.visible = False
-            self.fetch_button.visible = False
+                elif self.latest_zero_cal.state in (1, 2):  # 已接受 # 已废弃
+                    self.start_button.visible = True
+                    self.accept_button.visible = False
+                    self.abort_button.visible = False
+                    self.fetch_button.visible = False
 
-        self.content = ft.Column(
-            spacing=0,
-            controls=[
-                self.tips_card,
-                self.current_offset,
-                self.instant_records,
-                ft.Row(
-                    alignment=ft.MainAxisAlignment.CENTER,
+                self.content = ft.Column(
+                    spacing=0,
                     controls=[
-                        self.start_button,
-                        self.accept_button,
-                        self.fetch_button,
-                        self.abort_button
+                        self.tips_card,
+                        self.current_offset,
+                        self.instant_records,
+                        ft.Row(
+                            alignment=ft.MainAxisAlignment.CENTER,
+                            controls=[
+                                self.start_button,
+                                self.accept_button,
+                                self.fetch_button,
+                                self.abort_button
+                            ])
                     ])
-            ])
+        except:
+            logging.exception('exception occured at ZeroCalExecutor.build')

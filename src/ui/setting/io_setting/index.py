@@ -29,48 +29,49 @@ class IOSetting(ft.Container):
         self.loop_task = None
 
     def build(self):
-        try:
-            self.gps_conf = IOSettingGPS(self.conf)
-            self.output_conf = IOSettingOutput(self.conf)
+            try:
+                if self.page and self.page.session:
+                    self.gps_conf = IOSettingGPS(self.conf)
+                    self.output_conf = IOSettingOutput(self.conf)
 
-            self.save_button = ft.FilledButton(
-                self.page.session.get("lang.button.save"),
-                width=120, height=40,
-                on_click=lambda e: self.page.open(PermissionCheck(self.__save_data, 0))
-            )
-            self.reset_button = ft.OutlinedButton(
-                self.page.session.get("lang.button.reset"),
-                width=120, height=40,
-                on_click=self.__reset_data
-            )
+                    self.save_button = ft.FilledButton(
+                        self.page.session.get("lang.button.save"),
+                        width=120, height=40,
+                        on_click=lambda e: self.page.open(PermissionCheck(self.__save_data, 0))
+                    )
+                    self.reset_button = ft.OutlinedButton(
+                        self.page.session.get("lang.button.reset"),
+                        width=120, height=40,
+                        on_click=self.__reset_data
+                    )
 
-            controls = [
-                self.gps_conf,
-                self.output_conf,
-                ft.Row(
-                    alignment=ft.MainAxisAlignment.CENTER,
-                    controls=[self.save_button, self.reset_button]
-                )
-            ]
+                    controls = [
+                        self.gps_conf,
+                        self.output_conf,
+                        ft.Row(
+                            alignment=ft.MainAxisAlignment.CENTER,
+                            controls=[self.save_button, self.reset_button]
+                        )
+                    ]
 
-            if self.system_settings.is_master:
-                self.plc_conf = IOSettingPLC(self.conf)
-                controls.insert(1, self.plc_conf)
-                self.sps_conf = IOSettingSPS(self.conf)
-                controls.insert(2, self.sps_conf)
-                self.master_server_conf = IOSettingMasterServer()
-                controls.insert(3, self.master_server_conf)
-            else:
-                self.interface_conf = InterfaceConf(self.conf)
-                controls.insert(1, self.interface_conf)
+                    if self.system_settings.is_master:
+                        self.plc_conf = IOSettingPLC(self.conf)
+                        controls.insert(1, self.plc_conf)
+                        self.sps_conf = IOSettingSPS(self.conf)
+                        controls.insert(2, self.sps_conf)
+                        self.master_server_conf = IOSettingMasterServer()
+                        controls.insert(3, self.master_server_conf)
+                    else:
+                        self.interface_conf = InterfaceConf(self.conf)
+                        controls.insert(1, self.interface_conf)
 
-            self.content = ft.Column(
-                scroll=ft.ScrollMode.ADAPTIVE,
-                expand=True,
-                controls=[ft.ResponsiveRow(controls=controls)]
-            )
-        except:
-            logging.exception('exception occured at IOSetting.build')
+                    self.content = ft.Column(
+                        scroll=ft.ScrollMode.ADAPTIVE,
+                        expand=True,
+                        controls=[ft.ResponsiveRow(controls=controls)]
+                    )
+            except:
+                logging.exception('exception occured at IOSetting.build')
 
     def __save_data(self, user: User):
         if self.is_saving:

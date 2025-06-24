@@ -76,11 +76,6 @@ def check_single_instance(mutex_name: str = "shaft-power-meter"):
         sys.exit(0)
 
 
-def handle_error(e):
-    logging.error('============global exception occured===========')
-    logging.exception(e)
-
-
 def start_all_task():
     system_settings: SystemSettings = SystemSettings.get()
     asyncio.create_task(UtcTimer().start())
@@ -135,7 +130,17 @@ def on_mute():
 
 
 def set_content(page: ft.Page):
-    page.appbar = Header()
+    # 主菜单切换
+    def change_main_menu(name: str):
+        if name == 'HOME':
+            main_content.content = Home()
+        elif name == 'REPORT':
+            main_content.content = Report()
+        elif name == 'SETTING':
+            main_content.content = Setting()
+        main_content.update()
+
+    page.appbar = Header(on_menu_click=change_main_menu)
 
     main_content = ft.Container(padding=0, margin=0, content=Home())
 
@@ -153,18 +158,6 @@ def set_content(page: ft.Page):
     )
     page.add(main_stack)
     page.overlay.append(keyboard)
-
-    # 主菜单切换
-    def change_main_menu(topic, message):
-        if message == 'HOME':
-            main_content.content = Home()
-        elif message == 'REPORT':
-            main_content.content = Report()
-        elif message == 'SETTING':
-            main_content.content = Setting()
-        main_content.update()
-
-    page.pubsub.subscribe_topic('__change_main_menu', change_main_menu)
 
     # 监听EEXI breach
 
@@ -193,6 +186,14 @@ def set_content(page: ft.Page):
 
 
 async def main(page: ft.Page):
+
+    def handle_error(e):
+        logging.error('============global exception occured===========')
+        logging.exception(e)
+
+    def handle_exit():
+        page.window_destroy()
+
     try:
         preference: Preference = Preference.get()
 
@@ -205,11 +206,16 @@ async def main(page: ft.Page):
 
         page.update()
 
+        page.on_close = lambda _: handle_exit()
+
         start_all_task()
 
     except:
         logging.exception('exception occured at main')
 
 if __name__ == "__main__":
-    check_single_instance()
-    ft.app(target=main)
+    try:
+        check_single_instance()
+        ft.app(target=main)
+    except:
+        logging.exception('exception occured at __name__')

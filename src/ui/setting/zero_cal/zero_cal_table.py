@@ -15,43 +15,48 @@ class ZeroCalTable(AbstractTable):
         self.dtc: DateTimeConf = DateTimeConf.get()
 
     def load_total(self):
-        start_date = self.kwargs.get('start_date')
-        end_date = self.kwargs.get('end_date')
-        sql = ZeroCalInfo.select()
-        if start_date and end_date:
-            sql = sql.where(ZeroCalInfo.utc_date_time >=
-                            start_date, ZeroCalInfo.utc_date_time <= end_date)
+        try:
+            start_date = self.kwargs.get('start_date')
+            end_date = self.kwargs.get('end_date')
+            sql = ZeroCalInfo.select()
+            if start_date and end_date:
+                sql = sql.where(ZeroCalInfo.utc_date_time >=
+                                start_date, ZeroCalInfo.utc_date_time <= end_date)
 
-        return sql.count()
+            return sql.count()
+        except:
+            return 0
 
     def load_data(self):
-        sql = ZeroCalInfo.select(
-            ZeroCalInfo.id,
-            ZeroCalInfo.name,
-            ZeroCalInfo.utc_date_time,
-            ZeroCalInfo.torque_offset,
-            ZeroCalInfo.thrust_offset,
-            ZeroCalInfo.state
-        )
-        start_date = self.kwargs.get('start_date')
-        end_date = self.kwargs.get('end_date')
-        if start_date and end_date:
-            sql = sql.where(ZeroCalInfo.utc_date_time >=
-                            start_date, ZeroCalInfo.utc_date_time <= end_date)
-        data = sql.order_by(ZeroCalInfo.id.desc()).paginate(
-            self.current_page, self.page_size)
+        try:
+            sql = ZeroCalInfo.select(
+                ZeroCalInfo.id,
+                ZeroCalInfo.name,
+                ZeroCalInfo.utc_date_time,
+                ZeroCalInfo.torque_offset,
+                ZeroCalInfo.thrust_offset,
+                ZeroCalInfo.state
+            )
+            start_date = self.kwargs.get('start_date')
+            end_date = self.kwargs.get('end_date')
+            if start_date and end_date:
+                sql = sql.where(ZeroCalInfo.utc_date_time >= start_date, ZeroCalInfo.utc_date_time <= end_date)
+            data = sql.order_by(ZeroCalInfo.id.desc()).paginate(
+                self.current_page, self.page_size)
 
-        return [
-            [
-                item.id,
-                item.name,
-                item.utc_date_time.strftime(
-                    f'{self.dtc.date_format} %H:%M:%S'),
-                round(item.torque_offset, 10) if item.torque_offset else 0,
-                round(item.thrust_offset, 10) if item.thrust_offset else 0,
-                self.get_state_name(item.state)
-            ] for item in data
-        ]
+            return [
+                [
+                    item.id,
+                    item.name,
+                    item.utc_date_time.strftime(
+                        f'{self.dtc.date_format} %H:%M:%S'),
+                    round(item.torque_offset, 10) if item.torque_offset else 0,
+                    round(item.thrust_offset, 10) if item.thrust_offset else 0,
+                    self.get_state_name(item.state)
+                ] for item in data
+            ]
+        except:
+            return []
 
     def get_state_name(self, state: int):
         if state == 0:
@@ -66,12 +71,15 @@ class ZeroCalTable(AbstractTable):
         return self.get_columns()
 
     def get_columns(self):
-        session = self.page.session
-        return [
-            session.get("lang.common.no"),
-            session.get("lang.zero_cal.name"),
-            session.get("lang.common.utc_date_time"),
-            session.get("lang.zero_cal.torque_offset"),
-            session.get("lang.zero_cal.thrust_offset"),
-            session.get("lang.zero_cal.state")
-        ]
+        if self.page and self.page.session:
+            session = self.page.session
+            return [
+                session.get("lang.common.no"),
+                session.get("lang.zero_cal.name"),
+                session.get("lang.common.utc_date_time"),
+                session.get("lang.zero_cal.torque_offset"),
+                session.get("lang.zero_cal.thrust_offset"),
+                session.get("lang.zero_cal.state")
+            ]
+        
+        return []

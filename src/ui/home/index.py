@@ -20,9 +20,9 @@ class Home(ft.Container):
         super().__init__()
         self.task_running = False
         self.task = None
+        self.current_index = 0
 
         self.system_settings: SystemSettings = SystemSettings.get()
-        self.current_index = 0
 
         self.default_button_style = ft.ButtonStyle(
             shape=ft.RoundedRectangleBorder(radius=ft.border_radius.all(10)),
@@ -113,40 +113,41 @@ class Home(ft.Container):
             logging.error('exception occured at Home.build')
 
     def __on_click(self, index: int):
-        try:
-            if self.current_index == index:
-                return
+        if self.page and self.main_container and self.main_container.page:
+            try:
+                if self.current_index == index:
+                    return
 
-            self.current_index = index
-            for idx, item in enumerate(self.row_items.controls):
-                if idx == index:
-                    item.style = self.active_button_style
-                    item.icon_color = ft.Colors.PRIMARY
-                else:
-                    item.style = self.default_button_style
-                    item.icon_color = ft.Colors.INVERSE_SURFACE
-                if item and item.page:
-                    item.update()
+                self.current_index = index
+                for idx, item in enumerate(self.row_items.controls):
+                    if idx == index:
+                        item.style = self.active_button_style
+                        item.icon_color = ft.Colors.PRIMARY
+                    else:
+                        item.style = self.default_button_style
+                        item.icon_color = ft.Colors.INVERSE_SURFACE
+                    if item and item.page:
+                        item.update()
 
-            if index == 0:
-                self.main_container.content = Dashboard()
-            elif index == 1:
-                self.main_container.content = Counter()
-            elif index == 2:
-                self.main_container.content = TrendView()
-            elif index == 3:
-                self.main_container.content = PropellerCurve()
-            elif index == 4:
-                self.main_container.content = AlarmList()
-            elif index == 5:
-                self.main_container.content = EventList()
-            elif index == 6:
-                self.main_container.content = Logs()
+                if index == 0:
+                    self.main_container.content = Dashboard()
+                elif index == 1:
+                    self.main_container.content = Counter()
+                elif index == 2:
+                    self.main_container.content = TrendView()
+                elif index == 3:
+                    self.main_container.content = PropellerCurve()
+                elif index == 4:
+                    self.main_container.content = AlarmList()
+                elif index == 5:
+                    self.main_container.content = EventList()
+                elif index == 6:
+                    self.main_container.content = Logs()
 
-            if self.main_container and self.main_container.page:
-                self.main_container.update()
-        except:
-            logging.exception("exception occured at Home.__on_click")
+                if self.main_container and self.main_container.page:
+                    self.main_container.update()
+            except:
+                logging.exception("exception occured at Home.__on_click")
 
     def did_mount(self):
         self.task_running = True
@@ -158,8 +159,11 @@ class Home(ft.Container):
             self.task.cancel()
 
     async def test_auto_run(self):
+        idx = 0
         while self.task_running and gdata.auto_testing:
             try:
+                print(f'home.test_auto_run,idx={idx}')
+                idx += 1
                 self.__on_click(int(random() * 10) % 7)
             except:
                 return

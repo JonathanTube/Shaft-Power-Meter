@@ -26,7 +26,7 @@ class UtcTimer:
                 ).where(
                     DateTimeConf.id == date_time_conf.id
                 ).execute()
-            except Exception as e:
-                logging.exception(e)
+            except:
+                logging.exception('exception occured at UtcTimer.start')
             finally:
                 await asyncio.sleep(1)

@@ -19,7 +19,7 @@ class SpsOfflineTask:
 
                     if gdata.sps2_offline and gdata.amount_of_propeller == 2:
                         DataSaver.save('sps2', gdata.sps_offline_torque, gdata.sps_offline_thrust, gdata.sps_offline_speed)
-            except Exception as e:
+            except:
                 logging.exception("excpetion occured at SpsOfflineTask.start")
             finally:
                 await asyncio.sleep(2)

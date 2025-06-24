@@ -78,8 +78,9 @@ class Keyboard(ft.Stack):
             self.show()
             # recovery the border color of last text field
             try:
-                self.tf.border_color = ft.Colors.BLACK
-                self.tf.update()
+                if self.tf is not None:
+                    self.tf.border_color = ft.Colors.BLACK
+                    self.tf.update()
 
 
                 if text_field is not None:
@@ -98,7 +99,7 @@ class Keyboard(ft.Stack):
                     self.tf.border_color = ft.Colors.PRIMARY
                     self.tf.update()
             except:
-                pass
+                logging.exception("exception occured at Keyboard.open")
 
     def close(self):
         self.visible = False

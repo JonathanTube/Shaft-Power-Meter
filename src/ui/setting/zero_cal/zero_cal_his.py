@@ -1,3 +1,4 @@
+import logging
 import random
 import string
 import flet as ft
@@ -15,21 +16,26 @@ class ZeroCalHis(ft.Container):
         self.padding = 10
 
     def build(self):
-        self.search = DatetimeSearch(self.__on_search)
-        export_button = ft.OutlinedButton(
-            height=40,
-            on_click=self.__on_export,
-            icon=ft.Icons.DOWNLOAD_OUTLINED,
-            text=self.page.session.get("lang.common.export")
-        )
+        try:
+            if self.page and self.page.session:
+                self.search = DatetimeSearch(self.__on_search)
+                export_button = ft.OutlinedButton(
+                    height=40,
+                    on_click=self.__on_export,
+                    icon=ft.Icons.DOWNLOAD_OUTLINED,
+                    text=self.page.session.get("lang.common.export")
+                )
 
-        self.table = ZeroCalTable()
+                self.table = ZeroCalTable()
 
-        self.content = ft.Column(
-            expand=True,
-            spacing=5,
-            controls=[ft.Row([self.search, export_button]), self.table]
-        )
+                self.content = ft.Column(
+                    expand=True,
+                    spacing=5,
+                    controls=[ft.Row([self.search, export_button]), self.table]
+                )
+        except:
+            logging.exception('exception occured at ZeroCalHis.build')
+
 
     def __on_search(self, start_date: str, end_date: str):
         self.table.search(start_date=start_date, end_date=end_date)

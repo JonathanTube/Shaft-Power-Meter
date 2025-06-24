@@ -15,7 +15,7 @@ class SystemConf(ft.Container):
 
     def build(self):
         try:
-            if self.page:
+            if self.page and self.page.session:
                 self.system_conf_settings = SystemConfSettings()
                 self.system_conf_ship_info = SystemConfShipInfo()
 
