@@ -81,7 +81,7 @@ class GeneralPreference(ft.Container):
 
     def before_update(self):
         try:
-            if self.page:
+            if self.page and self.page.session:
                 s = self.page.session
                 # 更新主题设置部分
                 self.theme_label.value = s.get("lang.setting.theme")

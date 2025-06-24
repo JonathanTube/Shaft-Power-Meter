@@ -124,12 +124,17 @@ class InterfaceConf(ft.Container):
             raise ValueError(f'{self.page.session.get("lang.common.ip_address_format_error")}: {self.hmi_server_port.value}')
 
     def before_update(self):
-        self.connect_btn.visible = not ws_client.is_connected
-        self.connect_btn.text = self.page.session.get("lang.setting.connect_to_master")
-        self.connect_btn.bgcolor = ft.Colors.GREEN
-        self.connect_btn.disabled = False
+        try:
+            if self.connect_btn and self.connect_btn.page:
+                self.connect_btn.visible = not ws_client.is_connected
+                self.connect_btn.text = self.page.session.get("lang.setting.connect_to_master")
+                self.connect_btn.bgcolor = ft.Colors.GREEN
+                self.connect_btn.disabled = False
 
-        self.close_btn.visible = ws_client.is_connected
-        self.close_btn.text = self.page.session.get("lang.setting.disconnect_from_master")
-        self.close_btn.bgcolor = ft.Colors.RED
-        self.close_btn.disabled = False
+            if self.close_btn and self.close_btn.page:
+                self.close_btn.visible = ws_client.is_connected
+                self.close_btn.text = self.page.session.get("lang.setting.disconnect_from_master")
+                self.close_btn.bgcolor = ft.Colors.RED
+                self.close_btn.disabled = False
+        except:
+            logging.exception("exception occured at PropellerCurveDiagram.before_update")

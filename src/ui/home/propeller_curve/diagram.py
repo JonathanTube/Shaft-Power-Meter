@@ -62,15 +62,18 @@ class PropellerCurveDiagram(ft.Container):
         self.sps2_text = None
 
     def before_update(self):
-        #  清除当前图形缓存
-        plt.close('all')
-        # 重新应用样式
-        self.set_style()
-        # 重建图表对象
-        self.chart = self.create_chart()
-        if self.chart:
-            # 替换容器内容
-            self.content = self.chart
+        try:
+            #  清除当前图形缓存
+            plt.close('all')
+            # 重新应用样式
+            self.set_style()
+            # 重建图表对象
+            self.chart = self.create_chart()
+            if self.chart:
+                # 替换容器内容
+                self.content = self.chart
+        except:
+            logging.exception('exception occured at PropellerCurveDiagram.before_update') 
 
     def create_chart(self) -> MatplotlibChart:
         try:
@@ -214,8 +217,8 @@ class PropellerCurveDiagram(ft.Container):
                 self.sps2_text.set_x(sps2_percent_rpm_of_mcr)
                 self.sps2_text.set_y(sps2_percent_power_of_mcr + 1)
 
-                logging.info(f'update_sps1_points: sps1_percent_rpm_of_mcr={sps1_percent_rpm_of_mcr}%, sps1_percent_power_of_mcr={sps1_percent_power_of_mcr}%')
-                logging.info(f'update_sps2_points: sps2_percent_rpm_of_mcr={sps2_percent_rpm_of_mcr}%, sps2_percent_power_of_mcr={sps2_percent_power_of_mcr}%')
+                # logging.info(f'update_sps1_points: sps1_percent_rpm_of_mcr={sps1_percent_rpm_of_mcr}%, sps1_percent_power_of_mcr={sps1_percent_power_of_mcr}%')
+                # logging.info(f'update_sps2_points: sps2_percent_rpm_of_mcr={sps2_percent_rpm_of_mcr}%, sps2_percent_power_of_mcr={sps2_percent_power_of_mcr}%')
                 if self.chart and self.chart.page:
                     self.chart.update()
             except:

@@ -74,7 +74,7 @@ class GeneralDateTime(ft.Container):
 
     def before_update(self):
         try:
-            if self.page:
+            if self.page and self.page.session:
                 s = self.page.session
                 self.utc_date.label = s.get("lang.setting.date")
                 self.utc_time.label = s.get("lang.setting.time")

@@ -29,15 +29,18 @@ class TrendViewDiagram(ft.Container):
         self.system_unit = preference.system_unit
 
     def before_update(self):
-        # 清除当前图形缓存
-        plt.close('all')
-        # 重新应用样式
-        self.set_style()
-        # 重建图表对象
-        self.chart = self.create_chart()
-        if self.chart:
-            # 替换容器内容
-            self.content = self.chart
+        try:
+            # 清除当前图形缓存
+            plt.close('all')
+            # 重新应用样式
+            self.set_style()
+            # 重建图表对象
+            self.chart = self.create_chart()
+            if self.chart:
+                # 替换容器内容
+                self.content = self.chart
+        except:
+            logging.exception('exception occured at TrendViewDiagram.before_update') 
 
     def create_chart(self) -> MatplotlibChart:
         try:
@@ -50,7 +53,7 @@ class TrendViewDiagram(ft.Container):
             self.handle_update_chart()
             return MatplotlibChart(self.fig, isolated=True, expand=True, transparent=True)
         except:
-            logging.exception("exception occured at PropellerCurveDiagram.create_chart")
+            logging.exception("exception occured at TrendViewDiagram.create_chart")
             return None
 
     def set_style(self):

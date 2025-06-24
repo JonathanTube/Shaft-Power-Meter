@@ -123,12 +123,17 @@ class IOSettingGPS(ft.Container):
         self.conf.gps_port = self.gps_port.value
 
     def before_update(self):
-        self.connect_btn.visible = not gps.is_connected
-        self.connect_btn.text = self.page.session.get("lang.setting.connect")
-        self.connect_btn.bgcolor = ft.Colors.GREEN
-        self.connect_btn.disabled = False
+        try:
+            if self.connect_btn and self.connect_btn.page:
+                self.connect_btn.visible = not gps.is_connected
+                self.connect_btn.text = self.page.session.get("lang.setting.connect")
+                self.connect_btn.bgcolor = ft.Colors.GREEN
+                self.connect_btn.disabled = False
 
-        self.close_btn.visible = gps.is_connected
-        self.close_btn.text = self.page.session.get("lang.setting.disconnect")
-        self.close_btn.bgcolor = ft.Colors.RED
-        self.close_btn.disabled = False
+            if self.close_btn and self.close_btn.page:
+                self.close_btn.visible = gps.is_connected
+                self.close_btn.text = self.page.session.get("lang.setting.disconnect")
+                self.close_btn.bgcolor = ft.Colors.RED
+                self.close_btn.disabled = False
+        except:
+            logging.exception("exception occured at IOSettingGPS.before_update")

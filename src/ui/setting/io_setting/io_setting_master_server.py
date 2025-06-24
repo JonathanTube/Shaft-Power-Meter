@@ -95,12 +95,17 @@ class IOSettingMasterServer(ft.Container):
             logging.exception('exception occured at IOSettingMasterServer.on_stop')
 
     def before_update(self):
-        self.start_btn.visible = not ws_server.is_started
-        self.start_btn.text = self.page.session.get("lang.setting.start_master_server")
-        self.start_btn.bgcolor = ft.Colors.GREEN
-        self.start_btn.disabled = False
+        try:
+            if self.start_btn and self.start_btn.page:
+                self.start_btn.visible = not ws_server.is_started
+                self.start_btn.text = self.page.session.get("lang.setting.start_master_server")
+                self.start_btn.bgcolor = ft.Colors.GREEN
+                self.start_btn.disabled = False
 
-        self.stop_btn.visible = ws_server.is_started
-        self.stop_btn.text = self.page.session.get("lang.setting.stop_master_server")
-        self.stop_btn.bgcolor = ft.Colors.RED
-        self.stop_btn.disabled = False
+            if self.stop_btn and self.stop_btn.page:
+                self.stop_btn.visible = ws_server.is_started
+                self.stop_btn.text = self.page.session.get("lang.setting.stop_master_server")
+                self.stop_btn.bgcolor = ft.Colors.RED
+                self.stop_btn.disabled = False
+        except:
+            logging.exception("exception occured at IOSettingMasterServer.before_update")

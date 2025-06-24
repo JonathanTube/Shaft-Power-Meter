@@ -194,18 +194,23 @@ class Header(ft.AppBar):
                     self.utc_date_time.update()
             except:
                 logging.exception('exception occured at Header.sync_utc_date_time')
+
             finally:
                 await asyncio.sleep(1)
 
     def before_update(self):
-        if self.page and self.page.session:
-            system_setting: SystemSettings = SystemSettings.get()
-            self.report.visible = system_setting.sha_po_li
-            self.shapoli.visible = system_setting.sha_po_li
-            self.app_name.value = self.page.session.get("lang.common.app_name")
-            self.home.text = self.page.session.get("lang.header.home")
-            self.report.text = self.page.session.get("lang.header.report")
-            self.setting.text = self.page.session.get("lang.header.setting")
+        try:
+            if self.page and self.page.session:
+                system_setting: SystemSettings = SystemSettings.get()
+                self.report.visible = system_setting.sha_po_li
+                self.shapoli.visible = system_setting.sha_po_li
+                self.app_name.value = self.page.session.get("lang.common.app_name")
+                self.home.text = self.page.session.get("lang.header.home")
+                self.report.text = self.page.session.get("lang.header.report")
+                self.setting.text = self.page.session.get("lang.header.setting")
+        except:
+            logging.exception('exception occured at Header.before_update')
+                
 
     def did_mount(self):
         self.task_running = True

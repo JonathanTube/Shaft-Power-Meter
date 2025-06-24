@@ -57,7 +57,7 @@ class GeneralLimitationWarning(ft.Container):
 
     def before_update(self):
         try:
-            if self.page:
+            if self.page and self.page.session:
                 s = self.page.session
                 self.torque_warning.label = s.get("lang.common.torque")
                 self.speed_warning.label = s.get("lang.common.speed")

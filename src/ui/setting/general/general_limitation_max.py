@@ -56,7 +56,7 @@ class GeneralLimitationMax(ft.Container):
 
     def before_update(self):
         try:
-            if self.page:
+            if self.page and self.page.session:
                 s = self.page.session
                 self.speed_max.label = s.get("lang.common.speed")
                 self.torque_max.label = s.get("lang.common.torque")

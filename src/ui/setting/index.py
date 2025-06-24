@@ -133,7 +133,7 @@ class Setting(ft.Container):
 
     def before_update(self):
         try:
-            if self.page:
+            if self.page and self.page.session:
                 s = self.page.session
                 self.system_conf.label = s.get("lang.setting.system_conf.title")
                 self.general.label = s.get("lang.setting.general.title")

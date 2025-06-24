@@ -64,7 +64,7 @@ class GeneralOflineDefaultValue(ft.Container):
 
     def before_update(self):
         try:
-            if self.page:
+            if self.page and self.page.session:
                 s = self.page.session
                 self.torque_default_value.label = s.get("lang.common.torque")
                 self.thrust_default_value.label = s.get("lang.common.thrust")
