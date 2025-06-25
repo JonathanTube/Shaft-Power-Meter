@@ -242,6 +242,12 @@ class DataInit:
                 },
 
                 {
+                    "code": "lang.button.push_to_slave",
+                    "chinese": "推送到从机",
+                    "english": "Push To Slave"
+                },
+
+                {
                     "code": "lang.button.search",
                     "chinese": "搜索",
                     "english": "Search"

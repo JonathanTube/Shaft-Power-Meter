@@ -10,6 +10,7 @@ from db.models.user import User
 from ui.common.keyboard import keyboard
 from ui.common.permission_check import PermissionCheck
 from ui.common.toast import Toast
+from websocket.websocket_server import ws_server
 from ui.setting.propeller_conf.propeller_conf_load_limit_curve import PropellerConfLimitCurve
 from ui.setting.propeller_conf.propeller_conf_mcr import PropellerConfMcr
 from ui.setting.propeller_conf.propeller_conf_normal_curve import PropellerConfNormalCurve
@@ -64,6 +65,14 @@ class PropellerConf(ft.Container):
                     on_click=lambda e: self.__reset_data(e)
                 )
 
+                self.push_button = ft.OutlinedButton(
+                    self.page.session.get("lang.button.push_to_slave"),
+                    height=40,
+                    icon_color=ft.Colors.GREEN,
+                    icon=ft.Icons.SYNC_OUTLINED,
+                    on_click=self.__on_push
+                )
+
                 self.content = ft.Column(
                     scroll=ft.ScrollMode.ADAPTIVE,
                     expand=True,
@@ -80,7 +89,8 @@ class PropellerConf(ft.Container):
                                     alignment=ft.MainAxisAlignment.CENTER,
                                     controls=[
                                         self.save_button,
-                                        self.reset_button
+                                        self.reset_button,
+                                        self.push_button
                                     ]
                                 )
                             ]
@@ -135,3 +145,10 @@ class PropellerConf(ft.Container):
         self.content.clean()
         self.build()
         Toast.show_success(e.page)
+
+    def __on_push(self, e):
+        settings: PropellerSetting = PropellerSetting.get()
+        ws_server.broadcast({
+            'type': 'propeller_setting',
+            "data": model_to_dict(settings)
+        })

@@ -86,6 +86,8 @@ class WebSocketClient:
                     self.__handle_jm3846_data(data)
                 elif data['type'] == 'alarm_data':
                     self.__handle_alarm_logs(data)
+                elif data['type'] == 'propeller_setting':
+                    self.__handle_propeller_setting(data)
 
                 gdata.sps1_offline = False
                 gdata.sps2_offline = False
@@ -117,6 +119,9 @@ class WebSocketClient:
             speed = data['rpm']
 
         DataSaver.save(name, ad0_torque, ad1_thrust, speed)
+
+    def __handle_propeller_setting(self, data):
+        print(data)
 
     def __handle_alarm_logs(self, data):
         """处理alarm数据"""
