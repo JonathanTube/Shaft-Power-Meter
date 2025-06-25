@@ -45,6 +45,8 @@ class Header(ft.AppBar):
 
         self.is_switching = False
 
+        self.date_format = None
+
     def build(self):
         try:
             self.app_name = ft.Text(value=self.page.session.get("lang.common.app_name"), weight=ft.FontWeight.W_700, size=20)
@@ -197,12 +199,10 @@ class Header(ft.AppBar):
             self.is_switching = False
 
     async def sync_utc_date_time(self):
-        datetime_conf: DateTimeConf = DateTimeConf.get()
-        date_format = datetime_conf.date_format
         while self.task_running:
             try:
                 if gdata.utc_date_time:
-                    self.utc_date_time.text = gdata.utc_date_time.strftime(f"{date_format} %H:%M:%S")
+                    self.utc_date_time.text = gdata.utc_date_time.strftime(f"{self.date_format} %H:%M:%S")
                     self.utc_date_time.update()
             except:
                 logging.exception('exception occured at Header.sync_utc_date_time')
@@ -212,6 +212,8 @@ class Header(ft.AppBar):
 
     def before_update(self):
         try:
+            datetime_conf: DateTimeConf = DateTimeConf.get()
+            self.date_format = datetime_conf.date_format
             if self.page and self.page.session:
                 system_setting: SystemSettings = SystemSettings.get()
                 self.report.visible = system_setting.sha_po_li

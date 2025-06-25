@@ -103,25 +103,28 @@ class GeneralDateTime(ft.Container):
             logging.exception('exception occured at GeneralDateTime.__handle_time_change')
 
     def save_data(self, user_id: int):
-        standard_date_time_format = '%Y-%m-%d %H:%M:%S'
-        # save date time conf
-        new_date = self.utc_date.value
-        new_time = self.utc_time.value
-        self.date_time_conf.utc_date_time = datetime.strptime(f"{new_date} {new_time}:00", standard_date_time_format)
+        if self.page:
+            standard_date_time_format = '%Y-%m-%d %H:%M:%S'
+            # save date time conf
+            new_date = self.utc_date.value
+            new_time = self.utc_time.value
+            self.date_time_conf.utc_date_time = datetime.strptime(f"{new_date} {new_time}:00", standard_date_time_format)
 
-        self.date_time_conf.system_date_time = datetime.now()
-        self.date_time_conf.date_format = self.date_format.value
-        self.date_time_conf.sync_with_gps = self.sync_with_gps.value
-        gdata.enable_utc_time_sync_with_gps = self.sync_with_gps.value
-        self.date_time_conf.save()
-        OperationLog.create(
-            user_id=user_id,
-            utc_date_time=gdata.utc_date_time,
-            operation_type=OperationType.GENERAL_UTC_DATE_TIME,
-            operation_content=model_to_dict(self.date_time_conf)
-        )
+            self.date_time_conf.system_date_time = datetime.now()
+            self.date_time_conf.date_format = self.date_format.value
+            self.date_time_conf.sync_with_gps = self.sync_with_gps.value
+            gdata.enable_utc_time_sync_with_gps = self.sync_with_gps.value
+            self.date_time_conf.save()
+            OperationLog.create(
+                user_id=user_id,
+                utc_date_time=gdata.utc_date_time,
+                operation_type=OperationType.GENERAL_UTC_DATE_TIME,
+                operation_content=model_to_dict(self.date_time_conf)
+            )
 
-        new_date_time = f"{new_date} {new_time}:00"
+            new_date_time = f"{new_date} {new_time}:00"
 
-        new_utc_date_time = datetime.strptime(new_date_time, standard_date_time_format)
-        gdata.utc_date_time = new_utc_date_time
+            new_utc_date_time = datetime.strptime(new_date_time, standard_date_time_format)
+            gdata.utc_date_time = new_utc_date_time
+
+            self.page.update()

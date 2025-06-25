@@ -68,7 +68,7 @@ class DataInit:
                 utc_date_time=datetime.now(timezone.utc).strftime(standard_date_time_format),
                 system_date_time=datetime.now().strftime(standard_date_time_format),
                 sync_with_gps=True,
-                date_format="%Y-%m-%d",
+                date_format="%d/%m/%Y",
             )
 
     def __init_ship_info():
