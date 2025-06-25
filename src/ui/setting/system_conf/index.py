@@ -67,8 +67,8 @@ class SystemConf(ft.Container):
             self.__change_buttons()
 
             keyboard.close()
-            self.system_conf_settings.save(user.id)
-            self.system_conf_ship_info.save(user.id)
+            self.system_conf_settings.save(user)
+            self.system_conf_ship_info.save(user)
             Toast.show_success(self.page)
         except:
             logging.exception("system conf save data error")

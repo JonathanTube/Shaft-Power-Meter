@@ -30,3 +30,8 @@ class UtcTimer:
                 logging.exception('exception occured at UtcTimer.start')
             finally:
                 await asyncio.sleep(1)
+
+    def stop(self):
+        self.task_running = False
+
+utc_timer: UtcTimer = UtcTimer()

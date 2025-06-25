@@ -8,7 +8,7 @@ from ui.setting.test_mode.test_mode_range import TestModeRange
 from task.plc_sync_task import plc
 from utils.unit_converter import UnitConverter
 from db.models.preference import Preference
-from task.test_mode_task import testModeTask
+from task.test_mode_task import test_mode_task
 from ui.common.toast import Toast
 from common.global_data import gdata
 from db.models.operation_log import OperationLog
@@ -21,7 +21,7 @@ class TestMode(ft.Container):
     def __init__(self):
         super().__init__()
         self.alignment = ft.alignment.center
-        self.running = testModeTask.is_running
+        self.running = test_mode_task.is_running
         self.preference: Preference = Preference.get()
 
         self.sound_testing = False
@@ -171,7 +171,7 @@ class TestMode(ft.Container):
             if self.running:
                 return
 
-            self.page.run_task(testModeTask.start)
+            self.page.run_task(test_mode_task.start)
 
             self.range_card.enable()
 
@@ -200,7 +200,7 @@ class TestMode(ft.Container):
             if not self.running:
                 return
 
-            testModeTask.stop()
+            test_mode_task.stop()
             self.range_card.disable()
             self.page.close(self.dlg_stop_modal)
             self.running = False

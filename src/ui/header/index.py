@@ -3,9 +3,7 @@ import logging
 import flet as ft
 from random import random
 from common.global_data import gdata
-from common.operation_type import OperationType
 from db.models.date_time_conf import DateTimeConf
-from db.models.operation_log import OperationLog
 from db.models.user import User
 from ui.common.permission_check import PermissionCheck
 from ui.common.toast import Toast
@@ -14,12 +12,7 @@ from ui.header.logo import HeaderLogo
 from ui.header.theme import Theme
 from db.models.system_settings import SystemSettings
 from ui.common.keyboard import keyboard
-from task.sps1_read_task import sps1_read_task
-from task.sps2_read_task import sps2_read_task
-from websocket.websocket_client import ws_client
-from websocket.websocket_server import ws_server
-from task.plc_sync_task import plc
-from task.gps_sync_task import gps
+from utils.system_exit_tool import SystemExitTool
 
 
 class Header(ft.AppBar):
@@ -87,7 +80,7 @@ class Header(ft.AppBar):
 
             self.close_button = ft.IconButton(
                 icon=ft.Icons.CLOSE_ROUNDED,
-                on_click=lambda e: self.page.open(PermissionCheck(self.__exit_app, 1))
+                on_click=lambda e: self.page.open(PermissionCheck(self.__on_exit, 1))
             )
 
             self.theme = Theme()
@@ -107,46 +100,14 @@ class Header(ft.AppBar):
         except:
             logging.exception('exception occured at Header.build')
 
+    def __on_exit(self, user: User):
+        if self.page and self.page.session:
+            msg = self.page.session.get("lang.toast.system_exit")
+            Toast.show_error(self.page, msg, auto_hide=False)
+            self.page.run_task(SystemExitTool.exit_app, self.page, user)
+
     def __stop_auto_testing(self, e):
         gdata.auto_testing = False
-
-    async def __close_all_connects(self):
-        try:
-            logging.info('start closing all of the connections...')
-            # 关闭sps
-            await sps1_read_task.close()
-            await sps2_read_task.close()
-
-            # 关闭websocket
-            await ws_server.stop()
-            await ws_client.close()
-
-            # 关闭PLC
-            await plc.close()
-
-            # 关闭GPS
-            await gps.close()
-            logging.info('all of the connections were closed.')
-        except:
-            logging.exception('exception occured while app exits')
-        finally:
-            self.page.window.destroy()
-
-    def __exit_app(self, user: User):
-        try:
-            Toast.show_error(self.page, self.page.session.get("lang.toast.system_exit"))
-
-            user_id = user.id
-            OperationLog.create(
-                user_id=user_id,
-                utc_date_time=gdata.utc_date_time,
-                operation_type=OperationType.SYSTEM_EXIT,
-                operation_content=user.user_name
-            )
-
-            self.page.run_task(self.__close_all_connects)
-        except:
-            logging.exception('exception occured at Header.__exit_app')
 
     def __set_active(self, button: ft.ElevatedButton):
         button.bgcolor = ft.Colors.BLUE_800
@@ -163,13 +124,13 @@ class Header(ft.AppBar):
     def on_click(self, name):
         if self.is_switching:
             return
-        
+
         if self.page is None:
             return
 
         if self.active_name == name:
             return
-        
+
         try:
             self.is_switching = True
 
@@ -192,7 +153,7 @@ class Header(ft.AppBar):
 
             if self.on_menu_click:
                 self.on_menu_click(name)
-            
+
         except:
             logging.exception('exception occured at Header.on_click')
         finally:

@@ -5,7 +5,6 @@ import logging
 import flet as ft
 from db.models.io_conf import IOConf
 from db.models.system_settings import SystemSettings
-from task.utc_timer_task import UtcTimer
 from ui.common.fullscreen_alert import FullscreenAlert
 from ui.common.keyboard import keyboard
 from ui.common.windows_sound_player import WindowsSoundPlayer
@@ -25,7 +24,7 @@ from utils.logger import Logger
 from db.base import db
 from task.gps_sync_task import gps
 from task.sps_offline_task import sps_offline_task
-from task.utc_timer_task import UtcTimer
+from task.utc_timer_task import utc_timer
 from task.sps1_read_task import sps1_read_task
 from task.sps2_read_task import sps2_read_task
 from task.plc_sync_task import plc
@@ -78,7 +77,7 @@ def check_single_instance(mutex_name: str = "shaft-power-meter"):
 
 def start_all_task():
     system_settings: SystemSettings = SystemSettings.get()
-    asyncio.create_task(UtcTimer().start())
+    asyncio.create_task(utc_timer.start())
     asyncio.create_task(sps_offline_task.start())
 
     # 如果不是第一次装机，启动设备连接

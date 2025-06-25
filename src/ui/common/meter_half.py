@@ -45,12 +45,6 @@ class MeterHalf(ft.Container):
                 self.active_part.value = _active_value / total * 180
                 self.inactive_part.value = _inactive_value / total * 180
 
-                center_value = int(_active_value / total * 100)
-                self.__set_center_value(center_value)
-                if center_value > 100:
-                    self.active_part.value = 180
-                    self.inactive_part.value = 0
-
             # set outer color
             self.__set_outer_color()
             if self.outer and self.outer.page:
@@ -69,9 +63,10 @@ class MeterHalf(ft.Container):
 
         self.active_part.color = ft.Colors.RED
 
-    def __set_center_value(self, value: int):
-        self.center_text.value = value
-        self.center.update()
+    def set_center_value(self, value: int):
+        if self.center_text and self.center_text.page:
+            self.center_text.value = value
+            self.center.update()
 
     def __create_outer(self):
         self.active_part = ft.PieChartSection(0, color=ft.Colors.GREEN, radius=self.outer_radius)

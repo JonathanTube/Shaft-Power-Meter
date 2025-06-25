@@ -7,7 +7,7 @@ from db.models.test_mode_conf import TestModeConf
 from ui.common.custom_card import CustomCard
 from ui.common.toast import Toast
 from utils.unit_parser import UnitParser
-from task.test_mode_task import testModeTask
+from task.test_mode_task import test_mode_task
 
 
 class TestModeRange(ft.Container):
@@ -98,7 +98,7 @@ class TestModeRange(ft.Container):
             self.end_torque_text.value = f'{self.page.session.get('lang.setting.test_mode.max_torque')}: {max_torque_value} {max_torque_unit}'
             self.end_torque_text.update()
             self.__save_data()
-            testModeTask.set_torque_range(e.control.start_value, e.control.end_value)
+            test_mode_task.set_torque_range(e.control.start_value, e.control.end_value)
         except:
             logging.exception('exception occured at TestModeRange.__on_torque_change')
 
@@ -111,7 +111,7 @@ class TestModeRange(ft.Container):
             self.end_speed_text.value = f'{self.page.session.get('lang.setting.test_mode.max_speed')}: {int(e.control.end_value)} rpm, {end_speed_percentage}% MCR'
             self.end_speed_text.update()
             self.__save_data()
-            testModeTask.set_speed_range(e.control.start_value, e.control.end_value)
+            test_mode_task.set_speed_range(e.control.start_value, e.control.end_value)
         except:
             logging.exception('exception occured at TestModeRange.__on_speed_change')
 
@@ -124,7 +124,7 @@ class TestModeRange(ft.Container):
             self.end_thrust_text.value = f'{self.page.session.get('lang.setting.test_mode.max_thrust')}: {max_thrust_value} {max_thrust_unit}'
             self.end_thrust_text.update()
             self.__save_data()
-            testModeTask.set_thrust_range(e.control.start_value, e.control.end_value)
+            test_mode_task.set_thrust_range(e.control.start_value, e.control.end_value)
         except:
             logging.exception('exception occured at TestModeRange.__on_thrust_change')
 
@@ -167,9 +167,9 @@ class TestModeRange(ft.Container):
         self.speed_range.disabled = False
         self.thrust_range.disabled = False
         self.update()
-        testModeTask.set_torque_range(int(self.torque_range.start_value), int(self.torque_range.end_value))
-        testModeTask.set_speed_range(int(self.speed_range.start_value), int(self.speed_range.end_value))
-        testModeTask.set_thrust_range(int(self.thrust_range.start_value), int(self.thrust_range.end_value))
+        test_mode_task.set_torque_range(int(self.torque_range.start_value), int(self.torque_range.end_value))
+        test_mode_task.set_speed_range(int(self.speed_range.start_value), int(self.speed_range.end_value))
+        test_mode_task.set_thrust_range(int(self.thrust_range.start_value), int(self.thrust_range.end_value))
 
     def disable(self):
         self.torque_range.disabled = True

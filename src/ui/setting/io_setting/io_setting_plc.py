@@ -54,7 +54,7 @@ class IOSettingPLC(ft.Container):
                         shape=ft.RoundedRectangleBorder(radius=5)
                     ),
                     on_click=lambda e: self.page.open(PermissionCheck(self.__on_close, 2)
-                    )
+                                                      )
                 )
 
                 self.fetch_btn = ft.FilledButton(
@@ -65,11 +65,11 @@ class IOSettingPLC(ft.Container):
                     style=ft.ButtonStyle(
                         shape=ft.RoundedRectangleBorder(radius=5)
                     ),
-                    on_click=lambda e: self.page.run_task(self.load_range_data)
+                    on_click=lambda e: self.page.run_task(self.on_fetch)
                 )
 
                 self.plc_ip = ft.TextField(
-                    label=self.page.session.get("lang.setting.ip"), 
+                    label=self.page.session.get("lang.setting.ip"),
                     value=self.conf.plc_ip,
                     col={'sm': 4},
                     can_request_focus=False,
@@ -77,7 +77,7 @@ class IOSettingPLC(ft.Container):
                 )
 
                 self.plc_port = ft.TextField(
-                    label=self.page.session.get("lang.setting.port"), 
+                    label=self.page.session.get("lang.setting.port"),
                     value=self.conf.plc_port,
                     can_request_focus=False,
                     col={'sm': 4},
@@ -196,6 +196,26 @@ class IOSettingPLC(ft.Container):
                     on_click=lambda e: keyboard.open(e.control, 'int')
                 )
 
+                self.range_items = ft.ResponsiveRow(
+                    controls=[
+                        self.txt_power_range_min,
+                        self.txt_power_range_max,
+                        self.txt_power_range_offset,
+
+                        self.txt_torque_range_min,
+                        self.txt_torque_range_max,
+                        self.txt_torque_range_offset,
+
+                        self.txt_thrust_range_min,
+                        self.txt_thrust_range_max,
+                        self.txt_thrust_range_offset,
+
+                        self.txt_speed_range_min,
+                        self.txt_speed_range_max,
+                        self.txt_speed_range_offset
+                    ]
+                )
+
                 self.plc_enabled_items = ft.Container(
                     visible=self.conf.plc_enabled,
                     content=ft.ResponsiveRow(
@@ -209,23 +229,9 @@ class IOSettingPLC(ft.Container):
                                     self.connect_btn,
                                     self.close_btn,
                                     self.fetch_btn
-                                ]
+                                ],
                             ),
-                            self.txt_power_range_min,
-                            self.txt_power_range_max,
-                            self.txt_power_range_offset,
-
-                            self.txt_torque_range_min,
-                            self.txt_torque_range_max,
-                            self.txt_torque_range_offset,
-
-                            self.txt_thrust_range_min,
-                            self.txt_thrust_range_max,
-                            self.txt_thrust_range_offset,
-
-                            self.txt_speed_range_min,
-                            self.txt_speed_range_max,
-                            self.txt_speed_range_offset
+                            self.range_items
                         ])
                 )
                 self.custom_card = CustomCard(
@@ -260,6 +266,9 @@ class IOSettingPLC(ft.Container):
                 self.fetch_btn.visible = plc.is_connected
                 self.fetch_btn.disabled = False
                 self.fetch_btn.bgcolor = ft.Colors.BLUE
+
+            if self.page:
+                self.page.run_task(self.load_range_data)
         except:
             logging.exception('exception occured at IOSettingPLC.before_update')
 
@@ -276,7 +285,7 @@ class IOSettingPLC(ft.Container):
             self.connect_btn.disabled = True
             self.connect_btn.bgcolor = ft.Colors.GREY
             self.connect_btn.update()
-        
+
             OperationLog.create(
                 user_id=user.id,
                 utc_date_time=gdata.utc_date_time,
@@ -307,36 +316,30 @@ class IOSettingPLC(ft.Container):
         except:
             logging.exception('exception occured at __stop_plc_task')
 
+    async def on_fetch(self):
+        if self.page:
+            await self.load_range_data()
+            self.range_items.update()
+
     async def load_range_data(self):
         try:
-            plc_4_20_ma_data = await plc.read_4_20_ma_data()
-            self.txt_power_range_min.value = plc_4_20_ma_data["power_range_min"] // 10
-            self.txt_power_range_min.update()
-            self.txt_power_range_max.value = plc_4_20_ma_data["power_range_max"] // 10
-            self.txt_power_range_max.update()
-            self.txt_power_range_offset.value = plc_4_20_ma_data["power_range_offset"] // 10
-            self.txt_power_range_offset.update()
+            if self.conf.plc_enabled and plc.is_connected:
+                plc_4_20_ma_data = await plc.read_4_20_ma_data()
+                self.txt_power_range_min.value = plc_4_20_ma_data["power_range_min"] // 10
+                self.txt_power_range_max.value = plc_4_20_ma_data["power_range_max"] // 10
+                self.txt_power_range_offset.value = plc_4_20_ma_data["power_range_offset"] // 10
 
-            self.txt_torque_range_min.value = plc_4_20_ma_data["torque_range_min"] // 10
-            self.txt_torque_range_min.update()
-            self.txt_torque_range_max.value = plc_4_20_ma_data["torque_range_max"] // 10
-            self.txt_torque_range_max.update()
-            self.txt_torque_range_offset.value = plc_4_20_ma_data["torque_range_offset"] // 10
-            self.txt_torque_range_offset.update()
+                self.txt_torque_range_min.value = plc_4_20_ma_data["torque_range_min"] // 10
+                self.txt_torque_range_max.value = plc_4_20_ma_data["torque_range_max"] // 10
+                self.txt_torque_range_offset.value = plc_4_20_ma_data["torque_range_offset"] // 10
 
-            self.txt_thrust_range_min.value = plc_4_20_ma_data["thrust_range_min"] // 10
-            self.txt_thrust_range_min.update()
-            self.txt_thrust_range_max.value = plc_4_20_ma_data["thrust_range_max"] // 10
-            self.txt_thrust_range_max.update()
-            self.txt_thrust_range_offset.value = plc_4_20_ma_data["thrust_range_offset"] // 10
-            self.txt_thrust_range_offset.update()
+                self.txt_thrust_range_min.value = plc_4_20_ma_data["thrust_range_min"] // 10
+                self.txt_thrust_range_max.value = plc_4_20_ma_data["thrust_range_max"] // 10
+                self.txt_thrust_range_offset.value = plc_4_20_ma_data["thrust_range_offset"] // 10
 
-            self.txt_speed_range_min.value = plc_4_20_ma_data["speed_range_min"] // 10
-            self.txt_speed_range_min.update()
-            self.txt_speed_range_max.value = plc_4_20_ma_data["speed_range_max"] // 10
-            self.txt_speed_range_max.update()
-            self.txt_speed_range_offset.value = plc_4_20_ma_data["speed_range_offset"] // 10
-            self.txt_speed_range_offset.update()
+                self.txt_speed_range_min.value = plc_4_20_ma_data["speed_range_min"] // 10
+                self.txt_speed_range_max.value = plc_4_20_ma_data["speed_range_max"] // 10
+                self.txt_speed_range_offset.value = plc_4_20_ma_data["speed_range_offset"] // 10
         except:
             logging.exception('exception occured at load_range_data')
 

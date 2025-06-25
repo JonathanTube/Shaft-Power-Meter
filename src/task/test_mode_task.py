@@ -107,4 +107,4 @@ class TestModeTask:
             logging.exception('exception occured at save_generated_data')
 
 
-testModeTask: TestModeTask = TestModeTask()
+test_mode_task: TestModeTask = TestModeTask()

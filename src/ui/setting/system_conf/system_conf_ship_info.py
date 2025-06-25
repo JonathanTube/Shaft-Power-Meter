@@ -1,5 +1,6 @@
 import logging
 import flet as ft
+from db.models.user import User
 from ui.common.custom_card import CustomCard
 from db.models.ship_info import ShipInfo
 from db.models.operation_log import OperationLog
@@ -51,7 +52,7 @@ class SystemConfShipInfo(ft.Container):
         except:
             logging.exception('exception occured at SystemConfShipInfo.build')
 
-    def save(self, user_id: int):
+    def save(self, user: User):
         # 不要处理异常，外部已经catch
         self.ship_info.ship_type = self.ship_type.value
         self.ship_info.ship_name = self.ship_name.value
@@ -59,7 +60,7 @@ class SystemConfShipInfo(ft.Container):
         self.ship_info.ship_size = self.ship_size.value
         self.ship_info.save()
         OperationLog.create(
-            user_id=user_id,
+            user_id=user.id,
             utc_date_time=gdata.utc_date_time,
             operation_type=OperationType.SYSTEM_CONF_SHIP_INFO,
             operation_content=model_to_dict(self.ship_info)

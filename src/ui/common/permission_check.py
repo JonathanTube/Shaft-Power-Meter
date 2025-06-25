@@ -92,30 +92,35 @@ class PermissionCheck(ft.AlertDialog):
 
 
     def __on_cancel(self, e):
-        self.page.close(self)
-        if self.on_cancel:
-            self.on_cancel(e)
+        if self.page:
+            self.page.close(self)
+            self.update()
+            if self.on_cancel:
+                self.on_cancel(e)
 
     def __on_confirm(self, e):
         try:
-            s = self.page.session
-            user_id = self.user_name.value
-            user_pwd = self.user_pwd.value
-            if user_id == None or user_pwd == None:
-                Toast.show_error(self.page, s.get("lang.permission.user_name_and_pwd_are_required"))
-                return
+            if self.page and self.page.session:
+                s = self.page.session
+                user_id = self.user_name.value
+                user_pwd = self.user_pwd.value
+                if user_id == None or user_pwd == None:
+                    Toast.show_error(self.page, s.get("lang.permission.user_name_and_pwd_are_required"))
+                    return
 
-            user: User = User.select().where(User.user_role <= self.user_role, User.id == user_id).first()
+                user: User = User.select().where(User.user_role <= self.user_role, User.id == user_id).first()
 
-            if user is None:
-                Toast.show_error(self.page, s.get("lang.permission.user_name_or_pwd_is_incorrect"))
-                return
+                if user is None:
+                    Toast.show_error(self.page, s.get("lang.permission.user_name_or_pwd_is_incorrect"))
+                    return
 
-            if not user.check_password(user_pwd):
-                Toast.show_error(self.page, s.get("lang.permission.user_name_or_pwd_is_incorrect"))
-                return
+                if not user.check_password(user_pwd):
+                    Toast.show_error(self.page, s.get("lang.permission.user_name_or_pwd_is_incorrect"))
+                    return
 
-            self.page.close(self)
-            self.on_confirm(user)
+                self.page.close(self)
+                self.update()
+                self.on_confirm(user)
         except:
             logging.exception('exception occured at PermissionCheck.__on_confirm')
+

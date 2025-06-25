@@ -25,4 +25,7 @@ class SpsOfflineTask:
                 await asyncio.sleep(2)
 
 
+    def stop(self):
+        self.task_running = False
+
 sps_offline_task = SpsOfflineTask()

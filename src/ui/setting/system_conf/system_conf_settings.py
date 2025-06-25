@@ -4,9 +4,12 @@ from common.const_alarm_type import AlarmType
 from db.models.operation_log import OperationLog
 from db.models.preference import Preference
 from db.models.system_settings import SystemSettings
+from db.models.user import User
 from ui.common.custom_card import CustomCard
+from ui.common.toast import Toast
 from utils.alarm_saver import AlarmSaver
 from task.plc_sync_task import plc
+from utils.system_exit_tool import SystemExitTool
 from utils.unit_converter import UnitConverter
 from ui.common.keyboard import keyboard
 from common.operation_type import OperationType
@@ -17,6 +20,7 @@ from websocket.websocket_client import ws_client
 from common.global_data import gdata
 from task.sps1_read_task import sps1_read_task
 from task.sps2_read_task import sps2_read_task
+
 
 class SystemConfSettings(ft.Container):
     def __init__(self):
@@ -43,19 +47,11 @@ class SystemConfSettings(ft.Container):
                         self.running_mode
                     ]
                 )
-                
-
-
-
-
 
                 self.display_thrust = ft.Checkbox(
                     col={"md": 6}, label=self.page.session.get("lang.setting.display_thrust"),
                     value=self.system_settings.display_thrust
                 )
-
-
-
 
                 self.sha_po_li = ft.Checkbox(
                     col={"md": 6}, label=self.page.session.get("lang.setting.enable_sha_po_li"),
@@ -63,18 +59,10 @@ class SystemConfSettings(ft.Container):
                     on_change=self.__on_sha_po_li_change
                 )
 
-
-
-
                 self.display_propeller_curve = ft.Checkbox(
                     col={"md": 6}, label=self.page.session.get("lang.setting.display_propeller_curve"),
                     value=self.system_settings.display_propeller_curve
                 )
-
-
-
-
-
 
                 eexi_limited_power_value, eexi_limited_power_unit = self.__get_eexi_limited_power()
                 self.eexi_limited_power = ft.TextField(
@@ -88,10 +76,6 @@ class SystemConfSettings(ft.Container):
                     on_click=lambda e: keyboard.open(e.control, 'float')
                 )
 
-
-
-
-
                 self.eexi_breach_checking_duration = ft.TextField(
                     col={"md": 6},
                     label=self.page.session.get("lang.setting.eexi_breach_checking_duration"),
@@ -103,18 +87,10 @@ class SystemConfSettings(ft.Container):
                     on_click=lambda e: keyboard.open(e.control, 'int')
                 )
 
-
-
-
                 self.chk_hide_admin_account = ft.Checkbox(
                     col={"md": 6}, label=self.page.session.get("lang.setting.hide_admin_account"),
                     value=self.system_settings.hide_admin_account
                 )
-
-
-
-
-
 
                 self.single_propeller = ft.Radio(value="1", label=self.page.session.get("lang.setting.single_propeller"))
                 self.twins_propeller = ft.Radio(value="2", label=self.page.session.get("lang.setting.twins_propeller"))
@@ -150,7 +126,6 @@ class SystemConfSettings(ft.Container):
         except:
             logging.exception('exception occured at SystemConfSettings.build')
 
-
     def __on_sha_po_li_change(self, e):
         try:
             if self.system_settings.sha_po_li:
@@ -171,12 +146,22 @@ class SystemConfSettings(ft.Container):
         else:
             return (UnitConverter.w_to_shp(_eexi_limited_power), "sHp")
 
-    def save(self, user_id: int):
+    def save(self, user: User):
         # 不要处理异常，外部已经catch
-        if self.page is None:
+        if self.page is None or self.page.session is None:
             return
 
-        self.system_settings.is_master = True if self.running_mode.value == 'master' else False
+        is_master = True if self.running_mode.value == 'master' else False
+
+        # 如果运行模式被切换
+        if self.system_settings.is_master != is_master:
+            # 退出系统
+            msg = self.page.session.get("lang.toast.system_exit")
+            Toast.show_error(self.page, msg, auto_hide=False)
+            self.page.run_task(SystemExitTool.exit_app, self.page, user)
+            return
+
+        self.system_settings.is_master = is_master
         self.system_settings.amount_of_propeller = self.amount_of_propeller_radios.value
         self.system_settings.display_thrust = self.display_thrust.value
         self.system_settings.sha_po_li = self.sha_po_li.value
@@ -196,7 +181,7 @@ class SystemConfSettings(ft.Container):
         gdata.is_master = self.system_settings.is_master
 
         gdata.amount_of_propeller = self.system_settings.amount_of_propeller
-        
+
         gdata.shapoli = self.system_settings.sha_po_li
 
         gdata.eexi_breach_checking_duration = int(self.system_settings.eexi_breach_checking_duration)
@@ -204,7 +189,7 @@ class SystemConfSettings(ft.Container):
         gdata.eexi_limited_power = float(self.system_settings.eexi_limited_power)
 
         OperationLog.create(
-            user_id=user_id,
+            user_id=user.id,
             utc_date_time=gdata.utc_date_time,
             operation_type=OperationType.SYSTEM_CONF_SETTING,
             operation_content=model_to_dict(self.system_settings)

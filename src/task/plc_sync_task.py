@@ -219,7 +219,7 @@ class PlcSyncTask:
         return response.bits[0] if not response.isError() else None
 
     def _empty_4_20ma_data(self) -> dict:
-        return {key: None for key in [
+        return {key: 0 for key in [
             "power_range_min", "power_range_max", "power_range_offset",
             "torque_range_min", "torque_range_max", "torque_range_offset",
             "thrust_range_min", "thrust_range_max", "thrust_range_offset",
