@@ -221,7 +221,7 @@ class TestMode(ft.Container):
             gdata.eexi_breach = False
             gdata.sps1_offline = True
             gdata.sps2_offline = True
-            self.page.run_task(plc.write_alarm, False)
+            # 这里只需要回复power_overload的告警，alarm不需要管。
             self.page.run_task(plc.write_power_overload, False)
             Toast.show_success(self.page)
         except:

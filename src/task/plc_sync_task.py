@@ -60,7 +60,7 @@ class PlcSyncTask:
                     await self.heart_beat()
                 except:
                     logging.error(f"[***PLC***] {self._retry + 1}th reconnect failed")
-                    self.save_alarm()
+                    self.save_plc_alarm()
                 finally:
                     #  指数退避
                     await asyncio.sleep(2 ** self._retry)
@@ -76,15 +76,16 @@ class PlcSyncTask:
             try:
                 self._is_connected = True
                 self._retry = 0
-                await self.recovery_alarm()
+                await self.handle_alarms()
             except:
                 logging.error('exception occured at PlcSyncTask.heart_beat')
+                self.save_plc_alarm()
             finally:
                 await asyncio.sleep(5)
 
         # 到达这里，说明连接丢失
         self._is_connected = False
-        self.save_alarm()
+        self.save_plc_alarm()
 
     async def read_4_20_ma_data(self) -> dict:
         if not self._is_connected:
@@ -239,9 +240,9 @@ class PlcSyncTask:
             logging.error("[***PLC***] close plc error occured")
         finally:
             self._is_connected = False
-            self.save_alarm()
+            self.save_plc_alarm()
 
-    def save_alarm(self):
+    def save_plc_alarm(self):
         try:
             cnt: int = AlarmLog.select().where(AlarmLog.alarm_type == AlarmType.PLC_DISCONNECTED, AlarmLog.is_recovery == False).count()
             if cnt == 0:
@@ -252,7 +253,7 @@ class PlcSyncTask:
         except:
             logging.error('save PLC alarm failed.')
 
-    async def recovery_alarm(self):
+    async def handle_alarms(self):
         try:
             logging.info('[***PLC***] recovery PLC Alarm')
             AlarmLog.update(is_recovery=True).where(AlarmLog.alarm_type == AlarmType.PLC_DISCONNECTED).execute()
@@ -261,6 +262,8 @@ class PlcSyncTask:
             if cnt == 0:
                 logging.info(f'[***PLC***], check none of alarm, clear all plc alarm.')
                 await plc.write_alarm(False)
+            else:
+                await plc.write_alarm(True)
         except:
             logging.error('recovery PLC alarm failed.')
 
