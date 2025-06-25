@@ -87,8 +87,10 @@ def start_all_task():
     # 如果不是第一次装机，启动设备连接
     if cnt > 0:
         # GSP 不管主机从机都有
-        asyncio.create_task(gps.connect())
         asyncio.create_task(modbus_output.start())
+
+        if SystemSettings.enable_gps:
+            asyncio.create_task(gps.connect())
 
         # 如果是主机
         if system_settings.is_master:
@@ -96,7 +98,11 @@ def start_all_task():
             if io_conf.plc_enabled:
                 asyncio.create_task(plc.connect())
             asyncio.create_task(sps1_read_task.connect())
-            asyncio.create_task(ws_server.start())
+            
+            # 不是独立的，才需要运行server
+            if not system_settings.is_individual:
+                asyncio.create_task(ws_server.start())
+
             # start sps2 JM3846 if dual propellers.
             if system_settings.amount_of_propeller > 1:
                 asyncio.create_task(sps2_read_task.connect())

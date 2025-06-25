@@ -7,6 +7,8 @@ class SystemSettings(BaseModel):
 
     is_individual = BooleanField(verbose_name="是否单机", default=True)
 
+    enable_gps = BooleanField(verbose_name="启用GPS", default=False)
+
     display_thrust = BooleanField(verbose_name="是否显示推力", default=False)
 
     amount_of_propeller = IntegerField(verbose_name="螺旋桨数量 1-单桨 2-双桨", default=1)

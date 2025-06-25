@@ -756,6 +756,18 @@ class DataInit:
                 },
 
                 {
+                    "code": "lang.setting.enable_gps",
+                    "chinese": "启用GPS",
+                    "english": "Enable GPS"
+                },
+
+                {
+                    "code": "lang.setting.reboot_warning",
+                    "chinese": "当修改一些关键配置后，应用程序需要手动重启!",
+                    "english": "App needs to reboot manually, if you change some important configurations!"
+                },
+
+                {
                     "code": "lang.setting.master",
                     "chinese": "主机",
                     "english": "Master"

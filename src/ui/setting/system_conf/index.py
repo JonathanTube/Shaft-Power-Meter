@@ -1,3 +1,4 @@
+import flet as ft
 import time
 import flet as ft
 import logging
@@ -34,6 +35,15 @@ class SystemConf(ft.Container):
                         ft.ResponsiveRow(
                             alignment=ft.MainAxisAlignment.START,
                             controls=[
+                                ft.TextButton(
+                                    disabled=True,
+                                    text=self.page.session.get('lang.setting.reboot_warning'),
+                                    icon=ft.Icons.INFO_OUTLINE,
+                                    icon_color=ft.Colors.RED,
+                                    style=ft.ButtonStyle(
+                                        color=ft.Colors.RED
+                                    )
+                                ),
                                 self.system_conf_settings,
                                 self.system_conf_ship_info,
                                 buttons

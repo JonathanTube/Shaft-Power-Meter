@@ -22,18 +22,22 @@ class SystemConfSettings(ft.Container):
     def build(self):
         try:
             if self.page and self.page.session:
-                self.mode_master = ft.Radio(value='master', label=self.page.session.get("lang.setting.master"))
-                self.mode_slave = ft.Radio(value='slave', label=self.page.session.get("lang.setting.slave"))
+                self.mode_master = ft.Radio(
+                    value='master', 
+                    label_style=ft.TextStyle(color=ft.Colors.RED),
+                    active_color=ft.Colors.RED,
+                    label=self.page.session.get("lang.setting.master")
+                )
+                self.mode_slave = ft.Radio(
+                    value='slave', 
+                    label_style=ft.TextStyle(color=ft.Colors.RED),
+                    active_color=ft.Colors.RED,
+                    label=self.page.session.get("lang.setting.slave")
+                )
                 self.running_mode = ft.RadioGroup(
                     content=ft.Row([self.mode_master, self.mode_slave]),
                     value='master' if self.system_settings.is_master else 'slave',
                     on_change=self.__on_running_mode_change
-                )
-
-                self.is_individual = ft.Checkbox(
-                    col={"md": 6}, label=self.page.session.get("lang.setting.is_individual"),
-                    visible=self.system_settings.is_master,
-                    value=self.system_settings.is_individual
                 )
 
                 self.running_mode_row = ft.Row(
@@ -41,10 +45,27 @@ class SystemConfSettings(ft.Container):
                     controls=[
                         ft.Text(
                             self.page.session.get("lang.setting.running_mode"),
+                            color=ft.Colors.RED,
                             text_align=ft.TextAlign.RIGHT
                         ),
                         self.running_mode
                     ]
+                )
+
+                self.is_individual = ft.Checkbox(
+                    col={"md": 6}, label=self.page.session.get("lang.setting.is_individual"),
+                    visible=self.system_settings.is_master,
+                    check_color=ft.Colors.RED,
+                    label_style=ft.TextStyle(color=ft.Colors.RED),
+                    value=self.system_settings.is_individual
+                )
+
+                self.enable_gps = ft.Checkbox(
+                    col={"md": 6}, label=self.page.session.get("lang.setting.enable_gps"),
+                    visible=self.system_settings.is_master,
+                    check_color=ft.Colors.RED,
+                    label_style=ft.TextStyle(color=ft.Colors.RED),
+                    value=self.system_settings.enable_gps
                 )
 
                 self.display_thrust = ft.Checkbox(
@@ -112,9 +133,10 @@ class SystemConfSettings(ft.Container):
                     self.page.session.get("lang.setting.setting"),
                     ft.ResponsiveRow(controls=[
                         self.running_mode_row,
+                        self.enable_gps,
                         self.is_individual,
-                        self.amount_of_propeller_row,
                         self.display_thrust,
+                        self.amount_of_propeller_row,
                         self.display_propeller_curve,
                         self.sha_po_li,
                         self.chk_hide_admin_account,
@@ -130,6 +152,9 @@ class SystemConfSettings(ft.Container):
         self.is_individual.visible = e.data == 'master'
         self.is_individual.value = e.data == 'slave'
         self.is_individual.update()
+
+        self.enable_gps.value = False
+        self.enable_gps.update()
 
     def __on_sha_po_li_change(self, e):
         try:
@@ -164,8 +189,12 @@ class SystemConfSettings(ft.Container):
         is_individual_new = self.is_individual.value
         self.system_settings.is_individual = is_individual_new
 
+        enable_gps_old = self.system_settings.enable_gps
+        enable_gps_new = self.enable_gps.value
+        self.system_settings.enable_gps = enable_gps_new
+
         # 如果运行模式被切换
-        if is_master_new != is_master_old or is_individual_new != is_individual_old:
+        if is_master_new != is_master_old or is_individual_new != is_individual_old or enable_gps_new != enable_gps_old:
             self.system_settings.save()
             gdata.is_master = self.system_settings.is_master
             raise SystemError("running mode changed")

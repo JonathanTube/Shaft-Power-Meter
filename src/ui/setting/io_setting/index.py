@@ -31,7 +31,6 @@ class IOSetting(ft.Container):
     def build(self):
             try:
                 if self.page and self.page.session:
-                    self.gps_conf = IOSettingGPS(self.conf)
                     self.output_conf = IOSettingOutput(self.conf)
 
                     self.save_button = ft.FilledButton(
@@ -45,26 +44,29 @@ class IOSetting(ft.Container):
                         on_click=self.__reset_data
                     )
 
-                    controls = [
-                        self.gps_conf,
-                        self.output_conf,
-                        ft.Row(
-                            alignment=ft.MainAxisAlignment.CENTER,
-                            controls=[self.save_button, self.reset_button]
-                        )
-                    ]
+                    controls = []
+
+                    if self.system_settings.enable_gps:
+                        self.gps_conf = IOSettingGPS(self.conf)
+                        controls.append(self.gps_conf)
 
                     if self.system_settings.is_master:
                         self.plc_conf = IOSettingPLC(self.conf)
-                        controls.insert(1, self.plc_conf)
+                        controls.append(self.plc_conf)
                         self.sps_conf = IOSettingSPS(self.conf)
-                        controls.insert(2, self.sps_conf)
+                        controls.append(self.sps_conf)
                         if not self.system_settings.is_individual:
                             self.master_server_conf = IOSettingMasterServer()
-                            controls.insert(3, self.master_server_conf)
+                            controls.append(self.master_server_conf)
                     else:
                         self.interface_conf = InterfaceConf(self.conf)
-                        controls.insert(1, self.interface_conf)
+                        controls.append(self.interface_conf)
+
+                    controls.append(self.output_conf)
+
+                    controls.append(
+                        ft.Row(alignment=ft.MainAxisAlignment.CENTER,controls=[self.save_button, self.reset_button])
+                    )
 
                     self.content = ft.Column(
                         scroll=ft.ScrollMode.ADAPTIVE,

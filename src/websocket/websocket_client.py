@@ -36,12 +36,12 @@ class WebSocketClient:
         return self._is_connected
 
     async def connect(self):
-        if self._is_connected:
-            return
-        
-        self._is_canceled = False
-
         async with self._lock:  # 确保单线程重连
+            if self._is_connected:
+                return
+        
+            self._is_canceled = False
+
             while not gdata.is_master and self._retry < self._max_retries:
                 # 如果是手动取消，直接跳出
                 if self._is_canceled:

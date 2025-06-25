@@ -48,10 +48,10 @@ class JM3846AsyncClient:
     def get_ip_port() -> tuple[str, int]:
         pass
 
-    async def connect(self):
-        self._is_canceled = False
-        
+    async def connect(self):        
         async with self._lock:  # 确保单线程重连
+            self._is_canceled = False
+
             while gdata.is_master and self._retry < self._max_retries:
                 if self._is_canceled:
                     break
