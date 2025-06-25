@@ -63,7 +63,6 @@ class TestModeTask:
     def stop(self):
         try:
             DataLog.delete().where(DataLog.utc_date_time >= gdata.test_mode_start_time).execute()
-            AlarmLog.delete().where(AlarmLog.utc_date_time >= gdata.test_mode_start_time).execute()
             event_logs:list[EventLog] = EventLog.select().where(EventLog.started_at >= gdata.test_mode_start_time)
             for event in event_logs:
                 EventLog.delete().where(EventLog.id == event.id).execute()

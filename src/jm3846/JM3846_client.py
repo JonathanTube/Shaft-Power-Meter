@@ -49,6 +49,8 @@ class JM3846AsyncClient:
         pass
 
     async def connect(self):
+        self._is_canceled = False
+        
         async with self._lock:  # 确保单线程重连
             while gdata.is_master and self._retry < self._max_retries:
                 if self._is_canceled:

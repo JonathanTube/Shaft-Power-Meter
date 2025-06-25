@@ -59,8 +59,9 @@ class IOSetting(ft.Container):
                         controls.insert(1, self.plc_conf)
                         self.sps_conf = IOSettingSPS(self.conf)
                         controls.insert(2, self.sps_conf)
-                        self.master_server_conf = IOSettingMasterServer()
-                        controls.insert(3, self.master_server_conf)
+                        if not self.system_settings.is_individual:
+                            self.master_server_conf = IOSettingMasterServer()
+                            controls.insert(3, self.master_server_conf)
                     else:
                         self.interface_conf = InterfaceConf(self.conf)
                         controls.insert(1, self.interface_conf)

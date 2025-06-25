@@ -45,6 +45,8 @@ class WebSocketServer:
         if self._is_started:
             return
 
+        self._is_canceled = False
+
         async with self._lock:  # 确保单线程
             for attempt in range(self._max_retries):
                 if self._is_canceled:

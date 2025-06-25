@@ -750,6 +750,12 @@ class DataInit:
                 },
 
                 {
+                    "code": "lang.setting.is_individual",
+                    "chinese": "单机",
+                    "english": "Individual"
+                },
+
+                {
                     "code": "lang.setting.master",
                     "chinese": "主机",
                     "english": "Master"

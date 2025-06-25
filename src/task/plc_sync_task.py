@@ -28,6 +28,8 @@ class PlcSyncTask:
     async def connect(self):
         if self._is_connected:
             return
+        
+        self._is_canceled = False
 
         async with self._lock:  # 确保单线程重连
             self._retry = 0

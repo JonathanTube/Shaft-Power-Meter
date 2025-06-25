@@ -1,23 +1,16 @@
 import logging
 import flet as ft
-from common.const_alarm_type import AlarmType
 from db.models.operation_log import OperationLog
 from db.models.preference import Preference
 from db.models.system_settings import SystemSettings
 from db.models.user import User
 from ui.common.custom_card import CustomCard
-from utils.alarm_saver import AlarmSaver
-from task.plc_sync_task import plc
 from utils.unit_converter import UnitConverter
 from common.operation_type import OperationType
 from playhouse.shortcuts import model_to_dict
 from ui.common.keyboard import keyboard
 from common.global_data import gdata
-from websocket.websocket_server import ws_server
-from websocket.websocket_client import ws_client
 from common.global_data import gdata
-from task.sps1_read_task import sps1_read_task
-from task.sps2_read_task import sps2_read_task
 
 
 class SystemConfSettings(ft.Container):
@@ -33,8 +26,16 @@ class SystemConfSettings(ft.Container):
                 self.mode_slave = ft.Radio(value='slave', label=self.page.session.get("lang.setting.slave"))
                 self.running_mode = ft.RadioGroup(
                     content=ft.Row([self.mode_master, self.mode_slave]),
-                    value='master' if self.system_settings.is_master else 'slave'
+                    value='master' if self.system_settings.is_master else 'slave',
+                    on_change=self.__on_running_mode_change
                 )
+
+                self.is_individual = ft.Checkbox(
+                    col={"md": 6}, label=self.page.session.get("lang.setting.is_individual"),
+                    visible=self.system_settings.is_master,
+                    value=self.system_settings.is_individual
+                )
+
                 self.running_mode_row = ft.Row(
                     col={"md": 6},
                     controls=[
@@ -111,6 +112,7 @@ class SystemConfSettings(ft.Container):
                     self.page.session.get("lang.setting.setting"),
                     ft.ResponsiveRow(controls=[
                         self.running_mode_row,
+                        self.is_individual,
                         self.amount_of_propeller_row,
                         self.display_thrust,
                         self.display_propeller_curve,
@@ -123,6 +125,11 @@ class SystemConfSettings(ft.Container):
                 self.content = self.custom_card
         except:
             logging.exception('exception occured at SystemConfSettings.build')
+
+    def __on_running_mode_change(self, e):
+        self.is_individual.visible = e.data == 'master'
+        self.is_individual.value = e.data == 'slave'
+        self.is_individual.update()
 
     def __on_sha_po_li_change(self, e):
         try:
@@ -149,13 +156,16 @@ class SystemConfSettings(ft.Container):
         if self.page is None or self.page.session is None:
             return
 
-        is_mater_old = self.system_settings.is_master
+        is_master_old = self.system_settings.is_master
         is_master_new = True if self.running_mode.value == 'master' else False
-
         self.system_settings.is_master = is_master_new
-        
+
+        is_individual_old = self.system_settings.is_individual
+        is_individual_new = self.is_individual.value
+        self.system_settings.is_individual = is_individual_new
+
         # 如果运行模式被切换
-        if is_master_new != is_mater_old:
+        if is_master_new != is_master_old or is_individual_new != is_individual_old:
             self.system_settings.save()
             gdata.is_master = self.system_settings.is_master
             raise SystemError("running mode changed")
@@ -193,20 +203,3 @@ class SystemConfSettings(ft.Container):
             operation_type=OperationType.SYSTEM_CONF_SETTING,
             operation_content=model_to_dict(self.system_settings)
         )
-
-        if self.system_settings.is_master:
-            # 关闭websocket客户端连接
-            self.page.run_task(ws_client.close)
-            AlarmSaver.recovery(alarm_type=AlarmType.SLAVE_DISCONNECTED)
-        else:
-            self.page.run_task(plc.close)
-            AlarmSaver.recovery(alarm_type=AlarmType.PLC_DISCONNECTED)
-
-            self.page.run_task(ws_server.stop)
-            AlarmSaver.recovery(alarm_type=AlarmType.MASTER_SERVER_STOPPED)
-
-            self.page.run_task(sps1_read_task.close)
-            AlarmSaver.recovery(alarm_type=AlarmType.SPS1_DISCONNECTED)
-
-            self.page.run_task(sps2_read_task.close)
-            AlarmSaver.recovery(alarm_type=AlarmType.SPS2_DISCONNECTED)

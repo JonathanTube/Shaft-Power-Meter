@@ -32,6 +32,8 @@ class GpsSyncTask:
     async def connect(self):
         if self._is_connected:
             return
+        
+        self._is_canceled = False
 
         async with self._lock:  # 确保单线程重连
             while self._retry < self._max_retries:
