@@ -1,3 +1,4 @@
+import logging
 from db.models.breach_reason import BreachReason
 from db.models.counter_log import CounterLog
 from db.models.data_log import DataLog
@@ -59,6 +60,7 @@ class TableInit:
 
     @staticmethod
     def handle_change_running_mode():
+        logging.info('truncate table due to switching running mode.')
         BreachReason.truncate_table()
         DataLog.truncate_table()
         EventLog.truncate_table()

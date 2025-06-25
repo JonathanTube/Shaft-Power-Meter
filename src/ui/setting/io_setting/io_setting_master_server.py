@@ -24,7 +24,7 @@ class IOSettingMasterServer(ft.Container):
 
                 self.port = ft.TextField(
                     label=f'HMI {self.page.session.get("lang.setting.port")}',
-                    value='8000',
+                    value='8001',
                     read_only=True
                 )
 

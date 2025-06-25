@@ -110,7 +110,10 @@ class WebSocketServer:
             except:
                 logging.exception("[***HMI server***] exception occured at send_alarms")
             finally:
-                await asyncio.sleep(5)
+                try:
+                    await asyncio.sleep(5)
+                except:
+                    pass
 
     async def stop(self):
         self._is_canceled = True

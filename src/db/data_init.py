@@ -154,7 +154,7 @@ class DataInit:
                 sps2_ip='192.168.1.6',
                 sps2_port=6800,
                 hmi_server_ip='192.168.1.150',
-                hmi_server_port=8000
+                hmi_server_port=8001
             )
 
     def __init_test_mode_conf():

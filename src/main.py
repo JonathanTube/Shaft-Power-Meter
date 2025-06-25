@@ -3,6 +3,7 @@ import ctypes
 import sys
 import logging
 import flet as ft
+from db.models.data_log import DataLog
 from db.models.io_conf import IOConf
 from db.models.system_settings import SystemSettings
 from ui.common.fullscreen_alert import FullscreenAlert
@@ -77,12 +78,14 @@ def check_single_instance(mutex_name: str = "shaft-power-meter"):
 
 
 def start_all_task():
+    cnt = DataLog.select().count()
+
     system_settings: SystemSettings = SystemSettings.get()
     asyncio.create_task(utc_timer.start())
     asyncio.create_task(sps_offline_task.start())
 
     # 如果不是第一次装机，启动设备连接
-    if not is_db_empty:
+    if cnt > 0:
         # GSP 不管主机从机都有
         asyncio.create_task(gps.connect())
         asyncio.create_task(modbus_output.start())

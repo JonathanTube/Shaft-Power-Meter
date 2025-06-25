@@ -14,7 +14,7 @@ class IOConf(BaseModel):
     gps_port = IntegerField(verbose_name="GPS port", default=0)
 
     hmi_server_ip = CharField(verbose_name="HMI server IP address", default="127.0.0.1")
-    hmi_server_port = IntegerField(verbose_name="HMI server port", default=8000)
+    hmi_server_port = IntegerField(verbose_name="HMI server port", default=8001)
 
     sps1_ip = CharField(verbose_name="SPS1 IP address", default="")
     sps1_port = IntegerField(verbose_name="SPS1 port", default=502)
