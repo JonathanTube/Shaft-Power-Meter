@@ -6,15 +6,13 @@ from db.models.preference import Preference
 from db.models.system_settings import SystemSettings
 from db.models.user import User
 from ui.common.custom_card import CustomCard
-from ui.common.toast import Toast
 from utils.alarm_saver import AlarmSaver
 from task.plc_sync_task import plc
-from utils.system_exit_tool import SystemExitTool
 from utils.unit_converter import UnitConverter
-from ui.common.keyboard import keyboard
 from common.operation_type import OperationType
-from common.global_data import gdata
 from playhouse.shortcuts import model_to_dict
+from ui.common.keyboard import keyboard
+from common.global_data import gdata
 from websocket.websocket_server import ws_server
 from websocket.websocket_client import ws_client
 from common.global_data import gdata
@@ -151,17 +149,18 @@ class SystemConfSettings(ft.Container):
         if self.page is None or self.page.session is None:
             return
 
-        is_master = True if self.running_mode.value == 'master' else False
+        is_mater_old = self.system_settings.is_master
+        is_master_new = True if self.running_mode.value == 'master' else False
 
+        self.system_settings.is_master = is_master_new
+        
         # 如果运行模式被切换
-        if self.system_settings.is_master != is_master:
-            # 退出系统
-            msg = self.page.session.get("lang.toast.system_exit")
-            Toast.show_error(self.page, msg, auto_hide=False)
-            self.page.run_task(SystemExitTool.exit_app, self.page, user)
-            return
+        if is_master_new != is_mater_old:
+            self.system_settings.save()
+            gdata.is_master = self.system_settings.is_master
+            raise SystemError("running mode changed")
 
-        self.system_settings.is_master = is_master
+
         self.system_settings.amount_of_propeller = self.amount_of_propeller_radios.value
         self.system_settings.display_thrust = self.display_thrust.value
         self.system_settings.sha_po_li = self.sha_po_li.value

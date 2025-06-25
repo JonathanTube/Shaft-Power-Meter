@@ -31,7 +31,7 @@ class PlcSyncTask:
 
         async with self._lock:  # 确保单线程重连
             self._retry = 0
-            while self._retry < self._max_retries:
+            while gdata.is_master and self._retry < self._max_retries:
                 # 如果是手动取消，直接跳出
                 if self._is_canceled:
                     break
@@ -69,7 +69,7 @@ class PlcSyncTask:
             self._is_canceled = False
 
     async def heart_beat(self):
-        while self.plc_client is not None and self.plc_client.connected:
+        while gdata.is_master and self.plc_client is not None and self.plc_client.connected:
             if self._is_canceled:
                 return
 

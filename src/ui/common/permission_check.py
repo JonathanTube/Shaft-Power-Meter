@@ -94,7 +94,7 @@ class PermissionCheck(ft.AlertDialog):
     def __on_cancel(self, e):
         if self.page:
             self.page.close(self)
-            self.update()
+            self.page.update()
             if self.on_cancel:
                 self.on_cancel(e)
 
@@ -119,8 +119,7 @@ class PermissionCheck(ft.AlertDialog):
                     return
 
                 self.page.close(self)
-                self.update()
+                self.page.update()
                 self.on_confirm(user)
         except:
             logging.exception('exception occured at PermissionCheck.__on_confirm')
-

@@ -29,9 +29,8 @@ class Toast:
 
     @staticmethod
     def show_toast(page: ft.Page, message: str, bg_color: ft.Colors, color: ft.Colors, duration=2, auto_hide: bool = True):
-        
         try:
-            if page.overlay:
+            if page and page.overlay:
                 # 创建 Toast 控件
                 toast = ft.Container(
                     expand=True,

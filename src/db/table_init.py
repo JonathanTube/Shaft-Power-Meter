@@ -56,3 +56,19 @@ class TableInit:
             CounterLog,
             OfflineDefaultValue
         ], safe=True)
+
+    @staticmethod
+    def handle_change_running_mode():
+        BreachReason.truncate_table()
+        DataLog.truncate_table()
+        EventLog.truncate_table()
+        GpsLog.truncate_table()
+        IOConf.truncate_table()
+        ReportDetail.truncate_table()
+        ReportInfo.truncate_table()
+        ZeroCalInfo.truncate_table()
+        ZeroCalRecord.truncate_table()
+        AlarmLog.truncate_table()
+        TestModeConf.truncate_table()
+        OperationLog.truncate_table()
+        CounterLog.truncate_table()

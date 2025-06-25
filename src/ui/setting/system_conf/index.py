@@ -6,7 +6,9 @@ from ui.common.permission_check import PermissionCheck
 from ui.common.toast import Toast
 from ui.setting.system_conf.system_conf_settings import SystemConfSettings
 from ui.setting.system_conf.system_conf_ship_info import SystemConfShipInfo
-
+from ui.common.toast import Toast
+from db.table_init import TableInit
+from utils.system_exit_tool import SystemExitTool
 
 class SystemConf(ft.Container):
     def __init__(self):
@@ -70,6 +72,13 @@ class SystemConf(ft.Container):
             self.system_conf_settings.save(user)
             self.system_conf_ship_info.save(user)
             Toast.show_success(self.page)
+        except SystemError:
+            # 退出系统
+            msg = self.page.session.get("lang.toast.system_exit")
+            Toast.show_error(self.page, msg, auto_hide=False)
+            # 清理数据
+            self.page.run_task(SystemExitTool.exit_app, self.page, user)
+            TableInit.handle_change_running_mode()
         except:
             logging.exception("system conf save data error")
             Toast.show_error(self.page)

@@ -104,7 +104,7 @@ class Header(ft.AppBar):
         if self.page and self.page.session:
             msg = self.page.session.get("lang.toast.system_exit")
             Toast.show_error(self.page, msg, auto_hide=False)
-            self.page.run_task(SystemExitTool.exit_app, self.page, user)
+            asyncio.run(SystemExitTool.exit_app(self.page, user))
 
     def __stop_auto_testing(self, e):
         gdata.auto_testing = False

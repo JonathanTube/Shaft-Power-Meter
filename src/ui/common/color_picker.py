@@ -34,15 +34,18 @@ class ColorDialog(ft.IconButton):
         self.page.open(self.alert_dialog)
 
     def __change_color(self, e):
-        color = self.color_picker.color
+        try:
+            color = self.color_picker.color
 
-        self.icon_color = color
-        self.color = color
-        if callable(self.on_color_change):
-            self.on_color_change(color)
+            self.icon_color = color
+            self.color = color
+            if callable(self.on_color_change):
+                self.on_color_change(color)
 
-        self.alert_dialog.open = False
-        self.page.update()
+            self.alert_dialog.open = False
+            self.page.update()
+        except:
+            pass
 
     def __close_dialog(self, e):
         self.alert_dialog.open = False

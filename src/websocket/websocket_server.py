@@ -1,12 +1,13 @@
 import asyncio
+import logging
+import msgpack
 import websockets
 from typing import Set
-import logging
 from common.const_alarm_type import AlarmType
 from db.models.alarm_log import AlarmLog
 from db.models.io_conf import IOConf
-import msgpack
 from utils.alarm_saver import AlarmSaver
+from common.global_data import gdata
 
 date_time_format = '%Y-%m-%d %H:%M:%S'
 
@@ -28,7 +29,7 @@ class WebSocketServer:
     async def _client_handler(self, websocket):
         self.clients.add(websocket)
         try:
-            while True:
+            while gdata.is_master:
                 if self._is_canceled:
                     return
 
@@ -71,7 +72,7 @@ class WebSocketServer:
             self._is_canceled = False
 
     async def send_alarms(self):
-        while self._is_started:
+        while gdata.is_master and self._is_started:
 
             if self._is_canceled:
                 return

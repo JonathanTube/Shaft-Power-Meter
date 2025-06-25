@@ -2,8 +2,6 @@ import logging
 from common.const_alarm_type import AlarmType
 from db.models.alarm_log import AlarmLog
 from common.global_data import gdata
-from task.plc_sync_task import plc
-import asyncio
 
 
 class AlarmSaver:

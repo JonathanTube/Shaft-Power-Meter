@@ -50,7 +50,7 @@ class JM3846AsyncClient:
 
     async def connect(self):
         async with self._lock:  # 确保单线程重连
-            while self._retry < self._max_retries:
+            while gdata.is_master and self._retry < self._max_retries:
                 if self._is_canceled:
                     break
 
@@ -148,7 +148,7 @@ class JM3846AsyncClient:
 
     async def async_receive_looping(self):
         """持续接收0x44数据"""
-        while self._is_connected:
+        while gdata.is_master and self._is_connected:
             try:
                 if self.name == 'sps2' and int(gdata.amount_of_propeller) == 1:
                     logging.info('exit running since single propeller')

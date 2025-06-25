@@ -41,7 +41,8 @@ add_to_startup()
 is_db_empty = len(db.get_tables()) == 0
 if is_db_empty:
     TableInit.init()
-    DataInit.init()
+
+DataInit.init()
 
 gdata.set_default_value()
 
