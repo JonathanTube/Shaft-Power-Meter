@@ -7,9 +7,8 @@ from db.models.alarm_log import AlarmLog
 
 
 class AlarmButton(ft.TextButton):
-    def __init__(self, style: ft.ButtonStyle, on_click: Callable):
+    def __init__(self, on_click: Callable):
         super().__init__()
-        self.style = style
         self.icon = ft.Icons.WARNING_ROUNDED
         self.on_click = on_click
 
@@ -18,6 +17,8 @@ class AlarmButton(ft.TextButton):
 
         self.alarm_count = 0
         self.not_ack_count = 0
+
+        self.active = False
 
     def build(self):
         try:
@@ -36,15 +37,20 @@ class AlarmButton(ft.TextButton):
             color=ft.Colors.INVERSE_SURFACE,
             bgcolor=ft.Colors.SURFACE
         )
+
+        self.style.side = ft.border.all(2, ft.Colors.PRIMARY) if self.active else None
+        
         self.icon_color = ft.Colors.INVERSE_SURFACE
 
     def set_red_button(self):
         self.style = ft.ButtonStyle(
             shape=ft.RoundedRectangleBorder(radius=ft.border_radius.all(10)),
             color=ft.Colors.WHITE,
-            bgcolor=ft.Colors.RED
+            bgcolor=ft.Colors.RED,
+            side=ft.border.all(2, ft.Colors.PRIMARY)
         )
         self.icon_color = ft.Colors.WHITE
+        self.style.side = ft.border.all(2, ft.Colors.PRIMARY) if self.active else None
 
     def toggle_badge(self):
         if self.page:
@@ -64,7 +70,6 @@ class AlarmButton(ft.TextButton):
                     self.set_red_button()
                 else:
                     self.set_normal_button()
-                self.update()
         except:
             logging.exception('exception occured at AlarmButton.toggle_button')
 
@@ -80,6 +85,10 @@ class AlarmButton(ft.TextButton):
 
                 if self.not_ack_count > 0:
                     self.toggle_button(cnt % 2 == 0)
+                else:
+                    self.set_normal_button()
+
+                self.update()
 
                 cnt += 1
             except:

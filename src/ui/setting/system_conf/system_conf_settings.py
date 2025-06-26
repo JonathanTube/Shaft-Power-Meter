@@ -24,14 +24,10 @@ class SystemConfSettings(ft.Container):
             if self.page and self.page.session:
                 self.mode_master = ft.Radio(
                     value='master', 
-                    label_style=ft.TextStyle(color=ft.Colors.RED),
-                    active_color=ft.Colors.RED,
                     label=self.page.session.get("lang.setting.master")
                 )
                 self.mode_slave = ft.Radio(
                     value='slave', 
-                    label_style=ft.TextStyle(color=ft.Colors.RED),
-                    active_color=ft.Colors.RED,
                     label=self.page.session.get("lang.setting.slave")
                 )
                 self.running_mode = ft.RadioGroup(
@@ -45,7 +41,6 @@ class SystemConfSettings(ft.Container):
                     controls=[
                         ft.Text(
                             self.page.session.get("lang.setting.running_mode"),
-                            color=ft.Colors.RED,
                             text_align=ft.TextAlign.RIGHT
                         ),
                         self.running_mode
@@ -55,15 +50,11 @@ class SystemConfSettings(ft.Container):
                 self.is_individual = ft.Checkbox(
                     col={"md": 6}, label=self.page.session.get("lang.setting.is_individual"),
                     visible=self.system_settings.is_master,
-                    check_color=ft.Colors.RED,
-                    label_style=ft.TextStyle(color=ft.Colors.RED),
                     value=self.system_settings.is_individual
                 )
 
                 self.enable_gps = ft.Checkbox(
                     col={"md": 6}, label=self.page.session.get("lang.setting.enable_gps"),
-                    check_color=ft.Colors.RED,
-                    label_style=ft.TextStyle(color=ft.Colors.RED),
                     value=self.system_settings.enable_gps
                 )
 

@@ -8,20 +8,14 @@ from db.models.system_settings import SystemSettings
 
 
 class EventButton(ft.TextButton):
-    def __init__(self, style: ft.ButtonStyle, on_click: Callable):
+    def __init__(self, on_click: Callable):
         super().__init__()
-
-        self.style = style
 
         self.task = None
         self.task_running = True
 
         self.icon = ft.Icons.EVENT_OUTLINED
         self.icon_color = ft.Colors.INVERSE_SURFACE
-        self.style = ft.ButtonStyle(
-            shape=ft.RoundedRectangleBorder(radius=ft.border_radius.all(0)),
-            color=ft.Colors.INVERSE_SURFACE
-        )
         self.on_click = on_click
 
     def build(self):
