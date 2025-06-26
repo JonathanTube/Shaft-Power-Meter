@@ -150,7 +150,6 @@ class PropellerConf(ft.Container):
     def __on_push(self, e):
         try:
             if self.page:
-                self.__save_data()
                 settings: PropellerSetting = PropellerSetting.get()
                 data = model_to_dict(settings)
                 del data['created_at']
@@ -161,4 +160,5 @@ class PropellerConf(ft.Container):
                 })
                 Toast.show_success(self.page)
         except:
+            logging.exception('exception occured at PropellerConf.__on_push')
             Toast.show_error(self.page)
