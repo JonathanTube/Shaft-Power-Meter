@@ -62,7 +62,6 @@ class SystemConfSettings(ft.Container):
 
                 self.enable_gps = ft.Checkbox(
                     col={"md": 6}, label=self.page.session.get("lang.setting.enable_gps"),
-                    visible=self.system_settings.is_master,
                     check_color=ft.Colors.RED,
                     label_style=ft.TextStyle(color=ft.Colors.RED),
                     value=self.system_settings.enable_gps

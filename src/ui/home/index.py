@@ -65,7 +65,7 @@ class Home(ft.Container):
                 icon=ft.Icons.STACKED_LINE_CHART_OUTLINED,
                 icon_color=ft.Colors.INVERSE_SURFACE,
                 style=self.default_button_style,
-                visible=self.system_settings.is_master and self.system_settings.display_propeller_curve,
+                visible=self.system_settings.display_propeller_curve,
                 on_click=lambda e: self.__on_click(3)
             )
             self.alarm_button = AlarmButton(style=self.default_button_style, on_click=lambda e: self.__on_click(4))

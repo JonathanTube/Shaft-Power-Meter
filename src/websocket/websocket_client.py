@@ -8,9 +8,11 @@ import msgpack
 from common.const_alarm_type import AlarmType
 from db.models.alarm_log import AlarmLog
 from db.models.io_conf import IOConf
+from db.models.propeller_setting import PropellerSetting
 from jm3846.JM3846_calculator import JM3846Calculator
 from utils.alarm_saver import AlarmSaver
 from utils.data_saver import DataSaver
+from playhouse.shortcuts import dict_to_model
 from common.global_data import gdata
 
 
@@ -92,13 +94,15 @@ class WebSocketClient:
                 gdata.sps1_offline = False
                 gdata.sps2_offline = False
                 self._retry = 0
-            except:
-                logging.exception("[***HMI client***] exception occured at _receive_loop")
+            except websockets.ConnectionClosedError:
+                logging.error("[***HMI client***] ConnectionClosedError")
                 gdata.sps1_offline = True
                 gdata.sps2_offline = True
                 self._is_connected = False
                 AlarmSaver.create(alarm_type=AlarmType.SLAVE_DISCONNECTED)
                 break
+            except:
+                logging.exception("[***HMI client***] exception occured at _receive_loop")
 
     def __handle_jm3846_data(self, data):
         """处理从服务端接收到的数据"""
@@ -120,8 +124,10 @@ class WebSocketClient:
 
         DataSaver.save(name, ad0_torque, ad1_thrust, speed)
 
-    def __handle_propeller_setting(self, data):
-        print(data)
+    def __handle_propeller_setting(self, settings):
+        data = settings['data']
+        model:PropellerSetting = dict_to_model(PropellerSetting ,data)
+        model.save()
 
     def __handle_alarm_logs(self, data):
         """处理alarm数据"""
