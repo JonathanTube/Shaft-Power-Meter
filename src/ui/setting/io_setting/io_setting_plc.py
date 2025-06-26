@@ -325,6 +325,7 @@ class IOSettingPLC(ft.Container):
         try:
             if self.conf.plc_enabled and plc.is_connected:
                 plc_4_20_ma_data = await plc.read_4_20_ma_data()
+                logging.info(f'load plc_4_20_ma_data = {plc_4_20_ma_data}')
                 self.txt_power_range_min.value = plc_4_20_ma_data["power_range_min"] // 10
                 self.txt_power_range_max.value = plc_4_20_ma_data["power_range_max"] // 10
                 self.txt_power_range_offset.value = plc_4_20_ma_data["power_range_offset"] // 10

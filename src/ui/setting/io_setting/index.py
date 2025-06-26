@@ -92,7 +92,9 @@ class IOSetting(ft.Container):
             else:
                 self.interface_conf.save_data()
 
-            self.gps_conf.save_data()
+            if self.system_settings.enable_gps:
+                self.gps_conf.save_data()
+
             self.output_conf.save_data()
 
             OperationLog.create(
