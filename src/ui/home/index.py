@@ -68,8 +68,8 @@ class Home(ft.Container):
                 visible=self.system_settings.display_propeller_curve,
                 on_click=lambda e: self.__on_click(3)
             )
-            self.alarm_button = AlarmButton(style=self.default_button_style, on_click=lambda e: self.__on_click(4))
-            self.event_button = EventButton(style=self.default_button_style, on_click=lambda e: self.__on_click(5))
+            self.alarm_button = AlarmButton(on_click=lambda _: self.__on_click(4))
+            self.event_button = EventButton(on_click=lambda _: self.__on_click(5))
 
             self.logs = ft.TextButton(
                 text=self.page.session.get("lang.home.tab.logs"),
@@ -146,6 +146,7 @@ class Home(ft.Container):
                 elif index == 3:
                     self.main_container.content = PropellerCurve()
                 elif index == 4:
+                    self.alarm_button.active = True
                     self.main_container.content = AlarmList()
                 elif index == 5:
                     self.main_container.content = EventList()
