@@ -117,10 +117,10 @@ def set_appearance(page: ft.Page, preference: Preference):
     page.padding = 0
     page.theme_mode = get_theme_mode(preference)
     page.window.resizable = False
-    page.window.alignment = ft.alignment.center
     page.window.frameless = True
     page.window.always_on_top = False
-    page.window.alignment = ft.alignment.center
+    page.window.left = 0
+    page.window.top = 0
     if page.window.width <= 1200:
         if preference.fullscreen:
             page.window.full_screen = True
