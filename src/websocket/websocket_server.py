@@ -152,8 +152,8 @@ class WebSocketServer:
 
             return True
 
-        except websockets.ConnectionClosedError:
-            logging.exception("[***HMI server***] broadcast to all clients,ConnectionClosedError occured")
+        except websockets.ConnectionClosedError or websockets.ConnectionClosedOK  or websockets.ConnectionClosed:
+            logging.error("[***HMI server***] broadcast to all clients, connection closed")
         except:
             logging.exception("[***HMI server***] broadcast to all clients failed")
 
