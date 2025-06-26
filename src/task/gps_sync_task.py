@@ -55,10 +55,12 @@ class GpsSyncTask:
                     await self.receive_data()
 
                     logging.info(f'[***GPS***]disconnected from gps, ip={io_conf.gps_ip}, port={io_conf.gps_port}')
-                except:
-                    logging.exception(f"[***GPS***]connect to gps timeout, retry times={self._retry + 1}")
+                except ConnectionRefusedError or ConnectionAbortedError or ConnectionError or ConnectionResetError:
+                    logging.error(f"[***GPS***]connect to gps timeout, retry times={self._retry + 1}")
                     self._is_connected = False
                     AlarmSaver.create(alarm_type=AlarmType.GPS_DISCONNECTED)
+                except:
+                    logging.exception(f"[***GPS***]connect to gps timeout, retry times={self._retry + 1}")
                 finally:
                     #  指数退避
                     await asyncio.sleep(2 ** self._retry)
