@@ -69,6 +69,7 @@ class PropellerConf(ft.Container):
                     self.page.session.get("lang.button.push_to_slave"),
                     height=40,
                     icon_color=ft.Colors.GREEN,
+                    visible=self.system_settings.is_master and not self.system_settings.is_individual,
                     icon=ft.Icons.SYNC_OUTLINED,
                     on_click=self.__on_push
                 )
