@@ -109,6 +109,8 @@ class WebSocketServer:
 
                 else:
                     AlarmSaver.create(alarm_type=AlarmType.SLAVE_DISCONNECTED)
+            except websockets.ConnectionClosedError:
+                logging.exception("[***HMI server***] broadcast to all clients,ConnectionClosedError occured")
             except:
                 logging.exception("[***HMI server***] exception occured at send_alarms")
             finally:
@@ -142,10 +144,16 @@ class WebSocketServer:
             return False
 
         try:
+            if len(self.clients) == 0:
+                return False
+
             packed_data = msgpack.packb(data)
             await asyncio.gather(*[client.send(packed_data) for client in self.clients])
+
             return True
 
+        except websockets.ConnectionClosedError:
+            logging.exception("[***HMI server***] broadcast to all clients,ConnectionClosedError occured")
         except:
             logging.exception("[***HMI server***] broadcast to all clients failed")
 

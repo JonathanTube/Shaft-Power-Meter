@@ -147,8 +147,17 @@ class PropellerConf(ft.Container):
         Toast.show_success(e.page)
 
     def __on_push(self, e):
-        settings: PropellerSetting = PropellerSetting.get()
-        ws_server.broadcast({
-            'type': 'propeller_setting',
-            "data": model_to_dict(settings)
-        })
+        try:
+            if self.page:
+                self.__save_data()
+                settings: PropellerSetting = PropellerSetting.get()
+                data = model_to_dict(settings)
+                del data['created_at']
+                del data['update_at']
+                self.page.run_task(ws_server.broadcast, {
+                    'type': 'propeller_setting',
+                    "data": data
+                })
+                Toast.show_success(self.page)
+        except:
+            Toast.show_error(self.page)

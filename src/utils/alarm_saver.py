@@ -17,7 +17,7 @@ class AlarmSaver:
 
     @staticmethod
     def recovery(alarm_type: AlarmType):
-        logging.info(f'[***recovery alarm***] alarm_type={alarm_type}')
+        # logging.info(f'[***recovery alarm***] alarm_type={alarm_type}')
         AlarmLog.update(
             is_recovery=True, 
             is_sync=False
