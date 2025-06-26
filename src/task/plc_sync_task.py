@@ -118,6 +118,9 @@ class PlcSyncTask:
         return self._empty_4_20ma_data()
 
     async def write_4_20_ma_data(self, data: dict):
+
+        logging.info(f"PlcSyncTask.write_4_20_ma_data={data}")
+
         if not self._is_connected:
             return
 
