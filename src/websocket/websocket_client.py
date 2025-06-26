@@ -94,7 +94,7 @@ class WebSocketClient:
                 gdata.sps1_offline = False
                 gdata.sps2_offline = False
                 self._retry = 0
-            except websockets.ConnectionClosedError:
+            except websockets.ConnectionClosedError or websockets.ConnectionClosedOK or websockets.ConnectionClosed:
                 logging.error("[***HMI client***] ConnectionClosedError")
                 gdata.sps1_offline = True
                 gdata.sps2_offline = True

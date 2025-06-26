@@ -56,7 +56,7 @@ class GpsSyncTask:
 
                     logging.info(f'[***GPS***]disconnected from gps, ip={io_conf.gps_ip}, port={io_conf.gps_port}')
                 except:
-                    logging.error(f"[***GPS***]connect to gps timeout, retry times={self._retry + 1}")
+                    logging.exception(f"[***GPS***]connect to gps timeout, retry times={self._retry + 1}")
                     self._is_connected = False
                     AlarmSaver.create(alarm_type=AlarmType.GPS_DISCONNECTED)
                 finally:
