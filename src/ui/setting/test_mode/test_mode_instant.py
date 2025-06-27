@@ -80,37 +80,44 @@ class TestModeInstant(ft.ResponsiveRow):
     async def __refresh_instant(self):
         while self.task_running:
             try:
-                self.sps1_speed.value = f'{gdata.sps1_speed} rpm'
-                self.sps1_speed.update()
+                if self.sps1_speed and self.sps1_speed.page:
+                    self.sps1_speed.value = f'{gdata.sps1_speed} rpm'
+                    self.sps1_speed.update()
 
-                sps1_torque_value, sps1_torque_unit = UnitParser.parse_torque(gdata.sps1_torque, self.system_unit)
-                self.sps1_torque.value = f'{sps1_torque_value} {sps1_torque_unit}'
-                self.sps1_torque.update()
+                if self.sps1_torque and self.sps1_torque.page:
+                    sps1_torque_value, sps1_torque_unit = UnitParser.parse_torque(gdata.sps1_torque, self.system_unit)
+                    self.sps1_torque.value = f'{sps1_torque_value} {sps1_torque_unit}'
+                    self.sps1_torque.update()
 
-                sps1_thrust_value, sps1_thrust_unit = UnitParser.parse_thrust(gdata.sps1_thrust, self.system_unit)
-                self.sps1_thrust.value = f'{sps1_thrust_value} {sps1_thrust_unit}'
-                self.sps1_thrust.update()
+                if self.sps1_thrust and self.sps1_thrust.page:
+                    sps1_thrust_value, sps1_thrust_unit = UnitParser.parse_thrust(gdata.sps1_thrust, self.system_unit)
+                    self.sps1_thrust.value = f'{sps1_thrust_value} {sps1_thrust_unit}'
+                    self.sps1_thrust.update()
 
-                sps1_power_value, sps1_power_unit = UnitParser.parse_power(gdata.sps1_power, self.system_unit)
-                self.sps1_power.value = f'{sps1_power_value} {sps1_power_unit}'
-                self.sps1_power.update()
+                if self.sps1_power and self.sps1_power.page:
+                    sps1_power_value, sps1_power_unit = UnitParser.parse_power(gdata.sps1_power, self.system_unit)
+                    self.sps1_power.value = f'{sps1_power_value} {sps1_power_unit}'
+                    self.sps1_power.update()
 
                 if self.system_settings.amount_of_propeller == 2:
-                    self.sps2_speed.value = f'{gdata.sps2_speed} rpm'
-                    self.sps2_speed.update()
+                    if self.sps2_speed and self.sps2_speed.page:
+                        self.sps2_speed.value = f'{gdata.sps2_speed} rpm'
+                        self.sps2_speed.update()
 
-                    sps2_torque_value, sps2_torque_unit = UnitParser.parse_torque(gdata.sps2_torque, self.system_unit)
+                    if self.sps2_torque and self.sps2_torque.page:
+                        sps2_torque_value, sps2_torque_unit = UnitParser.parse_torque(gdata.sps2_torque, self.system_unit)
+                        self.sps2_torque.value = f'{sps2_torque_value} {sps2_torque_unit}'
+                        self.sps2_torque.update()
 
-                    self.sps2_torque.value = f'{sps2_torque_value} {sps2_torque_unit}'
-                    self.sps2_torque.update()
+                    if self.sps2_thrust and self.sps2_thrust.page:
+                        sps2_thrust_value, sps2_thrust_unit = UnitParser.parse_thrust(gdata.sps2_thrust, self.system_unit)
+                        self.sps2_thrust.value = f'{sps2_thrust_value} {sps2_thrust_unit}'
+                        self.sps2_thrust.update()
 
-                    sps2_thrust_value, sps2_thrust_unit = UnitParser.parse_thrust(gdata.sps2_thrust, self.system_unit)
-                    self.sps2_thrust.value = f'{sps2_thrust_value} {sps2_thrust_unit}'
-                    self.sps2_thrust.update()
-
-                    sps2_power_value, sps2_power_unit = UnitParser.parse_power(gdata.sps2_power, self.system_unit)
-                    self.sps2_power.value = f'{sps2_power_value} {sps2_power_unit}'
-                    self.sps2_power.update()
+                    if self.sps2_power and self.sps2_power.page:
+                        sps2_power_value, sps2_power_unit = UnitParser.parse_power(gdata.sps2_power, self.system_unit)
+                        self.sps2_power.value = f'{sps2_power_value} {sps2_power_unit}'
+                        self.sps2_power.update()
             except:
                 logging.exception('exception occured at TestModeInstant.__refresh_instant')
             finally:
