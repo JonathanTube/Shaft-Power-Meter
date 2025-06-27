@@ -20,7 +20,6 @@ from ui.common.windows_sound_player import WindowsSoundPlayer
 class TestMode(ft.Container):
     def __init__(self):
         super().__init__()
-        self.alignment = ft.alignment.center
         self.running = test_mode_task.is_running
         self.preference: Preference = Preference.get()
 
@@ -33,20 +32,27 @@ class TestMode(ft.Container):
         self.op_user = None
 
     def build(self):
-            try:
-                if self.page and self.page.session:
-                    self.content = ft.TextButton(
-                        icon=ft.Icons.LOCK_ROUNDED,
-                        text="",
-                        style=ft.ButtonStyle(
-                            icon_size=100,
-                            icon_color=ft.Colors.INVERSE_SURFACE
-                        ),
-                        on_click=lambda e: self.page.open(self.permission_check)
-                    )
-                    self.permission_check = PermissionCheck(on_confirm=self.create_controls, user_role=0)
-            except:
-                logging.exception('exception occured at TestMode.build')
+        try:
+            if self.page and self.page.session:
+                self.__create_lock_button()
+                self.permission_check = PermissionCheck(on_confirm=self.create_controls, user_role=0)
+        except:
+            logging.exception('exception occured at TestMode.build')
+
+    def __create_lock_button(self):
+        try:
+            self.alignment = ft.alignment.center
+            self.content = ft.TextButton(
+                icon=ft.Icons.LOCK_ROUNDED,
+                text="",
+                style=ft.ButtonStyle(
+                    icon_size=100,
+                    icon_color=ft.Colors.INVERSE_SURFACE
+                ),
+                on_click=lambda e: self.page.open(self.permission_check)
+            )
+        except:
+            pass
 
     def create_controls(self, user: User):
         self.op_user = user
@@ -229,17 +235,15 @@ class TestMode(ft.Container):
 
     async def __auto_lock(self):
         while self.task_running:
-            if self.visible:
-                try:
-                    time_diff = gdata.utc_date_time - self.last_op_utc_date_time
-                    if time_diff.total_seconds() > 60 * 10:
-                        self.visible = False
-                        self.page.open(self.permission_check)
-                        self.update()
-                except:
-                    return
-                finally:
-                    await asyncio.sleep(1)
+            try:
+                time_diff = gdata.utc_date_time - self.last_op_utc_date_time
+                if time_diff.total_seconds() > 60 * 10:
+                    self.__create_lock_button()
+                    self.update()
+            except:
+                return
+            finally:
+                await asyncio.sleep(1)
 
     def did_mount(self):
         self.task_running = True

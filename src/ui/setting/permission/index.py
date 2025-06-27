@@ -16,7 +16,6 @@ class Permission(ft.Container):
     def __init__(self):
         super().__init__()
         self.expand = True
-        self.alignment = ft.alignment.center
         self.padding = 10
         self.op_user = None
         self.last_op_utc_date_time = gdata.utc_date_time
@@ -31,18 +30,25 @@ class Permission(ft.Container):
     def build(self):
         if self.page and self.page.session:
             try:
+                self.__create_lock_button()
                 self.permission_check = PermissionCheck(on_confirm=self.__on_permission_checked, user_role=0)
-                self.content = ft.TextButton(
-                    icon=ft.Icons.LOCK_ROUNDED,
-                    text="",
-                    style=ft.ButtonStyle(
-                        icon_size=100,
-                        icon_color=ft.Colors.INVERSE_SURFACE
-                    ),
-                    on_click=lambda e: self.page.open(self.permission_check)
-                )
             except:
                 logging.exception('exception occured at Permission.build')
+
+    def __create_lock_button(self):
+        try:
+            self.alignment = ft.alignment.center
+            self.content = ft.TextButton(
+                icon=ft.Icons.LOCK_ROUNDED,
+                text="",
+                style=ft.ButtonStyle(
+                    icon_size=100,
+                    icon_color=ft.Colors.INVERSE_SURFACE
+                ),
+                on_click=lambda e: self.page.open(self.permission_check)
+            )
+        except:
+            pass
 
     def __on_permission_checked(self, user: User):
         try:
@@ -173,18 +179,15 @@ class Permission(ft.Container):
 
     async def __auto_lock(self):
         while self.task_running:
-            if self.visible:
-                try:
-                    time_diff = gdata.utc_date_time - self.last_op_utc_date_time
-                    # print(time_diff.total_seconds())
-                    if time_diff.total_seconds() > 60 * 10:
-                        self.visible = False
-                        self.page.open(self.permission_check)
-                        self.update()
-                except:
-                    return
-                finally:
-                    await asyncio.sleep(1)
+            try:
+                time_diff = gdata.utc_date_time - self.last_op_utc_date_time
+                if time_diff.total_seconds() > 60 * 10:
+                    self.__create_lock_button()
+                    self.update()
+            except:
+                return
+            finally:
+                await asyncio.sleep(1)
 
     def did_mount(self):
         self.task_running = True
