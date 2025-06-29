@@ -96,7 +96,7 @@ class ModbusOutputTask:
             sps1_thrust = int(gdata.sps1_thrust / 100) if self.io_conf.output_thrust else 0
             sps1_speed = int(gdata.sps1_speed * 10) if self.io_conf.output_speed else 0
             sps1_power = int(gdata.sps1_power / 100) if self.io_conf.output_power else 0
-            sps1_avg_power, sps1_total_energy = self.get_32bit_values('sps1')
+            sps1_avg_power, sps1_total_energy = self.get_avg_power_and_energy('sps1')
             # 构建寄存器值列表（每个值占2个寄存器）
             values = []
             for val in [sps1_torque, sps1_thrust, sps1_speed, sps1_power, sps1_avg_power, sps1_total_energy]:
@@ -109,7 +109,7 @@ class ModbusOutputTask:
                 sps2_thrust = int(gdata.sps2_thrust / 100) if self.io_conf.output_thrust else 0
                 sps2_speed = int(gdata.sps2_speed * 10) if self.io_conf.output_speed else 0
                 sps2_power = int(gdata.sps2_power / 100) if self.io_conf.output_power else 0
-                sps2_avg_power, sps2_total_energy = self.get_32bit_values('sps2')
+                sps2_avg_power, sps2_total_energy = self.get_avg_power_and_energy('sps2')
 
                 for val in [sps2_torque, sps2_thrust, sps2_speed, sps2_power, sps2_avg_power, sps2_total_energy]:
                     high, low = split_to_registers(val)
@@ -122,7 +122,7 @@ class ModbusOutputTask:
         except Exception:
             logging.exception("32-bit register update failed")
 
-    def get_32bit_values(self, sps_name: str):
+    def get_avg_power_and_energy(self, sps_name: str):
         """获取32位整数的平均功率和总能量"""
         counter_log = CounterLog.get_or_none(
             CounterLog.sps_name == sps_name,
@@ -134,7 +134,7 @@ class ModbusOutputTask:
         # 平均功率（单位：0.1W）
         avg_power = 0
         if self.io_conf.output_avg_power and counter_log.times > 0:
-            avg_power = int((counter_log.total_power / counter_log.times) * 10)  # 转换为0.1W单位
+            avg_power = int((counter_log.total_power / counter_log.times) / 100)
 
         # 总能量（单位：0.1Wh）
         total_energy = 0
