@@ -108,7 +108,7 @@ class JM3846AsyncClient:
             logging.exception(f'[***{self.name}***] JM3846 disconnect from sps failed')
         finally:
             self._is_connected = False
-            AlarmSaver.create(AlarmType.GPS_DISCONNECTED)
+            self.create_alarm()
 
     async def async_handle_0x03(self):
         """异步处理功能码0x03"""
