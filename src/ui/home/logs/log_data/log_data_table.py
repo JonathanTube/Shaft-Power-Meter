@@ -26,8 +26,7 @@ class LogDataTable(AbstractTable):
             DataLog.ad_0_torque,
             DataLog.ad_1_thrust,
             DataLog.speed,
-            DataLog.power,
-            DataLog.is_overload
+            DataLog.power
         )
         start_date = self.kwargs.get('start_date')
         end_date = self.kwargs.get('end_date')
@@ -45,8 +44,7 @@ class LogDataTable(AbstractTable):
                 item.ad_0_torque,
                 item.ad_1_thrust,
                 item.speed,
-                item.power,
-                item.is_overload
+                item.power
                 ] for item in data]
 
     def create_columns(self):
@@ -61,6 +59,5 @@ class LogDataTable(AbstractTable):
             f'{session.get("lang.common.torque")}(Nm)',
             f'{session.get("lang.common.thrust")}(N)',
             session.get("lang.common.speed"),
-            f'{session.get("lang.common.power")}(W)',
-            session.get("lang.common.is_overload")
+            f'{session.get("lang.common.power")}(W)'
         ]

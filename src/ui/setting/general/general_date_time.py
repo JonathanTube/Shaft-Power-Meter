@@ -26,7 +26,7 @@ class GeneralDateTime(ft.Container):
                     label=s.get("lang.setting.date"),
                     col={"md": 6},
                     can_request_focus=False,
-                    value=self.date_time_conf.utc_date_time.strftime('%Y-%m-%d'),
+                    value=self.date_time_conf.utc_date_time.strftime(self.date_time_conf.date_format),
                     on_click=lambda e: e.page.open(
                         ft.DatePicker(
                             on_change=self.__handle_date_change,
@@ -88,6 +88,7 @@ class GeneralDateTime(ft.Container):
                 self.date_format.label = s.get("lang.setting.date_format")
                 self.sync_with_gps.label = s.get("lang.setting.sync_with_gps")
                 self.custom_card.set_title(s.get("lang.setting.utc_date_time_conf"))
+                self.utc_date.value = self.date_time_conf.utc_date_time.strftime(self.date_time_conf.date_format)
         except:
             logging.exception('exception occured at GeneralDateTime.build')
 
@@ -111,7 +112,7 @@ class GeneralDateTime(ft.Container):
 
     def save_data(self, user_id: int):
         if self.page:
-            standard_date_time_format = '%Y-%m-%d %H:%M:%S'
+            standard_date_time_format = f'{self.date_time_conf.date_format} %H:%M:%S'
             # save date time conf
             new_date = self.utc_date.value
             new_time = self.utc_time.value

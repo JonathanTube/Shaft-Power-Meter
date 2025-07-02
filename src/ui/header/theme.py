@@ -1,6 +1,6 @@
 import flet as ft
-import screen_brightness_control as sbc
 import logging
+import screen_brightness_control as sbc
 from utils.brightness_controller import BrightnessController
 
 
@@ -53,23 +53,24 @@ class Theme(ft.Container):
                     on_click=lambda _: self.page.open(self.dlg)
                 )
             ])
+
+            if not BrightnessController.is_installed():
+                logging.info('AdvBrightnessDev未安装')
+                return
+
+            try:
+                logging.info('AdvBrightnessDev已安装')
+                self.brightness_ctl = BrightnessController()
+                self.brightness_ctl.open()
+                self.brightness_ctl_enabled = True
+                self.slider.value = self.brightness_ctl.get_percentage()
+                logging.info('AdvBrightnessDev初始化成功')
+            except:
+                logging.exception("AdvBrightnessUtility open failed.")
+                self.brightness_ctl_enabled = False
+
         except:
             logging.exception('exception occured at Theme.build')
-
-    def did_mount(self):
-        if not BrightnessController.is_installed():
-            return
-
-        self.brightness_ctl = BrightnessController()
-
-        try:
-            self.brightness_ctl.open()
-            self.brightness_ctl_enabled = True
-            self.slider.value = self.brightness_ctl.get_percentage()
-            self.slider.update()
-        except:
-            logging.exception("AdvBrightnessUtility open failed.")
-            self.brightness_ctl_enabled = False
 
     def toggle_theme(self):
         if self.page and self.page.session:
