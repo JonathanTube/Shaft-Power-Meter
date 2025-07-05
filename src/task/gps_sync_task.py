@@ -8,6 +8,7 @@ from db.models.gps_log import GpsLog
 from common.global_data import gdata
 from db.models.io_conf import IOConf
 from utils.alarm_saver import AlarmSaver
+from db.models.system_settings import SystemSettings
 
 
 class GpsSyncTask:
@@ -30,6 +31,10 @@ class GpsSyncTask:
         return self._is_connected
 
     async def connect(self):
+
+        system_settings: SystemSettings = SystemSettings.get()
+        self._is_master = system_settings.is_master
+    
         async with self._lock:  # 确保单线程重连
             if self._is_connected:
                 return
@@ -56,16 +61,16 @@ class GpsSyncTask:
 
                     logging.info(f'[***GPS***]disconnected from gps, ip={io_conf.gps_ip}, port={io_conf.gps_port}')
                 except (
-                            ConnectionRefusedError,
-                            ConnectionAbortedError,
-                            ConnectionError,
-                            ConnectionResetError,
-                            TimeoutError,
-                            asyncio.exceptions.CancelledError
-                        ):
+                    ConnectionRefusedError,
+                    ConnectionAbortedError,
+                    ConnectionError,
+                    ConnectionResetError,
+                    TimeoutError,
+                    asyncio.exceptions.CancelledError
+                ):
                     logging.error(f"[***GPS***]connect to gps timeout, retry times={self._retry + 1}")
                     self._is_connected = False
-                    AlarmSaver.create(alarm_type=AlarmType.GPS_DISCONNECTED)
+                    AlarmSaver.create(alarm_type=AlarmType.MASTER_GPS_DISCONNECTED if self._is_master else AlarmType.SLAVE_GPS_DISCONNECTED)
                 except:
                     logging.exception(f"[***GPS***]connect to gps timeout, retry times={self._retry + 1}")
                 finally:
@@ -98,8 +103,7 @@ class GpsSyncTask:
                     self._is_connected = True
                     if has_data_times % 5 == 0:
                         # 连接成功
-                        AlarmSaver.recovery(alarm_type=AlarmType.GPS_DISCONNECTED)
-
+                        AlarmSaver.recovery(alarm_type=AlarmType.MASTER_GPS_DISCONNECTED if self._is_master else AlarmType.SLAVE_GPS_DISCONNECTED)
 
                 str_data = data.decode('utf-8').strip()
                 self.parse_nmea_sentence(str_data)
@@ -107,7 +111,7 @@ class GpsSyncTask:
             except:
                 logging.error(f"[***GPS***] exception occured at receive_data")
                 self._is_connected = False
-                AlarmSaver.create(alarm_type=AlarmType.GPS_DISCONNECTED)
+                AlarmSaver.create(alarm_type=AlarmType.MASTER_GPS_DISCONNECTED if self._is_master else AlarmType.SLAVE_GPS_DISCONNECTED)
                 break
 
     async def close(self):
@@ -115,7 +119,7 @@ class GpsSyncTask:
         self._is_canceled = True
         if not self._is_connected:
             return
-        
+
         try:
             if not self.writer.is_closing():
                 self.writer.close()
@@ -126,7 +130,7 @@ class GpsSyncTask:
             self.writer = None
             self.reader = None
             self._is_connected = False
-            AlarmSaver.create(AlarmType.GPS_DISCONNECTED)
+            AlarmSaver.create(alarm_type=AlarmType.MASTER_GPS_DISCONNECTED if self._is_master else AlarmType.SLAVE_GPS_DISCONNECTED)
 
     def parse_nmea_sentence(self, sentence):
         try:

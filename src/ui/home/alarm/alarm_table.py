@@ -28,17 +28,19 @@ class AlarmTable(AbstractTable):
     def get_event_name(self, alarm_type: int) -> str:
         session = self.page.session
         match alarm_type:
-            case AlarmType.PLC_DISCONNECTED:
-                return session.get("lang.alarm.plc_disconnected")
-            case AlarmType.GPS_DISCONNECTED:
-                return session.get("lang.alarm.gps_disconnected")
-            case AlarmType.SPS1_DISCONNECTED:
-                return session.get("lang.alarm.sps1_disconnected")
-            case AlarmType.SPS2_DISCONNECTED:
-                return session.get("lang.alarm.sps2_disconnected")
+            case AlarmType.MASTER_PLC_DISCONNECTED:
+                return session.get("lang.alarm.master_plc_disconnected")
+            case AlarmType.SLAVE_GPS_DISCONNECTED:
+                return session.get("lang.alarm.slave_gps_disconnected")
+            case AlarmType.MASTER_GPS_DISCONNECTED:
+                return session.get("lang.alarm.master_gps_disconnected")
+            case AlarmType.MASTER_SPS1_DISCONNECTED:
+                return session.get("lang.alarm.master_sps1_disconnected")
+            case AlarmType.MASTER_SPS2_DISCONNECTED:
+                return session.get("lang.alarm.master_sps2_disconnected")
             case AlarmType.MASTER_SERVER_STOPPED:
                 return session.get("lang.alarm.master_server_stopped")
-            case AlarmType.SLAVE_DISCONNECTED:
+            case AlarmType.SLAVE_CLIENT_DISCONNECTED:
                 return session.get("lang.alarm.slave_master_disconnected")
             case AlarmType.APP_UNEXPECTED_EXIT:
                 return session.get("lang.alarm.app_unexpected_exit")

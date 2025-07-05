@@ -56,7 +56,7 @@ class WebSocketClient:
                     logging.info(f"[***HMI client***] connected to {uri}")
 
                     self._is_connected = True
-                    AlarmSaver.recovery(alarm_type=AlarmType.SLAVE_DISCONNECTED)
+                    AlarmSaver.recovery(alarm_type=AlarmType.SLAVE_CLIENT_DISCONNECTED)
 
                     # 启动后台接收任务
                     await self.receive_data()
@@ -65,7 +65,7 @@ class WebSocketClient:
                 except:
                     logging.error(f"[***HMI client***] failed to connect to {uri}")
                     self._is_connected = False
-                    AlarmSaver.create(alarm_type=AlarmType.SLAVE_DISCONNECTED)
+                    AlarmSaver.create(alarm_type=AlarmType.SLAVE_CLIENT_DISCONNECTED)
                 finally:
                     #  指数退避
                     await asyncio.sleep(2 ** self._retry)
@@ -101,7 +101,7 @@ class WebSocketClient:
                 gdata.sps1_offline = True
                 gdata.sps2_offline = True
                 self._is_connected = False
-                AlarmSaver.create(alarm_type=AlarmType.SLAVE_DISCONNECTED)
+                AlarmSaver.create(alarm_type=AlarmType.SLAVE_CLIENT_DISCONNECTED)
                 break
             except:
                 logging.exception("[***HMI client***] exception occured at _receive_loop")
@@ -178,7 +178,7 @@ class WebSocketClient:
             logging.error("[***HMI client***] failed to close websocket connection")
         finally:
             self._is_connected = False
-            AlarmSaver.create(alarm_type=AlarmType.SLAVE_DISCONNECTED)
+            AlarmSaver.create(alarm_type=AlarmType.SLAVE_CLIENT_DISCONNECTED)
 
 
 ws_client = WebSocketClient()

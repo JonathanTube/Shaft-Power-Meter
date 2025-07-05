@@ -309,12 +309,12 @@ class JM3846AsyncClient:
 
     def create_alarm(self):
         if self.name == 'sps1':
-            AlarmSaver.create(alarm_type=AlarmType.SPS1_DISCONNECTED)
+            AlarmSaver.create(alarm_type=AlarmType.MASTER_SPS1_DISCONNECTED)
         elif self.name == 'sps2':
-            AlarmSaver.create(alarm_type=AlarmType.SPS2_DISCONNECTED)
+            AlarmSaver.create(alarm_type=AlarmType.MASTER_SPS2_DISCONNECTED)
 
     def recovery_alarm(self):
         if self.name == 'sps1':
-            AlarmSaver.recovery(alarm_type=AlarmType.SPS1_DISCONNECTED)
+            AlarmSaver.recovery(alarm_type=AlarmType.MASTER_SPS1_DISCONNECTED)
         elif self.name == 'sps2':
-            AlarmSaver.recovery(alarm_type=AlarmType.SPS2_DISCONNECTED)
+            AlarmSaver.recovery(alarm_type=AlarmType.MASTER_SPS2_DISCONNECTED)

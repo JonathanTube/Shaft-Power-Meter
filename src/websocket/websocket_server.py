@@ -81,17 +81,15 @@ class WebSocketServer:
 
             try:
                 if len(self.clients) > 0:
-                    AlarmSaver.recovery(alarm_type=AlarmType.SLAVE_DISCONNECTED)
+                    AlarmSaver.recovery(alarm_type=AlarmType.SLAVE_CLIENT_DISCONNECTED)
 
-                    # GPS不同步
                     alarm_logs: list[AlarmLog] = AlarmLog.select(
                         AlarmLog.id,
                         AlarmLog.alarm_type,
                         AlarmLog.is_recovery,
                         AlarmLog.acknowledge_time
                     ).where(
-                        AlarmLog.is_sync == False,
-                        AlarmLog.alarm_type != AlarmType.GPS_DISCONNECTED
+                        AlarmLog.is_sync == False
                     )
                     
                     alarm_logs_dict = []
@@ -108,7 +106,7 @@ class WebSocketServer:
                                 AlarmLog.update(is_sync=True).where(AlarmLog.id == alarm_log.id).execute()
 
                 else:
-                    AlarmSaver.create(alarm_type=AlarmType.SLAVE_DISCONNECTED)
+                    AlarmSaver.create(alarm_type=AlarmType.SLAVE_CLIENT_DISCONNECTED)
             except websockets.ConnectionClosedError:
                 logging.exception("[***HMI server***] broadcast to all clients,ConnectionClosedError occured")
             except:

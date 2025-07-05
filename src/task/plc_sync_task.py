@@ -250,10 +250,10 @@ class PlcSyncTask:
 
     def save_plc_alarm(self):
         try:
-            cnt: int = AlarmLog.select().where(AlarmLog.alarm_type == AlarmType.PLC_DISCONNECTED, AlarmLog.is_recovery == False).count()
+            cnt: int = AlarmLog.select().where(AlarmLog.alarm_type == AlarmType.MASTER_PLC_DISCONNECTED, AlarmLog.is_recovery == False).count()
             if cnt == 0:
                 logging.info('[***PLC***] create alarm')
-                AlarmLog.create(utc_date_time=gdata.utc_date_time, alarm_type=AlarmType.PLC_DISCONNECTED)
+                AlarmLog.create(utc_date_time=gdata.utc_date_time, alarm_type=AlarmType.MASTER_PLC_DISCONNECTED)
             else:
                 logging.info('[***PLC***] alarm exists, skip')
         except:
@@ -262,7 +262,7 @@ class PlcSyncTask:
     async def handle_alarms(self):
         try:
             logging.info('[***PLC***] recovery PLC Alarm')
-            AlarmLog.update(is_recovery=True).where(AlarmLog.alarm_type == AlarmType.PLC_DISCONNECTED).execute()
+            AlarmLog.update(is_recovery=True).where(AlarmLog.alarm_type == AlarmType.MASTER_PLC_DISCONNECTED).execute()
 
             cnt: int = AlarmLog.select().where(AlarmLog.is_recovery == False).count()
             if cnt == 0:

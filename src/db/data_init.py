@@ -1496,22 +1496,27 @@ class DataInit:
                     "english": "Engine Shaft Power, % of A"
                 },
                 {
-                    "code": "lang.alarm.plc_disconnected",
+                    "code": "lang.alarm.master_plc_disconnected",
                     "chinese": "PLC 断开",
                     "english": "PLC Disconnected"
                 },
                 {
-                    "code": "lang.alarm.gps_disconnected",
-                    "chinese": "GPS 断开",
-                    "english": "GPS Disconnected"
+                    "code": "lang.alarm.slave_gps_disconnected",
+                    "chinese": "从机GPS断开",
+                    "english": "Slave GPS Disconnected"
                 },
                 {
-                    "code": "lang.alarm.sps1_disconnected",
+                    "code": "lang.alarm.master_gps_disconnected",
+                    "chinese": "主机GPS断开",
+                    "english": "Master GPS Disconnected"
+                },
+                {
+                    "code": "lang.alarm.master_sps1_disconnected",
                     "chinese": "SPS1 断开",
                     "english": "SPS1 Disconnected"
                 },
                 {
-                    "code": "lang.alarm.sps2_disconnected",
+                    "code": "lang.alarm.master_sps2_disconnected",
                     "chinese": "SPS2 断开",
                     "english": "SPS2 Disconnected"
                 },
