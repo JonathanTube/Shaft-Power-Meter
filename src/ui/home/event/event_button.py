@@ -8,14 +8,17 @@ from db.models.system_settings import SystemSettings
 
 
 class EventButton(ft.TextButton):
-    def __init__(self, on_click: Callable):
+    def __init__(self, style: ft.ButtonStyle, on_click: Callable):
         super().__init__()
 
         self.task = None
         self.task_running = True
 
+        self.style = style
+
         self.icon = ft.Icons.EVENT_OUTLINED
         self.icon_color = ft.Colors.INVERSE_SURFACE
+
         self.on_click = on_click
 
     def build(self):
@@ -25,7 +28,6 @@ class EventButton(ft.TextButton):
             self.visible = system_settings.sha_po_li
         except:
             logging.exception('exception occured at EventButton.build')
-
 
     async def __loop(self):
         while self.task_running:
