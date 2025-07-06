@@ -5,7 +5,7 @@ from db.models.io_conf import IOConf
 from db.models.system_settings import SystemSettings
 from task.plc_sync_task import plc
 from task.gps_sync_task import gps
-from websocket.websocket_client import ws_client
+from websocket.websocket_slave import ws_client
 from common.global_data import gdata
 
 

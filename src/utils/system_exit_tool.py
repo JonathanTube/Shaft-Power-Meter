@@ -2,8 +2,8 @@ import flet as ft
 import logging
 from task.sps1_read_task import sps1_read_task
 from task.sps2_read_task import sps2_read_task
-from websocket.websocket_client import ws_client
-from websocket.websocket_server import ws_server
+from websocket.websocket_slave import ws_client
+from websocket.websocket_master import ws_server
 from task.plc_sync_task import plc
 from task.gps_sync_task import gps
 from task.modbus_output_task import modbus_output

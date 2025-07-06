@@ -1,11 +1,7 @@
-import flet as ft
 from db.models.zero_cal_info import ZeroCalInfo
-from db.models.zero_cal_record import ZeroCalRecord
 from ui.common.abstract_table import AbstractTable
 from common.global_data import gdata
 from db.models.date_time_conf import DateTimeConf
-from db.models.io_conf import IOConf
-from websocket.websocket_client import ws_client
 
 
 class ZeroCalTable(AbstractTable):

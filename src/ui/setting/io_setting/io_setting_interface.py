@@ -9,7 +9,7 @@ from ui.common.custom_card import CustomCard
 from ui.common.keyboard import keyboard
 from ui.common.permission_check import PermissionCheck
 from ui.common.toast import Toast
-from websocket.websocket_client import ws_client
+from websocket.websocket_slave import ws_client
 from common.global_data import gdata
 
 

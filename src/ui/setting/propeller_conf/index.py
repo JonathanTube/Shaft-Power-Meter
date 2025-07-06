@@ -10,7 +10,7 @@ from db.models.user import User
 from ui.common.keyboard import keyboard
 from ui.common.permission_check import PermissionCheck
 from ui.common.toast import Toast
-from websocket.websocket_server import ws_server
+from websocket.websocket_master import ws_server
 from ui.setting.propeller_conf.propeller_conf_load_limit_curve import PropellerConfLimitCurve
 from ui.setting.propeller_conf.propeller_conf_mcr import PropellerConfMcr
 from ui.setting.propeller_conf.propeller_conf_normal_curve import PropellerConfNormalCurve

@@ -29,8 +29,8 @@ from task.utc_timer_task import utc_timer
 from task.sps1_read_task import sps1_read_task
 from task.sps2_read_task import sps2_read_task
 from task.plc_sync_task import plc
-from websocket.websocket_server import ws_server
-from websocket.websocket_client import ws_client
+from websocket.websocket_master import ws_server
+from websocket.websocket_slave import ws_client
 
 
 Logger(show_sql=False)

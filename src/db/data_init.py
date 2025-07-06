@@ -1512,13 +1512,13 @@ class DataInit:
                 },
                 {
                     "code": "lang.alarm.master_sps1_disconnected",
-                    "chinese": "SPS1 断开",
-                    "english": "SPS1 Disconnected"
+                    "chinese": "主机SPS1断开",
+                    "english": "Master SPS1 Disconnected"
                 },
                 {
                     "code": "lang.alarm.master_sps2_disconnected",
-                    "chinese": "SPS2 断开",
-                    "english": "SPS2 Disconnected"
+                    "chinese": "主机SPS2断开",
+                    "english": "Master SPS2 Disconnected"
                 },
                 {
                     "code": "lang.alarm.master_server_stopped",

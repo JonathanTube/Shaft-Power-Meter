@@ -16,8 +16,10 @@ from playhouse.shortcuts import dict_to_model
 from common.global_data import gdata
 
 
-standard_date_time_format = '%Y-%m-%d %H:%M:%S'
-class WebSocketClient:
+date_time_format = '%Y-%m-%d %H:%M:%S'
+
+
+class WebSocketSlave:
     def __init__(self):
         self._lock = asyncio.Lock()
 
@@ -41,7 +43,7 @@ class WebSocketClient:
         async with self._lock:  # 确保单线程重连
             if self._is_connected:
                 return
-        
+
             self._is_canceled = False
 
             while not gdata.is_master and self._retry < self._max_retries:
@@ -58,8 +60,11 @@ class WebSocketClient:
                     self._is_connected = True
                     AlarmSaver.recovery(alarm_type=AlarmType.SLAVE_CLIENT_DISCONNECTED)
 
-                    # 启动后台接收任务
-                    await self.receive_data()
+                    # 定期检查gps,alarm,并发送给master
+                    asyncio.create_task(self.send_gps_alarm_to_master())
+
+                    # 启动后台接收任务，loop
+                    await self.receive_data_from_master()
 
                     logging.info(f"[***HMI client***] disconnected from {uri}")
                 except:
@@ -74,7 +79,40 @@ class WebSocketClient:
             # 执行到这了，说明已经退出了
             self._is_canceled = False
 
-    async def receive_data(self):
+    async def send_gps_alarm_to_master(self):
+        while not gdata.is_master and self._is_connected:
+            try:
+                alarm_logs: list[AlarmLog] = AlarmLog.select(
+                    AlarmLog.id,
+                    AlarmLog.alarm_type,
+                    AlarmLog.is_recovery,
+                    AlarmLog.acknowledge_time
+                ).where(
+                    AlarmLog.alarm_type == AlarmType.SLAVE_GPS_DISCONNECTED,
+                    AlarmLog.is_sync == False
+                )
+                alarm_logs_dict = []
+                for alarm_log in alarm_logs:
+                    alarm_logs_dict.append({
+                        'alarm_type': alarm_log.alarm_type,
+                        'acknowledge_time': alarm_log.acknowledge_time.strftime(date_time_format) if alarm_log.acknowledge_time else "",
+                        'is_recovery': 1 if alarm_log.is_recovery else 0
+                    })
+                if len(alarm_logs) > 0:
+                    # 序列化数据
+                    packed_data = msgpack.packb({
+                        'type': 'alarm_logs_from_slave',
+                        'data': alarm_logs_dict
+                    })
+                    await self.websocket.send(packed_data)
+                    for alarm_log in alarm_logs:
+                        AlarmLog.update(is_sync=True).where(AlarmLog.id == alarm_log.id).execute()
+            except:
+                logging.error("[***HMI client***] send_gps_alarm_to_master error")
+            finally:
+                await asyncio.sleep(5)
+
+    async def receive_data_from_master(self):
         while not gdata.is_master and self._is_connected:
 
             if self._is_canceled:
@@ -86,8 +124,8 @@ class WebSocketClient:
 
                 if data['type'] == 'sps_data':
                     self.__handle_jm3846_data(data)
-                elif data['type'] == 'alarm_data':
-                    self.__handle_alarm_logs(data)
+                elif data['type'] == 'alarm_logs_from_master':
+                    self.__handle_alarm_logs_from_master(data)
                 elif data['type'] == 'propeller_setting':
                     self.__handle_propeller_setting(data)
 
@@ -128,39 +166,38 @@ class WebSocketClient:
 
     def __handle_propeller_setting(self, settings):
         data = settings['data']
-        model:PropellerSetting = dict_to_model(PropellerSetting ,data)
+        model: PropellerSetting = dict_to_model(PropellerSetting, data)
         model.save()
 
-    def __handle_alarm_logs(self, data):
+    def __handle_alarm_logs_from_master(self, data):
         """处理alarm数据"""
-        alarm_logs = data['alarm_logs']
+        alarm_logs = data['data']
         for alarm_log in alarm_logs:
             alarm_type = alarm_log['alarm_type']
             acknowledge_time = alarm_log['acknowledge_time']
 
             ack_time = None
             if acknowledge_time:
-                ack_time = datetime.strptime(acknowledge_time, standard_date_time_format)
+                ack_time = datetime.strptime(acknowledge_time, date_time_format)
 
             is_recovery = alarm_log['is_recovery']
             if is_recovery == 1:
                 AlarmLog.update(
-                    is_recovery=True, 
-                    is_from_master=True, 
-                    acknowledge_time=ack_time
+                    is_recovery=True, acknowledge_time=ack_time
                 ).where(
-                    AlarmLog.alarm_type == alarm_type
+                    AlarmLog.is_from_master == True, AlarmLog.alarm_type == alarm_type
                 ).execute()
             else:
                 cnt: int = AlarmLog.select().where(
-                                AlarmLog.alarm_type == alarm_type, 
-                                AlarmLog.is_recovery == False
-                            ).count()
+                    AlarmLog.is_from_master == True,
+                    AlarmLog.alarm_type == alarm_type,
+                    AlarmLog.is_recovery == False
+                ).count()
                 if cnt == 0:
                     AlarmLog.create(
                         utc_date_time=gdata.utc_date_time,
-                        acknowledge_time = ack_time, 
-                        is_from_master=True, 
+                        acknowledge_time=ack_time,
+                        is_from_master=True,
                         alarm_type=alarm_type
                     )
 
@@ -181,4 +218,4 @@ class WebSocketClient:
             AlarmSaver.create(alarm_type=AlarmType.SLAVE_CLIENT_DISCONNECTED)
 
 
-ws_client = WebSocketClient()
+ws_client = WebSocketSlave()

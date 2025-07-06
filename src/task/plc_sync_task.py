@@ -30,7 +30,7 @@ class PlcSyncTask:
 
             if self._is_connected:
                 return
-        
+
             self._is_canceled = False
 
             self._retry = 0
@@ -253,7 +253,7 @@ class PlcSyncTask:
             cnt: int = AlarmLog.select().where(AlarmLog.alarm_type == AlarmType.MASTER_PLC_DISCONNECTED, AlarmLog.is_recovery == False).count()
             if cnt == 0:
                 logging.info('[***PLC***] create alarm')
-                AlarmLog.create(utc_date_time=gdata.utc_date_time, alarm_type=AlarmType.MASTER_PLC_DISCONNECTED)
+                AlarmLog.create(utc_date_time=gdata.utc_date_time, alarm_type=AlarmType.MASTER_PLC_DISCONNECTED, is_from_master=gdata.is_master)
             else:
                 logging.info('[***PLC***] alarm exists, skip')
         except:
