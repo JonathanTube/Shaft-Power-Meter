@@ -68,14 +68,24 @@ class PermissionCheck(ft.AlertDialog):
 
 
     def __on_key_click(self, e):
-        txt = e.control.text
-        self.user_pwd.value += txt
-        self.user_pwd.update()
+        try:
+            if e.control is not None:
+                txt = e.control.text
+                if self.user_pwd is not None:
+                    self.user_pwd.value += txt
+                    self.user_pwd.update()
+        except:
+            logging.exception("exception occured at PermissionCheck.__on_key_click")
+
 
     def __on_delete_one(self, e):
-        if self.user_pwd:
-            self.user_pwd.value = self.user_pwd.value[:-1]
-            self.user_pwd.update()
+        try:
+            if self.user_pwd is not None:
+                self.user_pwd.value = self.user_pwd.value[:-1]
+                self.user_pwd.update()
+        except:
+            logging.exception("exception occured at PermissionCheck.__on_delete_one")
+
 
     def before_update(self):
         try:
@@ -92,11 +102,15 @@ class PermissionCheck(ft.AlertDialog):
 
 
     def __on_cancel(self, e):
-        if self.page:
-            self.page.close(self)
-            self.page.update()
-            if self.on_cancel:
-                self.on_cancel(e)
+        try:
+            if self.page:
+                self.page.close(self)
+                self.page.update()
+                if self.on_cancel:
+                    self.on_cancel(e)
+        except:
+            logging.exception("exception occured at PermissionCheck.__on_cancel")
+
 
     def __on_confirm(self, e):
         try:

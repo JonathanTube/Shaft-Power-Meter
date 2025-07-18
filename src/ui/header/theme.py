@@ -88,12 +88,13 @@ class Theme(ft.Container):
 
     def __slider_changed(self, e):
         try:
-            value = int(e.control.value)
-            if self.brightness_ctl_enabled:
-                self.brightness_ctl.set_percentage(value)
-            else:
-                sbc.set_brightness(value)
-            self.brightness.value = f"{int(value)}%"
-            self.brightness.update()
+            if e.control is not None:
+                value = int(e.control.value)
+                if self.brightness_ctl_enabled:
+                    self.brightness_ctl.set_percentage(value)
+                else:
+                    sbc.set_brightness(value)
+                self.brightness.value = f"{int(value)}%"
+                self.brightness.update()
         except:
             pass

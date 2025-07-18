@@ -141,11 +141,14 @@ class PropellerConf(ft.Container):
             self.__change_buttons()
 
     def __reset_data(self, e):
-        keyboard.close()
-        self.ps = PropellerSetting.get()
-        self.content.clean()
-        self.build()
-        Toast.show_success(e.page)
+        try:
+            keyboard.close()
+            self.ps = PropellerSetting.get()
+            self.content.clean()
+            self.build()
+            Toast.show_success(e.page)
+        except:
+            logging.exception("exception occured at PropellerConf.__reset_data")
 
     def __on_push(self, e):
         try:

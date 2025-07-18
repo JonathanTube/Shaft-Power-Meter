@@ -31,7 +31,11 @@ class ColorDialog(ft.IconButton):
             logging.exception('exception occured at ColorDialog.show')
 
     def __open_color_picker(self, e):
-        self.page.open(self.alert_dialog)
+        try:
+            if self.page is not None:
+                self.page.open(self.alert_dialog)
+        except:
+            logging.exception('exception occured at ColorDialog.__open_color_picker')
 
     def __change_color(self, e):
         try:
@@ -45,8 +49,11 @@ class ColorDialog(ft.IconButton):
             self.alert_dialog.open = False
             self.page.update()
         except:
-            pass
+            logging.exception('exception occured at ColorDialog.__change_color')
 
     def __close_dialog(self, e):
-        self.alert_dialog.open = False
-        self.alert_dialog.update()
+        try:
+            self.alert_dialog.open = False
+            self.alert_dialog.update()
+        except:
+            logging.exception('exception occured at ColorDialog.__close_dialog')

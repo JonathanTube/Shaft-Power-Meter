@@ -97,19 +97,22 @@ class IntervalCounter(ft.Container):
 
 
     def on_hours_change(self, e):
-        hours = self.hours_field.value
-        if not hours:
-            Toast.show_error(e.page, self.page.session.get('lang.counter.interval_cannot_be_empty'))
-            return
+        try:
+            hours = self.hours_field.value
+            if not hours:
+                Toast.show_error(e.page, self.page.session.get('lang.counter.interval_cannot_be_empty'))
+                return
 
-        h = float(hours)
+            h = float(hours)
 
-        if h <= 0:
-            Toast.show_error(e.page, self.page.session.get('lang.counter.interval_must_be_greater_than_0'))
-            return
+            if h <= 0:
+                Toast.show_error(e.page, self.page.session.get('lang.counter.interval_must_be_greater_than_0'))
+                return
 
-        self.hours = h
-        Toast.show_success(e.page, self.page.session.get('lang.counter.interval_has_been_changed'))
+            self.hours = h
+            Toast.show_success(e.page, self.page.session.get('lang.counter.interval_has_been_changed'))
+        except:
+            logging.exception('exception occured at AlarmList.on_hours_change')
 
     def did_mount(self):
         self.task_running = True

@@ -1,3 +1,4 @@
+import logging
 import flet as ft
 
 from ui.common.abstract_table import AbstractTable
@@ -73,14 +74,22 @@ class ReportInfoTable(AbstractTable):
         return ft.Row(controls=[view_button, export_button])
 
     def __view_report(self, e, id: int, report_name: str):
-        self.page.open(ReportInfoDialog(id, report_name))
+        try:
+            if self.page is not None:
+                self.page.open(ReportInfoDialog(id, report_name))
+        except:
+            logging.exception('exception occured at ReportInfoTable.__view_report')
 
     def __export_report(self, e, id: int, report_name: str):
-        self.file_picker = ft.FilePicker()
-        self.page.overlay.append(self.file_picker)
-        self.page.update()
-        self.file_picker.save_file(file_name=f"{report_name}.pdf", allowed_extensions=["pdf"])
-        self.file_picker.on_result = lambda e: self.__on_result(e, id)
+        try:
+            if self.page is not None:
+                self.file_picker = ft.FilePicker()
+                self.page.overlay.append(self.file_picker)
+                self.page.update()
+                self.file_picker.save_file(file_name=f"{report_name}.pdf", allowed_extensions=["pdf"])
+                self.file_picker.on_result = lambda e: self.__on_result(e, id)
+        except:
+            logging.exception('exception occured at ReportInfoTable.__export_report')
 
     def __on_result(self, e: ft.FilePickerResultEvent, id: int):
         if e.path:

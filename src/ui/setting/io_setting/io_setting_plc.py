@@ -53,8 +53,9 @@ class IOSettingPLC(ft.Container):
                     style=ft.ButtonStyle(
                         shape=ft.RoundedRectangleBorder(radius=5)
                     ),
-                    on_click=lambda e: self.page.open(PermissionCheck(self.__on_close, 2)
-                                                      )
+                    on_click=lambda e: self.page.open(
+                        PermissionCheck(self.__on_close, 2)
+                    )
                 )
 
                 self.fetch_btn = ft.FilledButton(

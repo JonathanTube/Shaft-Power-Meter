@@ -44,12 +44,16 @@ class AlarmList(ft.Container):
             logging.exception('exception occured at AlarmList.build')
 
     def __on_export(self, e):
-        self.file_picker = ft.FilePicker()
-        self.page.overlay.append(self.file_picker)
-        self.page.update()
-        random_str = ''.join(random.choices(string.ascii_letters + string.digits, k=2))
-        self.file_picker.save_file(file_name=f"AlarmLog_{random_str}.xlsx", allowed_extensions=["xlsx", "xls"])
-        self.file_picker.on_result = lambda e: self.__on_result(e)
+        try:
+            if self.page is not None:
+                self.file_picker = ft.FilePicker()
+                self.page.overlay.append(self.file_picker)
+                self.page.update()
+                random_str = ''.join(random.choices(string.ascii_letters + string.digits, k=2))
+                self.file_picker.save_file(file_name=f"AlarmLog_{random_str}.xlsx", allowed_extensions=["xlsx", "xls"])
+                self.file_picker.on_result = lambda e: self.__on_result(e)
+        except:
+            logging.exception('exception occured at AlarmList.__on_export')
 
     def __on_result(self, e):
         if e.path:
@@ -98,21 +102,24 @@ class AlarmList(ft.Container):
             self.page.overlay.remove(self.file_picker)
 
     def __on_acknowledge(self, e):
-        # get selected rows
-        selected_rows = [item for item in self.table.data_table.rows if item.selected]
-        if len(selected_rows) == 0:
-            Toast.show_error(self.page, self.page.session.get("lang.alarm.please_select_at_least_one_alarm"))
-            return
+        try:
+            # get selected rows
+            selected_rows = [item for item in self.table.data_table.rows if item.selected]
+            if len(selected_rows) == 0:
+                Toast.show_error(self.page, self.page.session.get("lang.alarm.please_select_at_least_one_alarm"))
+                return
 
-        for row in selected_rows:
-            AlarmLog.update(acknowledge_time=gdata.utc_date_time, is_sync = False).where(
-                AlarmLog.id == row.cells[0].data,
-                AlarmLog.is_from_master == gdata.is_master,
-                AlarmLog.acknowledge_time == None
-            ).execute()
+            for row in selected_rows:
+                AlarmLog.update(acknowledge_time=gdata.utc_date_time, is_sync = False).where(
+                    AlarmLog.id == row.cells[0].data,
+                    AlarmLog.is_from_master == gdata.is_master,
+                    AlarmLog.acknowledge_time == None
+                ).execute()
 
-        self.table.search()
-        Toast.show_success(self.page)
+            self.table.search()
+            Toast.show_success(self.page)
+        except:
+            logging.exception('exception occured at AlarmList.__on_acknowledge')
 
     def __on_search(self, start_date: str, end_date: str):
         self.table.search(start_date=start_date, end_date=end_date)

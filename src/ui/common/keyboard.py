@@ -69,9 +69,13 @@ class Keyboard(ft.Stack):
             logging.exception('exception occured at Keyboard.build')
 
     def show(self):
-        if self.page:
-            self.visible = True
-            self.update()
+        try:
+            if self.page:
+                self.visible = True
+                self.update()
+        except:
+            logging.exception("exception occured at Keyboard.show")
+
 
     def open(self, text_field: ft.TextField, type: Literal['int', 'float', 'ip'] = 'float'):
         if self.page:
@@ -82,9 +86,8 @@ class Keyboard(ft.Stack):
                     self.tf.border_color = ft.Colors.BLACK
                     self.tf.update()
 
-
                 if text_field is not None:
-                    self.words = str(text_field.value)            
+                    self.words = str(text_field.value)
 
                 if not self.opened:
                     self.__on_open(None)
@@ -102,57 +105,82 @@ class Keyboard(ft.Stack):
                 logging.exception("exception occured at Keyboard.open")
 
     def close(self):
-        self.visible = False
-        self.update()
-        self.__on_close(None)
+        try:
+            self.visible = False
+            self.update()
+            self.__on_close(None)
+        except:
+            logging.exception("exception occured at Keyboard.close")
 
     def __on_open(self, e):
-        self.opened = True
-        self.gd.content = self.kb_open
-        self.gd.left = 500
-        self.gd.top = 250
-        self.gd.right = None
-        self.gd.bottom = None
-        self.gd.update()
+        try:
+            self.opened = True
+            self.gd.content = self.kb_open
+            self.gd.left = 500
+            self.gd.top = 250
+            self.gd.right = None
+            self.gd.bottom = None
+            self.gd.update()
+        except:
+            logging.exception("exception occured at Keyboard.__on_open")
 
     def __on_close(self, e):
-        self.opened = False
-        self.gd.content = self.kb_close
-        self.gd.left = None
-        self.gd.top = None
-        self.gd.right = 10
-        self.gd.bottom = 10
-        self.gd.update()
+        try:
+            self.opened = False
+            self.gd.content = self.kb_close
+            self.gd.left = None
+            self.gd.top = None
+            self.gd.right = 10
+            self.gd.bottom = 10
+            self.gd.update()
+        except:
+            logging.exception("exception occured at Keyboard.__on_close")
 
     def __on_pan_update(self, e: ft.DragUpdateEvent):
-        if self.opened:
-            e.control.top = max(0, e.control.top + e.delta_y)
-            e.control.left = max(0, e.control.left + e.delta_x)
-            e.control.update()
+        try:
+            if self.opened and e.control is not None:
+                e.control.top = max(0, e.control.top + e.delta_y)
+                e.control.left = max(0, e.control.left + e.delta_x)
+                e.control.update()
+        except:
+            logging.exception("exception occured at Keyboard.__on_pan_update")
 
     def __on_key_click(self, e):
-        txt = e.control.text
-        # 不能以点开头
-        if self.words == "" and txt == '.':
-            return
-        # 只能输入一个点
-        if self.type == 'float' and '.' in self.words and txt == '.':
-            return
-        self.words += txt
-        self.__on_change(self.words)
+        try:
+            if e.control is not None:
+                txt = e.control.text
+                # 不能以点开头
+                if self.words == "" and txt == '.':
+                    return
+                # 只能输入一个点
+                if self.type == 'float' and '.' in self.words and txt == '.':
+                    return
+                self.words += txt
+                self.__on_change(self.words)
+        except:
+            logging.exception("exception occured at Keyboard.__on_key_click")
 
     def __on_delete_one(self, e):
-        self.words = self.words[:-1]
-        self.__on_change(self.words)
+        try:
+            self.words = self.words[:-1]
+            self.__on_change(self.words)
+        except:
+            logging.exception("exception occured at Keyboard.__on_delete_one")
 
     def __on_delete_all(self, e):
-        self.words = ""
-        self.__on_change(self.words)
+        try:
+            self.words = ""
+            self.__on_change(self.words)
+        except:
+            logging.exception("exception occured at Keyboard.__on_delete_all")
 
     def __on_change(self, e):
-        if self.tf is not None:
-            self.tf.value = e
-            self.tf.update()
+        try:
+            if self.tf is not None:
+                self.tf.value = e
+                self.tf.update()
+        except:
+            logging.exception("exception occured at Keyboard.__on_change")
 
 
 keyboard = Keyboard()

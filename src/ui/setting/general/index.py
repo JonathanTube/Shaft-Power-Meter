@@ -21,8 +21,12 @@ class General(ft.Container):
         self.is_saving = False
 
     def __on_save_button_click(self, e):
-        keyboard.close()
-        self.page.open(PermissionCheck(self.__save_data, 2))
+        try:
+            keyboard.close()
+            if self.page is not None:
+                self.page.open(PermissionCheck(self.__save_data, 2))
+        except:
+            logging.exception('exception occured at General.__on_save_button_click')
 
     def __on_system_unit_change(self, system_unit: int):
         self.system_unit = system_unit
@@ -106,7 +110,11 @@ class General(ft.Container):
             self.__change_buttons()
 
     def __reset_data(self, e):
-        keyboard.close()
-        self.content.clean()
-        self.build()
-        self.update()
+        try:
+            keyboard.close()
+            self.content.clean()
+            self.build()
+            self.update()
+        except:
+            logging.exception('exception occured at General.__reset_data')
+

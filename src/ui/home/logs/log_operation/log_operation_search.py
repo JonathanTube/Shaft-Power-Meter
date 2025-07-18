@@ -31,13 +31,16 @@ class LogOperationSearch(ft.Container):
             logging.exception('exception occured at LogOperationSearch.build')
 
     def __handle_search(self, e):
-        start_date, end_date = self.date_time_range.get_date_range()
-        operation_type = self.operation_type.value
+        try:
+            start_date, end_date = self.date_time_range.get_date_range()
+            operation_type = self.operation_type.value
 
-        _start_date = None
-        _end_date = None
-        if start_date != "" and end_date != "":
-            start_date = f"{start_date} 00:00:00"
-            end_date = f"{end_date} 23:59:59"
+            _start_date = None
+            _end_date = None
+            if start_date != "" and end_date != "":
+                start_date = f"{start_date} 00:00:00"
+                end_date = f"{end_date} 23:59:59"
 
-        self.on_search(_start_date, _end_date, operation_type)
+            self.on_search(_start_date, _end_date, operation_type)
+        except:
+            logging.exception('exception occured at LogOperationSearch.__handle_search')

@@ -113,8 +113,9 @@ class AbstractTable(ft.Container):
             logging.exception('exception occured at abstract_table.__create_table_rows')
 
     def __on_select_changed(self, e):
-        e.control.selected = not e.control.selected
-        e.control.update()
+        if e.control is not None:
+            e.control.selected = not e.control.selected
+            e.control.update()
 
     def did_mount(self):
         if self.page is None:

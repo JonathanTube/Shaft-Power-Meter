@@ -179,7 +179,11 @@ class ZeroCalExecutor(ft.Container):
         )
 
     def __on_start_permission(self, e):
-        self.page.open(PermissionCheck(self.__on_start, 2))
+        try:
+            if self.page is not None:
+                self.page.open(PermissionCheck(self.__on_start, 2))
+        except:
+            logging.exception('exception occured at ZeroCalExecutor.__on_start_permission')
 
     def __on_start(self, user: User):
         ZeroCalInfo.create(utc_date_time=gdata.utc_date_time, state=0, name=self.name)
@@ -237,84 +241,93 @@ class ZeroCalExecutor(ft.Container):
         self.fetch_button.update()
 
     def __on_accept(self, e):
-        # if times of recording is less than 8, do nothing.
-        if len(self.latest_zero_cal.records) < 8:
-            return
+        try:
+            # if times of recording is less than 8, do nothing.
+            if len(self.latest_zero_cal.records) < 8:
+                return
 
-        # 设置为已接受
-        query = ZeroCalInfo.update(state=1).where(ZeroCalInfo.id == self.latest_zero_cal.id, ZeroCalInfo.name == self.name)
-        query.execute()
+            # 设置为已接受
+            query = ZeroCalInfo.update(state=1).where(ZeroCalInfo.id == self.latest_zero_cal.id, ZeroCalInfo.name == self.name)
+            query.execute()
 
-        self.__reset_to_start()
+            self.__reset_to_start()
 
-        if self.name == 'sps1':
-            gdata.sps1_torque_offset = self.latest_accepted_zero_cal.torque_offset
-            gdata.sps1_thrust_offset = self.latest_accepted_zero_cal.thrust_offset
-        else:
-            gdata.sps2_torque_offset = self.latest_accepted_zero_cal.torque_offset
-            gdata.sps2_thrust_offset = self.latest_accepted_zero_cal.thrust_offset
+            if self.name == 'sps1':
+                gdata.sps1_torque_offset = self.latest_accepted_zero_cal.torque_offset
+                gdata.sps1_thrust_offset = self.latest_accepted_zero_cal.thrust_offset
+            else:
+                gdata.sps2_torque_offset = self.latest_accepted_zero_cal.torque_offset
+                gdata.sps2_thrust_offset = self.latest_accepted_zero_cal.thrust_offset
 
-        self.current_torque_offset.value = round(self.latest_accepted_zero_cal.torque_offset, 10)
-        self.current_thrust_offset.value = round(self.latest_accepted_zero_cal.thrust_offset, 10)
-        self.current_offset.update()
+            self.current_torque_offset.value = round(self.latest_accepted_zero_cal.torque_offset, 10)
+            self.current_thrust_offset.value = round(self.latest_accepted_zero_cal.thrust_offset, 10)
+            self.current_offset.update()
 
-        Toast.show_success(e.page, message=self.page.session.get("lang.zero_cal.accepted"))
+            Toast.show_success(e.page, message=self.page.session.get("lang.zero_cal.accepted"))
+        except:
+            logging.exception('exception occured at ZeroCalExecutor.__on_accept')
 
     def __on_abort(self, e):
-        query = ZeroCalInfo.update(state=2).where(ZeroCalInfo.id == self.latest_zero_cal.id, ZeroCalInfo.name == self.name)
-        query.execute()
+        try:
+            query = ZeroCalInfo.update(state=2).where(ZeroCalInfo.id == self.latest_zero_cal.id, ZeroCalInfo.name == self.name)
+            query.execute()
 
-        self.__reset_to_start()
-        Toast.show_success(e.page, message=self.page.session.get("lang.zero_cal.aborted"))
+            self.__reset_to_start()
+            Toast.show_success(e.page, message=self.page.session.get("lang.zero_cal.aborted"))
+        except:
+            logging.exception('exception occured at ZeroCalExecutor.__on_abort')
 
     def __on_fetch(self, e):
-        # 如果主记录为空，说明还没开始，跳过
-        if self.latest_zero_cal is None:
-            return
+        try:
+            # 如果主记录为空，说明还没开始，跳过
+            if self.latest_zero_cal is None:
+                return
 
-        if len(self.latest_zero_cal.records) >= 8:
-            return
+            if len(self.latest_zero_cal.records) >= 8:
+                return
 
-        ZeroCalRecord.create(
-            name=self.name,
-            zero_cal_info=self.latest_zero_cal.id,
-            mv_per_v_for_torque=gdata.sps1_mv_per_v_for_torque if self.name == 'sps1' else gdata.sps2_mv_per_v_for_torque,
-            mv_per_v_for_thrust=gdata.sps1_mv_per_v_for_thrust if self.name == 'sps1' else gdata.sps2_mv_per_v_for_thrust
-        )
+            ZeroCalRecord.create(
+                name=self.name,
+                zero_cal_info=self.latest_zero_cal.id,
+                mv_per_v_for_torque=gdata.sps1_mv_per_v_for_torque if self.name == 'sps1' else gdata.sps2_mv_per_v_for_torque,
+                mv_per_v_for_thrust=gdata.sps1_mv_per_v_for_thrust if self.name == 'sps1' else gdata.sps2_mv_per_v_for_thrust
+            )
 
-        self.result_card.visible = True
-        self.result_card.update()
+            self.result_card.visible = True
+            self.result_card.update()
 
-        self.__load_data()
+            self.__load_data()
 
-        self.accept_button.visible = len(self.latest_zero_cal.records) == 8
-        self.accept_button.update()
+            self.accept_button.visible = len(self.latest_zero_cal.records) == 8
+            self.accept_button.update()
 
-        self.fetch_button.visible = len(self.latest_zero_cal.records) < 8
-        self.fetch_button.update()
+            self.fetch_button.visible = len(self.latest_zero_cal.records) < 8
+            self.fetch_button.update()
 
-        # 刷新表格与统计
-        self.table.rows = self.__get_table_rows()
-        self.table.update()
+            # 刷新表格与统计
+            self.table.rows = self.__get_table_rows()
+            self.table.update()
 
-        # 获得计算结果
-        [avg_torque, avg_thrust] = self.__get_new_avg()
+            # 获得计算结果
+            [avg_torque, avg_thrust] = self.__get_new_avg()
 
-        # 保存值到数据库
-        query = (ZeroCalInfo.update(
-            torque_offset=avg_torque,
-            thrust_offset=avg_thrust
-        ).where(ZeroCalInfo.id == self.latest_zero_cal.id))
-        query.execute()
+            # 保存值到数据库
+            query = (ZeroCalInfo.update(
+                torque_offset=avg_torque,
+                thrust_offset=avg_thrust
+            ).where(ZeroCalInfo.id == self.latest_zero_cal.id))
+            query.execute()
 
-        # 筛选平均值
-        self.new_avg_torque.value = round(avg_torque, 10)
-        self.new_avg_torque.update()
+            # 筛选平均值
+            self.new_avg_torque.value = round(avg_torque, 10)
+            self.new_avg_torque.update()
 
-        self.new_avg_thrust.value = round(avg_thrust, 10)
-        self.new_avg_thrust.update()
+            self.new_avg_thrust.value = round(avg_thrust, 10)
+            self.new_avg_thrust.update()
 
-        Toast.show_success(e.page)
+            Toast.show_success(e.page)
+        except:
+            logging.exception('exception occured at ZeroCalExecutor.__on_fetch')
 
     def build(self):
         try:

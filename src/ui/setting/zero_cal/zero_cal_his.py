@@ -42,12 +42,17 @@ class ZeroCalHis(ft.Container):
 
 
     def __on_export(self, e):
-        self.file_picker = ft.FilePicker()
-        self.page.overlay.append(self.file_picker)
-        self.page.update()
-        random_str = ''.join(random.choices(string.ascii_letters + string.digits, k=2))
-        self.file_picker.save_file(file_name=f"Zero_Cal_History_{random_str}.xlsx", allowed_extensions=["xlsx", "xls"])
-        self.file_picker.on_result = lambda e: self.__on_result(e)
+        try:
+            if self.page is not None:
+                self.file_picker = ft.FilePicker()
+                self.page.overlay.append(self.file_picker)
+                self.page.update()
+                random_str = ''.join(random.choices(string.ascii_letters + string.digits, k=2))
+                self.file_picker.save_file(file_name=f"Zero_Cal_History_{random_str}.xlsx", allowed_extensions=["xlsx", "xls"])
+                self.file_picker.on_result = lambda e: self.__on_result(e)
+        except:
+            logging.exception('exception occured at ZeroCalHis.__on_export')
+
 
 
     def __on_result(self, e):

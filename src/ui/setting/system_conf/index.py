@@ -45,7 +45,11 @@ class SystemConf(ft.Container):
             logging.exception('exception occured at SystemConf.build')
 
     def __on_save_button_click(self, e):
-        self.page.open(PermissionCheck(self.__save_data, 0))
+        try:
+            if self.page is not None:
+                self.page.open(PermissionCheck(self.__save_data, 0))
+        except:
+            logging.exception('exception occured at SystemConf.__on_save_button_click')
 
     def __change_buttons(self):
         try:
@@ -89,7 +93,10 @@ class SystemConf(ft.Container):
             Toast.show_error(self.page)
 
     def __reset_data(self, e):
-        keyboard.close()
-        self.content.clean()
-        self.build()
-        Toast.show_success(e.page)
+        try:
+            keyboard.close()
+            self.content.clean()
+            self.build()
+            Toast.show_success(e.page)
+        except:
+            logging.exception("exception occured at SystemConf.__reset_data")

@@ -96,15 +96,20 @@ class EventForm(ft.AlertDialog):
         e.page.close(self)
 
     def __on_click_save(self, e):
-        self.event_log.breach_reason = self.breach_reason.value
-        self.event_log.note = self.note.value
-        self.event_log.beaufort_number = self.beaufort_number.value
-        self.event_log.wave_height = self.wave_height.value
-        self.event_log.ice_condition = self.ice_condition.value
-        if self.event_log.breach_reason is None or self.event_log.beaufort_number is None or self.event_log.beaufort_number == "" or self.event_log.wave_height is None or self.event_log.wave_height == "" or self.event_log.ice_condition is None or self.event_log.ice_condition == "":
-            Toast.show_warning(self.page, self.page.session.get("lang.event.please_input_all_fields_except_note"))
-            return
-        self.page.open(PermissionCheck(self.__save_data, 1))
+        try:
+            if self.event_log is not None:
+                self.event_log.breach_reason = self.breach_reason.value
+                self.event_log.note = self.note.value
+                self.event_log.beaufort_number = self.beaufort_number.value
+                self.event_log.wave_height = self.wave_height.value
+                self.event_log.ice_condition = self.ice_condition.value
+                if self.event_log.breach_reason is None or self.event_log.beaufort_number is None or self.event_log.beaufort_number == "" or self.event_log.wave_height is None or self.event_log.wave_height == "" or self.event_log.ice_condition is None or self.event_log.ice_condition == "":
+                    Toast.show_warning(self.page, self.page.session.get("lang.event.please_input_all_fields_except_note"))
+                    return
+                self.page.open(PermissionCheck(self.__save_data, 1))
+        except:
+            logging.exception('exception occured at EventForm.__on_click_save')
+
 
     def __save_data(self, user: User):
         try:

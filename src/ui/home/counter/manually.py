@@ -34,26 +34,41 @@ class ManuallyCounter(ft.Container):
         self.date_format = f'{datetime_conf.date_format} %H:%M:%S'
 
     def __on_start(self, e):
-        counter_log = CounterLog.get_or_none(CounterLog.sps_name == self.name, CounterLog.counter_type == 1)
-        # if count log exists, delete it
-        if counter_log is not None:
-            self.__delete_counter_log()
+        try:
+            counter_log = CounterLog.get_or_none(CounterLog.sps_name == self.name, CounterLog.counter_type == 1)
+            # if count log exists, delete it
+            if counter_log is not None:
+                self.__delete_counter_log()
 
-        # and then create new count log
-        CounterLog.create(sps_name=self.name, counter_type=1, start_utc_date_time=gdata.utc_date_time, counter_status="running")
-        self.__calculate()
+            # and then create new count log
+            CounterLog.create(sps_name=self.name, counter_type=1, start_utc_date_time=gdata.utc_date_time, counter_status="running")
+            self.__calculate()
+        except:
+            logging.exception('exception occured at ManuallyCounter.__on_start')
 
     def __on_stop(self, e):
-        CounterLog.update(counter_status="reset", stop_utc_date_time=gdata.utc_date_time).where(CounterLog.sps_name == self.name, CounterLog.counter_type == 1).execute()
-        self.__calculate()
+        try:
+            CounterLog.update(counter_status="reset", stop_utc_date_time=gdata.utc_date_time).where(CounterLog.sps_name == self.name, CounterLog.counter_type == 1).execute()
+            self.__calculate()
+        except:
+            logging.exception('exception occured at ManuallyCounter.__on_stop')
+
 
     def __on_resume(self, e):
-        self.__delete_counter_log()
-        e.page.close(self.dlg_modal)
-        self.__calculate()
+        try:
+            if e.page is not None:
+                self.__delete_counter_log()
+                e.page.close(self.dlg_modal)
+                self.__calculate()
+        except:
+            logging.exception('exception occured at ManuallyCounter.__on_resume')
 
     def __delete_counter_log(self):
-        CounterLog.delete().where(CounterLog.sps_name == self.name, CounterLog.counter_type == 1).execute()
+        try:
+            CounterLog.delete().where(CounterLog.sps_name == self.name, CounterLog.counter_type == 1).execute()
+        except:
+            logging.exception('exception occured at ManuallyCounter.__delete_counter_log')
+
 
     def __create_dlg_modal(self):
         self.dlg_modal = ft.AlertDialog(

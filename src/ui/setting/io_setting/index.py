@@ -112,11 +112,15 @@ class IOSetting(ft.Container):
             self.__change_buttons()
 
     def __reset_data(self, e):
-        keyboard.close()
-        self.conf = IOConf.get()
-        self.content.clean()
-        self.build()
-        Toast.show_success(e.page)
+        try:
+            keyboard.close()
+            self.conf = IOConf.get()
+            self.content.clean()
+            self.build()
+            Toast.show_success(e.page)
+        except:
+            logging.exception('exception occured at IOSetting.__reset_data')
+
 
     def __change_buttons(self):
         if self.save_button and self.save_button.page:
