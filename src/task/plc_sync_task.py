@@ -45,8 +45,7 @@ class PlcSyncTask:
                     self.ip = io_conf.plc_ip
                     self.port = io_conf.plc_port
 
-                    logging.info(
-                        f'[***PLC***] connect to plc {self.ip} {self.port}')
+                    logging.info(f'[***PLC***] connect to plc {self.ip} {self.port}')
 
                     self.plc_client = AsyncModbusTcpClient(
                         host=io_conf.plc_ip,

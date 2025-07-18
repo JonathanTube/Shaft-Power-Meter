@@ -81,6 +81,9 @@ class GpsSyncTask:
             self._is_canceled = False
 
     async def receive_data(self):
+        if self.reader is None:
+            return
+
         no_data_times = 0
         has_data_times = 0
         while not self.reader.at_eof():
@@ -121,7 +124,7 @@ class GpsSyncTask:
             return
 
         try:
-            if not self.writer.is_closing():
+            if self.writer is not None and not self.writer.is_closing():
                 self.writer.close()
                 await self.writer.wait_closed()
         except:

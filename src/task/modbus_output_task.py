@@ -123,28 +123,33 @@ class ModbusOutputTask:
             logging.exception("32-bit register update failed")
 
     def get_avg_power_and_energy(self, sps_name: str):
-        """获取32位整数的平均功率和总能量"""
-        counter_log = CounterLog.get_or_none(
-            CounterLog.sps_name == sps_name,
-            CounterLog.counter_type == 2
-        )
-        if not counter_log:
+        try:
+            """获取32位整数的平均功率和总能量"""
+            counter_log = CounterLog.get_or_none(
+                CounterLog.sps_name == sps_name,
+                CounterLog.counter_type == 2
+            )
+            if not counter_log:
+                return 0, 0
+
+            # 平均功率（单位：0.1W）
+            avg_power = 0
+            if self.io_conf.output_avg_power and counter_log.times > 0:
+                avg_power = int((counter_log.total_power / counter_log.times) / 100)
+
+            # 总能量（单位：0.1Wh）
+            total_energy = 0
+            if self.io_conf.output_sum_power and avg_power:
+                start_time = counter_log.start_utc_date_time
+                if start_time is not None:
+                    end_time = gdata.utc_date_time
+                    hours = (end_time - start_time).total_seconds() / 3600
+                    total_energy = int(avg_power * hours)  # 单位：0.1Wh
+
+            return avg_power, total_energy
+        except:
+            logging.exception("exception occurred at stop_modbus_server.get_avg_power_and_energy")
             return 0, 0
-
-        # 平均功率（单位：0.1W）
-        avg_power = 0
-        if self.io_conf.output_avg_power and counter_log.times > 0:
-            avg_power = int((counter_log.total_power / counter_log.times) / 100)
-
-        # 总能量（单位：0.1Wh）
-        total_energy = 0
-        if self.io_conf.output_sum_power and avg_power:
-            start_time = counter_log.start_utc_date_time
-            end_time = gdata.utc_date_time
-            hours = (end_time - start_time).total_seconds() / 3600
-            total_energy = int(avg_power * hours)  # 单位：0.1Wh
-
-        return avg_power, total_energy
 
 
 modbus_output: ModbusOutputTask = ModbusOutputTask()

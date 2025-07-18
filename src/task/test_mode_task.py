@@ -6,7 +6,6 @@ from db.models.counter_log import CounterLog
 from db.models.data_log import DataLog
 from db.models.system_settings import SystemSettings
 from common.global_data import gdata
-from db.models.alarm_log import AlarmLog
 from db.models.event_log import EventLog
 from db.models.report_info import ReportInfo
 from utils.data_saver import DataSaver
