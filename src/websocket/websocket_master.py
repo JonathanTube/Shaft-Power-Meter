@@ -19,7 +19,7 @@ class WebSocketMaster:
         self.clients: Set[websockets.WebSocketServerProtocol] = set()
         self.server = None
 
-        self._max_retries = 20  # 最大重连次数
+        self._max_retries = 6  # 最大重连次数
 
         self._is_started = False
         self._is_canceled = False

@@ -31,7 +31,7 @@ class WebSocketSlave:
 
         self._is_canceled = False
 
-        self._max_retries = 20  # 最大重连次数
+        self._max_retries = 6  # 最大重连次数
 
         self.jm3846Calculator = JM3846Calculator()
 

@@ -12,16 +12,12 @@ class Dashboard(ft.Container):
     def __init__(self):
         super().__init__()
         self.padding = 10
-        self.system_settings = SystemSettings.get_or_none()
+        self.system_settings: SystemSettings = SystemSettings.get()
 
     def build(self):
         try:
-            if self.system_settings is None:
-                sha_po_li = False
-                amount_of_power = 1
-            else:
-                sha_po_li = self.system_settings.sha_po_li
-                amount_of_power = self.system_settings.amount_of_propeller
+            sha_po_li = self.system_settings.sha_po_li
+            amount_of_power = self.system_settings.amount_of_propeller
 
             if amount_of_power == 1:
                 if sha_po_li:

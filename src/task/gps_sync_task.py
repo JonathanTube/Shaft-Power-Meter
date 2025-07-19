@@ -20,7 +20,7 @@ class GpsSyncTask:
 
         self._retry = 0
 
-        self._max_retries = 20  # 最大重连次数
+        self._max_retries = 6  # 最大重连次数
 
         self._is_connected = False
 

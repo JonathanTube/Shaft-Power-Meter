@@ -35,7 +35,7 @@ class JM3846AsyncClient:
         self._lock = asyncio.Lock()
 
         self._retry = 0
-        self._max_retries = 20
+        self._max_retries = 6
 
         self._is_connected = False
         self._is_canceled = False
@@ -223,9 +223,11 @@ class JM3846AsyncClient:
                 self.set_offline(True)
             except ConnectionResetError as e:
                 logging.error(f'[***{self.name}***] JM3846 Connection reset: {e}')
+                self.set_offline(True)
                 return
             except:
                 logging.error(f'[***{self.name}***] JM3846 0x44 Receive error')
+                self.set_offline(True)
                 return
 
     async def save_0x44_result(self, result: dict):

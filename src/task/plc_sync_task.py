@@ -14,7 +14,7 @@ class PlcSyncTask:
         self.plc_client: Optional[AsyncModbusTcpClient] = None
 
         self._retry = 0
-        self._max_retries = 20  # 最大重连次数
+        self._max_retries = 6  # 最大重连次数
         self._is_connected = False
         self._is_canceled = False
 
