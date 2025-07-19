@@ -128,16 +128,17 @@ class InterfaceConf(ft.Container):
 
     def before_update(self):
         try:
-            if self.connect_btn and self.connect_btn.page:
-                self.connect_btn.visible = not ws_client.is_connected
-                self.connect_btn.text = self.page.session.get("lang.setting.connect_to_master")
-                self.connect_btn.bgcolor = ft.Colors.GREEN
-                self.connect_btn.disabled = False
+            if self.page and self.page.session:
+                if self.connect_btn:
+                    self.connect_btn.visible = not ws_client.is_connected
+                    self.connect_btn.text = self.page.session.get("lang.setting.connect_to_master")
+                    self.connect_btn.bgcolor = ft.Colors.GREEN
+                    self.connect_btn.disabled = False
 
-            if self.close_btn and self.close_btn.page:
-                self.close_btn.visible = ws_client.is_connected
-                self.close_btn.text = self.page.session.get("lang.setting.disconnect_from_master")
-                self.close_btn.bgcolor = ft.Colors.RED
-                self.close_btn.disabled = False
+                if self.close_btn:
+                    self.close_btn.visible = ws_client.is_connected
+                    self.close_btn.text = self.page.session.get("lang.setting.disconnect_from_master")
+                    self.close_btn.bgcolor = ft.Colors.RED
+                    self.close_btn.disabled = False
         except:
             logging.exception("exception occured at PropellerCurveDiagram.before_update")

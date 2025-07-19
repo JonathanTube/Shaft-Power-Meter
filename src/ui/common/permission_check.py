@@ -100,7 +100,7 @@ class PermissionCheck(ft.AlertDialog):
             else:
                 users = User.select().where(User.user_role <= self.user_role).execute()
 
-            if self.user_name and self.user_name.page:
+            if self.user_name:
                 self.user_name.options = [ft.dropdown.Option(text=user.user_name, key=user.id) for user in users]
         except:
             logging.exception('exception occured at PermissionCheck.before_update')

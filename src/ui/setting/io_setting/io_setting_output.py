@@ -160,17 +160,18 @@ class IOSettingOutput(ft.Container):
 
     def before_update(self):
         try:
-            if self.start_btn and self.start_btn.page:
-                self.start_btn.visible = not modbus_output.is_started
-                self.start_btn.text = self.page.session.get("lang.setting.connect")
-                self.start_btn.bgcolor = ft.Colors.GREEN
-                self.start_btn.disabled = False
+            if self.page and self.page.session:
+                if self.start_btn:
+                    self.start_btn.visible = not modbus_output.is_started
+                    self.start_btn.text = self.page.session.get("lang.setting.connect")
+                    self.start_btn.bgcolor = ft.Colors.GREEN
+                    self.start_btn.disabled = False
 
-            if self.stop_btn and self.stop_btn.page:
-                self.stop_btn.visible = modbus_output.is_started
-                self.stop_btn.text = self.page.session.get("lang.setting.disconnect")
-                self.stop_btn.bgcolor = ft.Colors.RED
-                self.stop_btn.disabled = False
+                if self.stop_btn:
+                    self.stop_btn.visible = modbus_output.is_started
+                    self.stop_btn.text = self.page.session.get("lang.setting.disconnect")
+                    self.stop_btn.bgcolor = ft.Colors.RED
+                    self.stop_btn.disabled = False
 
             modbus_output.update_conf()
         except:

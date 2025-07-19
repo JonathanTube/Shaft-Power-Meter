@@ -250,25 +250,25 @@ class IOSettingPLC(ft.Container):
 
     def before_update(self):
         try:
-            if self.connect_btn and self.connect_btn.page:
-                self.connect_btn.text = self.page.session.get("lang.setting.connect")
-                self.connect_btn.visible = not plc.is_connected
-                self.connect_btn.disabled = False
-                self.connect_btn.bgcolor = ft.Colors.GREEN
+            if self.page and self.page.session:
+                if self.connect_btn:
+                    self.connect_btn.text = self.page.session.get("lang.setting.connect")
+                    self.connect_btn.visible = not plc.is_connected
+                    self.connect_btn.disabled = False
+                    self.connect_btn.bgcolor = ft.Colors.GREEN
 
-            if self.close_btn and self.close_btn.page:
-                self.close_btn.text = self.page.session.get("lang.setting.disconnect")
-                self.close_btn.visible = plc.is_connected
-                self.close_btn.disabled = False
-                self.close_btn.bgcolor = ft.Colors.RED
+                if self.close_btn:
+                    self.close_btn.text = self.page.session.get("lang.setting.disconnect")
+                    self.close_btn.visible = plc.is_connected
+                    self.close_btn.disabled = False
+                    self.close_btn.bgcolor = ft.Colors.RED
 
-            if self.fetch_btn and self.fetch_btn.page:
-                self.fetch_btn.text = self.page.session.get("lang.setting.fetch_data")
-                self.fetch_btn.visible = plc.is_connected
-                self.fetch_btn.disabled = False
-                self.fetch_btn.bgcolor = ft.Colors.BLUE
+                if self.fetch_btn:
+                    self.fetch_btn.text = self.page.session.get("lang.setting.fetch_data")
+                    self.fetch_btn.visible = plc.is_connected
+                    self.fetch_btn.disabled = False
+                    self.fetch_btn.bgcolor = ft.Colors.BLUE
 
-            if self.page:
                 self.page.run_task(self.load_range_data)
         except:
             logging.exception('exception occured at IOSettingPLC.before_update')

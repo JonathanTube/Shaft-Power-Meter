@@ -55,7 +55,7 @@ class CustomCard(ft.Card):
 
     def before_update(self):
         try:
-            if self.heading_title and self.heading_title.page:
+            if self.heading_title:
                 self.heading_title.value = self.heading
         except:
             logging.exception('exception occured at CustomCard.before_update')

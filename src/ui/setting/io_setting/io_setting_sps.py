@@ -333,29 +333,30 @@ class IOSettingSPS(ft.Container):
 
     def before_update(self):
         try:
-            if self.sps1_connect and self.sps1_connect.page:
-                self.sps1_connect.text = self.page.session.get("lang.setting.connect")
-                self.sps1_connect.visible = not sps1_read_task.is_connected
-                self.sps1_connect.bgcolor = ft.Colors.GREEN
-                self.sps1_connect.disabled = False
+            if self.page and self.page.session:
+                if self.sps1_connect:
+                    self.sps1_connect.text = self.page.session.get("lang.setting.connect")
+                    self.sps1_connect.visible = not sps1_read_task.is_connected
+                    self.sps1_connect.bgcolor = ft.Colors.GREEN
+                    self.sps1_connect.disabled = False
 
-            if self.sps1_disconnect and self.sps1_disconnect.page:
-                self.sps1_disconnect.text = self.page.session.get("lang.setting.disconnect")
-                self.sps1_disconnect.visible = sps1_read_task.is_connected
-                self.sps1_disconnect.bgcolor = ft.Colors.RED
-                self.sps1_disconnect.disabled = False
+                if self.sps1_disconnect:
+                    self.sps1_disconnect.text = self.page.session.get("lang.setting.disconnect")
+                    self.sps1_disconnect.visible = sps1_read_task.is_connected
+                    self.sps1_disconnect.bgcolor = ft.Colors.RED
+                    self.sps1_disconnect.disabled = False
 
-            if self.is_dual:
-                if self.sps2_connect and self.sps2_connect.page:
-                    self.sps2_connect.text = self.page.session.get("lang.setting.connect")
-                    self.sps2_connect.visible = not sps2_read_task.is_connected
-                    self.sps2_connect.bgcolor = ft.Colors.GREEN
-                    self.sps2_connect.disabled = False
+                if self.is_dual:
+                    if self.sps2_connect:
+                        self.sps2_connect.text = self.page.session.get("lang.setting.connect")
+                        self.sps2_connect.visible = not sps2_read_task.is_connected
+                        self.sps2_connect.bgcolor = ft.Colors.GREEN
+                        self.sps2_connect.disabled = False
 
-                if self.sps2_disconnect and self.sps2_disconnect.page:
-                    self.sps2_disconnect.text = self.page.session.get("lang.setting.disconnect")
-                    self.sps2_disconnect.visible = sps2_read_task.is_connected
-                    self.sps2_disconnect.bgcolor = ft.Colors.RED
-                    self.sps2_disconnect.disabled = False
+                    if self.sps2_disconnect:
+                        self.sps2_disconnect.text = self.page.session.get("lang.setting.disconnect")
+                        self.sps2_disconnect.visible = sps2_read_task.is_connected
+                        self.sps2_disconnect.bgcolor = ft.Colors.RED
+                        self.sps2_disconnect.disabled = False
         except:
             logging.exception('exception occured at IOSettingSPS.before_update')

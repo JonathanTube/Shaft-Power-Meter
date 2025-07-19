@@ -95,19 +95,19 @@ class Pagination(ft.Container):
 
                 self.visible = self.total > self.page_size
 
-                if self.page_number and self.page_number.page:
+                if self.page_number:
                     self.page_number.value = f"{self.current_page} of {self.total_pages}"
 
-                if self.first_page_button and self.first_page_button.page:
+                if self.first_page_button:
                     self.first_page_button.disabled = self.current_page <= 1
 
-                if self.previous_page_button and self.previous_page_button.page:
+                if self.previous_page_button:
                     self.previous_page_button.disabled = self.current_page <= 1
             
-                if self.last_page_button and self.last_page_button.page:
+                if self.last_page_button:
                     self.last_page_button.disabled = self.current_page >= self.total_pages
 
-                if self.next_page_button and self.next_page_button.page:
+                if self.next_page_button:
                     self.next_page_button.disabled = self.current_page >= self.total_pages
         except:
             logging.exception('exception occured at Pagination.before_update')
