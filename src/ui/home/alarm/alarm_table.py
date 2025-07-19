@@ -62,7 +62,7 @@ class AlarmTable(AbstractTable):
         end_date = self.kwargs.get('end_date')
         if start_date and end_date:
             sql = sql.where(AlarmLog.utc_date_time >= start_date, AlarmLog.utc_date_time <= end_date)
-        data = sql.order_by(AlarmLog.id.desc()).paginate(self.current_page, self.page_size)
+        data:list[AlarmLog] = sql.order_by(AlarmLog.id.desc()).paginate(self.current_page, self.page_size)
 
         
     
@@ -70,7 +70,7 @@ class AlarmTable(AbstractTable):
 
         for item in data:
             status_column = '✔️'if item.is_recovery else '❌'
-            if item.is_from_master:
+            if item.is_from_master != gdata.is_master:
                 status_column += '🔒'
 
             data_list.append([
