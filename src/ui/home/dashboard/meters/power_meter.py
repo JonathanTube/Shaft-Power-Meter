@@ -25,7 +25,8 @@ class PowerMeter(ft.Container):
 
             heading = self.page.session.get("lang.common.power")
             self.content = MeterRound(
-                heading=heading, radius=self.radius, unit="W", max=max, limit=limit)
+                heading=heading, radius=self.radius, unit="W", max=max, limit=limit
+            )
         except:
             logging.exception('exception occured at PowerMeter.build')
 

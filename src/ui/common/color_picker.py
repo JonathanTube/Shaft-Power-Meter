@@ -9,8 +9,10 @@ class ColorDialog(ft.IconButton):
         self.on_color_change = on_change
 
         self.icon = ft.Icons.COLOR_LENS
-        self.icon_color = color
-        self.color = color
+
+        self.icon_color = color if color is not None else ft.Colors.BLUE
+        self.color = color if color is not None else ft.Colors.BLUE
+
         self.icon_size = 30
         self.on_click = self.__open_color_picker
         self.col = {"xs": 6}
@@ -22,8 +24,8 @@ class ColorDialog(ft.IconButton):
             self.alert_dialog = ft.AlertDialog(
                 content=self.color_picker,
                 actions=[
-                    ft.TextButton("OK", on_click=self.__change_color),
-                    ft.TextButton("Cancel", on_click=self.__close_dialog)
+                    ft.TextButton(self.page.session.get("lang.button.confirm"), on_click=self.__change_color),
+                    ft.TextButton(self.page.session.get("lang.button.cancel"), on_click=self.__close_dialog)
                 ],
                 actions_alignment=ft.MainAxisAlignment.END
             )
@@ -39,21 +41,27 @@ class ColorDialog(ft.IconButton):
 
     def __change_color(self, e):
         try:
-            color = self.color_picker.color
+            if self.color_picker and self.color_picker.page:
+                color = self.color_picker.color
 
-            self.icon_color = color
-            self.color = color
-            if callable(self.on_color_change):
-                self.on_color_change(color)
+                self.icon_color = color
+                self.color = color
 
-            self.alert_dialog.open = False
-            self.page.update()
+                if callable(self.on_color_change):
+                    self.on_color_change(color)
+                    
+                if self.alert_dialog:
+                    self.alert_dialog.open = False
+                
+                if self.page:
+                    self.page.update()
         except:
             logging.exception('exception occured at ColorDialog.__change_color')
 
     def __close_dialog(self, e):
         try:
-            self.alert_dialog.open = False
-            self.alert_dialog.update()
+            if self.alert_dialog and self.alert_dialog.page:
+                self.alert_dialog.open = False
+                self.alert_dialog.update()
         except:
             logging.exception('exception occured at ColorDialog.__close_dialog')

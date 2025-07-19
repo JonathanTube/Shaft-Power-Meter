@@ -27,7 +27,7 @@ class SimpleCard(ft.Container):
     def build(self):
         try:
             title_container = ft.Container(
-                visible=self._title != "",
+                visible=self._title is not None and self._title != "",
                 expand=False,
                 alignment=ft.alignment.center if self._text_center else ft.alignment.top_left,
                 content=ft.Text(

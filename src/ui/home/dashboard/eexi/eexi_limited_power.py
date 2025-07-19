@@ -71,10 +71,13 @@ class EEXILimitedPower(ft.Container):
                     active_value += gdata.sps2_power
 
                 inactive_value = self.unlimited_power - active_value
-                self.meter_half.set_outer_value(active_value, inactive_value)
-                if self.eexi_power > 0:
-                    percentage_of_eexi = int(active_value / self.eexi_power * 100)
-                    self.meter_half.set_center_value(percentage_of_eexi)
+
+                if self.meter_half is not None:
+                    self.meter_half.set_outer_value(active_value, inactive_value)
+                    if self.eexi_power > 0:
+                        percentage_of_eexi = int(active_value / self.eexi_power * 100)
+                        self.meter_half.set_center_value(percentage_of_eexi)
+
                 self.update_mode()
         except:
             logging.exception('exception occured at EEXILimitedPower.reload')

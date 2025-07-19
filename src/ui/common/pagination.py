@@ -15,23 +15,22 @@ class Pagination(ft.Container):
 
     def build(self):
         try:
-            self.page_number = ft.Text(
-                value=f"Page {self.current_page} of {self.total_pages}"
-            )
+            self.page_number = ft.Text(value=f"Page {self.current_page} of {self.total_pages}")
+
             self.first_page_button = ft.IconButton(
-                icon=ft.icons.FIRST_PAGE,
+                icon=ft.Icons.FIRST_PAGE,
                 on_click=self.on_first_page_click
             )
             self.previous_page_button = ft.IconButton(
-                icon=ft.icons.ARROW_BACK,
+                icon=ft.Icons.ARROW_BACK,
                 on_click=self.on_previous_page_click
             )
             self.next_page_button = ft.IconButton(
-                icon=ft.icons.ARROW_FORWARD,
+                icon=ft.Icons.ARROW_FORWARD,
                 on_click=self.on_next_page_click
             )
             self.last_page_button = ft.IconButton(
-                icon=ft.icons.LAST_PAGE,
+                icon=ft.Icons.LAST_PAGE,
                 on_click=self.on_last_page_click
             )
             self.content = ft.Row(
@@ -50,7 +49,8 @@ class Pagination(ft.Container):
     def on_first_page_click(self, e):
         try:
             self.current_page = 1
-            self.on_change(self.current_page, self.page_size)
+            if self.on_change is not None:
+                self.on_change(self.current_page, self.page_size)
             self.update()
         except:
             logging.exception("exception occured at Pagination.on_first_page_click")
@@ -58,7 +58,8 @@ class Pagination(ft.Container):
     def on_previous_page_click(self, e):
         try:
             self.current_page = max(1, self.current_page - 1)
-            self.on_change(self.current_page, self.page_size)
+            if self.on_change is not None:
+                self.on_change(self.current_page, self.page_size)
             self.update()
         except:
             logging.exception("exception occured at Pagination.on_previous_page_click")
@@ -66,7 +67,8 @@ class Pagination(ft.Container):
     def on_next_page_click(self, e):
         try:
             self.current_page = min(self.total_pages, self.current_page + 1)
-            self.on_change(self.current_page, self.page_size)
+            if self.on_change is not None:
+                self.on_change(self.current_page, self.page_size)
             self.update()
         except:
             logging.exception("exception occured at Pagination.on_next_page_click")
@@ -74,7 +76,8 @@ class Pagination(ft.Container):
     def on_last_page_click(self, e):
         try:
             self.current_page = self.total_pages
-            self.on_change(self.current_page, self.page_size)
+            if self.on_change is not None:
+                self.on_change(self.current_page, self.page_size)
             self.update()
         except:
             logging.exception("exception occured at Pagination.on_last_page_click")
@@ -90,23 +93,21 @@ class Pagination(ft.Container):
             if self.page:
                 self.total_pages = (self.total + self.page_size - 1) // self.page_size
 
-                self.page_number.value = f"{self.current_page} of {self.total_pages}"
                 self.visible = self.total > self.page_size
 
-                self.page_number.value = f"{self.current_page} of {self.total_pages}"
+                if self.page_number and self.page_number.page:
+                    self.page_number.value = f"{self.current_page} of {self.total_pages}"
 
-                if self.current_page <= 1:
-                    self.first_page_button.disabled = True
-                    self.previous_page_button.disabled = True
-                else:
-                    self.first_page_button.disabled = False
-                    self.previous_page_button.disabled = False
+                if self.first_page_button and self.first_page_button.page:
+                    self.first_page_button.disabled = self.current_page <= 1
 
-                if self.current_page >= self.total_pages:
-                    self.last_page_button.disabled = True
-                    self.next_page_button.disabled = True
-                else:
-                    self.last_page_button.disabled = False
-                    self.next_page_button.disabled = False
+                if self.previous_page_button and self.previous_page_button.page:
+                    self.previous_page_button.disabled = self.current_page <= 1
+            
+                if self.last_page_button and self.last_page_button.page:
+                    self.last_page_button.disabled = self.current_page >= self.total_pages
+
+                if self.next_page_button and self.next_page_button.page:
+                    self.next_page_button.disabled = self.current_page >= self.total_pages
         except:
             logging.exception('exception occured at Pagination.before_update')

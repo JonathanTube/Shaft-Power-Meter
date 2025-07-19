@@ -28,41 +28,44 @@ class PermissionCheck(ft.AlertDialog):
         elif self.user_role == 2:
             return "User"
 
+        return 'unknown'
+
     def build(self):
         try:
-            s = self.page.session
-            self.title = ft.Text(f"{self.get_role_name()}-{s.get('lang.permission.authentication')}")
-            self.user_name = ft.Dropdown(
-                width=300,
-                label=self.page.session.get("lang.permission.user_name"),
-                value=1,
-                options=[]
-            )
-            self.user_pwd = ft.TextField(
-                width=300,
-                value="123456",
-                label=s.get("lang.permission.user_pwd"),
-                read_only=True,
-                password=True,
-                can_reveal_password=True
-            )
+            if self.page and self.page.session:
+                s = self.page.session
+                self.title = ft.Text(f"{self.get_role_name()}-{s.get('lang.permission.authentication')}")
+                self.user_name = ft.Dropdown(
+                    width=300,
+                    label=s.get("lang.permission.user_name"),
+                    value=1,
+                    options=[]
+                )
+                self.user_pwd = ft.TextField(
+                    width=300,
+                    value="123456",
+                    label=s.get("lang.permission.user_pwd"),
+                    read_only=True,
+                    password=True,
+                    can_reveal_password=True
+                )
 
-            self.number_keys = [ft.OutlinedButton(str(i), col={"xs": 3}, on_click=self.__on_key_click) for i in range(1, 10)]
-            self.number_keys.append(ft.OutlinedButton(str(0), col={"xs": 3}, on_click=self.__on_key_click))
-            self.number_keys.append(ft.OutlinedButton(icon=ft.Icons.BACKSPACE_OUTLINED, col={"xs": 3}, on_click=self.__on_delete_one))
+                self.number_keys = [ft.OutlinedButton(str(i), col={"xs": 3}, on_click=self.__on_key_click) for i in range(1, 10)]
+                self.number_keys.append(ft.OutlinedButton(str(0), col={"xs": 3}, on_click=self.__on_key_click))
+                self.number_keys.append(ft.OutlinedButton(icon=ft.Icons.BACKSPACE_OUTLINED, col={"xs": 3}, on_click=self.__on_delete_one))
 
-            self.content = ft.Column(
-                height=220,
-                controls=[
-                    self.user_name, 
-                    self.user_pwd,
-                    ft.ResponsiveRow(controls=self.number_keys)
+                self.content = ft.Column(
+                    height=220,
+                    controls=[
+                        self.user_name, 
+                        self.user_pwd,
+                        ft.ResponsiveRow(controls=self.number_keys)
+                    ]
+                )
+                self.actions = [
+                    ft.TextButton(text=s.get("lang.button.confirm"), on_click=self.__on_confirm),
+                    ft.TextButton(text=s.get("lang.button.cancel"), visible=self.closable, on_click=self.__on_cancel)
                 ]
-            )
-            self.actions = [
-                ft.TextButton(s.get("lang.button.confirm"), on_click=self.__on_confirm),
-                ft.TextButton(s.get("lang.button.cancel"), visible=self.closable, on_click=self.__on_cancel)
-            ]
         except:
             logging.exception('exception occured at PermissionCheck.build')
 
@@ -71,7 +74,7 @@ class PermissionCheck(ft.AlertDialog):
         try:
             if e.control is not None:
                 txt = e.control.text
-                if self.user_pwd is not None:
+                if self.user_pwd and self.user_pwd.page:
                     self.user_pwd.value += txt
                     self.user_pwd.update()
         except:
@@ -80,7 +83,7 @@ class PermissionCheck(ft.AlertDialog):
 
     def __on_delete_one(self, e):
         try:
-            if self.user_pwd is not None:
+            if self.user_pwd and self.user_pwd.page:
                 self.user_pwd.value = self.user_pwd.value[:-1]
                 self.user_pwd.update()
         except:
@@ -96,7 +99,9 @@ class PermissionCheck(ft.AlertDialog):
                 users = User.select().where(User.user_role <= self.user_role, User.user_role > 0).execute()
             else:
                 users = User.select().where(User.user_role <= self.user_role).execute()
-            self.user_name.options = [ft.dropdown.Option(text=user.user_name, key=user.id) for user in users]
+
+            if self.user_name and self.user_name.page:
+                self.user_name.options = [ft.dropdown.Option(text=user.user_name, key=user.id) for user in users]
         except:
             logging.exception('exception occured at PermissionCheck.before_update')
 
@@ -116,24 +121,25 @@ class PermissionCheck(ft.AlertDialog):
         try:
             if self.page and self.page.session:
                 s = self.page.session
-                user_id = self.user_name.value
-                user_pwd = self.user_pwd.value
-                if user_id == None or user_pwd == None:
-                    Toast.show_error(self.page, s.get("lang.permission.user_name_and_pwd_are_required"))
-                    return
+                if self.user_name and self.user_pwd:
+                    user_id = self.user_name.value
+                    user_pwd = self.user_pwd.value
+                    if user_id == None or user_pwd == None:
+                        Toast.show_error(self.page, s.get("lang.permission.user_name_and_pwd_are_required"))
+                        return
 
-                user: User = User.select().where(User.user_role <= self.user_role, User.id == user_id).first()
+                    user: User = User.select().where(User.user_role <= self.user_role, User.id == user_id).first()
 
-                if user is None:
-                    Toast.show_error(self.page, s.get("lang.permission.user_name_or_pwd_is_incorrect"))
-                    return
+                    if user is None:
+                        Toast.show_error(self.page, s.get("lang.permission.user_name_or_pwd_is_incorrect"))
+                        return
 
-                if not user.check_password(user_pwd):
-                    Toast.show_error(self.page, s.get("lang.permission.user_name_or_pwd_is_incorrect"))
-                    return
+                    if not user.check_password(user_pwd):
+                        Toast.show_error(self.page, s.get("lang.permission.user_name_or_pwd_is_incorrect"))
+                        return
 
-                self.page.close(self)
-                self.page.update()
-                self.on_confirm(user)
+                    self.page.close(self)
+                    self.page.update()
+                    self.on_confirm(user)
         except:
             logging.exception('exception occured at PermissionCheck.__on_confirm')

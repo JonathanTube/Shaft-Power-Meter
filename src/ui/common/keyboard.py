@@ -85,7 +85,7 @@ class Keyboard(ft.Stack):
                 if self.tf and self.tf.page:
                     self.tf.border_color = ft.Colors.BLACK
                     self.tf.update()
-
+            
                 if text_field is not None:
                     self.words = str(text_field.value)
 
@@ -93,12 +93,13 @@ class Keyboard(ft.Stack):
                     self.__on_open(None)
 
                 self.type = type
-                self.point.visible = self.type == 'float' or self.type == 'ip'
-                self.point.update()
+                if self.point and self.point.page:
+                    self.point.visible = self.type == 'float' or self.type == 'ip'
+                    self.point.update()
 
                 self.tf = text_field
                 # set the border color of current text field
-                if self.tf is not None:
+                if self.tf and self.tf.page:
                     self.tf.border_color = ft.Colors.PRIMARY
                     self.tf.update()
             except:
@@ -115,24 +116,26 @@ class Keyboard(ft.Stack):
     def __on_open(self, e):
         try:
             self.opened = True
-            self.gd.content = self.kb_open
-            self.gd.left = 500
-            self.gd.top = 250
-            self.gd.right = None
-            self.gd.bottom = None
-            self.gd.update()
+            if self.gd and self.gd.page:
+                self.gd.content = self.kb_open
+                self.gd.left = 500
+                self.gd.top = 250
+                self.gd.right = None
+                self.gd.bottom = None
+                self.gd.update()
         except:
             logging.exception("exception occured at Keyboard.__on_open")
 
     def __on_close(self, e):
         try:
             self.opened = False
-            self.gd.content = self.kb_close
-            self.gd.left = None
-            self.gd.top = None
-            self.gd.right = 10
-            self.gd.bottom = 10
-            self.gd.update()
+            if self.gd and self.gd.page:
+                self.gd.content = self.kb_close
+                self.gd.left = None
+                self.gd.top = None
+                self.gd.right = 10
+                self.gd.bottom = 10
+                self.gd.update()
         except:
             logging.exception("exception occured at Keyboard.__on_close")
 
@@ -176,7 +179,7 @@ class Keyboard(ft.Stack):
 
     def __on_change(self, e):
         try:
-            if self.tf is not None:
+            if self.tf and self.tf.page:
                 self.tf.value = e
                 self.tf.update()
         except:

@@ -61,12 +61,14 @@ class FullscreenAlert(ft.Container):
 
     def show(self):
         self.running = True
-        self.task = self.page.run_task(self.blink)
+        if self.page is not None:
+            self.task = self.page.run_task(self.blink)
 
     def hide(self):
         try:
             self.visible = False
             self.update()
+            self.running = False
             if self.task:
                 self.task.cancel()
         except:
