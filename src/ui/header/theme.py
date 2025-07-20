@@ -13,7 +13,7 @@ class Theme(ft.Container):
 
     def build(self):
         try:
-            self.brightness = ft.Text(f"{100}%", size=30, weight=ft.FontWeight.W_500)
+            self.brightness = ft.Text(value=f"{100}%", size=30, weight=ft.FontWeight.W_500)
 
             self.slider = ft.Slider(
                 width=300,
@@ -56,6 +56,13 @@ class Theme(ft.Container):
 
             if not BrightnessController.is_installed():
                 logging.info('AdvBrightnessDev未安装')
+
+                # 调用sbc,设置默认亮度比
+                brightness_list = sbc.get_brightness()
+                if len(brightness_list) > 0:
+                    brightness_percentage = brightness_list[0]
+                    self.init_brightness_percentage(brightness_percentage)
+
                 return
 
             try:
@@ -63,7 +70,10 @@ class Theme(ft.Container):
                 self.brightness_ctl = BrightnessController()
                 self.brightness_ctl.open()
                 self.brightness_ctl_enabled = True
-                self.slider.value = self.brightness_ctl.get_percentage()
+                
+                brightness_percentage = self.brightness_ctl.get_percentage()
+                self.init_brightness_percentage(brightness_percentage)
+
                 logging.info('AdvBrightnessDev初始化成功')
             except:
                 logging.exception("AdvBrightnessUtility open failed.")
@@ -72,29 +82,45 @@ class Theme(ft.Container):
         except:
             logging.exception('exception occured at Theme.build')
 
+    def init_brightness_percentage(self, brightness_percentage):
+        if self.slider is not None:
+            self.slider.value = brightness_percentage
+
+        if self.brightness is not None:
+            self.brightness.value = f"{brightness_percentage}%"
+
     def toggle_theme(self):
-        if self.page and self.page.session:
-            try:
-                if self.page.theme_mode == ft.ThemeMode.LIGHT:
-                    self.page.theme_mode = ft.ThemeMode.DARK
-                    self.icon = ft.Icons.DARK_MODE
-                else:
-                    self.page.theme_mode = ft.ThemeMode.LIGHT
-                    self.icon = ft.Icons.LIGHT_MODE
-                self.page.update()
+        if self.page is None:
+            return
+
+        try:
+            if self.page.theme_mode == ft.ThemeMode.LIGHT:
+                self.page.theme_mode = ft.ThemeMode.DARK
+                self.icon = ft.Icons.DARK_MODE
+            else:
+                self.page.theme_mode = ft.ThemeMode.LIGHT
+                self.icon = ft.Icons.LIGHT_MODE
+            self.page.update()
+
+            if self.page.appbar and self.page.appbar.page:
                 self.page.appbar.update()
-            except:
-                logging.exception('exception occured at Theme.toggle_theme')
+
+        except:
+            logging.exception('exception occured at Theme.toggle_theme')
 
     def __slider_changed(self, e):
         try:
-            if e.control is not None:
+            if e.control is not None and e.control.value is not None:
                 value = int(e.control.value)
+
                 if self.brightness_ctl_enabled:
                     self.brightness_ctl.set_percentage(value)
                 else:
                     sbc.set_brightness(value)
-                self.brightness.value = f"{int(value)}%"
-                self.brightness.update()
+
+                if self.brightness and self.brightness.page:
+                    self.brightness.value = f"{int(value)}%"
+                    self.brightness.update()
         except:
-            pass
+            logging.exception('exception occured at Theme.__slider_changed')
+

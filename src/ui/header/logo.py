@@ -3,6 +3,7 @@ import flet as ft
 import os
 from pathlib import Path
 
+
 class HeaderLogo(ft.Container):
     def __init__(self):
         super().__init__()
@@ -12,18 +13,18 @@ class HeaderLogo(ft.Container):
         try:
             # Get absolute path to ensure reliability
             base_dir = Path(__file__).parent.parent.parent
-            if self.page.theme_mode == ft.ThemeMode.LIGHT:
+            if self.page is not None and self.page.theme_mode == ft.ThemeMode.LIGHT:
                 return os.path.join(base_dir, "assets", "logo_dark.png")
             else:
                 return os.path.join(base_dir, "assets", "logo_light.png")
         except:
             logging.exception('exception occured at HeaderLogo.get_src')
 
-            
     def update_style(self):
         try:
-            self.content.src = self.get_src()
-            self.content.update()
+            if self.content and self.content.page:
+                self.content.src = self.get_src()
+                self.content.update()
         except:
             logging.exception('exception occured at HeaderLogo.update_style')
 
