@@ -2,6 +2,7 @@ from datetime import datetime
 import logging
 import flet as ft
 from common.global_data import gdata
+from db.models.data_log import DataLog
 from db.models.system_settings import SystemSettings
 from ui.common.custom_card import CustomCard
 from db.models.date_time_conf import DateTimeConf
@@ -153,5 +154,8 @@ class GeneralDateTime(ft.Container):
 
         new_utc_date_time = datetime.strptime(new_date_time, standard_date_time_format)
         gdata.utc_date_time = new_utc_date_time
+
+        # 需要删除掉之前大于当前时间的数据，否则会影响eexi breach判断
+        DataLog.delete().where(DataLog.utc_date_time >= gdata.utc_date_time).execute()
 
         self.page.update()
