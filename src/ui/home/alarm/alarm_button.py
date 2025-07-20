@@ -30,39 +30,57 @@ class AlarmButton(ft.TextButton):
             logging.exception('exception occured at AlarmButton.build')
 
     def handle_data(self):
-        self.alarm_count = AlarmLog.select().where(AlarmLog.is_recovery == False).count()
-        self.not_ack_count = AlarmLog.select().where(AlarmLog.acknowledge_time.is_null()).count()
+        try:
+            self.alarm_count = AlarmLog.select().where(AlarmLog.is_recovery == False).count()
+            self.not_ack_count = AlarmLog.select().where(AlarmLog.acknowledge_time.is_null()).count()
+        except:
+            logging.exception('exception occured at AlarmButton.handle_data')
+            self.alarm_count = 0
+            self.not_ack_count = 0
 
     def set_normal_button(self):
-        self.style = ft.ButtonStyle(
-            shape=ft.RoundedRectangleBorder(radius=ft.border_radius.all(10)),
-            color=ft.Colors.INVERSE_SURFACE,
-            bgcolor=ft.Colors.SURFACE,
-            side=ft.border.all(2, ft.Colors.PRIMARY) if self.active else None
-        )
+        try:
+            self.style = ft.ButtonStyle(
+                shape=ft.RoundedRectangleBorder(radius=ft.border_radius.all(10)),
+                color=ft.Colors.INVERSE_SURFACE,
+                bgcolor=ft.Colors.SURFACE
+            )
 
-        self.icon_color = ft.Colors.INVERSE_SURFACE
+            if self.active:
+                self.style.side = ft.border.all(2, ft.Colors.PRIMARY)
+
+            self.icon_color = ft.Colors.INVERSE_SURFACE
+        except:
+            logging.exception('exception occured at AlarmButton.set_normal_button')
 
     def set_red_button(self):
-        self.style = ft.ButtonStyle(
-            shape=ft.RoundedRectangleBorder(radius=ft.border_radius.all(10)),
-            color=ft.Colors.WHITE,
-            bgcolor=ft.Colors.RED,
-            side=ft.border.all(2, ft.Colors.PRIMARY)
-        )
-        self.icon_color = ft.Colors.WHITE
-        self.style.side = ft.border.all(2, ft.Colors.PRIMARY) if self.active else None
+        try:
+            self.style = ft.ButtonStyle(
+                shape=ft.RoundedRectangleBorder(radius=ft.border_radius.all(10)),
+                color=ft.Colors.WHITE,
+                bgcolor=ft.Colors.RED
+            )
+
+            if self.active:
+                self.style.side = ft.border.all(2, ft.Colors.PRIMARY)
+
+            self.icon_color = ft.Colors.WHITE
+        except:
+            logging.exception('exception occured at AlarmButton.set_red_button')
 
     def toggle_badge(self):
-        if self.page:
-            if self.alarm_count > 0:
-                self.badge = ft.Badge(
-                    text=str(self.alarm_count), label_visible=True,
-                    bgcolor=ft.Colors.RED, text_color=ft.Colors.WHITE
-                )
-            else:
-                self.badge = None
-            self.update()
+        try:
+            if self.page:
+                if self.alarm_count > 0:
+                    self.badge = ft.Badge(
+                        text=str(self.alarm_count), label_visible=True,
+                        bgcolor=ft.Colors.RED, text_color=ft.Colors.WHITE
+                    )
+                else:
+                    self.badge = None
+                self.update()
+        except:
+            logging.exception('exception occured at AlarmButton.toggle_badge')
 
     def toggle_button(self, blink: bool):
         try:
@@ -99,7 +117,8 @@ class AlarmButton(ft.TextButton):
                 await asyncio.sleep(1)
 
     def did_mount(self):
-        self.task = self.page.run_task(self.__loop)
+        if self.page:
+            self.task = self.page.run_task(self.__loop)
 
     def will_unmount(self):
         self.task_running = False

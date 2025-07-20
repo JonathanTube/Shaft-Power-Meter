@@ -71,22 +71,23 @@ class ManuallyCounter(ft.Container):
 
 
     def __create_dlg_modal(self):
-        self.dlg_modal = ft.AlertDialog(
-            modal=True,
-            title=ft.Text(self.page.session.get('lang.counter.please_confirm')),
-            content=ft.Text(self.page.session.get('lang.counter.do_you_really_want_to_reset_counter')),
-            actions=[
-                ft.TextButton(
-                    self.page.session.get('lang.counter.yes'),
-                    on_click=lambda e: self.__on_resume(e)
-                ),
-                ft.TextButton(
-                    text=self.page.session.get('lang.counter.no'),
-                    on_click=lambda e: e.page.close(self.dlg_modal)
-                )
-            ],
-            actions_alignment=ft.MainAxisAlignment.END
-        )
+        if self.page and self.page.session:
+            self.dlg_modal = ft.AlertDialog(
+                modal=True,
+                title=ft.Text(self.page.session.get('lang.counter.please_confirm')),
+                content=ft.Text(self.page.session.get('lang.counter.do_you_really_want_to_reset_counter')),
+                actions=[
+                    ft.TextButton(
+                        self.page.session.get('lang.counter.yes'),
+                        on_click=lambda e: self.__on_resume(e)
+                    ),
+                    ft.TextButton(
+                        text=self.page.session.get('lang.counter.no'),
+                        on_click=lambda e: e.page.close(self.dlg_modal)
+                    )
+                ],
+                actions_alignment=ft.MainAxisAlignment.END
+            )
 
     def build(self):
         try:
@@ -181,7 +182,8 @@ class ManuallyCounter(ft.Container):
 
     def did_mount(self):
         self.task_running = True
-        self._task = self.page.run_task(self.__running)
+        if self.page:
+            self._task = self.page.run_task(self.__running)
 
     def will_unmount(self):
         self.task_running = False
@@ -198,83 +200,105 @@ class ManuallyCounter(ft.Container):
                 await asyncio.sleep(self.interval)
 
     def __calculate(self):
-        average_power = 0
-        average_speed = 0
+        try:
+            if self.page and self.page.session:
+                average_power = 0
+                average_speed = 0
 
-        counter_log: CounterLog = CounterLog.get_or_none(CounterLog.sps_name == self.name, CounterLog.counter_type == 1)
-        if counter_log is None or counter_log.counter_status == "stopped":
-            self.status_text.value = self.page.session.get('lang.counter.stopped')
-            self.status_container.bgcolor = ft.Colors.RED_500
-            self.status_container.update()
+                counter_log: CounterLog = CounterLog.get_or_none(CounterLog.sps_name == self.name, CounterLog.counter_type == 1)
+                if counter_log is None or counter_log.counter_status == "stopped":
+                    self.status_text.value = self.page.session.get('lang.counter.stopped')
+                    if self.status_container and self.status_container.page:
+                        self.status_container.bgcolor = ft.Colors.RED_500
+                        self.status_container.update()
 
-            self.started_at.visible = False
-            self.time_elapsed.visible = False
-            self.stopped_at.visible = False
-            self.infos.update()
+                    self.started_at.visible = False
+                    self.time_elapsed.visible = False
+                    self.stopped_at.visible = False
+                    if self.infos and self.infos.page:
+                        self.infos.update()
 
-            self.start_button.visible = True
-            self.stop_button.visible = False
-            self.resume_button.visible = False
-            self.buttons.update()
+                    self.start_button.visible = True
+                    self.stop_button.visible = False
+                    self.resume_button.visible = False
+                    if self.buttons and self.buttons.page:
+                        self.buttons.update()
 
-            self.display.set_average_power(0, self.system_unit)
-            self.display.set_total_energy(0, self.system_unit)
-            self.display.set_average_speed(0)
-            return
+                    if self.display:
+                        self.display.set_average_power(0, self.system_unit)
+                        self.display.set_total_energy(0, self.system_unit)
+                        self.display.set_average_speed(0)
+                    return
 
-        if counter_log.counter_status == "reset":
-            self.status_text.value = self.page.session.get('lang.counter.reset')
-            self.status_container.bgcolor = ft.Colors.ORANGE_500
-            self.status_container.update()
+                if counter_log.counter_status == "reset":
+                    self.status_text.value = self.page.session.get('lang.counter.reset')
+                    self.status_container.bgcolor = ft.Colors.ORANGE_500
+                    self.status_container.update()
 
-            self.stopped_at.value = f'{self.page.session.get("lang.counter.stopped_at")} {counter_log.stop_utc_date_time.strftime(self.date_format)}'
-            self.stopped_at.visible = True
-            self.started_at.visible = False
-            self.time_elapsed.visible = True
-            self.infos.update()
-            self.start_button.visible = False
-            self.stop_button.visible = False
-            self.resume_button.visible = True
-            self.buttons.update()
-            return
+                    self.stopped_at.value = f'{self.page.session.get("lang.counter.stopped_at")} {counter_log.stop_utc_date_time.strftime(self.date_format)}'
+                    self.stopped_at.visible = True
+                    self.started_at.visible = False
+                    self.time_elapsed.visible = True
 
-        # the rest of the code is for the running status
-        self.status_text.value = self.page.session.get('lang.counter.running')
-        self.status_container.bgcolor = ft.Colors.GREEN_500
-        self.status_container.update()
+                    if self.infos and self.infos.page:
+                        self.infos.update()
 
-        self.started_at.value = f'{self.page.session.get("lang.counter.started_at")} {counter_log.start_utc_date_time.strftime(self.date_format)}'
-        self.started_at.visible = True
-        self.time_elapsed.visible = True
-        self.stopped_at.visible = False
-        self.infos.update()
+                    self.start_button.visible = False
+                    self.stop_button.visible = False
+                    self.resume_button.visible = True
 
-        self.start_button.visible = False
-        self.stop_button.visible = True
-        self.resume_button.visible = False
-        self.buttons.update()
+                    if self.buttons and self.buttons.page:
+                        self.buttons.update()
 
-        start_time = counter_log.start_utc_date_time
-        end_time = gdata.utc_date_time
+                    return
 
-        if counter_log.times != 0:
-            average_power = counter_log.total_power / counter_log.times
-            average_speed = counter_log.total_speed / counter_log.times
+                # the rest of the code is for the running status
+                self.status_text.value = self.page.session.get('lang.counter.running')
 
-        hours = (end_time - start_time).total_seconds() / 3600
+                if self.status_container and self.status_container.page:
+                    self.status_container.bgcolor = ft.Colors.GREEN_500
+                    self.status_container.update()
 
-        total_energy = average_power * hours / 1000  # kWh
+                self.started_at.value = f'{self.page.session.get("lang.counter.started_at")} {counter_log.start_utc_date_time.strftime(self.date_format)}'
+                self.started_at.visible = True
+                self.time_elapsed.visible = True
+                self.stopped_at.visible = False
 
-        time_elapsed = end_time - start_time
-        days = time_elapsed.days
-        hours = time_elapsed.seconds // 3600
-        minutes = (time_elapsed.seconds % 3600) // 60
-        seconds = time_elapsed.seconds % 60
+                if self.infos and self.infos.page:
+                    self.infos.update()
 
-        time_elapsed = f'{days:02d} d {hours:02d}:{minutes:02d}:{seconds:02d} h'
-        self.time_elapsed.value = f'{time_elapsed} {self.page.session.get("lang.counter.measured")}'
-        self.time_elapsed.update()
+                self.start_button.visible = False
+                self.stop_button.visible = True
+                self.resume_button.visible = False
 
-        self.display.set_average_power(average_power, self.system_unit)
-        self.display.set_total_energy(total_energy, self.system_unit)
-        self.display.set_average_speed(average_speed)
+                if self.buttons and self.buttons.page:
+                    self.buttons.update()
+
+                start_time = counter_log.start_utc_date_time
+                end_time = gdata.utc_date_time
+
+                if counter_log.times != 0:
+                    average_power = counter_log.total_power / counter_log.times
+                    average_speed = counter_log.total_speed / counter_log.times
+
+                hours = (end_time - start_time).total_seconds() / 3600
+
+                total_energy = average_power * hours / 1000  # kWh
+
+                time_elapsed = end_time - start_time
+                days = time_elapsed.days
+                hours = time_elapsed.seconds // 3600
+                minutes = (time_elapsed.seconds % 3600) // 60
+                seconds = time_elapsed.seconds % 60
+
+                time_elapsed = f'{days:02d} d {hours:02d}:{minutes:02d}:{seconds:02d} h'
+                if self.time_elapsed and self.time_elapsed.page:
+                    self.time_elapsed.value = f'{time_elapsed} {self.page.session.get("lang.counter.measured")}'
+                    self.time_elapsed.update()
+
+                if self.display:
+                    self.display.set_average_power(average_power, self.system_unit)
+                    self.display.set_total_energy(total_energy, self.system_unit)
+                    self.display.set_average_speed(average_speed)
+        except:
+            logging.exception("exception occured at ManuallyCounter.__calculate")

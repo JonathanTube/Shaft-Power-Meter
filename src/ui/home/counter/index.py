@@ -13,9 +13,6 @@ class Counter(ft.Container):
         self.padding = 10
         self.expand = True
 
-        self.__load_config()
-
-    def __load_config(self):
         system_settings: SystemSettings = SystemSettings.get_or_none()
         self.dual = system_settings.amount_of_propeller == 2
 
