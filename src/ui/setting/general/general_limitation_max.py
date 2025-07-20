@@ -21,7 +21,7 @@ class GeneralLimitationMax(ft.Container):
 
     def build(self):
         try:
-            if self.page:
+            if self.page and self.page.session:
                 self.speed_max = ft.TextField(
                     suffix_text="rpm",
                     label=self.page.session.get("lang.common.speed"),
@@ -58,10 +58,17 @@ class GeneralLimitationMax(ft.Container):
         try:
             if self.page and self.page.session:
                 s = self.page.session
-                self.speed_max.label = s.get("lang.common.speed")
-                self.torque_max.label = s.get("lang.common.torque")
-                self.power_max.label = s.get("lang.common.power")
-                self.custom_card.set_title(s.get("lang.setting.maximum_limitations"))
+                if self.speed_max is not None:
+                    self.speed_max.label = s.get("lang.common.speed")
+
+                if self.torque_max is not None:    
+                    self.torque_max.label = s.get("lang.common.torque")
+
+                if self.power_max is not None:    
+                    self.power_max.label = s.get("lang.common.power")
+
+                if self.custom_card is not None:
+                    self.custom_card.set_title(s.get("lang.setting.maximum_limitations"))
         except:
             logging.exception('exception occured at GeneralLimitationMax.before_update')
 
@@ -72,20 +79,27 @@ class GeneralLimitationMax(ft.Container):
                 torque_limit = self.limitations.torque_max
                 power_limit = self.limitations.power_max
                 if self.system_unit == 0:
-                    self.torque_max.suffix_text = "kNm"
-                    self.torque_max.value = round(torque_limit / 1000, 1)
 
-                    self.power_max.suffix_text = "kW"
-                    self.power_max.value = round(power_limit / 1000, 1)
+                    if self.torque_max is not None:
+                        self.torque_max.suffix_text = "kNm"
+                        self.torque_max.value = round(torque_limit / 1000, 1)
+
+                    if self.power_max is not None:
+                        self.power_max.suffix_text = "kW"
+                        self.power_max.value = round(power_limit / 1000, 1)
 
                 elif self.system_unit == 1:
-                    self.torque_max.suffix_text = "Tm"
-                    self.torque_max.value = UnitConverter.nm_to_tm(torque_limit)
 
-                    self.power_max.suffix_text = "sHp"
-                    self.power_max.value = UnitConverter.w_to_shp(power_limit)
+                    if self.torque_max is not None:
+                        self.torque_max.suffix_text = "Tm"
+                        self.torque_max.value = UnitConverter.nm_to_tm(torque_limit)
 
-                self.content.update()
+                    if self.power_max is not None:
+                        self.power_max.suffix_text = "sHp"
+                        self.power_max.value = UnitConverter.w_to_shp(power_limit)
+
+                if self.content and self.content.page:
+                    self.content.update()
         except:
             logging.exception('exception occured at GeneralLimitationMax.update_unit')
 

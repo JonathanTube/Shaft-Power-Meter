@@ -15,22 +15,24 @@ class GeneralDateTime(ft.Container):
         super().__init__()
         self.expand = True
         self.date_time_conf: DateTimeConf = DateTimeConf.get()
-        self.system_settings:SystemSettings = SystemSettings.get()
+        self.system_settings: SystemSettings = SystemSettings.get()
 
     def build(self):
         try:
-            if self.page:
+            if self.page and self.page.session:
                 s = self.page.session
+
+                utc_date_time = self.date_time_conf.utc_date_time
 
                 self.utc_date = ft.TextField(
                     label=s.get("lang.setting.date"),
                     col={"md": 6},
                     can_request_focus=False,
-                    value=self.date_time_conf.utc_date_time.strftime(self.date_time_conf.date_format),
+                    value=utc_date_time.strftime(self.date_time_conf.date_format) if utc_date_time is not None else '',
                     on_click=lambda e: e.page.open(
                         ft.DatePicker(
                             on_change=self.__handle_date_change,
-                            current_date=self.date_time_conf.utc_date_time.date()
+                            current_date=utc_date_time.date() if utc_date_time is not None else datetime.now()
                         )
                     )
                 )
@@ -39,7 +41,7 @@ class GeneralDateTime(ft.Container):
                     label=s.get("lang.setting.time"),
                     col={"md": 6},
                     can_request_focus=False,
-                    value=self.date_time_conf.utc_date_time.strftime('%H:%M'),
+                    value=utc_date_time.strftime('%H:%M') if utc_date_time is not None else '',
                     on_click=lambda e: e.page.open(
                         ft.TimePicker(
                             on_change=self.__handle_time_change
@@ -83,56 +85,73 @@ class GeneralDateTime(ft.Container):
         try:
             if self.page and self.page.session:
                 s = self.page.session
-                self.utc_date.label = s.get("lang.setting.date")
-                self.utc_time.label = s.get("lang.setting.time")
-                self.date_format.label = s.get("lang.setting.date_format")
-                self.sync_with_gps.label = s.get("lang.setting.sync_with_gps")
-                self.custom_card.set_title(s.get("lang.setting.utc_date_time_conf"))
-                self.utc_date.value = self.date_time_conf.utc_date_time.strftime(self.date_time_conf.date_format)
+                if self.utc_date is not None:
+                    self.utc_date.label = s.get("lang.setting.date")
+                    if self.date_time_conf and self.date_time_conf.utc_date_time:
+                        self.utc_date.value = self.date_time_conf.utc_date_time.strftime(self.date_time_conf.date_format)
+
+                if self.utc_time is not None:
+                    self.utc_time.label = s.get("lang.setting.time")
+
+                if self.date_format is not None:
+                    self.date_format.label = s.get("lang.setting.date_format")
+
+                if self.sync_with_gps is not None:
+                    self.sync_with_gps.label = s.get("lang.setting.sync_with_gps")
+
+                if self.custom_card is not None:
+                    self.custom_card.set_title(s.get("lang.setting.utc_date_time_conf"))
         except:
             logging.exception('exception occured at GeneralDateTime.build')
 
     def __handle_date_change(self, e):
         try:
-            utc_date = e.control.value.strftime('%Y-%m-%d')
-            if self.utc_date and self.utc_date.page:
-                self.utc_date.value = utc_date
-                self.utc_date.update()
+            if e.control is not None and e.control.value is not None:
+                utc_date = e.control.value.strftime('%Y-%m-%d')
+                if self.utc_date and self.utc_date.page:
+                    self.utc_date.value = utc_date
+                    self.utc_date.update()
         except:
             logging.exception('exception occured at GeneralDateTime.__handle_date_change')
 
     def __handle_time_change(self, e):
         try:
-            utc_time = e.control.value.strftime('%H:%M')
-            if self.utc_time and self.utc_time.page:
-                self.utc_time.value = utc_time
-                self.utc_time.update()
+            if e.control is not None and e.control.value is not None:
+                utc_time = e.control.value.strftime('%H:%M')
+                if self.utc_time and self.utc_time.page:
+                    self.utc_time.value = utc_time
+                    self.utc_time.update()
         except:
             logging.exception('exception occured at GeneralDateTime.__handle_time_change')
 
     def save_data(self, user_id: int):
-        if self.page:
-            standard_date_time_format = f'{self.date_time_conf.date_format} %H:%M:%S'
-            # save date time conf
-            new_date = self.utc_date.value
-            new_time = self.utc_time.value
-            self.date_time_conf.utc_date_time = datetime.strptime(f"{new_date} {new_time}:00", standard_date_time_format)
+        if self.page is None:
+            return
 
-            self.date_time_conf.system_date_time = datetime.now()
-            self.date_time_conf.date_format = self.date_format.value
-            self.date_time_conf.sync_with_gps = self.sync_with_gps.value
-            gdata.enable_utc_time_sync_with_gps = self.sync_with_gps.value
-            self.date_time_conf.save()
-            OperationLog.create(
-                user_id=user_id,
-                utc_date_time=gdata.utc_date_time,
-                operation_type=OperationType.GENERAL_UTC_DATE_TIME,
-                operation_content=model_to_dict(self.date_time_conf)
-            )
+        if self.date_time_conf is None:
+            return
 
-            new_date_time = f"{new_date} {new_time}:00"
+        standard_date_time_format = f'{self.date_time_conf.date_format} %H:%M:%S'
+        # save date time conf
+        new_date = self.utc_date.value
+        new_time = self.utc_time.value
+        self.date_time_conf.utc_date_time = datetime.strptime(f"{new_date} {new_time}:00", standard_date_time_format)
 
-            new_utc_date_time = datetime.strptime(new_date_time, standard_date_time_format)
-            gdata.utc_date_time = new_utc_date_time
+        self.date_time_conf.system_date_time = datetime.now()
+        self.date_time_conf.date_format = self.date_format.value
+        self.date_time_conf.sync_with_gps = self.sync_with_gps.value
+        gdata.enable_utc_time_sync_with_gps = self.sync_with_gps.value
+        self.date_time_conf.save()
+        OperationLog.create(
+            user_id=user_id,
+            utc_date_time=gdata.utc_date_time,
+            operation_type=OperationType.GENERAL_UTC_DATE_TIME,
+            operation_content=model_to_dict(self.date_time_conf)
+        )
 
-            self.page.update()
+        new_date_time = f"{new_date} {new_time}:00"
+
+        new_utc_date_time = datetime.strptime(new_date_time, standard_date_time_format)
+        gdata.utc_date_time = new_utc_date_time
+
+        self.page.update()

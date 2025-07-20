@@ -21,7 +21,7 @@ class GeneralLimitationWarning(ft.Container):
 
     def build(self):
         try:
-            if self.page:
+            if self.page and self.page.session:
                 self.torque_warning = ft.TextField(
                     suffix_text="kNm",
                     label=self.page.session.get("lang.common.torque"),
@@ -59,10 +59,17 @@ class GeneralLimitationWarning(ft.Container):
         try:
             if self.page and self.page.session:
                 s = self.page.session
-                self.torque_warning.label = s.get("lang.common.torque")
-                self.speed_warning.label = s.get("lang.common.speed")
-                self.power_warning.label = s.get("lang.common.power")
-                self.custom_card.set_title(s.get("lang.setting.warning_limitations"))
+                if self.torque_warning is not None:
+                    self.torque_warning.label = s.get("lang.common.torque")
+
+                if self.speed_warning is not None:
+                    self.speed_warning.label = s.get("lang.common.speed")
+
+                if self.power_warning is not None:    
+                    self.power_warning.label = s.get("lang.common.power")
+
+                if self.custom_card is not None:
+                    self.custom_card.set_title(s.get("lang.setting.warning_limitations"))
         except:
             logging.exception('exception occured at GeneralLimitationWarning.before_update')
 
@@ -73,20 +80,26 @@ class GeneralLimitationWarning(ft.Container):
                 torque_warning = self.limitations.torque_warning
                 power_warning = self.limitations.power_warning
                 if self.system_unit == 0:
-                    self.torque_warning.suffix_text = "kNm"
-                    self.torque_warning.value = round(torque_warning / 1000, 1)
 
-                    self.power_warning.suffix_text = "kW"
-                    self.power_warning.value = round(power_warning / 1000, 1)
+                    if self.torque_warning is not None:
+                        self.torque_warning.suffix_text = "kNm"
+                        self.torque_warning.value = round(torque_warning / 1000, 1)
+
+                    if self.power_warning is not None:
+                        self.power_warning.suffix_text = "kW"
+                        self.power_warning.value = round(power_warning / 1000, 1)
 
                 elif self.system_unit == 1:
-                    self.torque_warning.suffix_text = "Tm"
-                    self.torque_warning.value = UnitConverter.nm_to_tm(torque_warning)
+                    if self.torque_warning is not None:
+                        self.torque_warning.suffix_text = "Tm"
+                        self.torque_warning.value = UnitConverter.nm_to_tm(torque_warning)
 
-                    self.power_warning.suffix_text = "sHp"
-                    self.power_warning.value = UnitConverter.w_to_shp(power_warning)
+                    if self.power_warning is not None:
+                        self.power_warning.suffix_text = "sHp"
+                        self.power_warning.value = UnitConverter.w_to_shp(power_warning)
 
-                self.content.update()
+                if self.content and self.content.page:
+                    self.content.update()
         except:
             logging.exception('exception occured at GeneralLimitationWarning.update_unit')
 

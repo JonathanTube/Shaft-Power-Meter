@@ -19,7 +19,7 @@ class GeneralOflineDefaultValue(ft.Container):
 
     def build(self):
         try:
-            if self.page:
+            if self.page and self.page.session:
                 self.torque_default_value = ft.TextField(
                     suffix_text="Nm",
                     label=self.page.session.get("lang.common.torque"),
@@ -66,14 +66,24 @@ class GeneralOflineDefaultValue(ft.Container):
         try:
             if self.page and self.page.session:
                 s = self.page.session
-                self.torque_default_value.label = s.get("lang.common.torque")
-                self.thrust_default_value.label = s.get("lang.common.thrust")
-                self.speed_default_value.label = s.get("lang.common.speed")
-                self.custom_card.set_title(s.get("lang.setting.offline_default_value"))
+                if self.torque_default_value is not None:
+                    self.torque_default_value.label = s.get("lang.common.torque")
+
+                if self.thrust_default_value is not None:    
+                    self.thrust_default_value.label = s.get("lang.common.thrust")
+
+                if self.speed_default_value is not None:    
+                    self.speed_default_value.label = s.get("lang.common.speed")
+
+                if self.custom_card is not None:    
+                    self.custom_card.set_title(s.get("lang.setting.offline_default_value"))
         except:
             logging.exception('exception occured at GeneralOflineDefaultValue.before_update')
 
     def save_data(self, user_id: int):
+        if self.odv is None:
+            return
+
         self.odv.torque_default_value = float(self.torque_default_value.value or 0)
         self.odv.thrust_default_value = float(self.thrust_default_value.value or 0)
         self.odv.speed_default_value = float(self.speed_default_value.value or 0)
@@ -106,26 +116,34 @@ class GeneralOflineDefaultValue(ft.Container):
             speed_default_value = float(self.odv.speed_default_value or 0)
 
             if self.system_unit == 0:
-                self.torque_default_value.suffix_text = "kNm"
-                self.torque_default_value.value = round(torque_default_value / 1000, 1)
 
-                self.thrust_default_value.suffix_text = "kN"
-                self.thrust_default_value.value = round(thrust_default_value / 1000, 1)
+                if self.torque_default_value is not None:
+                    self.torque_default_value.suffix_text = "kNm"
+                    self.torque_default_value.value = round(torque_default_value / 1000, 1)
 
-                self.speed_default_value.suffix_text = "rpm"
-                self.speed_default_value.value = round(speed_default_value, 1)
+                if self.thrust_default_value is not None:
+                    self.thrust_default_value.suffix_text = "kN"
+                    self.thrust_default_value.value = round(thrust_default_value / 1000, 1)
+
+                if self.speed_default_value is not None:
+                    self.speed_default_value.suffix_text = "rpm"
+                    self.speed_default_value.value = round(speed_default_value, 1)
 
             elif self.system_unit == 1:
-                self.torque_default_value.suffix_text = "Tm"
-                self.torque_default_value.value = UnitConverter.nm_to_tm(torque_default_value)
+                if self.torque_default_value is not None:
+                    self.torque_default_value.suffix_text = "Tm"
+                    self.torque_default_value.value = UnitConverter.nm_to_tm(torque_default_value)
 
-                self.thrust_default_value.suffix_text = "T"
-                self.thrust_default_value.value = UnitConverter.n_to_t(thrust_default_value)
+                if self.thrust_default_value is not None:
+                    self.thrust_default_value.suffix_text = "T"
+                    self.thrust_default_value.value = UnitConverter.n_to_t(thrust_default_value)
 
-                self.speed_default_value.suffix_text = "rpm"
-                self.speed_default_value.value = round(speed_default_value, 1)
+                if self.speed_default_value is not None:
+                    self.speed_default_value.suffix_text = "rpm"
+                    self.speed_default_value.value = round(speed_default_value, 1)
 
-            self.content.update()
+            if self.content and self.content.page:
+                self.content.update()
         except:
             logging.exception('exception occured at GeneralOflineDefaultValue.update_unit')
 

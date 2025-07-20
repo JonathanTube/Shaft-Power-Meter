@@ -19,7 +19,7 @@ class GeneralPreference(ft.Container):
 
     def build(self):
         try:
-            if self.page:
+            if self.page and self.page.session:
                 s = self.page.session
                 self.theme_label = ft.Text(s.get("lang.setting.theme"))
                 self.theme_light = ft.Radio(value=0, label=s.get("lang.setting.theme.light"))
@@ -111,7 +111,7 @@ class GeneralPreference(ft.Container):
         self.on_system_unit_change(int(self.system_unit.value))
 
     def save_data(self, user_id: int):
-        if self.page is None:
+        if self.page is None or self.page.session is None:
             return
 
         # save preference
@@ -138,7 +138,9 @@ class GeneralPreference(ft.Container):
         for item in Language.select():
             self.page.session.set(item.code, item.english if self.preference.language == 0 else item.chinese)
 
-        self.page.window.full_screen = new_fullscreen
+        if self.page.window is not None:
+            self.page.window.full_screen = new_fullscreen
+
         theme = int(self.preference.theme)
         self.page.theme_mode = ft.ThemeMode.LIGHT if theme == 0 else ft.ThemeMode.DARK
         self.page.update()
