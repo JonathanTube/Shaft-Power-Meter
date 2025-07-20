@@ -98,14 +98,14 @@ class EventTable(AbstractTable):
             show_note = items[7] is not None and items[7].strip() != ""
             return ft.Row(controls=[
                 ft.IconButton(
-                    icon=ft.icons.WARNING,
+                    icon=ft.Icons.WARNING,
                     icon_color=ft.Colors.RED,
                     icon_size=20,
                     visible=show_reason,
                     on_click=lambda e: self.page.open(EventForm(items[0], self.__update_table))
                 ),
                 ft.IconButton(
-                    icon=ft.icons.NOTE,
+                    icon=ft.Icons.NOTE,
                     icon_color=ft.Colors.GREEN,
                     icon_size=20,
                     visible=show_note,

@@ -110,7 +110,7 @@ class ManuallyCounter(ft.Container):
 
             self.start_button = ft.FilledButton(
                 text=self.page.session.get('lang.counter.start'),
-                icon=ft.icons.PLAY_CIRCLE_OUTLINED,
+                icon=ft.Icons.PLAY_CIRCLE_OUTLINED,
                 icon_color=ft.Colors.WHITE,
                 bgcolor=ft.Colors.GREEN,
                 color=ft.Colors.WHITE,
@@ -121,7 +121,7 @@ class ManuallyCounter(ft.Container):
 
             self.stop_button = ft.FilledButton(
                 text=self.page.session.get('lang.counter.stop'),
-                icon=ft.icons.STOP_CIRCLE_OUTLINED,
+                icon=ft.Icons.STOP_CIRCLE_OUTLINED,
                 icon_color=ft.Colors.WHITE,
                 bgcolor=ft.Colors.RED,
                 color=ft.Colors.WHITE,
@@ -135,7 +135,7 @@ class ManuallyCounter(ft.Container):
                 bgcolor=ft.Colors.ORANGE,
                 icon_color=ft.Colors.WHITE,
                 color=ft.Colors.WHITE,
-                icon=ft.icons.RESTART_ALT_OUTLINED,
+                icon=ft.Icons.RESTART_ALT_OUTLINED,
                 width=220,
                 visible=False,
                 on_click=lambda e: e.page.open(self.dlg_modal)

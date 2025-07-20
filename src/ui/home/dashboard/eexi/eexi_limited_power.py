@@ -34,7 +34,7 @@ class EEXILimitedPower(ft.Container):
             self.meter_half = MeterHalf(radius=meter_radius, green=green, orange=orange, red=red)
             self.title = ft.Text(f"{self.page.session.get('lang.common.eexi_limited_power')}(%)", size=16, weight=ft.FontWeight.W_600)
             self.unlimited_mode = ft.Text(f"{self.page.session.get('lang.common.power_unlimited_mode')}:", weight=ft.FontWeight.W_400)
-            self.unlimited_mode_icon = ft.Icon(ft.icons.INFO_OUTLINED, color=ft.Colors.GREEN, size=18)
+            self.unlimited_mode_icon = ft.Icon(ft.Icons.INFO_OUTLINED, color=ft.Colors.GREEN, size=18)
 
             self.unlimited_mode_row = ft.Row(
                 vertical_alignment=ft.CrossAxisAlignment.CENTER,

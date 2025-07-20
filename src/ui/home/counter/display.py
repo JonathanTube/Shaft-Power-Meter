@@ -37,7 +37,7 @@ class CounterDisplay(ft.Container):
             controls=[
                 ft.Row(
                     controls=[
-                        ft.Icon(ft.icons.ENERGY_SAVINGS_LEAF_OUTLINED, size=16),
+                        ft.Icon(ft.Icons.ENERGY_SAVINGS_LEAF_OUTLINED, size=16),
                         self.total_energy_label
                     ]
                 ),
@@ -62,7 +62,7 @@ class CounterDisplay(ft.Container):
             controls=[
                 ft.Row(
                     controls=[
-                        ft.Icon(ft.icons.ELECTRIC_BOLT_OUTLINED, size=16),
+                        ft.Icon(ft.Icons.ELECTRIC_BOLT_OUTLINED, size=16),
                         self.average_power_label
                     ]
                 ),
@@ -83,7 +83,7 @@ class CounterDisplay(ft.Container):
             controls=[
                 ft.Row(
                     controls=[
-                        ft.Icon(ft.icons.SPEED_OUTLINED, size=16),
+                        ft.Icon(ft.Icons.SPEED_OUTLINED, size=16),
                         self.average_speed_label
                     ]
                 ),

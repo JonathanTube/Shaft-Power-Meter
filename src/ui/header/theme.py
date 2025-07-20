@@ -32,12 +32,12 @@ class Theme(ft.Container):
                             ft.Row([
                                 ft.Icon(
                                     expand=False,
-                                    name=ft.icons.DARK_MODE_ROUNDED
+                                    name=ft.Icons.DARK_MODE_ROUNDED
                                 ),
                                 self.slider,
                                 ft.Icon(
                                     expand=False,
-                                    name=ft.icons.LIGHT_MODE_ROUNDED
+                                    name=ft.Icons.LIGHT_MODE_ROUNDED
                                 )
                             ])
                         ])
@@ -49,7 +49,7 @@ class Theme(ft.Container):
                     on_click=lambda _: self.toggle_theme()
                 ),
                 ft.IconButton(
-                    icon=ft.icons.SETTINGS_BRIGHTNESS,
+                    icon=ft.Icons.SETTINGS_BRIGHTNESS,
                     on_click=lambda _: self.page.open(self.dlg)
                 )
             ])
