@@ -950,7 +950,7 @@ class DataInit:
                 {
                     "code": "lang.setting.data_refresh_interval",
                     "chinese": "界面数据刷新间隔",
-                    "english": "Data Refresh Interval"
+                    "english": "Data Average Interval"
                 },
 
                 {
