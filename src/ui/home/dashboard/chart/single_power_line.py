@@ -58,7 +58,12 @@ class SinglePowerLine(ft.Container):
             power_and_unit = UnitParser.parse_power(self.max_power, self.system_unit)
             left_max = math.ceil(power_and_unit[0])
             left_unit = power_and_unit[1]
-            width = self.page.window.width - 80
+
+            width = 1000
+
+            if self.page and self.page.window:
+                width = self.page.window.width - 80
+
             self.chart = ft.LineChart(
                 width=width,
                 min_y=0,
@@ -84,74 +89,96 @@ class SinglePowerLine(ft.Container):
                 ]
             )
 
-            self.content = SimpleCard(
-                title=self.page.session.get("lang.common.power"),
-                body=ft.Container(
-                    content=self.chart,
-                    padding=ft.padding.only(right=30)
-                ),
-                text_center=True
-            )
+            if self.page and self.page.session:
+                self.content = SimpleCard(
+                    title=self.page.session.get("lang.common.power"),
+                    body=ft.Container(
+                        content=self.chart,
+                        padding=ft.padding.only(right=30)
+                    ),
+                    text_center=True
+                )
         except:
             logging.exception('exception occured at SinglePowerLine.reload')
 
-
     def reload(self):
         try:
-            if self.page:
-                self.__handle_bottom_axis()
-                self.__handle_data_line()
+            self.__handle_bottom_axis()
+            self.__handle_data_line()
+
+            if self.threshold_filled:
                 self.threshold_filled.data_points = self.get_threshold_data()
+            
+            if self.threshold_line:
                 self.threshold_line.data_points = self.get_threshold_data()
+
+            if self.chart and self.chart.page:
                 self.chart.update()
         except:
             logging.exception('exception occured at SinglePowerLine.reload')
 
     def __handle_bottom_axis(self):
-        labels = []
-        for index, item in enumerate(gdata.sps1_power_history):
-            label = ft.ChartAxisLabel(
-                value=index,
-                label=ft.Container(
-                    content=ft.Text(value=item[1].strftime('%H:%M:%S')),
-                    padding=ft.padding.only(top=10)
-                )
-            )
-            labels.append(label)
+        try:
+            labels = []
+            for index, item in enumerate(gdata.sps1_power_history):
+                if len(item) > 1:
+                    label = ft.ChartAxisLabel(
+                        value=index,
+                        label=ft.Container(
+                            content=ft.Text(value=item[1].strftime('%H:%M:%S')),
+                            padding=ft.padding.only(top=10)
+                        )
+                    )
+                    labels.append(label)
 
-        self.chart.bottom_axis.labels = labels
-        self.chart.bottom_axis.visible = len(labels) > 0
-        size = 8
-        if len(labels) > size:
-            self.chart.bottom_axis.labels_interval = (len(labels) + size) // size
+            if self.chart and self.chart.bottom_axis:
+                self.chart.bottom_axis.labels = labels
+                self.chart.bottom_axis.visible = len(labels) > 0
+                size = 8
+                if len(labels) > size:
+                    self.chart.bottom_axis.labels_interval = (len(labels) + size) // size
+        except:
+            logging.exception('exception occured at SinglePowerLine.__handle_bottom_axis')
+
 
     def __handle_data_line(self):
-        data_points = []
-        for index in range(len(gdata.sps1_power_history)):
-            power_sps1 = gdata.sps1_power_history[index][0]
-            power_sps2 = 0
-            try:
-                # print(f"gdata.sps2_power_history======================: {gdata.sps2_power_history}")
-                # print(f"index======================: {index}")
-                # print(f"gdata.sps2_power_history[index]================111======: {gdata.sps2_power_history[index]}")
-                power_sps2 = gdata.sps2_power_history[index][0]
-            except IndexError:
-                # 这里有可能是单浆，不处理
+        try:
+            data_points = []
+            for index in range(len(gdata.sps1_power_history)):
+                power_sps1 = gdata.sps1_power_history[index][0]
                 power_sps2 = 0
+                try:
+                    # print(f"gdata.sps2_power_history======================: {gdata.sps2_power_history}")
+                    # print(f"index======================: {index}")
+                    # print(f"gdata.sps2_power_history[index]================111======: {gdata.sps2_power_history[index]}")
+                    power_sps2 = gdata.sps2_power_history[index][0]
+                except IndexError:
+                    # 这里有可能是单浆，不处理
+                    power_sps2 = 0
 
-            power = power_sps1 + power_sps2
-            if power > self.max_power:
-                power = self.max_power
+                power = power_sps1 + power_sps2
+                if power > self.max_power:
+                    power = self.max_power
 
-            power_and_unit = UnitParser.parse_power(power, self.system_unit)
-            data_points.append(ft.LineChartDataPoint(index, power_and_unit[0]))
+                power_and_unit = UnitParser.parse_power(power, self.system_unit)
+                data_points.append(ft.LineChartDataPoint(index, power_and_unit[0]))
 
-        self.data_line.data_points = data_points
+            if self.data_line:
+                self.data_line.data_points = data_points
+
+        except:
+            logging.exception('exception occured at SinglePowerLine.__handle_data_line')
 
     def get_threshold_data(self):
-        data_points = []
-        power_and_unit = UnitParser.parse_power(self.threshold_power, self.system_unit)
-        for index in range(len(gdata.sps1_power_history)):
-            data_points.append(ft.LineChartDataPoint(index, power_and_unit[0]))
+        try:
+            data_points = []
+            power_and_unit = UnitParser.parse_power(self.threshold_power, self.system_unit)
+            for index in range(len(gdata.sps1_power_history)):
+                data_points.append(ft.LineChartDataPoint(index, power_and_unit[0]))
 
-        return data_points
+            return data_points
+        except:
+            logging.exception('exception occured at SinglePowerLine.__handle_data_line')
+
+        return []
+

@@ -15,10 +15,19 @@ class SingleMeters(ft.Container):
         self.amount_of_propeller = system_settings.amount_of_propeller
 
     def get_radius(self, radio):
-        radius = self.page.window.height * radio
-        if self.amount_of_propeller == 2:
-            radius = radius * 0.75
-        return radius
+        try:
+            if self.page is None or self.page.window is None:
+                return 0
+
+            radius = self.page.window.height * radio
+            if self.amount_of_propeller == 2:
+                radius = radius * 0.75
+
+            return radius
+        except:
+            logging.exception('exception occured at SingleMeters.build')
+
+        return 0
 
     def build(self):
         try:
@@ -59,14 +68,15 @@ class SingleMeters(ft.Container):
         except:
             logging.exception('exception occured at SingleMeters.build')
 
-
-
     def reload(self):
         try:
-            self.speed_meter.reload()
-            self.power_meter.reload()
-            self.torque_meter.reload()
+            if self.speed_meter:
+                self.speed_meter.reload()
+
+            if self.power_meter:    
+                self.power_meter.reload()
+
+            if self.torque_meter:    
+                self.torque_meter.reload()
         except:
             logging.exception('exception occured at SingleMeters.reload')
-
-

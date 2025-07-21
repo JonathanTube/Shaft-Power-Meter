@@ -36,8 +36,11 @@ class SingleShaPoLiOff(ft.Stack):
         interval = preference.data_refresh_interval
         while self.task_running:
             try:
-                self.single_meters.reload()
-                self.thrust_power.reload()
+                if self.single_meters:
+                    self.single_meters.reload()
+                
+                if self.thrust_power:
+                    self.thrust_power.reload()
             except:
                 logging.exception("exception occured at SingleShaPoLiOff.load_data")
                 break
@@ -46,7 +49,8 @@ class SingleShaPoLiOff(ft.Stack):
 
     def did_mount(self):
         self.task_running = True
-        self.task = self.page.run_task(self.load_data)
+        if self.page:
+            self.task = self.page.run_task(self.load_data)
 
     def will_unmount(self):
         self.task_running = False

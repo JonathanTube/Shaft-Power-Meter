@@ -17,9 +17,15 @@ class PowerLimited(ft.Container):
 
     def build(self):
         try:
+            if self.page is None or self.page.session is None:
+                return
+
             self.title = ft.Text(self.page.session.get("lang.common.limited_power"), weight=ft.FontWeight.W_600)
 
             power_and_unit = UnitParser.parse_power(self.power, self.system_unit)
+            if len(power_and_unit) < 2:
+                return
+
             self.limited_power_value = ft.Text(power_and_unit[0])
             self.limited_power_unit = ft.Text(power_and_unit[1])
 
@@ -43,4 +49,3 @@ class PowerLimited(ft.Container):
 
         except:
             logging.exception('exception occured at PowerLimited.build')
-

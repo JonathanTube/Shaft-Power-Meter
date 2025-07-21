@@ -20,6 +20,9 @@ class PowerUnlimited(ft.Container):
 
     def build(self):
         try:
+            if self.page is None or self.page.session is None:
+                return
+
             self.title = ft.Text(self.page.session.get("lang.common.unlimited_power"), weight=ft.FontWeight.W_600)
             power = self.power * 2 if self.is_dual else self.power
             power_and_unit = UnitParser.parse_power(power, self.system_unit)

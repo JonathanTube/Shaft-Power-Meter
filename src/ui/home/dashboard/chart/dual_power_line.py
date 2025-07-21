@@ -43,7 +43,12 @@ class DualPowerLine(ft.Container):
             power_and_unit = UnitParser.parse_power(self.power_max, self.unit)
             left_max = math.ceil(power_and_unit[0])
             left_unit = power_and_unit[1]
-            width = self.page.window.width - 80
+
+            width = 1000
+
+            if self.page and self.page.window:
+                width = self.page.window.width - 80
+
             self.chart = ft.LineChart(
                 width=width,
                 expand=True,
@@ -62,57 +67,76 @@ class DualPowerLine(ft.Container):
             )
 
             # self.chart_title = ft.Text(self.page.session.get("lang.common.power"), size=18, weight=ft.FontWeight.BOLD)
-            chart_top = ft.Row(
-                alignment=ft.MainAxisAlignment.CENTER,
-                spacing=10,
-                controls=[
-                    # self.chart_title,
-                    ft.Text(self.page.session.get("lang.common.sps1"), color=self.sps1_color),
-                    ft.Text(self.page.session.get("lang.common.sps2"), color=self.sps2_color)
-                ])
-            self.content = SimpleCard(body=ft.Column(controls=[chart_top, self.chart]))
+            if self.page.session:
+                chart_top = ft.Row(
+                    alignment=ft.MainAxisAlignment.CENTER,
+                    spacing=10,
+                    controls=[
+                        # self.chart_title,
+                        ft.Text(self.page.session.get("lang.common.sps1"), color=self.sps1_color),
+                        ft.Text(self.page.session.get("lang.common.sps2"), color=self.sps2_color)
+                    ])
+                self.content = SimpleCard(body=ft.Column(controls=[chart_top, self.chart]))
         except:
             logging.exception('exception occured at DualPowerLine.build')
 
-
     def reload(self):
         try:
-            self.__handle_bottom_axis()
-            self.__handle_data_line_sps1()
-            self.__handle_data_line_sps2()
-            self.chart.update()
+            if self.chart and self.chart.page:
+                self.__handle_bottom_axis()
+                self.__handle_data_line_sps1()
+                self.__handle_data_line_sps2()
+                self.chart.update()
         except:
             logging.exception('exception occured at DualPowerLine.reload')
 
-
     def __handle_bottom_axis(self):
-        labels = []
-        for index, item in enumerate(gdata.sps1_power_history):
-            label = ft.ChartAxisLabel(
-                value=index,
-                label=ft.Container(
-                    content=ft.Text(value=item[1].strftime('%H:%M:%S')),
-                    padding=ft.padding.only(top=10)
-                )
-            )
-            labels.append(label)
-        self.chart.bottom_axis.labels = labels
-        self.chart.bottom_axis.visible = len(labels) > 0
-        size = 8
-        if len(labels) > size:
-            self.chart.bottom_axis.labels_interval = (len(labels) + size) // size
+        try:
+            labels = []
+            for index, item in enumerate(gdata.sps1_power_history):
+                if len(item) > 1:
+                    label = ft.ChartAxisLabel(
+                        value=index,
+                        label=ft.Container(
+                            content=ft.Text(value=item[1].strftime('%H:%M:%S')),
+                            padding=ft.padding.only(top=10)
+                        )
+                    )
+                    labels.append(label)
+            
+            if self.chart and self.chart.bottom_axis:
+                self.chart.bottom_axis.labels = labels
+                self.chart.bottom_axis.visible = len(labels) > 0
+                size = 8
+                if len(labels) > size:
+                    self.chart.bottom_axis.labels_interval = (len(labels) + size) // size
+        except:
+            logging.exception('exception occured at DualPowerLine.__handle_bottom_axis')
 
     def __handle_data_line_sps1(self):
-        data_points = []
-        for index, item in enumerate(gdata.sps1_power_history):
-            _power = UnitParser.parse_power(item[0], self.unit)
-            data_points.append(ft.LineChartDataPoint(index, _power[0]))
-        self.sps1_data_series.data_points = data_points
+        try:
+            data_points = []
+            for index, item in enumerate(gdata.sps1_power_history):
+                if len(item) > 0:
+                    _power = UnitParser.parse_power(item[0], self.unit)
+                    data_points.append(ft.LineChartDataPoint(index, _power[0]))
+
+            if self.sps1_data_series is not None:
+                self.sps1_data_series.data_points = data_points
+
+        except:
+            logging.exception('exception occured at DualPowerLine.__handle_data_line_sps1')
 
     def __handle_data_line_sps2(self):
-        data_points = []
-        for index, item in enumerate(gdata.sps2_power_history):
-            _power = UnitParser.parse_power(item[0], self.unit)
-            data_points.append(ft.LineChartDataPoint(index, _power[0]))
+        try:
+            data_points = []
+            for index, item in enumerate(gdata.sps2_power_history):
+                if len(item) > 0:
+                    _power = UnitParser.parse_power(item[0], self.unit)
+                    data_points.append(ft.LineChartDataPoint(index, _power[0]))
 
-        self.sps2_data_series.data_points = data_points
+            if self.sps2_data_series is not None:
+                self.sps2_data_series.data_points = data_points
+
+        except:
+            logging.exception('exception occured at DualPowerLine.__handle_data_line_sps2')

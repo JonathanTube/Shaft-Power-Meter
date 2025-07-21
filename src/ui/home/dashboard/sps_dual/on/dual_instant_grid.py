@@ -39,14 +39,18 @@ class DualInstantGrid(ft.Container):
         except:
             logging.exception('exception occured at DualInstantGrid.build')
 
-
-
     def reload(self):
         try:
-            self.dual_instant_power.reload()
-            self.dual_instant_speed.reload()
-            self.dual_instant_torque.reload()
-            self.dual_instant_thrust.reload()
+            if self.dual_instant_power:
+                self.dual_instant_power.reload()
+
+            if self.dual_instant_speed:
+                self.dual_instant_speed.reload()
+
+            if self.dual_instant_torque:
+                self.dual_instant_torque.reload()
+
+            if self.dual_instant_thrust:
+                self.dual_instant_thrust.reload()
         except:
             logging.exception('exception occured at DualInstantGrid.reload')
-

@@ -3,7 +3,6 @@ import logging
 import flet as ft
 from db.models.preference import Preference
 from ui.home.dashboard.sps_dual.off.dual_meters import DualMeters
-from ui.home.dashboard.chart.dual_power_line import DualPowerLine
 
 
 class DualShaPoLiOff(ft.Container):
@@ -16,7 +15,6 @@ class DualShaPoLiOff(ft.Container):
         try:
             self.sps1_meters = DualMeters(name="sps1")
             self.sps2_meters = DualMeters(name="sps2")
-            self.dual_power_line = DualPowerLine()
 
             self.content = ft.Column(
                 expand=True,
@@ -49,7 +47,8 @@ class DualShaPoLiOff(ft.Container):
 
     def did_mount(self):
         self.task_running = True
-        self.task = self.page.run_task(self.load_data)
+        if self.page:
+            self.task = self.page.run_task(self.load_data)
 
     def will_unmount(self):
         self.task_running = False

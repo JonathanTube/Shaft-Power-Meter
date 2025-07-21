@@ -21,6 +21,9 @@ class DualInstantPower(ft.Container):
 
     def build(self):
         try:
+            if self.page is None or self.page.session is None:
+                return
+
             self.__create_power_sps1()
             self.__create_power_sps2()
             self.__create_power_total()

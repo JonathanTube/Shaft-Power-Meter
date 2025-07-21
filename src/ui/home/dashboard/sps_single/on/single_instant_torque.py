@@ -15,13 +15,13 @@ class SingleInstantTorque(ft.Container):
 
     def build(self):
         try:
-            self.torque_value = ft.Text(
-                '0', size=18, width=80, text_align=ft.TextAlign.RIGHT
-            )
+            if self.page is None or self.page.session is None:
+                return
 
-            self.torque_unit = ft.Text(
-                'Nm', size=18, width=50, text_align=ft.TextAlign.LEFT
-            )
+            self.torque_value = ft.Text('0', size=18, width=80, text_align=ft.TextAlign.RIGHT)
+
+            self.torque_unit = ft.Text('Nm', size=18, width=50, text_align=ft.TextAlign.LEFT)
+
             self.content = SimpleCard(
                 title=self.page.session.get("lang.common.torque"),
                 body=ft.Row(
@@ -34,9 +34,10 @@ class SingleInstantTorque(ft.Container):
 
     def reload(self):
         try:
-            torque = UnitParser.parse_torque(gdata.sps1_torque, self.system_unit)
-            self.torque_value.value = torque[0]
-            self.torque_unit.value = torque[1]
-            self.content.update()
+            if self.content and self.content.page:
+                torque = UnitParser.parse_torque(gdata.sps1_torque, self.system_unit)
+                self.torque_value.value = torque[0]
+                self.torque_unit.value = torque[1]
+                self.content.update()
         except:
             logging.exception('exception occured at SingleInstantTorque.reload')

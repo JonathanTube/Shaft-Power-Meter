@@ -19,13 +19,24 @@ class DualMeters(ft.Container):
         self.amount_of_propeller = system_settings.amount_of_propeller
 
     def get_radius(self, radio):
-        radius = self.page.window.height * radio
-        if self.amount_of_propeller == 2:
-            radius = radius * 0.62
-        return radius
+        try:
+            if self.page is None or self.page.window is None:
+                return 0
+
+            radius = self.page.window.height * radio
+            if self.amount_of_propeller == 2:
+                radius = radius * 0.62
+            return radius
+        except:
+            logging.exception('exception occured at DualMeters.get_radius')
+
+        return 0
 
     def build(self):
         try:
+            if self.page is None or self.page.session is None:
+                return
+
             self.speed_meter = SpeedMeter(self.name, self.get_radius(0.22))
             self.power_meter = PowerMeter(self.name, self.get_radius(0.32))
             self.torque_meter = TorqueMeter(self.name, self.get_radius(0.22))
@@ -57,10 +68,17 @@ class DualMeters(ft.Container):
 
     def reload(self):
         try:
-            self.power_meter.reload()
-            self.torque_meter.reload()
-            self.speed_meter.reload()
-            self.thrust_meter.reload()
+            if self.power_meter:
+                self.power_meter.reload()
+
+            if self.torque_meter:    
+                self.torque_meter.reload()
+
+            if self.speed_meter:    
+                self.speed_meter.reload()
+            
+            if self.thrust_meter:
+                self.thrust_meter.reload()
         except:
             logging.exception('exception occured at DualMeters.reload')
 

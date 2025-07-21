@@ -20,6 +20,9 @@ class ThrustBlock(ft.Container):
 
     def build(self):
         try:
+            if self.page is None or self.page.session is None:
+                return
+
             self.title = ft.Text(self.page.session.get("lang.common.thrust"), weight=ft.FontWeight.W_500, size=20)
             self.thrust_value = ft.Text("0")
             self.thrust_unit = ft.Text("N")
@@ -37,6 +40,9 @@ class ThrustBlock(ft.Container):
 
     def reload(self):
         try:
+            if self.content is None or self.content.page is None:
+                return
+
             if self.name == "sps1":
                 thrust_and_unit = UnitParser.parse_thrust(gdata.sps1_thrust, self.system_unit)
                 self.thrust_value.value = thrust_and_unit[0]

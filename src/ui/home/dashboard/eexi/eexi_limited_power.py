@@ -24,6 +24,9 @@ class EEXILimitedPower(ft.Container):
 
     def build(self):
         try:
+            if self.page is None or self.page.window is None or self.page.session is None:
+                return
+
             if self.page.window.height <= 600:
                 meter_radius = self.container_height * 0.6
             else:
@@ -33,7 +36,7 @@ class EEXILimitedPower(ft.Container):
             red = self.unlimited_power - self.eexi_power
             self.meter_half = MeterHalf(radius=meter_radius, green=green, orange=orange, red=red)
             self.title = ft.Text(f"{self.page.session.get('lang.common.eexi_limited_power')}(%)", size=16, weight=ft.FontWeight.W_600)
-            self.unlimited_mode = ft.Text(f"{self.page.session.get('lang.common.power_unlimited_mode')}:", weight=ft.FontWeight.W_400)
+            self.unlimited_mode = ft.Text(f"{self.page.session.get('lang.common.power_unlimited_mode')}", weight=ft.FontWeight.W_400)
             self.unlimited_mode_icon = ft.Icon(ft.Icons.INFO_OUTLINED, color=ft.Colors.GREEN, size=18)
 
             self.unlimited_mode_row = ft.Row(
@@ -89,21 +92,16 @@ class EEXILimitedPower(ft.Container):
                 if self.amount_of_propeller == 2:
                     instant_power += gdata.sps2_power
 
-                if instant_power <= self.normal_power:
-                    self.unlimited_mode_icon.visible = False
-                elif instant_power <= self.eexi_power:
+                self.unlimited_mode_row.visible = instant_power > self.normal_power
+
+                if instant_power <= self.eexi_power:
                     self.unlimited_mode_icon.color = ft.Colors.ORANGE
                     self.unlimited_mode.color = ft.Colors.ORANGE
-                    self.unlimited_mode_icon.visible = True
                 else:
                     self.unlimited_mode_icon.color = ft.Colors.RED
                     self.unlimited_mode.color = ft.Colors.RED
-                    self.unlimited_mode_icon.visible = True
                 
-                if self.unlimited_mode_icon:
-                    self.unlimited_mode_icon.update()
-
-                if self.unlimited_mode:
-                    self.unlimited_mode.update()
+                if self.unlimited_mode_row and self.unlimited_mode_row.page:
+                    self.unlimited_mode_row.update()
         except:
             logging.exception('exception occured at EEXILimitedPower.update_mode')
