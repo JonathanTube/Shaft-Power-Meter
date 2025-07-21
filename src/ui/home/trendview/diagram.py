@@ -48,6 +48,7 @@ class TrendViewDiagram(ft.Container):
             """创建初始图表结构"""
             self.fig, self.ax_rpm = plt.subplots(figsize=(10, 5.5))
             self.fig.subplots_adjust(left=0.08, right=0.92, top=0.95, bottom=0.1)
+            self.fig.autofmt_xdate()
             self._configure_axes()
             self._setup_power_axis()
             self.handle_update_chart()
@@ -70,9 +71,10 @@ class TrendViewDiagram(ft.Container):
         """配置主轴参数"""
         # 日期轴格式化
         self.ax_rpm.xaxis.set_major_locator(mdates.AutoDateLocator())
-        self.ax_rpm.xaxis.set_major_formatter(
-            mdates.ConciseDateFormatter(self.ax_rpm.xaxis.get_major_locator())
-        )
+
+        date_time_conf: DateTimeConf = DateTimeConf.get()
+        date_format = date_time_conf.date_format
+        self.ax_rpm.xaxis.set_major_formatter(mdates.DateFormatter(f'{date_format} %H:%M')) 
 
         # 主轴样式
         self.ax_rpm.set_xlabel(xlabel=self.page.session.get('lang.common.utc_date_time'), fontsize=10)

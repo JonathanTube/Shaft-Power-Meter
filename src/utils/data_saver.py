@@ -57,7 +57,7 @@ class DataSaver:
                 gdata.sps1_thrust = thrust
                 gdata.sps1_speed = speed
                 gdata.sps1_power = power
-                if len(gdata.sps1_power_history) > 100:
+                if len(gdata.sps1_power_history) > 60:
                     gdata.sps1_power_history.pop(0)
                 gdata.sps1_power_history.append((power, utc_date_time))
             else:
@@ -65,7 +65,7 @@ class DataSaver:
                 gdata.sps2_thrust = thrust
                 gdata.sps2_speed = speed
                 gdata.sps2_power = power
-                if len(gdata.sps2_power_history) > 100:
+                if len(gdata.sps2_power_history) > 60:
                     gdata.sps2_power_history.pop(0)
                 gdata.sps2_power_history.append((power, utc_date_time))
 
