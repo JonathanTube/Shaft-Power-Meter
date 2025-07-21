@@ -149,8 +149,8 @@ class DataInit:
                 plc_port=502,
                 gps_ip='192.168.1.3',
                 gps_port=51001,
-                sps1_ip='192.168.1.5',
-                sps1_port=6800,
+                sps_ip='192.168.1.5',
+                sps_port=6800,
                 sps2_ip='192.168.1.6',
                 sps2_port=6800,
                 hmi_server_ip='192.168.1.150',
@@ -358,9 +358,9 @@ class DataInit:
                 },
 
                 {
-                    "code": "lang.common.sps1",
+                    "code": "lang.common.sps",
                     "chinese": "螺旋桨1",
-                    "english": "sps1"
+                    "english": "sps"
                 },
 
                 {
@@ -1511,9 +1511,9 @@ class DataInit:
                     "english": "Master GPS Disconnected"
                 },
                 {
-                    "code": "lang.alarm.master_sps1_disconnected",
-                    "chinese": "主机SPS1断开",
-                    "english": "Master SPS1 Disconnected"
+                    "code": "lang.alarm.master_sps_disconnected",
+                    "chinese": "主机SPS断开",
+                    "english": "Master SPS Disconnected"
                 },
                 {
                     "code": "lang.alarm.master_sps2_disconnected",

@@ -20,7 +20,7 @@ class EEXIBreach:
 
         # 如果正在突破，则保存突破报告明细
         if EEXIBreach.report_id is not None:
-            EEXIBreach.__save_report_detail('sps1', gdata.utc_date_time, gdata.sps1_speed, gdata.sps1_torque, gdata.sps1_power)
+            EEXIBreach.__save_report_detail('sps', gdata.utc_date_time, gdata.sps_speed, gdata.sps_torque, gdata.sps_power)
             # 如果是双桨，则保存双桨的报告明细
             is_twins = gdata.amount_of_propeller == 2
             if is_twins:

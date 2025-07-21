@@ -8,7 +8,7 @@ class ReportDetail(BaseModel):
 
     report_info = ForeignKeyField(ReportInfo, index=True, backref="ReportInfo", verbose_name="报告")
 
-    name = CharField(verbose_name="名称:sps1/sps2")
+    name = CharField(verbose_name="名称:sps/sps2")
 
     utc_date_time = DateTimeField()
 

@@ -18,9 +18,9 @@ class Counter(ft.Container):
 
     def build(self):
         try:
-            interval_counter_sps1 = IntervalCounter('sps1')
-            manually_counter_sps1 = ManuallyCounter('sps1')
-            total_counter_sps1 = TotalCounter('sps1')
+            interval_counter_sps = IntervalCounter('sps')
+            manually_counter_sps = ManuallyCounter('sps')
+            total_counter_sps = TotalCounter('sps')
 
             if self.dual:
                 interval_counter_sps2 = IntervalCounter('sps2')
@@ -30,8 +30,8 @@ class Counter(ft.Container):
                 self.content = ft.Column(
                     scroll=ft.ScrollMode.AUTO,
                     controls=[
-                        ft.Text('sps1', weight=ft.FontWeight.BOLD, size=16),
-                        ft.Row(expand=True, controls=[interval_counter_sps1, manually_counter_sps1, total_counter_sps1]),
+                        ft.Text('sps', weight=ft.FontWeight.BOLD, size=16),
+                        ft.Row(expand=True, controls=[interval_counter_sps, manually_counter_sps, total_counter_sps]),
                         ft.Text('sps2', weight=ft.FontWeight.BOLD, size=16),
                         ft.Row(expand=True, controls=[interval_counter_sps2, manually_counter_sps2, total_counter_sps2])
                     ])
@@ -40,7 +40,7 @@ class Counter(ft.Container):
             self.content = ft.Column(
                 scroll=ft.ScrollMode.AUTO,
                 controls=[
-                    ft.Row(expand=True, controls=[interval_counter_sps1, manually_counter_sps1, total_counter_sps1]),
+                    ft.Row(expand=True, controls=[interval_counter_sps, manually_counter_sps, total_counter_sps]),
                     ft.Text('', expand=True)
                 ])
         except:

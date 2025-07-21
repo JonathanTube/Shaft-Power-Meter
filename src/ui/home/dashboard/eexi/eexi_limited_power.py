@@ -68,7 +68,7 @@ class EEXILimitedPower(ft.Container):
     def reload(self):
         try:
             if self.page:
-                active_value = gdata.sps1_power
+                active_value = gdata.sps_power
 
                 if self.amount_of_propeller == 2:
                     active_value += gdata.sps2_power
@@ -88,7 +88,7 @@ class EEXILimitedPower(ft.Container):
     def update_mode(self):
         try:
             if self.page:
-                instant_power = gdata.sps1_power
+                instant_power = gdata.sps_power
                 if self.amount_of_propeller == 2:
                     instant_power += gdata.sps2_power
 

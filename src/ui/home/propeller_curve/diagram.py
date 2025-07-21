@@ -56,9 +56,9 @@ class PropellerCurveDiagram(ft.Container):
         self.power_of_overload = ps.value_of_overload_curve
         self.color_of_overload = ps.line_color_of_overload_curve
 
-        self.sps1_point = None
+        self.sps_point = None
         self.sps2_point = None
-        self.sps1_text = None
+        self.sps_text = None
         self.sps2_text = None
 
     def before_update(self):
@@ -88,8 +88,8 @@ class PropellerCurveDiagram(ft.Container):
             self.handle_style(ax)
             # 优化布局
             fig.tight_layout()
-            self.sps1_point = ax.scatter(0, 0, color='orange', zorder=10, label='SPS1 Operating Point', s=40)
-            self.sps1_text = ax.text(0, 0, 'SPS1', ha='center', va='bottom', fontsize=8)
+            self.sps_point = ax.scatter(0, 0, color='orange', zorder=10, label='SPS Operating Point', s=40)
+            self.sps_text = ax.text(0, 0, 'SPS', ha='center', va='bottom', fontsize=8)
             self.sps2_point = ax.scatter(0, 0, color='purple', zorder=10, label='SPS2 Operating Point', s=40)
             self.sps2_text = ax.text(0, 0, 'SPS2', ha='center', va='bottom', fontsize=8)
             return MatplotlibChart(fig, isolated=True, expand=True, transparent=True)
@@ -205,11 +205,11 @@ class PropellerCurveDiagram(ft.Container):
                 if self.rpm_of_mcr == 0 or self.power_of_mcr == 0:
                     return
 
-                sps1_percent_rpm_of_mcr = round(gdata.sps1_speed / self.rpm_of_mcr * 100, 2)
-                sps1_percent_power_of_mcr = round(gdata.sps1_power / self.power_of_mcr * 100, 2)
-                self.sps1_point.set_offsets([sps1_percent_rpm_of_mcr, sps1_percent_power_of_mcr])
-                self.sps1_text.set_x(sps1_percent_rpm_of_mcr)
-                self.sps1_text.set_y(sps1_percent_power_of_mcr + 1)
+                sps_percent_rpm_of_mcr = round(gdata.sps_speed / self.rpm_of_mcr * 100, 2)
+                sps_percent_power_of_mcr = round(gdata.sps_power / self.power_of_mcr * 100, 2)
+                self.sps_point.set_offsets([sps_percent_rpm_of_mcr, sps_percent_power_of_mcr])
+                self.sps_text.set_x(sps_percent_rpm_of_mcr)
+                self.sps_text.set_y(sps_percent_power_of_mcr + 1)
 
                 sps2_percent_rpm_of_mcr = round(gdata.sps2_speed / self.rpm_of_mcr * 100, 2)
                 sps2_percent_power_of_mcr = round(gdata.sps2_power / self.power_of_mcr * 100, 2)
@@ -217,7 +217,7 @@ class PropellerCurveDiagram(ft.Container):
                 self.sps2_text.set_x(sps2_percent_rpm_of_mcr)
                 self.sps2_text.set_y(sps2_percent_power_of_mcr + 1)
 
-                # logging.info(f'update_sps1_points: sps1_percent_rpm_of_mcr={sps1_percent_rpm_of_mcr}%, sps1_percent_power_of_mcr={sps1_percent_power_of_mcr}%')
+                # logging.info(f'update_sps_points: sps_percent_rpm_of_mcr={sps_percent_rpm_of_mcr}%, sps_percent_power_of_mcr={sps_percent_power_of_mcr}%')
                 # logging.info(f'update_sps2_points: sps2_percent_rpm_of_mcr={sps2_percent_rpm_of_mcr}%, sps2_percent_power_of_mcr={sps2_percent_power_of_mcr}%')
                 if self.chart and self.chart.page:
                     self.chart.update()

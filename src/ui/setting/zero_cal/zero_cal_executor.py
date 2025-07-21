@@ -72,8 +72,8 @@ class ZeroCalExecutor(ft.Container):
         ))
 
     def __create_current_offset(self):
-        self.current_torque_offset = ft.Text(round(gdata.sps1_torque_offset if self.name == 'sps1' else gdata.sps2_torque_offset, 10))
-        self.current_thrust_offset = ft.Text(round(gdata.sps1_thrust_offset if self.name == 'sps1' else gdata.sps2_thrust_offset, 10))
+        self.current_torque_offset = ft.Text(round(gdata.sps_torque_offset if self.name == 'sps' else gdata.sps2_torque_offset, 10))
+        self.current_thrust_offset = ft.Text(round(gdata.sps_thrust_offset if self.name == 'sps' else gdata.sps2_thrust_offset, 10))
         row = ft.Row(
             height=40,
             spacing=20,
@@ -252,9 +252,9 @@ class ZeroCalExecutor(ft.Container):
 
             self.__reset_to_start()
 
-            if self.name == 'sps1':
-                gdata.sps1_torque_offset = self.latest_accepted_zero_cal.torque_offset
-                gdata.sps1_thrust_offset = self.latest_accepted_zero_cal.thrust_offset
+            if self.name == 'sps':
+                gdata.sps_torque_offset = self.latest_accepted_zero_cal.torque_offset
+                gdata.sps_thrust_offset = self.latest_accepted_zero_cal.thrust_offset
             else:
                 gdata.sps2_torque_offset = self.latest_accepted_zero_cal.torque_offset
                 gdata.sps2_thrust_offset = self.latest_accepted_zero_cal.thrust_offset
@@ -289,8 +289,8 @@ class ZeroCalExecutor(ft.Container):
             ZeroCalRecord.create(
                 name=self.name,
                 zero_cal_info=self.latest_zero_cal.id,
-                mv_per_v_for_torque=gdata.sps1_mv_per_v_for_torque if self.name == 'sps1' else gdata.sps2_mv_per_v_for_torque,
-                mv_per_v_for_thrust=gdata.sps1_mv_per_v_for_thrust if self.name == 'sps1' else gdata.sps2_mv_per_v_for_thrust
+                mv_per_v_for_torque=gdata.sps_mv_per_v_for_torque if self.name == 'sps' else gdata.sps2_mv_per_v_for_torque,
+                mv_per_v_for_thrust=gdata.sps_mv_per_v_for_thrust if self.name == 'sps' else gdata.sps2_mv_per_v_for_thrust
             )
 
             self.result_card.visible = True

@@ -9,7 +9,7 @@ from typing import Literal
 
 
 class PowerMeter(ft.Container):
-    def __init__(self, name: Literal["sps1", "sps2"], radius: float = 0):
+    def __init__(self, name: Literal["sps", "sps2"], radius: float = 0):
         super().__init__()
         self.expand = False
         self.name = name
@@ -37,10 +37,10 @@ class PowerMeter(ft.Container):
                 return
             
 
-            if self.name == "sps1":
-                if gdata.sps1_power is not None:
-                    power_and_unit = UnitParser.parse_power(gdata.sps1_power, self.system_unit)
-                    self.content.set_data(gdata.sps1_power, power_and_unit[0], power_and_unit[1])
+            if self.name == "sps":
+                if gdata.sps_power is not None:
+                    power_and_unit = UnitParser.parse_power(gdata.sps_power, self.system_unit)
+                    self.content.set_data(gdata.sps_power, power_and_unit[0], power_and_unit[1])
             else:
                 if gdata.sps2_power is not None:
                     power_and_unit = UnitParser.parse_power(gdata.sps2_power, self.system_unit)

@@ -129,14 +129,14 @@ class WebSocketSlave:
                 elif data['type'] == 'propeller_setting':
                     self.__handle_propeller_setting(data)
 
-                gdata.sps1_offline = False
+                gdata.sps_offline = False
                 gdata.sps2_offline = False
                 self._retry = 0
             except (websockets.ConnectionClosedError,
                     websockets.ConnectionClosedOK,
                     websockets.ConnectionClosed):
                 logging.error("[***HMI client***] ConnectionClosedError")
-                gdata.sps1_offline = True
+                gdata.sps_offline = True
                 gdata.sps2_offline = True
                 self._is_connected = False
                 AlarmSaver.create(alarm_type=AlarmType.SLAVE_CLIENT_DISCONNECTED)

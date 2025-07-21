@@ -8,7 +8,7 @@ from typing import Literal
 
 
 class ThrustBlock(ft.Container):
-    def __init__(self, name: Literal["sps1", "sps2"]):
+    def __init__(self, name: Literal["sps", "sps2"]):
         super().__init__()
         self.right = 10
         self.top = 10
@@ -43,8 +43,8 @@ class ThrustBlock(ft.Container):
             if self.content is None or self.content.page is None:
                 return
 
-            if self.name == "sps1":
-                thrust_and_unit = UnitParser.parse_thrust(gdata.sps1_thrust, self.system_unit)
+            if self.name == "sps":
+                thrust_and_unit = UnitParser.parse_thrust(gdata.sps_thrust, self.system_unit)
                 self.thrust_value.value = thrust_and_unit[0]
                 self.thrust_unit.value = thrust_and_unit[1]
             else:

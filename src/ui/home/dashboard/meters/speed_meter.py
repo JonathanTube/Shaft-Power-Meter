@@ -7,7 +7,7 @@ from typing import Literal
 
 
 class SpeedMeter(ft.Container):
-    def __init__(self, name: Literal["sps1", "sps2"], radius : float = 0):
+    def __init__(self, name: Literal["sps", "sps2"], radius : float = 0):
         super().__init__()
         self.expand = False
         self.name = name
@@ -33,9 +33,9 @@ class SpeedMeter(ft.Container):
             if self.content is None:
                 return
 
-            if self.name == "sps1":
-                if gdata.sps1_speed is not None:
-                    self.content.set_data(gdata.sps1_speed, gdata.sps1_speed, "rpm")
+            if self.name == "sps":
+                if gdata.sps_speed is not None:
+                    self.content.set_data(gdata.sps_speed, gdata.sps_speed, "rpm")
             else:
                 if gdata.sps2_speed is not None:
                     self.content.set_data(gdata.sps2_speed, gdata.sps2_speed, "rpm")

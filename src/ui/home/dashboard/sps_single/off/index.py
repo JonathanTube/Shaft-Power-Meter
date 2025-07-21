@@ -13,7 +13,7 @@ class SingleShaPoLiOff(ft.Stack):
 
     def build(self):
         try:
-            self.thrust_power = ThrustBlock("sps1")
+            self.thrust_power = ThrustBlock("sps")
             self.single_meters = SingleMeters()
 
             self.controls = [

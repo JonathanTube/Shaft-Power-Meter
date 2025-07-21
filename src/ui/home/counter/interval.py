@@ -13,7 +13,7 @@ from peewee import fn
 
 
 class IntervalCounter(ft.Container):
-    def __init__(self, name: Literal['sps1', 'sps2']):
+    def __init__(self, name: Literal['sps', 'sps2']):
         super().__init__()
         self.name = name
 

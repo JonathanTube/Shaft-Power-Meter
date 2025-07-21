@@ -92,14 +92,14 @@ class ModbusOutputTask:
                 low = uint32_value & 0xFFFF           # 低16位
                 return high, low
 
-            sps1_torque = int(gdata.sps1_torque / 100) if self.io_conf.output_torque else 0
-            sps1_thrust = int(gdata.sps1_thrust / 100) if self.io_conf.output_thrust else 0
-            sps1_speed = int(gdata.sps1_speed * 10) if self.io_conf.output_speed else 0
-            sps1_power = int(gdata.sps1_power / 100) if self.io_conf.output_power else 0
-            sps1_avg_power, sps1_total_energy = self.get_avg_power_and_energy('sps1')
+            sps_torque = int(gdata.sps_torque / 100) if self.io_conf.output_torque else 0
+            sps_thrust = int(gdata.sps_thrust / 100) if self.io_conf.output_thrust else 0
+            sps_speed = int(gdata.sps_speed * 10) if self.io_conf.output_speed else 0
+            sps_power = int(gdata.sps_power / 100) if self.io_conf.output_power else 0
+            sps_avg_power, sps_total_energy = self.get_avg_power_and_energy('sps')
             # 构建寄存器值列表（每个值占2个寄存器）
             values = []
-            for val in [sps1_torque, sps1_thrust, sps1_speed, sps1_power, sps1_avg_power, sps1_total_energy]:
+            for val in [sps_torque, sps_thrust, sps_speed, sps_power, sps_avg_power, sps_total_energy]:
                 high, low = split_to_registers(val)
                 values.append(high)
                 values.append(low)

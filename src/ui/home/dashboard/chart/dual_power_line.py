@@ -12,7 +12,7 @@ class DualPowerLine(ft.Container):
     def __init__(self):
         super().__init__()
 
-        self.sps1_color = ft.Colors.ORANGE
+        self.sps_color = ft.Colors.ORANGE
         self.sps2_color = ft.Colors.BLUE
 
         self.expand = True
@@ -25,10 +25,10 @@ class DualPowerLine(ft.Container):
 
     def build(self):
         try:
-            self.sps1_data_series = ft.LineChartData(
+            self.sps_data_series = ft.LineChartData(
                 curved=False,
                 stroke_width=2,
-                color=self.sps1_color,
+                color=self.sps_color,
                 data_points=[]
             )
             self.sps2_data_series = ft.LineChartData(
@@ -63,7 +63,7 @@ class DualPowerLine(ft.Container):
                     ]
                 ),
                 bottom_axis=ft.ChartAxis(labels_size=30, labels_interval=1, visible=False),
-                data_series=[self.sps1_data_series, self.sps2_data_series]
+                data_series=[self.sps_data_series, self.sps2_data_series]
             )
 
             # self.chart_title = ft.Text(self.page.session.get("lang.common.power"), size=18, weight=ft.FontWeight.BOLD)
@@ -73,7 +73,7 @@ class DualPowerLine(ft.Container):
                     spacing=10,
                     controls=[
                         # self.chart_title,
-                        ft.Text(self.page.session.get("lang.common.sps1"), color=self.sps1_color),
+                        ft.Text(self.page.session.get("lang.common.sps"), color=self.sps_color),
                         ft.Text(self.page.session.get("lang.common.sps2"), color=self.sps2_color)
                     ])
                 self.content = SimpleCard(body=ft.Column(controls=[chart_top, self.chart]))
@@ -84,7 +84,7 @@ class DualPowerLine(ft.Container):
         try:
             if self.chart and self.chart.page:
                 self.__handle_bottom_axis()
-                self.__handle_data_line_sps1()
+                self.__handle_data_line_sps()
                 self.__handle_data_line_sps2()
                 self.chart.update()
         except:
@@ -93,7 +93,7 @@ class DualPowerLine(ft.Container):
     def __handle_bottom_axis(self):
         try:
             labels = []
-            for index, item in enumerate(gdata.sps1_power_history):
+            for index, item in enumerate(gdata.sps_power_history):
                 if len(item) > 1:
                     label = ft.ChartAxisLabel(
                         value=index,
@@ -113,19 +113,19 @@ class DualPowerLine(ft.Container):
         except:
             logging.exception('exception occured at DualPowerLine.__handle_bottom_axis')
 
-    def __handle_data_line_sps1(self):
+    def __handle_data_line_sps(self):
         try:
             data_points = []
-            for index, item in enumerate(gdata.sps1_power_history):
+            for index, item in enumerate(gdata.sps_power_history):
                 if len(item) > 0:
                     _power = UnitParser.parse_power(item[0], self.unit)
                     data_points.append(ft.LineChartDataPoint(index, _power[0]))
 
-            if self.sps1_data_series is not None:
-                self.sps1_data_series.data_points = data_points
+            if self.sps_data_series is not None:
+                self.sps_data_series.data_points = data_points
 
         except:
-            logging.exception('exception occured at DualPowerLine.__handle_data_line_sps1')
+            logging.exception('exception occured at DualPowerLine.__handle_data_line_sps')
 
     def __handle_data_line_sps2(self):
         try:

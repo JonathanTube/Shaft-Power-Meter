@@ -11,7 +11,7 @@ from ui.common.custom_card import CustomCard
 from ui.common.keyboard import keyboard
 from ui.common.permission_check import PermissionCheck
 from common.global_data import gdata
-from task.sps1_read_task import sps1_read_task
+from task.sps_read_task import sps_read_task
 from task.sps2_read_task import sps2_read_task
 from ui.common.toast import Toast
 
@@ -32,25 +32,25 @@ class IOSettingSPS(ft.Container):
         try:
             if self.page and self.page.session:
                 # sps conf. start
-                self.sps1_ip = ft.TextField(
-                    label=f'{self.page.session.get("lang.setting.ip")} SPS1',
-                    value=self.conf.sps1_ip,
+                self.sps_ip = ft.TextField(
+                    label=f'{self.page.session.get("lang.setting.ip")} SPS',
+                    value=self.conf.sps_ip,
                     read_only=True,
                     col={'sm': 4},
                     can_request_focus=False,
                     on_click=lambda e: keyboard.open(e.control, 'ip')
                 )
 
-                self.sps1_port = ft.TextField(
-                    label=f'{self.page.session.get("lang.setting.port")} SPS1',
-                    value=self.conf.sps1_port,
+                self.sps_port = ft.TextField(
+                    label=f'{self.page.session.get("lang.setting.port")} SPS',
+                    value=self.conf.sps_port,
                     read_only=True,
                     col={'sm': 4},
                     can_request_focus=False,
                     on_click=lambda e: keyboard.open(e.control, 'int')
                 )
 
-                self.sps1_connect = ft.FilledButton(
+                self.sps_connect = ft.FilledButton(
                     text=self.page.session.get("lang.setting.connect"),
                     bgcolor=ft.Colors.GREEN,
                     color=ft.Colors.WHITE,
@@ -59,10 +59,10 @@ class IOSettingSPS(ft.Container):
                     style=ft.ButtonStyle(
                         shape=ft.RoundedRectangleBorder(radius=5)
                     ),
-                    on_click=lambda e: self.page.open(PermissionCheck(self.__connect_sps1, 2))
+                    on_click=lambda e: self.page.open(PermissionCheck(self.__connect_sps, 2))
                 )
 
-                self.sps1_disconnect = ft.FilledButton(
+                self.sps_disconnect = ft.FilledButton(
                     text=self.page.session.get("lang.setting.disconnect"),
                     bgcolor=ft.Colors.RED,
                     color=ft.Colors.WHITE,
@@ -71,7 +71,7 @@ class IOSettingSPS(ft.Container):
                     style=ft.ButtonStyle(
                         shape=ft.RoundedRectangleBorder(radius=5)
                     ),
-                    on_click=lambda e: self.page.open(PermissionCheck(self.__close_sps1, 2))
+                    on_click=lambda e: self.page.open(PermissionCheck(self.__close_sps, 2))
                 )
 
                 self.sps2_ip = ft.TextField(
@@ -167,16 +167,16 @@ class IOSettingSPS(ft.Container):
                 )
                 # factor conf. end
 
-                self.row_sps1 = ft.ResponsiveRow(
+                self.row_sps = ft.ResponsiveRow(
                     controls=[
-                        self.sps1_ip,
-                        self.sps1_port,
+                        self.sps_ip,
+                        self.sps_port,
                         ft.Row(
                             col={'sm': 4},
                             alignment=ft.alignment.center_left,
                             controls=[
-                                self.sps1_connect,
-                                self.sps1_disconnect
+                                self.sps_connect,
+                                self.sps_disconnect
                             ]
                         )
                     ]
@@ -201,7 +201,7 @@ class IOSettingSPS(ft.Container):
                     self.page.session.get("lang.setting.sps_conf"),
                     ft.ResponsiveRow(
                         controls=[
-                            self.row_sps1,
+                            self.row_sps,
                             self.row_sps2,
                             self.shaft_outer_diameter,
                             self.shaft_inner_diameter,
@@ -213,7 +213,7 @@ class IOSettingSPS(ft.Container):
         except:
             logging.exception('exception occured at IOSettingSPS.build')
 
-    def __connect_sps1(self, user: User):
+    def __connect_sps(self, user: User):
         try:
             self.save_data()
             self.conf.save()
@@ -222,38 +222,38 @@ class IOSettingSPS(ft.Container):
             return
         
         try:
-            self.sps1_connect.text = 'loading...'
-            self.sps1_connect.bgcolor = ft.Colors.GREY
-            self.sps1_connect.disabled = True
-            self.sps1_connect.update()
+            self.sps_connect.text = 'loading...'
+            self.sps_connect.bgcolor = ft.Colors.GREY
+            self.sps_connect.disabled = True
+            self.sps_connect.update()
 
             OperationLog.create(
                 user_id=user.id,
                 utc_date_time=gdata.utc_date_time,
-                operation_type=OperationType.CONNECT_TO_SPS1,
+                operation_type=OperationType.CONNECT_TO_SPS,
                 operation_content=user.user_name
             )
 
-            self.page.run_task(sps1_read_task.connect)
+            self.page.run_task(sps_read_task.connect)
         except:
-            logging.exception("exception occured at __connect_to_sps1")
+            logging.exception("exception occured at __connect_to_sps")
 
 
-    def __close_sps1(self, user: User):
+    def __close_sps(self, user: User):
         try:
-            self.sps1_disconnect.text = 'loading...'
-            self.sps1_disconnect.bgcolor = ft.Colors.GREY
-            self.sps1_disconnect.disabled = True
-            self.sps1_disconnect.update()
+            self.sps_disconnect.text = 'loading...'
+            self.sps_disconnect.bgcolor = ft.Colors.GREY
+            self.sps_disconnect.disabled = True
+            self.sps_disconnect.update()
             OperationLog.create(
                 user_id=user.id,
                 utc_date_time=gdata.utc_date_time,
-                operation_type=OperationType.DISCONNECT_FROM_SPS1,
+                operation_type=OperationType.DISCONNECT_FROM_SPS,
                 operation_content=user.user_name
             )
-            self.page.run_task(sps1_read_task.close)
+            self.page.run_task(sps_read_task.close)
         except:
-            logging.exception("exception occured at __disconnect_from_sps1")
+            logging.exception("exception occured at __disconnect_from_sps")
 
     def __connect_sps2(self, user: User):
         try:
@@ -296,11 +296,11 @@ class IOSettingSPS(ft.Container):
 
     def save_data(self):
         try:
-            ipaddress.ip_address(self.sps1_ip.value)
-            self.conf.sps1_ip = self.sps1_ip.value
-            self.conf.sps1_port = self.sps1_port.value
+            ipaddress.ip_address(self.sps_ip.value)
+            self.conf.sps_ip = self.sps_ip.value
+            self.conf.sps_port = self.sps_port.value
         except ValueError:
-            raise ValueError(f'{self.page.session.get("lang.common.ip_address_format_error")}: {self.sps1_ip.value}')
+            raise ValueError(f'{self.page.session.get("lang.common.ip_address_format_error")}: {self.sps_ip.value}')
 
         if self.is_dual:
             try:
@@ -334,17 +334,17 @@ class IOSettingSPS(ft.Container):
     def before_update(self):
         try:
             if self.page and self.page.session:
-                if self.sps1_connect:
-                    self.sps1_connect.text = self.page.session.get("lang.setting.connect")
-                    self.sps1_connect.visible = not sps1_read_task.is_connected
-                    self.sps1_connect.bgcolor = ft.Colors.GREEN
-                    self.sps1_connect.disabled = False
+                if self.sps_connect:
+                    self.sps_connect.text = self.page.session.get("lang.setting.connect")
+                    self.sps_connect.visible = not sps_read_task.is_connected
+                    self.sps_connect.bgcolor = ft.Colors.GREEN
+                    self.sps_connect.disabled = False
 
-                if self.sps1_disconnect:
-                    self.sps1_disconnect.text = self.page.session.get("lang.setting.disconnect")
-                    self.sps1_disconnect.visible = sps1_read_task.is_connected
-                    self.sps1_disconnect.bgcolor = ft.Colors.RED
-                    self.sps1_disconnect.disabled = False
+                if self.sps_disconnect:
+                    self.sps_disconnect.text = self.page.session.get("lang.setting.disconnect")
+                    self.sps_disconnect.visible = sps_read_task.is_connected
+                    self.sps_disconnect.bgcolor = ft.Colors.RED
+                    self.sps_disconnect.disabled = False
 
                 if self.is_dual:
                     if self.sps2_connect:

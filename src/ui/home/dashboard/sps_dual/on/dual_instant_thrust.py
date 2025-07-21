@@ -25,7 +25,7 @@ class DualInstantThrust(ft.Container):
 
     def build(self):
         try:
-            self.__create_thrust_sps1()
+            self.__create_thrust_sps()
             self.__create_thrust_sps2()
 
             content = ft.Column(
@@ -33,7 +33,7 @@ class DualInstantThrust(ft.Container):
                 horizontal_alignment=ft.CrossAxisAlignment.END,
                 alignment=ft.MainAxisAlignment.END,
                 spacing=0,
-                controls=[self.thrust_sps1, self.thrust_sps2]
+                controls=[self.thrust_sps, self.thrust_sps2]
             )
 
             self.content = SimpleCard(title=self.page.session.get("lang.common.thrust"), body=content)
@@ -42,11 +42,11 @@ class DualInstantThrust(ft.Container):
 
     def reload(self):
         try:
-            thrust_sps1 = UnitParser.parse_thrust(gdata.sps1_thrust, self.unit)
+            thrust_sps = UnitParser.parse_thrust(gdata.sps_thrust, self.unit)
             thrust_sps2 = UnitParser.parse_thrust(gdata.sps2_thrust, self.unit)
 
-            self.thrust_sps1_value.value = thrust_sps1[0]
-            self.thrust_sps1_unit.value = thrust_sps1[1]
+            self.thrust_sps_value.value = thrust_sps[0]
+            self.thrust_sps_unit.value = thrust_sps[1]
 
             self.thrust_sps2_value.value = thrust_sps2[0]
             self.thrust_sps2_unit.value = thrust_sps2[1]
@@ -56,32 +56,32 @@ class DualInstantThrust(ft.Container):
             logging.exception('exception occured at DualInstantThrust.reload')
 
 
-    def __create_thrust_sps1(self):
-        self.sps1_label = ft.Text(
-            value=self.page.session.get("lang.common.sps1"),
+    def __create_thrust_sps(self):
+        self.sps_label = ft.Text(
+            value=self.page.session.get("lang.common.sps"),
             text_align=ft.TextAlign.RIGHT,
             size=self.font_size_of_label,
             weight=ft.FontWeight.W_600
         )
-        self.thrust_sps1_value = ft.Text(
+        self.thrust_sps_value = ft.Text(
             value='0',
             size=self.font_size_of_value,
             width=80,
             text_align=ft.TextAlign.RIGHT,
             weight=ft.FontWeight.W_500
         )
-        self.thrust_sps1_unit = ft.Text('kN', width=40,
+        self.thrust_sps_unit = ft.Text('kN', width=40,
                                         text_align=ft.TextAlign.LEFT,
                                         size=self.font_size_of_unit,
                                         weight=ft.FontWeight.W_500
                                         )
 
-        self.thrust_sps1 = ft.Row(
+        self.thrust_sps = ft.Row(
             tight=True,
             controls=[
-                self.sps1_label,
-                self.thrust_sps1_value,
-                self.thrust_sps1_unit
+                self.sps_label,
+                self.thrust_sps_value,
+                self.thrust_sps_unit
             ])
 
     def __create_thrust_sps2(self):

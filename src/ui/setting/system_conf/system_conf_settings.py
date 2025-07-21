@@ -110,6 +110,7 @@ class SystemConfSettings(ft.Container):
                 )
                 self.amount_of_propeller_row = ft.Row(
                     col={"md": 6},
+                    visible=False,
                     controls=[
                         ft.Text(
                             self.page.session.get("lang.setting.amount_of_propeller"),

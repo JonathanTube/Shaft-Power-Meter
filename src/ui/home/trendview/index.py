@@ -24,7 +24,7 @@ class TrendView(ft.Container):
     def build(self):
         try:
             self.search = DatetimeSearch(self.__on_search)
-            self.sps1_chart = TrendViewDiagram()
+            self.sps_chart = TrendViewDiagram()
 
             if self.is_twins:
                 self.sps2_chart = TrendViewDiagram()
@@ -36,7 +36,7 @@ class TrendView(ft.Container):
                         ft.Tabs(
                             expand=True,
                             tabs=[
-                                ft.Tab(text='SPS1', content=self.sps1_chart),
+                                ft.Tab(text='SPS', content=self.sps_chart),
                                 ft.Tab(text='SPS2', content=self.sps2_chart)
                             ]
                         )
@@ -46,7 +46,7 @@ class TrendView(ft.Container):
                 self.content = ft.Column(
                     expand=True,
                     spacing=0,
-                    controls=[self.search, self.sps1_chart]
+                    controls=[self.search, self.sps_chart]
                 )
         except:
             logging.exception('exception occured at TrendView.build')
@@ -61,13 +61,13 @@ class TrendView(ft.Container):
                 if days_diff > 90:
                     Toast.show_error(self.page, self.page.session.get('lang.trendview.cannot_search_more_than_90_days'))
                     return
-                self.handle_data(start_date, end_date, 'sps1')
+                self.handle_data(start_date, end_date, 'sps')
                 if self.is_twins:
                     self.handle_data(start_date, end_date, 'sps2')
         except:
             pass
 
-    def handle_data(self, start_date: str, end_date: str, name: Literal['sps1', 'sps2']):
+    def handle_data(self, start_date: str, end_date: str, name: Literal['sps', 'sps2']):
         cnt = DataLog.select().where(DataLog.utc_date_time >= start_date, DataLog.utc_date_time <= end_date).where(DataLog.name == name).count()
         logging.info(f"trendview query data count: {cnt}")
         max_data_count = 8000
@@ -82,7 +82,7 @@ class TrendView(ft.Container):
             DataLog.utc_date_time >= start_date,
             DataLog.utc_date_time <= end_date
         ).where(DataLog.name == name).where(DataLog.id % portion == 0).order_by(DataLog.id.desc())
-        if name == 'sps1':
-            self.sps1_chart.update_chart(data_logs)
+        if name == 'sps':
+            self.sps_chart.update_chart(data_logs)
         elif name == 'sps2':
             self.sps2_chart.update_chart(data_logs)

@@ -13,7 +13,7 @@ class DualShaPoLiOff(ft.Container):
 
     def build(self):
         try:
-            self.sps1_meters = DualMeters(name="sps1")
+            self.sps_meters = DualMeters(name="sps")
             self.sps2_meters = DualMeters(name="sps2")
 
             self.content = ft.Column(
@@ -23,7 +23,7 @@ class DualShaPoLiOff(ft.Container):
                     ft.Row(
                         expand=True,
                         spacing=10,
-                        controls=[self.sps1_meters, self.sps2_meters]
+                        controls=[self.sps_meters, self.sps2_meters]
                     )
                 ]
             )
@@ -36,7 +36,7 @@ class DualShaPoLiOff(ft.Container):
         interval = preference.data_refresh_interval
         while self.task_running:
             try:
-                self.sps1_meters.reload()
+                self.sps_meters.reload()
                 self.sps2_meters.reload()
             except:
                 logging.exception('exception occured at DualShaPoLiOff.load_data')

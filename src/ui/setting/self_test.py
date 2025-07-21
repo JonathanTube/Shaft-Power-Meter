@@ -16,7 +16,7 @@ class SelfTest(ft.Tabs):
         self.system_settings:SystemSettings = SystemSettings.get()
         self.conf: IOConf = IOConf.get()
         self.plc_task = None
-        self.sps1_task = None
+        self.sps_task = None
         self.sps2_task = None
         self.hmi_server_task = None
         self.gps_task = None
@@ -29,7 +29,7 @@ class SelfTest(ft.Tabs):
                     self.plc_log = ft.ListView(
                         padding=10, auto_scroll=True, height=500, spacing=5, expand=True)
                     
-                    self.sps1_log = ft.ListView(
+                    self.sps_log = ft.ListView(
                         padding=10, auto_scroll=True, height=500, spacing=5, expand=True)
                     
                     self.sps2_log = ft.ListView(
@@ -42,7 +42,7 @@ class SelfTest(ft.Tabs):
                         padding=10, auto_scroll=True, height=500, spacing=5, expand=True)
                     
                     self.tabs = [
-                        ft.Tab(text="SPS-1", content=self.sps1_log, visible=self.system_settings.is_master),
+                        ft.Tab(text="SPS-1", content=self.sps_log, visible=self.system_settings.is_master),
                         ft.Tab(text="SPS-2", content=self.sps2_log, visible=self.system_settings.is_master and self.system_settings.amount_of_propeller == 2),
                         ft.Tab(text="HMI Server", content=self.hmi_server_log, visible=not self.system_settings.is_master),
                         ft.Tab(text="GPS", content=self.gps_log),
@@ -58,7 +58,7 @@ class SelfTest(ft.Tabs):
             self.plc_task = self.page.run_task(self.__read_plc_data)
 
         if self.system_settings.is_master:
-            self.sps1_task = self.page.run_task(self.__read_sps1_data)
+            self.sps_task = self.page.run_task(self.__read_sps_data)
             if gdata.amount_of_propeller == 2:
                 self.sps2_task = self.page.run_task(self.__read_sps2_data)
         else:
@@ -73,8 +73,8 @@ class SelfTest(ft.Tabs):
             self.plc_task.cancel()
 
         if self.system_settings.is_master:
-            if self.sps1_task:
-                self.sps1_task.cancel()
+            if self.sps_task:
+                self.sps_task.cancel()
 
             if self.sps2_task and gdata.amount_of_propeller == 2:
                 self.sps2_task.cancel()
@@ -114,17 +114,17 @@ class SelfTest(ft.Tabs):
             finally:
                 await asyncio.sleep(2)
 
-    async def __read_sps1_data(self):
+    async def __read_sps_data(self):
         while self.task_running:
             try:
-                sps1_data = f'ad0={gdata.sps1_ad0}, ad1={gdata.sps1_ad1}, speed={gdata.sps1_speed}'
-                if gdata.sps1_offline:
-                    self.sps1_log.controls.append(ft.Text('Disconnected from SPS-1'))
+                sps_data = f'ad0={gdata.sps_ad0}, ad1={gdata.sps_ad1}, speed={gdata.sps_speed}'
+                if gdata.sps_offline:
+                    self.sps_log.controls.append(ft.Text('Disconnected from SPS-1'))
                 else:
-                    self.sps1_log.controls.append(ft.Text(f"SPS-1 Data: {sps1_data}"))
-                self.sps1_log.update()
+                    self.sps_log.controls.append(ft.Text(f"SPS-1 Data: {sps_data}"))
+                self.sps_log.update()
             except:
-                logging.exception('exception occured at SelfTest.__read_sps1_data')
+                logging.exception('exception occured at SelfTest.__read_sps_data')
             finally:
                 await asyncio.sleep(2)
 
@@ -146,8 +146,8 @@ class SelfTest(ft.Tabs):
         while self.task_running:
             try:
                 if ws_client.is_connected:
-                    sps1_data = f'sps1: torque={gdata.sps1_torque}, thrust={gdata.sps1_thrust}, speed={gdata.sps1_speed}'
-                    self.hmi_server_log.controls.append(ft.Text(f"HMI Server Data: {sps1_data}"))
+                    sps_data = f'sps: torque={gdata.sps_torque}, thrust={gdata.sps_thrust}, speed={gdata.sps_speed}'
+                    self.hmi_server_log.controls.append(ft.Text(f"HMI Server Data: {sps_data}"))
                     if gdata.amount_of_propeller == 2:
                         sps2_data = f'sps2: torque={gdata.sps2_torque}, thrust={gdata.sps2_thrust}, speed={gdata.sps2_speed}'
                         self.hmi_server_log.controls.append(ft.Text(f"HMI Server Data: {sps2_data}"))

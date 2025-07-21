@@ -5,7 +5,7 @@ from ..base import BaseModel
 class DataLog(BaseModel):
     utc_date_time = DateTimeField(verbose_name="UTC日期时间")
 
-    name = CharField(verbose_name="名称:sps1 or sps2")
+    name = CharField(verbose_name="名称:sps or sps2")
 
     ad_0_torque = FloatField(verbose_name="扭矩(Nm)")
 

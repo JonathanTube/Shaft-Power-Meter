@@ -44,8 +44,8 @@ class AlarmTable(AbstractTable):
                     return session.get("lang.alarm.slave_gps_disconnected")
                 case AlarmType.MASTER_GPS_DISCONNECTED:
                     return session.get("lang.alarm.master_gps_disconnected")
-                case AlarmType.MASTER_SPS1_DISCONNECTED:
-                    return session.get("lang.alarm.master_sps1_disconnected")
+                case AlarmType.MASTER_SPS_DISCONNECTED:
+                    return session.get("lang.alarm.master_sps_disconnected")
                 case AlarmType.MASTER_SPS2_DISCONNECTED:
                     return session.get("lang.alarm.master_sps2_disconnected")
                 case AlarmType.MASTER_SERVER_STOPPED:
@@ -99,6 +99,9 @@ class AlarmTable(AbstractTable):
             logging.exception("exception occured at AlarmTable.load_data")
 
         return []
+
+    def has_operations(self):
+        return False
 
     def create_columns(self):
         return self.get_columns()

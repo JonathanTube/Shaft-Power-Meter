@@ -31,9 +31,9 @@ class SingleMeters(ft.Container):
 
     def build(self):
         try:
-            self.speed_meter = SpeedMeter("sps1", self.get_radius(0.16))
-            self.power_meter = PowerMeter("sps1", self.get_radius(0.22))
-            self.torque_meter = TorqueMeter("sps1", self.get_radius(0.16))
+            self.speed_meter = SpeedMeter("sps", self.get_radius(0.16))
+            self.power_meter = PowerMeter("sps", self.get_radius(0.22))
+            self.torque_meter = TorqueMeter("sps", self.get_radius(0.16))
 
             row = ft.Row(
                 alignment=ft.MainAxisAlignment.CENTER,

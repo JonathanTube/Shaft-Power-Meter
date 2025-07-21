@@ -24,7 +24,7 @@ class DualInstantPower(ft.Container):
             if self.page is None or self.page.session is None:
                 return
 
-            self.__create_power_sps1()
+            self.__create_power_sps()
             self.__create_power_sps2()
             self.__create_power_total()
 
@@ -35,7 +35,7 @@ class DualInstantPower(ft.Container):
                 spacing=0,
                 controls=[
                     self.power_total,
-                    self.power_sps1,
+                    self.power_sps,
                     self.power_sps2
                 ]
             )
@@ -46,12 +46,12 @@ class DualInstantPower(ft.Container):
 
     def reload(self): 
         try:  
-            power_sps1 = UnitParser.parse_power(gdata.sps1_power, self.unit)
+            power_sps = UnitParser.parse_power(gdata.sps_power, self.unit)
             power_sps2 = UnitParser.parse_power(gdata.sps2_power, self.unit)
-            power_total = UnitParser.parse_power(gdata.sps1_power + gdata.sps2_power, self.unit)
+            power_total = UnitParser.parse_power(gdata.sps_power + gdata.sps2_power, self.unit)
 
-            self.power_sps1_value.value = power_sps1[0]
-            self.power_sps1_unit.value = power_sps1[1]
+            self.power_sps_value.value = power_sps[0]
+            self.power_sps_unit.value = power_sps[1]
 
             self.power_sps2_value.value = power_sps2[0]
             self.power_sps2_unit.value = power_sps2[1]
@@ -64,32 +64,32 @@ class DualInstantPower(ft.Container):
             logging.exception('exception occured at DualInstantGrid.reload')
 
 
-    def __create_power_sps1(self):
-        self.sps1_label = ft.Text(
-            value=self.page.session.get("lang.common.sps1"),
+    def __create_power_sps(self):
+        self.sps_label = ft.Text(
+            value=self.page.session.get("lang.common.sps"),
             text_align=ft.TextAlign.RIGHT,
             size=self.font_size_of_label,
             weight=ft.FontWeight.W_600
         )
-        self.power_sps1_value = ft.Text(
+        self.power_sps_value = ft.Text(
             value='0',
             size=self.font_size_of_value,
             width=80,
             text_align=ft.TextAlign.RIGHT,
             weight=ft.FontWeight.W_500
         )
-        self.power_sps1_unit = ft.Text('W', width=40,
+        self.power_sps_unit = ft.Text('W', width=40,
                                        text_align=ft.TextAlign.LEFT,
                                        size=self.font_size_of_unit,
                                        weight=ft.FontWeight.W_500
                                        )
 
-        self.power_sps1 = ft.Row(
+        self.power_sps = ft.Row(
             tight=True,
             controls=[
-                self.sps1_label,
-                self.power_sps1_value,
-                self.power_sps1_unit
+                self.sps_label,
+                self.power_sps_value,
+                self.power_sps_unit
             ])
 
     def __create_power_sps2(self):

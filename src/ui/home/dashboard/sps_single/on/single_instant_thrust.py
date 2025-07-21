@@ -34,7 +34,7 @@ class SingleInstantThrust(ft.Container):
 
     def reload(self):
         try:
-            thrust = UnitParser.parse_thrust(gdata.sps1_thrust, self.system_unit)
+            thrust = UnitParser.parse_thrust(gdata.sps_thrust, self.system_unit)
             self.thrust_value.value = thrust[0]
             self.thrust_unit.value = thrust[1]
             self.content.update()

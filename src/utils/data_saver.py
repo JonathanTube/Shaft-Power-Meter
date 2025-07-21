@@ -52,14 +52,14 @@ class DataSaver:
                 })
             )
 
-            if name == 'sps1':
-                gdata.sps1_torque = torque
-                gdata.sps1_thrust = thrust
-                gdata.sps1_speed = speed
-                gdata.sps1_power = power
-                if len(gdata.sps1_power_history) > 60:
-                    gdata.sps1_power_history.pop(0)
-                gdata.sps1_power_history.append((power, utc_date_time))
+            if name == 'sps':
+                gdata.sps_torque = torque
+                gdata.sps_thrust = thrust
+                gdata.sps_speed = speed
+                gdata.sps_power = power
+                if len(gdata.sps_power_history) > 60:
+                    gdata.sps_power_history.pop(0)
+                gdata.sps_power_history.append((power, utc_date_time))
             else:
                 gdata.sps2_torque = torque
                 gdata.sps2_thrust = thrust

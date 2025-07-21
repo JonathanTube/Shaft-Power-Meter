@@ -41,7 +41,7 @@ class TestModeTask:
 
         while self.is_running:
             try:
-                self.save_generated_data('sps1')
+                self.save_generated_data('sps')
 
                 if amount_of_propeller == 2:
                     self.save_generated_data('sps2')
@@ -79,17 +79,17 @@ class TestModeTask:
                 times=valid_data_log['times']
             )
             # recalculate total counter
-            gdata.sps1_speed = 0
-            gdata.sps1_power = 0
-            gdata.sps1_torque = 0
-            gdata.sps1_thrust = 0
+            gdata.sps_speed = 0
+            gdata.sps_power = 0
+            gdata.sps_torque = 0
+            gdata.sps_thrust = 0
 
             gdata.sps2_speed = 0
             gdata.sps2_power = 0
             gdata.sps2_torque = 0
             gdata.sps2_thrust = 0
 
-            gdata.sps1_power_history = []
+            gdata.sps_power_history = []
             gdata.sps2_power_history = []
         except:
             logging.exception('test mode task error')

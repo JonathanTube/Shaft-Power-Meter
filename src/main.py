@@ -26,7 +26,7 @@ from db.base import db
 from task.gps_sync_task import gps
 from task.sps_offline_task import sps_offline_task
 from task.utc_timer_task import utc_timer
-from task.sps1_read_task import sps1_read_task
+from task.sps_read_task import sps_read_task
 from task.sps2_read_task import sps2_read_task
 from task.plc_sync_task import plc
 from websocket.websocket_master import ws_server
@@ -97,7 +97,7 @@ def start_all_task():
             io_conf: IOConf = IOConf.get()
             if io_conf.plc_enabled:
                 asyncio.create_task(plc.connect())
-            asyncio.create_task(sps1_read_task.connect())
+            asyncio.create_task(sps_read_task.connect())
             
             # 不是独立的，才需要运行server
             if not system_settings.is_individual:

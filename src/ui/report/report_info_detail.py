@@ -62,7 +62,7 @@ class ReportInfoDialog(ft.AlertDialog):
                 else:
                     self.report_details: list[ReportDetail] = ReportDetail.select().where(
                         ReportDetail.report_info == self.report_info.id,
-                        ReportDetail.name == 'sps1'
+                        ReportDetail.name == 'sps'
                     ).order_by(
                         ReportDetail.id.asc()
                     ).limit(250)
@@ -300,13 +300,13 @@ class ReportInfoDialog(ft.AlertDialog):
                     _power_value = ""
                     _total_power_value = 0
                     for report_detail in report_details:
-                        if report_detail.name == 'sps1':
+                        if report_detail.name == 'sps':
                             _speed_value = f"{report_detail.speed}"
-                            _sps1_torque, _ = UnitParser.parse_torque(report_detail.torque, system_unit, shrink=False)
-                            _torque_value = f"{_sps1_torque}"
-                            _sps1_power, _ = UnitParser.parse_power(report_detail.power, system_unit, shrink=False)
-                            _power_value = f"{_sps1_power}"
-                            _total_power_value = _sps1_power
+                            _sps_torque, _ = UnitParser.parse_torque(report_detail.torque, system_unit, shrink=False)
+                            _torque_value = f"{_sps_torque}"
+                            _sps_power, _ = UnitParser.parse_power(report_detail.power, system_unit, shrink=False)
+                            _power_value = f"{_sps_power}"
+                            _total_power_value = _sps_power
                         else:
                             _speed_value = f"{_speed_value} ; {report_detail.speed}"
                             _sps2_torque, _ = UnitParser.parse_torque(report_detail.torque, system_unit, shrink=False)

@@ -9,7 +9,7 @@ from typing import Literal
 
 
 class TorqueMeter(ft.Container):
-    def __init__(self, name: Literal["sps1", "sps2"], radius: float):
+    def __init__(self, name: Literal["sps", "sps2"], radius: float):
         super().__init__()
         self.expand = False
         self.name = name
@@ -36,10 +36,10 @@ class TorqueMeter(ft.Container):
             if self.content is None:
                 return
 
-            if self.name == "sps1":
-                if gdata.sps1_torque is not None:
-                    torque_and_unit = UnitParser.parse_torque(gdata.sps1_torque, self.system_unit)
-                    self.content.set_data(gdata.sps1_torque, torque_and_unit[0], torque_and_unit[1])
+            if self.name == "sps":
+                if gdata.sps_torque is not None:
+                    torque_and_unit = UnitParser.parse_torque(gdata.sps_torque, self.system_unit)
+                    self.content.set_data(gdata.sps_torque, torque_and_unit[0], torque_and_unit[1])
             else:
                 if gdata.sps2_torque is not None:
                     torque_and_unit = UnitParser.parse_torque(gdata.sps2_torque, self.system_unit)

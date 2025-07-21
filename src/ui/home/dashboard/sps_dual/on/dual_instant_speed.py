@@ -17,7 +17,7 @@ class DualInstantSpeed(ft.Container):
 
     def build(self):
         try:
-            self.__create_speed_sps1()
+            self.__create_speed_sps()
             self.__create_speed_sps2()
 
             content = ft.Column(
@@ -25,7 +25,7 @@ class DualInstantSpeed(ft.Container):
                 horizontal_alignment=ft.CrossAxisAlignment.END,
                 alignment=ft.MainAxisAlignment.END,
                 spacing=0,
-                controls=[self.speed_sps1, self.speed_sps2]
+                controls=[self.speed_sps, self.speed_sps2]
             )
 
             self.content = SimpleCard(title=self.page.session.get("lang.common.speed"), body=content)
@@ -35,11 +35,11 @@ class DualInstantSpeed(ft.Container):
 
     def reload(self):
         try:
-            speed_sps1 = UnitParser.parse_speed(gdata.sps1_speed)
+            speed_sps = UnitParser.parse_speed(gdata.sps_speed)
             speed_sps2 = UnitParser.parse_speed(gdata.sps2_speed)
 
-            self.speed_sps1_value.value = speed_sps1[0]
-            self.speed_sps1_unit.value = speed_sps1[1]
+            self.speed_sps_value.value = speed_sps[0]
+            self.speed_sps_unit.value = speed_sps[1]
 
             self.speed_sps2_value.value = speed_sps2[0]
             self.speed_sps2_unit.value = speed_sps2[1]
@@ -48,31 +48,31 @@ class DualInstantSpeed(ft.Container):
         except:
             logging.exception('exception occured at DualInstantSpeed.reload')
 
-    def __create_speed_sps1(self):
-        self.sps1_label = ft.Text(
-            value=self.page.session.get("lang.common.sps1"),
+    def __create_speed_sps(self):
+        self.sps_label = ft.Text(
+            value=self.page.session.get("lang.common.sps"),
             text_align=ft.TextAlign.RIGHT,
             size=self.font_size_of_label,
             weight=ft.FontWeight.W_600
         )
-        self.speed_sps1_value = ft.Text(
+        self.speed_sps_value = ft.Text(
             value='0',
             size=self.font_size_of_value,
             width=80,
             text_align=ft.TextAlign.RIGHT,
             weight=ft.FontWeight.W_500
         )
-        self.speed_sps1_unit = ft.Text(self.page.session.get("lang.common.rpm"), width=40,
+        self.speed_sps_unit = ft.Text(self.page.session.get("lang.common.rpm"), width=40,
                                        text_align=ft.TextAlign.LEFT,
                                        size=self.font_size_of_unit,
                                        weight=ft.FontWeight.W_500
                                        )
-        self.speed_sps1 = ft.Row(
+        self.speed_sps = ft.Row(
             tight=True,
             controls=[
-                self.sps1_label,
-                self.speed_sps1_value,
-                self.speed_sps1_unit
+                self.sps_label,
+                self.speed_sps_value,
+                self.speed_sps_unit
             ])
 
     def __create_speed_sps2(self):

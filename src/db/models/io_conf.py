@@ -16,8 +16,8 @@ class IOConf(BaseModel):
     hmi_server_ip = CharField(verbose_name="HMI server IP address", default="127.0.0.1")
     hmi_server_port = IntegerField(verbose_name="HMI server port", default=8001)
 
-    sps1_ip = CharField(verbose_name="SPS1 IP address", default="")
-    sps1_port = IntegerField(verbose_name="SPS1 port", default=502)
+    sps_ip = CharField(verbose_name="SPS IP address", default="")
+    sps_port = IntegerField(verbose_name="SPS port", default=502)
 
     sps2_ip = CharField(verbose_name="SPS2 IP address", default="")
     sps2_port = IntegerField(verbose_name="SPS2 port", default=502)

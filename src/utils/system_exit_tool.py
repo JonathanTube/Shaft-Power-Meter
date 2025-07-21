@@ -1,6 +1,6 @@
 import flet as ft
 import logging
-from task.sps1_read_task import sps1_read_task
+from task.sps_read_task import sps_read_task
 from task.sps2_read_task import sps2_read_task
 from websocket.websocket_slave import ws_client
 from websocket.websocket_master import ws_server
@@ -33,7 +33,7 @@ class SystemExitTool:
 
             logging.info('start closing all of the connections...')
             # 关闭sps
-            await sps1_read_task.close()
+            await sps_read_task.close()
             await sps2_read_task.close()
 
             # 关闭websocket

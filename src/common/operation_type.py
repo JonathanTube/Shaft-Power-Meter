@@ -20,7 +20,7 @@ class OperationType(int, Enum):
     USER_UPDATE = 16
 
     ZERO_CAL = 17
-    ZERO_CAL_SPS1 = 18
+    ZERO_CAL_SPS = 18
     ZERO_CAL_SPS2 = 19
     PERMISSION_CONF = 20
     TEST_MODE_CONF = 21
@@ -35,8 +35,8 @@ class OperationType(int, Enum):
     START_HMI_SERVER = 26
     STOP_HMI_SERVER = 27
 
-    CONNECT_TO_SPS1 = 28
-    DISCONNECT_FROM_SPS1 = 29
+    CONNECT_TO_SPS = 28
+    DISCONNECT_FROM_SPS = 29
 
     CONNECT_TO_SPS2 = 30
     DISCONNECT_FROM_SPS2 = 31

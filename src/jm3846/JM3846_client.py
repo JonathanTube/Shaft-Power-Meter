@@ -245,15 +245,15 @@ class JM3846AsyncClient:
                 ad0 = round(result['ch0_ad'], 2)
                 ad0_mv_per_v = self.jm3846Calculator.calculate_mv_per_v(ad0, self.gain_0)
 
-                if self.name == 'sps1':
-                    gdata.sps1_ad0 = ad0
-                    gdata.sps1_mv_per_v_for_torque = ad0_mv_per_v
+                if self.name == 'sps':
+                    gdata.sps_ad0 = ad0
+                    gdata.sps_mv_per_v_for_torque = ad0_mv_per_v
                 else:
                     gdata.sps2_ad0 = ad0
                     gdata.sps2_mv_per_v_for_torque = ad0_mv_per_v
 
                 # 加上偏移量
-                torque_offset = gdata.sps1_torque_offset if self.name == 'sps1' else gdata.sps2_torque_offset
+                torque_offset = gdata.sps_torque_offset if self.name == 'sps' else gdata.sps2_torque_offset
                 ad0_microstrain = self.jm3846Calculator.calculate_microstrain(ad0_mv_per_v + (torque_offset * -1))
                 torque = self.jm3846Calculator.calculate_torque(ad0_microstrain)
                 logging.info(f'name=[***{self.name}***],ad0={ad0}, ad0_mv_per_v={ad0_mv_per_v}, torque_offset={torque_offset}, microstrain={ad0_microstrain}, torque={torque}')
@@ -261,21 +261,21 @@ class JM3846AsyncClient:
                 ad1 = round(result['ch1_ad'], 2)
                 ad1_mv_per_v = self.jm3846Calculator.calculate_mv_per_v(ad1, self.gain_1)
 
-                if self.name == 'sps1':
-                    gdata.sps1_ad1 = ad1
-                    gdata.sps1_mv_per_v_for_thrust = ad1_mv_per_v
+                if self.name == 'sps':
+                    gdata.sps_ad1 = ad1
+                    gdata.sps_mv_per_v_for_thrust = ad1_mv_per_v
                 else:
                     gdata.sps2_ad1 = ad1
                     gdata.sps2_mv_per_v_for_thrust = ad1_mv_per_v
 
                 # 加上偏移量
-                thrust_offset = gdata.sps1_thrust_offset if self.name == 'sps1' else gdata.sps2_thrust_offset
+                thrust_offset = gdata.sps_thrust_offset if self.name == 'sps' else gdata.sps2_thrust_offset
                 thrust = self.jm3846Calculator.calculate_thrust(ad1_mv_per_v + thrust_offset)
                 logging.info(f'name=[***{self.name}***],ad1={ad1},ad1_mv_per_v={ad1_mv_per_v}, thrust_offset={thrust_offset}, thrust={thrust}')
             if 'rpm' in result:
                 rpm = round(result['rpm'], 2)
-                if self.name == 'sps1':
-                    gdata.sps1_speed = rpm
+                if self.name == 'sps':
+                    gdata.sps_speed = rpm
                 else:
                     gdata.sps2_speed = rpm
 
@@ -304,19 +304,19 @@ class JM3846AsyncClient:
             logging.error(f'[***{self.name}***] JM3846 0x45 error')
 
     def set_offline(self, is_offline: bool):
-        if self.name == 'sps1':
-            gdata.sps1_offline = is_offline
+        if self.name == 'sps':
+            gdata.sps_offline = is_offline
         elif self.name == 'sps2':
             gdata.sps2_offline = is_offline
 
     def create_alarm(self):
-        if self.name == 'sps1':
-            AlarmSaver.create(alarm_type=AlarmType.MASTER_SPS1_DISCONNECTED)
+        if self.name == 'sps':
+            AlarmSaver.create(alarm_type=AlarmType.MASTER_SPS_DISCONNECTED)
         elif self.name == 'sps2':
             AlarmSaver.create(alarm_type=AlarmType.MASTER_SPS2_DISCONNECTED)
 
     def recovery_alarm(self):
-        if self.name == 'sps1':
-            AlarmSaver.recovery(alarm_type=AlarmType.MASTER_SPS1_DISCONNECTED)
+        if self.name == 'sps':
+            AlarmSaver.recovery(alarm_type=AlarmType.MASTER_SPS_DISCONNECTED)
         elif self.name == 'sps2':
             AlarmSaver.recovery(alarm_type=AlarmType.MASTER_SPS2_DISCONNECTED)

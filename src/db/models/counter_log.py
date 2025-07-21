@@ -5,7 +5,7 @@ from ..base import BaseModel
 class CounterLog(BaseModel):
     counter_type = IntegerField(verbose_name="类型: 1-manually 2-total")
 
-    sps_name = CharField(verbose_name="sps name: sps1 or sps2")
+    sps_name = CharField(verbose_name="sps name: sps or sps2")
 
     total_speed = BigIntegerField(verbose_name="累积转速(RPM)", default=0)
 

@@ -11,7 +11,7 @@ from db.models.system_settings import SystemSettings
 
 
 class DualMeters(ft.Container):
-    def __init__(self, name: Literal["sps1", "sps2"]):
+    def __init__(self, name: Literal["sps", "sps2"]):
         super().__init__()
         self.expand = True
         self.name = name
@@ -42,7 +42,7 @@ class DualMeters(ft.Container):
             self.torque_meter = TorqueMeter(self.name, self.get_radius(0.22))
             self.thrust_meter = ThrustBlock(self.name)
 
-            title = self.page.session.get("lang.common.sps1")
+            title = self.page.session.get("lang.common.sps")
             if self.name == "sps2":
                 title = self.page.session.get("lang.common.sps2")
 

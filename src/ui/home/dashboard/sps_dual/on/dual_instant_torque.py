@@ -22,7 +22,7 @@ class DualInstantTorque(ft.Container):
 
     def build(self):
         try:
-            self.__create_torque_sps1()
+            self.__create_torque_sps()
             self.__create_torque_sps2()
 
             content = ft.Column(
@@ -31,7 +31,7 @@ class DualInstantTorque(ft.Container):
                 alignment=ft.MainAxisAlignment.END,
                 spacing=0,
                 controls=[
-                    self.torque_sps1,
+                    self.torque_sps,
                     self.torque_sps2
                 ]
             )
@@ -43,11 +43,11 @@ class DualInstantTorque(ft.Container):
 
     def reload(self):
         try:
-            torque_sps1 = UnitParser.parse_torque(gdata.sps1_torque, self.unit)
+            torque_sps = UnitParser.parse_torque(gdata.sps_torque, self.unit)
             torque_sps2 = UnitParser.parse_torque(gdata.sps2_torque, self.unit)
 
-            self.torque_sps1_value.value = torque_sps1[0]
-            self.torque_sps1_unit.value = torque_sps1[1]
+            self.torque_sps_value.value = torque_sps[0]
+            self.torque_sps_unit.value = torque_sps[1]
 
             self.torque_sps2_value.value = torque_sps2[0]
             self.torque_sps2_unit.value = torque_sps2[1]
@@ -57,31 +57,31 @@ class DualInstantTorque(ft.Container):
             logging.exception('exception occured at DualInstantTorque.reload')
 
 
-    def __create_torque_sps1(self):
-        self.sps1_label = ft.Text(
-            value=self.page.session.get("lang.common.sps1"),
+    def __create_torque_sps(self):
+        self.sps_label = ft.Text(
+            value=self.page.session.get("lang.common.sps"),
             text_align=ft.TextAlign.RIGHT,
             size=self.font_size_of_label,
             weight=ft.FontWeight.W_600
         )
-        self.torque_sps1_value = ft.Text(
+        self.torque_sps_value = ft.Text(
             value='0',
             size=self.font_size_of_value,
             width=80,
             text_align=ft.TextAlign.RIGHT,
             weight=ft.FontWeight.W_500
         )
-        self.torque_sps1_unit = ft.Text('Nm', width=40,
+        self.torque_sps_unit = ft.Text('Nm', width=40,
                                         text_align=ft.TextAlign.LEFT,
                                         size=self.font_size_of_unit,
                                         weight=ft.FontWeight.W_500
                                         )
-        self.torque_sps1 = ft.Row(
+        self.torque_sps = ft.Row(
             tight=True,
             controls=[
-                self.sps1_label,
-                self.torque_sps1_value,
-                self.torque_sps1_unit
+                self.sps_label,
+                self.torque_sps_value,
+                self.torque_sps_unit
             ])
 
     def __create_torque_sps2(self):

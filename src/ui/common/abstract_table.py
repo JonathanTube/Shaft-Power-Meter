@@ -171,16 +171,3 @@ class AbstractTable(ft.Container):
     @abstractmethod
     def create_operations(self, items: list):
         pass
-
-    def update_columns(self, columns: list[str]):
-        try:
-            if self.page and self.page.session:
-                wrapped_columns = [ft.DataColumn(ft.Text(column)) for column in columns]
-                if self.has_operations():
-                    session = self.page.session
-                    wrapped_columns.append(ft.DataColumn(ft.Text(session.get("lang.common.operation"))))
-
-                if self.data_table and self.data_table.page:
-                    self.data_table.columns = wrapped_columns
-        except:
-            logging.exception('exception occured at abstract_table.update_columns')

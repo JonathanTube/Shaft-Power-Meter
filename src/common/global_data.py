@@ -28,19 +28,19 @@ class GlobalData:
         #  是否开启自动从GPS同步UTC时间
         self.enable_utc_time_sync_with_gps = False
 
-        self.sps1_speed = 0
-        self.sps1_power = 0
-        self.sps1_torque = 0
-        self.sps1_thrust = 0
+        self.sps_speed = 0
+        self.sps_power = 0
+        self.sps_torque = 0
+        self.sps_thrust = 0
         
-        self.sps1_ad0 = 0
-        self.sps1_ad1 = 0
-        self.sps1_speed = 0
+        self.sps_ad0 = 0
+        self.sps_ad1 = 0
+        self.sps_speed = 0
 
-        self.sps1_mv_per_v_for_torque = 0
-        self.sps1_mv_per_v_for_thrust = 0
-        self.sps1_torque_offset = 0
-        self.sps1_thrust_offset = 0
+        self.sps_mv_per_v_for_torque = 0
+        self.sps_mv_per_v_for_thrust = 0
+        self.sps_torque_offset = 0
+        self.sps_thrust_offset = 0
 
         self.sps2_speed = 0
         self.sps2_power = 0
@@ -56,7 +56,7 @@ class GlobalData:
         self.sps2_torque_offset = 0
         self.sps2_thrust_offset = 0
 
-        self.sps1_power_history: list[tuple[float, datetime]] = []
+        self.sps_power_history: list[tuple[float, datetime]] = []
         self.sps2_power_history: list[tuple[float, datetime]] = []
         self.gps_location = None
 
@@ -70,7 +70,7 @@ class GlobalData:
         self.power_of_overload = 0
 
         # 默认离线
-        self.sps1_offline: bool = True
+        self.sps_offline: bool = True
         self.sps2_offline: bool = True
         self.sps_offline_torque = 0
         self.sps_offline_thrust = 0
@@ -114,11 +114,11 @@ class GlobalData:
         self.power_of_overload = propellerSetting.value_of_overload_curve
         self.alarm_enabled_of_overload_curve = propellerSetting.alarm_enabled_of_overload_curve
         # get the last accepted zero cal. record.
-        sps1_accepted_zero_cal: ZeroCalInfo = ZeroCalInfo.select().where(
-            ZeroCalInfo.state == 1, ZeroCalInfo.name == 'sps1').order_by(ZeroCalInfo.id.desc()).first()
-        if sps1_accepted_zero_cal is not None:
-            self.sps1_torque_offset = sps1_accepted_zero_cal.torque_offset
-            self.sps1_thrust_offset = sps1_accepted_zero_cal.thrust_offset
+        sps_accepted_zero_cal: ZeroCalInfo = ZeroCalInfo.select().where(
+            ZeroCalInfo.state == 1, ZeroCalInfo.name == 'sps').order_by(ZeroCalInfo.id.desc()).first()
+        if sps_accepted_zero_cal is not None:
+            self.sps_torque_offset = sps_accepted_zero_cal.torque_offset
+            self.sps_thrust_offset = sps_accepted_zero_cal.thrust_offset
 
         sps2_accepted_zero_cal: ZeroCalInfo = ZeroCalInfo.select().where(ZeroCalInfo.state == 1, ZeroCalInfo.name == 'sps2').order_by(ZeroCalInfo.id.desc()).first()
         if sps2_accepted_zero_cal is not None:

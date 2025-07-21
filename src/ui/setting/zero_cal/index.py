@@ -1,7 +1,7 @@
 import logging
 import flet as ft
 
-from ui.setting.zero_cal.zero_cal_executor_sps1 import ZeroCalExecutorSPS1
+from ui.setting.zero_cal.zero_cal_executor_sps import ZeroCalExecutorSPS
 from ui.setting.zero_cal.zero_cal_executor_sps2 import ZeroCalExecutorSPS2
 from ui.setting.zero_cal.zero_cal_his import ZeroCalHis
 from db.models.system_settings import SystemSettings
@@ -27,11 +27,11 @@ class ZeroCal(ft.Container):
                     return
 
 
-                self.executor_sps1 = ft.Tab(
-                    text=f'{self.page.session.get("lang.zero_cal.executor")} SPS1',
+                self.executor_sps = ft.Tab(
+                    text=f'{self.page.session.get("lang.zero_cal.executor")} SPS',
                     content=ft.Container(
                         padding=ft.padding.only(top=10, bottom=5),
-                        content=ZeroCalExecutorSPS1()
+                        content=ZeroCalExecutorSPS()
                     )
                 )
                 self.executor_sps2 = ft.Tab(
@@ -50,7 +50,7 @@ class ZeroCal(ft.Container):
                             content=self.his
                         )
                     ),
-                    self.executor_sps1
+                    self.executor_sps
                 ]
 
                 if self.system_settings.amount_of_propeller > 1:

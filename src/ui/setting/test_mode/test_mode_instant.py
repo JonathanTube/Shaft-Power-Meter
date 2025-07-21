@@ -21,26 +21,26 @@ class TestModeInstant(ft.ResponsiveRow):
     def build(self):
         try:
             if self.page and self.page.session:
-                self.sps1_torque = self.__get_uniform_text("0")
-                self.sps1_speed = self.__get_uniform_text("0")
-                self.sps1_thrust = self.__get_uniform_text("0")
-                self.sps1_power = self.__get_uniform_text("0")
-                self.sps1_instant_data_card = ft.ResponsiveRow(
+                self.sps_torque = self.__get_uniform_text("0")
+                self.sps_speed = self.__get_uniform_text("0")
+                self.sps_thrust = self.__get_uniform_text("0")
+                self.sps_power = self.__get_uniform_text("0")
+                self.sps_instant_data_card = ft.ResponsiveRow(
                     alignment=ft.alignment.center,
                     controls=[
                         self.__get_uniform_text(self.page.session.get('lang.common.torque')),
-                        self.sps1_torque,
+                        self.sps_torque,
                         self.__get_uniform_text(self.page.session.get('lang.common.speed')),
-                        self.sps1_speed,
+                        self.sps_speed,
                         self.__get_uniform_text(self.page.session.get('lang.common.thrust')),
-                        self.sps1_thrust,
+                        self.sps_thrust,
                         self.__get_uniform_text(self.page.session.get('lang.common.power')),
-                        self.sps1_power
+                        self.sps_power
                     ]
                 )
                 if self.system_settings.amount_of_propeller == 1:
                     self.controls = [
-                        CustomCard(f'sps1 {self.page.session.get('lang.setting.test_mode.instant_mock_data')}', self.sps1_instant_data_card)
+                        CustomCard(f'sps {self.page.session.get('lang.setting.test_mode.instant_mock_data')}', self.sps_instant_data_card)
                     ]
                 else:
                     self.sps2_torque = self.__get_uniform_text("0")
@@ -63,8 +63,8 @@ class TestModeInstant(ft.ResponsiveRow):
 
                     self.controls = [
                         CustomCard(
-                            f'sps1 {self.page.session.get('lang.setting.test_mode.instant_mock_data')}',
-                            self.sps1_instant_data_card
+                            f'sps {self.page.session.get('lang.setting.test_mode.instant_mock_data')}',
+                            self.sps_instant_data_card
                         ),
                         CustomCard(
                             f'sps2 {self.page.session.get('lang.setting.test_mode.instant_mock_data')}',
@@ -80,24 +80,24 @@ class TestModeInstant(ft.ResponsiveRow):
     async def __refresh_instant(self):
         while self.task_running:
             try:
-                if self.sps1_speed and self.sps1_speed.page:
-                    self.sps1_speed.value = f'{gdata.sps1_speed} rpm'
-                    self.sps1_speed.update()
+                if self.sps_speed and self.sps_speed.page:
+                    self.sps_speed.value = f'{gdata.sps_speed} rpm'
+                    self.sps_speed.update()
 
-                if self.sps1_torque and self.sps1_torque.page:
-                    sps1_torque_value, sps1_torque_unit = UnitParser.parse_torque(gdata.sps1_torque, self.system_unit)
-                    self.sps1_torque.value = f'{sps1_torque_value} {sps1_torque_unit}'
-                    self.sps1_torque.update()
+                if self.sps_torque and self.sps_torque.page:
+                    sps_torque_value, sps_torque_unit = UnitParser.parse_torque(gdata.sps_torque, self.system_unit)
+                    self.sps_torque.value = f'{sps_torque_value} {sps_torque_unit}'
+                    self.sps_torque.update()
 
-                if self.sps1_thrust and self.sps1_thrust.page:
-                    sps1_thrust_value, sps1_thrust_unit = UnitParser.parse_thrust(gdata.sps1_thrust, self.system_unit)
-                    self.sps1_thrust.value = f'{sps1_thrust_value} {sps1_thrust_unit}'
-                    self.sps1_thrust.update()
+                if self.sps_thrust and self.sps_thrust.page:
+                    sps_thrust_value, sps_thrust_unit = UnitParser.parse_thrust(gdata.sps_thrust, self.system_unit)
+                    self.sps_thrust.value = f'{sps_thrust_value} {sps_thrust_unit}'
+                    self.sps_thrust.update()
 
-                if self.sps1_power and self.sps1_power.page:
-                    sps1_power_value, sps1_power_unit = UnitParser.parse_power(gdata.sps1_power, self.system_unit)
-                    self.sps1_power.value = f'{sps1_power_value} {sps1_power_unit}'
-                    self.sps1_power.update()
+                if self.sps_power and self.sps_power.page:
+                    sps_power_value, sps_power_unit = UnitParser.parse_power(gdata.sps_power, self.system_unit)
+                    self.sps_power.value = f'{sps_power_value} {sps_power_unit}'
+                    self.sps_power.update()
 
                 if self.system_settings.amount_of_propeller == 2:
                     if self.sps2_speed and self.sps2_speed.page:

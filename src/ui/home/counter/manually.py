@@ -10,7 +10,7 @@ from common.global_data import gdata
 
 
 class ManuallyCounter(ft.Container):
-    def __init__(self, name: Literal['sps1', 'sps2']):
+    def __init__(self, name: Literal['sps', 'sps2']):
         super().__init__()
         self.expand = True
         self.name = name
