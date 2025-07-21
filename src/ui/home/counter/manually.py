@@ -131,8 +131,8 @@ class ManuallyCounter(ft.Container):
                 on_click=lambda e: self.__on_stop(e)
             )
 
-            self.resume_button = ft.FilledButton(
-                text=self.page.session.get('lang.counter.resume'),
+            self.reset_button = ft.FilledButton(
+                text=self.page.session.get('lang.counter.reset'),
                 bgcolor=ft.Colors.ORANGE,
                 icon_color=ft.Colors.WHITE,
                 color=ft.Colors.WHITE,
@@ -162,7 +162,7 @@ class ManuallyCounter(ft.Container):
                 controls=[
                     self.start_button,
                     self.stop_button,
-                    self.resume_button
+                    self.reset_button
                 ]
             )
             self.content = ft.Column(
@@ -220,7 +220,7 @@ class ManuallyCounter(ft.Container):
 
                     self.start_button.visible = True
                     self.stop_button.visible = False
-                    self.resume_button.visible = False
+                    self.reset_button.visible = False
                     if self.buttons and self.buttons.page:
                         self.buttons.update()
 
@@ -245,7 +245,7 @@ class ManuallyCounter(ft.Container):
 
                     self.start_button.visible = False
                     self.stop_button.visible = False
-                    self.resume_button.visible = True
+                    self.reset_button.visible = True
 
                     if self.buttons and self.buttons.page:
                         self.buttons.update()
@@ -269,7 +269,7 @@ class ManuallyCounter(ft.Container):
 
                 self.start_button.visible = False
                 self.stop_button.visible = True
-                self.resume_button.visible = False
+                self.reset_button.visible = False
 
                 if self.buttons and self.buttons.page:
                     self.buttons.update()

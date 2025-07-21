@@ -1358,9 +1358,9 @@ class DataInit:
                     "english": "Stop"
                 },
                 {
-                    "code": "lang.counter.resume",
+                    "code": "lang.counter.reset",
                     "chinese": "恢复",
-                    "english": "Resume"
+                    "english": "Reset"
                 },
                 {
                     "code": "lang.counter.total_energy",
