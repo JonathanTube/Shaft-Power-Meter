@@ -109,7 +109,7 @@ class EventTable(AbstractTable):
                     icon_color=ft.Colors.GREEN,
                     icon_size=20,
                     visible=show_note,
-                    on_click=lambda e: self.page.open(EventNote(items[7]))
+                    on_click=lambda e: self.page.open(EventNote(items[0]))
                 )
             ])
         except:

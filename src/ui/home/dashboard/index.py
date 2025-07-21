@@ -14,6 +14,7 @@ class Dashboard(ft.Container):
         self.padding = 10
         self.system_settings: SystemSettings = SystemSettings.get()
 
+
     def build(self):
         try:
             sha_po_li = self.system_settings.sha_po_li
