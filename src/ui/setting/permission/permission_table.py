@@ -74,7 +74,7 @@ class PermissionTable(AbstractTable):
         session = self.page.session
         edit_button.text = session.get("lang.button.edit")
         delete_button.text = session.get("lang.button.delete")
-        if items[1] == "root":
+        if items[1] == "admin":
             return ft.Row(controls=[edit_button])
         else:
             return ft.Row(controls=[edit_button, delete_button])
