@@ -121,15 +121,17 @@ class SinglePowerLine(ft.Container):
         try:
             labels = []
             for index, item in enumerate(gdata.sps1_power_history):
-                if len(item) > 1:
-                    label = ft.ChartAxisLabel(
-                        value=index,
-                        label=ft.Container(
-                            content=ft.Text(value=item[1].strftime('%H:%M:%S')),
-                            padding=ft.padding.only(top=10)
+                # 每隔6个数据点显示一个标签
+                if index % 6 == 0:
+                    if len(item) > 1:
+                        label = ft.ChartAxisLabel(
+                            value=index,
+                            label=ft.Container(
+                                content=ft.Text(value=item[1].strftime('%H:%M:%S')),
+                                padding=ft.padding.only(top=10)
+                            )
                         )
-                    )
-                    labels.append(label)
+                        labels.append(label)
 
             if self.chart and self.chart.bottom_axis:
                 self.chart.bottom_axis.labels = labels

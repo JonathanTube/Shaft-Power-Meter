@@ -56,8 +56,8 @@ class GlobalData:
         self.sps2_torque_offset = 0
         self.sps2_thrust_offset = 0
 
-        self.sps1_power_history: list[float, datetime] = []
-        self.sps2_power_history: list[float, datetime] = []
+        self.sps1_power_history: list[tuple[float, datetime]] = []
+        self.sps2_power_history: list[tuple[float, datetime]] = []
         self.gps_location = None
 
         self.test_mode_running: bool = False
