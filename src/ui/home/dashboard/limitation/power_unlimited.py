@@ -2,7 +2,6 @@ import logging
 import flet as ft
 from utils.unit_parser import UnitParser
 from db.models.preference import Preference
-from db.models.propeller_setting import PropellerSetting
 from db.models.system_settings import SystemSettings
 
 
@@ -12,11 +11,10 @@ class PowerUnlimited(ft.Container):
         self.expand = True
         system_settings: SystemSettings = SystemSettings.get()
         self.is_dual = system_settings.amount_of_propeller == 2
+        self.power = system_settings.unlimited_power
+
         preference: Preference = Preference.get()
         self.system_unit = preference.system_unit
-
-        propeller_settings: PropellerSetting = PropellerSetting.get()
-        self.power = propeller_settings.shaft_power_of_mcr_operating_point
 
     def build(self):
         try:

@@ -3,7 +3,6 @@ import flet as ft
 from ui.common.meter_half import MeterHalf
 from db.models.system_settings import SystemSettings
 from common.global_data import gdata
-from db.models.propeller_setting import PropellerSetting
 
 
 class EEXILimitedPower(ft.Container):
@@ -14,10 +13,9 @@ class EEXILimitedPower(ft.Container):
         self.container_width = width
         self.container_height = height
 
-        propeller_settings: PropellerSetting = PropellerSetting.get()
         system_settings: SystemSettings = SystemSettings.get()
 
-        self.unlimited_power = propeller_settings.shaft_power_of_mcr_operating_point
+        self.unlimited_power = system_settings.unlimited_power
         self.amount_of_propeller = system_settings.amount_of_propeller
         self.eexi_power = system_settings.eexi_limited_power
         self.normal_power = self.eexi_power * 0.9

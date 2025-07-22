@@ -3,7 +3,6 @@ import flet as ft
 from db.models.event_log import EventLog
 from db.models.report_info import ReportInfo
 from db.models.ship_info import ShipInfo
-from db.models.propeller_setting import PropellerSetting
 from db.models.system_settings import SystemSettings
 from db.models.preference import Preference
 from db.models.report_detail import ReportDetail
@@ -45,7 +44,6 @@ class ReportInfoDialog(ft.AlertDialog):
     def __load_data(self):
         try:
             self.ship_info: ShipInfo = ShipInfo.get()
-            self.propeller_setting: PropellerSetting = PropellerSetting.get()
             self.preference: Preference = Preference.get()
             self.system_settings: SystemSettings = SystemSettings.get()
             self.report_info: ReportInfo = ReportInfo.get_by_id(self.id)
@@ -92,7 +90,7 @@ class ReportInfoDialog(ft.AlertDialog):
 
     def __create_basic_info(self):
         try:
-            unlimited_power = self.propeller_setting.shaft_power_of_mcr_operating_point
+            unlimited_power = self.system_settings.unlimited_power
             limited_power = self.system_settings.eexi_limited_power
             system_unit = self.preference.system_unit
             unlimited_power_value, unlimited_power_unit = UnitParser.parse_power(unlimited_power, system_unit, shrink=False)

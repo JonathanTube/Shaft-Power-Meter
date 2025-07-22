@@ -1,5 +1,6 @@
 import logging
 import flet as ft
+from db.models.system_settings import SystemSettings
 from db.models.user import User
 from ui.common.custom_card import CustomCard
 from db.models.ship_info import ShipInfo
@@ -65,3 +66,11 @@ class SystemConfShipInfo(ft.Container):
             operation_type=OperationType.SYSTEM_CONF_SHIP_INFO,
             operation_content=model_to_dict(self.ship_info)
         )
+
+    def before_update(self):
+        try:
+            system_settings: SystemSettings = SystemSettings.get()
+            self.visible = system_settings.sha_po_li
+        except:
+            logging.exception('exception occured at SystemConfShipInfo.before_update')
+

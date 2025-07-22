@@ -80,6 +80,9 @@ class SystemConf(ft.Container):
             Toast.show_success(self.page)
             self.is_saving = False
             self.__change_buttons()
+
+            self.system_conf_ship_info.update()
+            self.system_conf_settings.update()
         except SystemError:
             # 退出系统
             msg = self.page.session.get("lang.toast.system_exit")

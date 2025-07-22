@@ -21,13 +21,13 @@ class SinglePowerLine(ft.Container):
         system_settings: SystemSettings = SystemSettings.get()
         self.sha_po_li = system_settings.sha_po_li
 
-        limitations: Limitations = Limitations.get()
-        self.max_power = limitations.power_max
-
         if self.sha_po_li:
             self.threshold_power = system_settings.eexi_limited_power
+            self.max_power = system_settings.unlimited_power
         else:
+            limitations: Limitations = Limitations.get()
             self.threshold_power = limitations.power_warning
+            self.max_power = limitations.power_max
 
     def build(self):
         try:

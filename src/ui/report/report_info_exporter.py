@@ -3,7 +3,6 @@ from fpdf import FPDF
 from db.models.event_log import EventLog
 from db.models.report_info import ReportInfo
 from db.models.ship_info import ShipInfo
-from db.models.propeller_setting import PropellerSetting
 from db.models.system_settings import SystemSettings
 from db.models.preference import Preference
 from db.models.report_detail import ReportDetail
@@ -25,7 +24,6 @@ class ReportInfoExporter(FPDF):
     def __load_data(self, id: int):
         try:
             self.ship_info: ShipInfo = ShipInfo.get()
-            self.propeller_setting: PropellerSetting = PropellerSetting.get()
             self.preference: Preference = Preference.get()
             self.system_settings: SystemSettings = SystemSettings.get()
 
@@ -83,7 +81,7 @@ class ReportInfoExporter(FPDF):
 
         system_unit = self.preference.system_unit
         self.__insert_label("Un-limited Power", w=self.per_cell_width)
-        unlimited_power = self.propeller_setting.shaft_power_of_mcr_operating_point
+        unlimited_power = self.system_settings.unlimited_power
         unlimited_power, unlimited_unit = UnitParser.parse_power(unlimited_power, system_unit, shrink=False)
         self.__insert_value(f"{unlimited_power} {unlimited_unit}", w=self.per_cell_width)
 

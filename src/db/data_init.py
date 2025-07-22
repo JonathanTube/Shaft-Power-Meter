@@ -57,6 +57,7 @@ class DataInit:
                 display_thrust=False,
                 amount_of_propeller=1,
                 sha_po_li=True,
+                unlimited_power=7710 * 1000,
                 eexi_limited_power=6300 * 1000,
                 eexi_breach_checking_duration=60
             )
@@ -811,6 +812,12 @@ class DataInit:
                     "code": "lang.setting.twins_propeller",
                     "chinese": "双桨",
                     "english": "Twins"
+                },
+
+                {
+                    "code": "lang.setting.unlimited_power",
+                    "chinese": "最大功率",
+                    "english": "Unlimited Power"
                 },
 
                 {
