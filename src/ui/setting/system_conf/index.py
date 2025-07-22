@@ -12,6 +12,7 @@ from ui.common.toast import Toast
 from db.table_init import TableInit
 from utils.system_exit_tool import SystemExitTool
 
+
 class SystemConf(ft.Container):
     def __init__(self):
         super().__init__()
@@ -75,14 +76,18 @@ class SystemConf(ft.Container):
             self.__change_buttons()
 
             keyboard.close()
-            self.system_conf_settings.save(user)
-            self.system_conf_ship_info.save(user)
+
+            if self.system_conf_settings and self.system_conf_settings.page:
+                self.system_conf_settings.save(user)
+                self.system_conf_settings.update()
+
+            if self.system_conf_ship_info and self.system_conf_ship_info.page:
+                self.system_conf_ship_info.update()
+                self.system_conf_ship_info.save(user)
+
             Toast.show_success(self.page)
             self.is_saving = False
             self.__change_buttons()
-
-            self.system_conf_ship_info.update()
-            self.system_conf_settings.update()
         except SystemError:
             # 退出系统
             msg = self.page.session.get("lang.toast.system_exit")

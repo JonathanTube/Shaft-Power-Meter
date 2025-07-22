@@ -12,17 +12,24 @@ class AlarmSaver:
             AlarmLog.is_recovery == False
         ).count()
         if cnt == 0:
-            AlarmLog.create(utc_date_time=gdata.utc_date_time, alarm_type=alarm_type, is_from_master=gdata.is_master)
+            AlarmLog.create(utc_date_time=gdata.utc_date_time,
+                            alarm_type=alarm_type,
+                            is_from_master=gdata.is_master)
             logging.info(f'[***save alarm***] alarm_type={alarm_type}, save alarm log')
 
     @staticmethod
-    def recovery(alarm_type: AlarmType):
+    def recovery(alarm_type_occured: AlarmType, alarm_type_recovered: AlarmType):
         # logging.info(f'[***recovery alarm***] alarm_type={alarm_type}')
         AlarmLog.update(
             is_recovery=True,
             is_sync=False
         ).where(
-            AlarmLog.alarm_type == alarm_type,
+            AlarmLog.alarm_type == alarm_type_occured,
             AlarmLog.is_recovery == False,
             AlarmLog.is_from_master == gdata.is_master
         ).execute()
+
+        AlarmLog.create(utc_date_time=gdata.utc_date_time,
+                        alarm_type=alarm_type_recovered,
+                        is_recovery=True,
+                        is_from_master=gdata.is_master)

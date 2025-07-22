@@ -1504,13 +1504,28 @@ class DataInit:
                 },
                 {
                     "code": "lang.alarm.master_plc_disconnected",
-                    "chinese": "PLC 断开",
+                    "chinese": "PLC断开",
                     "english": "PLC Disconnected"
+                },
+                {
+                    "code": "lang.alarm.master_plc_connected",
+                    "chinese": "PLC连接",
+                    "english": "PLC Connected"
                 },
                 {
                     "code": "lang.alarm.slave_gps_disconnected",
                     "chinese": "从机GPS断开",
                     "english": "Slave GPS Disconnected"
+                },
+                {
+                    "code": "lang.alarm.slave_gps_connected",
+                    "chinese": "从机GPS连接",
+                    "english": "Slave GPS Connected"
+                },
+                {
+                    "code": "lang.alarm.master_gps_connected",
+                    "chinese": "主机GPS连接",
+                    "english": "Master GPS Connected"
                 },
                 {
                     "code": "lang.alarm.master_gps_disconnected",
@@ -1523,9 +1538,19 @@ class DataInit:
                     "english": "Master SPS Disconnected"
                 },
                 {
+                    "code": "lang.alarm.master_sps_connected",
+                    "chinese": "主机SPS连接",
+                    "english": "Master SPS Connected"
+                },
+                {
                     "code": "lang.alarm.master_sps2_disconnected",
                     "chinese": "主机SPS2断开",
                     "english": "Master SPS2 Disconnected"
+                },
+                {
+                    "code": "lang.alarm.master_sps2_connected",
+                    "chinese": "主机SPS2连接",
+                    "english": "Master SPS2 Connected"
                 },
                 {
                     "code": "lang.alarm.master_server_stopped",
@@ -1533,14 +1558,29 @@ class DataInit:
                     "english": "Master Server Stopped"
                 },
                 {
+                    "code": "lang.alarm.master_server_started",
+                    "chinese": "Master服务端已启动",
+                    "english": "Master Server Started"
+                },
+                {
                     "code": "lang.alarm.slave_master_disconnected",
                     "chinese": "从机已断开连接",
                     "english": "Slave-Master Disconnected"
                 },
                 {
+                    "code": "lang.alarm.slave_master_connected",
+                    "chinese": "从机已恢复连接",
+                    "english": "Slave-Master Connected"
+                },
+                {
                     "code": "lang.alarm.app_unexpected_exit",
                     "chinese": "应用意外退出",
                     "english": "App Unexpected Exit"
+                },
+                {
+                    "code": "lang.alarm.power_optimal_load",
+                    "chinese": "功率正常",
+                    "english": "Power Optimal Load"
                 },
                 {
                     "code": "lang.alarm.power_overload",

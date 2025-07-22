@@ -106,7 +106,16 @@ class GpsSyncTask:
                     self._is_connected = True
                     if has_data_times % 5 == 0:
                         # 连接成功
-                        AlarmSaver.recovery(alarm_type=AlarmType.MASTER_GPS_DISCONNECTED if self._is_master else AlarmType.SLAVE_GPS_DISCONNECTED)
+                        if self._is_master:
+                            AlarmSaver.recovery(
+                                alarm_type_occured=AlarmType.MASTER_GPS_DISCONNECTED,
+                                alarm_type_recovered=AlarmType.MASTER_GPS_CONNECTED
+                            )
+                        else:
+                            AlarmSaver.recovery(
+                                alarm_type_occured=AlarmType.SLAVE_GPS_DISCONNECTED,
+                                alarm_type_recovered=AlarmType.SLAVE_GPS_CONNECTED
+                            )
 
                 str_data = data.decode('utf-8').strip()
                 self.parse_nmea_sentence(str_data)

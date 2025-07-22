@@ -61,7 +61,10 @@ class WebSocketMaster:
                     self.server = await websockets.serve(self._client_handler, host, port, ping_interval=30, ping_timeout=10)
                     logging.info(f"[***HMI server***] websocket server started at ws://{host}:{port}")
                     self._is_started = True
-                    AlarmSaver.recovery(alarm_type=AlarmType.MASTER_SERVER_STOPPED)
+                    AlarmSaver.recovery(
+                        alarm_type_occured=AlarmType.MASTER_SERVER_STOPPED, 
+                        alarm_type_recovered=AlarmType.MASTER_SERVER_STARTED
+                    )
 
 
                     asyncio.create_task(self.receive_alarms_from_slave())
@@ -87,7 +90,10 @@ class WebSocketMaster:
 
             try:
                 if len(self.clients) > 0:
-                    AlarmSaver.recovery(alarm_type=AlarmType.SLAVE_CLIENT_DISCONNECTED)
+                    AlarmSaver.recovery(
+                        alarm_type_occured=AlarmType.SLAVE_CLIENT_DISCONNECTED,
+                        alarm_type_recovered=AlarmType.SLAVE_CLIENT_CONNECTED
+                    )
 
                     alarm_logs: list[AlarmLog] = AlarmLog.select(
                         AlarmLog.id,

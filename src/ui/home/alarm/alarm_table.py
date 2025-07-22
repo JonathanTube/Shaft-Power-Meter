@@ -40,22 +40,46 @@ class AlarmTable(AbstractTable):
             match alarm_type:
                 case AlarmType.MASTER_PLC_DISCONNECTED:
                     return session.get("lang.alarm.master_plc_disconnected")
+                case AlarmType.MASTER_PLC_CONNECTED:
+                    return session.get("lang.alarm.master_plc_connected")
+
                 case AlarmType.SLAVE_GPS_DISCONNECTED:
                     return session.get("lang.alarm.slave_gps_disconnected")
+                case AlarmType.SLAVE_GPS_CONNECTED:
+                    return session.get("lang.alarm.slave_gps_connected")
+
                 case AlarmType.MASTER_GPS_DISCONNECTED:
                     return session.get("lang.alarm.master_gps_disconnected")
+                case AlarmType.MASTER_GPS_CONNECTED:
+                    return session.get("lang.alarm.master_gps_connected")
+                
                 case AlarmType.MASTER_SPS_DISCONNECTED:
                     return session.get("lang.alarm.master_sps_disconnected")
+                case AlarmType.MASTER_SPS_CONNECTED:
+                    return session.get("lang.alarm.master_sps_connected")
+                
                 case AlarmType.MASTER_SPS2_DISCONNECTED:
                     return session.get("lang.alarm.master_sps2_disconnected")
+                case AlarmType.MASTER_SPS2_CONNECTED:
+                    return session.get("lang.alarm.master_sps2_connected")
+                
                 case AlarmType.MASTER_SERVER_STOPPED:
                     return session.get("lang.alarm.master_server_stopped")
+                case AlarmType.MASTER_SERVER_STARTED:
+                    return session.get("lang.alarm.master_server_started")
+
                 case AlarmType.SLAVE_CLIENT_DISCONNECTED:
                     return session.get("lang.alarm.slave_master_disconnected")
-                case AlarmType.APP_UNEXPECTED_EXIT:
-                    return session.get("lang.alarm.app_unexpected_exit")
+                case AlarmType.SLAVE_CLIENT_CONNECTED:
+                    return session.get("lang.alarm.slave_master_connected")
+                
                 case AlarmType.POWER_OVERLOAD:
                     return session.get("lang.alarm.power_overload")
+                case AlarmType.POWER_OPTIMAL_LOAD:
+                    return session.get("lang.alarm.power_optimal_load")
+                
+                case AlarmType.APP_UNEXPECTED_EXIT:
+                    return session.get("lang.alarm.app_unexpected_exit")
                 case _:
                     return session.get("lang.alarm.unknown")
         except:

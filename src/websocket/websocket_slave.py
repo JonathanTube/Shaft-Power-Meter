@@ -58,7 +58,10 @@ class WebSocketSlave:
                     logging.info(f"[***HMI client***] connected to {uri}")
 
                     self._is_connected = True
-                    AlarmSaver.recovery(alarm_type=AlarmType.SLAVE_CLIENT_DISCONNECTED)
+                    AlarmSaver.recovery(
+                        alarm_type_occured=AlarmType.SLAVE_CLIENT_DISCONNECTED,
+                        alarm_type_recovered=AlarmType.SLAVE_CLIENT_CONNECTED
+                    )
 
                     # 定期检查gps,alarm,并发送给master
                     asyncio.create_task(self.send_gps_alarm_to_master())
