@@ -40,6 +40,9 @@ class JM3846AsyncClient:
         self._is_connected = False
         self._is_canceled = False
 
+        # 新增接收任务引用
+        self._receive_task: Optional[asyncio.Task] = None
+
     @property
     def is_connected(self):
         return self._is_connected
@@ -51,6 +54,7 @@ class JM3846AsyncClient:
     async def connect(self):        
         async with self._lock:  # 确保单线程重连
             self._is_canceled = False
+            self._retry = 0  # 重置重试计数器
 
             while gdata.is_master and self._retry < self._max_retries:
                 if self._is_canceled:
@@ -74,7 +78,8 @@ class JM3846AsyncClient:
                     self.recovery_alarm()
                     self._is_connected = True
                     
-                    await self.async_receive_looping()
+                    # 启动接收任务并保存引用
+                    self._receive_task = asyncio.create_task(self.async_receive_looping())
                 except TimeoutError:
                     logging.error(f'[***{self.name}***] start JM3846 client timeout')
                     self._is_connected = False
@@ -84,17 +89,22 @@ class JM3846AsyncClient:
                     self._is_connected = False
                     self.create_alarm()
                 finally:
-                    #  指数退避
-                    await asyncio.sleep(2 ** self._retry)
-                    self._retry += 1
+                    if not self._is_canceled:  # 只有未取消时才执行退避
+                        await asyncio.sleep(2 ** self._retry)
+                        self._retry += 1
 
             self._is_canceled = False
 
     async def close(self):
         self._is_canceled = True
 
-        if not self._is_connected:
-            return
+       # 取消接收任务
+        if self._receive_task and not self._receive_task.done():
+            self._receive_task.cancel()
+            try:
+                await self._receive_task
+            except asyncio.CancelledError:
+                pass  # 正常取消，无需处理
 
         try:
             if self.writer:
@@ -107,7 +117,10 @@ class JM3846AsyncClient:
         except:
             logging.exception(f'[***{self.name}***] JM3846 disconnect from sps failed')
         finally:
-            self._is_connected = False
+            self.writer = None
+            self.reader = None
+
+        self._is_connected = False
 
     async def async_handle_0x03(self):
         """异步处理功能码0x03"""
