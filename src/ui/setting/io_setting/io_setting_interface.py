@@ -1,6 +1,7 @@
 import ipaddress
 import logging
 import flet as ft
+from common.const_alarm_type import AlarmType
 from common.operation_type import OperationType
 from db.models.io_conf import IOConf
 from db.models.operation_log import OperationLog
@@ -9,6 +10,7 @@ from ui.common.custom_card import CustomCard
 from ui.common.keyboard import keyboard
 from ui.common.permission_check import PermissionCheck
 from ui.common.toast import Toast
+from utils.alarm_saver import AlarmSaver
 from websocket.websocket_slave import ws_client
 from common.global_data import gdata
 
@@ -114,6 +116,7 @@ class InterfaceConf(ft.Container):
                 operation_content=user.user_name
             )
             self.page.run_task(ws_client.close)
+            AlarmSaver.create(alarm_type=AlarmType.SLAVE_CLIENT_DISCONNECTED)
         except: 
             logging.exception("exception occured at InterfaceConf.__on_close")
 

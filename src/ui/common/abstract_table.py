@@ -78,6 +78,7 @@ class AbstractTable(ft.Container):
                 cells.append(ft.DataCell(self.create_operations(items), data=items))
         except:
             logging.exception('exception occured at AbstractTable.__create_cells')
+        print('===========cells=',cells)
         return cells
         
 
@@ -113,6 +114,10 @@ class AbstractTable(ft.Container):
                     )
 
                 self.data_table.rows = rows
+                print('====================1')
+                print(self.data_table.columns)
+                print('====================2')
+                print(self.data_table.rows)
                 self.data_table.update()
         except:
             logging.exception('exception occured at abstract_table.__create_table_rows')

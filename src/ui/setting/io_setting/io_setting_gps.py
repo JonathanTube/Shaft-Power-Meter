@@ -1,6 +1,7 @@
 import ipaddress
 import logging
 import flet as ft
+from common.const_alarm_type import AlarmType
 from common.operation_type import OperationType
 from db.models.io_conf import IOConf
 from db.models.operation_log import OperationLog
@@ -11,6 +12,7 @@ from ui.common.keyboard import keyboard
 from ui.common.permission_check import PermissionCheck
 from common.global_data import gdata
 from ui.common.toast import Toast
+from utils.alarm_saver import AlarmSaver
 
 
 class IOSettingGPS(ft.Container):
@@ -112,6 +114,7 @@ class IOSettingGPS(ft.Container):
                 operation_content=user.user_name
             )
             self.page.run_task(gps.close)
+            AlarmSaver.create(alarm_type=AlarmType.MASTER_GPS_DISCONNECTED if gdata.is_master else AlarmType.SLAVE_GPS_DISCONNECTED)
         except:
             logging.exception("exception occured at IOSettingGPS.__on_close")
 

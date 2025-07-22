@@ -314,6 +314,7 @@ class IOSettingPLC(ft.Container):
                 operation_content=user.user_name
             )
             self.page.run_task(plc.close)
+            plc.save_plc_alarm()
         except:
             logging.exception('exception occured at __stop_plc_task')
 

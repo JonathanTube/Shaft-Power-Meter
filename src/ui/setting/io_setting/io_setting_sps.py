@@ -252,6 +252,7 @@ class IOSettingSPS(ft.Container):
                 operation_content=user.user_name
             )
             self.page.run_task(sps_read_task.close)
+            sps_read_task.create_alarm()
         except:
             logging.exception("exception occured at __disconnect_from_sps")
 

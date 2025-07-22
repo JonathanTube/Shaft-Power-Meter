@@ -218,7 +218,6 @@ class WebSocketSlave:
             logging.error("[***HMI client***] failed to close websocket connection")
         finally:
             self._is_connected = False
-            AlarmSaver.create(alarm_type=AlarmType.SLAVE_CLIENT_DISCONNECTED)
 
 
 ws_client = WebSocketSlave()

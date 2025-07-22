@@ -245,7 +245,6 @@ class PlcSyncTask:
             logging.error("[***PLC***] close plc error occured")
         finally:
             self._is_connected = False
-            self.save_plc_alarm()
 
     def save_plc_alarm(self):
         try:

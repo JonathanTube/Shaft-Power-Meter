@@ -221,7 +221,6 @@ class WebSocketMaster:
         except:
             logging.error('[***HMI server***] stop websocket server failed')
         finally:
-            AlarmSaver.create(alarm_type=AlarmType.MASTER_SERVER_STOPPED)
             self._is_started = False
 
     async def broadcast(self, data) -> bool:

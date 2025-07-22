@@ -19,7 +19,14 @@ class AlarmSaver:
 
     @staticmethod
     def recovery(alarm_type_occured: AlarmType, alarm_type_recovered: AlarmType):
-        # logging.info(f'[***recovery alarm***] alarm_type={alarm_type}')
+        cnt: int = AlarmLog.select().where(
+            AlarmLog.alarm_type == alarm_type_occured,
+            AlarmLog.is_recovery == False
+        ).count()
+        # 如何过没待恢复的记录，直接跳过
+        if cnt == 0:
+            return
+        
         AlarmLog.update(
             is_recovery=True,
             is_sync=False

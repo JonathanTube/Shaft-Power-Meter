@@ -142,7 +142,6 @@ class GpsSyncTask:
             self.writer = None
             self.reader = None
             self._is_connected = False
-            AlarmSaver.create(alarm_type=AlarmType.MASTER_GPS_DISCONNECTED if self._is_master else AlarmType.SLAVE_GPS_DISCONNECTED)
 
     def parse_nmea_sentence(self, sentence):
         try:

@@ -86,10 +86,10 @@ def start_all_task():
 
     # 如果不是第一次装机，启动设备连接
     if cnt > 0:
-        # GSP 不管主机从机都有
         asyncio.create_task(modbus_output.start())
 
-        if SystemSettings.enable_gps:
+        # GSP 不管主机从机都有
+        if system_settings.enable_gps:
             asyncio.create_task(gps.connect())
 
         # 如果是主机

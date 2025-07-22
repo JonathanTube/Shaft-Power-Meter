@@ -1,10 +1,12 @@
 import logging
 import flet as ft
+from common.const_alarm_type import AlarmType
 from common.operation_type import OperationType
 from db.models.operation_log import OperationLog
 from db.models.user import User
 from ui.common.custom_card import CustomCard
 from ui.common.permission_check import PermissionCheck
+from utils.alarm_saver import AlarmSaver
 from websocket.websocket_master import ws_server
 from common.global_data import gdata
 
@@ -94,6 +96,7 @@ class IOSettingMasterServer(ft.Container):
                 operation_content=user.user_name
             )
             self.page.run_task(ws_server.stop)
+            AlarmSaver.create(alarm_type=AlarmType.MASTER_SERVER_STOPPED)
         except:
             logging.exception('exception occured at IOSettingMasterServer.on_stop')
 
