@@ -1505,12 +1505,12 @@ class DataInit:
                 {
                     "code": "lang.alarm.master_plc_disconnected",
                     "chinese": "PLC断开",
-                    "english": "PLC Disconnected"
+                    "english": "Master PLC Disconnected"
                 },
                 {
                     "code": "lang.alarm.master_plc_connected",
                     "chinese": "PLC连接",
-                    "english": "PLC Connected"
+                    "english": "Master PLC Connected"
                 },
                 {
                     "code": "lang.alarm.slave_gps_disconnected",

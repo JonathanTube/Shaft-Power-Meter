@@ -44,8 +44,7 @@ class LogDataTable(AbstractTable):
                 sql = sql.where(DataLog.utc_date_time >= start_date,
                                 DataLog.utc_date_time <= end_date)
 
-            data = sql.order_by(DataLog.id.desc()).paginate(
-                self.current_page, self.page_size)
+            data = sql.order_by(DataLog.id.desc()).paginate(self.current_page, self.page_size)
 
             data_list = []
             for item in data:
@@ -56,15 +55,14 @@ class LogDataTable(AbstractTable):
                 data_list.append([
                     item.id,
                     item.name,
-                    item.utc_date_time.strftime(
-                        f'{self.dtc.date_format} %H:%M:%S'),
+                    item.utc_date_time.strftime(f'{self.dtc.date_format} %H:%M:%S'),
                     torque[0],
                     thrust[0],
                     speed[0],
                     power[0]
                 ])
 
-                return data_list
+            return data_list
         except:
             logging.exception('exception occured at LogDataTable.load_data')
 
