@@ -102,6 +102,17 @@ class TotalCounter(ft.Container):
 
             hours = (end_time - start_time).total_seconds() / 3600
 
+            # 如果当前时间小于，装机时间，肯定调整过时间；
+            if hours < 0:
+                hours = 0 # 直接置0
+                # reset
+                CounterLog.update(
+                    start_utc_date_time = gdata.utc_date_time
+                ).where(
+                    CounterLog.sps_name == self.name,
+                    CounterLog.counter_type == 2
+                ).execute()
+
             total_energy = (average_power * hours) / 1000  # kWh
 
             time_elapsed = end_time - start_time
