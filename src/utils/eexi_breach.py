@@ -33,17 +33,38 @@ class EEXIBreach:
         start_time = start_time - timedelta(seconds=1)
 
         # 查询在时间窗口内，功率小于等于eexi的记录
-        count_power_below_eexi = DataLog.select().where(
-            DataLog.utc_date_time >= start_time,
-            DataLog.power <= gdata.eexi_limited_power
-        ).count()
+        count_power_below_eexi = 0
 
-        
-       # 查询在时间窗口内，功率大于eexi的记录数
-        count_power_above_eexi = DataLog.select().where(
-            DataLog.utc_date_time >= start_time,
-            DataLog.power > gdata.eexi_limited_power
-        ).count()
+        # 查询在时间窗口内，功率大于eexi的记录数
+        count_power_above_eexi = 0
+
+        if gdata.amount_of_propeller == 1:
+            count_power_below_eexi = DataLog.select().where(
+                DataLog.utc_date_time >= start_time,
+                DataLog.power <= gdata.eexi_limited_power
+            ).count()
+
+            count_power_above_eexi = DataLog.select().where(
+                DataLog.utc_date_time >= start_time,
+                DataLog.power > gdata.eexi_limited_power
+            ).count()
+        else:
+            count_power_below_eexi = DataLog.select().where(
+                DataLog.utc_date_time >= start_time
+            ).group_by(
+                DataLog.utc_date_time
+            ).having(
+                fn.SUM(DataLog.power) <= gdata.eexi_limited_power
+            ).count()
+
+            count_power_above_eexi = DataLog.select().where(
+                DataLog.utc_date_time >= start_time
+            ).group_by(
+                DataLog.utc_date_time
+            ).having(
+                fn.SUM(DataLog.power) > gdata.eexi_limited_power
+            ).count()
+
 
         # 如果相等，说明没有数据，跳过所有判断，保持原样
         if count_power_below_eexi == count_power_above_eexi:

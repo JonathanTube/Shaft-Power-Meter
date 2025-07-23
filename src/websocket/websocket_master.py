@@ -99,6 +99,7 @@ class WebSocketMaster:
                         AlarmLog.id,
                         AlarmLog.alarm_type,
                         AlarmLog.is_recovery,
+                        AlarmLog.utc_date_time,
                         AlarmLog.acknowledge_time
                     ).where(
                         AlarmLog.is_sync == False
@@ -107,7 +108,9 @@ class WebSocketMaster:
                     alarm_logs_dict = []
                     for alarm_log in alarm_logs:
                         alarm_logs_dict.append({
+                            'master_alarm_id': alarm_log.id,
                             'alarm_type': alarm_log.alarm_type,
+                            'utc_date_time': alarm_log.utc_date_time.strftime(date_time_format) if alarm_log.utc_date_time else "",
                             'acknowledge_time': alarm_log.acknowledge_time.strftime(date_time_format) if alarm_log.acknowledge_time else "",
                             'is_recovery': 1 if alarm_log.is_recovery else 0
                         })
@@ -175,33 +178,36 @@ class WebSocketMaster:
 
         try:
             for alarm_log in alarm_logs:
+                slave_alarm_id = alarm_log['slave_alarm_id']
                 alarm_type = alarm_log['alarm_type']
+                utc_date_time = alarm_log['utc_date_time']
                 acknowledge_time = alarm_log['acknowledge_time']
+                is_recovery = alarm_log['is_recovery']
 
                 ack_time = None
                 if acknowledge_time:
                     ack_time = datetime.strptime(acknowledge_time, date_time_format)
 
-                is_recovery = alarm_log['is_recovery']
-                if is_recovery == 1:
+                udt = None
+                if utc_date_time:
+                    udt = datetime.strptime(utc_date_time, date_time_format)
+
+                cnt: int = AlarmLog.select().where(AlarmLog.slave_alarm_id == slave_alarm_id).count()
+
+                if cnt > 0:
                     AlarmLog.update(
-                        is_recovery=True, acknowledge_time=ack_time
+                        is_recovery=is_recovery, acknowledge_time=ack_time
                     ).where(
-                        AlarmLog.is_from_master == False, AlarmLog.alarm_type == alarm_type
+                        AlarmLog.slave_alarm_id == slave_alarm_id
                     ).execute()
                 else:
-                    cnt: int = AlarmLog.select().where(
-                        AlarmLog.is_from_master == False,
-                        AlarmLog.alarm_type == alarm_type,
-                        AlarmLog.is_recovery == False
-                    ).count()
-                    if cnt == 0:
-                        AlarmLog.create(
-                            utc_date_time=gdata.utc_date_time,
-                            acknowledge_time=ack_time,
-                            is_from_master=False,
-                            alarm_type=alarm_type
-                        )
+                    AlarmLog.create(
+                        utc_date_time=udt,
+                        acknowledge_time=ack_time,
+                        is_from_master=False,
+                        alarm_type=alarm_type,
+                        slave_alarm_id=slave_alarm_id
+                    )
 
             logging.info(f"成功同步 {len(alarm_logs)} 条报警slave GPS报警日志")
         except Exception as e:

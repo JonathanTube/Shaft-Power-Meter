@@ -15,5 +15,9 @@ class AlarmLog(BaseModel):
 
     is_from_master = BooleanField(verbose_name="是否来自于master", default=False)
 
+    master_alarm_id = IntegerField(verbose_name='主机的alarm_id', null=True)
+
+    slave_alarm_id = IntegerField(verbose_name='从机的alarm_id', null=True)
+
     class Meta:
         table_name = 'alarm_log'
