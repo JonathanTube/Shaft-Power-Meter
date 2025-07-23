@@ -41,6 +41,7 @@ class WebSocketSlave:
 
     async def connect(self):
         async with self._lock:  # 确保单线程重连
+            self._retry = 0
             if self._is_connected:
                 return
 
@@ -209,6 +210,7 @@ class WebSocketSlave:
                     acknowledge_time=ack_time,
                     alarm_type=alarm_type,
                     is_from_master=True,
+                    is_recovery=is_recovery,
                     master_alarm_id=master_alarm_id
                 )
 

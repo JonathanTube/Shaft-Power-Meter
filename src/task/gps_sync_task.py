@@ -36,6 +36,7 @@ class GpsSyncTask:
         self._is_master = system_settings.is_master
     
         async with self._lock:  # 确保单线程重连
+            self._retry = 0
             if self._is_connected:
                 return
 
