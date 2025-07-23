@@ -92,8 +92,8 @@ class WebSocketSlave:
                     AlarmLog.utc_date_time,
                     AlarmLog.acknowledge_time
                 ).where(
-                    AlarmLog.alarm_type == AlarmType.SLAVE_GPS_DISCONNECTED,
-                    AlarmLog.is_sync == False
+                    AlarmLog.is_sync == False,
+                    AlarmLog.is_from_master == False
                 )
                 alarm_logs_dict = []
                 for alarm_log in alarm_logs:

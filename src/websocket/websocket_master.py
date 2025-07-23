@@ -102,7 +102,8 @@ class WebSocketMaster:
                         AlarmLog.utc_date_time,
                         AlarmLog.acknowledge_time
                     ).where(
-                        AlarmLog.is_sync == False
+                        AlarmLog.is_sync == False,
+                        AlarmLog.is_from_master == True
                     )
 
                     alarm_logs_dict = []
