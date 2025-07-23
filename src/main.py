@@ -139,19 +139,22 @@ def on_mute():
 
 
 def set_content(page: ft.Page):
+    content_home = Home()
+    content_report = Report()
+    content_setting = Setting()
     # 主菜单切换
     def change_main_menu(name: str):
         if name == 'HOME':
-            main_content.content = Home()
+            main_content.content = content_home
         elif name == 'REPORT':
-            main_content.content = Report()
+            main_content.content = content_report
         elif name == 'SETTING':
-            main_content.content = Setting()
+            main_content.content = content_setting
         main_content.update()
 
     page.appbar = Header(on_menu_click=change_main_menu)
 
-    main_content = ft.Container(padding=0, margin=0, content=Home())
+    main_content = ft.Container(padding=0, margin=0, content=content_home)
 
     fullscreen_alert = FullscreenAlert()
 

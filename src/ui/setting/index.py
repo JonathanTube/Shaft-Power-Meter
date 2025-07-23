@@ -148,6 +148,8 @@ class Setting(ft.Container):
 
     def before_update(self):
         try:
+            self.idx = 0
+            self.rail.selected_index = 0
             if self.page and self.page.session:
                 s = self.page.session
                 self.system_conf.label = s.get("lang.setting.system_conf.title")
