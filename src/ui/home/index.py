@@ -111,9 +111,21 @@ class Home(ft.Container):
                     self.main_container
                 ]
             )
+
+            self.content_dashboard = Dashboard()
+            self.content_counter = Counter()
+            self.content_trend_view =TrendView()
+            self.content_propeller_curve =PropellerCurve()
+            self.content_alarm_list =AlarmList()
+            self.content_event_list =EventList()
+            self.content_logs =Logs()
         except:
             logging.error('exception occured at Home.build')
 
+    def before_update(self):
+        self.current_index = 0
+        return super().before_update()
+    
     def __on_click(self, index: int):
         if self.is_switching:
             return
@@ -138,19 +150,19 @@ class Home(ft.Container):
 
             if self.page and self.main_container and self.main_container.page:
                 if index == 0:
-                    self.main_container.content = Dashboard()
+                    self.main_container.content = self.content_dashboard
                 elif index == 1:
-                    self.main_container.content = Counter()
+                    self.main_container.content = self.content_counter
                 elif index == 2:
-                    self.main_container.content = TrendView()
+                    self.main_container.content = self.content_trend_view
                 elif index == 3:
-                    self.main_container.content = PropellerCurve()
+                    self.main_container.content = self.content_propeller_curve
                 elif index == 4:
-                    self.main_container.content = AlarmList()
+                    self.main_container.content = self.content_alarm_list
                 elif index == 5:
-                    self.main_container.content = EventList()
+                    self.main_container.content = self.content_event_list
                 elif index == 6:
-                    self.main_container.content = Logs()
+                    self.main_container.content = self.content_logs
 
                 self.alarm_button.active = index == 4
 
