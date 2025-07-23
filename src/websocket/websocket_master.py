@@ -103,7 +103,10 @@ class WebSocketMaster:
                         AlarmLog.acknowledge_time
                     ).where(
                         AlarmLog.is_sync == False,
-                        AlarmLog.is_from_master == True
+                        AlarmLog.is_from_master == True,
+                        # 彼此的连接错误不同步
+                        AlarmLog.alarm_type != AlarmType.SLAVE_CLIENT_DISCONNECTED,
+                        AlarmLog.alarm_type != AlarmType.SLAVE_CLIENT_CONNECTED
                     )
 
                     alarm_logs_dict = []
