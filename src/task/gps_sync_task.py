@@ -127,7 +127,6 @@ class GpsSyncTask:
                 break
 
     async def close(self):
-        logging.info(f'[***GPS***] disconnected from GPS')
         self._is_canceled = True
         if not self._is_connected:
             return
@@ -136,6 +135,8 @@ class GpsSyncTask:
             if self.writer is not None and not self.writer.is_closing():
                 self.writer.close()
                 await self.writer.wait_closed()
+
+            logging.info(f'[***GPS***] disconnected from GPS')
         except:
             logging.error("[***GPS***] gps close connection error")
         finally:
