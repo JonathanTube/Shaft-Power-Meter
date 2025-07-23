@@ -93,7 +93,9 @@ class WebSocketSlave:
                     AlarmLog.acknowledge_time
                 ).where(
                     AlarmLog.is_sync == False,
-                    AlarmLog.is_from_master == False
+                    AlarmLog.is_from_master == False,
+                    # 只同步GPS情况
+                    AlarmLog.alarm_type == AlarmType.SLAVE_GPS_DISCONNECTED,
                 )
                 alarm_logs_dict = []
                 for alarm_log in alarm_logs:
