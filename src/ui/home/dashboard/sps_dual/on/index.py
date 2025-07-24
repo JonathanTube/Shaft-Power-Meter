@@ -15,6 +15,9 @@ class DualShaPoLiOn(ft.Container):
 
     def build(self):
         try:
+            if self.page is None or self.page.window is None:
+                return
+
             w = self.page.window.width * 0.5
             h = self.page.window.height * 0.5
 
@@ -35,8 +38,13 @@ class DualShaPoLiOn(ft.Container):
 
 
     async def load_data(self):
-        preference: Preference = Preference.get()
-        interval = preference.data_refresh_interval
+        interval = 5
+        try:
+            preference: Preference = Preference.get()
+            interval = preference.data_refresh_interval
+        except:
+            pass
+
         while self.task_running:
             try:
                 self.instant_grid.reload()
@@ -50,7 +58,8 @@ class DualShaPoLiOn(ft.Container):
 
     def did_mount(self):
         self.task_running = True
-        self.task = self.page.run_task(self.load_data)
+        if self.page:
+            self.task = self.page.run_task(self.load_data)
 
     def will_unmount(self):
         self.task_running = False

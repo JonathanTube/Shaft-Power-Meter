@@ -32,8 +32,13 @@ class DualShaPoLiOff(ft.Container):
 
 
     async def load_data(self):
-        preference: Preference = Preference.get()
-        interval = preference.data_refresh_interval
+        interval = 5
+        try:
+            preference: Preference = Preference.get()
+            interval = preference.data_refresh_interval
+        except:
+            pass
+
         while self.task_running:
             try:
                 self.sps_meters.reload()

@@ -17,18 +17,31 @@ class DualInstantSpeed(ft.Container):
 
     def build(self):
         try:
+            if self.page is None or self.page.session is None:
+                return
+
             self.__create_speed_sps()
             self.__create_speed_sps2()
 
-            content = ft.Column(
-                expand=True,
-                horizontal_alignment=ft.CrossAxisAlignment.END,
-                alignment=ft.MainAxisAlignment.END,
-                spacing=0,
-                controls=[self.speed_sps, self.speed_sps2]
-            )
+            controls = []
 
-            self.content = SimpleCard(title=self.page.session.get("lang.common.speed"), body=content)
+            if self.speed_sps:
+                controls.append(self.speed_sps)
+            
+            if self.speed_sps2:
+                controls.append(self.speed_sps2)
+
+            if len(controls) > 0:
+                content = ft.Column(
+                    expand=True,
+                    horizontal_alignment=ft.CrossAxisAlignment.END,
+                    alignment=ft.MainAxisAlignment.END,
+                    spacing=0,
+                    controls=controls
+                )
+
+                self.content = SimpleCard(title=self.page.session.get("lang.common.speed"), body=content)
+
         except:
             logging.exception('exception occured at DualInstantSpeed.build')
 
@@ -44,61 +57,79 @@ class DualInstantSpeed(ft.Container):
             self.speed_sps2_value.value = speed_sps2[0]
             self.speed_sps2_unit.value = speed_sps2[1]
 
-            self.content.update()
+            if self.content and self.content.page:
+                self.content.update()
         except:
             logging.exception('exception occured at DualInstantSpeed.reload')
 
     def __create_speed_sps(self):
-        self.sps_label = ft.Text(
-            value=self.page.session.get("lang.common.sps"),
-            text_align=ft.TextAlign.RIGHT,
-            size=self.font_size_of_label,
-            weight=ft.FontWeight.W_600
-        )
-        self.speed_sps_value = ft.Text(
-            value='0',
-            size=self.font_size_of_value,
-            width=80,
-            text_align=ft.TextAlign.RIGHT,
-            weight=ft.FontWeight.W_500
-        )
-        self.speed_sps_unit = ft.Text(self.page.session.get("lang.common.rpm"), width=40,
-                                       text_align=ft.TextAlign.LEFT,
-                                       size=self.font_size_of_unit,
-                                       weight=ft.FontWeight.W_500
-                                       )
-        self.speed_sps = ft.Row(
-            tight=True,
-            controls=[
-                self.sps_label,
-                self.speed_sps_value,
-                self.speed_sps_unit
-            ])
+        try:
+            if self.page is None or self.page.session is None:
+                return
+            
+            self.sps_label = ft.Text(
+                value=self.page.session.get("lang.common.sps"),
+                text_align=ft.TextAlign.RIGHT,
+                size=self.font_size_of_label,
+                weight=ft.FontWeight.W_600
+            )
+            self.speed_sps_value = ft.Text(
+                value='0',
+                size=self.font_size_of_value,
+                width=80,
+                text_align=ft.TextAlign.RIGHT,
+                weight=ft.FontWeight.W_500
+            )
+            self.speed_sps_unit = ft.Text(
+                value=self.page.session.get("lang.common.rpm"), 
+                width=40,
+                text_align=ft.TextAlign.LEFT,
+                size=self.font_size_of_unit,
+                weight=ft.FontWeight.W_500
+            )
+            self.speed_sps = ft.Row(
+                tight=True,
+                controls=[
+                    self.sps_label,
+                    self.speed_sps_value,
+                    self.speed_sps_unit
+                ])
+        except:
+            logging.exception('exception occured at DualInstantSpeed.__create_speed_sps')
+
 
     def __create_speed_sps2(self):
-        self.sps2_label = ft.Text(
-            value=self.page.session.get("lang.common.sps2"),
-            text_align=ft.TextAlign.END,
-            size=self.font_size_of_label,
-            weight=ft.FontWeight.W_600
-        )
-        self.speed_sps2_value = ft.Text(
-            value='0',
-            size=self.font_size_of_value,
-            width=80,
-            text_align=ft.TextAlign.END,
-            weight=ft.FontWeight.W_500
-        )
-        self.speed_sps2_unit = ft.Text(self.page.session.get("lang.common.rpm"), width=40,
-                                       text_align=ft.TextAlign.LEFT,
-                                       size=self.font_size_of_unit,
-                                       weight=ft.FontWeight.W_500
-                                       )
-        self.speed_sps2 = ft.Row(
-            tight=True,
-            controls=[
-                self.sps2_label,
-                self.speed_sps2_value,
-                self.speed_sps2_unit
-            ]
-        )
+        try:
+            if self.page is None or self.page.session is None:
+                return
+
+            self.sps2_label = ft.Text(
+                value=self.page.session.get("lang.common.sps2"),
+                text_align=ft.TextAlign.END,
+                size=self.font_size_of_label,
+                weight=ft.FontWeight.W_600
+            )
+            self.speed_sps2_value = ft.Text(
+                value='0',
+                size=self.font_size_of_value,
+                width=80,
+                text_align=ft.TextAlign.END,
+                weight=ft.FontWeight.W_500
+            )
+            self.speed_sps2_unit = ft.Text(
+                self.page.session.get("lang.common.rpm"), width=40,
+                text_align=ft.TextAlign.LEFT,
+                size=self.font_size_of_unit,
+                weight=ft.FontWeight.W_500
+            )
+            self.speed_sps2 = ft.Row(
+                tight=True,
+                controls=[
+                    self.sps2_label,
+                    self.speed_sps2_value,
+                    self.speed_sps2_unit
+                ]
+            )
+
+        except:
+          logging.exception('exception occured at DualInstantSpeed.__create_speed_sps2')

@@ -4,26 +4,19 @@ from ui.home.dashboard.meters.speed_meter import SpeedMeter
 from ui.home.dashboard.meters.power_meter import PowerMeter
 from ui.home.dashboard.meters.torque_meter import TorqueMeter
 from ui.common.simple_card import SimpleCard
-from db.models.system_settings import SystemSettings
 
 
 class SingleMeters(ft.Container):
     def __init__(self):
         super().__init__()
         self.expand = True
-        system_settings: SystemSettings = SystemSettings.get()
-        self.amount_of_propeller = system_settings.amount_of_propeller
 
     def get_radius(self, radio):
         try:
             if self.page is None or self.page.window is None:
                 return 0
 
-            radius = self.page.window.height * radio
-            if self.amount_of_propeller == 2:
-                radius = radius * 0.75
-
-            return radius
+            return self.page.window.height * radio
         except:
             logging.exception('exception occured at SingleMeters.build')
 

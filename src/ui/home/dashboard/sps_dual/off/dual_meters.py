@@ -7,7 +7,6 @@ from ui.home.dashboard.meters.torque_meter import TorqueMeter
 from ui.home.dashboard.thrust.index import ThrustBlock
 from ui.common.simple_card import SimpleCard
 from typing import Literal
-from db.models.system_settings import SystemSettings
 
 
 class DualMeters(ft.Container):
@@ -15,8 +14,6 @@ class DualMeters(ft.Container):
         super().__init__()
         self.expand = True
         self.name = name
-        system_settings: SystemSettings = SystemSettings.get()
-        self.amount_of_propeller = system_settings.amount_of_propeller
 
     def get_radius(self, radio):
         try:
@@ -24,9 +21,7 @@ class DualMeters(ft.Container):
                 return 0
 
             radius = self.page.window.height * radio
-            if self.amount_of_propeller == 2:
-                radius = radius * 0.62
-            return radius
+            return radius * 0.62
         except:
             logging.exception('exception occured at DualMeters.get_radius')
 
