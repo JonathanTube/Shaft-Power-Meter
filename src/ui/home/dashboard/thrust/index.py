@@ -13,10 +13,18 @@ class ThrustBlock(ft.Container):
         self.right = 10
         self.top = 10
         self.name = name
-        preference: Preference = Preference.get()
-        self.system_unit = preference.system_unit
-        system_settings: SystemSettings = SystemSettings.get()
-        self.visible = system_settings.display_thrust
+
+        self.system_unit = 0
+        self.visible = False
+
+        try:
+            preference: Preference = Preference.get()
+            self.system_unit = preference.system_unit
+
+            system_settings: SystemSettings = SystemSettings.get()
+            self.visible = system_settings.display_thrust
+        except:
+            pass
 
     def build(self):
         try:
