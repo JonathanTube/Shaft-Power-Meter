@@ -266,7 +266,7 @@ class JM3846AsyncClient:
 
                 # 加上偏移量
                 torque_offset = gdata.sps_torque_offset if self.name == 'sps' else gdata.sps2_torque_offset
-                ad0_microstrain = self.jm3846Calculator.calculate_microstrain(ad0_mv_per_v + (torque_offset * -1))
+                ad0_microstrain = self.jm3846Calculator.calculate_microstrain(ad0_mv_per_v + torque_offset)
                 torque = self.jm3846Calculator.calculate_torque(ad0_microstrain)
                 logging.info(f'name=[***{self.name}***],ad0={ad0}, ad0_mv_per_v={ad0_mv_per_v}, torque_offset={torque_offset}, microstrain={ad0_microstrain}, torque={torque}')
             if 'ch1_ad' in result:
