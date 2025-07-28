@@ -89,6 +89,14 @@ class GlobalData:
 
         self.eexi_breach = False
 
+        # SPS - 0x03 配置相关参数
+        self.ch_sel_1 = None
+        self.gain_1 = None
+        self.ch_sel_0 = None
+        self.gain_0 = None
+        self.speed_sel = None
+        self.sample_rate = None
+
     def set_default_value(self):
         systemSettings: SystemSettings = SystemSettings.get()
 

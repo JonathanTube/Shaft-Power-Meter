@@ -50,7 +50,8 @@ class TestModeTask:
                 self.is_running = False
                 break
             finally:
-                await asyncio.sleep(1)
+                # 默认2s生成一次，和SPS采集一致
+                await asyncio.sleep(2)
 
     async def start(self):
         try:

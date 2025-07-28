@@ -121,7 +121,8 @@ class TestModeInstant(ft.ResponsiveRow):
             except:
                 logging.exception('exception occured at TestModeInstant.__refresh_instant')
             finally:
-                await asyncio.sleep(1)
+                # 默认2s生成一次，和SPS采集一致
+                await asyncio.sleep(2)
 
     def did_mount(self):
         self.task_running = True
