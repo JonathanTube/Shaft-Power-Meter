@@ -11,7 +11,7 @@ class Preference(BaseModel):
 
     language = IntegerField(verbose_name="语言 English-0, Chinese-1", default=0)
 
-    data_refresh_interval = IntegerField(verbose_name="页面数据刷新间隔, 默认5s", default=5)
+    data_refresh_interval = IntegerField(verbose_name="页面数据刷新间隔, 默认2s", default=2)
 
     class Meta:
         table_name = 'preference'

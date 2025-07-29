@@ -97,6 +97,9 @@ class GlobalData:
         self.speed_sel = None
         self.sample_rate = None
 
+        # thrust采集时长,默认10s
+        self.seconds_of_thrust_collection = 10
+
     def set_default_value(self):
         systemSettings: SystemSettings = SystemSettings.get()
 
@@ -122,8 +125,7 @@ class GlobalData:
         self.power_of_overload = propellerSetting.value_of_overload_curve
         self.alarm_enabled_of_overload_curve = propellerSetting.alarm_enabled_of_overload_curve
         # get the last accepted zero cal. record.
-        sps_accepted_zero_cal: ZeroCalInfo = ZeroCalInfo.select().where(
-            ZeroCalInfo.state == 1, ZeroCalInfo.name == 'sps').order_by(ZeroCalInfo.id.desc()).first()
+        sps_accepted_zero_cal: ZeroCalInfo = ZeroCalInfo.select().where(ZeroCalInfo.state == 1, ZeroCalInfo.name == 'sps').order_by(ZeroCalInfo.id.desc()).first()
         if sps_accepted_zero_cal is not None:
             self.sps_torque_offset = sps_accepted_zero_cal.torque_offset
             self.sps_thrust_offset = sps_accepted_zero_cal.thrust_offset

@@ -7,7 +7,8 @@ from common.const_alarm_type import AlarmType
 from jm3846.JM3846_0x03 import JM38460x03Async
 from jm3846.JM3846_0x44 import JM38460x44Async
 from jm3846.JM3846_0x45 import JM38460x45Async
-from jm3846.JM3846_data_handler import jm3846_data_handler
+from jm3846.JM3846_torque_rpm import jm3846_torque_rpm
+from jm3846.JM3846_thrust import jm3846_thrust
 from utils.alarm_saver import AlarmSaver
 from common.global_data import gdata
 
@@ -62,8 +63,10 @@ class JM3846AsyncClient:
                     # 请求配置参数
                     await self.async_handle_0x03()
 
-                    # 启动处理数据的任务
-                    asyncio.create_task(jm3846_data_handler.start(self.name))
+                    # 启动处理Torque和rpm的任务,2s一次
+                    asyncio.create_task(jm3846_torque_rpm.start(self.name))
+                    # 启动处理thrust的任务，10s一次
+                    asyncio.create_task(jm3846_thrust.start(self.name))
 
                     # 请求多帧数据
                     await self.async_handle_0x44()
@@ -78,12 +81,14 @@ class JM3846AsyncClient:
                     logging.error(f'[***{self.name}***] start JM3846 client timeout')
                     self._is_connected = False
                     self.create_alarm()
-                    jm3846_data_handler.stop()
+                    jm3846_torque_rpm.stop()
+                    jm3846_thrust.stop()
                 except:
                     logging.error(f'[***{self.name}***] start JM3846 client failed')
                     self._is_connected = False
                     self.create_alarm()
-                    jm3846_data_handler.stop()
+                    jm3846_torque_rpm.stop()
+                    jm3846_thrust.stop()
                 finally:
                     if not self._is_canceled:  # 只有未取消时才执行退避
                         seconds = 2 ** self._retry
@@ -91,7 +96,8 @@ class JM3846AsyncClient:
                         await asyncio.sleep(seconds)
                         self._retry += 1
 
-            jm3846_data_handler.stop()
+            jm3846_torque_rpm.stop()
+            jm3846_thrust.stop()
             self.set_offline(True)
             self._is_connected = True
             self._is_canceled = False
@@ -100,7 +106,8 @@ class JM3846AsyncClient:
         self._is_canceled = True
 
         try:
-            jm3846_data_handler.stop()
+            jm3846_torque_rpm.stop()
+            jm3846_thrust.stop()
             if self.writer:
                 # 发送0x45,断开数据流
                 await self.async_handle_0x45()
@@ -172,7 +179,8 @@ class JM3846AsyncClient:
                 if response == b'':
                     self.set_offline(True)
                     self._is_connected = False
-                    jm3846_data_handler.stop()
+                    jm3846_torque_rpm.stop()
+                    jm3846_thrust.stop()
                     break
 
                 # 基本头长度检查

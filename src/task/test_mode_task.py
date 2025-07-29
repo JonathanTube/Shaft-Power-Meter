@@ -8,7 +8,6 @@ from db.models.system_settings import SystemSettings
 from common.global_data import gdata
 from db.models.event_log import EventLog
 from db.models.report_info import ReportInfo
-from utils.data_saver import DataSaver
 
 
 class TestModeTask:
@@ -101,7 +100,14 @@ class TestModeTask:
             instant_torque = int(random.uniform(self.min_torque, self.max_torque))
             instant_speed = int(random.uniform(self.min_speed, self.max_speed))
             instant_thrust = int(random.uniform(self.min_thrust, self.max_thrust))
-            DataSaver.save(name, instant_torque, instant_thrust, instant_speed)
+            if name == 'sps':
+                gdata.sps_torque = instant_torque
+                gdata.sps_thrust = instant_thrust
+                gdata.sps_speed = instant_speed
+            if name == 'sps2':
+                gdata.sps2_torque = instant_torque
+                gdata.sps2_thrust = instant_thrust
+                gdata.sps2_speed = instant_speed
         except:
             logging.exception('exception occured at save_generated_data')
 

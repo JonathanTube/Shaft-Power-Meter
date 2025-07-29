@@ -140,7 +140,7 @@ class DataInit:
                 fullscreen=False,
                 system_unit=0,
                 language=0,
-                data_refresh_interval=5
+                data_refresh_interval=2
             )
 
     def __init_io_conf():
@@ -957,7 +957,7 @@ class DataInit:
                 {
                     "code": "lang.setting.data_refresh_interval",
                     "chinese": "界面数据刷新间隔",
-                    "english": "Data Average Interval"
+                    "english": "Dashboard Data Refresh Interval"
                 },
 
                 {

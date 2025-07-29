@@ -1,7 +1,8 @@
 import logging
 import struct
 
-from jm3846.JM3846_data_handler import jm3846_data_handler
+from jm3846.JM3846_torque_rpm import jm3846_torque_rpm
+from jm3846.JM3846_thrust import jm3846_thrust
 
 class JM38460x44Async:
 
@@ -44,7 +45,9 @@ class JM38460x44Async:
                 if i+1 >= len(payload):
                     break
                 # 小端序，无符号整型
-                jm3846_data_handler.data_accululation_0x44.append(struct.unpack('<H', payload[i:i+2])[0])
+                data = struct.unpack('<H', payload[i:i+2])[0]
+                jm3846_torque_rpm.data_accumulate_2s_0x44.append(data)
+                jm3846_thrust.data_accumulate_0x44.append(data)
 
             return current_frame
         except:

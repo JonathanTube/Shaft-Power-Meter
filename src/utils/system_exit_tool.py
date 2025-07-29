@@ -7,7 +7,7 @@ from websocket.websocket_master import ws_server
 from task.plc_sync_task import plc
 from task.gps_sync_task import gps
 from task.modbus_output_task import modbus_output
-from task.sps_offline_task import sps_offline_task
+from task.data_record_task import data_record_task
 from task.test_mode_task import test_mode_task
 from task.utc_timer_task import utc_timer
 from db.models.user import User
@@ -50,7 +50,7 @@ class SystemExitTool:
             await modbus_output.stop()
 
             # 关闭sps_offline
-            sps_offline_task.stop()
+            data_record_task.stop()
 
             # 关闭test mode
             test_mode_task.stop()

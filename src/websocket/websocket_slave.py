@@ -11,7 +11,6 @@ from db.models.io_conf import IOConf
 from db.models.propeller_setting import PropellerSetting
 from jm3846.JM3846_calculator import JM3846Calculator
 from utils.alarm_saver import AlarmSaver
-from utils.data_saver import DataSaver
 from playhouse.shortcuts import dict_to_model
 from common.global_data import gdata
 
@@ -161,18 +160,25 @@ class WebSocketSlave:
             return
 
         name = data['name']
-        ad0_torque = 0
-        ad1_thrust = 0
-        speed = 0
 
         if 'torque' in data:
-            ad0_torque = data['torque']
-        if 'thrust' in data:
-            ad1_thrust = data['thrust']
-        if 'rpm' in data:
-            speed = data['rpm']
+            if name == 'sps':
+                gdata.sps_torque = data['torque']
+            elif name == 'sps2':
+                gdata.sps2_torque = data['torque']
 
-        DataSaver.save(name, ad0_torque, ad1_thrust, speed)
+        if 'thrust' in data:
+            if name == 'sps':
+                gdata.sps_thrust = data['thrust']
+            elif name == 'sps2':
+                gdata.sps2_thrust = data['thrust']
+
+        if 'rpm' in data:
+            if name == 'sps':
+                gdata.sps_speed = data['rpm']
+            elif name == 'sps2':
+                gdata.sps2_speed = data['rpm']
+
 
     def __handle_propeller_setting(self, settings):
         data = settings['data']

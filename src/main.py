@@ -24,7 +24,7 @@ from utils.auto_startup import add_to_startup
 from utils.logger import Logger
 from db.base import db
 from task.gps_sync_task import gps
-from task.sps_offline_task import sps_offline_task
+from task.data_record_task import data_record_task
 from task.utc_timer_task import utc_timer
 from task.sps_read_task import sps_read_task
 from task.sps2_read_task import sps2_read_task
@@ -82,7 +82,7 @@ def start_all_task():
 
     system_settings: SystemSettings = SystemSettings.get()
     asyncio.create_task(utc_timer.start())
-    asyncio.create_task(sps_offline_task.start())
+    asyncio.create_task(data_record_task.start())
 
     # 如果不是第一次装机，启动设备连接
     if cnt > 0:
