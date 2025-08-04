@@ -1773,11 +1773,6 @@ class DataInit:
                     "english": "Thrust-Offset"
                 },
                 {
-                    "code": "lang.zero_cal.state",
-                    "chinese": "状态",
-                    "english": "State"
-                },
-                {
                     "code": "lang.zero_cal.executor",
                     "chinese": "调零",
                     "english": "Zero Cal."
@@ -1786,11 +1781,6 @@ class DataInit:
                     "code": "lang.zero_cal.history",
                     "chinese": "历史记录",
                     "english": "Zero Cal. History"
-                },
-                {
-                    "code": "lang.zero_cal.on_progress",
-                    "chinese": "调零进行中",
-                    "english": "Progressing"
                 },
                 {
                     "code": "lang.zero_cal.last_performed",
@@ -1826,16 +1816,6 @@ class DataInit:
                     "code": "lang.zero_cal.reset",
                     "chinese": "重置",
                     "english": "Reset"
-                },
-                {
-                    "code": "lang.zero_cal.accepted",
-                    "chinese": "已接受",
-                    "english": "Accepted"
-                },
-                {
-                    "code": "lang.zero_cal.aborted",
-                    "chinese": "已中止",
-                    "english": "Aborted"
                 },
                 {
                     "code": "lang.zero_cal.mv_per_v_for_torque",

@@ -32,8 +32,6 @@ class WebSocketSlave:
 
         self._max_retries = 6  # 最大重连次数
 
-        self.jm3846Calculator = JM3846Calculator()
-
     @property
     def is_connected(self):
         return self._is_connected

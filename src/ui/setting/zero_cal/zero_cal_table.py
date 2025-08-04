@@ -30,8 +30,7 @@ class ZeroCalTable(AbstractTable):
                 ZeroCalInfo.name,
                 ZeroCalInfo.utc_date_time,
                 ZeroCalInfo.torque_offset,
-                ZeroCalInfo.thrust_offset,
-                ZeroCalInfo.state
+                ZeroCalInfo.thrust_offset
             )
             start_date = self.kwargs.get('start_date')
             end_date = self.kwargs.get('end_date')
@@ -47,21 +46,11 @@ class ZeroCalTable(AbstractTable):
                     item.utc_date_time.strftime(
                         f'{self.dtc.date_format} %H:%M:%S'),
                     round(item.torque_offset, 10) if item.torque_offset else 0,
-                    round(item.thrust_offset, 10) if item.thrust_offset else 0,
-                    self.get_state_name(item.state)
+                    round(item.thrust_offset, 10) if item.thrust_offset else 0
                 ] for item in data
             ]
         except:
             return []
-
-    def get_state_name(self, state: int):
-        if state == 0:
-            return self.page.session.get("lang.zero_cal.on_progress")
-        elif state == 1:
-            return self.page.session.get("lang.zero_cal.accepted")
-        elif state == 2:
-            return self.page.session.get("lang.zero_cal.aborted")
-        return ""
 
     def create_columns(self):
         return self.get_columns()
@@ -74,8 +63,7 @@ class ZeroCalTable(AbstractTable):
                 session.get("lang.zero_cal.name"),
                 session.get("lang.common.utc_date_time"),
                 session.get("lang.zero_cal.torque_offset"),
-                session.get("lang.zero_cal.thrust_offset"),
-                session.get("lang.zero_cal.state")
+                session.get("lang.zero_cal.thrust_offset")
             ]
         
         return []

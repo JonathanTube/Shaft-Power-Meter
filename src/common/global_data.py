@@ -37,8 +37,6 @@ class GlobalData:
         self.sps_ad1 = 0
         self.sps_speed = 0
 
-        self.sps_mv_per_v_for_torque = 0
-        self.sps_mv_per_v_for_thrust = 0
         self.sps_torque_offset = 0
         self.sps_thrust_offset = 0
 
@@ -51,8 +49,6 @@ class GlobalData:
         self.sps2_ad1 = 0
         self.sps2_speed = 0
 
-        self.sps2_mv_per_v_for_torque = 0
-        self.sps2_mv_per_v_for_thrust = 0
         self.sps2_torque_offset = 0
         self.sps2_thrust_offset = 0
 
@@ -97,8 +93,18 @@ class GlobalData:
         self.speed_sel = None
         self.sample_rate = None
 
-        # thrust采集时长,默认10s
-        self.seconds_of_thrust_collection = 10
+
+        self.zero_cal_sps_torque_is_running = False
+        self.zero_cal_sps2_torque_is_running = False
+
+        self.zero_cal_sps_thrust_is_running = False
+        self.zero_cal_sps2_thrust_is_running = False
+
+        self.zero_cal_sps_ad0_for_torque = []
+        self.zero_cal_sps2_ad0_for_torque = []
+        
+        self.zero_cal_sps_ad1_for_thrust = []
+        self.zero_cal_sps2_ad1_for_thrust = []
 
     def set_default_value(self):
         systemSettings: SystemSettings = SystemSettings.get()
@@ -125,12 +131,12 @@ class GlobalData:
         self.power_of_overload = propellerSetting.value_of_overload_curve
         self.alarm_enabled_of_overload_curve = propellerSetting.alarm_enabled_of_overload_curve
         # get the last accepted zero cal. record.
-        sps_accepted_zero_cal: ZeroCalInfo = ZeroCalInfo.select().where(ZeroCalInfo.state == 1, ZeroCalInfo.name == 'sps').order_by(ZeroCalInfo.id.desc()).first()
+        sps_accepted_zero_cal: ZeroCalInfo = ZeroCalInfo.select().where(ZeroCalInfo.name == 'sps').order_by(ZeroCalInfo.id.desc()).first()
         if sps_accepted_zero_cal is not None:
             self.sps_torque_offset = sps_accepted_zero_cal.torque_offset
             self.sps_thrust_offset = sps_accepted_zero_cal.thrust_offset
 
-        sps2_accepted_zero_cal: ZeroCalInfo = ZeroCalInfo.select().where(ZeroCalInfo.state == 1, ZeroCalInfo.name == 'sps2').order_by(ZeroCalInfo.id.desc()).first()
+        sps2_accepted_zero_cal: ZeroCalInfo = ZeroCalInfo.select().where(ZeroCalInfo.name == 'sps2').order_by(ZeroCalInfo.id.desc()).first()
         if sps2_accepted_zero_cal is not None:
             self.sps2_torque_offset = sps2_accepted_zero_cal.torque_offset
             self.sps2_thrust_offset = sps2_accepted_zero_cal.thrust_offset
