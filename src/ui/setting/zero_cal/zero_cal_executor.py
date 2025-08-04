@@ -1,6 +1,7 @@
 import logging
 import flet as ft
 from db.models.zero_cal_info import ZeroCalInfo
+from ui.common.permission_check import PermissionCheck
 from ui.setting.zero_cal.zero_cal_executor_result import ZeroCalExecutorResult
 from ui.setting.zero_cal.zero_cal_executor_thrust import ZeroCalExecutorThrust
 from ui.setting.zero_cal.zero_cal_executor_tips import ZeroCalExecutorTips
@@ -13,8 +14,11 @@ class ZeroCalExecutor(ft.Container):
     def __init__(self, name: str):
         super().__init__()
         self.name = name
-        self.torque_offset = None
-        self.thrust_offset = None
+
+        self.is_torque_finish = False
+        self.is_thrust_finish = False
+        self.torque_offset = 0
+        self.thrust_offset = 0
 
     def build(self):
         try:
@@ -31,7 +35,7 @@ class ZeroCalExecutor(ft.Container):
                 text=self.page.session.get("lang.zero_cal.accept"),
                 bgcolor=ft.Colors.LIGHT_GREEN, color=ft.Colors.WHITE,
                 width=120, height=40, visible=False,
-                on_click=self.on_accept
+                on_click=lambda e: self.page.open(PermissionCheck(self.on_accept, 0))
             )
 
             self.content = ft.Column(
@@ -46,6 +50,7 @@ class ZeroCalExecutor(ft.Container):
                         ]
                     ),
                     self.zeroCalExecutorResult,
+                    ft.Container(width=100, height=20),
                     ft.Row(
                         alignment=ft.MainAxisAlignment.CENTER,
                         controls=[
@@ -56,49 +61,42 @@ class ZeroCalExecutor(ft.Container):
             logging.exception('exception occured at ZeroCalExecutor.build')
 
     def on_torque_finish(self, avg_torque):
+        self.is_torque_finish = True
         self.torque_offset = avg_torque
         self.update_buttons()
-        self.update_result()
-
-    def on_thrust_finish(self, avg_thrust):
-        self.thrust_offset = avg_thrust
-        self.update_buttons()
-        self.update_result()
+        # 获取最后一次
+        last_record = self.load_last_accepted_zero_cal()
+        last_torque_offset = last_record.torque_offset if last_record else 0
+        # 这里当前的平均值 - 上一次的，不就相当于每次减一下，除以6，和一下等式作用一样
+        self.torque_offset = round(self.torque_offset - last_torque_offset, 4)
+        self.zeroCalExecutorResult.update_torque_result(self.torque_offset)
 
     def on_torque_abort(self):
-        self.torque_offset = None
+        self.is_torque_finish = False
+        self.torque_offset = 0
         self.update_buttons()
-        self.update_result()
+        self.zeroCalExecutorResult.update_torque_result(0)
+
+    def on_thrust_finish(self, avg_thrust):
+        self.is_thrust_finish = True
+        self.thrust_offset = round(avg_thrust, 4)
+        self.update_buttons()
+        self.zeroCalExecutorResult.update_thrust_result(self.thrust_offset)
 
     def on_thrust_abort(self):
-        self.thrust_offset = None
+        self.is_thrust_finish = False
+        self.thrust_offset = 0
         self.update_buttons()
-        self.update_result()
+        self.zeroCalExecutorResult.update_thrust_result(0)
 
     def is_all_finish(self):
-        return self.torque_offset is not None and self.thrust_offset is not None
+        return self.is_torque_finish and self.is_thrust_finish
 
     def update_buttons(self):
         finished = self.is_all_finish()
         if self.accept_button and self.accept_button.page:
             self.accept_button.visible = finished
             self.accept_button.page.update()
-
-    def update_result(self):
-        if not self.is_all_finish():
-            return
-
-        last_record = self.load_last_accepted_zero_cal()
-        last_torque_offset = 0
-        if last_record:
-            last_torque_offset = last_record.torque_offset
-
-        # 这里当前的平均值 - 上一次的，不就相当于每次减一下，除以6，和一下等式作用一样
-        self.torque_offset = self.torque_offset - last_torque_offset
-
-        self.zeroCalExecutorResult.update_result(
-            self.torque_offset, self.thrust_offset
-        )
 
     def on_accept(self, e):
         try:
@@ -114,6 +112,15 @@ class ZeroCalExecutor(ft.Container):
             else:
                 gdata.sps2_torque_offset = self.torque_offset
                 gdata.sps2_thrust_offset = self.thrust_offset
+
+            if self.accept_button and self.accept_button.page:
+                self.accept_button.visible = False
+                self.accept_button.update()
+
+            self.zeroCalExecutorTips.update()
+            self.zeroCalExecutorThrust.reset()
+            self.zeroCalExecutorTorque.reset()
+            self.zeroCalExecutorResult.update()
 
             Toast.show_success(self.page)
         except:

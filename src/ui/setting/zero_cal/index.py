@@ -11,7 +11,7 @@ class ZeroCal(ft.Container):
     def __init__(self):
         super().__init__()
         self.expand = True
-        self.alignment=ft.alignment.center
+        self.alignment = ft.alignment.center
         self.system_settings: SystemSettings = SystemSettings.get()
 
     def __on_change(self, e):
@@ -25,7 +25,6 @@ class ZeroCal(ft.Container):
                 if not self.system_settings.is_master:
                     self.content = ft.Text(value=self.page.session.get('lang.setting.zero_cal.disabled'), size=20)
                     return
-
 
                 self.executor_sps = ft.Tab(
                     text=f'{self.page.session.get("lang.zero_cal.executor")} SPS',

@@ -41,15 +41,13 @@ class JM3846TorqueRpm:
             if self.name == 'sps':
                 if ch0_ad:
                     gdata.sps_ad0 = ch0_ad
-                    gdata.sps_torque = self.cal_torque(
-                        ch0_ad, gdata.sps_torque_offset)
+                    gdata.sps_torque = self.cal_torque(ch0_ad, gdata.sps_torque_offset)
                 if rpm:
                     gdata.sps_speed = round(rpm / 10, 2)
             else:
                 if ch0_ad:
                     gdata.sps2_ad0 = ch0_ad
-                    gdata.sps2_torque = self.cal_torque(
-                        ch0_ad, gdata.sps2_torque_offset)
+                    gdata.sps2_torque = self.cal_torque(ch0_ad, gdata.sps2_torque_offset)
                 if rpm:
                     gdata.sps2_speed = round(rpm / 10, 2)
 
@@ -59,16 +57,12 @@ class JM3846TorqueRpm:
 
     def cal_torque(self, ch0_ad, torque_offset):
         try:
-            ad0_mv_per_v = JM3846Calculator.calculate_mv_per_v(
-                ch0_ad, gdata.gain_0)
-            # 加上偏移量
-            ad0_mv_per_v += torque_offset
-            ad0_microstrain = JM3846Calculator.calculate_microstrain(
-                ad0_mv_per_v)
+            ad0_mv_per_v = JM3846Calculator.calculate_mv_per_v(ch0_ad, gdata.gain_0)
+            # 减去偏移量
+            ad0_mv_per_v = ad0_mv_per_v - torque_offset
+            ad0_microstrain = JM3846Calculator.calculate_microstrain(ad0_mv_per_v)
             torque = JM3846Calculator.calculate_torque(ad0_microstrain)
-            logging.info(
-                f'name=[***{self.name}***],ad0={ch0_ad}, ad0_mv_per_v={ad0_mv_per_v}, torque_offset={torque_offset}, microstrain={ad0_microstrain}, torque={torque}'
-            )
+            logging.info(f'name=[***{self.name}***],ad0={ch0_ad}, ad0_mv_per_v={ad0_mv_per_v}, torque_offset={torque_offset}, microstrain={ad0_microstrain}, torque={torque}')
             return torque
         except:
             logging.exception(

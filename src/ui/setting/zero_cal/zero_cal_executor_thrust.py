@@ -51,7 +51,7 @@ class ZeroCalExecutorThrust(ft.Card):
             self.abort_button = ft.FilledButton(
                 text=self.page.session.get("lang.zero_cal.abort"),
                 bgcolor=ft.Colors.RED, visible=False,
-                color=ft.Colors.WHITE, width=100, on_click=self.on_abort
+                color=ft.Colors.WHITE, width=100, on_click=lambda e: self.on_abort()
             )
 
             self.operation = ft.Container(
@@ -89,7 +89,7 @@ class ZeroCalExecutorThrust(ft.Card):
                 "exception occured at ZeroCalExecutorThrust.on_start"
             )
 
-    def on_abort(self, e):
+    def on_abort(self):
         try:
             gdata.zero_cal_sps_thrust_is_running = False
             gdata.zero_cal_sps_ad1_for_thrust.clear()
@@ -145,13 +145,13 @@ class ZeroCalExecutorThrust(ft.Card):
                         gdata.zero_cal_sps_ad1_for_thrust)
                     mv_per_v = JM3846Calculator.calculate_mv_per_v(
                         average_ad1, gdata.gain_1)
-                    self.seconds_tick.value = round(mv_per_v, 2)
+                    self.seconds_tick.value = round(mv_per_v, 4)
                 elif self.name == 'sps2':
                     average_ad1 = JM3846ThrustUtil.get_avg(
                         gdata.zero_cal_sps_ad1_for_thrust)
                     mv_per_v = JM3846Calculator.calculate_mv_per_v(
                         average_ad1, gdata.gain_1)
-                    self.seconds_tick.value = round(mv_per_v, 2)
+                    self.seconds_tick.value = round(mv_per_v, 4)
                 self.seconds_tick.update()
 
                 # 正常情况下执行到这里，需要回调on_finish方法
@@ -165,6 +165,9 @@ class ZeroCalExecutorThrust(ft.Card):
         finally:
             gdata.zero_cal_sps_thrust_is_running = False
             gdata.zero_cal_sps_ad1_for_thrust.clear()
+
+    def reset(self):
+        self.on_abort()
 
     def will_unmount(self):
         if self.tick_task:

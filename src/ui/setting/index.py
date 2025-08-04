@@ -46,21 +46,21 @@ class Setting(ft.Container):
                 keyboard.close()
 
                 if idx == 0:
-                    self.right_content.content = SystemConf()
+                    self.right_content.content = self.content_system_conf
                 elif idx == 1:
-                    self.right_content.content = General()
+                    self.right_content.content = self.content_general
                 elif idx == 2:
-                    self.right_content.content = IOSetting()
+                    self.right_content.content = self.content_io_setting
                 elif idx == 3:
-                    self.right_content.content = PropellerConf()
+                    self.right_content.content = self.content_propeller_conf
                 elif idx == 4:
-                    self.right_content.content = ZeroCal()
+                    self.right_content.content = self.content_zero_cal
                 elif idx == 5:
-                    self.right_content.content = SelfTest()
+                    self.right_content.content = self.content_self_test
                 elif idx == 6:
-                    self.right_content.content = Permission()
+                    self.right_content.content = self.content_permission
                 elif idx == 7:
-                    self.right_content.content = TestMode()
+                    self.right_content.content = self.content_test_mode
 
                 if self.right_content and self.right_content.page:
                     self.right_content.update()
@@ -71,6 +71,15 @@ class Setting(ft.Container):
 
     def build(self):
         try:
+            self.content_system_conf = SystemConf()
+            self.content_general = General()
+            self.content_io_setting = IOSetting()
+            self.content_propeller_conf = PropellerConf()
+            self.content_zero_cal = ZeroCal()
+            self.content_self_test = SelfTest()
+            self.content_permission = Permission()
+            self.content_test_mode = TestMode()
+
             if self.page and self.page.session:
                 self.right_content = ft.Container(
                     expand=True,
@@ -144,7 +153,6 @@ class Setting(ft.Container):
                 )
         except:
             logging.exception('exception occured at Setting.build')
-
 
     def before_update(self):
         try:

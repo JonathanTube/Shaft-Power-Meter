@@ -43,7 +43,7 @@ class ZeroCalExecutorTorque(ft.Card):
             self.abort_button = ft.FilledButton(
                 text=self.page.session.get("lang.zero_cal.abort"),
                 bgcolor=ft.Colors.RED, visible=False,
-                color=ft.Colors.WHITE, width=100, on_click=self.on_abort
+                color=ft.Colors.WHITE, width=100, on_click=lambda e: self.on_abort()
             )
 
             self.items = ft.GridView(
@@ -118,8 +118,7 @@ class ZeroCalExecutorTorque(ft.Card):
 
             result = JM3846TorqueRpmUtil.get_avg(data_list)
             avg_ad0: float = result[0]
-            mv_per_v = JM3846Calculator.calculate_mv_per_v(
-                avg_ad0, gdata.gain_0)
+            mv_per_v = JM3846Calculator.calculate_mv_per_v(avg_ad0, gdata.gain_0)
 
             # 处理完成清空cache
             if self.name == 'sps':
@@ -133,6 +132,7 @@ class ZeroCalExecutorTorque(ft.Card):
             self.index += 1
             # 如果全部采集完成，并且完成回调函数不为空，触发回调完成
             if self.index >= 6 and self.on_finish:
+                self.countdown_task.cancel()
                 self.on_finish(round(self.sum_torque_offset / 6, 4))
 
         except:
@@ -168,7 +168,7 @@ class ZeroCalExecutorTorque(ft.Card):
                 txt.value = value
                 txt.update()
 
-    def on_abort(self, e):
+    def on_abort(self):
         try:
             if self.fetch_button and self.fetch_button.page:
                 self.fetch_button.disabled = False
@@ -184,6 +184,9 @@ class ZeroCalExecutorTorque(ft.Card):
                 self.on_abort_callback()
         except:
             logging.exception('exception occured at ZeroCalExecutor.on_abort')
+
+    def reset(self):
+        self.on_abort()
 
     def will_unmount(self):
         if self.countdown_task:
