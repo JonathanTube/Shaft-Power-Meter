@@ -23,7 +23,8 @@ class AudioAlarm(ft.Container):
                 bgcolor=ft.Colors.RED,
                 visible=False,
                 color=ft.Colors.WHITE,
-                on_click=lambda e: self.page.open(PermissionCheck(self.on_mute, 1))
+                on_click=lambda e: self.page.open(
+                    PermissionCheck(self.on_mute, 1))
             )
         except:
             logging.exception('exception occured at AudioAlarm.build')
@@ -73,4 +74,4 @@ class AudioAlarm(ft.Container):
             # write_eexi_breach_alarm内部会判断是否连接plc
             self.page.run_task(plc.write_eexi_breach_alarm, occured)
         else:
-            ws_client.send_eexi_breach_alarm_to_master(occured)
+            self.page.run_task(ws_client.send_eexi_breach_alarm_to_master, occured)
