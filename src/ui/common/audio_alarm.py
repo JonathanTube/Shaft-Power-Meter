@@ -58,6 +58,5 @@ class AudioAlarm(ft.Container):
                 self.content.disabled = True
                 self.content.bgcolor = ft.Colors.RED_400
                 self.content.update()
-
         except:
             logging.exception('exception occured at AudioAlarm.on_mute')

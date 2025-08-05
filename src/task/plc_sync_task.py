@@ -197,6 +197,16 @@ class PlcSyncTask:
         except:
             logging.error(f"[***PLC***] {self.ip}:{self.port} write power overload failed")
 
+    async def write_eexi_breach_alarm(self, occured):
+        if not self._is_connected:
+            return
+
+        try:
+            await self.plc_client.write_coil(address=12290, value=occured)
+            logging.info(f"[***PLC***] write eexi breach: {occured}")
+        except:
+            logging.error(f"[***PLC***] {self.ip}:{self.port} write eexi breach failed")
+
     async def read_alarm(self) -> bool:
         if not self._is_connected:
             return

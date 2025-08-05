@@ -5,7 +5,7 @@ import threading
 import time
 from queue import Queue
 
-
+# 用来测试本地的modbus输出
 class ModbusFletApp:
     def __init__(self, page: ft.Page):
         self.page = page
