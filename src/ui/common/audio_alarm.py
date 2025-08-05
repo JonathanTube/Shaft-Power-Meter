@@ -5,6 +5,7 @@ from db.models.event_log import EventLog
 from ui.common.permission_check import PermissionCheck
 from task.utc_timer_task import gdata
 from task.plc_sync_task import plc
+from websocket.websocket_slave import ws_client
 
 
 class AudioAlarm(ft.Container):
@@ -30,7 +31,7 @@ class AudioAlarm(ft.Container):
     def show(self):
         try:
             # 向plc发送报警-打开
-            self.page.run_task(plc.write_eexi_breach_alarm, True)
+            self.notify_eexi_breach(True)
             if self.content and self.content.page:
                 self.content.visible = True
                 self.content.disabled = False
@@ -43,7 +44,7 @@ class AudioAlarm(ft.Container):
     def hide(self):
         try:
             # 向plc发送报警-关闭
-            self.page.run_task(plc.write_eexi_breach_alarm, False)
+            self.notify_eexi_breach(False)
             if self.content and self.content.page:
                 self.content.visible = False
                 self.content.update()
@@ -53,7 +54,7 @@ class AudioAlarm(ft.Container):
     def on_mute(self, user: User):
         try:
             # 向plc发送报警-关闭
-            self.page.run_task(plc.write_eexi_breach_alarm, False)
+            self.notify_eexi_breach(False)
             event_log: EventLog = EventLog.select().order_by(EventLog.id.desc()).first()
             if event_log:
                 event_log.acknowledged_at = gdata.utc_date_time
@@ -66,3 +67,10 @@ class AudioAlarm(ft.Container):
                 self.content.update()
         except:
             logging.exception('exception occured at AudioAlarm.on_mute')
+
+    def notify_eexi_breach(self, occured):
+        if gdata.is_master:
+            # write_eexi_breach_alarm内部会判断是否连接plc
+            self.page.run_task(plc.write_eexi_breach_alarm, occured)
+        else:
+            ws_client.send_eexi_breach_alarm_to_master(occured)

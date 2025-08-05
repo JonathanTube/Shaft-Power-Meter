@@ -9,6 +9,7 @@ from db.models.alarm_log import AlarmLog
 from db.models.io_conf import IOConf
 from utils.alarm_saver import AlarmSaver
 from common.global_data import gdata
+from task.plc_sync_task import plc
 
 date_time_format = '%Y-%m-%d %H:%M:%S'
 
@@ -62,10 +63,9 @@ class WebSocketMaster:
                     logging.info(f"[***HMI server***] websocket server started at ws://{host}:{port}")
                     self._is_started = True
                     AlarmSaver.recovery(
-                        alarm_type_occured=AlarmType.MASTER_SERVER_STOPPED, 
+                        alarm_type_occured=AlarmType.MASTER_SERVER_STOPPED,
                         alarm_type_recovered=AlarmType.MASTER_SERVER_STARTED
                     )
-
 
                     asyncio.create_task(self.receive_alarms_from_slave())
 
@@ -170,10 +170,16 @@ class WebSocketMaster:
 
             if msg_type == 'alarm_logs_from_slave':
                 await self._sync_alarm_logs_from_slave(data.get('data', []))
+            if msg_type == 'alarm_eexi_breach':
+                await self._sync_alarm_eexi_breach_from_slave(data.get('data', False))
             else:
                 logging.warning(f"未知消息类型: {msg_type}")
         except Exception as e:
             logging.exception(f"消息解析失败: {e}")
+
+    async def _sync_alarm_eexi_breach_from_slave(self, occured):
+        """同步来自slave的eexi breach报警"""
+        await plc.write_eexi_breach_alarm(occured)
 
     async def _sync_alarm_logs_from_slave(self, alarm_logs: list):
         """将从客户端接收的报警日志同步到数据库"""

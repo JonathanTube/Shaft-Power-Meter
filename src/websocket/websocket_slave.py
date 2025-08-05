@@ -9,7 +9,6 @@ from common.const_alarm_type import AlarmType
 from db.models.alarm_log import AlarmLog
 from db.models.io_conf import IOConf
 from db.models.propeller_setting import PropellerSetting
-from jm3846.JM3846_calculator import JM3846Calculator
 from utils.alarm_saver import AlarmSaver
 from playhouse.shortcuts import dict_to_model
 from common.global_data import gdata
@@ -79,6 +78,18 @@ class WebSocketSlave:
 
             # 执行到这了，说明已经退出了
             self._is_canceled = False
+
+    async def send_eexi_breach_alarm_to_master(self, occured):
+        if gdata.is_master:
+            return
+        if not self._is_connected:
+            return
+        # 序列化数据
+        packed_data = msgpack.packb({
+            'type': 'alarm_eexi_breach',
+            'data': occured
+        })
+        await self.websocket.send(packed_data)
 
     async def send_gps_alarm_to_master(self):
         while not gdata.is_master and self._is_connected:
@@ -177,7 +188,6 @@ class WebSocketSlave:
             elif name == 'sps2':
                 gdata.sps2_speed = data['rpm']
 
-
     def __handle_propeller_setting(self, settings):
         data = settings['data']
         model: PropellerSetting = dict_to_model(PropellerSetting, data)
@@ -196,7 +206,7 @@ class WebSocketSlave:
             ack_time = None
             if acknowledge_time:
                 ack_time = datetime.strptime(acknowledge_time, date_time_format)
-            
+
             udt = None
             if utc_date_time:
                 udt = datetime.strptime(utc_date_time, date_time_format)
@@ -205,7 +215,7 @@ class WebSocketSlave:
             cnt = AlarmLog.select().where(AlarmLog.master_alarm_id == master_alarm_id).count()
             if cnt > 0:
                 AlarmLog.update(
-                    is_recovery=is_recovery, acknowledge_time=ack_time, alarm_type = alarm_type
+                    is_recovery=is_recovery, acknowledge_time=ack_time, alarm_type=alarm_type
                 ).where(
                     AlarmLog.master_alarm_id == master_alarm_id
                 ).execute()
