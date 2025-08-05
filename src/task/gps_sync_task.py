@@ -154,9 +154,16 @@ class GpsSyncTask:
             if isinstance(msg, pynmea2.types.talker.RMC):
                 utc_date = msg.datestamp
                 utc_time = msg.timestamp
-                latitude = msg.latitude
-                longitude = msg.longitude
-                location = f"{longitude},{latitude}"
+                # 纬度转换 (DD°MM.MMM'N)
+                lat_deg = int(msg.latitude)
+                lat_min = (msg.latitude - lat_deg) * 60
+                lat_str = f"{lat_deg}°{lat_min:.3f}′{msg.lat_dir}"
+                
+                # 经度转换 (DDD°MM.MMM'E)
+                lon_deg = int(msg.longitude)
+                lon_min = (msg.longitude - lon_deg) * 60
+                lon_str = f"{lon_deg}°{lon_min:.3f}′{msg.lon_dir}"
+                location = f"{lat_str}, {lon_str}"
                 gdata.gps_location = location
                 time_str = f"{utc_date} {utc_time}"
                 GpsLog.create(location=location, utc_date_time=time_str)
