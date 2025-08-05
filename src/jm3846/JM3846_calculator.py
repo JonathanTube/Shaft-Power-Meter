@@ -32,7 +32,7 @@ class JM3846Calculator:
         if gdata.sensitivity_factor_k == 0:
             return 0
         result = mv_per_v / gdata.sensitivity_factor_k * (10**3)
-        logging.info(f"calculate_microstrain: result={result}")
+        # logging.info(f"calculate_microstrain: result={result}")
         return result
 
     @staticmethod

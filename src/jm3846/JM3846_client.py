@@ -12,6 +12,7 @@ from jm3846.JM3846_thrust import jm3846_thrust
 from utils.alarm_saver import AlarmSaver
 from common.global_data import gdata
 
+
 class JM3846AsyncClient:
     """基于asyncio的Modbus TCP异步客户端"""
 
@@ -29,18 +30,20 @@ class JM3846AsyncClient:
         self._retry = 0
         self._max_retries = 6
 
-        self._is_connected = False
+        self._is_running = False
         self._is_canceled = False
 
     @property
     def is_connected(self):
-        return self._is_connected
+        if self.name == 'sps':
+            return not gdata.sps_offline
+        return not gdata.sps2_offline
 
     @abstractmethod
     def get_ip_port() -> tuple[str, int]:
         pass
 
-    async def connect(self):        
+    async def connect(self):
         async with self._lock:  # 确保单线程重连
             self._is_canceled = False
             self._retry = 0  # 重置重试计数器
@@ -59,36 +62,29 @@ class JM3846AsyncClient:
                         timeout=10
                     )
 
+                    if not jm3846_torque_rpm.is_running():
+                        # 启动处理Torque和rpm的任务,2s一次
+                        asyncio.create_task(jm3846_torque_rpm.start(self.name))
+
+                    if not jm3846_thrust.is_running():
+                        # 启动处理thrust的任务，10s一次
+                        asyncio.create_task(jm3846_thrust.start(self.name))
+
                     logging.info(f'[***{self.name}***] JM3846 Connected successfully')
                     # 请求配置参数
                     await self.async_handle_0x03()
-
-                    # 启动处理Torque和rpm的任务,2s一次
-                    asyncio.create_task(jm3846_torque_rpm.start(self.name))
-                    # 启动处理thrust的任务，10s一次
-                    asyncio.create_task(jm3846_thrust.start(self.name))
-
                     # 请求多帧数据
                     await self.async_handle_0x44()
-                    
-                    self._retry = 0
-                    self._is_connected = True
-                    self.recovery_alarm()
-                    
+                    # 设置运作中
+                    self._is_running = True
                     # 启动接收任务, 这里是阻塞的，不然外部一直循环
                     await self.async_receive_looping()
                 except TimeoutError:
                     logging.error(f'[***{self.name}***] start JM3846 client timeout')
-                    self._is_connected = False
-                    self.create_alarm()
-                    jm3846_torque_rpm.stop()
-                    jm3846_thrust.stop()
+                    self.set_offline(True)
                 except:
                     logging.error(f'[***{self.name}***] start JM3846 client failed')
-                    self._is_connected = False
-                    self.create_alarm()
-                    jm3846_torque_rpm.stop()
-                    jm3846_thrust.stop()
+                    self.set_offline(True)
                 finally:
                     if not self._is_canceled:  # 只有未取消时才执行退避
                         seconds = 2 ** self._retry
@@ -96,32 +92,26 @@ class JM3846AsyncClient:
                         await asyncio.sleep(seconds)
                         self._retry += 1
 
-            jm3846_torque_rpm.stop()
-            jm3846_thrust.stop()
             self.set_offline(True)
-            self._is_connected = True
             self._is_canceled = False
 
     async def close(self):
         self._is_canceled = True
 
         try:
-            jm3846_torque_rpm.stop()
-            jm3846_thrust.stop()
+            self.set_offline(True)
             if self.writer:
                 # 发送0x45,断开数据流
                 await self.async_handle_0x45()
                 self.writer.close()
                 await self.writer.wait_closed()
                 logging.info(f'[***{self.name}***] JM3846 Connection closed')
-                self.set_offline(True)
         except:
             logging.exception(f'[***{self.name}***] JM3846 disconnect from sps failed')
         finally:
             self.writer = None
             self.reader = None
-
-        self._is_connected = False
+            self._is_running = False
 
     async def async_handle_0x03(self):
         """异步处理功能码0x03"""
@@ -129,7 +119,7 @@ class JM3846AsyncClient:
             self.transaction_id = (self.transaction_id + 1) % 0xFFFF
             # 发送请求
             request = JM38460x03Async.build_request(self.transaction_id)
-            
+
             if not self.writer:
                 return
 
@@ -138,9 +128,10 @@ class JM3846AsyncClient:
             await self.writer.drain()
         except TimeoutError:
             logging.error(f'[***{self.name}***] JM3846 0x03 request timeout')
+            self.set_offline(True)
         except:
             logging.error(f'[***{self.name}***] JM3846 0x03 error')
-
+            self.set_offline(True)
 
     async def async_handle_0x44(self):
         """异步处理功能码0x44"""
@@ -155,7 +146,7 @@ class JM3846AsyncClient:
 
             if not self.writer:
                 return
-        
+
             logging.info(f'[***{self.name}***] send 0x44 req={bytes.hex(request)}')
             self.writer.write(request)
             await self.writer.drain()
@@ -164,7 +155,7 @@ class JM3846AsyncClient:
 
     async def async_receive_looping(self):
         """持续接收0x44数据"""
-        while gdata.is_master and self._is_connected:
+        while self._is_running:
             try:
                 if self.name == 'sps2' and int(gdata.amount_of_propeller) == 1:
                     logging.info('exit running since single propeller')
@@ -173,14 +164,11 @@ class JM3846AsyncClient:
 
                 # 接收响应
                 response = await asyncio.wait_for(self.reader.read(256), timeout=5)
-                
+
                 # logging.info(f'raw_data from sps={bytes.hex(response)}')
 
                 if response == b'':
                     self.set_offline(True)
-                    self._is_connected = False
-                    jm3846_torque_rpm.stop()
-                    jm3846_thrust.stop()
                     break
 
                 # 基本头长度检查
@@ -208,7 +196,7 @@ class JM3846AsyncClient:
                         logging.info("sps config. hasn't been gotten.")
                         continue
 
-                    current_frame:int = JM38460x44Async.parse_response(response)
+                    current_frame: int = JM38460x44Async.parse_response(response)
 
                     self.set_offline(False)
 
@@ -225,6 +213,7 @@ class JM3846AsyncClient:
             except TimeoutError:
                 logging.error(f'[***{self.name}***] JM3846 0x44 receive timeout, retrying...')
                 self.set_offline(True)
+                return
             except ConnectionResetError as e:
                 logging.error(f'[***{self.name}***] JM3846 Connection reset: {e}')
                 self.set_offline(True)
@@ -233,7 +222,6 @@ class JM3846AsyncClient:
                 logging.exception(f'[***{self.name}***] JM3846 0x44 Receive error')
                 self.set_offline(True)
                 return
-
 
     async def async_handle_0x45(self):
         """异步处理功能码0x45"""
@@ -253,6 +241,16 @@ class JM3846AsyncClient:
             logging.error(f'[***{self.name}***] JM3846 0x45 error')
 
     def set_offline(self, is_offline: bool):
+        self._is_running = not is_offline
+
+        if is_offline:
+            jm3846_torque_rpm.stop()
+            jm3846_thrust.stop()
+            self.create_alarm()
+        else:
+            self._retry = 0
+            self.recovery_alarm()
+
         if self.name == 'sps':
             gdata.sps_offline = is_offline
         elif self.name == 'sps2':

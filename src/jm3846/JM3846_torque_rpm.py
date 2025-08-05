@@ -11,13 +11,16 @@ class JM3846TorqueRpm:
         # 2s内数据
         self.accumulated_data: list[int] = []
 
-        self.is_running = False
+        self._is_running = False
         self.name = None
+
+    def is_running(self):
+        return self._is_running
 
     async def start(self, name):
         self.name = name
-        self.is_running = True
-        while self.is_running:
+        self._is_running = True
+        while self._is_running:
             # 清理数据
             self.accumulated_data.clear()
             # 等待数据累积
@@ -34,7 +37,7 @@ class JM3846TorqueRpm:
             self.handle_result(result[0], result[1])
 
     def stop(self):
-        self.is_running = False
+        self._is_running = False
 
     def handle_result(self, ch0_ad, rpm):
         try:
