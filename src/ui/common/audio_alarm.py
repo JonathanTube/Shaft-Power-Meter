@@ -1,6 +1,5 @@
 import logging
 import flet as ft
-from typing import Callable
 from db.models.event_log import EventLog
 from db.models.user import User
 from ui.common.permission_check import PermissionCheck
@@ -8,12 +7,10 @@ from task.utc_timer_task import gdata
 
 
 class AudioAlarm(ft.Container):
-    def __init__(self, on_mute: Callable):
+    def __init__(self):
         super().__init__()
         self.right = 10
         self.top = 4
-
-        self.callback = on_mute
 
     def build(self):
         try:
@@ -24,7 +21,7 @@ class AudioAlarm(ft.Container):
                 bgcolor=ft.Colors.RED,
                 visible=False,
                 color=ft.Colors.WHITE,
-                on_click=lambda e: self.page.open(PermissionCheck(self.__on_mute, 1))
+                on_click=lambda e: self.page.open(PermissionCheck(self.on_mute, 1))
             )
         except:
             logging.exception('exception occured at AudioAlarm.build')
@@ -49,7 +46,7 @@ class AudioAlarm(ft.Container):
         except:
             logging.exception('exception occured at AudioAlarm.hide')
 
-    def __on_mute(self, user: User):
+    def on_mute(self, user: User):
         try:
             event_log: EventLog = EventLog.select().order_by(EventLog.id.desc()).first()
             if event_log:
@@ -62,7 +59,5 @@ class AudioAlarm(ft.Container):
                 self.content.bgcolor = ft.Colors.RED_400
                 self.content.update()
 
-            if self.callback is not None:
-                self.callback()
         except:
-            logging.exception('exception occured at AudioAlarm.__on_mute')
+            logging.exception('exception occured at AudioAlarm.on_mute')

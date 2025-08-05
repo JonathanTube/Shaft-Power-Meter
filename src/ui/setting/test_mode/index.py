@@ -14,7 +14,6 @@ from common.global_data import gdata
 from db.models.operation_log import OperationLog
 from common.operation_type import OperationType
 from db.models.user import User
-from ui.common.windows_sound_player import WindowsSoundPlayer
 
 
 class TestMode(ft.Container):
@@ -22,10 +21,6 @@ class TestMode(ft.Container):
         super().__init__()
         self.running = test_mode_task.is_running
         self.preference: Preference = Preference.get()
-
-        self.sound_testing = False
-
-        self.player = WindowsSoundPlayer()
 
         self.last_op_utc_date_time = gdata.utc_date_time
 
@@ -107,42 +102,17 @@ class TestMode(ft.Container):
             on_click=lambda e: self.__on_toggle_auto_test()
         )
 
-        self.sound_test_button = ft.FilledButton(
-            height=40,
-            text=self.page.session.get('lang.button.start_sound_testing'),
-            icon=ft.Icons.AUDIOTRACK_OUTLINED,
-            bgcolor=ft.Colors.GREEN,
-            color=ft.Colors.WHITE,
-            icon_color=ft.Colors.WHITE,
-            on_click=lambda e: self.__on_toggle_sound_test()
-        )
-
         self.content = ft.Column(
             controls=[
                 self.range_card,
                 self.instant_card,
                 ft.Row(
                     alignment=ft.MainAxisAlignment.CENTER,
-                    controls=[self.start_button, self.stop_button, self.auto_test_button, self.sound_test_button]
+                    controls=[self.start_button, self.stop_button, self.auto_test_button]
                 )
             ]
         )
         self.update()
-
-    def __on_toggle_sound_test(self):
-        try:
-            if self.sound_testing:
-                self.sound_test_button.text = self.page.session.get('lang.button.start_sound_testing')
-                self.sound_test_button.bgcolor = ft.Colors.GREEN
-                self.player.stop()
-            else:
-                self.sound_test_button.text = self.page.session.get('lang.button.stop_sound_testing')
-                self.sound_test_button.bgcolor = ft.Colors.RED
-                self.player.play()
-            self.sound_testing = not self.sound_testing
-            self.sound_test_button.update()
-        except:
-            Toast.show_error(self.page, "__on_toggle_sound_test failed.")
 
     def __on_toggle_auto_test(self):
         try:
@@ -253,9 +223,6 @@ class TestMode(ft.Container):
 
     def will_unmount(self):
         self.task_running = False
-
-        if self.sound_testing:
-            self.player.stop()
 
         if self.task is not None:
             self.task.cancel()

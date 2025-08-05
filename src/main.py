@@ -8,7 +8,6 @@ from db.models.io_conf import IOConf
 from db.models.system_settings import SystemSettings
 from ui.common.fullscreen_alert import FullscreenAlert
 from ui.common.keyboard import keyboard
-from ui.common.windows_sound_player import WindowsSoundPlayer
 from ui.header.index import Header
 from ui.home.index import Home
 from ui.report.index import Report
@@ -46,8 +45,6 @@ if is_db_empty:
 DataInit.init()
 
 gdata.set_default_value()
-
-sound_player = WindowsSoundPlayer()
 
 
 def get_theme_mode(preference: Preference):
@@ -98,7 +95,7 @@ def start_all_task():
             if io_conf.plc_enabled:
                 asyncio.create_task(plc.connect())
             asyncio.create_task(sps_read_task.connect())
-            
+
             # 不是独立的，才需要运行server
             if not system_settings.is_individual:
                 asyncio.create_task(ws_server.start())
@@ -134,15 +131,12 @@ def set_appearance(page: ft.Page, preference: Preference):
     page.window.prevent_close = True
 
 
-def on_mute():
-    sound_player.stop()
-
-
 def set_content(page: ft.Page):
     content_home = Home()
     content_report = Report()
     content_setting = Setting()
     # 主菜单切换
+
     def change_main_menu(name: str):
         if name == 'HOME':
             main_content.content = content_home
@@ -158,7 +152,7 @@ def set_content(page: ft.Page):
 
     fullscreen_alert = FullscreenAlert()
 
-    audio_alarm_btn = AudioAlarm(on_mute=on_mute)
+    audio_alarm_btn = AudioAlarm()
 
     main_stack = ft.Stack(
         controls=[
@@ -181,13 +175,11 @@ def set_content(page: ft.Page):
                     if not is_running:
                         fullscreen_alert.show()
                         audio_alarm_btn.show()
-                        sound_player.play()
                         is_running = True
                 else:
                     if is_running:
                         fullscreen_alert.hide()
                         audio_alarm_btn.hide()
-                        sound_player.stop()
                         is_running = False
             except:
                 logging.exception('exception occured at FullscreenAlert.__watch_eexi_breach')
