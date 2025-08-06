@@ -141,11 +141,11 @@ class GeneralDateTime(ft.Container):
         self.date_time_conf.system_date_time = datetime.now()
         self.date_time_conf.date_format = self.date_format.value
         self.date_time_conf.sync_with_gps = self.sync_with_gps.value
-        gdata.configDateTime.enable_utc_time_sync_with_gps = self.sync_with_gps.value
+        gdata.configDateTime.sync_with_gps = self.sync_with_gps.value
         self.date_time_conf.save()
         OperationLog.create(
             user_id=user_id,
-            utc_date_time=gdata.configDateTime.utc_date_time,
+            utc_date_time=gdata.configDateTime.utc,
             operation_type=OperationType.GENERAL_UTC_DATE_TIME,
             operation_content=model_to_dict(self.date_time_conf)
         )
@@ -153,9 +153,9 @@ class GeneralDateTime(ft.Container):
         new_date_time = f"{new_date} {new_time}:00"
 
         new_utc_date_time = datetime.strptime(new_date_time, standard_date_time_format)
-        gdata.configDateTime.utc_date_time = new_utc_date_time
+        gdata.configDateTime.utc = new_utc_date_time
 
         # 需要删除掉之前大于当前时间的数据，否则会影响eexi breach判断
-        DataLog.delete().where(DataLog.utc_date_time >= gdata.configDateTime.utc_date_time).execute()
+        DataLog.delete().where(DataLog.utc_date_time >= gdata.configDateTime.utc).execute()
 
         self.page.update()

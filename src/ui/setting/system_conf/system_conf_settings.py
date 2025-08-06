@@ -228,7 +228,7 @@ class SystemConfSettings(ft.Container):
 
         OperationLog.create(
             user_id=user.id,
-            utc_date_time=gdata.configDateTime.utc_date_time,
+            utc_date_time=gdata.configDateTime.utc,
             operation_type=OperationType.SYSTEM_CONF_SETTING,
             operation_content=model_to_dict(self.system_settings)
         )

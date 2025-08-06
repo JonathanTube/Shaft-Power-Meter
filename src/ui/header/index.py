@@ -171,8 +171,8 @@ class Header(ft.AppBar):
     async def sync_utc_date_time(self):
         while self.task_running:
             try:
-                if gdata.configDateTime.utc_date_time and self.utc_date_time and self.utc_date_time.page:
-                    self.utc_date_time.text = gdata.configDateTime.utc_date_time.strftime(f"{self.date_format} %H:%M:%S")
+                if gdata.configDateTime.utc and self.utc_date_time and self.utc_date_time.page:
+                    self.utc_date_time.text = gdata.configDateTime.utc.strftime(f"{self.date_format} %H:%M:%S")
                     self.utc_date_time.update()
             except:
                 logging.exception('exception occured at Header.sync_utc_date_time')

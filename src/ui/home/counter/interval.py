@@ -140,7 +140,7 @@ class IntervalCounter(ft.Container):
 
     def __calculate(self):
         try:
-            param_end_time = gdata.configDateTime.utc_date_time
+            param_end_time = gdata.configDateTime.utc
             param_start_time = param_end_time - timedelta(hours=self.hours)
 
             data_log = DataLog.select(

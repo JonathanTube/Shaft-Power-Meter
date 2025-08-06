@@ -25,6 +25,8 @@ class Setting(ft.Container):
         self.task = None
         self.task_running = False
 
+        self.rail = None
+
     def __set_content(self, e):
         idx = e.control.selected_index
         self.__switch_content(idx)
@@ -154,10 +156,13 @@ class Setting(ft.Container):
         except:
             logging.exception('exception occured at Setting.build')
 
+    def set_index_0(self):
+        self.idx = 0
+        if self.rail and self.rail.page:
+            self.rail.selected_index = 0
+
     def before_update(self):
         try:
-            self.idx = 0
-            self.rail.selected_index = 0
             if self.page and self.page.session:
                 s = self.page.session
                 self.system_conf.label = s.get("lang.setting.system_conf.title")

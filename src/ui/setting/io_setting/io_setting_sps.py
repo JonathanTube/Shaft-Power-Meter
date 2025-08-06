@@ -229,7 +229,7 @@ class IOSettingSPS(ft.Container):
 
             OperationLog.create(
                 user_id=user.id,
-                utc_date_time=gdata.configDateTime.utc_date_time,
+                utc_date_time=gdata.configDateTime.utc,
                 operation_type=OperationType.CONNECT_TO_SPS,
                 operation_content=user.user_name
             )
@@ -247,7 +247,7 @@ class IOSettingSPS(ft.Container):
             self.sps_disconnect.update()
             OperationLog.create(
                 user_id=user.id,
-                utc_date_time=gdata.configDateTime.utc_date_time,
+                utc_date_time=gdata.configDateTime.utc,
                 operation_type=OperationType.DISCONNECT_FROM_SPS,
                 operation_content=user.user_name
             )
@@ -271,7 +271,7 @@ class IOSettingSPS(ft.Container):
             self.sps2_connect.update()
             OperationLog.create(
                 user_id=user.id,
-                utc_date_time=gdata.configDateTime.utc_date_time,
+                utc_date_time=gdata.configDateTime.utc,
                 operation_type=OperationType.CONNECT_TO_SPS2,
                 operation_content=user.user_name
             )
@@ -287,7 +287,7 @@ class IOSettingSPS(ft.Container):
             self.sps2_disconnect.update()
             OperationLog.create(
                 user_id=user.id,
-                utc_date_time=gdata.configDateTime.utc_date_time,
+                utc_date_time=gdata.configDateTime.utc,
                 operation_type=OperationType.DISCONNECT_FROM_SPS2,
                 operation_content=user.user_name
             )

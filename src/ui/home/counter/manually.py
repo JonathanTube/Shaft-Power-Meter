@@ -41,14 +41,14 @@ class ManuallyCounter(ft.Container):
                 self.__delete_counter_log()
 
             # and then create new count log
-            CounterLog.create(sps_name=self.name, counter_type=1, start_utc_date_time=gdata.configDateTime.utc_date_time, counter_status="running")
+            CounterLog.create(sps_name=self.name, counter_type=1, start_utc_date_time=gdata.configDateTime.utc, counter_status="running")
             self.__calculate()
         except:
             logging.exception('exception occured at ManuallyCounter.__on_start')
 
     def __on_stop(self, e):
         try:
-            CounterLog.update(counter_status="reset", stop_utc_date_time=gdata.configDateTime.utc_date_time).where(CounterLog.sps_name == self.name, CounterLog.counter_type == 1).execute()
+            CounterLog.update(counter_status="reset", stop_utc_date_time=gdata.configDateTime.utc).where(CounterLog.sps_name == self.name, CounterLog.counter_type == 1).execute()
             self.__calculate()
         except:
             logging.exception('exception occured at ManuallyCounter.__on_stop')
@@ -275,7 +275,7 @@ class ManuallyCounter(ft.Container):
                     self.buttons.update()
 
                 start_time = counter_log.start_utc_date_time
-                end_time = gdata.configDateTime.utc_date_time
+                end_time = gdata.configDateTime.utc
 
                 if counter_log.times != 0:
                     average_power = counter_log.total_power / counter_log.times

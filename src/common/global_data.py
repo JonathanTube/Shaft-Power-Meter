@@ -31,13 +31,13 @@ class ConfigCommon:
 @dataclass
 class ConfigDateTime:
     #  是否开启自动从GPS同步UTC时间
-    enable_utc_time_sync_with_gps = False
-    utc_date_time: datetime = None
-    system_date_time: datetime = None
+    sync_with_gps = False
+    utc: datetime = None
+    system: datetime = None
 
     def set_default_value(self):
         dateTimeConf: DateTimeConf = DateTimeConf.get()
-        self.enable_utc_time_sync_with_gps = dateTimeConf.sync_with_gps
+        self.sync_with_gps = dateTimeConf.sync_with_gps
 
 
 @dataclass

@@ -16,7 +16,7 @@ class DataSaver:
     @staticmethod
     def save(name: str, torque: float, thrust: float, speed: float):
         try:
-            utc_date_time = gdata.configDateTime.utc_date_time
+            utc_date_time = gdata.configDateTime.utc
             power = FormulaCalculator.calculate_instant_power(torque, speed)
             # delete invalid data which is over than 3 months.
             DataLog.delete().where(DataLog.utc_date_time < utc_date_time - timedelta(weeks=4 * 3)).execute()
@@ -115,7 +115,7 @@ class DataSaver:
                 total_speed=speed,
                 total_power=power,
                 times=1,
-                start_utc_date_time=gdata.configDateTime.utc_date_time,
+                start_utc_date_time=gdata.configDateTime.utc,
                 counter_status="running"
             )
         else:

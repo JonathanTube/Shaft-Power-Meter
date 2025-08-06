@@ -142,7 +142,7 @@ class ModbusOutputTask:
             if self.io_conf.output_sum_power and avg_power:
                 start_time = counter_log.start_utc_date_time
                 if start_time is not None:
-                    end_time = gdata.configDateTime.utc_date_time
+                    end_time = gdata.configDateTime.utc
                     hours = (end_time - start_time).total_seconds() / 3600
                     total_energy = int(avg_power * hours)  # 单位：0.1Wh
 

@@ -13,7 +13,7 @@ class AlarmSaver:
         ).count()
         if cnt == 0:
             AlarmLog.create(
-                utc_date_time=gdata.configDateTime.utc_date_time,
+                utc_date_time=gdata.configDateTime.utc,
                 alarm_type=alarm_type,
                 is_from_master=gdata.configCommon.is_master
             )
@@ -38,7 +38,7 @@ class AlarmSaver:
             AlarmLog.is_from_master == gdata.configCommon.is_master
         ).execute()
 
-        AlarmLog.create(utc_date_time=gdata.configDateTime.utc_date_time,
+        AlarmLog.create(utc_date_time=gdata.configDateTime.utc,
                         alarm_type=alarm_type_recovered,
                         is_recovery=True,
                         is_from_master=gdata.configCommon.is_master)

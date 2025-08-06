@@ -143,6 +143,7 @@ def set_content(page: ft.Page):
         elif name == 'REPORT':
             main_content.content = content_report
         elif name == 'SETTING':
+            content_setting.set_index_0()
             main_content.content = content_setting
         main_content.update()
 

@@ -54,7 +54,7 @@ class TestModeTask:
 
     async def start(self):
         try:
-            gdata.configTest.start_time = gdata.configDateTime.utc_date_time
+            gdata.configTest.start_time = gdata.configDateTime.utc
             asyncio.create_task(self.generate_random_data())
         except:
             logging.exception('exception occured at TestModeTask.start')

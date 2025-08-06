@@ -18,7 +18,7 @@ class EEXIBreach:
         if not gdata.configCommon.shapoli:
             return
 
-        utc_date_time = gdata.configDateTime.utc_date_time
+        utc_date_time = gdata.configDateTime.utc
         is_twins = gdata.configCommon.amount_of_propeller == 2
 
         # 如果正在突破，则保存突破报告明细
@@ -116,7 +116,7 @@ class EEXIBreach:
             event_log: EventLog = EventLog.select().where(EventLog.ended_at == None).order_by(EventLog.id.asc()).first()
 
             if event_log is not None:
-                event_log.ended_at = gdata.configDateTime.utc_date_time
+                event_log.ended_at = gdata.configDateTime.utc
                 event_log.ended_position = gdata.configGps.location
                 event_log.save()
 

@@ -18,14 +18,14 @@ class Permission(ft.Container):
         self.expand = True
         self.padding = 10
         self.op_user = None
-        self.last_op_utc_date_time = gdata.configDateTime.utc_date_time
+        self.last_op_utc_date_time = gdata.configDateTime.utc
         self.on_click = self.__on_click
 
         self.task = None
         self.task_running = False
 
     def __on_click(self, e):
-        self.last_op_utc_date_time = gdata.configDateTime.utc_date_time
+        self.last_op_utc_date_time = gdata.configDateTime.utc
 
     def build(self):
         if self.page and self.page.session:
@@ -59,7 +59,7 @@ class Permission(ft.Container):
 
             self.op_user = user
 
-            self.last_op_utc_date_time = gdata.configDateTime.utc_date_time
+            self.last_op_utc_date_time = gdata.configDateTime.utc
 
             self.dropdown = ft.Dropdown(
                 label=self.page.session.get("lang.permission.role"),
@@ -157,7 +157,7 @@ class Permission(ft.Container):
             )
             OperationLog.create(
                 user_id=self.op_user.id,
-                utc_date_time=gdata.configDateTime.utc_date_time,
+                utc_date_time=gdata.configDateTime.utc,
                 operation_type=OperationType.USER_ADD,
                 operation_content=model_to_dict(User.select(User.id, User.user_name).where(User.id == user.id).get())
             )
@@ -180,7 +180,7 @@ class Permission(ft.Container):
     async def __auto_lock(self):
         while self.task_running:
             try:
-                time_diff = gdata.configDateTime.utc_date_time - self.last_op_utc_date_time
+                time_diff = gdata.configDateTime.utc - self.last_op_utc_date_time
                 if time_diff.total_seconds() > 60 * 10:
                     self.__create_lock_button()
                     self.update()

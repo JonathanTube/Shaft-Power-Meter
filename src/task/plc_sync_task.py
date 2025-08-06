@@ -262,7 +262,7 @@ class PlcSyncTask:
             cnt: int = AlarmLog.select().where(AlarmLog.alarm_type == AlarmType.MASTER_PLC_DISCONNECTED, AlarmLog.is_recovery == False).count()
             if cnt == 0:
                 logging.info('[***PLC***] create alarm')
-                AlarmLog.create(utc_date_time=gdata.configDateTime.utc_date_time, alarm_type=AlarmType.MASTER_PLC_DISCONNECTED, is_from_master=gdata.configCommon.is_master)
+                AlarmLog.create(utc_date_time=gdata.configDateTime.utc, alarm_type=AlarmType.MASTER_PLC_DISCONNECTED, is_from_master=gdata.configCommon.is_master)
             else:
                 logging.info('[***PLC***] alarm exists, skip')
         except:
@@ -272,7 +272,7 @@ class PlcSyncTask:
         try:
             logging.info('[***PLC***] recovery PLC Alarm')
             AlarmLog.update(is_recovery=True).where(AlarmLog.alarm_type == AlarmType.MASTER_PLC_DISCONNECTED).execute()
-            AlarmLog.create(utc_date_time=gdata.configDateTime.utc_date_time, alarm_type=AlarmType.MASTER_PLC_CONNECTED, is_recovery=True, is_from_master=gdata.configCommon.is_master)
+            AlarmLog.create(utc_date_time=gdata.configDateTime.utc, alarm_type=AlarmType.MASTER_PLC_CONNECTED, is_recovery=True, is_from_master=gdata.configCommon.is_master)
 
             cnt: int = AlarmLog.select().where(AlarmLog.is_recovery == False).count()
             if cnt == 0:

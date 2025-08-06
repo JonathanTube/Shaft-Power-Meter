@@ -99,7 +99,7 @@ class IOSetting(ft.Container):
 
             OperationLog.create(
                 user_id=user.id,
-                utc_date_time=gdata.configDateTime.utc_date_time,
+                utc_date_time=gdata.configDateTime.utc,
                 operation_type=OperationType.IO_CONF,
                 operation_content=model_to_dict(self.conf)
             )

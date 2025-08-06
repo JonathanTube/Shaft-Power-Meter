@@ -22,7 +22,7 @@ class TestMode(ft.Container):
         self.running = test_mode_task.is_running
         self.preference: Preference = Preference.get()
 
-        self.last_op_utc_date_time = gdata.configDateTime.utc_date_time
+        self.last_op_utc_date_time = gdata.configDateTime.utc
 
         self.op_user = None
 
@@ -158,7 +158,7 @@ class TestMode(ft.Container):
 
             OperationLog.create(
                 user_id=self.op_user.id,
-                utc_date_time=gdata.configDateTime.utc_date_time,
+                utc_date_time=gdata.configDateTime.utc,
                 operation_type=OperationType.TEST_MODE_CONF,
                 operation_content='started test mode'
             )
@@ -187,7 +187,7 @@ class TestMode(ft.Container):
 
             OperationLog.create(
                 user_id=self.op_user.id,
-                utc_date_time=gdata.configDateTime.utc_date_time,
+                utc_date_time=gdata.configDateTime.utc,
                 operation_type=OperationType.TEST_MODE_CONF,
                 operation_content='stopped test mode'
             )
@@ -206,7 +206,7 @@ class TestMode(ft.Container):
     async def __auto_lock(self):
         while self.task_running:
             try:
-                time_diff = gdata.configDateTime.utc_date_time - self.last_op_utc_date_time
+                time_diff = gdata.configDateTime.utc - self.last_op_utc_date_time
                 if time_diff.total_seconds() > 60 * 10:
                     self.__create_lock_button()
                     self.update()

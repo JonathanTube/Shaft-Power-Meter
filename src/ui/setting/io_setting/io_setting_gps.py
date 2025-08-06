@@ -92,7 +92,7 @@ class IOSettingGPS(ft.Container):
 
             OperationLog.create(
                 user_id=user.id,
-                utc_date_time=gdata.configDateTime.utc_date_time,
+                utc_date_time=gdata.configDateTime.utc,
                 operation_type=OperationType.CONNECT_TO_GPS,
                 operation_content=user.user_name
             )
@@ -109,7 +109,7 @@ class IOSettingGPS(ft.Container):
 
             OperationLog.create(
                 user_id=user.id,
-                utc_date_time=gdata.configDateTime.utc_date_time,
+                utc_date_time=gdata.configDateTime.utc,
                 operation_type=OperationType.DISCONNECT_FROM_GPS,
                 operation_content=user.user_name
             )

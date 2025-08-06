@@ -62,7 +62,7 @@ class SystemConfShipInfo(ft.Container):
         self.ship_info.save()
         OperationLog.create(
             user_id=user.id,
-            utc_date_time=gdata.configDateTime.utc_date_time,
+            utc_date_time=gdata.configDateTime.utc,
             operation_type=OperationType.SYSTEM_CONF_SHIP_INFO,
             operation_content=model_to_dict(self.ship_info)
         )

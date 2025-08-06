@@ -26,7 +26,7 @@ class SystemExitTool:
             user_id = user.id
             OperationLog.create(
                 user_id=user_id,
-                utc_date_time=gdata.configDateTime.utc_date_time,
+                utc_date_time=gdata.configDateTime.utc,
                 operation_type=OperationType.SYSTEM_EXIT,
                 operation_content=user.user_name
             )

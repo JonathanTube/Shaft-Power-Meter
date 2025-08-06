@@ -102,7 +102,7 @@ class GeneralOflineDefaultValue(ft.Container):
 
         operation_log = OperationLog(
             user_id=user_id,
-            utc_date_time=gdata.configDateTime.utc_date_time,
+            utc_date_time=gdata.configDateTime.utc,
             operation_type=OperationType.OFFLINE_DEFAULT_VALUE,
             operation_content=f"update offline default value: {self.odv.torque_default_value}, {self.odv.thrust_default_value}, {self.odv.speed_default_value}"
         )

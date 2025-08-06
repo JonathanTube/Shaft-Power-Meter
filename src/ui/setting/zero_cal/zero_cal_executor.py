@@ -101,7 +101,7 @@ class ZeroCalExecutor(ft.Container):
     def on_accept(self, e):
         try:
             ZeroCalInfo.create(
-                utc_date_time=gdata.configDateTime.utc_date_time, name=self.name,
+                utc_date_time=gdata.configDateTime.utc, name=self.name,
                 torque_offset=self.torque_offset, thrust_offset=self.thrust_offset
             )
 

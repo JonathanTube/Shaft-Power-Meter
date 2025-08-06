@@ -95,7 +95,7 @@ class TotalCounter(ft.Container):
             if counter_log is None:
                 return
             start_time = counter_log.start_utc_date_time
-            end_time = gdata.configDateTime.utc_date_time
+            end_time = gdata.configDateTime.utc
 
             average_power = counter_log.total_power / counter_log.times
             average_speed = counter_log.total_speed / counter_log.times
@@ -107,7 +107,7 @@ class TotalCounter(ft.Container):
                 hours = 0 # 直接置0
                 # reset
                 CounterLog.update(
-                    start_utc_date_time = gdata.configDateTime.utc_date_time
+                    start_utc_date_time = gdata.configDateTime.utc
                 ).where(
                     CounterLog.sps_name == self.name,
                     CounterLog.counter_type == 2
