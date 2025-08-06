@@ -148,7 +148,7 @@ class WebSocketSlave:
                     self.__handle_propeller_setting(data)
 
                 gdata.configSPS.is_offline = False
-                gdata.configSPS2 = False
+                gdata.configSPS2.is_offline = False
                 self._retry = 0
             except (websockets.ConnectionClosedError, websockets.ConnectionClosedOK, websockets.ConnectionClosed):
                 logging.error("[***HMI client***] ConnectionClosedError")
