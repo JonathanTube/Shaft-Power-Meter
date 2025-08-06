@@ -52,11 +52,11 @@ class ThrustBlock(ft.Container):
                 return
 
             if self.name == "sps":
-                thrust_and_unit = UnitParser.parse_thrust(gdata.sps_thrust, self.system_unit)
+                thrust_and_unit = UnitParser.parse_thrust(gdata.configSPS.sps_thrust, self.system_unit)
                 self.thrust_value.value = thrust_and_unit[0]
                 self.thrust_unit.value = thrust_and_unit[1]
             else:
-                thrust_and_unit = UnitParser.parse_thrust(gdata.sps2_thrust, self.system_unit)
+                thrust_and_unit = UnitParser.parse_thrust(gdata.configSPS2.sps_thrust, self.system_unit)
                 self.thrust_value.value = thrust_and_unit[0]
                 self.thrust_unit.value = thrust_and_unit[1]
             self.content.update()

@@ -48,8 +48,8 @@ class DualInstantSpeed(ft.Container):
 
     def reload(self):
         try:
-            speed_sps = UnitParser.parse_speed(gdata.sps_speed)
-            speed_sps2 = UnitParser.parse_speed(gdata.sps2_speed)
+            speed_sps = UnitParser.parse_speed(gdata.configSPS.sps_speed)
+            speed_sps2 = UnitParser.parse_speed(gdata.configSPS2.sps_speed)
 
             self.speed_sps_value.value = speed_sps[0]
             self.speed_sps_unit.value = speed_sps[1]

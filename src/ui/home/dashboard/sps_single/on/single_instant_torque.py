@@ -35,7 +35,7 @@ class SingleInstantTorque(ft.Container):
     def reload(self):
         try:
             if self.content and self.content.page:
-                torque = UnitParser.parse_torque(gdata.sps_torque, self.system_unit)
+                torque = UnitParser.parse_torque(gdata.configSPS.sps_torque, self.system_unit)
                 self.torque_value.value = torque[0]
                 self.torque_unit.value = torque[1]
                 self.content.update()

@@ -93,7 +93,7 @@ class DualPowerLine(ft.Container):
     def __handle_bottom_axis(self):
         try:
             labels = []
-            for index, item in enumerate(gdata.sps_power_history):
+            for index, item in enumerate(gdata.configSPS.sps_power_history):
                 if len(item) > 1:
                     label = ft.ChartAxisLabel(
                         value=index,
@@ -116,7 +116,7 @@ class DualPowerLine(ft.Container):
     def __handle_data_line_sps(self):
         try:
             data_points = []
-            for index, item in enumerate(gdata.sps_power_history):
+            for index, item in enumerate(gdata.configSPS.sps_power_history):
                 if len(item) > 0:
                     _power = UnitParser.parse_power(item[0], self.unit)
                     data_points.append(ft.LineChartDataPoint(index, _power[0]))
@@ -130,7 +130,7 @@ class DualPowerLine(ft.Container):
     def __handle_data_line_sps2(self):
         try:
             data_points = []
-            for index, item in enumerate(gdata.sps2_power_history):
+            for index, item in enumerate(gdata.configSPS2.sps2_power_history):
                 if len(item) > 0:
                     _power = UnitParser.parse_power(item[0], self.unit)
                     data_points.append(ft.LineChartDataPoint(index, _power[0]))

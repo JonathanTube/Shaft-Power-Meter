@@ -229,7 +229,7 @@ class IOSettingSPS(ft.Container):
 
             OperationLog.create(
                 user_id=user.id,
-                utc_date_time=gdata.utc_date_time,
+                utc_date_time=gdata.configDateTime.utc_date_time,
                 operation_type=OperationType.CONNECT_TO_SPS,
                 operation_content=user.user_name
             )
@@ -247,7 +247,7 @@ class IOSettingSPS(ft.Container):
             self.sps_disconnect.update()
             OperationLog.create(
                 user_id=user.id,
-                utc_date_time=gdata.utc_date_time,
+                utc_date_time=gdata.configDateTime.utc_date_time,
                 operation_type=OperationType.DISCONNECT_FROM_SPS,
                 operation_content=user.user_name
             )
@@ -271,7 +271,7 @@ class IOSettingSPS(ft.Container):
             self.sps2_connect.update()
             OperationLog.create(
                 user_id=user.id,
-                utc_date_time=gdata.utc_date_time,
+                utc_date_time=gdata.configDateTime.utc_date_time,
                 operation_type=OperationType.CONNECT_TO_SPS2,
                 operation_content=user.user_name
             )
@@ -287,7 +287,7 @@ class IOSettingSPS(ft.Container):
             self.sps2_disconnect.update()
             OperationLog.create(
                 user_id=user.id,
-                utc_date_time=gdata.utc_date_time,
+                utc_date_time=gdata.configDateTime.utc_date_time,
                 operation_type=OperationType.DISCONNECT_FROM_SPS2,
                 operation_content=user.user_name
             )
@@ -323,11 +323,11 @@ class IOSettingSPS(ft.Container):
 
             self.factor_conf.save()
 
-            gdata.bearing_outer_diameter_D = float(self.shaft_outer_diameter.value)
-            gdata.bearing_inner_diameter_d = float(self.shaft_inner_diameter.value)
-            gdata.sensitivity_factor_k = float(self.sensitivity_factor_k.value)
-            gdata.elastic_modulus_E = float(self.elastic_modulus_E.value)
-            gdata.poisson_ratio_mu = float(self.poisson_ratio_mu.value)
+            gdata.configCalc.bearing_outer_diameter_D = float(self.shaft_outer_diameter.value)
+            gdata.configCalc.bearing_inner_diameter_d = float(self.shaft_inner_diameter.value)
+            gdata.configCalc.sensitivity_factor_k = float(self.sensitivity_factor_k.value)
+            gdata.configCalc.elastic_modulus_E = float(self.elastic_modulus_E.value)
+            gdata.configCalc.poisson_ratio_mu = float(self.poisson_ratio_mu.value)
             logging.info('factor of gdata was refreshed.')
         except:
             logging.exception('exception occured at IOSettingSPS.save_factor')

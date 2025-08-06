@@ -9,7 +9,7 @@ from utils.unit_parser import UnitParser
 class LogDataTable(AbstractTable):
     def __init__(self):
         super().__init__()
-        self.table_width = gdata.default_table_width
+        self.table_width = gdata.configCommon.default_table_width
         self.dtc: DateTimeConf = DateTimeConf.get()
 
     def load_total(self):

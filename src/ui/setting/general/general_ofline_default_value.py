@@ -96,13 +96,13 @@ class GeneralOflineDefaultValue(ft.Container):
             self.odv.thrust_default_value = UnitConverter.t_to_n(self.odv.thrust_default_value)
         self.odv.save()
 
-        gdata.sps_offline_torque = self.odv.torque_default_value
-        gdata.sps_offline_speed = self.odv.speed_default_value
-        gdata.sps_offline_thrust = self.odv.thrust_default_value
+        gdata.configOffline.sps_offline_torque = self.odv.torque_default_value
+        gdata.configOffline.sps_offline_speed = self.odv.speed_default_value
+        gdata.configOffline.sps_offline_thrust = self.odv.thrust_default_value
 
         operation_log = OperationLog(
             user_id=user_id,
-            utc_date_time=gdata.utc_date_time,
+            utc_date_time=gdata.configDateTime.utc_date_time,
             operation_type=OperationType.OFFLINE_DEFAULT_VALUE,
             operation_content=f"update offline default value: {self.odv.torque_default_value}, {self.odv.thrust_default_value}, {self.odv.speed_default_value}"
         )

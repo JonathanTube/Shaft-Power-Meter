@@ -4,6 +4,7 @@ from common.global_data import gdata
 from jm3846.JM3846_torque_rpm import jm3846_torque_rpm
 from jm3846.JM3846_thrust import jm3846_thrust
 
+
 class JM38460x44Async:
 
     @staticmethod
@@ -25,7 +26,7 @@ class JM38460x44Async:
         )
 
     @staticmethod
-    def parse_response(data: bytes) -> int:
+    def parse_response(data: bytes, name: str) -> int:
         try:
             # 解析MBAP头
             _, _, length, _ = struct.unpack(">HHHB", data[:7])
@@ -47,15 +48,26 @@ class JM38460x44Async:
                 # 小端序，无符号整型
                 data = struct.unpack('<H', payload[i:i+2])[0]
 
-                if gdata.zero_cal_sps_torque_is_running:
-                    gdata.zero_cal_sps_ad0_for_torque.append(data)
-                else:
-                    jm3846_torque_rpm.accumulated_data.append(data)
+                if name == 'sps':
+                    if gdata.configSPS.zero_cal_sps_torque_is_running:
+                        gdata.configSPS.zero_cal_sps_ad0_for_torque.append(data)
+                    else:
+                        jm3846_torque_rpm.accumulated_data.append(data)
 
-                if gdata.zero_cal_sps_thrust_is_running:
-                    gdata.zero_cal_sps_ad1_for_thrust.append(data)
+                    if gdata.configSPS.zero_cal_sps_thrust_is_running:
+                        gdata.configSPS.zero_cal_sps_ad1_for_thrust.append(data)
+                    else:
+                        jm3846_thrust.accumulated_data.append(data)
                 else:
-                    jm3846_thrust.accumulated_data.append(data)
+                    if gdata.configSPS2.zero_cal_sps2_torque_is_running:
+                        gdata.configSPS2.zero_cal_sps2_ad0_for_torque.append(data)
+                    else:
+                        jm3846_torque_rpm.accumulated_data.append(data)
+
+                    if gdata.configSPS2.zero_cal_sps2_thrust_is_running:
+                        gdata.configSPS2.zero_cal_sps2_ad1_for_thrust.append(data)
+                    else:
+                        jm3846_thrust.accumulated_data.append(data)
 
             return current_frame
         except:

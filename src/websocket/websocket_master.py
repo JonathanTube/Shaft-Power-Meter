@@ -32,7 +32,7 @@ class WebSocketMaster:
     async def _client_handler(self, websocket):
         self.clients.add(websocket)
         try:
-            while gdata.is_master:
+            while gdata.configCommon.is_master:
                 if self._is_canceled:
                     return
 
@@ -83,7 +83,7 @@ class WebSocketMaster:
             self._is_canceled = False
 
     async def send_alarms_to_salve(self):
-        while gdata.is_master and self._is_started:
+        while gdata.configCommon.is_master and self._is_started:
 
             if self._is_canceled:
                 return
@@ -138,7 +138,7 @@ class WebSocketMaster:
 
     async def receive_alarms_from_slave(self):
         """接收从客户端（slave）发送的报警消息"""
-        while gdata.is_master and self._is_started:
+        while gdata.configCommon.is_master and self._is_started:
             if self._is_canceled:
                 return
 

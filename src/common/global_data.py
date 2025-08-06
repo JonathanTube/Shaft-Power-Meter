@@ -1,3 +1,4 @@
+from dataclasses import dataclass, field
 from datetime import datetime
 from db.models.factor_conf import FactorConf
 from db.models.offline_default_value import OfflineDefaultValue
@@ -7,151 +8,216 @@ from db.models.date_time_conf import DateTimeConf
 from db.models.zero_cal_info import ZeroCalInfo
 
 
-class GlobalData:
-    def __init__(self):
-        self.is_master = False
+@dataclass
+class ConfigCommon:
+    is_master = False
+    amount_of_propeller = 1
+    shapoli = False
+    eexi_breach_checking_duration = 5
+    eexi_limited_power = 999999
 
-        self.auto_testing = False
-
-        self.default_table_width = 990
-        self.utc_date_time: datetime = None
-        self.system_date_time: datetime = None
-
-        self.shapoli = False
-
-        self.amount_of_propeller = 1
-
-        self.eexi_breach_checking_duration = 5
-
-        self.eexi_limited_power = 999999
-
-        #  是否开启自动从GPS同步UTC时间
-        self.enable_utc_time_sync_with_gps = False
-
-        self.sps_speed = 0
-        self.sps_power = 0
-        self.sps_torque = 0
-        self.sps_thrust = 0
-        
-        self.sps_ad0 = 0
-        self.sps_ad1 = 0
-        self.sps_speed = 0
-
-        self.sps_torque_offset = 0
-        self.sps_thrust_offset = 0
-
-        self.sps2_speed = 0
-        self.sps2_power = 0
-        self.sps2_torque = 0
-        self.sps2_thrust = 0
-
-        self.sps2_ad0 = 0
-        self.sps2_ad1 = 0
-        self.sps2_speed = 0
-
-        self.sps2_torque_offset = 0
-        self.sps2_thrust_offset = 0
-
-        self.sps_power_history: list[tuple[float, datetime]] = []
-        self.sps2_power_history: list[tuple[float, datetime]] = []
-        self.gps_location = None
-
-        self.test_mode_running: bool = False
-        self.test_mode_start_time = None
-
-        self.speed_of_mcr = 0
-        self.power_of_mcr = 0
-        self.speed_of_torque_load_limit = 0
-        self.power_of_torque_load_limit = 0
-        self.power_of_overload = 0
-
-        # 默认离线
-        self.sps_offline: bool = True
-        self.sps2_offline: bool = True
-        self.sps_offline_torque = 0
-        self.sps_offline_thrust = 0
-        self.sps_offline_speed = 0
-
-        # 计算参数
-        self.bearing_outer_diameter_D = 0
-        self.bearing_inner_diameter_d = 0
-        self.elastic_modulus_E = 0
-        self.poisson_ratio_mu = 0
-        self.sensitivity_factor_k = 0
-
-        self.gps_raw_data = ""
-
-        self.alarm_enabled_of_overload_curve = False
-
-        self.eexi_breach = False
-
-        # SPS - 0x03 配置相关参数
-        self.ch_sel_1 = None
-        self.gain_1 = None
-        self.ch_sel_0 = None
-        self.gain_0 = None
-        self.speed_sel = None
-        self.sample_rate = None
-
-
-        self.zero_cal_sps_torque_is_running = False
-        self.zero_cal_sps2_torque_is_running = False
-
-        self.zero_cal_sps_thrust_is_running = False
-        self.zero_cal_sps2_thrust_is_running = False
-
-        self.zero_cal_sps_ad0_for_torque = []
-        self.zero_cal_sps2_ad0_for_torque = []
-        
-        self.zero_cal_sps_ad1_for_thrust = []
-        self.zero_cal_sps2_ad1_for_thrust = []
+    default_table_width = 990
+    alarm_enabled_of_overload_curve = False
 
     def set_default_value(self):
         systemSettings: SystemSettings = SystemSettings.get()
-
         self.is_master = systemSettings.is_master
-
         self.amount_of_propeller = systemSettings.amount_of_propeller
-
         self.shapoli = systemSettings.sha_po_li
-
         self.eexi_breach_checking_duration = systemSettings.eexi_breach_checking_duration
-        
         self.eexi_limited_power = systemSettings.eexi_limited_power
 
+
+@dataclass
+class ConfigDateTime:
+    #  是否开启自动从GPS同步UTC时间
+    enable_utc_time_sync_with_gps = False
+    utc_date_time: datetime = None
+    system_date_time: datetime = None
+
+    def set_default_value(self):
         dateTimeConf: DateTimeConf = DateTimeConf.get()
         self.enable_utc_time_sync_with_gps = dateTimeConf.sync_with_gps
 
-        propellerSetting: PropellerSetting = PropellerSetting.get()
-        self.speed_of_mcr = propellerSetting.rpm_of_mcr_operating_point
-        self.power_of_mcr = propellerSetting.shaft_power_of_mcr_operating_point
-        self.speed_of_torque_load_limit = propellerSetting.rpm_right_of_torque_load_limit_curve
-        self.power_of_torque_load_limit = propellerSetting.bhp_right_of_torque_load_limit_curve + \
-            propellerSetting.value_of_overload_curve
-        self.power_of_overload = propellerSetting.value_of_overload_curve
-        self.alarm_enabled_of_overload_curve = propellerSetting.alarm_enabled_of_overload_curve
+
+@dataclass
+class ConfigTest:
+    auto_testing = False
+    test_mode_running: bool = False
+    test_mode_start_time = None
+
+
+@dataclass
+class ConfigGps:
+    gps_raw_data = None
+    gps_location = None
+
+    def set_default_value(self):
+        self.gps_raw_data = ""
+
+
+@dataclass
+class ConfigOffline:
+    # 默认离线数值
+    sps_offline_torque = 0
+    sps_offline_thrust = 0
+    sps_offline_speed = 0
+
+    def set_default_value(self):
+        offline_default_value: OfflineDefaultValue = OfflineDefaultValue.get()
+        self.sps_offline_thrust = offline_default_value.thrust_default_value
+        self.sps_offline_torque = offline_default_value.torque_default_value
+        self.sps_offline_speed = offline_default_value.speed_default_value
+
+
+@dataclass
+class ConfigSPS:
+    sps_speed = 0
+    sps_power = 0
+    sps_torque = 0
+    sps_thrust = 0
+
+    sps_ad0 = 0
+    sps_ad1 = 0
+
+    sps_torque_offset = 0
+    sps_thrust_offset = 0
+
+    sps_power_history: list[tuple[float, datetime]] = field(default_factory=list)
+    sps_offline = True
+
+    # 0x03 配置相关参数
+    ch_sel_1 = None
+    gain_1 = None
+    ch_sel_0 = None
+    gain_0 = None
+    speed_sel = None
+    sample_rate = None
+
+    zero_cal_sps_torque_is_running = False
+    zero_cal_sps_thrust_is_running = False
+    zero_cal_sps_ad0_for_torque: list[float] = field(default_factory=list)
+    zero_cal_sps_ad1_for_thrust: list[float] = field(default_factory=list)
+
+    def set_default_value(self):
         # get the last accepted zero cal. record.
         sps_accepted_zero_cal: ZeroCalInfo = ZeroCalInfo.select().where(ZeroCalInfo.name == 'sps').order_by(ZeroCalInfo.id.desc()).first()
         if sps_accepted_zero_cal is not None:
             self.sps_torque_offset = sps_accepted_zero_cal.torque_offset
             self.sps_thrust_offset = sps_accepted_zero_cal.thrust_offset
 
+
+@dataclass
+class ConfigSPS2:
+    sps_speed = 0
+    sps_power = 0
+    sps_torque = 0
+    sps_thrust = 0
+
+    sps_ad0 = 0
+    sps_ad1 = 0
+
+    sps_torque_offset = 0
+    sps_thrust_offset = 0
+
+    sps2_power_history: list[tuple[float, datetime]] = field(default_factory=list)
+    sps2_offline: bool = True
+
+    # 0x03 配置相关参数
+    ch_sel_1 = None
+    gain_1 = None
+    ch_sel_0 = None
+    gain_0 = None
+    speed_sel = None
+    sample_rate = None
+
+    zero_cal_sps2_torque_is_running = False
+    zero_cal_sps2_thrust_is_running = False
+    zero_cal_sps2_ad0_for_torque: list[float] = field(default_factory=list)
+    zero_cal_sps2_ad1_for_thrust: list[float] = field(default_factory=list)
+
+    def set_default_value(self):
         sps2_accepted_zero_cal: ZeroCalInfo = ZeroCalInfo.select().where(ZeroCalInfo.name == 'sps2').order_by(ZeroCalInfo.id.desc()).first()
         if sps2_accepted_zero_cal is not None:
             self.sps2_torque_offset = sps2_accepted_zero_cal.torque_offset
             self.sps2_thrust_offset = sps2_accepted_zero_cal.thrust_offset
 
-        offline_default_value: OfflineDefaultValue = OfflineDefaultValue.get()
-        self.sps_offline_thrust = offline_default_value.thrust_default_value
-        self.sps_offline_torque = offline_default_value.torque_default_value
-        self.sps_offline_speed = offline_default_value.speed_default_value
 
+@dataclass
+class ConfigCalc:
+    # 计算参数
+    bearing_outer_diameter_D = 0
+    bearing_inner_diameter_d = 0
+    elastic_modulus_E = 0
+    poisson_ratio_mu = 0
+    sensitivity_factor_k = 0
+
+    def set_default_value(self):
         factor_conf: FactorConf = FactorConf.get()
         self.bearing_outer_diameter_D = factor_conf.bearing_outer_diameter_D
         self.bearing_inner_diameter_d = factor_conf.bearing_inner_diameter_d
         self.elastic_modulus_E = factor_conf.elastic_modulus_E
         self.poisson_ratio_mu = factor_conf.poisson_ratio_mu
         self.sensitivity_factor_k = factor_conf.sensitivity_factor_k
+
+
+@dataclass
+class ConfigPropperCurve:
+    speed_of_mcr = 0
+    power_of_mcr = 0
+    speed_of_torque_load_limit = 0
+    power_of_torque_load_limit = 0
+    power_of_overload = 0
+    eexi_breach = False
+
+    def set_default_value(self):
+        propellerSetting: PropellerSetting = PropellerSetting.get()
+        self.speed_of_mcr = propellerSetting.rpm_of_mcr_operating_point
+        self.power_of_mcr = propellerSetting.shaft_power_of_mcr_operating_point
+        self.speed_of_torque_load_limit = propellerSetting.rpm_right_of_torque_load_limit_curve
+        self.power_of_torque_load_limit = propellerSetting.bhp_right_of_torque_load_limit_curve + propellerSetting.value_of_overload_curve
+        self.power_of_overload = propellerSetting.value_of_overload_curve
+        self.alarm_enabled_of_overload_curve = propellerSetting.alarm_enabled_of_overload_curve
+
+
+@dataclass
+class GlobalData:
+    configCommon = None
+    configDateTime = None
+    configTest = None
+    configGps = None
+    configOffline = None
+    configSPS = None
+    configSPS2 = None
+    configCalc = None
+    configPropperCurve = None
+
+    def set_default_value(self):
+        self.configCommon = ConfigCommon()
+        self.configCommon.set_default_value()
+
+        self.configDateTime = ConfigDateTime()
+        self.configDateTime.set_default_value()
+
+        self.configTest = ConfigTest()
+
+        self.configGps = ConfigGps()
+        self.configGps.set_default_value()
+
+        self.configOffline = ConfigOffline()
+        self.configOffline.set_default_value()
+
+        self.configSPS = ConfigSPS()
+        self.configSPS.set_default_value()
+
+        self.configSPS2 = ConfigSPS2()
+        self.configSPS2.set_default_value()
+
+        self.configCalc = ConfigCalc()
+        self.configCalc.set_default_value()
+
+        self.configPropperCurve = ConfigPropperCurve()
+        self.configPropperCurve.set_default_value()
 
 
 gdata: GlobalData = GlobalData()

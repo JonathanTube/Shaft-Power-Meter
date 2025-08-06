@@ -101,17 +101,17 @@ class ZeroCalExecutor(ft.Container):
     def on_accept(self, e):
         try:
             ZeroCalInfo.create(
-                utc_date_time=gdata.utc_date_time, name=self.name,
+                utc_date_time=gdata.configDateTime.utc_date_time, name=self.name,
                 torque_offset=self.torque_offset, thrust_offset=self.thrust_offset
             )
 
             # 设置全局变量
             if self.name == 'sps':
-                gdata.sps_torque_offset = self.torque_offset
-                gdata.sps_thrust_offset = self.thrust_offset
+                gdata.configSPS.sps_torque_offset = self.torque_offset
+                gdata.configSPS.sps_thrust_offset = self.thrust_offset
             else:
-                gdata.sps2_torque_offset = self.torque_offset
-                gdata.sps2_thrust_offset = self.thrust_offset
+                gdata.configSPS2.sps2_torque_offset = self.torque_offset
+                gdata.configSPS2.sps2_thrust_offset = self.thrust_offset
 
             if self.accept_button and self.accept_button.page:
                 self.accept_button.visible = False

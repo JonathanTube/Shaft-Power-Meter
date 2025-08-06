@@ -27,7 +27,7 @@ class TestModeRange(ft.Container):
     def build(self):
         try:
             if self.page and self.page.session:
-                disabled = not gdata.test_mode_running
+                disabled = not gdata.configTest.test_mode_running
                 min_torque_value, min_torque_unit = self.__get_torque_and_unit(self.conf.min_torque)
                 max_torque_value, max_torque_unit = self.__get_torque_and_unit(self.conf.max_torque)
                 self.start_torque_text = self.__create_range_start_text('lang.setting.test_mode.min_torque', min_torque_value, min_torque_unit)
@@ -104,8 +104,8 @@ class TestModeRange(ft.Container):
 
     def __on_speed_change(self, e):
         try:
-            start_speed_percentage = round(e.control.start_value * 100 / gdata.speed_of_mcr, 2)
-            end_speed_percentage = round(e.control.end_value * 100 / gdata.speed_of_mcr, 2)
+            start_speed_percentage = round(e.control.start_value * 100 / gdata.configPropperCurve.speed_of_mcr, 2)
+            end_speed_percentage = round(e.control.end_value * 100 / gdata.configPropperCurve.speed_of_mcr, 2)
             self.start_speed_text.value = f'{self.page.session.get('lang.setting.test_mode.min_speed')}: {int(e.control.start_value)} rpm, {start_speed_percentage}% MCR'
             self.start_speed_text.update()
             self.end_speed_text.value = f'{self.page.session.get('lang.setting.test_mode.max_speed')}: {int(e.control.end_value)} rpm, {end_speed_percentage}% MCR'

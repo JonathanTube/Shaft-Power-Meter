@@ -181,7 +181,7 @@ class Setting(ft.Container):
             self.task.cancel()
 
     async def test_auto_run(self):
-        while self.task_running and gdata.auto_testing:
+        while self.task_running and gdata.configTest.auto_testing:
             try:
                 idx = int(random() * 10) % len(self.rail.destinations)
                 logging.info(f'&&&&&&&&&&&&&&-Setting.test_auto_run, idx = {idx}')

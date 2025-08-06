@@ -15,7 +15,7 @@ class AlarmTable(AbstractTable):
         self.date_time_format = f"{date_format} %H:%M:%S"
 
         self.show_checkbox_column = True
-        self.table_width = gdata.default_table_width
+        self.table_width = gdata.configCommon.default_table_width
 
     def load_total(self):
         try:
@@ -107,7 +107,7 @@ class AlarmTable(AbstractTable):
 
             for item in data:
                 status_column = '✔️'if item.is_recovery else '❌'
-                if item.is_from_master != gdata.is_master:
+                if item.is_from_master != gdata.configCommon.is_master:
                     status_column += '🔒'
 
                 data_list.append([

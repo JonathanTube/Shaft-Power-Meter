@@ -194,7 +194,7 @@ class SystemConfSettings(ft.Container):
         # 如果运行模式被切换
         if is_master_new != is_master_old or is_individual_new != is_individual_old or enable_gps_new != enable_gps_old:
             self.system_settings.save()
-            gdata.is_master = self.system_settings.is_master
+            gdata.configCommon.is_master = self.system_settings.is_master
             raise SystemError("running mode changed")
 
 
@@ -216,19 +216,19 @@ class SystemConfSettings(ft.Container):
 
         self.system_settings.save()
 
-        gdata.is_master = self.system_settings.is_master
+        gdata.configCommon.is_master = self.system_settings.is_master
 
-        gdata.amount_of_propeller = self.system_settings.amount_of_propeller
+        gdata.configCommon.amount_of_propeller = self.system_settings.amount_of_propeller
 
-        gdata.shapoli = self.system_settings.sha_po_li
+        gdata.configCommon.shapoli = self.system_settings.sha_po_li
 
-        gdata.eexi_breach_checking_duration = int(self.system_settings.eexi_breach_checking_duration)
+        gdata.configCommon.eexi_breach_checking_duration = int(self.system_settings.eexi_breach_checking_duration)
 
-        gdata.eexi_limited_power = float(self.system_settings.eexi_limited_power)
+        gdata.configCommon.eexi_limited_power = float(self.system_settings.eexi_limited_power)
 
         OperationLog.create(
             user_id=user.id,
-            utc_date_time=gdata.utc_date_time,
+            utc_date_time=gdata.configDateTime.utc_date_time,
             operation_type=OperationType.SYSTEM_CONF_SETTING,
             operation_content=model_to_dict(self.system_settings)
         )

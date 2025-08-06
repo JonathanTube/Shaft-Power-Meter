@@ -89,9 +89,9 @@ class ZeroCalExecutorTorque(ft.Card):
     async def on_fetch(self, e):
         # 开始采集thrust-ad1
         if self.name == 'sps':
-            gdata.zero_cal_sps_torque_is_running = True
+            gdata.configSPS.zero_cal_sps_torque_is_running = True
         else:
-            gdata.zero_cal_sps2_torque_is_running = True
+            gdata.configSPS2.zero_cal_sps2_torque_is_running = True
 
         self.countdown_task = self.page.run_task(self.handle_countdown)
 
@@ -109,22 +109,17 @@ class ZeroCalExecutorTorque(ft.Card):
                 countdown_seconds -= 1
 
             # 2s倒计时结束，开始统计thrust-ad1
-            data_list = []
-
-            if self.name == 'sps':
-                data_list = gdata.zero_cal_sps_ad0_for_torque
-            elif self.name == 'sps2':
-                data_list = gdata.zero_cal_sps2_ad0_for_torque
-
+            data_list = gdata.configSPS.zero_cal_sps_ad0_for_torque if self.name == 'sps' else gdata.configSPS2.zero_cal_sps2_ad0_for_torque
+            gain_0 = gdata.configSPS.gain_0 if self.name == 'sps' else gdata.configSPS2.gain_0
             result = JM3846TorqueRpmUtil.get_avg(data_list)
             avg_ad0: float = result[0]
-            mv_per_v = JM3846Calculator.calculate_mv_per_v(avg_ad0, gdata.gain_0)
+            mv_per_v = JM3846Calculator.calculate_mv_per_v(avg_ad0, gain_0)
 
             # 处理完成清空cache
             if self.name == 'sps':
-                gdata.zero_cal_sps_ad0_for_torque.clear()
+                gdata.configSPS.zero_cal_sps_ad0_for_torque.clear()
             elif self.name == 'sps2':
-                gdata.zero_cal_sps2_ad0_for_torque.clear()
+                gdata.configSPS2.zero_cal_sps2_ad0_for_torque.clear()
 
             self.set_mv_per_v(self.index, round(mv_per_v, 4))
             self.sum_torque_offset += mv_per_v
@@ -155,9 +150,9 @@ class ZeroCalExecutorTorque(ft.Card):
 
             # 倒计时执行完毕
             if self.name == 'sps':
-                gdata.zero_cal_sps_torque_is_running = False
+                gdata.configSPS.zero_cal_sps_torque_is_running = False
             else:
-                gdata.zero_cal_sps2_torque_is_running = False
+                gdata.configSPS2.zero_cal_sps2_torque_is_running = False
 
     def set_mv_per_v(self, index, value):
         if self.items and self.items.page:

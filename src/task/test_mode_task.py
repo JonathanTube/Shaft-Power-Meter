@@ -54,15 +54,15 @@ class TestModeTask:
 
     async def start(self):
         try:
-            gdata.test_mode_start_time = gdata.utc_date_time
+            gdata.configTest.test_mode_start_time = gdata.configDateTime.utc_date_time
             asyncio.create_task(self.generate_random_data())
         except:
             logging.exception('exception occured at TestModeTask.start')
 
     def stop(self):
         try:
-            DataLog.delete().where(DataLog.utc_date_time >= gdata.test_mode_start_time).execute()
-            event_logs:list[EventLog] = EventLog.select().where(EventLog.started_at >= gdata.test_mode_start_time)
+            DataLog.delete().where(DataLog.utc_date_time >= gdata.configTest.test_mode_start_time).execute()
+            event_logs:list[EventLog] = EventLog.select().where(EventLog.started_at >= gdata.configTest.test_mode_start_time)
             for event in event_logs:
                 EventLog.delete().where(EventLog.id == event.id).execute()
                 ReportInfo.delete().where(ReportInfo.event_log == event).execute()
@@ -79,18 +79,18 @@ class TestModeTask:
                 times=valid_data_log['times']
             )
             # recalculate total counter
-            gdata.sps_speed = 0
-            gdata.sps_power = 0
-            gdata.sps_torque = 0
-            gdata.sps_thrust = 0
+            gdata.configSPS.sps_speed = 0
+            gdata.configSPS.sps_power = 0
+            gdata.configSPS.sps_torque = 0
+            gdata.configSPS.sps_thrust = 0
 
-            gdata.sps2_speed = 0
-            gdata.sps2_power = 0
-            gdata.sps2_torque = 0
-            gdata.sps2_thrust = 0
+            gdata.configSPS2.sps2_speed = 0
+            gdata.configSPS2.sps2_power = 0
+            gdata.configSPS2.sps2_torque = 0
+            gdata.configSPS2.sps2_thrust = 0
 
-            gdata.sps_power_history = []
-            gdata.sps2_power_history = []
+            gdata.configSPS.sps_power_history = []
+            gdata.configSPS2.sps2_power_history = []
         except:
             logging.exception('test mode task error')
         self.is_running = False

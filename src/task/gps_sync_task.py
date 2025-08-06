@@ -147,9 +147,9 @@ class GpsSyncTask:
 
     def parse_nmea_sentence(self, sentence):
         try:
-            gdata.gps_raw_data = sentence
+            gdata.configGps.gps_raw_data = sentence
             # delete invalid data(4 weeks * 3 = 12 weeks ago)
-            GpsLog.delete().where(GpsLog.utc_date_time < (gdata.utc_date_time - timedelta(weeks=4 * 3))).execute()
+            GpsLog.delete().where(GpsLog.utc_date_time < (gdata.configDateTime.utc_date_time - timedelta(weeks=4 * 3))).execute()
             msg = pynmea2.parse(sentence)
             if isinstance(msg, pynmea2.types.talker.RMC):
                 utc_date = msg.datestamp
@@ -164,18 +164,18 @@ class GpsSyncTask:
                 lon_min = (msg.longitude - lon_deg) * 60
                 lon_str = f"{lon_deg}°{lon_min:.3f}′{msg.lon_dir}"
                 location = f"{lat_str}, {lon_str}"
-                gdata.gps_location = location
+                gdata.configGps.gps_location = location
                 time_str = f"{utc_date} {utc_time}"
                 GpsLog.create(location=location, utc_date_time=time_str)
                 # 更新UTC时间
-                if gdata.enable_utc_time_sync_with_gps:
+                if gdata.configDateTime.enable_utc_time_sync_with_gps:
                     dt = datetime.fromisoformat(time_str)
                     # UTC标准化+去除微秒
                     dt_utc = dt.astimezone(ZoneInfo("UTC")).replace(microsecond=0, tzinfo=None)
-                    gdata.utc_date_time = dt_utc
+                    gdata.configDateTime.utc_date_time = dt_utc
         except:
             logging.exception("[***GPS***]gps parse nmea sentence failed")
-            gdata.gps_location = None
+            gdata.configGps.gps_location = None
 
 
 gps = GpsSyncTask()

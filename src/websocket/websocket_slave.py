@@ -43,7 +43,7 @@ class WebSocketSlave:
 
             self._is_canceled = False
 
-            while not gdata.is_master and self._retry < self._max_retries:
+            while not gdata.configCommon.is_master and self._retry < self._max_retries:
                 # 如果是手动取消，直接跳出
                 if self._is_canceled:
                     break
@@ -80,7 +80,7 @@ class WebSocketSlave:
             self._is_canceled = False
 
     async def send_eexi_breach_alarm_to_master(self, occured):
-        if gdata.is_master:
+        if gdata.configCommon.is_master:
             return
         if not self._is_connected:
             return
@@ -92,7 +92,7 @@ class WebSocketSlave:
         await self.websocket.send(packed_data)
 
     async def send_gps_alarm_to_master(self):
-        while not gdata.is_master and self._is_connected:
+        while not gdata.configCommon.is_master and self._is_connected:
             try:
                 alarm_logs: list[AlarmLog] = AlarmLog.select(
                     AlarmLog.id,
@@ -131,7 +131,7 @@ class WebSocketSlave:
                 await asyncio.sleep(5)
 
     async def receive_data_from_master(self):
-        while not gdata.is_master and self._is_connected:
+        while not gdata.configCommon.is_master and self._is_connected:
 
             if self._is_canceled:
                 return
@@ -147,15 +147,13 @@ class WebSocketSlave:
                 elif data['type'] == 'propeller_setting':
                     self.__handle_propeller_setting(data)
 
-                gdata.sps_offline = False
-                gdata.sps2_offline = False
+                gdata.configSPS.sps_offline = False
+                gdata.configSPS2 = False
                 self._retry = 0
-            except (websockets.ConnectionClosedError,
-                    websockets.ConnectionClosedOK,
-                    websockets.ConnectionClosed):
+            except (websockets.ConnectionClosedError, websockets.ConnectionClosedOK, websockets.ConnectionClosed):
                 logging.error("[***HMI client***] ConnectionClosedError")
-                gdata.sps_offline = True
-                gdata.sps2_offline = True
+                gdata.configSPS.sps_offline = True
+                gdata.configSPS2.sps2_offline = True
                 self._is_connected = False
                 AlarmSaver.create(alarm_type=AlarmType.SLAVE_CLIENT_DISCONNECTED)
                 break
@@ -164,7 +162,7 @@ class WebSocketSlave:
 
     def __handle_jm3846_data(self, data):
         """处理从服务端接收到的数据"""
-        if gdata.test_mode_running:
+        if gdata.configTest.test_mode_running:
             logging.info('[***HMI client***] test mode is running, skip handle jm3846 data from websocket.')
             return
 
@@ -172,21 +170,21 @@ class WebSocketSlave:
 
         if 'torque' in data:
             if name == 'sps':
-                gdata.sps_torque = data['torque']
+                gdata.configSPS.sps_torque = data['torque']
             elif name == 'sps2':
-                gdata.sps2_torque = data['torque']
+                gdata.configSPS2.sps2_torque = data['torque']
 
         if 'thrust' in data:
             if name == 'sps':
-                gdata.sps_thrust = data['thrust']
+                gdata.configSPS.sps_thrust = data['thrust']
             elif name == 'sps2':
-                gdata.sps2_thrust = data['thrust']
+                gdata.configSPS2.sps2_thrust = data['thrust']
 
         if 'rpm' in data:
             if name == 'sps':
-                gdata.sps_speed = data['rpm']
+                gdata.configSPS.sps_speed = data['rpm']
             elif name == 'sps2':
-                gdata.sps2_speed = data['rpm']
+                gdata.configSPS2.sps2_speed = data['rpm']
 
     def __handle_propeller_setting(self, settings):
         data = settings['data']

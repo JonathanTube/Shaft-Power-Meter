@@ -108,7 +108,7 @@ class Header(ft.AppBar):
             asyncio.run(SystemExitTool.exit_app(self.page, user))
 
     def __stop_auto_testing(self, e):
-        gdata.auto_testing = False
+        gdata.configTest.auto_testing = False
 
     def __set_active(self, button: ft.ElevatedButton):
         try:
@@ -171,8 +171,8 @@ class Header(ft.AppBar):
     async def sync_utc_date_time(self):
         while self.task_running:
             try:
-                if gdata.utc_date_time and self.utc_date_time and self.utc_date_time.page:
-                    self.utc_date_time.text = gdata.utc_date_time.strftime(f"{self.date_format} %H:%M:%S")
+                if gdata.configDateTime.utc_date_time and self.utc_date_time and self.utc_date_time.page:
+                    self.utc_date_time.text = gdata.configDateTime.utc_date_time.strftime(f"{self.date_format} %H:%M:%S")
                     self.utc_date_time.update()
             except:
                 logging.exception('exception occured at Header.sync_utc_date_time')
@@ -234,7 +234,7 @@ class Header(ft.AppBar):
         idx = 0
         while self._auto_run_running:
             try:
-                if gdata.auto_testing:
+                if gdata.configTest.auto_testing:
                     logging.info(f"&&&&&&&&&&&&&&-main menu auto testing, idx={idx}")
                     self.on_click(arr[idx % 3])
                     self.theme.toggle_theme()

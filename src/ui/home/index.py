@@ -184,7 +184,7 @@ class Home(ft.Container):
 
     async def test_auto_run(self):
         idx = 0
-        while self.task_running and gdata.auto_testing:
+        while self.task_running and gdata.configTest.auto_testing:
             try:
                 logging.info(f'&&&&&&&&&&&&&&-home.test_auto_run, idx={idx}')
                 idx += 1

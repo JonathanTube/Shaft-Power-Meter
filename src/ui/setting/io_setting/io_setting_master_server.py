@@ -74,7 +74,7 @@ class IOSettingMasterServer(ft.Container):
 
             OperationLog.create(
                 user_id=user.id,
-                utc_date_time=gdata.utc_date_time,
+                utc_date_time=gdata.configDateTime.utc_date_time,
                 operation_type=OperationType.START_HMI_SERVER,
                 operation_content=user.user_name
             )
@@ -91,7 +91,7 @@ class IOSettingMasterServer(ft.Container):
 
             OperationLog.create(
                 user_id=user.id,
-                utc_date_time=gdata.utc_date_time,
+                utc_date_time=gdata.configDateTime.utc_date_time,
                 operation_type=OperationType.STOP_HMI_SERVER,
                 operation_content=user.user_name
             )

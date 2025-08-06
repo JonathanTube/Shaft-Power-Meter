@@ -26,15 +26,21 @@ class JM3846Thrust:
             # 等待数据累积
             await asyncio.sleep(10)
 
-            if gdata.test_mode_running:
+            if gdata.configTest.test_mode_running:
+                logging.info('test mode is running, skip recording thrust.')
                 break
 
-            # 处理数据
-            if gdata.zero_cal_sps_thrust_is_running:
-                logging.info('test mode is running, skip recording thrust.')
-                continue
+            if name == 'sps':
+                if gdata.configSPS.zero_cal_sps_thrust_is_running:
+                    logging.info('SPS is doing zero cal., skip recording thrust.')
+                    continue
+            else:
+                if gdata.configSPS2.zero_cal_sps2_thrust_is_running:
+                    logging.info('SPS2 is doing zero cal., skip recording thrust.')
+                    continue
 
-            ch1_ad = JM3846ThrustUtil.get_avg(self.accumulated_data)
+            # 处理数据
+            ch1_ad = JM3846ThrustUtil.get_avg(self.accumulated_data, self.name)
             self.handle_result(ch1_ad)
 
     def stop(self):
@@ -45,19 +51,21 @@ class JM3846Thrust:
             if ch1_ad is None:
                 return
 
-            ad1_mv_per_v = JM3846Calculator.calculate_mv_per_v(ch1_ad, gdata.gain_1)
+            gain_1 = gdata.configSPS.gain_1 if self.name == 'sps' else gdata.configSPS2.gain_1
+            thrust_offset = gdata.configSPS.sps_thrust_offset if self.name == 'sps' else gdata.configSPS2.sps_thrust_offset
+
+            ad1_mv_per_v = JM3846Calculator.calculate_mv_per_v(ch1_ad, gain_1)
             # 减去偏移量
-            thrust_offset = gdata.sps_thrust_offset if self.name == 'sps' else gdata.sps2_thrust_offset
             ad1_mv_per_v = ad1_mv_per_v - thrust_offset
             thrust = JM3846Calculator.calculate_thrust(ad1_mv_per_v)
             logging.info(f'name=[***{self.name}***],ad1={ch1_ad},ad1_mv_per_v={ad1_mv_per_v}, thrust_offset={thrust_offset}, thrust={thrust}')
 
             if self.name == 'sps':
-                gdata.sps_ad1 = ch1_ad
-                gdata.sps_thrust = thrust
+                gdata.configSPS.sps_ad1 = ch1_ad
+                gdata.configSPS.sps_thrust = thrust
             elif self.name == 'sps2':
-                gdata.sps2_ad1 = ch1_ad
-                gdata.sps2_thrust = thrust
+                gdata.configSPS2.sps_ad1 = ch1_ad
+                gdata.configSPS2.sps_thrust = thrust
 
         except:
             logging.exception('exception occured at JM3846Thrust.handle_result')

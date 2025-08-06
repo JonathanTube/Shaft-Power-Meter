@@ -81,21 +81,21 @@ class TestModeInstant(ft.ResponsiveRow):
         while self.task_running:
             try:
                 if self.sps_speed and self.sps_speed.page:
-                    self.sps_speed.value = f'{gdata.sps_speed} rpm'
+                    self.sps_speed.value = f'{gdata.configSPS.sps_speed} rpm'
                     self.sps_speed.update()
 
                 if self.sps_torque and self.sps_torque.page:
-                    sps_torque_value, sps_torque_unit = UnitParser.parse_torque(gdata.sps_torque, self.system_unit)
+                    sps_torque_value, sps_torque_unit = UnitParser.parse_torque(gdata.configSPS.sps_torque, self.system_unit)
                     self.sps_torque.value = f'{sps_torque_value} {sps_torque_unit}'
                     self.sps_torque.update()
 
                 if self.sps_thrust and self.sps_thrust.page:
-                    sps_thrust_value, sps_thrust_unit = UnitParser.parse_thrust(gdata.sps_thrust, self.system_unit)
+                    sps_thrust_value, sps_thrust_unit = UnitParser.parse_thrust(gdata.configSPS.sps_thrust, self.system_unit)
                     self.sps_thrust.value = f'{sps_thrust_value} {sps_thrust_unit}'
                     self.sps_thrust.update()
 
                 if self.sps_power and self.sps_power.page:
-                    sps_power_value, sps_power_unit = UnitParser.parse_power(gdata.sps_power, self.system_unit)
+                    sps_power_value, sps_power_unit = UnitParser.parse_power(gdata.configSPS.sps_power, self.system_unit)
                     self.sps_power.value = f'{sps_power_value} {sps_power_unit}'
                     self.sps_power.update()
 
@@ -105,17 +105,17 @@ class TestModeInstant(ft.ResponsiveRow):
                         self.sps2_speed.update()
 
                     if self.sps2_torque and self.sps2_torque.page:
-                        sps2_torque_value, sps2_torque_unit = UnitParser.parse_torque(gdata.sps2_torque, self.system_unit)
+                        sps2_torque_value, sps2_torque_unit = UnitParser.parse_torque(gdata.configSPS2.sps_torque, self.system_unit)
                         self.sps2_torque.value = f'{sps2_torque_value} {sps2_torque_unit}'
                         self.sps2_torque.update()
 
                     if self.sps2_thrust and self.sps2_thrust.page:
-                        sps2_thrust_value, sps2_thrust_unit = UnitParser.parse_thrust(gdata.sps2_thrust, self.system_unit)
+                        sps2_thrust_value, sps2_thrust_unit = UnitParser.parse_thrust(gdata.configSPS2.sps_thrust, self.system_unit)
                         self.sps2_thrust.value = f'{sps2_thrust_value} {sps2_thrust_unit}'
                         self.sps2_thrust.update()
 
                     if self.sps2_power and self.sps2_power.page:
-                        sps2_power_value, sps2_power_unit = UnitParser.parse_power(gdata.sps2_power, self.system_unit)
+                        sps2_power_value, sps2_power_unit = UnitParser.parse_power(gdata.configSPS2.sps_power, self.system_unit)
                         self.sps2_power.value = f'{sps2_power_value} {sps2_power_unit}'
                         self.sps2_power.update()
             except:

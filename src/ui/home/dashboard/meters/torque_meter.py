@@ -37,12 +37,12 @@ class TorqueMeter(ft.Container):
                 return
 
             if self.name == "sps":
-                if gdata.sps_torque is not None:
-                    torque_and_unit = UnitParser.parse_torque(gdata.sps_torque, self.system_unit)
-                    self.content.set_data(gdata.sps_torque, torque_and_unit[0], torque_and_unit[1])
+                if gdata.configSPS.sps_torque is not None:
+                    torque_and_unit = UnitParser.parse_torque(gdata.configSPS.sps_torque, self.system_unit)
+                    self.content.set_data(gdata.configSPS.sps_torque, torque_and_unit[0], torque_and_unit[1])
             else:
-                if gdata.sps2_torque is not None:
-                    torque_and_unit = UnitParser.parse_torque(gdata.sps2_torque, self.system_unit)
-                    self.content.set_data(gdata.sps2_torque, torque_and_unit[0], torque_and_unit[1])
+                if gdata.configSPS.sps_torque is not None:
+                    torque_and_unit = UnitParser.parse_torque(gdata.configSPS.sps_torque, self.system_unit)
+                    self.content.set_data(gdata.configSPS.sps_torque, torque_and_unit[0], torque_and_unit[1])
         except:
             logging.exception('exception occured at TorqueMeter.reload')

@@ -116,7 +116,7 @@ class EventForm(ft.AlertDialog):
             self.event_log.save()
             OperationLog.create(
                 user_id=user.id,
-                utc_date_time=gdata.utc_date_time,
+                utc_date_time=gdata.configDateTime.utc_date_time,
                 operation_type=OperationType.IO_CONF,
                 operation_content=model_to_dict(self.event_log)
             )

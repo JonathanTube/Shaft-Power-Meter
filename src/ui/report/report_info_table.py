@@ -14,7 +14,7 @@ class ReportInfoTable(AbstractTable):
     def __init__(self):
         super().__init__()
         self.file_picker = None
-        self.table_width = gdata.default_table_width
+        self.table_width = gdata.configCommon.default_table_width
 
         datetime_conf: DateTimeConf = DateTimeConf.get()
         date_format = datetime_conf.date_format

@@ -18,7 +18,7 @@ class JM38460x03Async:
         )
 
     @staticmethod
-    def parse_response(data: bytes):
+    def parse_response(data: bytes, name: str):
         try:
             # 解析MBAP头
             _, _, length, _ = struct.unpack(">HHHB", data[:7])
@@ -32,13 +32,20 @@ class JM38460x03Async:
             values = [struct.unpack(">H", data_bytes[i:i+2])[0]
                       for i in range(0, byte_count, 2)]
 
-            gdata.ch_sel_1 = (values[2] >> 8) & 0xFF
-            gdata.gain_1 = JM38460x03Async.parse_gain((values[3] >> 8) & 0xFF)
-            gdata.ch_sel_0 = values[2] & 0xFF
-            gdata.gain_0 = JM38460x03Async.parse_gain(values[3] & 0xFF)
-            gdata.speed_sel = bool(values[4] & 0x01)
-            gdata.sample_rate = values[5]
-
+            if name == 'sps':
+                gdata.configSPS.ch_sel_1 = (values[2] >> 8) & 0xFF
+                gdata.configSPS.gain_1 = JM38460x03Async.parse_gain((values[3] >> 8) & 0xFF)
+                gdata.configSPS.ch_sel_0 = values[2] & 0xFF
+                gdata.configSPS.gain_0 = JM38460x03Async.parse_gain(values[3] & 0xFF)
+                gdata.configSPS.speed_sel = bool(values[4] & 0x01)
+                gdata.configSPS.sample_rate = values[5]
+            else:
+                gdata.configSPS2.ch_sel_1 = (values[2] >> 8) & 0xFF
+                gdata.configSPS2.gain_1 = JM38460x03Async.parse_gain((values[3] >> 8) & 0xFF)
+                gdata.configSPS2.ch_sel_0 = values[2] & 0xFF
+                gdata.configSPS2.gain_0 = JM38460x03Async.parse_gain(values[3] & 0xFF)
+                gdata.configSPS2.speed_sel = bool(values[4] & 0x01)
+                gdata.configSPS2.sample_rate = values[5]
         except:
             logging.exception(
                 f"exception occured at JM38460x03Async.parse_response"

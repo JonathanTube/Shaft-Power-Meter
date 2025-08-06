@@ -13,7 +13,7 @@ class PermissionTable(AbstractTable):
     def __init__(self, user: User):
         super().__init__()
         self.op_user = user
-        self.table_width = gdata.default_table_width - 150
+        self.table_width = gdata.configCommon.default_table_width - 150
 
     def load_total(self):
         role = self.kwargs.get("role")
@@ -159,7 +159,7 @@ class PermissionTable(AbstractTable):
             User.update(user_pwd=encrypt_password, user_role=self.role.value).where(User.id == user_id).execute()
             OperationLog.create(
                 user_id=self.op_user.id,
-                utc_date_time=gdata.utc_date_time,
+                utc_date_time=gdata.configDateTime.utc_date_time,
                 operation_type=OperationType.USER_UPDATE,
                 operation_content=model_to_dict(User.select(User.id, User.user_name).where(User.id == user_id).get())
             )
@@ -190,7 +190,7 @@ class PermissionTable(AbstractTable):
             self.page.close(self.del_dialog)
             OperationLog.create(
                 user_id=self.op_user.id,
-                utc_date_time=gdata.utc_date_time,
+                utc_date_time=gdata.configDateTime.utc_date_time,
                 operation_type=OperationType.USER_DELETE,
                 operation_content=model_to_dict(User.select(User.id, User.user_name).where(User.id == user_id).get())
             )

@@ -22,7 +22,7 @@ class TestMode(ft.Container):
         self.running = test_mode_task.is_running
         self.preference: Preference = Preference.get()
 
-        self.last_op_utc_date_time = gdata.utc_date_time
+        self.last_op_utc_date_time = gdata.configDateTime.utc_date_time
 
         self.op_user = None
 
@@ -94,8 +94,8 @@ class TestMode(ft.Container):
 
         self.auto_test_button = ft.FilledButton(
             height=40,
-            text=self.page.session.get('lang.button.stop_fatigue_testing') if gdata.auto_testing else self.page.session.get('lang.button.start_fatigue_testing'),
-            bgcolor=ft.Colors.RED if gdata.auto_testing else ft.Colors.GREEN,
+            text=self.page.session.get('lang.button.stop_fatigue_testing') if gdata.configTest.auto_testing else self.page.session.get('lang.button.start_fatigue_testing'),
+            bgcolor=ft.Colors.RED if gdata.configTest.auto_testing else ft.Colors.GREEN,
             color=ft.Colors.WHITE,
             icon=ft.Icons.AUTO_MODE_OUTLINED,
             icon_color=ft.Colors.WHITE,
@@ -116,7 +116,7 @@ class TestMode(ft.Container):
 
     def __on_toggle_auto_test(self):
         try:
-            if gdata.auto_testing:
+            if gdata.configTest.auto_testing:
                 self.auto_test_button.bgcolor = ft.Colors.GREEN
                 self.auto_test_button.text = self.page.session.get('lang.button.start_fatigue_testing')
             else:
@@ -124,7 +124,7 @@ class TestMode(ft.Container):
                 self.auto_test_button.text = self.page.session.get('lang.button.stop_fatigue_testing')
 
             self.auto_test_button.update()
-            gdata.auto_testing = not gdata.auto_testing
+            gdata.configTest.auto_testing = not gdata.configTest.auto_testing
         except:
             Toast.show_error(self.page, "__on_toggle_auto_test failed.")
 
@@ -158,15 +158,15 @@ class TestMode(ft.Container):
 
             OperationLog.create(
                 user_id=self.op_user.id,
-                utc_date_time=gdata.utc_date_time,
+                utc_date_time=gdata.configDateTime.utc_date_time,
                 operation_type=OperationType.TEST_MODE_CONF,
                 operation_content='started test mode'
             )
             # 将sps设备设置为在线，防止offline_task 写入默认值
-            gdata.sps_offline = False
-            gdata.sps2_offline = False
+            gdata.configSPS.sps_offline = False
+            gdata.configSPS2.sps2_offline = False
             self.running = True
-            gdata.test_mode_running = True
+            gdata.configTest.test_mode_running = True
             Toast.show_success(self.page)
         except:
             Toast.show_error(self.page, "start test mode failed.")
@@ -187,16 +187,16 @@ class TestMode(ft.Container):
 
             OperationLog.create(
                 user_id=self.op_user.id,
-                utc_date_time=gdata.utc_date_time,
+                utc_date_time=gdata.configDateTime.utc_date_time,
                 operation_type=OperationType.TEST_MODE_CONF,
                 operation_content='stopped test mode'
             )
 
             # 恢复现场
-            gdata.test_mode_running = False
-            gdata.eexi_breach = False
-            gdata.sps_offline = True
-            gdata.sps2_offline = True
+            gdata.configTest.test_mode_running = False
+            gdata.configPropperCurve.eexi_breach = False
+            gdata.configSPS.sps_offline = True
+            gdata.configSPS2.sps2_offline = True
             # 这里只需要回复power_overload的告警，alarm不需要管。
             self.page.run_task(plc.write_power_overload, False)
             Toast.show_success(self.page)
@@ -206,7 +206,7 @@ class TestMode(ft.Container):
     async def __auto_lock(self):
         while self.task_running:
             try:
-                time_diff = gdata.utc_date_time - self.last_op_utc_date_time
+                time_diff = gdata.configDateTime.utc_date_time - self.last_op_utc_date_time
                 if time_diff.total_seconds() > 60 * 10:
                     self.__create_lock_button()
                     self.update()
@@ -217,7 +217,7 @@ class TestMode(ft.Container):
 
     def did_mount(self):
         self.task_running = True
-        if not gdata.auto_testing:
+        if not gdata.configTest.auto_testing:
             self.page.open(self.permission_check)
         self.task = self.page.run_task(self.__auto_lock)
 

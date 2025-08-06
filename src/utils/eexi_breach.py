@@ -15,19 +15,27 @@ class EEXIBreach:
     @staticmethod
     def handle_breach_and_recovery():
         # logging.info('==================eexi_breach_task: start==================')
-        if not gdata.shapoli:
+        if not gdata.configCommon.shapoli:
             return
+
+        utc_date_time = gdata.configDateTime.utc_date_time
+        is_twins = gdata.configCommon.amount_of_propeller == 2
 
         # 如果正在突破，则保存突破报告明细
         if EEXIBreach.report_id is not None:
-            EEXIBreach.__save_report_detail('sps', gdata.utc_date_time, gdata.sps_speed, gdata.sps_torque, gdata.sps_power)
+            EEXIBreach.__save_report_detail(
+                'sps', utc_date_time,
+                gdata.configSPS.sps_speed, gdata.configSPS.sps_torque, gdata.configSPS.sps_power
+            )
             # 如果是双桨，则保存双桨的报告明细
-            is_twins = gdata.amount_of_propeller == 2
             if is_twins:
-                EEXIBreach.__save_report_detail('sps2', gdata.utc_date_time, gdata.sps2_speed, gdata.sps2_torque, gdata.sps2_power)
+                EEXIBreach.__save_report_detail(
+                    'sps2', utc_date_time,
+                    gdata.configSPS2.sps_speed, gdata.configSPS2.sps_torque, gdata.configSPS2.sps_power
+                )
 
-        seconds = gdata.eexi_breach_checking_duration
-        start_time = gdata.utc_date_time - timedelta(seconds=seconds)
+        seconds = gdata.configCommon.eexi_breach_checking_duration
+        start_time = utc_date_time - timedelta(seconds=seconds)
 
         # 再减去数据刷新间隔，类似滑动窗口，因为下位机数据采集间隔是1s，所以需要减去1s
         start_time = start_time - timedelta(seconds=1)
@@ -38,15 +46,15 @@ class EEXIBreach:
         # 查询在时间窗口内，功率大于eexi的记录数
         count_power_above_eexi = 0
 
-        if gdata.amount_of_propeller == 1:
+        if not is_twins:
             count_power_below_eexi = DataLog.select().where(
                 DataLog.utc_date_time >= start_time,
-                DataLog.power <= gdata.eexi_limited_power
+                DataLog.power <= gdata.configCommon.eexi_limited_power
             ).count()
 
             count_power_above_eexi = DataLog.select().where(
                 DataLog.utc_date_time >= start_time,
-                DataLog.power > gdata.eexi_limited_power
+                DataLog.power > gdata.configCommon.eexi_limited_power
             ).count()
         else:
             count_power_below_eexi = DataLog.select().where(
@@ -54,7 +62,7 @@ class EEXIBreach:
             ).group_by(
                 DataLog.utc_date_time
             ).having(
-                fn.SUM(DataLog.power) <= gdata.eexi_limited_power
+                fn.SUM(DataLog.power) <= gdata.configCommon.eexi_limited_power
             ).count()
 
             count_power_above_eexi = DataLog.select().where(
@@ -62,9 +70,8 @@ class EEXIBreach:
             ).group_by(
                 DataLog.utc_date_time
             ).having(
-                fn.SUM(DataLog.power) > gdata.eexi_limited_power
+                fn.SUM(DataLog.power) > gdata.configCommon.eexi_limited_power
             ).count()
-
 
         # 如果相等，说明没有数据，跳过所有判断，保持原样
         if count_power_below_eexi == count_power_above_eexi:
@@ -78,15 +85,13 @@ class EEXIBreach:
         if count_power_above_eexi == 0:
             EEXIBreach.__handle_recovery_event(start_time)
 
-
-
     @staticmethod
     def __handle_breach_event(start_time: datetime):
         # 如果还没有创建报告，则创建报告
         if EEXIBreach.report_id is None:
-            gdata.eexi_breach = True
+            gdata.configPropperCurve.eexi_breach = True
 
-            event_log: EventLog = EventLog.create(started_at=start_time, started_position=gdata.gps_location)
+            event_log: EventLog = EventLog.create(started_at=start_time, started_position=gdata.configGps.gps_location)
 
             report_info = ReportInfo.create(event_log=event_log, report_name=f"Compliance Report #{event_log.id}")
 
@@ -107,17 +112,17 @@ class EEXIBreach:
     @staticmethod
     def __handle_recovery_event(start_time: datetime):
         if EEXIBreach.report_id is not None:
-            gdata.eexi_breach = False
+            gdata.configPropperCurve.eexi_breach = False
             event_log: EventLog = EventLog.select().where(EventLog.ended_at == None).order_by(EventLog.id.asc()).first()
 
             if event_log is not None:
-                event_log.ended_at = gdata.utc_date_time
-                event_log.ended_position = gdata.gps_location
+                event_log.ended_at = gdata.configDateTime.utc_date_time
+                event_log.ended_position = gdata.configGps.gps_location
                 event_log.save()
 
             EEXIBreach.report_id = None
             # 记录之前所有的恢复数据
-            data:list[DataLog] = DataLog.select(
+            data: list[DataLog] = DataLog.select(
                 DataLog.name, DataLog.utc_date_time, DataLog.speed, DataLog.ad_0_torque, DataLog.power
             ).where(
                 DataLog.utc_date_time >= start_time

@@ -33,7 +33,7 @@ class DualInstantPower(ft.Container):
             self.__create_power_sps2()
             self.__create_power_total()
 
-            controls=[]
+            controls = []
 
             if self.power_total:
                 controls.append(self.power_total)
@@ -52,17 +52,19 @@ class DualInstantPower(ft.Container):
                     spacing=0,
                     controls=controls
                 )
-                self.content = SimpleCard(title=self.page.session.get("lang.common.power"), body=content)  
+                self.content = SimpleCard(title=self.page.session.get("lang.common.power"), body=content)
 
         except:
             logging.exception('exception occured at DualInstantPower.build')
 
-
-    def reload(self): 
-        try:  
-            power_sps = UnitParser.parse_power(gdata.sps_power, self.unit)
-            power_sps2 = UnitParser.parse_power(gdata.sps2_power, self.unit)
-            power_total = UnitParser.parse_power(gdata.sps_power + gdata.sps2_power, self.unit)
+    def reload(self):
+        try:
+            power_sps = UnitParser.parse_power(gdata.configSPS.sps_power, self.unit)
+            power_sps2 = UnitParser.parse_power(gdata.configSPS2.sps_power, self.unit)
+            power_total = UnitParser.parse_power(
+                gdata.configSPS.sps_power + gdata.configSPS2.sps_power,
+                self.unit
+            )
 
             self.power_sps_value.value = power_sps[0]
             self.power_sps_unit.value = power_sps[1]
@@ -78,7 +80,6 @@ class DualInstantPower(ft.Container):
 
         except:
             logging.exception('exception occured at DualInstantGrid.reload')
-
 
     def __create_power_sps(self):
         try:
@@ -99,7 +100,7 @@ class DualInstantPower(ft.Container):
                 weight=ft.FontWeight.W_500
             )
             self.power_sps_unit = ft.Text(
-                value='W', 
+                value='W',
                 width=40,
                 text_align=ft.TextAlign.LEFT,
                 size=self.font_size_of_unit,
@@ -135,7 +136,7 @@ class DualInstantPower(ft.Container):
                 weight=ft.FontWeight.W_500
             )
             self.power_sps2_unit = ft.Text(
-                value='W', 
+                value='W',
                 width=40,
                 text_align=ft.TextAlign.LEFT,
                 size=self.font_size_of_unit,
@@ -151,7 +152,6 @@ class DualInstantPower(ft.Container):
 
         except:
             logging.exception('exception occured at DualInstantGrid.__create_power_sps2')
-
 
     def __create_power_total(self):
         try:

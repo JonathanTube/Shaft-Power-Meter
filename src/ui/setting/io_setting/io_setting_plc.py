@@ -289,7 +289,7 @@ class IOSettingPLC(ft.Container):
 
             OperationLog.create(
                 user_id=user.id,
-                utc_date_time=gdata.utc_date_time,
+                utc_date_time=gdata.configDateTime.utc_date_time,
                 operation_type=OperationType.CONNECT_TO_PLC,
                 operation_content=user.user_name
             )
@@ -309,7 +309,7 @@ class IOSettingPLC(ft.Container):
 
             OperationLog.create(
                 user_id=user.id,
-                utc_date_time=gdata.utc_date_time,
+                utc_date_time=gdata.configDateTime.utc_date_time,
                 operation_type=OperationType.DISCONNECT_FROM_PLC,
                 operation_content=user.user_name
             )

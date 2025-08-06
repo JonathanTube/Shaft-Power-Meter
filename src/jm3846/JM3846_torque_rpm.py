@@ -26,14 +26,12 @@ class JM3846TorqueRpm:
             # 等待数据累积
             await asyncio.sleep(2)
 
-            if gdata.test_mode_running:
-                logging.info(
-                    'test mode is running, skip recording torque and rpm.'
-                )
+            if gdata.configTest.test_mode_running:
+                logging.info('test mode is running, skip recording torque and rpm.')
                 continue
 
             # 处理数据
-            result = JM3846TorqueRpmUtil.get_avg(self.accumulated_data)
+            result = JM3846TorqueRpmUtil.get_avg(self.accumulated_data, name)
             self.handle_result(result[0], result[1])
 
     def stop(self):
@@ -43,24 +41,26 @@ class JM3846TorqueRpm:
         try:
             if self.name == 'sps':
                 if ch0_ad:
-                    gdata.sps_ad0 = ch0_ad
-                    gdata.sps_torque = self.cal_torque(ch0_ad, gdata.sps_torque_offset)
+                    gdata.configSPS.sps_ad0 = ch0_ad
+                    gdata.configSPS.sps_torque = self.cal_torque(ch0_ad)
                 if rpm:
-                    gdata.sps_speed = round(rpm / 10, 2)
+                    gdata.configSPS.sps_speed = round(rpm / 10, 2)
             else:
                 if ch0_ad:
-                    gdata.sps2_ad0 = ch0_ad
-                    gdata.sps2_torque = self.cal_torque(ch0_ad, gdata.sps2_torque_offset)
+                    gdata.configSPS2.sps_ad0 = ch0_ad
+                    gdata.configSPS2.sps_torque = self.cal_torque(ch0_ad)
                 if rpm:
-                    gdata.sps2_speed = round(rpm / 10, 2)
+                    gdata.configSPS2.sps_speed = round(rpm / 10, 2)
 
         except:
             logging.exception(
                 'exception occured at JM3846TorqueRpm.handle_result')
 
-    def cal_torque(self, ch0_ad, torque_offset):
+    def cal_torque(self, ch0_ad):
         try:
-            ad0_mv_per_v = JM3846Calculator.calculate_mv_per_v(ch0_ad, gdata.gain_0)
+            torque_offset = gdata.configSPS.sps_torque_offset if self.name == 'sps' else gdata.configSPS2.sps2_torque_offset
+            gain_0 = gdata.configSPS.gain_0 if self.name == 'sps' else gdata.configSPS2.gain_0
+            ad0_mv_per_v = JM3846Calculator.calculate_mv_per_v(ch0_ad, gain_0)
             # 减去偏移量
             ad0_mv_per_v = ad0_mv_per_v - torque_offset
             ad0_microstrain = JM3846Calculator.calculate_microstrain(ad0_mv_per_v)

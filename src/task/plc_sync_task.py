@@ -34,7 +34,7 @@ class PlcSyncTask:
             self._is_canceled = False
 
             self._retry = 0
-            while gdata.is_master and self._retry < self._max_retries:
+            while gdata.configCommon.is_master and self._retry < self._max_retries:
                 # 如果是手动取消，直接跳出
                 if self._is_canceled:
                     break
@@ -71,7 +71,7 @@ class PlcSyncTask:
             self._is_canceled = False
 
     async def heart_beat(self):
-        while gdata.is_master and self.plc_client is not None and self.plc_client.connected:
+        while gdata.configCommon.is_master and self.plc_client is not None and self.plc_client.connected:
             if self._is_canceled:
                 return
 
@@ -262,7 +262,7 @@ class PlcSyncTask:
             cnt: int = AlarmLog.select().where(AlarmLog.alarm_type == AlarmType.MASTER_PLC_DISCONNECTED, AlarmLog.is_recovery == False).count()
             if cnt == 0:
                 logging.info('[***PLC***] create alarm')
-                AlarmLog.create(utc_date_time=gdata.utc_date_time, alarm_type=AlarmType.MASTER_PLC_DISCONNECTED, is_from_master=gdata.is_master)
+                AlarmLog.create(utc_date_time=gdata.configDateTime.utc_date_time, alarm_type=AlarmType.MASTER_PLC_DISCONNECTED, is_from_master=gdata.configCommon.is_master)
             else:
                 logging.info('[***PLC***] alarm exists, skip')
         except:
@@ -272,7 +272,7 @@ class PlcSyncTask:
         try:
             logging.info('[***PLC***] recovery PLC Alarm')
             AlarmLog.update(is_recovery=True).where(AlarmLog.alarm_type == AlarmType.MASTER_PLC_DISCONNECTED).execute()
-            AlarmLog.create(utc_date_time=gdata.utc_date_time, alarm_type=AlarmType.MASTER_PLC_CONNECTED, is_recovery=True, is_from_master=gdata.is_master)
+            AlarmLog.create(utc_date_time=gdata.configDateTime.utc_date_time, alarm_type=AlarmType.MASTER_PLC_CONNECTED, is_recovery=True, is_from_master=gdata.configCommon.is_master)
 
             cnt: int = AlarmLog.select().where(AlarmLog.is_recovery == False).count()
             if cnt == 0:

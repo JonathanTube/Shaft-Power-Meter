@@ -23,7 +23,7 @@ class SingleInstantSpeed(ft.Container):
 
     def reload(self):
         try:
-            speed = UnitParser.parse_speed(gdata.sps_speed)
+            speed = UnitParser.parse_speed(gdata.configSPS.sps_speed)
             self.speed_value.value = speed[0]
             self.speed_value.update()
             self.speed_unit.value = speed[1]

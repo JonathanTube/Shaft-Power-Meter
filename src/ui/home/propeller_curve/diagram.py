@@ -205,14 +205,14 @@ class PropellerCurveDiagram(ft.Container):
                 if self.rpm_of_mcr == 0 or self.power_of_mcr == 0:
                     return
 
-                sps_percent_rpm_of_mcr = round(gdata.sps_speed / self.rpm_of_mcr * 100, 2)
-                sps_percent_power_of_mcr = round(gdata.sps_power / self.power_of_mcr * 100, 2)
+                sps_percent_rpm_of_mcr = round(gdata.configSPS.sps_speed / self.rpm_of_mcr * 100, 2)
+                sps_percent_power_of_mcr = round(gdata.configSPS.sps_power / self.power_of_mcr * 100, 2)
                 self.sps_point.set_offsets([sps_percent_rpm_of_mcr, sps_percent_power_of_mcr])
                 self.sps_text.set_x(sps_percent_rpm_of_mcr)
                 self.sps_text.set_y(sps_percent_power_of_mcr + 1)
 
-                sps2_percent_rpm_of_mcr = round(gdata.sps2_speed / self.rpm_of_mcr * 100, 2)
-                sps2_percent_power_of_mcr = round(gdata.sps2_power / self.power_of_mcr * 100, 2)
+                sps2_percent_rpm_of_mcr = round(gdata.configSPS2.sps_speed / self.rpm_of_mcr * 100, 2)
+                sps2_percent_power_of_mcr = round(gdata.configSPS2.sps_power / self.power_of_mcr * 100, 2)
                 self.sps2_point.set_offsets([sps2_percent_rpm_of_mcr, sps2_percent_power_of_mcr])
                 self.sps2_text.set_x(sps2_percent_rpm_of_mcr)
                 self.sps2_text.set_y(sps2_percent_power_of_mcr + 1)

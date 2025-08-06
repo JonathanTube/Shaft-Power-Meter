@@ -66,5 +66,5 @@ class PropellerConfMcr(ft.Container):
         else:
             self.ps.shaft_power_of_mcr_operating_point = UnitConverter.shp_to_w(shaft_power)
 
-        gdata.power_of_mcr = float(self.ps.shaft_power_of_mcr_operating_point)
-        gdata.speed_of_mcr = int(self.ps.rpm_of_mcr_operating_point)
+        gdata.configPropperCurve.power_of_mcr = float(self.ps.shaft_power_of_mcr_operating_point)
+        gdata.configPropperCurve.speed_of_mcr = int(self.ps.rpm_of_mcr_operating_point)

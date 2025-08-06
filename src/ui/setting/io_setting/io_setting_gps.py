@@ -92,7 +92,7 @@ class IOSettingGPS(ft.Container):
 
             OperationLog.create(
                 user_id=user.id,
-                utc_date_time=gdata.utc_date_time,
+                utc_date_time=gdata.configDateTime.utc_date_time,
                 operation_type=OperationType.CONNECT_TO_GPS,
                 operation_content=user.user_name
             )
@@ -109,12 +109,12 @@ class IOSettingGPS(ft.Container):
 
             OperationLog.create(
                 user_id=user.id,
-                utc_date_time=gdata.utc_date_time,
+                utc_date_time=gdata.configDateTime.utc_date_time,
                 operation_type=OperationType.DISCONNECT_FROM_GPS,
                 operation_content=user.user_name
             )
             self.page.run_task(gps.close)
-            AlarmSaver.create(alarm_type=AlarmType.MASTER_GPS_DISCONNECTED if gdata.is_master else AlarmType.SLAVE_GPS_DISCONNECTED)
+            AlarmSaver.create(alarm_type=AlarmType.MASTER_GPS_DISCONNECTED if gdata.configCommon.is_master else AlarmType.SLAVE_GPS_DISCONNECTED)
         except:
             logging.exception("exception occured at IOSettingGPS.__on_close")
 

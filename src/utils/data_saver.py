@@ -16,7 +16,7 @@ class DataSaver:
     @staticmethod
     def save(name: str, torque: float, thrust: float, speed: float):
         try:
-            utc_date_time = gdata.utc_date_time
+            utc_date_time = gdata.configDateTime.utc_date_time
             power = FormulaCalculator.calculate_instant_power(torque, speed)
             # delete invalid data which is over than 3 months.
             DataLog.delete().where(DataLog.utc_date_time < utc_date_time - timedelta(weeks=4 * 3)).execute()
@@ -32,7 +32,7 @@ class DataSaver:
                 is_overload=is_overload
             )
             # 保存瞬时数据
-            if gdata.is_master and plc.is_connected:
+            if gdata.configCommon.is_master and plc.is_connected:
                 asyncio.create_task(plc.write_instant_data(power, torque, thrust, speed))
 
             # save counter log of total
@@ -53,21 +53,21 @@ class DataSaver:
             )
 
             if name == 'sps':
-                gdata.sps_torque = torque
-                gdata.sps_thrust = thrust
-                gdata.sps_speed = speed
-                gdata.sps_power = power
-                if len(gdata.sps_power_history) > 60:
-                    gdata.sps_power_history.pop(0)
-                gdata.sps_power_history.append((power, utc_date_time))
+                gdata.configSPS.sps_torque = torque
+                gdata.configSPS.sps_thrust = thrust
+                gdata.configSPS.sps_speed = speed
+                gdata.configSPS.sps_power = power
+                if len(gdata.configSPS.sps_power_history) > 60:
+                    gdata.configSPS.sps_power_history.pop(0)
+                gdata.configSPS.sps_power_history.append((power, utc_date_time))
             else:
-                gdata.sps2_torque = torque
-                gdata.sps2_thrust = thrust
-                gdata.sps2_speed = speed
-                gdata.sps2_power = power
-                if len(gdata.sps2_power_history) > 60:
-                    gdata.sps2_power_history.pop(0)
-                gdata.sps2_power_history.append((power, utc_date_time))
+                gdata.configSPS2.sps_torque = torque
+                gdata.configSPS2.sps_thrust = thrust
+                gdata.configSPS2.sps_speed = speed
+                gdata.configSPS2.sps_power = power
+                if len(gdata.configSPS2.sps2_power_history) > 60:
+                    gdata.configSPS2.sps2_power_history.pop(0)
+                gdata.configSPS2.sps2_power_history.append((power, utc_date_time))
 
             # 处理EEXI过载和恢复
             EEXIBreach.handle_breach_and_recovery()
@@ -79,18 +79,18 @@ class DataSaver:
     @staticmethod
     def is_overload(speed, power):
         # 这里判断的是overload curve，而不是简单的判断power_of_mcr
-        max_speed = gdata.speed_of_torque_load_limit
-        max_power = gdata.power_of_torque_load_limit + gdata.power_of_overload
+        max_speed = gdata.configPropperCurve.speed_of_torque_load_limit
+        max_power = gdata.configPropperCurve.power_of_torque_load_limit + gdata.configPropperCurve.power_of_overload
         # 相对MCR的转速百分比
-        speed_percentage = speed / gdata.speed_of_mcr * 100
+        speed_percentage = speed / gdata.configPropperCurve.speed_of_mcr * 100
         # 理论的overload的功率阈值
         overload_power_percentage = round((speed_percentage / max_speed) ** 2 * max_power, 2)
         # 实际的功率百分比
-        actual_power_percentage = round(power / gdata.power_of_mcr * 100, 2)
+        actual_power_percentage = round(power / gdata.configPropperCurve.power_of_mcr * 100, 2)
         # logging.info(f"date_saver: overload_power_percentage={overload_power_percentage}, actual_power_percentage={actual_power_percentage}")
         overload: bool = actual_power_percentage > overload_power_percentage
 
-        if gdata.alarm_enabled_of_overload_curve:
+        if gdata.configPropperCurve.alarm_enabled_of_overload_curve:
             if overload:  # 处理功率过载
                 AlarmSaver.create(AlarmType.POWER_OVERLOAD)
                 # 写入plc-overload
@@ -115,7 +115,7 @@ class DataSaver:
                 total_speed=speed,
                 total_power=power,
                 times=1,
-                start_utc_date_time=gdata.utc_date_time,
+                start_utc_date_time=gdata.configDateTime.utc_date_time,
                 counter_status="running"
             )
         else:

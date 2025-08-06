@@ -58,7 +58,7 @@ class AudioAlarm(ft.Container):
             self.notify_eexi_breach(False)
             event_log: EventLog = EventLog.select().order_by(EventLog.id.desc()).first()
             if event_log:
-                event_log.acknowledged_at = gdata.utc_date_time
+                event_log.acknowledged_at = gdata.configDateTime.utc_date_time
                 event_log.save()
 
             if self.content and self.content.page:
@@ -70,7 +70,7 @@ class AudioAlarm(ft.Container):
             logging.exception('exception occured at AudioAlarm.on_mute')
 
     def notify_eexi_breach(self, occured):
-        if gdata.is_master:
+        if gdata.configCommon.is_master:
             # write_eexi_breach_alarm内部会判断是否连接plc
             self.page.run_task(plc.write_eexi_breach_alarm, occured)
         else:

@@ -130,7 +130,7 @@ class GeneralPreference(ft.Container):
 
         OperationLog.create(
             user_id=user_id,
-            utc_date_time=gdata.utc_date_time,
+            utc_date_time=gdata.configDateTime.utc_date_time,
             operation_type=OperationType.GENERAL_PREFERENCE,
             operation_content=model_to_dict(self.preference)
         )

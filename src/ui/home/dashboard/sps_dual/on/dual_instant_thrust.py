@@ -58,8 +58,8 @@ class DualInstantThrust(ft.Container):
 
     def reload(self):
         try:
-            thrust_sps = UnitParser.parse_thrust(gdata.sps_thrust, self.unit)
-            thrust_sps2 = UnitParser.parse_thrust(gdata.sps2_thrust, self.unit)
+            thrust_sps = UnitParser.parse_thrust(gdata.configSPS.sps_thrust, self.unit)
+            thrust_sps2 = UnitParser.parse_thrust(gdata.configSPS2.sps_thrust, self.unit)
 
             self.thrust_sps_value.value = thrust_sps[0]
             self.thrust_sps_unit.value = thrust_sps[1]

@@ -28,7 +28,7 @@ class DualInstantTorque(ft.Container):
         try:
             if self.page is None or self.page.session is None:
                 return
-            
+
             self.__create_torque_sps()
             self.__create_torque_sps2()
 
@@ -52,11 +52,10 @@ class DualInstantTorque(ft.Container):
         except:
             logging.exception('exception occured at DualInstantTorque.build')
 
-
     def reload(self):
         try:
-            torque_sps = UnitParser.parse_torque(gdata.sps_torque, self.unit)
-            torque_sps2 = UnitParser.parse_torque(gdata.sps2_torque, self.unit)
+            torque_sps = UnitParser.parse_torque(gdata.configSPS.sps_torque, self.unit)
+            torque_sps2 = UnitParser.parse_torque(gdata.configSPS2.sps_torque, self.unit)
 
             self.torque_sps_value.value = torque_sps[0]
             self.torque_sps_unit.value = torque_sps[1]
@@ -68,7 +67,6 @@ class DualInstantTorque(ft.Container):
                 self.content.update()
         except:
             logging.exception('exception occured at DualInstantTorque.reload')
-
 
     def __create_torque_sps(self):
         try:
@@ -89,7 +87,7 @@ class DualInstantTorque(ft.Container):
                 weight=ft.FontWeight.W_500
             )
             self.torque_sps_unit = ft.Text(
-                value='Nm', 
+                value='Nm',
                 width=40,
                 text_align=ft.TextAlign.LEFT,
                 size=self.font_size_of_unit,
@@ -105,12 +103,11 @@ class DualInstantTorque(ft.Container):
         except:
             logging.exception('exception occured at DualInstantTorque.__create_torque_sps')
 
-
     def __create_torque_sps2(self):
         try:
             if self.page is None or self.page.session is None:
                 return
-            
+
             self.sps2_label = ft.Text(
                 value=self.page.session.get("lang.common.sps2"),
                 text_align=ft.TextAlign.END,
@@ -125,7 +122,7 @@ class DualInstantTorque(ft.Container):
                 weight=ft.FontWeight.W_500
             )
             self.torque_sps2_unit = ft.Text(
-                value='Nm', 
+                value='Nm',
                 width=40,
                 text_align=ft.TextAlign.LEFT,
                 size=self.font_size_of_unit,
@@ -140,4 +137,3 @@ class DualInstantTorque(ft.Container):
                 ])
         except:
             logging.exception('exception occured at DualInstantTorque.__create_torque_sps2')
-

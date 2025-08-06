@@ -36,8 +36,8 @@ class JM3846AsyncClient:
     @property
     def is_connected(self):
         if self.name == 'sps':
-            return not gdata.sps_offline
-        return not gdata.sps2_offline
+            return not gdata.configSPS.sps_offline
+        return not gdata.configSPS2.sps2_offline
 
     @abstractmethod
     def get_ip_port() -> tuple[str, int]:
@@ -48,7 +48,7 @@ class JM3846AsyncClient:
             self._is_canceled = False
             self._retry = 0  # 重置重试计数器
 
-            while gdata.is_master and self._retry < self._max_retries:
+            while gdata.configCommon.is_master and self._retry < self._max_retries:
                 if self._is_canceled:
                     break
 
@@ -157,9 +157,9 @@ class JM3846AsyncClient:
         """持续接收0x44数据"""
         while self._is_running:
             try:
-                if self.name == 'sps2' and int(gdata.amount_of_propeller) == 1:
+                if self.name == 'sps2' and int(gdata.configCommon.amount_of_propeller) == 1:
                     logging.info('exit running since single propeller')
-                    gdata.sps2_offline = True
+                    gdata.configSPS2.sps2_offline = True
                     return
 
                 # 接收响应
@@ -186,17 +186,20 @@ class JM3846AsyncClient:
                     continue
 
                 if func_code == 0x03:
-                    JM38460x03Async.parse_response(response)
+                    JM38460x03Async.parse_response(response, self.name)
                     continue
 
                 if func_code == 0x44:
+                    ch_sel_1 = gdata.configSPS.ch_sel_1 if self.name == 'sps' else gdata.configSPS2.ch_sel_1
+                    ch_sel_0 = gdata.configSPS.ch_sel_0 if self.name == 'sps' else gdata.configSPS2.ch_sel_0
+                    speed_sel = gdata.configSPS.speed_sel if self.name == 'sps' else gdata.configSPS2.speed_sel
                     # 检查配置信息
-                    if any(v is None for v in [gdata.ch_sel_1, gdata.ch_sel_0, gdata.speed_sel]):
+                    if any(v is None for v in [ch_sel_1, ch_sel_0, speed_sel]):
                         # 配置参数为空，直接跳过
                         logging.info("sps config. hasn't been gotten.")
                         continue
 
-                    current_frame: int = JM38460x44Async.parse_response(response)
+                    current_frame: int = JM38460x44Async.parse_response(response, self.name)
 
                     self.set_offline(False)
 
@@ -252,9 +255,9 @@ class JM3846AsyncClient:
             self.recovery_alarm()
 
         if self.name == 'sps':
-            gdata.sps_offline = is_offline
+            gdata.configSPS.sps_offline = is_offline
         elif self.name == 'sps2':
-            gdata.sps2_offline = is_offline
+            gdata.configSPS2.sps2_offline = is_offline
 
     def create_alarm(self):
         if self.name == 'sps':

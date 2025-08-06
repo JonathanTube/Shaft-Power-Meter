@@ -6,7 +6,7 @@ from db.models.date_time_conf import DateTimeConf
 class LogGpsTable(AbstractTable):
     def __init__(self):
         super().__init__()
-        self.table_width = gdata.default_table_width
+        self.table_width = gdata.configCommon.default_table_width
         self.dtc: DateTimeConf = DateTimeConf.get()
 
     def load_total(self):

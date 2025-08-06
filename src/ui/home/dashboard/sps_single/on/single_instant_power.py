@@ -39,7 +39,7 @@ class SingleInstantPower(ft.Container):
 
     def reload(self):
         try:
-            power = UnitParser.parse_power(gdata.sps_power, self.system_unit)
+            power = UnitParser.parse_power(gdata.configSPS.sps_power, self.system_unit)
             self.power_value.value = power[0]
             self.power_unit.value = power[1]
             self.content.update()
