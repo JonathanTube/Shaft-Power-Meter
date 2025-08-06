@@ -101,13 +101,13 @@ class TestModeTask:
             instant_speed = int(random.uniform(self.min_speed, self.max_speed))
             instant_thrust = int(random.uniform(self.min_thrust, self.max_thrust))
             if name == 'sps':
-                gdata.sps_torque = instant_torque
-                gdata.sps_thrust = instant_thrust
-                gdata.sps_speed = instant_speed
+                gdata.configSPS.torque = instant_torque
+                gdata.configSPS.thrust = instant_thrust
+                gdata.configSPS.speed = instant_speed
             if name == 'sps2':
-                gdata.sps2_torque = instant_torque
-                gdata.sps2_thrust = instant_thrust
-                gdata.sps2_speed = instant_speed
+                gdata.configSPS2.torque = instant_torque
+                gdata.configSPS2.thrust = instant_thrust
+                gdata.configSPS2.speed = instant_speed
         except:
             logging.exception('exception occured at save_generated_data')
 
