@@ -31,11 +31,11 @@ class JM3846Thrust:
                 break
 
             if name == 'sps':
-                if gdata.configSPS.zero_cal_sps_thrust_is_running:
+                if gdata.configSPS.zero_cal_thrust_running:
                     logging.info('SPS is doing zero cal., skip recording thrust.')
                     continue
             else:
-                if gdata.configSPS2.zero_cal_sps2_thrust_is_running:
+                if gdata.configSPS2.zero_cal_thrust_running:
                     logging.info('SPS2 is doing zero cal., skip recording thrust.')
                     continue
 
@@ -52,7 +52,7 @@ class JM3846Thrust:
                 return
 
             gain_1 = gdata.configSPS.gain_1 if self.name == 'sps' else gdata.configSPS2.gain_1
-            thrust_offset = gdata.configSPS.sps_thrust_offset if self.name == 'sps' else gdata.configSPS2.sps_thrust_offset
+            thrust_offset = gdata.configSPS.thrust_offset if self.name == 'sps' else gdata.configSPS2.thrust_offset
 
             ad1_mv_per_v = JM3846Calculator.calculate_mv_per_v(ch1_ad, gain_1)
             # 减去偏移量
@@ -61,11 +61,11 @@ class JM3846Thrust:
             logging.info(f'name=[***{self.name}***],ad1={ch1_ad},ad1_mv_per_v={ad1_mv_per_v}, thrust_offset={thrust_offset}, thrust={thrust}')
 
             if self.name == 'sps':
-                gdata.configSPS.sps_ad1 = ch1_ad
-                gdata.configSPS.sps_thrust = thrust
+                gdata.configSPS.ad1 = ch1_ad
+                gdata.configSPS.thrust = thrust
             elif self.name == 'sps2':
-                gdata.configSPS2.sps_ad1 = ch1_ad
-                gdata.configSPS2.sps_thrust = thrust
+                gdata.configSPS2.ad1 = ch1_ad
+                gdata.configSPS2.thrust = thrust
 
         except:
             logging.exception('exception occured at JM3846Thrust.handle_result')

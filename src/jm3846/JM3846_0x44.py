@@ -49,23 +49,23 @@ class JM38460x44Async:
                 data = struct.unpack('<H', payload[i:i+2])[0]
 
                 if name == 'sps':
-                    if gdata.configSPS.zero_cal_sps_torque_is_running:
-                        gdata.configSPS.zero_cal_sps_ad0_for_torque.append(data)
+                    if gdata.configSPS.zero_cal_torque_running:
+                        gdata.configSPS.zero_cal_ad0_for_torque.append(data)
                     else:
                         jm3846_torque_rpm.accumulated_data.append(data)
 
-                    if gdata.configSPS.zero_cal_sps_thrust_is_running:
-                        gdata.configSPS.zero_cal_sps_ad1_for_thrust.append(data)
+                    if gdata.configSPS.zero_cal_thrust_running:
+                        gdata.configSPS.zero_cal_ad1_for_thrust.append(data)
                     else:
                         jm3846_thrust.accumulated_data.append(data)
                 else:
-                    if gdata.configSPS2.zero_cal_sps2_torque_is_running:
-                        gdata.configSPS2.zero_cal_sps2_ad0_for_torque.append(data)
+                    if gdata.configSPS2.zero_cal_torque_running:
+                        gdata.configSPS2.zero_cal_ad0_for_torque.append(data)
                     else:
                         jm3846_torque_rpm.accumulated_data.append(data)
 
-                    if gdata.configSPS2.zero_cal_sps2_thrust_is_running:
-                        gdata.configSPS2.zero_cal_sps2_ad1_for_thrust.append(data)
+                    if gdata.configSPS2.zero_cal_thrust_running:
+                        gdata.configSPS2.zero_cal_ad1_for_thrust.append(data)
                     else:
                         jm3846_thrust.accumulated_data.append(data)
 

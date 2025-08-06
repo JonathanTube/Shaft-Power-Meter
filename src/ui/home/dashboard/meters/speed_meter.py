@@ -34,10 +34,10 @@ class SpeedMeter(ft.Container):
                 return
 
             if self.name == "sps":
-                if gdata.configSPS.sps_speed is not None:
-                    self.content.set_data(gdata.configSPS.sps_speed, gdata.configSPS.sps_speed, "rpm")
+                if gdata.configSPS.speed is not None:
+                    self.content.set_data(gdata.configSPS.speed, gdata.configSPS.speed, "rpm")
             else:
-                if gdata.configSPS2.sps_speed is not None:
-                    self.content.set_data(gdata.configSPS2.sps_speed, gdata.configSPS2.sps_speed, "rpm")
+                if gdata.configSPS2.speed is not None:
+                    self.content.set_data(gdata.configSPS2.speed, gdata.configSPS2.speed, "rpm")
         except:
             logging.exception('exception occured at SpeedMeter.reload')

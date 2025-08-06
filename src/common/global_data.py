@@ -17,7 +17,7 @@ class ConfigCommon:
     eexi_limited_power = 999999
 
     default_table_width = 990
-    alarm_enabled_of_overload_curve = False
+    is_overload_alarm = False
 
     def set_default_value(self):
         systemSettings: SystemSettings = SystemSettings.get()
@@ -44,47 +44,47 @@ class ConfigDateTime:
 class ConfigTest:
     auto_testing = False
     test_mode_running: bool = False
-    test_mode_start_time = None
+    start_time = None
 
 
 @dataclass
 class ConfigGps:
-    gps_raw_data = None
-    gps_location = None
+    raw_data = None
+    location = None
 
     def set_default_value(self):
-        self.gps_raw_data = ""
+        self.raw_data = ""
 
 
 @dataclass
 class ConfigOffline:
     # 默认离线数值
-    sps_offline_torque = 0
-    sps_offline_thrust = 0
-    sps_offline_speed = 0
+    torque = 0
+    thrust = 0
+    speed = 0
 
     def set_default_value(self):
         offline_default_value: OfflineDefaultValue = OfflineDefaultValue.get()
-        self.sps_offline_thrust = offline_default_value.thrust_default_value
-        self.sps_offline_torque = offline_default_value.torque_default_value
-        self.sps_offline_speed = offline_default_value.speed_default_value
+        self.thrust = offline_default_value.thrust_default_value
+        self.torque = offline_default_value.torque_default_value
+        self.speed = offline_default_value.speed_default_value
 
 
 @dataclass
 class ConfigSPS:
-    sps_speed = 0
-    sps_power = 0
-    sps_torque = 0
-    sps_thrust = 0
+    speed = 0
+    power = 0
+    torque = 0
+    thrust = 0
 
-    sps_ad0 = 0
-    sps_ad1 = 0
+    ad0 = 0
+    ad1 = 0
 
-    sps_torque_offset = 0
-    sps_thrust_offset = 0
+    torque_offset = 0
+    thrust_offset = 0
 
-    sps_power_history: list[tuple[float, datetime]] = field(default_factory=list)
-    sps_offline = True
+    power_history: list[tuple[float, datetime]] = field(default_factory=list)
+    is_offline = True
 
     # 0x03 配置相关参数
     ch_sel_1 = None
@@ -94,34 +94,34 @@ class ConfigSPS:
     speed_sel = None
     sample_rate = None
 
-    zero_cal_sps_torque_is_running = False
-    zero_cal_sps_thrust_is_running = False
-    zero_cal_sps_ad0_for_torque: list[float] = field(default_factory=list)
-    zero_cal_sps_ad1_for_thrust: list[float] = field(default_factory=list)
+    zero_cal_torque_running = False
+    zero_cal_thrust_running = False
+    zero_cal_ad0_for_torque: list[float] = field(default_factory=list)
+    zero_cal_ad1_for_thrust: list[float] = field(default_factory=list)
 
     def set_default_value(self):
         # get the last accepted zero cal. record.
         sps_accepted_zero_cal: ZeroCalInfo = ZeroCalInfo.select().where(ZeroCalInfo.name == 'sps').order_by(ZeroCalInfo.id.desc()).first()
         if sps_accepted_zero_cal is not None:
-            self.sps_torque_offset = sps_accepted_zero_cal.torque_offset
-            self.sps_thrust_offset = sps_accepted_zero_cal.thrust_offset
+            self.torque_offset = sps_accepted_zero_cal.torque_offset
+            self.thrust_offset = sps_accepted_zero_cal.thrust_offset
 
 
 @dataclass
 class ConfigSPS2:
-    sps_speed = 0
-    sps_power = 0
-    sps_torque = 0
-    sps_thrust = 0
+    speed = 0
+    power = 0
+    torque = 0
+    thrust = 0
 
-    sps_ad0 = 0
-    sps_ad1 = 0
+    ad0 = 0
+    ad1 = 0
 
-    sps_torque_offset = 0
-    sps_thrust_offset = 0
+    torque_offset = 0
+    thrust_offset = 0
 
-    sps2_power_history: list[tuple[float, datetime]] = field(default_factory=list)
-    sps2_offline: bool = True
+    power_history: list[tuple[float, datetime]] = field(default_factory=list)
+    is_offline: bool = True
 
     # 0x03 配置相关参数
     ch_sel_1 = None
@@ -131,10 +131,10 @@ class ConfigSPS2:
     speed_sel = None
     sample_rate = None
 
-    zero_cal_sps2_torque_is_running = False
-    zero_cal_sps2_thrust_is_running = False
-    zero_cal_sps2_ad0_for_torque: list[float] = field(default_factory=list)
-    zero_cal_sps2_ad1_for_thrust: list[float] = field(default_factory=list)
+    zero_cal_torque_running = False
+    zero_cal_thrust_running = False
+    zero_cal_ad0_for_torque: list[float] = field(default_factory=list)
+    zero_cal_ad1_for_thrust: list[float] = field(default_factory=list)
 
     def set_default_value(self):
         sps2_accepted_zero_cal: ZeroCalInfo = ZeroCalInfo.select().where(ZeroCalInfo.name == 'sps2').order_by(ZeroCalInfo.id.desc()).first()

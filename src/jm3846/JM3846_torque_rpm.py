@@ -41,16 +41,16 @@ class JM3846TorqueRpm:
         try:
             if self.name == 'sps':
                 if ch0_ad:
-                    gdata.configSPS.sps_ad0 = ch0_ad
-                    gdata.configSPS.sps_torque = self.cal_torque(ch0_ad)
+                    gdata.configSPS.ad0 = ch0_ad
+                    gdata.configSPS.torque = self.cal_torque(ch0_ad)
                 if rpm:
-                    gdata.configSPS.sps_speed = round(rpm / 10, 2)
+                    gdata.configSPS.speed = round(rpm / 10, 2)
             else:
                 if ch0_ad:
-                    gdata.configSPS2.sps_ad0 = ch0_ad
-                    gdata.configSPS2.sps_torque = self.cal_torque(ch0_ad)
+                    gdata.configSPS2.ad0 = ch0_ad
+                    gdata.configSPS2.torque = self.cal_torque(ch0_ad)
                 if rpm:
-                    gdata.configSPS2.sps_speed = round(rpm / 10, 2)
+                    gdata.configSPS2.speed = round(rpm / 10, 2)
 
         except:
             logging.exception(
@@ -58,7 +58,7 @@ class JM3846TorqueRpm:
 
     def cal_torque(self, ch0_ad):
         try:
-            torque_offset = gdata.configSPS.sps_torque_offset if self.name == 'sps' else gdata.configSPS2.sps2_torque_offset
+            torque_offset = gdata.configSPS.torque_offset if self.name == 'sps' else gdata.configSPS2.sps2_torque_offset
             gain_0 = gdata.configSPS.gain_0 if self.name == 'sps' else gdata.configSPS2.gain_0
             ad0_mv_per_v = JM3846Calculator.calculate_mv_per_v(ch0_ad, gain_0)
             # 减去偏移量

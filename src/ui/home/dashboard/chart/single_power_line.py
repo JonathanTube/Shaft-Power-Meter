@@ -120,7 +120,7 @@ class SinglePowerLine(ft.Container):
     def __handle_bottom_axis(self):
         try:
             labels = []
-            for index, item in enumerate(gdata.configSPS.sps_power_history):
+            for index, item in enumerate(gdata.configSPS.power_history):
                 # 每隔6个数据点显示一个标签
                 if index % 6 == 0:
                     if len(item) > 1:
@@ -146,11 +146,11 @@ class SinglePowerLine(ft.Container):
     def __handle_data_line(self):
         try:
             data_points = []
-            for index in range(len(gdata.configSPS.sps_power_history)):
-                power_sps = gdata.configSPS.sps_power_history[index][0]
+            for index in range(len(gdata.configSPS.power_history)):
+                power_sps = gdata.configSPS.power_history[index][0]
                 power_sps2 = 0
                 try:
-                    power_sps2 = gdata.configSPS2.sps2_power_history[index][0]
+                    power_sps2 = gdata.configSPS2.power_history[index][0]
                 except IndexError:
                     # 这里有可能是单浆，不处理
                     power_sps2 = 0
@@ -172,7 +172,7 @@ class SinglePowerLine(ft.Container):
         try:
             data_points = []
             power_and_unit = UnitParser.parse_power(self.threshold_power, self.system_unit)
-            for index in range(len(gdata.configSPS.sps_power_history)):
+            for index in range(len(gdata.configSPS.power_history)):
                 data_points.append(ft.LineChartDataPoint(index, power_and_unit[0]))
 
             return data_points

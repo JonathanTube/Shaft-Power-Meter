@@ -54,8 +54,8 @@ class DualInstantTorque(ft.Container):
 
     def reload(self):
         try:
-            torque_sps = UnitParser.parse_torque(gdata.configSPS.sps_torque, self.unit)
-            torque_sps2 = UnitParser.parse_torque(gdata.configSPS2.sps_torque, self.unit)
+            torque_sps = UnitParser.parse_torque(gdata.configSPS.torque, self.unit)
+            torque_sps2 = UnitParser.parse_torque(gdata.configSPS2.torque, self.unit)
 
             self.torque_sps_value.value = torque_sps[0]
             self.torque_sps_unit.value = torque_sps[1]

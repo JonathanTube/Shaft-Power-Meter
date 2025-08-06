@@ -92,10 +92,10 @@ class ModbusOutputTask:
                 low = uint32_value & 0xFFFF           # 低16位
                 return high, low
 
-            sps_torque = int(gdata.configSPS.sps_torque / 100) if self.io_conf.output_torque else 0
-            sps_thrust = int(gdata.configSPS.sps_thrust / 100) if self.io_conf.output_thrust else 0
-            sps_speed = int(gdata.configSPS.sps_speed * 10) if self.io_conf.output_speed else 0
-            sps_power = int(gdata.configSPS.sps_power / 100) if self.io_conf.output_power else 0
+            sps_torque = int(gdata.configSPS.torque / 100) if self.io_conf.output_torque else 0
+            sps_thrust = int(gdata.configSPS.thrust / 100) if self.io_conf.output_thrust else 0
+            sps_speed = int(gdata.configSPS.speed * 10) if self.io_conf.output_speed else 0
+            sps_power = int(gdata.configSPS.power / 100) if self.io_conf.output_power else 0
             sps_avg_power, sps_total_energy = self.get_avg_power_and_energy('sps')
             # 构建寄存器值列表（每个值占2个寄存器）
             values = []
@@ -105,10 +105,10 @@ class ModbusOutputTask:
                 values.append(low)
 
             if self.amount_of_propeller > 1:
-                sps2_torque = int(gdata.configSPS2.sps_torque / 100) if self.io_conf.output_torque else 0
-                sps2_thrust = int(gdata.configSPS2.sps_thrust / 100) if self.io_conf.output_thrust else 0
-                sps2_speed = int(gdata.configSPS2.sps_speed * 10) if self.io_conf.output_speed else 0
-                sps2_power = int(gdata.configSPS2.sps_power / 100) if self.io_conf.output_power else 0
+                sps2_torque = int(gdata.configSPS2.torque / 100) if self.io_conf.output_torque else 0
+                sps2_thrust = int(gdata.configSPS2.thrust / 100) if self.io_conf.output_thrust else 0
+                sps2_speed = int(gdata.configSPS2.speed * 10) if self.io_conf.output_speed else 0
+                sps2_power = int(gdata.configSPS2.power / 100) if self.io_conf.output_power else 0
                 sps2_avg_power, sps2_total_energy = self.get_avg_power_and_energy('sps2')
 
                 for val in [sps2_torque, sps2_thrust, sps2_speed, sps2_power, sps2_avg_power, sps2_total_energy]:

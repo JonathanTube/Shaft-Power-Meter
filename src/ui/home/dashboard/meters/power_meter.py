@@ -38,12 +38,12 @@ class PowerMeter(ft.Container):
             
 
             if self.name == "sps":
-                if gdata.configSPS.sps_power is not None:
-                    power_and_unit = UnitParser.parse_power(gdata.configSPS.sps_power, self.system_unit)
-                    self.content.set_data(gdata.configSPS.sps_power, power_and_unit[0], power_and_unit[1])
+                if gdata.configSPS.power is not None:
+                    power_and_unit = UnitParser.parse_power(gdata.configSPS.power, self.system_unit)
+                    self.content.set_data(gdata.configSPS.power, power_and_unit[0], power_and_unit[1])
             else:
-                if gdata.configSPS2.sps_power is not None:
-                    power_and_unit = UnitParser.parse_power(gdata.configSPS2.sps_power, self.system_unit)
-                    self.content.set_data(gdata.configSPS2.sps_power, power_and_unit[0], power_and_unit[1])
+                if gdata.configSPS2.power is not None:
+                    power_and_unit = UnitParser.parse_power(gdata.configSPS2.power, self.system_unit)
+                    self.content.set_data(gdata.configSPS2.power, power_and_unit[0], power_and_unit[1])
         except:
             logging.exception('exception occured at PowerMeter.reload')

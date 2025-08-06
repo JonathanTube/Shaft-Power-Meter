@@ -25,13 +25,13 @@ class EEXIBreach:
         if EEXIBreach.report_id is not None:
             EEXIBreach.__save_report_detail(
                 'sps', utc_date_time,
-                gdata.configSPS.sps_speed, gdata.configSPS.sps_torque, gdata.configSPS.sps_power
+                gdata.configSPS.speed, gdata.configSPS.torque, gdata.configSPS.power
             )
             # 如果是双桨，则保存双桨的报告明细
             if is_twins:
                 EEXIBreach.__save_report_detail(
                     'sps2', utc_date_time,
-                    gdata.configSPS2.sps_speed, gdata.configSPS2.sps_torque, gdata.configSPS2.sps_power
+                    gdata.configSPS2.speed, gdata.configSPS2.torque, gdata.configSPS2.power
                 )
 
         seconds = gdata.configCommon.eexi_breach_checking_duration
@@ -91,7 +91,7 @@ class EEXIBreach:
         if EEXIBreach.report_id is None:
             gdata.configPropperCurve.eexi_breach = True
 
-            event_log: EventLog = EventLog.create(started_at=start_time, started_position=gdata.configGps.gps_location)
+            event_log: EventLog = EventLog.create(started_at=start_time, started_position=gdata.configGps.location)
 
             report_info = ReportInfo.create(event_log=event_log, report_name=f"Compliance Report #{event_log.id}")
 
@@ -117,7 +117,7 @@ class EEXIBreach:
 
             if event_log is not None:
                 event_log.ended_at = gdata.configDateTime.utc_date_time
-                event_log.ended_position = gdata.configGps.gps_location
+                event_log.ended_position = gdata.configGps.location
                 event_log.save()
 
             EEXIBreach.report_id = None

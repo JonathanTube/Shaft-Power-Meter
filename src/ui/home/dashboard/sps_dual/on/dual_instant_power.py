@@ -59,10 +59,10 @@ class DualInstantPower(ft.Container):
 
     def reload(self):
         try:
-            power_sps = UnitParser.parse_power(gdata.configSPS.sps_power, self.unit)
-            power_sps2 = UnitParser.parse_power(gdata.configSPS2.sps_power, self.unit)
+            power_sps = UnitParser.parse_power(gdata.configSPS.power, self.unit)
+            power_sps2 = UnitParser.parse_power(gdata.configSPS2.power, self.unit)
             power_total = UnitParser.parse_power(
-                gdata.configSPS.sps_power + gdata.configSPS2.sps_power,
+                gdata.configSPS.power + gdata.configSPS2.power,
                 self.unit
             )
 

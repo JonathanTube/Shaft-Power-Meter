@@ -92,11 +92,11 @@ class ZeroCalExecutorThrust(ft.Card):
     def on_abort(self):
         try:
             if self.name == 'sps':
-                gdata.configSPS.zero_cal_sps_thrust_is_running = False
-                gdata.configSPS.zero_cal_sps_ad1_for_thrust.clear()
+                gdata.configSPS.zero_cal_thrust_running = False
+                gdata.configSPS.zero_cal_ad1_for_thrust.clear()
             else:
-                gdata.configSPS2.zero_cal_sps2_thrust_is_running = False
-                gdata.configSPS2.zero_cal_sps2_ad1_for_thrust.clear()
+                gdata.configSPS2.zero_cal_thrust_running = False
+                gdata.configSPS2.zero_cal_ad1_for_thrust.clear()
 
             if self.fetch_button and self.fetch_button.page:
                 self.fetch_button.visible = True
@@ -121,15 +121,15 @@ class ZeroCalExecutorThrust(ft.Card):
     async def on_tick(self):
         try:
             if self.name == 'sps':
-                if gdata.configSPS.zero_cal_sps_thrust_is_running:
+                if gdata.configSPS.zero_cal_thrust_running:
                     return
                 # 标记调零开始
-                gdata.configSPS.zero_cal_sps_thrust_is_running = True
+                gdata.configSPS.zero_cal_thrust_running = True
             else:
-                if gdata.configSPS2.zero_cal_sps2_thrust_is_running:
+                if gdata.configSPS2.zero_cal_thrust_running:
                     return
                 # 标记调零开始
-                gdata.configSPS2.zero_cal_sps2_thrust_is_running = True
+                gdata.configSPS2.zero_cal_thrust_running = True
 
             if self.fetch_button and self.fetch_button.page:
                 self.fetch_button.visible = False
@@ -141,7 +141,7 @@ class ZeroCalExecutorThrust(ft.Card):
 
             if self.seconds_tick and self.seconds_tick.page:
                 for i in range(20, 0, -1):
-                    is_running = gdata.configSPS.zero_cal_sps_thrust_is_running if self.name == 'sps' else gdata.configSPS2.zero_cal_sps2_thrust_is_running
+                    is_running = gdata.configSPS.zero_cal_thrust_running if self.name == 'sps' else gdata.configSPS2.zero_cal_thrust_running
                     if is_running == False:
                         return
 
@@ -151,11 +151,11 @@ class ZeroCalExecutorThrust(ft.Card):
 
                 # 时间到，调零结束
                 if self.name == 'sps':
-                    average_ad1 = JM3846ThrustUtil.get_avg(gdata.configSPS.zero_cal_sps_ad1_for_thrust, self.name)
+                    average_ad1 = JM3846ThrustUtil.get_avg(gdata.configSPS.zero_cal_ad1_for_thrust, self.name)
                     mv_per_v = JM3846Calculator.calculate_mv_per_v(average_ad1, gdata.configSPS.gain_1)
                     self.seconds_tick.value = round(mv_per_v, 4)
                 elif self.name == 'sps2':
-                    average_ad1 = JM3846ThrustUtil.get_avg(gdata.configSPS2.zero_cal_sps2_ad1_for_thrust, self.name)
+                    average_ad1 = JM3846ThrustUtil.get_avg(gdata.configSPS2.zero_cal_ad1_for_thrust, self.name)
                     mv_per_v = JM3846Calculator.calculate_mv_per_v(average_ad1, gdata.configSPS2.gain_1)
                     self.seconds_tick.value = round(mv_per_v, 4)
                 self.seconds_tick.update()
@@ -170,11 +170,11 @@ class ZeroCalExecutorThrust(ft.Card):
 
         finally:
             if self.name == 'sps':
-                gdata.configSPS.zero_cal_sps_thrust_is_running = False
-                gdata.configSPS.zero_cal_sps_ad1_for_thrust.clear()
+                gdata.configSPS.zero_cal_thrust_running = False
+                gdata.configSPS.zero_cal_ad1_for_thrust.clear()
             else:
-                gdata.configSPS2.zero_cal_sps2_thrust_is_running = False
-                gdata.configSPS2.zero_cal_sps2_ad1_for_thrust.clear()
+                gdata.configSPS2.zero_cal_thrust_running = False
+                gdata.configSPS2.zero_cal_ad1_for_thrust.clear()
 
     def reset(self):
         self.on_abort()

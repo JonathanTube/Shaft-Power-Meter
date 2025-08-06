@@ -96,9 +96,9 @@ class GeneralOflineDefaultValue(ft.Container):
             self.odv.thrust_default_value = UnitConverter.t_to_n(self.odv.thrust_default_value)
         self.odv.save()
 
-        gdata.configOffline.sps_offline_torque = self.odv.torque_default_value
-        gdata.configOffline.sps_offline_speed = self.odv.speed_default_value
-        gdata.configOffline.sps_offline_thrust = self.odv.thrust_default_value
+        gdata.configOffline.torque = self.odv.torque_default_value
+        gdata.configOffline.speed = self.odv.speed_default_value
+        gdata.configOffline.thrust = self.odv.thrust_default_value
 
         operation_log = OperationLog(
             user_id=user_id,

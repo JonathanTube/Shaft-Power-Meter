@@ -107,8 +107,8 @@ class ZeroCalExecutor(ft.Container):
 
             # 设置全局变量
             if self.name == 'sps':
-                gdata.configSPS.sps_torque_offset = self.torque_offset
-                gdata.configSPS.sps_thrust_offset = self.thrust_offset
+                gdata.configSPS.torque_offset = self.torque_offset
+                gdata.configSPS.thrust_offset = self.thrust_offset
             else:
                 gdata.configSPS2.sps2_torque_offset = self.torque_offset
                 gdata.configSPS2.sps2_thrust_offset = self.thrust_offset

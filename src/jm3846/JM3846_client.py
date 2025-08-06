@@ -36,8 +36,8 @@ class JM3846AsyncClient:
     @property
     def is_connected(self):
         if self.name == 'sps':
-            return not gdata.configSPS.sps_offline
-        return not gdata.configSPS2.sps2_offline
+            return not gdata.configSPS.is_offline
+        return not gdata.configSPS2.is_offline
 
     @abstractmethod
     def get_ip_port() -> tuple[str, int]:
@@ -159,7 +159,7 @@ class JM3846AsyncClient:
             try:
                 if self.name == 'sps2' and int(gdata.configCommon.amount_of_propeller) == 1:
                     logging.info('exit running since single propeller')
-                    gdata.configSPS2.sps2_offline = True
+                    gdata.configSPS2.is_offline = True
                     return
 
                 # 接收响应
@@ -255,9 +255,9 @@ class JM3846AsyncClient:
             self.recovery_alarm()
 
         if self.name == 'sps':
-            gdata.configSPS.sps_offline = is_offline
+            gdata.configSPS.is_offline = is_offline
         elif self.name == 'sps2':
-            gdata.configSPS2.sps2_offline = is_offline
+            gdata.configSPS2.is_offline = is_offline
 
     def create_alarm(self):
         if self.name == 'sps':

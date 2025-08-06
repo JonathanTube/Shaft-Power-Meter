@@ -53,21 +53,21 @@ class DataSaver:
             )
 
             if name == 'sps':
-                gdata.configSPS.sps_torque = torque
-                gdata.configSPS.sps_thrust = thrust
-                gdata.configSPS.sps_speed = speed
-                gdata.configSPS.sps_power = power
-                if len(gdata.configSPS.sps_power_history) > 60:
-                    gdata.configSPS.sps_power_history.pop(0)
-                gdata.configSPS.sps_power_history.append((power, utc_date_time))
+                gdata.configSPS.torque = torque
+                gdata.configSPS.thrust = thrust
+                gdata.configSPS.speed = speed
+                gdata.configSPS.power = power
+                if len(gdata.configSPS.power_history) > 60:
+                    gdata.configSPS.power_history.pop(0)
+                gdata.configSPS.power_history.append((power, utc_date_time))
             else:
-                gdata.configSPS2.sps_torque = torque
-                gdata.configSPS2.sps_thrust = thrust
-                gdata.configSPS2.sps_speed = speed
-                gdata.configSPS2.sps_power = power
-                if len(gdata.configSPS2.sps2_power_history) > 60:
-                    gdata.configSPS2.sps2_power_history.pop(0)
-                gdata.configSPS2.sps2_power_history.append((power, utc_date_time))
+                gdata.configSPS2.torque = torque
+                gdata.configSPS2.thrust = thrust
+                gdata.configSPS2.speed = speed
+                gdata.configSPS2.power = power
+                if len(gdata.configSPS2.power_history) > 60:
+                    gdata.configSPS2.power_history.pop(0)
+                gdata.configSPS2.power_history.append((power, utc_date_time))
 
             # 处理EEXI过载和恢复
             EEXIBreach.handle_breach_and_recovery()

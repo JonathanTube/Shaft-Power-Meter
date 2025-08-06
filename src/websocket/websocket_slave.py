@@ -147,13 +147,13 @@ class WebSocketSlave:
                 elif data['type'] == 'propeller_setting':
                     self.__handle_propeller_setting(data)
 
-                gdata.configSPS.sps_offline = False
+                gdata.configSPS.is_offline = False
                 gdata.configSPS2 = False
                 self._retry = 0
             except (websockets.ConnectionClosedError, websockets.ConnectionClosedOK, websockets.ConnectionClosed):
                 logging.error("[***HMI client***] ConnectionClosedError")
-                gdata.configSPS.sps_offline = True
-                gdata.configSPS2.sps2_offline = True
+                gdata.configSPS.is_offline = True
+                gdata.configSPS2.is_offline = True
                 self._is_connected = False
                 AlarmSaver.create(alarm_type=AlarmType.SLAVE_CLIENT_DISCONNECTED)
                 break
@@ -170,19 +170,19 @@ class WebSocketSlave:
 
         if 'torque' in data:
             if name == 'sps':
-                gdata.configSPS.sps_torque = data['torque']
+                gdata.configSPS.torque = data['torque']
             elif name == 'sps2':
                 gdata.configSPS2.sps2_torque = data['torque']
 
         if 'thrust' in data:
             if name == 'sps':
-                gdata.configSPS.sps_thrust = data['thrust']
+                gdata.configSPS.thrust = data['thrust']
             elif name == 'sps2':
                 gdata.configSPS2.sps2_thrust = data['thrust']
 
         if 'rpm' in data:
             if name == 'sps':
-                gdata.configSPS.sps_speed = data['rpm']
+                gdata.configSPS.speed = data['rpm']
             elif name == 'sps2':
                 gdata.configSPS2.sps2_speed = data['rpm']
 

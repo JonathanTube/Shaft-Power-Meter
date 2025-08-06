@@ -163,8 +163,8 @@ class TestMode(ft.Container):
                 operation_content='started test mode'
             )
             # 将sps设备设置为在线，防止offline_task 写入默认值
-            gdata.configSPS.sps_offline = False
-            gdata.configSPS2.sps2_offline = False
+            gdata.configSPS.is_offline = False
+            gdata.configSPS2.is_offline = False
             self.running = True
             gdata.configTest.test_mode_running = True
             Toast.show_success(self.page)
@@ -195,8 +195,8 @@ class TestMode(ft.Container):
             # 恢复现场
             gdata.configTest.test_mode_running = False
             gdata.configPropperCurve.eexi_breach = False
-            gdata.configSPS.sps_offline = True
-            gdata.configSPS2.sps2_offline = True
+            gdata.configSPS.is_offline = True
+            gdata.configSPS2.is_offline = True
             # 这里只需要回复power_overload的告警，alarm不需要管。
             self.page.run_task(plc.write_power_overload, False)
             Toast.show_success(self.page)

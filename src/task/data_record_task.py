@@ -21,13 +21,13 @@ class DataRecordTask:
                     continue
 
                 # 测试模式关闭
-                if gdata.configSPS.sps_offline:
+                if gdata.configSPS.is_offline:
                     self.save_sps_offline_data()
                 else:
                     self.save_sps_online_data()
 
                 if is_dual:
-                    if gdata.configSPS2.sps2_offline:
+                    if gdata.configSPS2.is_offline:
                         self.save_sps2_offline_data()
                     else:
                         self.save_sps2_online_data()
@@ -40,25 +40,25 @@ class DataRecordTask:
     def save_sps_online_data(self):
         DataSaver.save(
             'sps',
-            gdata.configSPS.sps_torque, gdata.configSPS.sps_thrust, gdata.configSPS.sps_speed
+            gdata.configSPS.torque, gdata.configSPS.thrust, gdata.configSPS.speed
         )
 
     def save_sps2_online_data(self):
         DataSaver.save(
             'sps2',
-            gdata.configSPS2.sps_torque, gdata.configSPS2.sps_thrust, gdata.configSPS2.sps_speed
+            gdata.configSPS2.torque, gdata.configSPS2.thrust, gdata.configSPS2.speed
         )
 
     def save_sps_offline_data(self):
         DataSaver.save(
             'sps',
-            gdata.configOffline.sps_offline_torque, gdata.configOffline.sps_offline_thrust, gdata.configOffline.sps_offline_speed
+            gdata.configOffline.torque, gdata.configOffline.thrust, gdata.configOffline.speed
         )
 
     def save_sps2_offline_data(self):
         DataSaver.save(
             'sps2',
-            gdata.configOffline.sps_offline_torque, gdata.configOffline.sps_offline_thrust, gdata.configOffline.sps_offline_speed
+            gdata.configOffline.torque, gdata.configOffline.thrust, gdata.configOffline.speed
         )
 
     def stop(self):
