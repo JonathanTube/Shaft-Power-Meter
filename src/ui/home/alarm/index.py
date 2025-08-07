@@ -152,8 +152,8 @@ class AlarmList(ft.Container):
         while self.task_running:
             try:
                 selected_rows = [item for item in table.data_table.rows if item.selected]
-                # 只有当没有选中复选框的时候
-                if len(selected_rows) == 0:
+                # 只有当没有选中复选框的时候，并且是第一页
+                if len(selected_rows) == 0 and self.table.current_page == 1:
                     # 才去更新表格
                     if self.table and self.table.page:
                         if self.start_date and self.end_date:

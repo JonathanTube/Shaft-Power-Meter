@@ -101,8 +101,15 @@ class JM3846AsyncClient:
     async def close(self):
         self._is_canceled = True
 
+        if self.name == 'sps':
+            gdata.configSPS.is_offline = True
+        elif self.name == 'sps2':
+            gdata.configSPS2.is_offline = True
+
         try:
-            self.set_offline(True)
+            self._is_running = False
+            jm3846_torque_rpm.stop()
+            jm3846_thrust.stop()
             if self.writer:
                 # 发送0x45,断开数据流
                 await self.async_handle_0x45()

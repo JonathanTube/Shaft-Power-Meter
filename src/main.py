@@ -139,6 +139,7 @@ def set_content(page: ft.Page):
 
     def change_main_menu(name: str):
         if name == 'HOME':
+            content_home.current_index = 0
             main_content.content = content_home
         elif name == 'REPORT':
             main_content.content = content_report

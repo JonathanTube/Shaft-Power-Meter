@@ -1,23 +1,29 @@
 import logging
+import threading
 from common.const_alarm_type import AlarmType
 from db.models.alarm_log import AlarmLog
 from common.global_data import gdata
 
 
 class AlarmSaver:
+     # 新增：全局锁对象
+    _lock = threading.Lock()
+    
     @staticmethod
     def create(alarm_type: AlarmType):
-        cnt: int = AlarmLog.select().where(
-            AlarmLog.alarm_type == alarm_type,
-            AlarmLog.is_recovery == False
-        ).count()
-        if cnt == 0:
-            AlarmLog.create(
-                utc_date_time=gdata.configDateTime.utc,
-                alarm_type=alarm_type,
-                is_from_master=gdata.configCommon.is_master
-            )
-            logging.info(f'[***save alarm***] alarm_type={alarm_type}, save alarm log')
+        # 加锁（使用with语句确保锁自动释放）
+        with AlarmSaver._lock:
+            cnt: int = AlarmLog.select().where(
+                AlarmLog.alarm_type == alarm_type,
+                AlarmLog.is_recovery == False
+            ).count()
+            if cnt == 0:
+                AlarmLog.create(
+                    utc_date_time=gdata.configDateTime.utc,
+                    alarm_type=alarm_type,
+                    is_from_master=gdata.configCommon.is_master
+                )
+                logging.info(f'[***save alarm***] alarm_type={alarm_type}, save alarm log')
 
     @staticmethod
     def recovery(alarm_type_occured: AlarmType, alarm_type_recovered: AlarmType):
