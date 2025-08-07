@@ -80,7 +80,7 @@ class AbstractTable(ft.Container):
             logging.exception('exception occured at AbstractTable.__create_cells')
         # print('===========cells=',cells)
         return cells
-        
+
 
     def __on_double_tap(self, e, content):
         if self.page and content is not None:
@@ -102,12 +102,20 @@ class AbstractTable(ft.Container):
     def __create_table_rows(self):
         try:
             if self.data_table and self.data_table.page:
+                column_length = len(self.data_table.columns)
+
                 data = self.load_data()
                 rows = []
                 for items in data:
+                    # 判断字段个数是否和渲染的cells个数相同，不同直接不渲染
+                    cells = self.__create_cells(items)
+                    if (len(cells) != column_length):
+                        rows == []
+                        break
+
                     rows.append(
                         ft.DataRow(
-                            cells=self.__create_cells(items),
+                            cells=cells,
                             selected=False,
                             on_select_changed=lambda e: self.__on_select_changed(e)
                         )

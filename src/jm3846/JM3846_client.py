@@ -33,6 +33,8 @@ class JM3846AsyncClient:
         self._is_running = False
         self._is_canceled = False
 
+        self.timeoutTimes = 10
+
     @property
     def is_connected(self):
         if self.name == 'sps':
@@ -49,6 +51,7 @@ class JM3846AsyncClient:
             self._retry = 0  # 重置重试计数器
 
             while gdata.configCommon.is_master and self._retry < self._max_retries:
+                self.timeoutTimes = 10  # 重置超时最大次数
                 if self._is_canceled:
                     break
 
@@ -88,7 +91,7 @@ class JM3846AsyncClient:
                 finally:
                     if not self._is_canceled:  # 只有未取消时才执行退避
                         seconds = 2 ** self._retry
-                        logging.info(f'retry times = {self._retry}, wait for {seconds}s to reconnect')
+                        logging.info(f'[***{self.name}***] JM3846 retry times = {self._retry}, wait for {seconds}s to reconnect')
                         await asyncio.sleep(seconds)
                         self._retry += 1
 
@@ -139,12 +142,12 @@ class JM3846AsyncClient:
         if not self.writer:
             return
 
-        logging.info(f'[***{self.name}***] send 0x44 req={bytes.hex(request)}')
+        logging.info(f'[***{self.name}***] JM3846 send 0x44 req={bytes.hex(request)}')
         self.writer.write(request)
         await self.writer.drain()
 
     async def async_receive_looping(self):
-        """持续接收0x44数据"""
+        """持续接收数据"""
         while self._is_running:
             try:
                 if self.name == 'sps2' and int(gdata.configCommon.amount_of_propeller) == 1:
@@ -168,6 +171,8 @@ class JM3846AsyncClient:
 
                 # 解析功能码
                 func_code = struct.unpack(">B", response[7:8])[0]
+
+                logging.info(f'[***{self.name}***] func_code={func_code}')
 
                 # 异常响应处理
                 if func_code & 0x80:
@@ -204,9 +209,12 @@ class JM3846AsyncClient:
                     continue
 
             except TimeoutError:
-                logging.error(f'[***{self.name}***] JM3846 0x44 receive timeout, retrying...')
-                self.set_offline(True)
-                continue
+                logging.error(f'[***{self.name}***] JM3846 receive data timeout, retry times left = {self.timeoutTimes}')
+                self.timeoutTimes -= 1
+                if self.timeoutTimes <= 0:
+                    logging.error(f'[***{self.name}***] JM3846 timeout too many times, reconnect...')
+                    self.set_offline(True)
+                    return
             except ConnectionResetError as e:
                 logging.error(f'[***{self.name}***] JM3846 Connection reset: {e}')
                 self.set_offline(True)
@@ -234,9 +242,8 @@ class JM3846AsyncClient:
             logging.error(f'[***{self.name}***] JM3846 0x45 error')
 
     def set_offline(self, is_offline: bool):
-        self._is_running = not is_offline
-
         if is_offline:
+            self._is_running = True
             jm3846_torque_rpm.stop()
             jm3846_thrust.stop()
             self.create_alarm()
