@@ -114,18 +114,14 @@ class Home(ft.Container):
 
             self.content_dashboard = Dashboard()
             self.content_counter = Counter()
-            self.content_trend_view =TrendView()
-            self.content_propeller_curve =PropellerCurve()
-            self.content_alarm_list =AlarmList()
-            self.content_event_list =EventList()
-            self.content_logs =Logs()
+            self.content_trend_view = TrendView()
+            self.content_propeller_curve = PropellerCurve()
+            self.content_alarm_list = AlarmList()
+            self.content_event_list = EventList()
+            self.content_logs = Logs()
         except:
             logging.error('exception occured at Home.build')
 
-    def before_update(self):
-        self.current_index = 0
-        return super().before_update()
-    
     def __on_click(self, index: int):
         if self.is_switching:
             return

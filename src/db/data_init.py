@@ -473,12 +473,6 @@ class DataInit:
                 },
 
                 {
-                    "code": "lang.common.recovery_status",
-                    "chinese": "状态",
-                    "english": "Status"
-                },
-
-                {
                     "code": "lang.common.view",
                     "chinese": "查看",
                     "english": "View"

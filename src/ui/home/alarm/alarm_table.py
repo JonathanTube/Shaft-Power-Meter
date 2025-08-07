@@ -52,17 +52,17 @@ class AlarmTable(AbstractTable):
                     return session.get("lang.alarm.master_gps_disconnected")
                 case AlarmType.MASTER_GPS_CONNECTED:
                     return session.get("lang.alarm.master_gps_connected")
-                
+
                 case AlarmType.MASTER_SPS_DISCONNECTED:
                     return session.get("lang.alarm.master_sps_disconnected")
                 case AlarmType.MASTER_SPS_CONNECTED:
                     return session.get("lang.alarm.master_sps_connected")
-                
+
                 case AlarmType.MASTER_SPS2_DISCONNECTED:
                     return session.get("lang.alarm.master_sps2_disconnected")
                 case AlarmType.MASTER_SPS2_CONNECTED:
                     return session.get("lang.alarm.master_sps2_connected")
-                
+
                 case AlarmType.MASTER_SERVER_STOPPED:
                     return session.get("lang.alarm.master_server_stopped")
                 case AlarmType.MASTER_SERVER_STARTED:
@@ -72,12 +72,12 @@ class AlarmTable(AbstractTable):
                     return session.get("lang.alarm.slave_master_disconnected")
                 case AlarmType.SLAVE_CLIENT_CONNECTED:
                     return session.get("lang.alarm.slave_master_connected")
-                
+
                 case AlarmType.POWER_OVERLOAD:
                     return session.get("lang.alarm.power_overload")
                 case AlarmType.POWER_OPTIMAL_LOAD:
                     return session.get("lang.alarm.power_optimal_load")
-                
+
                 case AlarmType.APP_UNEXPECTED_EXIT:
                     return session.get("lang.alarm.app_unexpected_exit")
                 case _:
@@ -106,16 +106,11 @@ class AlarmTable(AbstractTable):
             data_list = []
 
             for item in data:
-                status_column = '✔️'if item.is_recovery else '❌'
-                if item.is_from_master != gdata.configCommon.is_master:
-                    status_column += '🔒'
-
                 data_list.append([
                     item.id,
                     item.utc_date_time.strftime(self.date_time_format),
                     self.get_event_name(item.alarm_type),
-                    item.acknowledge_time.strftime(self.date_time_format) if item.acknowledge_time else "",
-                    status_column
+                    item.acknowledge_time.strftime(self.date_time_format) if item.acknowledge_time else ""
                 ])
 
             return data_list
@@ -137,12 +132,11 @@ class AlarmTable(AbstractTable):
                 session.get("lang.common.no"),
                 session.get("lang.common.utc_date_time"),
                 session.get("lang.common.event_name"),
-                session.get("lang.common.acknowledge_time"),
-                session.get("lang.common.recovery_status")
+                session.get("lang.common.acknowledge_time")
             ]
         except:
             logging.exception("exception occured at AlarmTable.get_columns")
 
         return [
-            '', '', '', '', ''
+            '', '', '', ''
         ]

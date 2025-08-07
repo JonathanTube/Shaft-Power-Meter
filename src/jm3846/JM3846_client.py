@@ -243,7 +243,7 @@ class JM3846AsyncClient:
 
     def set_offline(self, is_offline: bool):
         if is_offline:
-            self._is_running = True
+            self._is_running = False
             jm3846_torque_rpm.stop()
             jm3846_thrust.stop()
             self.create_alarm()
