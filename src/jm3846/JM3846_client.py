@@ -115,43 +115,33 @@ class JM3846AsyncClient:
 
     async def async_handle_0x03(self):
         """异步处理功能码0x03"""
-        try:
-            self.transaction_id = (self.transaction_id + 1) % 0xFFFF
-            # 发送请求
-            request = JM38460x03Async.build_request(self.transaction_id)
+        self.transaction_id = (self.transaction_id + 1) % 0xFFFF
+        # 发送请求
+        request = JM38460x03Async.build_request(self.transaction_id)
 
-            if not self.writer:
-                return
+        if not self.writer:
+            return
 
-            logging.info(f'[***{self.name}***] JM3846 0x03 req = {bytes.hex(request)}')
-            self.writer.write(request)
-            await self.writer.drain()
-        except TimeoutError:
-            logging.error(f'[***{self.name}***] JM3846 0x03 request timeout')
-            self.set_offline(True)
-        except:
-            logging.error(f'[***{self.name}***] JM3846 0x03 error')
-            self.set_offline(True)
+        logging.info(f'[***{self.name}***] JM3846 0x03 req = {bytes.hex(request)}')
+        self.writer.write(request)
+        await self.writer.drain()
 
     async def async_handle_0x44(self):
         """异步处理功能码0x44"""
-        try:
-            self.transaction_id = (self.transaction_id + 1) % 0xFFFF
+        self.transaction_id = (self.transaction_id + 1) % 0xFFFF
 
-            request = JM38460x44Async.build_request(
-                tid=self.transaction_id,
-                frame_size=self.frame_size,
-                total_frames=self.total_frames
-            )
+        request = JM38460x44Async.build_request(
+            tid=self.transaction_id,
+            frame_size=self.frame_size,
+            total_frames=self.total_frames
+        )
 
-            if not self.writer:
-                return
+        if not self.writer:
+            return
 
-            logging.info(f'[***{self.name}***] send 0x44 req={bytes.hex(request)}')
-            self.writer.write(request)
-            await self.writer.drain()
-        except:
-            logging.exception(f'[***{self.name}***] JM3846 0x44 error')
+        logging.info(f'[***{self.name}***] send 0x44 req={bytes.hex(request)}')
+        self.writer.write(request)
+        await self.writer.drain()
 
     async def async_receive_looping(self):
         """持续接收0x44数据"""
@@ -165,7 +155,7 @@ class JM3846AsyncClient:
                 # 接收响应
                 response = await asyncio.wait_for(self.reader.read(256), timeout=5)
 
-                # logging.info(f'raw_data from sps={bytes.hex(response)}')
+                logging.info(f'raw_data from sps={bytes.hex(response)}')
 
                 if response == b'':
                     self.set_offline(True)
@@ -216,7 +206,7 @@ class JM3846AsyncClient:
             except TimeoutError:
                 logging.error(f'[***{self.name}***] JM3846 0x44 receive timeout, retrying...')
                 self.set_offline(True)
-                return
+                continue
             except ConnectionResetError as e:
                 logging.error(f'[***{self.name}***] JM3846 Connection reset: {e}')
                 self.set_offline(True)
