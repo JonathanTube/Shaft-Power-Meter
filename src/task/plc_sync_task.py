@@ -271,8 +271,10 @@ class PlcSyncTask:
     async def handle_alarm_recovery(self):
         try:
             logging.info('[***PLC***] recovery PLC Alarm')
-            AlarmLog.update(is_recovery=True).where(AlarmLog.alarm_type == AlarmType.MASTER_PLC_DISCONNECTED).execute()
-            AlarmLog.create(utc_date_time=gdata.configDateTime.utc, alarm_type=AlarmType.MASTER_PLC_CONNECTED, is_recovery=True, is_from_master=gdata.configCommon.is_master)
+            cnt_alarm_plc: int = AlarmLog.select().where(AlarmLog.alarm_type == AlarmType.MASTER_PLC_DISCONNECTED, AlarmLog.is_recovery == False).count()
+            if cnt_alarm_plc > 0:
+                AlarmLog.update(is_recovery=True).where(AlarmLog.alarm_type == AlarmType.MASTER_PLC_DISCONNECTED).execute()
+                AlarmLog.create(utc_date_time=gdata.configDateTime.utc, alarm_type=AlarmType.MASTER_PLC_CONNECTED, is_recovery=True, is_from_master=gdata.configCommon.is_master)
 
             cnt: int = AlarmLog.select().where(AlarmLog.is_recovery == False).count()
             if cnt == 0:
