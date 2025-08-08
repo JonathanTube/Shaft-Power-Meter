@@ -74,6 +74,8 @@ class JM3846AsyncClient:
                         asyncio.create_task(jm3846_thrust.start(self.name))
 
                     logging.info(f'[***{self.name}***] JM3846 Connected successfully')
+                    # 发送0x45,断开数据流,send 0x45 to sps while reconnecting.
+                    await self.async_handle_0x45()
                     # 请求配置参数
                     await self.async_handle_0x03()
                     # 请求多帧数据
@@ -163,12 +165,11 @@ class JM3846AsyncClient:
                     return
 
                 # 接收响应
-                response = await asyncio.wait_for(self.reader.read(256), timeout=5)
+                response = await asyncio.wait_for(self.reader.read(256), timeout=30)
 
                 logging.info(f'raw_data from sps={bytes.hex(response)}')
 
                 if response == b'':
-                    self.set_offline(True)
                     break
 
                 # 基本头长度检查
