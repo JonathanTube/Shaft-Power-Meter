@@ -103,15 +103,3 @@ class JM38460x44:
         JM38460x44.running = False
         if JM38460x44.loop_task:
             JM38460x44.loop_task.cancel()
-
-    @staticmethod
-    async def stop_and_wait():
-        """fixed: 停止接收并等待任务结束"""
-        JM38460x44.running = False
-        if JM38460x44.loop_task:
-            JM38460x44.loop_task.cancel()
-            try:
-                await JM38460x44.loop_task
-            except asyncio.CancelledError:
-                pass
-            JM38460x44.loop_task = None

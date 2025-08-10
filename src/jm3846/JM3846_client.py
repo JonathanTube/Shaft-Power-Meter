@@ -56,7 +56,7 @@ class JM3846AsyncClient(ABC):
     async def release(self):
         """终止一切运行，关闭资源"""
         try:
-            await JM38460x44.stop_and_wait()  # 等待0x44任务安全退出
+            JM38460x44.stop()  # 等待0x44任务安全退出
 
             self.stop_background_tasks()
 
@@ -69,8 +69,8 @@ class JM3846AsyncClient(ABC):
                 self.writer.close()
                 await self.writer.wait_closed()
 
-        except Exception:
-            logging.exception('close failed')
+        except:
+            logging.exception('release')
         finally:
             self.create_alarm_hook()
             self.set_offline_hook(True)
