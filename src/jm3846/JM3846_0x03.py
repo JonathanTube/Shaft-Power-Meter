@@ -47,9 +47,7 @@ class JM38460x03Async:
                 gdata.configSPS2.speed_sel = bool(values[4] & 0x01)
                 gdata.configSPS2.sample_rate = values[5]
         except:
-            logging.exception(
-                f"exception occured at JM38460x03Async.parse_response"
-            )
+            logging.exception(f"exception occured at JM38460x03Async.parse_response")
 
     @staticmethod
     def parse_gain(reg_value: int) -> int:
