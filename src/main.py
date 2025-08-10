@@ -110,7 +110,7 @@ def start_all_task():
 
 def set_appearance(page: ft.Page, preference: Preference):
     page.theme = ft.Theme(scrollbar_theme=ft.ScrollbarTheme(thickness=20))
-    page.title = page.session.get("lang.lang.app.name")
+    page.title = page.session.get("lang.common.app_name")
     page.padding = 0
     page.theme_mode = get_theme_mode(preference)
     page.window.resizable = False

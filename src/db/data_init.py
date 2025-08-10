@@ -183,12 +183,6 @@ class DataInit:
             Language.truncate_table()
         Language.insert_many([
                 {
-                    "code": "lang.lang.app.name",
-                    "chinese": "轴功率仪",
-                    "english": "Shaft Power Meter"
-                },
-
-                {
                     "code": "lang.toast.system_exit",
                     "chinese": "系统正在关闭中，请勿操作...",
                     "english": "System is closing, please do not operate..."
