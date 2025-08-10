@@ -21,7 +21,6 @@ class JM3846AsyncClient:
         self.frame_size = 120
         self.total_frames = 0xFFFF
 
-        self.transaction_id = 0
         self.reader: Optional[asyncio.StreamReader] = None
         self.writer: Optional[asyncio.StreamWriter] = None
 
@@ -74,10 +73,18 @@ class JM3846AsyncClient:
                         asyncio.create_task(jm3846_thrust.start(self.name))
 
                     logging.info(f'[***{self.name}***] JM3846 Connected successfully')
+
                     # 发送0x45,断开数据流,send 0x45 to sps while reconnecting.
-                    await self.async_handle_0x45()
-                    # 请求配置参数
-                    await self.async_handle_0x03()
+                    is_result_0x45_ok = await self.async_handle_0x45()
+                    if not is_result_0x45_ok:
+                        continue
+
+                    # 请求配置参数0x03
+                    is_result_0x03_ok = await self.async_handle_0x03()
+                    # 请求失败直接重试
+                    if not is_result_0x03_ok:
+                        continue
+
                     # 请求多帧数据
                     await self.async_handle_0x44()
                     # 设置运作中
@@ -127,30 +134,31 @@ class JM3846AsyncClient:
 
     async def async_handle_0x03(self):
         """异步处理功能码0x03"""
-        self.transaction_id = (self.transaction_id + 1) % 0xFFFF
         # 发送请求
-        request = JM38460x03Async.build_request(self.transaction_id)
-
-        if not self.writer:
-            return
+        request = JM38460x03Async.build_request()
 
         logging.info(f'[***{self.name}***] JM3846 0x03 req = {bytes.hex(request)}')
         self.writer.write(request)
         await self.writer.drain()
+        # 接收响应
+        # Step 1: 读 MBAP 头
+        header = await asyncio.wait_for(self.reader.readexactly(6), timeout=10)
+        # Step 2: 从头部解析剩余长度
+        length = struct.unpack(">H", header[4:6])[0]
+        # Step 3: 读剩余部分
+        body = await asyncio.wait_for(self.reader.readexactly(length), timeout=10)
+        response = header + body
+        # 解析功能码
+        func_code = struct.unpack(">B", response[7:8])[0]
+        # 直接解析数据
+        if func_code == 0x03:
+            JM38460x03Async.parse_response(response, self.name)
+            return True
+        return False
 
     async def async_handle_0x44(self):
         """异步处理功能码0x44"""
-        self.transaction_id = (self.transaction_id + 1) % 0xFFFF
-
-        request = JM38460x44Async.build_request(
-            tid=self.transaction_id,
-            frame_size=self.frame_size,
-            total_frames=self.total_frames
-        )
-
-        if not self.writer:
-            return
-
+        request = JM38460x44Async.build_request(self.frame_size, self.total_frames)
         logging.info(f'[***{self.name}***] JM3846 send 0x44 req={bytes.hex(request)}')
         self.writer.write(request)
         await self.writer.drain()
@@ -164,8 +172,13 @@ class JM3846AsyncClient:
                     gdata.configSPS2.is_offline = True
                     return
 
-                # 接收响应
-                response = await asyncio.wait_for(self.reader.read(256), timeout=30)
+                # Step 1: 读 MBAP 头
+                header = await asyncio.wait_for(self.reader.readexactly(6), timeout=30)
+                length = struct.unpack(">H", header[4:6])[0]
+
+                # Step 2: 读剩余数据
+                body = await asyncio.wait_for(self.reader.readexactly(length), timeout=30)
+                response = header + body
 
                 logging.info(f'raw_data from sps={bytes.hex(response)}')
 
@@ -188,10 +201,6 @@ class JM3846AsyncClient:
                     logging.error(f'[***{self.name}***] SPS return errors, error_code is {error_code}')
                     continue
 
-                if func_code == 0x03:
-                    JM38460x03Async.parse_response(response, self.name)
-                    continue
-
                 if func_code == 0x44:
                     ch_sel_1 = gdata.configSPS.ch_sel_1 if self.name == 'sps' else gdata.configSPS2.ch_sel_1
                     ch_sel_0 = gdata.configSPS.ch_sel_0 if self.name == 'sps' else gdata.configSPS2.ch_sel_0
@@ -209,12 +218,6 @@ class JM3846AsyncClient:
                     if current_frame >= self.total_frames:
                         await self.async_handle_0x45()
                         await self.async_handle_0x44()
-
-                    continue
-
-                if func_code == 0x45:
-                    JM38460x45Async.parse_response(response)
-                    continue
 
             except TimeoutError:
                 logging.error(f'[***{self.name}***] JM3846 receive data timeout, retry times left = {self.timeoutTimes}')
@@ -235,15 +238,28 @@ class JM3846AsyncClient:
     async def async_handle_0x45(self):
         """异步处理功能码0x45"""
         try:
-            self.transaction_id = (self.transaction_id + 1) % 0xFFFF
-
-            request = JM38460x45Async.build_request(self.transaction_id)
-            if not self.writer:
-                return
+            request = JM38460x45Async.build_request()
 
             logging.info(f'[***{self.name}***] send 0x45 req={bytes.hex(request)}')
             self.writer.write(request)
             await self.writer.drain()
+            # 先读 MBAP 头
+            header = await asyncio.wait_for(self.reader.readexactly(6), timeout=10)
+            length = struct.unpack(">H", header[4:6])[0]
+            # 再读body
+            body = await asyncio.wait_for(self.reader.readexactly(length), timeout=10)
+            response = header + body
+            # 为空直接返回
+            if response == b'':
+                return False
+            # 解析功能码
+            func_code = struct.unpack(">B", response[7:8])[0]
+            # 解析内容
+            if func_code == 0x45:
+                JM38460x45Async.parse_response(response)
+                return True
+            return False
+
         except asyncio.TimeoutError:
             logging.error(f'[***{self.name}***] JM3846 0x45 request timeout')
         except Exception:

@@ -5,10 +5,10 @@ from common.global_data import gdata
 
 class JM38460x03Async:
     @staticmethod
-    def build_request(tid: int) -> bytes:
+    def build_request() -> bytes:
         return struct.pack(
             ">HHHBBHH",
-            tid,
+            0x0003,   # 事务标识符
             0x0000,   # 协议标识符固定0x0000
             6,        # 长度字段 = 1 + 1 + 2 + 2 = 6
             0xFF,     # Unit ID固定0xFF

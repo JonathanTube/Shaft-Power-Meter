@@ -8,14 +8,14 @@ from jm3846.JM3846_thrust import jm3846_thrust
 class JM38460x44Async:
 
     @staticmethod
-    def build_request(tid: int, frame_size: int, total_frames: int) -> bytes:
+    def build_request(frame_size: int, total_frames: int) -> bytes:
         """
         构建0x44功能码请求帧
         返回: bytes类型请求数据
         """
         return struct.pack(
             '>HHHBBHHH',
-            tid,
+            0x0044,         # 事务标识符
             0x0000,         # 协议标识符固定0x0000
             8,              # 长度字段 = 1 + 1 + 2 + 2 + 2= 8
             0xFF,           # Unit ID固定0xFF
