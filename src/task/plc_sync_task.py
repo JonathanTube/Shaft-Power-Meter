@@ -1,11 +1,13 @@
 import asyncio
 import logging
+from peewee import fn, Case
 from typing import Optional
 from pymodbus.client import AsyncModbusTcpClient
 from common.const_alarm_type import AlarmType
 from db.models.alarm_log import AlarmLog
 from db.models.io_conf import IOConf
 from common.global_data import gdata
+from utils.alarm_saver import AlarmSaver
 
 
 class PlcSyncTask:
@@ -62,7 +64,7 @@ class PlcSyncTask:
                     await self.heart_beat()
                 except:
                     logging.error(f"[***PLC***] {self._retry + 1}th reconnect failed")
-                    self.save_plc_alarm()
+                    AlarmSaver.create(AlarmType.MASTER_PLC)
                 finally:
                     #  指数退避
                     await asyncio.sleep(2 ** self._retry)
@@ -81,13 +83,13 @@ class PlcSyncTask:
                 await self.handle_alarm_recovery()
             except:
                 logging.error('exception occured at PlcSyncTask.heart_beat')
-                self.save_plc_alarm()
+                AlarmSaver.create(AlarmType.MASTER_PLC)
             finally:
                 await asyncio.sleep(5)
 
         # 到达这里，说明连接丢失
         self._is_connected = False
-        self.save_plc_alarm()
+        AlarmSaver.create(AlarmType.MASTER_PLC)
 
     async def read_4_20_ma_data(self) -> dict:
         if not self._is_connected:
@@ -257,33 +259,28 @@ class PlcSyncTask:
         finally:
             self._is_connected = False
 
-    def save_plc_alarm(self):
-        try:
-            cnt: int = AlarmLog.select().where(AlarmLog.alarm_type == AlarmType.MASTER_PLC_DISCONNECTED, AlarmLog.is_recovery == False).count()
-            if cnt == 0:
-                logging.info('[***PLC***] create alarm')
-                AlarmLog.create(utc_date_time=gdata.configDateTime.utc, alarm_type=AlarmType.MASTER_PLC_DISCONNECTED, is_from_master=gdata.configCommon.is_master)
-            else:
-                logging.info('[***PLC***] alarm exists, skip')
-        except:
-            logging.error('save PLC alarm failed.')
-
     async def handle_alarm_recovery(self):
         try:
             logging.info('[***PLC***] recovery PLC Alarm')
-            cnt_alarm_plc: int = AlarmLog.select().where(AlarmLog.alarm_type == AlarmType.MASTER_PLC_DISCONNECTED, AlarmLog.is_recovery == False).count()
-            if cnt_alarm_plc > 0:
-                AlarmLog.update(is_recovery=True).where(AlarmLog.alarm_type == AlarmType.MASTER_PLC_DISCONNECTED).execute()
-                AlarmLog.create(utc_date_time=gdata.configDateTime.utc, alarm_type=AlarmType.MASTER_PLC_CONNECTED, is_recovery=True, is_from_master=gdata.configCommon.is_master)
-
-            cnt: int = AlarmLog.select().where(AlarmLog.is_recovery == False).count()
-            if cnt == 0:
-                logging.info(f'[***PLC***], check none of alarm, clear all plc alarm.')
-                await plc.write_alarm(False)
-            else:
+            # 恢复PLC
+            AlarmSaver.recovery(AlarmType.MASTER_PLC)
+            # 是否存在报警
+            if self.has_alarms():
                 await plc.write_alarm(True)
+            else:
+                await plc.write_alarm(False)
         except:
             logging.error('recovery PLC alarm failed.')
+
+    def has_alarms(self) -> bool:
+        cnts = (
+            AlarmLog.select(
+                fn.COUNT(Case(None, [(AlarmLog.is_recovery == False, 1)])).alias('cnt_occured'),
+                fn.COUNT(Case(None, [(AlarmLog.is_recovery == True, 1)])).alias('cnt_recovery')
+            ).dicts().get()
+        )
+
+        return cnts['cnt_occured'] > cnts['cnt_recovery']
 
 
 # 全局单例

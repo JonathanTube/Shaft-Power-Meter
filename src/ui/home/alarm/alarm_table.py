@@ -4,6 +4,7 @@ from ui.common.abstract_table import AbstractTable
 from db.models.alarm_log import AlarmLog
 from common.global_data import gdata
 from db.models.date_time_conf import DateTimeConf
+from ui.home.alarm.alarm_util import AlarmUtil
 
 
 class AlarmTable(AbstractTable):
@@ -31,62 +32,6 @@ class AlarmTable(AbstractTable):
 
         return 0
 
-    def get_event_name(self, alarm_type: int) -> str:
-        try:
-            if self.page is None or self.page.session is None:
-                return ''
-
-            session = self.page.session
-            match alarm_type:
-                case AlarmType.MASTER_PLC_DISCONNECTED:
-                    return session.get("lang.alarm.master_plc_disconnected")
-                case AlarmType.MASTER_PLC_CONNECTED:
-                    return session.get("lang.alarm.master_plc_connected")
-
-                case AlarmType.SLAVE_GPS_DISCONNECTED:
-                    return session.get("lang.alarm.slave_gps_disconnected")
-                case AlarmType.SLAVE_GPS_CONNECTED:
-                    return session.get("lang.alarm.slave_gps_connected")
-
-                case AlarmType.MASTER_GPS_DISCONNECTED:
-                    return session.get("lang.alarm.master_gps_disconnected")
-                case AlarmType.MASTER_GPS_CONNECTED:
-                    return session.get("lang.alarm.master_gps_connected")
-
-                case AlarmType.MASTER_SPS_DISCONNECTED:
-                    return session.get("lang.alarm.master_sps_disconnected")
-                case AlarmType.MASTER_SPS_CONNECTED:
-                    return session.get("lang.alarm.master_sps_connected")
-
-                case AlarmType.MASTER_SPS2_DISCONNECTED:
-                    return session.get("lang.alarm.master_sps2_disconnected")
-                case AlarmType.MASTER_SPS2_CONNECTED:
-                    return session.get("lang.alarm.master_sps2_connected")
-
-                case AlarmType.MASTER_SERVER_STOPPED:
-                    return session.get("lang.alarm.master_server_stopped")
-                case AlarmType.MASTER_SERVER_STARTED:
-                    return session.get("lang.alarm.master_server_started")
-
-                case AlarmType.SLAVE_CLIENT_DISCONNECTED:
-                    return session.get("lang.alarm.slave_master_disconnected")
-                case AlarmType.SLAVE_CLIENT_CONNECTED:
-                    return session.get("lang.alarm.slave_master_connected")
-
-                case AlarmType.POWER_OVERLOAD:
-                    return session.get("lang.alarm.power_overload")
-                case AlarmType.POWER_OPTIMAL_LOAD:
-                    return session.get("lang.alarm.power_optimal_load")
-
-                case AlarmType.APP_UNEXPECTED_EXIT:
-                    return session.get("lang.alarm.app_unexpected_exit")
-                case _:
-                    return session.get("lang.alarm.unknown")
-        except:
-            logging.exception("exception occured at AlarmTable.get_event_name")
-
-        return ''
-
     def load_data(self):
         try:
             sql = AlarmLog.select(
@@ -109,7 +54,7 @@ class AlarmTable(AbstractTable):
                 data_list.append([
                     item.id,
                     item.utc_date_time.strftime(self.date_time_format),
-                    self.get_event_name(item.alarm_type),
+                    AlarmUtil.get_event_name(self.page, item.alarm_type, item.is_recovery),
                     item.acknowledge_time.strftime(self.date_time_format) if item.acknowledge_time else ""
                 ])
 

@@ -96,7 +96,7 @@ class IOSettingMasterServer(ft.Container):
                 operation_content=user.user_name
             )
             self.page.run_task(ws_server.stop)
-            AlarmSaver.create(alarm_type=AlarmType.MASTER_SERVER_STOPPED)
+            AlarmSaver.create(AlarmType.MASTER_SERVER)
         except:
             logging.exception('exception occured at IOSettingMasterServer.on_stop')
 

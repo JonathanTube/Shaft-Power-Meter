@@ -11,6 +11,7 @@ from jm3846.JM3846_thrust import jm3846_thrust
 
 class JM3846AsyncClient(ABC):
     """基于asyncio的Modbus TCP异步客户端（通用父类）"""
+
     def __init__(self, name: str):
         self.name = name
         self.reader: Optional[asyncio.StreamReader] = None
@@ -43,33 +44,36 @@ class JM3846AsyncClient(ABC):
 
             except:
                 logging.exception(f'[JM3846-{self.name}] connect error')
-                await self.close()
 
+            await self.release()
             await asyncio.sleep(2 ** self._retry_times)
             self._retry_times += 1
 
     async def close(self):
+        self._retry_times = self._max_retries + 1  # 强制 connect 循环退出
+        await self.release()
+
+    async def release(self):
         """终止一切运行，关闭资源"""
         try:
-            self._retry_times = self._max_retries + 1  # 强制 connect 循环退出
             await JM38460x44.stop_and_wait()  # 等待0x44任务安全退出
+
+            self.stop_background_tasks()
 
             if self.writer:
                 try:
                     await JM38460x45.handle(self.name, self.reader, self.writer)  # 确保在断流前发0x45
-                except Exception:
+                except:
                     logging.warning(f'[JM3846-{self.name}] failed to send 0x45 on close')
 
                 self.writer.close()
                 await self.writer.wait_closed()
 
-            self.create_alarm_hook()
-            self.stop_background_tasks()
-            self.set_offline_hook(True)
-
         except Exception:
             logging.exception('close failed')
         finally:
+            self.create_alarm_hook()
+            self.set_offline_hook(True)
             self.writer = None
             self.reader = None
 

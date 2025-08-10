@@ -62,10 +62,7 @@ class WebSocketMaster:
                     self.server = await websockets.serve(self._client_handler, host, port, ping_interval=30, ping_timeout=10)
                     logging.info(f"[***HMI server***] websocket server started at ws://{host}:{port}")
                     self._is_started = True
-                    AlarmSaver.recovery(
-                        alarm_type_occured=AlarmType.MASTER_SERVER_STOPPED,
-                        alarm_type_recovered=AlarmType.MASTER_SERVER_STARTED
-                    )
+                    AlarmSaver.recovery(AlarmType.MASTER_SERVER)
 
                     asyncio.create_task(self.receive_alarms_from_slave())
 
@@ -74,7 +71,7 @@ class WebSocketMaster:
                 except:
                     logging.exception('exception occured at WebSocketServer.start')
                     self._is_started = False
-                    AlarmSaver.create(alarm_type=AlarmType.MASTER_SERVER_STOPPED)
+                    AlarmSaver.create(AlarmType.MASTER_SERVER)
                 finally:
                     #  指数退避
                     await asyncio.sleep(2 ** attempt)
@@ -83,6 +80,7 @@ class WebSocketMaster:
             self._is_canceled = False
 
     async def send_alarms_to_salve(self):
+        """主机向从机发送未同步的alarm"""
         while gdata.configCommon.is_master and self._is_started:
 
             if self._is_canceled:
@@ -90,10 +88,7 @@ class WebSocketMaster:
 
             try:
                 if len(self.clients) > 0:
-                    AlarmSaver.recovery(
-                        alarm_type_occured=AlarmType.SLAVE_CLIENT_DISCONNECTED,
-                        alarm_type_recovered=AlarmType.SLAVE_CLIENT_CONNECTED
-                    )
+                    AlarmSaver.recovery(AlarmType.SLAVE_CLIENT)
 
                     alarm_logs: list[AlarmLog] = AlarmLog.select(
                         AlarmLog.id,
@@ -105,8 +100,7 @@ class WebSocketMaster:
                         AlarmLog.is_sync == False,
                         AlarmLog.is_from_master == True,
                         # 彼此的连接错误不同步
-                        AlarmLog.alarm_type != AlarmType.SLAVE_CLIENT_DISCONNECTED,
-                        AlarmLog.alarm_type != AlarmType.SLAVE_CLIENT_CONNECTED
+                        AlarmLog.alarm_type != AlarmType.SLAVE_CLIENT
                     )
 
                     alarm_logs_dict = []
@@ -114,9 +108,9 @@ class WebSocketMaster:
                         alarm_logs_dict.append({
                             'master_alarm_id': alarm_log.id,
                             'alarm_type': alarm_log.alarm_type,
+                            'is_recovery': 1 if alarm_log.is_recovery else 0,
                             'utc_date_time': alarm_log.utc_date_time.strftime(date_time_format) if alarm_log.utc_date_time else "",
-                            'acknowledge_time': alarm_log.acknowledge_time.strftime(date_time_format) if alarm_log.acknowledge_time else "",
-                            'is_recovery': 1 if alarm_log.is_recovery else 0
+                            'acknowledge_time': alarm_log.acknowledge_time.strftime(date_time_format) if alarm_log.acknowledge_time else ""
                         })
                     if len(alarm_logs) > 0:
                         is_success = await self.broadcast({'type': 'alarm_logs_from_master', 'data': alarm_logs_dict})
@@ -125,7 +119,7 @@ class WebSocketMaster:
                                 AlarmLog.update(is_sync=True).where(AlarmLog.id == alarm_log.id).execute()
 
                 else:
-                    AlarmSaver.create(alarm_type=AlarmType.SLAVE_CLIENT_DISCONNECTED)
+                    AlarmSaver.create(AlarmType.SLAVE_CLIENT)
             except websockets.ConnectionClosedError:
                 logging.exception("[***HMI server***] broadcast to all clients,ConnectionClosedError occured")
             except:

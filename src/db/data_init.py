@@ -1549,11 +1549,6 @@ class DataInit:
                     "english": "Slave-Master Connected"
                 },
                 {
-                    "code": "lang.alarm.app_unexpected_exit",
-                    "chinese": "应用意外退出",
-                    "english": "App Unexpected Exit"
-                },
-                {
                     "code": "lang.alarm.power_optimal_load",
                     "chinese": "功率正常",
                     "english": "Power Optimal Load"

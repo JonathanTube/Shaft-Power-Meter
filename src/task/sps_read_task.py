@@ -17,10 +17,10 @@ class SpsReadTask(JM3846AsyncClient):
         gdata.configSPS.is_offline = is_offline
 
     def create_alarm_hook(self):
-        AlarmSaver.create(alarm_type=AlarmType.MASTER_SPS_DISCONNECTED)
+        AlarmSaver.create(AlarmType.MASTER_SPS)
 
     def recovery_alarm_hook(self):
-        AlarmSaver.recovery(AlarmType.MASTER_SPS_DISCONNECTED, AlarmType.MASTER_SPS_CONNECTED)
+        AlarmSaver.recovery(AlarmType.MASTER_SPS)
 
 
 sps_read_task = SpsReadTask()

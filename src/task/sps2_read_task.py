@@ -17,10 +17,10 @@ class Sps2ReadTask(JM3846AsyncClient):
         gdata.configSPS2.is_offline = is_offline
 
     def create_alarm_hook(self):
-        AlarmSaver.create(alarm_type=AlarmType.MASTER_SPS2_DISCONNECTED)
+        AlarmSaver.create(AlarmType.MASTER_SPS2)
 
     def recovery_alarm_hook(self):
-        AlarmSaver.recovery(AlarmType.MASTER_SPS2_DISCONNECTED, AlarmType.MASTER_SPS2_CONNECTED)
+        AlarmSaver.recovery(AlarmType.MASTER_SPS2)
 
 
 sps2_read_task = Sps2ReadTask()

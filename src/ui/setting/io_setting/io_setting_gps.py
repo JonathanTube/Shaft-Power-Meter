@@ -114,7 +114,10 @@ class IOSettingGPS(ft.Container):
                 operation_content=user.user_name
             )
             self.page.run_task(gps.close)
-            AlarmSaver.create(alarm_type=AlarmType.MASTER_GPS_DISCONNECTED if gdata.configCommon.is_master else AlarmType.SLAVE_GPS_DISCONNECTED)
+            if gdata.configCommon.is_master:
+                AlarmSaver.create(AlarmType.MASTER_GPS)
+            else:
+                AlarmSaver.create(AlarmType.SLAVE_GPS)
         except:
             logging.exception("exception occured at IOSettingGPS.__on_close")
 

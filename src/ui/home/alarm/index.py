@@ -10,6 +10,7 @@ from ui.common.toast import Toast
 from ui.home.alarm.alarm_table import AlarmTable
 from common.global_data import gdata
 from common.const_alarm_type import AlarmType
+from ui.home.alarm.alarm_util import AlarmUtil
 
 
 class AlarmList(ft.Container):
@@ -56,7 +57,7 @@ class AlarmList(ft.Container):
 
                 self.page.update()
 
-                random_str = ''.join(random.choices(string.ascii_letters + string.digits, k=2))
+                random_str = ''.join(random.choices(string.ascii_letters + string.digits, k=5))
 
                 if self.file_picker is not None:
                     self.file_picker.save_file(file_name=f"AlarmLog_{random_str}.xlsx", allowed_extensions=["xlsx", "xls"])
@@ -72,7 +73,9 @@ class AlarmList(ft.Container):
                 if start_date and end_date:
                     query = AlarmLog.select(
                         AlarmLog.utc_date_time,
-                        AlarmLog.alarm_type, AlarmLog.acknowledge_time
+                        AlarmLog.alarm_type,
+                        AlarmLog.is_recovery,
+                        AlarmLog.acknowledge_time
                     ).where(
                         AlarmLog.utc_date_time >= start_date,
                         AlarmLog.utc_date_time <= end_date
@@ -81,13 +84,14 @@ class AlarmList(ft.Container):
                     query = AlarmLog.select(
                         AlarmLog.utc_date_time,
                         AlarmLog.alarm_type,
+                        AlarmLog.is_recovery,
                         AlarmLog.acknowledge_time
                     ).order_by(AlarmLog.id.desc()).limit(1000)
                 data = []
                 for item in query:
                     data.append({
                         "utc_date_time": item.utc_date_time,
-                        "alarm_type": AlarmType.get_alarm_type_name(item.alarm_type),
+                        "alarm_type": AlarmUtil.get_event_name(self.page, item.alarm_type, item.is_recovery),
                         "acknowledge_time": item.acknowledge_time
                     })
                 df = pd.DataFrame(data)

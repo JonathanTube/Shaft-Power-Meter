@@ -1,6 +1,6 @@
 import asyncio
-from datetime import timedelta
 import logging
+from datetime import timedelta
 from common.const_alarm_type import AlarmType
 from db.models.counter_log import CounterLog
 from db.models.data_log import DataLog
@@ -96,11 +96,8 @@ class DataSaver:
                 # 写入plc-overload
                 asyncio.create_task(plc.write_power_overload(True))
             else:  # 功率恢复
+                AlarmSaver.recovery(AlarmType.POWER_OVERLOAD)
                 # 写入plc-overload
-                AlarmSaver.recovery(
-                    alarm_type_occured=AlarmType.POWER_OVERLOAD,
-                    alarm_type_recovered=AlarmType.POWER_OPTIMAL_LOAD
-                )
                 asyncio.create_task(plc.write_power_overload(False))
 
         return overload

@@ -55,10 +55,7 @@ class WebSocketSlave:
                     logging.info(f"[***HMI client***] connected to {uri}")
 
                     self._is_connected = True
-                    AlarmSaver.recovery(
-                        alarm_type_occured=AlarmType.SLAVE_CLIENT_DISCONNECTED,
-                        alarm_type_recovered=AlarmType.SLAVE_CLIENT_CONNECTED
-                    )
+                    AlarmSaver.recovery(AlarmType.SLAVE_CLIENT)
 
                     # 定期检查gps,alarm,并发送给master
                     asyncio.create_task(self.send_gps_alarm_to_master())
@@ -70,7 +67,7 @@ class WebSocketSlave:
                 except:
                     logging.error(f"[***HMI client***] failed to connect to {uri}")
                     self._is_connected = False
-                    AlarmSaver.create(alarm_type=AlarmType.SLAVE_CLIENT_DISCONNECTED)
+                    AlarmSaver.create(AlarmType.SLAVE_CLIENT)
                 finally:
                     #  指数退避
                     await asyncio.sleep(2 ** self._retry)
@@ -104,17 +101,16 @@ class WebSocketSlave:
                     AlarmLog.is_sync == False,
                     AlarmLog.is_from_master == False,
                     # 彼此的连接错误不同步
-                    AlarmLog.alarm_type != AlarmType.SLAVE_CLIENT_DISCONNECTED,
-                    AlarmLog.alarm_type != AlarmType.SLAVE_CLIENT_CONNECTED
+                    AlarmLog.alarm_type != AlarmType.SLAVE_CLIENT
                 )
                 alarm_logs_dict = []
                 for alarm_log in alarm_logs:
                     alarm_logs_dict.append({
                         'slave_alarm_id': alarm_log.id,
                         'alarm_type': alarm_log.alarm_type,
+                        'is_recovery': 1 if alarm_log.is_recovery else 0,
                         'utc_date_time': alarm_log.utc_date_time.strftime(date_time_format) if alarm_log.utc_date_time else "",
-                        'acknowledge_time': alarm_log.acknowledge_time.strftime(date_time_format) if alarm_log.acknowledge_time else "",
-                        'is_recovery': 1 if alarm_log.is_recovery else 0
+                        'acknowledge_time': alarm_log.acknowledge_time.strftime(date_time_format) if alarm_log.acknowledge_time else ""
                     })
                 if len(alarm_logs) > 0:
                     # 序列化数据
@@ -155,7 +151,7 @@ class WebSocketSlave:
                 gdata.configSPS.is_offline = True
                 gdata.configSPS2.is_offline = True
                 self._is_connected = False
-                AlarmSaver.create(alarm_type=AlarmType.SLAVE_CLIENT_DISCONNECTED)
+                AlarmSaver.create(AlarmType.SLAVE_CLIENT)
                 break
             except:
                 logging.exception("[***HMI client***] exception occured at _receive_loop")
