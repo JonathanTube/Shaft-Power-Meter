@@ -193,7 +193,7 @@ def set_content(page: ft.Page):
 
 
 async def main(page: ft.Page):
-    init_debug(page)
+    # init_debug(page)
     
     def handle_error(e):
         logging.error('============global exception occured===========')
@@ -220,8 +220,6 @@ async def main(page: ft.Page):
 
     except:
         logging.exception('exception occured at main')
-
-    # wrap_all_handlers(page)  # 包装所有事件
 
 if __name__ == "__main__":
     try:
