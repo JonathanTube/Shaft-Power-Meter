@@ -44,8 +44,7 @@ class JM38460x45:
         await writer.drain()
 
         response = await JM3846Util.read_frame(reader)
+        logging.info(f'[JM3846-{name}] send 0x45 res hex={bytes.hex(response)}')
         func_code = struct.unpack(">B", response[7:8])[0]
         if func_code == 0x45:
-            res_0x45 = JM38460x45.parse_response(response)
-            if res_0x45 == 0x45:
-                logging.info(f'[JM3846-{name}] stop 0x44 successfully')
+            JM38460x45.parse_response(response)

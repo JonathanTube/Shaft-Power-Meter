@@ -326,7 +326,6 @@ class IOSettingSPS(ft.Container):
             gdata.configCalc.sensitivity_factor_k = float(self.sensitivity_factor_k.value)
             gdata.configCalc.elastic_modulus_E = float(self.elastic_modulus_E.value)
             gdata.configCalc.poisson_ratio_mu = float(self.poisson_ratio_mu.value)
-            logging.info('factor of gdata was refreshed.')
         except:
             logging.exception('exception occured at IOSettingSPS.save_factor')
 
