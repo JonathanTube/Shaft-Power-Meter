@@ -63,12 +63,10 @@ class JM3846AsyncClient(ABC):
             if self.writer:
                 try:
                     await JM38460x45.handle(self.name, self.reader, self.writer)  # 确保在断流前发0x45
+                    self.writer.close()
+                    await self.writer.wait_closed()
                 except:
                     logging.warning(f'[JM3846-{self.name}] failed to send 0x45 on close')
-
-                self.writer.close()
-                await self.writer.wait_closed()
-
         except Exception:
             logging.exception('close failed')
         finally:
