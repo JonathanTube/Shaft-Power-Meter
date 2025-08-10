@@ -25,7 +25,7 @@ class JM3846AsyncClient(ABC):
         self._retry_times = 0
         while self._retry_times < self._max_retries:
             try:
-                # fixed: 连接建立和初始化放在锁里，长循环移到锁外，避免锁死
+                # 连接建立和初始化放在锁里，长循环移到锁外，避免锁死
                 async with self._lock:
                     host, port = self.get_ip_port()
                     logging.info(f'[JM3846-{self.name}] Connecting to {host}:{port}')
@@ -38,10 +38,10 @@ class JM3846AsyncClient(ABC):
                     self.recovery_alarm_hook()
                     self.set_offline_hook(False)
 
-                # fixed: 0x44 循环放到锁外执行
+                # 0x44 循环放到锁外执行
                 await JM38460x44.handle(self.name, self.reader, self.writer)
 
-            except Exception:
+            except:
                 logging.exception(f'[JM3846-{self.name}] connect error')
                 await self.close()
 
@@ -51,12 +51,12 @@ class JM3846AsyncClient(ABC):
     async def close(self):
         """终止一切运行，关闭资源"""
         try:
-            self._retry_times = self._max_retries + 1  # fixed: 强制 connect 循环退出
-            await JM38460x44.stop_and_wait()  # fixed: 等待0x44任务安全退出
+            self._retry_times = self._max_retries + 1  # 强制 connect 循环退出
+            await JM38460x44.stop_and_wait()  # 等待0x44任务安全退出
 
             if self.writer:
                 try:
-                    await JM38460x45.handle(self.name, self.reader, self.writer)  # fixed: 确保在断流前发0x45
+                    await JM38460x45.handle(self.name, self.reader, self.writer)  # 确保在断流前发0x45
                 except Exception:
                     logging.warning(f'[JM3846-{self.name}] failed to send 0x45 on close')
 
