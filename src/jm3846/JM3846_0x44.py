@@ -92,9 +92,9 @@ class JM38460x44:
 
             if func_code == 0x44:
                 current_frame = JM38460x44.parse_response(response, name)
-                if current_frame >= JM38460x44.total_frames:
+                if current_frame + 1 >= JM38460x44.total_frames:
                     request = JM38460x44.build_request(JM38460x44.frame_size, JM38460x44.total_frames)
-                    logging.info(f'[JM3846-{name}] resend 0x44 req (current_frame={current_frame})')
+                    logging.info(f'[JM3846-{name}] send 0x44 req (current_frame={current_frame}) is greater than (total_frames={JM38460x44.total_frames})')
                     writer.write(request)
                     await writer.drain()
 
