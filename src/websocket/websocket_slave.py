@@ -206,10 +206,10 @@ class WebSocketSlave:
                 udt = datetime.strptime(utc_date_time, date_time_format)
 
             # 查找是否存在
-            cnt = AlarmLog.select().where(AlarmLog.out_id == outer_id).count()
+            cnt = AlarmLog.select().where(AlarmLog.outer_id == outer_id).count()
 
             if cnt > 0:
-                AlarmLog.update(acknowledge_time=ack_time).where(AlarmLog.out_id == outer_id).execute()
+                AlarmLog.update(acknowledge_time=ack_time).where(AlarmLog.outer_id == outer_id).execute()
             else:
                 AlarmLog.create(
                     utc_date_time=udt, acknowledge_time=ack_time,
