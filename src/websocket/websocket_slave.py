@@ -55,7 +55,7 @@ class WebSocketSlave:
                     logging.info(f"[***HMI client***] connected to {uri}")
 
                     self._is_connected = True
-                    AlarmSaver.recovery(AlarmType.SLAVE_CLIENT)
+                    AlarmSaver.recovery(AlarmType.SLAVE_MASTER)
 
                     # 定期检查gps,alarm,并发送给master
                     asyncio.create_task(self.send_gps_alarm_to_master())
@@ -67,7 +67,7 @@ class WebSocketSlave:
                 except:
                     logging.error(f"[***HMI client***] failed to connect to {uri}")
                     self._is_connected = False
-                    AlarmSaver.create(AlarmType.SLAVE_CLIENT)
+                    AlarmSaver.create(AlarmType.SLAVE_MASTER)
                 finally:
                     #  指数退避
                     await asyncio.sleep(2 ** self._retry)
@@ -101,7 +101,7 @@ class WebSocketSlave:
                     AlarmLog.is_sync == False,
                     AlarmLog.is_from_master == False,
                     # 彼此的连接错误不同步
-                    AlarmLog.alarm_type != AlarmType.SLAVE_CLIENT
+                    AlarmLog.alarm_type != AlarmType.SLAVE_MASTER
                 )
                 alarm_logs_dict = []
                 for alarm_log in alarm_logs:
@@ -151,7 +151,7 @@ class WebSocketSlave:
                 gdata.configSPS.is_offline = True
                 gdata.configSPS2.is_offline = True
                 self._is_connected = False
-                AlarmSaver.create(AlarmType.SLAVE_CLIENT)
+                AlarmSaver.create(AlarmType.SLAVE_MASTER)
                 break
             except:
                 logging.exception("[***HMI client***] exception occured at _receive_loop")

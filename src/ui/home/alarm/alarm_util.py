@@ -40,7 +40,7 @@ class AlarmUtil:
                         return session.get("lang.alarm.master_server_started")
                     return session.get("lang.alarm.master_server_stopped")
 
-                case AlarmType.SLAVE_CLIENT:
+                case AlarmType.SLAVE_MASTER:
                     if is_recovery:
                         return session.get("lang.alarm.slave_master_connected")
                     return session.get("lang.alarm.slave_master_disconnected")

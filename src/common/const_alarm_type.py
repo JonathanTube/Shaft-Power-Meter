@@ -9,6 +9,7 @@ class AlarmType(str, Enum):
     MASTER_SERVER = "MASTER_SERVER"
 
     SLAVE_GPS = "SLAVE_GPS"
-    SLAVE_CLIENT = "SLAVE_CLIENT"
+    # 主机和从机通讯
+    SLAVE_MASTER = "SLAVE_MASTER"
 
     POWER_OVERLOAD = "POWER_OVERLOAD"

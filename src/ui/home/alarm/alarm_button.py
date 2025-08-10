@@ -2,6 +2,7 @@ import asyncio
 import logging
 import flet as ft
 from typing import Callable
+from peewee import fn, Case
 
 from db.models.alarm_log import AlarmLog
 
@@ -31,9 +32,15 @@ class AlarmButton(ft.TextButton):
 
     def handle_data(self):
         try:
-            self.alarm_count = AlarmLog.select().where(AlarmLog.is_recovery == False).count()
+            cnts = (
+                AlarmLog.select(
+                    fn.COUNT(Case(None, [(AlarmLog.is_recovery == False, 1)])).alias('cnt_occured'),
+                    fn.COUNT(Case(None, [(AlarmLog.is_recovery == True, 1)])).alias('cnt_recovery')
+                ).dicts().get()
+            )
+            self.alarm_count = cnts['cnt_occured'] - cnts['cnt_recovery']
             self.not_ack_count = AlarmLog.select().where(
-                AlarmLog.is_recovery == False, 
+                AlarmLog.is_recovery == False,
                 AlarmLog.acknowledge_time.is_null()
             ).count()
         except:

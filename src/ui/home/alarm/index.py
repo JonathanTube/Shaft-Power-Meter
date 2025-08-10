@@ -79,7 +79,7 @@ class AlarmList(ft.Container):
                     ).where(
                         AlarmLog.utc_date_time >= start_date,
                         AlarmLog.utc_date_time <= end_date
-                    ).order_by(AlarmLog.id.desc()).limit(1000)
+                    ).order_by(AlarmLog.alarm_type.asc(), AlarmLog.id.desc()).limit(1000)
                 else:
                     query = AlarmLog.select(
                         AlarmLog.utc_date_time,

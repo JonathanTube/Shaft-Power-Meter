@@ -116,7 +116,7 @@ class InterfaceConf(ft.Container):
                 operation_content=user.user_name
             )
             self.page.run_task(ws_client.close)
-            AlarmSaver.create(AlarmType.SLAVE_CLIENT)
+            AlarmSaver.create(AlarmType.SLAVE_MASTER)
         except: 
             logging.exception("exception occured at InterfaceConf.__on_close")
 

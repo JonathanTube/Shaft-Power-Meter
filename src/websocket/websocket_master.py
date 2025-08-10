@@ -88,7 +88,7 @@ class WebSocketMaster:
 
             try:
                 if len(self.clients) > 0:
-                    AlarmSaver.recovery(AlarmType.SLAVE_CLIENT)
+                    AlarmSaver.recovery(AlarmType.SLAVE_MASTER)
 
                     alarm_logs: list[AlarmLog] = AlarmLog.select(
                         AlarmLog.id,
@@ -100,7 +100,7 @@ class WebSocketMaster:
                         AlarmLog.is_sync == False,
                         AlarmLog.is_from_master == True,
                         # 彼此的连接错误不同步
-                        AlarmLog.alarm_type != AlarmType.SLAVE_CLIENT
+                        AlarmLog.alarm_type != AlarmType.SLAVE_MASTER
                     )
 
                     alarm_logs_dict = []
@@ -119,7 +119,7 @@ class WebSocketMaster:
                                 AlarmLog.update(is_sync=True).where(AlarmLog.id == alarm_log.id).execute()
 
                 else:
-                    AlarmSaver.create(AlarmType.SLAVE_CLIENT)
+                    AlarmSaver.create(AlarmType.SLAVE_MASTER)
             except websockets.ConnectionClosedError:
                 logging.exception("[***HMI server***] broadcast to all clients,ConnectionClosedError occured")
             except:
