@@ -106,12 +106,23 @@ class JM38460x44:
 
     @staticmethod
     async def stop_and_wait():
-        """fixed: 停止接收并等待任务结束"""
-        JM38460x44.running = False
-        if JM38460x44.loop_task:
-            JM38460x44.loop_task.cancel()
-            try:
+        """
+        停止 0x44 任务并安全等待退出
+        """
+        if JM38460x44.loop_task is None:
+            print("[JM3846_0x44] loop_task is None, 无需等待")
+            return
+
+        # 🆕 新增安全检查和取消逻辑
+        try:
+            if not JM38460x44.loop_task.done():
+                print("[JM3846_0x44] 正在等待 loop_task 退出...")
                 await JM38460x44.loop_task
-            except asyncio.CancelledError:
-                pass
+            else:
+                print("[JM3846_0x44] loop_task 已经完成, result=", JM38460x44.loop_task.result())
+        except asyncio.CancelledError:
+            print("[JM3846_0x44] loop_task 已取消")
+        except Exception as e:
+            print(f"[JM3846_0x44] loop_task 等待过程中出错: {e}")
+        finally:
             JM38460x44.loop_task = None
