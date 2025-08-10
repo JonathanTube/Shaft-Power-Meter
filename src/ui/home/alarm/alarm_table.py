@@ -1,5 +1,4 @@
 import logging
-from common.const_alarm_type import AlarmType
 from ui.common.abstract_table import AbstractTable
 from db.models.alarm_log import AlarmLog
 from common.global_data import gdata
@@ -39,13 +38,13 @@ class AlarmTable(AbstractTable):
                 AlarmLog.utc_date_time,
                 AlarmLog.alarm_type,
                 AlarmLog.is_recovery,
-                AlarmLog.acknowledge_time
+                AlarmLog.acknowledge_time,
             )
             start_date = self.kwargs.get('start_date')
             end_date = self.kwargs.get('end_date')
             if start_date and end_date:
                 sql = sql.where(AlarmLog.utc_date_time >= start_date, AlarmLog.utc_date_time <= end_date)
-            data: list[AlarmLog] = sql.order_by(AlarmLog.alarm_type.asc(), AlarmLog.id.desc()).paginate(self.current_page, self.page_size)
+            data: list[AlarmLog] = sql.order_by(AlarmLog.id.desc()).paginate(self.current_page, self.page_size)
 
             data_list = []
 
