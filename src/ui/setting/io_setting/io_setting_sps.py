@@ -220,7 +220,7 @@ class IOSettingSPS(ft.Container):
         except Exception as e:
             Toast.show_error(self.page, str(e))
             return
-        
+
         try:
             self.sps_connect.text = 'loading...'
             self.sps_connect.bgcolor = ft.Colors.GREY
@@ -238,7 +238,6 @@ class IOSettingSPS(ft.Container):
         except:
             logging.exception("exception occured at __connect_to_sps")
 
-
     def __close_sps(self, user: User):
         try:
             self.sps_disconnect.text = 'loading...'
@@ -252,7 +251,6 @@ class IOSettingSPS(ft.Container):
                 operation_content=user.user_name
             )
             self.page.run_task(sps_read_task.close)
-            sps_read_task.create_alarm()
         except:
             logging.exception("exception occured at __disconnect_from_sps")
 
@@ -337,26 +335,26 @@ class IOSettingSPS(ft.Container):
             if self.page and self.page.session:
                 if self.sps_connect:
                     self.sps_connect.text = self.page.session.get("lang.setting.connect")
-                    self.sps_connect.visible = not sps_read_task.is_connected
+                    self.sps_connect.visible = gdata.configSPS.is_offline
                     self.sps_connect.bgcolor = ft.Colors.GREEN
                     self.sps_connect.disabled = False
 
                 if self.sps_disconnect:
                     self.sps_disconnect.text = self.page.session.get("lang.setting.disconnect")
-                    self.sps_disconnect.visible = sps_read_task.is_connected
+                    self.sps_disconnect.visible = not gdata.configSPS.is_offline
                     self.sps_disconnect.bgcolor = ft.Colors.RED
                     self.sps_disconnect.disabled = False
 
                 if self.is_dual:
                     if self.sps2_connect:
                         self.sps2_connect.text = self.page.session.get("lang.setting.connect")
-                        self.sps2_connect.visible = not sps2_read_task.is_connected
+                        self.sps2_connect.visible = gdata.configSPS2.is_offline
                         self.sps2_connect.bgcolor = ft.Colors.GREEN
                         self.sps2_connect.disabled = False
 
                     if self.sps2_disconnect:
                         self.sps2_disconnect.text = self.page.session.get("lang.setting.disconnect")
-                        self.sps2_disconnect.visible = sps2_read_task.is_connected
+                        self.sps2_disconnect.visible = not gdata.configSPS2.is_offline
                         self.sps2_disconnect.bgcolor = ft.Colors.RED
                         self.sps2_disconnect.disabled = False
         except:

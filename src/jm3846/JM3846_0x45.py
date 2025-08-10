@@ -29,6 +29,6 @@ class JM38460x45Async:
         """
         try:
             func_code = data[7]
-            logging.info(f"JM38460x45Async.parse_response.func_code={func_code}")
+            return func_code
         except:
             logging.exception(f"Exception occured at JM38460x45Async.parse_response")
