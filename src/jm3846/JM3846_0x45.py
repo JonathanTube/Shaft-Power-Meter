@@ -1,8 +1,10 @@
 import struct
 import logging
 
+from jm3846.JM3846_util import JM3846Util
 
-class JM38460x45Async:
+
+class JM38460x45:
     """异步版本的功能码0x45处理器"""
 
     @staticmethod
@@ -32,3 +34,18 @@ class JM38460x45Async:
             return func_code
         except:
             logging.exception(f"Exception occured at JM38460x45Async.parse_response")
+
+    @staticmethod
+    async def handle(name: str, reader, writer):
+        """功能码0x45：断开数据流"""
+        request = JM38460x45.build_request()
+        logging.info(f'[JM3846-{name}] send 0x45 req hex={bytes.hex(request)}')
+        writer.write(request)
+        await writer.drain()
+
+        response = await JM3846Util.read_frame(reader)
+        func_code = struct.unpack(">B", response[7:8])[0]
+        if func_code == 0x45:
+            res_0x45 = JM38460x45.parse_response(response)
+            if res_0x45 == 0x45:
+                logging.info(f'[JM3846-{name}] stop 0x44 successfully')
