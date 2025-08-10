@@ -51,11 +51,28 @@ class Toast:
                 toast.opacity = 1
                 page.update()
 
-                if auto_hide:
-                    # 定时隐藏并移除
-                    time.sleep(duration)
-                    toast.opacity = 0
-                    page.overlay.remove(toast)
-                    page.update()
+            # -- 在 Toast.show_toast 中，替换 auto_hide 部分为：
+            if auto_hide:
+                def _hide_toast(p: ft.Page):
+                    try:
+                        time.sleep(duration)  # 这个 sleep 在后台线程执行，不会阻塞主线程
+                        try:
+                            toast.opacity = 0
+                            if toast in p.overlay:
+                                p.overlay.remove(toast)
+                            p.update()
+                        except Exception:
+                            logging.exception("toast hide error")
+                    except Exception:
+                        logging.exception("toast background error")
+
+                # 用 page.run_task 在后台线程执行 _hide_toast
+                try:
+                    page.run_task(_hide_toast, page)
+                except Exception:
+                    # 如果 run_task 不可用或失败，降级为线程（保底）
+                    import threading
+                    threading.Thread(target=_hide_toast, args=(page,), daemon=True).start()
+
         except:
             logging.exception("toast error")

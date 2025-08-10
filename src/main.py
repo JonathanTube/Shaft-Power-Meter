@@ -6,6 +6,7 @@ import flet as ft
 from db.models.data_log import DataLog
 from db.models.io_conf import IOConf
 from db.models.system_settings import SystemSettings
+from debug import init_debug
 from ui.common.fullscreen_alert import FullscreenAlert
 from ui.common.keyboard import keyboard
 from ui.header.index import Header
@@ -192,7 +193,8 @@ def set_content(page: ft.Page):
 
 
 async def main(page: ft.Page):
-
+    init_debug(page)
+    
     def handle_error(e):
         logging.error('============global exception occured===========')
         logging.exception(e)
@@ -218,6 +220,8 @@ async def main(page: ft.Page):
 
     except:
         logging.exception('exception occured at main')
+
+    # wrap_all_handlers(page)  # 包装所有事件
 
 if __name__ == "__main__":
     try:
