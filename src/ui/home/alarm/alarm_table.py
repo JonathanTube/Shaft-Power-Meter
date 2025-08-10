@@ -38,9 +38,8 @@ class AlarmTable(AbstractTable):
                 AlarmLog.id,
                 AlarmLog.utc_date_time,
                 AlarmLog.alarm_type,
-                AlarmLog.acknowledge_time,
                 AlarmLog.is_recovery,
-                AlarmLog.is_from_master
+                AlarmLog.acknowledge_time
             )
             start_date = self.kwargs.get('start_date')
             end_date = self.kwargs.get('end_date')

@@ -106,7 +106,7 @@ class WebSocketMaster:
                     alarm_logs_dict = []
                     for alarm_log in alarm_logs:
                         alarm_logs_dict.append({
-                            'master_alarm_id': alarm_log.id,
+                            'id': alarm_log.id,
                             'alarm_type': alarm_log.alarm_type,
                             'is_recovery': 1 if alarm_log.is_recovery else 0,
                             'utc_date_time': alarm_log.utc_date_time.strftime(date_time_format) if alarm_log.utc_date_time else "",
@@ -182,11 +182,11 @@ class WebSocketMaster:
 
         try:
             for alarm_log in alarm_logs:
-                slave_alarm_id = alarm_log['slave_alarm_id']
+                outer_id = alarm_log['id']
                 alarm_type = alarm_log['alarm_type']
+                is_recovery = alarm_log['is_recovery']
                 utc_date_time = alarm_log['utc_date_time']
                 acknowledge_time = alarm_log['acknowledge_time']
-                is_recovery = alarm_log['is_recovery']
 
                 ack_time = None
                 if acknowledge_time:
@@ -196,21 +196,15 @@ class WebSocketMaster:
                 if utc_date_time:
                     udt = datetime.strptime(utc_date_time, date_time_format)
 
-                cnt: int = AlarmLog.select().where(AlarmLog.slave_alarm_id == slave_alarm_id).count()
+                cnt: int = AlarmLog.select().where(AlarmLog.outer_id == outer_id).count()
 
                 if cnt > 0:
-                    AlarmLog.update(
-                        is_recovery=is_recovery, acknowledge_time=ack_time
-                    ).where(
-                        AlarmLog.slave_alarm_id == slave_alarm_id
-                    ).execute()
+                    AlarmLog.update(acknowledge_time=ack_time).where(AlarmLog.outer_id == outer_id).execute()
                 else:
                     AlarmLog.create(
-                        utc_date_time=udt,
-                        acknowledge_time=ack_time,
-                        is_from_master=False,
-                        alarm_type=alarm_type,
-                        slave_alarm_id=slave_alarm_id
+                        utc_date_time=udt, acknowledge_time=ack_time,
+                        alarm_type=alarm_type, is_recovery=is_recovery,
+                        is_from_master=False, outer_id=outer_id
                     )
 
             logging.info(f"成功同步 {len(alarm_logs)} 条报警slave GPS报警日志")

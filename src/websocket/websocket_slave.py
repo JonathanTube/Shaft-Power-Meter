@@ -106,7 +106,7 @@ class WebSocketSlave:
                 alarm_logs_dict = []
                 for alarm_log in alarm_logs:
                     alarm_logs_dict.append({
-                        'slave_alarm_id': alarm_log.id,
+                        'id': alarm_log.id,
                         'alarm_type': alarm_log.alarm_type,
                         'is_recovery': 1 if alarm_log.is_recovery else 0,
                         'utc_date_time': alarm_log.utc_date_time.strftime(date_time_format) if alarm_log.utc_date_time else "",
@@ -191,11 +191,11 @@ class WebSocketSlave:
         """处理alarm数据"""
         alarm_logs = data['data']
         for alarm_log in alarm_logs:
-            master_alarm_id = alarm_log['master_alarm_id']
+            outer_id = alarm_log['id']
             alarm_type = alarm_log['alarm_type']
+            is_recovery = alarm_log['is_recovery']
             utc_date_time = alarm_log['utc_date_time']
             acknowledge_time = alarm_log['acknowledge_time']
-            is_recovery = alarm_log['is_recovery']
 
             ack_time = None
             if acknowledge_time:
@@ -206,21 +206,15 @@ class WebSocketSlave:
                 udt = datetime.strptime(utc_date_time, date_time_format)
 
             # 查找是否存在
-            cnt = AlarmLog.select().where(AlarmLog.master_alarm_id == master_alarm_id).count()
+            cnt = AlarmLog.select().where(AlarmLog.out_id == outer_id).count()
+
             if cnt > 0:
-                AlarmLog.update(
-                    is_recovery=is_recovery, acknowledge_time=ack_time, alarm_type=alarm_type
-                ).where(
-                    AlarmLog.master_alarm_id == master_alarm_id
-                ).execute()
+                AlarmLog.update(acknowledge_time=ack_time).where(AlarmLog.out_id == outer_id).execute()
             else:
                 AlarmLog.create(
-                    utc_date_time=udt,
-                    acknowledge_time=ack_time,
-                    alarm_type=alarm_type,
-                    is_from_master=True,
-                    is_recovery=is_recovery,
-                    master_alarm_id=master_alarm_id
+                    utc_date_time=udt, acknowledge_time=ack_time,
+                    alarm_type=alarm_type, is_recovery=is_recovery,
+                    is_from_master=True, outer_id=outer_id
                 )
 
     async def close(self):
