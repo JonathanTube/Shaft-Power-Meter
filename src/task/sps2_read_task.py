@@ -3,7 +3,6 @@ import logging
 import asyncio
 from jm3846.JM3846_client import JM3846AsyncClient
 from db.models.io_conf import IOConf
-from common.global_data import gdata
 from common.const_alarm_type import AlarmType
 from utils.alarm_saver import AlarmSaver
 
@@ -13,6 +12,7 @@ logger = logging.getLogger("Sps2ReadTask")
 class Sps2ReadTask(JM3846AsyncClient):
     def __init__(self):
         super().__init__("sps2")
+        self.is_online = None
 
     def get_ip_port(self):
         """同步获取 SPS2 IP 和端口"""
@@ -23,14 +23,19 @@ class Sps2ReadTask(JM3846AsyncClient):
             logger.exception("[Sps2ReadTask] 获取 IO 配置失败")
             return "127.0.0.1", 502
 
-    def set_offline_hook(self, is_offline: bool):
-        """设置离线状态（非阻塞）"""
-        try:
-            gdata.configSPS2.is_offline = bool(is_offline)
-        except Exception:
-            logger.exception("[Sps2ReadTask] 设置离线状态失败")
+    def set_online(self):
+        """设置在线状态（非阻塞）"""
+        if self.is_online is None or self.is_online == False:
+            self.is_online = True
+            self.recovery_alarm()
 
-    def create_alarm_hook(self):
+    def set_offline(self):
+        """设置离线状态（非阻塞）"""
+        if self.is_online is None or self.is_online == True:
+            self.is_online = False
+            self.create_alarm()
+
+    def create_alarm(self):
         """创建报警（异步执行数据库写入）"""
         try:
             loop = asyncio.get_running_loop()
@@ -41,7 +46,7 @@ class Sps2ReadTask(JM3846AsyncClient):
         except Exception:
             logger.exception("[Sps2ReadTask] 创建报警失败")
 
-    def recovery_alarm_hook(self):
+    def recovery_alarm(self):
         """恢复报警（异步执行数据库写入）"""
         try:
             loop = asyncio.get_running_loop()

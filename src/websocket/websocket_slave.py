@@ -13,15 +13,12 @@ from common.global_data import gdata
 from utils.datetime_util import DateTimeUtil
 
 
-date_time_format = '%Y-%m-%d %H:%M:%S'
-
-
 class WebSocketSlave:
     def __init__(self):
         self._lock = asyncio.Lock()
         self.websocket = None
         self.is_online = False  # 当前连接状态
-        self._is_canceled = False
+        self.is_canceled = False
 
     async def start(self):
         """启动客户端（无限重连版）"""
@@ -29,11 +26,11 @@ class WebSocketSlave:
             if self.is_online:
                 return
 
-            self._is_canceled = False
+            self.is_canceled = False
 
             while not gdata.configCommon.is_master:
                 # 如果是手动取消，直接跳出
-                if self._is_canceled:
+                if self.is_canceled:
                     break
 
                 try:
@@ -109,7 +106,7 @@ class WebSocketSlave:
 
     async def receive_data_from_master(self):
         while not gdata.configCommon.is_master and self.is_online:
-            if self._is_canceled:
+            if self.is_canceled:
                 return
 
             try:
@@ -122,13 +119,8 @@ class WebSocketSlave:
                     self.__handle_alarm_logs_from_master(data)
                 elif data['type'] == 'propeller_setting':
                     self.__handle_propeller_setting(data)
-
-                gdata.configSPS.is_offline = False
-                gdata.configSPS2.is_offline = False
             except (websockets.ConnectionClosedError, websockets.ConnectionClosedOK, websockets.ConnectionClosed):
                 logging.error("[Slave客户端] 连接断开")
-                gdata.configSPS.is_offline = True
-                gdata.configSPS2.is_offline = True
                 self.is_online = False
                 AlarmSaver.create(AlarmType.SLAVE_MASTER)
                 break
@@ -192,7 +184,7 @@ class WebSocketSlave:
                 )
 
     async def stop(self):
-        self._is_canceled = True
+        self.is_canceled = True
 
         if not self.is_online:
             return

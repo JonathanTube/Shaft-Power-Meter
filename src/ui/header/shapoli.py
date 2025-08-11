@@ -1,6 +1,6 @@
 import logging
 import flet as ft
-from db.models.system_settings import SystemSettings
+from common.global_data import gdata
 
 
 class ShaPoLi(ft.Container):
@@ -10,8 +10,7 @@ class ShaPoLi(ft.Container):
 
     def build(self):
         try:
-            self.system_settings: SystemSettings = SystemSettings.get()
-            self.visible = self.system_settings.sha_po_li
+            self.visible = gdata.configCommon.shapoli
 
             self.content = ft.TextButton(
                 text="ShaPoLi",

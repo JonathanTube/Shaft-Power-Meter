@@ -1,3 +1,4 @@
+import asyncio
 import logging
 import flet as ft
 from typing import Callable
@@ -14,11 +15,11 @@ class PermissionCheck(ft.AlertDialog):
         self.on_confirm = on_confirm
         self.on_cancel = on_cancel
         self.closable = closable
-        # self.barrier_color = ft.Colors.TRANSPARENT
+
         self.shadow_color = ft.Colors.PRIMARY
         self.elevation = 8
 
-        self.system_settings:SystemSettings = SystemSettings.get()
+        self.system_settings: SystemSettings = None
 
     def get_role_name(self):
         if self.user_role == 0:
@@ -32,6 +33,7 @@ class PermissionCheck(ft.AlertDialog):
 
     def build(self):
         try:
+            self.system_settings = asyncio.to_thread(SystemSettings.get)
             if self.page and self.page.session:
                 s = self.page.session
                 self.title = ft.Text(f"{self.get_role_name()}-{s.get('lang.permission.authentication')}")
@@ -57,7 +59,7 @@ class PermissionCheck(ft.AlertDialog):
                 self.content = ft.Column(
                     height=220,
                     controls=[
-                        self.user_name, 
+                        self.user_name,
                         self.user_pwd,
                         ft.ResponsiveRow(controls=self.number_keys)
                     ]
@@ -69,7 +71,6 @@ class PermissionCheck(ft.AlertDialog):
         except:
             logging.exception('exception occured at PermissionCheck.build')
 
-
     def __on_key_click(self, e):
         try:
             if e.control is not None:
@@ -80,7 +81,6 @@ class PermissionCheck(ft.AlertDialog):
         except:
             logging.exception("exception occured at PermissionCheck.__on_key_click")
 
-
     def __on_delete_one(self, e):
         try:
             if self.user_pwd and self.user_pwd.page:
@@ -89,11 +89,10 @@ class PermissionCheck(ft.AlertDialog):
         except:
             logging.exception("exception occured at PermissionCheck.__on_delete_one")
 
-
     def before_update(self):
         try:
             users = []
-            if self.user_role == 0: # admin rights
+            if self.user_role == 0:  # admin rights
                 users = User.select().where(User.user_role == 0).execute()
             elif self.system_settings.hide_admin_account:
                 users = User.select().where(User.user_role <= self.user_role, User.user_role > 0).execute()
@@ -105,7 +104,6 @@ class PermissionCheck(ft.AlertDialog):
         except:
             logging.exception('exception occured at PermissionCheck.before_update')
 
-
     def __on_cancel(self, e):
         try:
             if self.page:
@@ -115,7 +113,6 @@ class PermissionCheck(ft.AlertDialog):
                     self.on_cancel(e)
         except:
             logging.exception("exception occured at PermissionCheck.__on_cancel")
-
 
     def __on_confirm(self, e):
         try:

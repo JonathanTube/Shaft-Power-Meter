@@ -5,7 +5,6 @@ from common.operation_type import OperationType
 from db.models.factor_conf import FactorConf
 from db.models.io_conf import IOConf
 from db.models.operation_log import OperationLog
-from db.models.system_settings import SystemSettings
 from db.models.user import User
 from ui.common.custom_card import CustomCard
 from ui.common.keyboard import keyboard
@@ -20,8 +19,6 @@ class IOSettingSPS(ft.Container):
     def __init__(self, conf: IOConf):
         super().__init__()
         self.conf: IOConf = conf
-        self.system_settings: SystemSettings = SystemSettings.get()
-        self.is_dual = self.system_settings.amount_of_propeller > 1
 
         self.factor_conf: FactorConf = FactorConf.get()
 
@@ -194,7 +191,7 @@ class IOSettingSPS(ft.Container):
                                 self.sps2_disconnect
                             ])
                     ],
-                    visible=self.is_dual
+                    visible=gdata.configCommon.amount_of_propeller == 2
                 )
 
                 self.custom_card = CustomCard(
@@ -301,7 +298,7 @@ class IOSettingSPS(ft.Container):
         except ValueError:
             raise ValueError(f'{self.page.session.get("lang.common.ip_address_format_error")}: {self.sps_ip.value}')
 
-        if self.is_dual:
+        if gdata.configCommon.amount_of_propeller == 2:
             try:
                 ipaddress.ip_address(self.sps2_ip.value)
                 self.conf.sps2_ip = self.sps2_ip.value
@@ -334,26 +331,26 @@ class IOSettingSPS(ft.Container):
             if self.page and self.page.session:
                 if self.sps_connect:
                     self.sps_connect.text = self.page.session.get("lang.setting.connect")
-                    self.sps_connect.visible = gdata.configSPS.is_offline
+                    self.sps_connect.visible = not sps_read_task.is_online
                     self.sps_connect.bgcolor = ft.Colors.GREEN
                     self.sps_connect.disabled = False
 
                 if self.sps_disconnect:
                     self.sps_disconnect.text = self.page.session.get("lang.setting.disconnect")
-                    self.sps_disconnect.visible = not gdata.configSPS.is_offline
+                    self.sps_disconnect.visible = sps_read_task.is_online
                     self.sps_disconnect.bgcolor = ft.Colors.RED
                     self.sps_disconnect.disabled = False
 
-                if self.is_dual:
+                if gdata.configCommon.amount_of_propeller == 2:
                     if self.sps2_connect:
                         self.sps2_connect.text = self.page.session.get("lang.setting.connect")
-                        self.sps2_connect.visible = gdata.configSPS2.is_offline
+                        self.sps2_connect.visible = not sps2_read_task.is_online
                         self.sps2_connect.bgcolor = ft.Colors.GREEN
                         self.sps2_connect.disabled = False
 
                     if self.sps2_disconnect:
                         self.sps2_disconnect.text = self.page.session.get("lang.setting.disconnect")
-                        self.sps2_disconnect.visible = not gdata.configSPS2.is_offline
+                        self.sps2_disconnect.visible = sps2_read_task.is_online
                         self.sps2_disconnect.bgcolor = ft.Colors.RED
                         self.sps2_disconnect.disabled = False
         except:

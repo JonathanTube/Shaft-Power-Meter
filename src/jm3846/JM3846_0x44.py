@@ -65,11 +65,11 @@ class JM38460x44:
         return current_frame
 
     @staticmethod
-    async def handle(name, reader, writer):
+    async def handle(name, reader, writer, on_success: callable, on_error: callable):
         if writer is None or writer.is_closing():
             logging.warning(f"[{name}] connection closed, stopping handle")
             return
-        
+
         request = JM38460x44.build_request(JM38460x44.frame_size, JM38460x44.total_frames)
         logging.info(f'[JM3846-{name}] send 0x44 req hex={bytes.hex(request)}')
 
@@ -82,20 +82,23 @@ class JM38460x44:
             logging.exception(f"[{name}] unexpected error in drain")
 
         JM38460x44.running = True
-        JM38460x44.loop_task = asyncio.create_task(JM38460x44.receive_0x44(name, reader, writer))
+        JM38460x44.loop_task = asyncio.create_task(JM38460x44.receive_0x44(name, reader, writer, on_success, on_error))
         await JM38460x44.loop_task
 
     @staticmethod
-    async def receive_0x44(name, reader, writer):
+    async def receive_0x44(name, reader, writer, on_success: callable, on_error: callable):
         while JM38460x44.running:
             try:
                 frame = await JM3846Util.read_frame(reader)
                 if frame is None:
+                    on_error()
                     return  # 优雅退出
             except asyncio.CancelledError:
+                on_error()
                 break
             except Exception:
                 logging.warning(f'[JM3846-{name}] receive_0x44 error')
+                on_error()
                 break
 
             func_code = struct.unpack(">B", frame[7:8])[0]
@@ -109,6 +112,7 @@ class JM38460x44:
                     logging.info(f'[JM3846-{name}] send 0x44 req (current_frame={current_frame}) is greater than (total_frames={JM38460x44.total_frames})')
                     writer.write(request)
                     await writer.drain()
+                on_success()
 
     @staticmethod
     def stop():

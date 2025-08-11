@@ -8,7 +8,7 @@ from db.models.preference import Preference
 from db.models.report_detail import ReportDetail
 from utils.unit_parser import UnitParser
 from db.models.date_time_conf import DateTimeConf
-
+from common.global_data import gdata
 
 class ReportInfoDialog(ft.AlertDialog):
     def __init__(self, id, report_name):
@@ -17,9 +17,6 @@ class ReportInfoDialog(ft.AlertDialog):
         datetime_conf: DateTimeConf = DateTimeConf.get()
         self.date_format = datetime_conf.date_format
         self.date_time_format = f"{self.date_format} %H:%M:%S"
-
-        system_settings: SystemSettings = SystemSettings.get()
-        self.is_dual = system_settings.amount_of_propeller == 2
 
         self.id = id
         self.report_name = report_name if report_name is not None else ''
@@ -51,7 +48,7 @@ class ReportInfoDialog(ft.AlertDialog):
             if self.report_info is not None:
                 self.event_log: EventLog = self.report_info.event_log
                 # limit the max report details to 200 otherwise the database will be locked
-                if self.is_dual:
+                if gdata.configCommon.amount_of_propeller == 2:
                     self.report_details: list[ReportDetail] = ReportDetail.select().where(
                         ReportDetail.report_info == self.report_info.id
                     ).order_by(
@@ -286,7 +283,7 @@ class ReportInfoDialog(ft.AlertDialog):
 
             rows = []
 
-            if self.is_dual:
+            if gdata.configCommon.amount_of_propeller == 2:
                 # get distinct utc_date_time list from report_details
                 utc_date_times = list(set([report_detail.utc_date_time for report_detail in self.report_details]))
                 for index, utc_date_time in enumerate(utc_date_times):
@@ -347,7 +344,7 @@ class ReportInfoDialog(ft.AlertDialog):
                 ft.DataColumn(ft.Text(f"Torque(kNm)") if system_unit == 0 else ft.Text(f"Torque(Tm)")),
                 ft.DataColumn(ft.Text(f"Power(kW)") if system_unit == 0 else ft.Text(f"Power(sHp)")),
             ]
-            if self.is_dual:
+            if gdata.configCommon.amount_of_propeller == 2:
                 columns.append(ft.DataColumn(ft.Text(f"Total Power(kW)") if system_unit == 0 else ft.Text(f"Total Power(sHp)")))
 
             table = ft.DataTable(

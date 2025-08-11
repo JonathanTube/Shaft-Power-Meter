@@ -1,10 +1,9 @@
 import logging
 import flet as ft
-
-from db.models.system_settings import SystemSettings
 from ui.home.counter.interval import IntervalCounter
 from ui.home.counter.manually import ManuallyCounter
 from ui.home.counter.total import TotalCounter
+from common.global_data import gdata
 
 
 class Counter(ft.Container):
@@ -13,16 +12,13 @@ class Counter(ft.Container):
         self.padding = 10
         self.expand = True
 
-        system_settings: SystemSettings = SystemSettings.get_or_none()
-        self.dual = system_settings.amount_of_propeller == 2
-
     def build(self):
         try:
             interval_counter_sps = IntervalCounter('sps')
             manually_counter_sps = ManuallyCounter('sps')
             total_counter_sps = TotalCounter('sps')
 
-            if self.dual:
+            if gdata.configCommon.amount_of_propeller == 2:
                 interval_counter_sps2 = IntervalCounter('sps2')
                 manually_counter_sps2 = ManuallyCounter('sps2')
                 total_counter_sps2 = TotalCounter('sps2')
@@ -45,4 +41,3 @@ class Counter(ft.Container):
                 ])
         except:
             logging.exception('exception occured at Counter.build')
-

@@ -10,7 +10,6 @@ from ui.common.toast import Toast
 from ui.header.shapoli import ShaPoLi
 from ui.header.logo import HeaderLogo
 from ui.header.theme import Theme
-from db.models.system_settings import SystemSettings
 from ui.common.keyboard import keyboard
 from utils.system_exit_tool import SystemExitTool
 
@@ -185,12 +184,11 @@ class Header(ft.AppBar):
             datetime_conf: DateTimeConf = DateTimeConf.get()
             self.date_format = datetime_conf.date_format
             if self.page and self.page.session:
-                system_setting: SystemSettings = SystemSettings.get()
                 if self.report is not None:
-                    self.report.visible = system_setting.sha_po_li
+                    self.report.visible = gdata.configCommon.shapoli
 
                 if self.shapoli is not None:    
-                    self.shapoli.visible = system_setting.sha_po_li
+                    self.shapoli.visible = gdata.configCommon.shapoli
 
                 if self.app_name is not None:
                     self.app_name.value = self.page.session.get("lang.common.app_name")

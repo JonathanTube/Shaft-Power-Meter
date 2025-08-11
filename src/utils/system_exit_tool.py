@@ -20,6 +20,23 @@ from common.global_data import gdata
 
 class SystemExitTool:
     @staticmethod
+    def _safe_schedule_stop(coro):
+        try:
+            if asyncio.iscoroutine(coro):
+                # 将 stop 协程调度到当前运行 loop（不 await）
+                try:
+                    loop = asyncio.get_running_loop()
+                    loop.create_task(coro)
+                except RuntimeError:
+                    # 没有运行 loop（防御），直接创建任务（也许会绑定默认 loop）
+                    asyncio.create_task(coro)
+            else:
+                # 可能是同步 stop
+                pass
+        except Exception:
+            logging.exception("_safe_schedule_stop failed")
+
+    @staticmethod
     async def exit_app(page: ft.Page | None, user: User):
         if page is None:
             return
@@ -37,35 +54,35 @@ class SystemExitTool:
 
             if gdata.configCommon.is_master:
                 # 关闭sps
-                await sps_read_task.close()
+                SystemExitTool._safe_schedule_stop(sps_read_task.close())
                 # 如果是dual才关闭
                 if gdata.configCommon.amount_of_propeller == 2:
-                    await sps2_read_task.close()
+                    SystemExitTool._safe_schedule_stop(sps2_read_task.close())
 
                 # 关闭websocket
-                await ws_server.stop()
+                SystemExitTool._safe_schedule_stop(ws_server.stop())
 
                 # 关闭PLC
-                await plc.close()
+                SystemExitTool._safe_schedule_stop(plc.close())
 
             else:
                 # 关闭websocket
-                await ws_client.stop()
+                SystemExitTool._safe_schedule_stop(ws_client.stop())
 
             # 关闭GPS
-            await gps.close()
+            SystemExitTool._safe_schedule_stop(gps.close())
 
             # 关闭modbus
-            await modbus_output.stop()
+            SystemExitTool._safe_schedule_stop(modbus_output.stop())
 
             # 关闭sps_offline
-            await data_record_task.stop()
+            SystemExitTool._safe_schedule_stop(data_record_task.stop())
+
+            # 关闭时间task
+            SystemExitTool._safe_schedule_stop(utc_timer.stop())
 
             # 关闭test mode
             test_mode_task.stop()
-
-            # 关闭时间task
-            await utc_timer.stop()
 
             logging.info('关闭所有外部资源连接')
         except:
@@ -73,7 +90,5 @@ class SystemExitTool:
         finally:
             try:
                 page.window.destroy()
-                await asyncio.sleep(2)  # 给 UI 一点时间
             except:
-                pass
-            os._exit(0)  # 兜底强杀
+                os._exit(0)  # 兜底强杀

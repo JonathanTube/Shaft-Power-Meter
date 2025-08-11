@@ -16,7 +16,6 @@ class EEXILimitedPower(ft.Container):
         system_settings: SystemSettings = SystemSettings.get()
 
         self.unlimited_power = system_settings.unlimited_power
-        self.amount_of_propeller = system_settings.amount_of_propeller
         self.eexi_power = system_settings.eexi_limited_power
         self.normal_power = self.eexi_power * 0.9
 
@@ -68,7 +67,7 @@ class EEXILimitedPower(ft.Container):
             if self.page:
                 active_value = gdata.configSPS.power
 
-                if self.amount_of_propeller == 2:
+                if gdata.configCommon.amount_of_propeller == 2:
                     active_value += gdata.configSPS2.power
 
                 inactive_value = self.unlimited_power - active_value
@@ -87,7 +86,7 @@ class EEXILimitedPower(ft.Container):
         try:
             if self.page:
                 instant_power = gdata.configSPS.power
-                if self.amount_of_propeller == 2:
+                if gdata.configCommon.amount_of_propeller == 2:
                     instant_power += gdata.configSPS2.power
 
                 self.unlimited_mode_row.visible = instant_power > self.normal_power

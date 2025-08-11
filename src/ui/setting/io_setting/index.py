@@ -22,59 +22,61 @@ from ui.common.keyboard import keyboard
 class IOSetting(ft.Container):
     def __init__(self):
         super().__init__()
-        self.system_settings: SystemSettings = SystemSettings.get()
-        self.conf: IOConf = IOConf.get()
         self.is_saving = False
         self.task_running = False
         self.loop_task = None
+        self.system_settings: SystemSettings = None
+        self.conf: IOConf = None
 
     def build(self):
-            try:
-                if self.page and self.page.session:
-                    self.output_conf = IOSettingOutput(self.conf)
+        try:
+            self.system_settings = asyncio.to_thread(SystemSettings.get)
+            self.conf = asyncio.to_thread(IOConf.get)
+            if self.page and self.page.session:
+                self.output_conf = IOSettingOutput(self.conf)
 
-                    self.save_button = ft.FilledButton(
-                        self.page.session.get("lang.button.save"),
-                        width=120, height=40,
-                        on_click=lambda e: self.page.open(PermissionCheck(self.__save_data, 0))
-                    )
-                    self.reset_button = ft.OutlinedButton(
-                        self.page.session.get("lang.button.reset"),
-                        width=120, height=40,
-                        on_click=self.__reset_data
-                    )
+                self.save_button = ft.FilledButton(
+                    self.page.session.get("lang.button.save"),
+                    width=120, height=40,
+                    on_click=lambda e: self.page.open(PermissionCheck(self.__save_data, 0))
+                )
+                self.reset_button = ft.OutlinedButton(
+                    self.page.session.get("lang.button.reset"),
+                    width=120, height=40,
+                    on_click=self.__reset_data
+                )
 
-                    controls = []
+                controls = []
 
-                    if self.system_settings.enable_gps:
-                        self.gps_conf = IOSettingGPS(self.conf)
-                        controls.append(self.gps_conf)
+                if self.system_settings.enable_gps:
+                    self.gps_conf = IOSettingGPS(self.conf)
+                    controls.append(self.gps_conf)
 
-                    if self.system_settings.is_master:
-                        self.plc_conf = IOSettingPLC(self.conf)
-                        controls.append(self.plc_conf)
-                        self.sps_conf = IOSettingSPS(self.conf)
-                        controls.append(self.sps_conf)
-                        if not self.system_settings.is_individual:
-                            self.master_server_conf = IOSettingMasterServer()
-                            controls.append(self.master_server_conf)
-                    else:
-                        self.interface_conf = InterfaceConf(self.conf)
-                        controls.append(self.interface_conf)
+                if self.system_settings.is_master:
+                    self.plc_conf = IOSettingPLC(self.conf)
+                    controls.append(self.plc_conf)
+                    self.sps_conf = IOSettingSPS(self.conf)
+                    controls.append(self.sps_conf)
+                    if not self.system_settings.is_individual:
+                        self.master_server_conf = IOSettingMasterServer()
+                        controls.append(self.master_server_conf)
+                else:
+                    self.interface_conf = InterfaceConf(self.conf)
+                    controls.append(self.interface_conf)
 
-                    controls.append(self.output_conf)
+                controls.append(self.output_conf)
 
-                    controls.append(
-                        ft.Row(alignment=ft.MainAxisAlignment.CENTER,controls=[self.save_button, self.reset_button])
-                    )
+                controls.append(
+                    ft.Row(alignment=ft.MainAxisAlignment.CENTER, controls=[self.save_button, self.reset_button])
+                )
 
-                    self.content = ft.Column(
-                        scroll=ft.ScrollMode.ADAPTIVE,
-                        expand=True,
-                        controls=[ft.ResponsiveRow(controls=controls)]
-                    )
-            except:
-                logging.exception('exception occured at IOSetting.build')
+                self.content = ft.Column(
+                    scroll=ft.ScrollMode.ADAPTIVE,
+                    expand=True,
+                    controls=[ft.ResponsiveRow(controls=controls)]
+                )
+        except:
+            logging.exception('exception occured at IOSetting.build')
 
     def __save_data(self, user: User):
         if self.is_saving:
@@ -114,13 +116,12 @@ class IOSetting(ft.Container):
     def __reset_data(self, e):
         try:
             keyboard.close()
-            self.conf = IOConf.get()
+            self.conf = asyncio.to_thread(IOConf.get)
             self.content.clean()
             self.build()
             Toast.show_success(e.page)
         except:
             logging.exception('exception occured at IOSetting.__reset_data')
-
 
     def __change_buttons(self):
         if self.save_button and self.save_button.page:

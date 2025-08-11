@@ -84,7 +84,6 @@ class ConfigSPS:
     thrust_offset = 0
 
     power_history: list[tuple[float, datetime]] = field(default_factory=list)
-    is_offline = True
 
     # 0x03 配置相关参数
     ch_sel_1 = None
@@ -121,7 +120,6 @@ class ConfigSPS2:
     thrust_offset = 0
 
     power_history: list[tuple[float, datetime]] = field(default_factory=list)
-    is_offline: bool = True
 
     # 0x03 配置相关参数
     ch_sel_1 = None

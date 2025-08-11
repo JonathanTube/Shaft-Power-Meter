@@ -3,6 +3,9 @@ import asyncio
 import logging
 from common.global_data import gdata
 from utils.data_saver import DataSaver
+from websocket.websocket_slave import ws_client
+from task.sps_read_task import sps_read_task
+from task.sps2_read_task import sps2_read_task
 
 
 class DataRecordTask:
@@ -30,18 +33,32 @@ class DataRecordTask:
                     await asyncio.sleep(2)
                     continue
 
-                # 处理SPS1
-                if gdata.configSPS.is_offline:
-                    self.save_sps_offline_data()
-                else:
-                    self.save_sps_online_data()
-
-                # 处理SPS2（双螺旋桨）
-                if is_dual:
-                    if gdata.configSPS2.is_offline:
-                        self.save_sps2_offline_data()
+                # 主机
+                if gdata.configCommon.is_master:
+                    # 处理SPS1
+                    if sps_read_task.is_online:
+                        self.save_sps_online_data()
                     else:
+                        self.save_sps_offline_data()
+
+                    # 处理SPS2（双螺旋桨）
+                    if is_dual:
+                        if sps2_read_task.is_online:
+                            self.save_sps2_online_data()
+                        else:
+                            self.save_sps2_offline_data()
+                    await asyncio.sleep(2)
+                    continue
+
+                # 从机
+                if ws_client.is_online:
+                    self.save_sps_online_data()
+                    if is_dual:
                         self.save_sps2_online_data()
+                else:
+                    self.save_sps_offline_data()
+                    if is_dual:
+                        self.save_sps2_offline_data()
 
             except Exception:
                 logging.exception("DataRecordTask 循环异常")

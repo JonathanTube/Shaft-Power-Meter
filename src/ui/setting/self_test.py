@@ -7,13 +7,13 @@ from task.plc_sync_task import plc
 from task.gps_sync_task import gps
 from websocket.websocket_slave import ws_client
 from common.global_data import gdata
+from task.sps_read_task import sps_read_task
+from task.sps2_read_task import sps2_read_task
 
 
 class SelfTest(ft.Tabs):
     def __init__(self):
         super().__init__()
-        self.system_settings: SystemSettings = SystemSettings.get()
-        self.conf: IOConf = IOConf.get()
         self.plc_task = None
         self.sps_task = None
         self.sps2_task = None
@@ -22,8 +22,13 @@ class SelfTest(ft.Tabs):
 
         self.task_running = False
 
+        self.system_settings: SystemSettings = None
+        self.conf: IOConf = None
+
     def build(self):
         try:
+            self.system_settings = asyncio.to_thread(SystemSettings.get)
+            self.conf = asyncio.to_thread(IOConf.get)
             if self.page and self.page.session:
                 self.plc_log = ft.ListView(
                     padding=10, auto_scroll=True, height=500, spacing=5, expand=True)
@@ -122,10 +127,10 @@ class SelfTest(ft.Tabs):
         while self.task_running:
             try:
                 sps_data = f'ad0={round(gdata.configSPS.ad0, 1)},ad1={round(gdata.configSPS.ad1, 1)},speed={round(gdata.configSPS.speed, 1)},torque={round(gdata.configSPS.torque, 1)},thrust={round(gdata.configSPS.thrust, 1)}'
-                if gdata.configSPS.is_offline:
-                    self.sps_log.controls.append(ft.Text('Disconnected from SPS'))
-                else:
+                if sps_read_task.is_online:
                     self.sps_log.controls.append(ft.Text(f"SPS Data: {sps_data}"))
+                else:
+                    self.sps_log.controls.append(ft.Text('Disconnected from SPS'))
                 self.sps_log.update()
             except:
                 logging.exception('exception occured at SelfTest.__read_sps_data')
@@ -136,10 +141,10 @@ class SelfTest(ft.Tabs):
         while self.task_running:
             try:
                 sps2_data = f'ad0={round(gdata.configSPS2.ad0, 1)},ad1={round(gdata.configSPS2.ad1, 1)},speed={round(gdata.configSPS2.speed, 1)},torque={round(gdata.configSPS2.torque, 1)},thrust={round(gdata.configSPS2.thrust, 1)}'
-                if gdata.configSPS2.is_offline:
-                    self.sps2_log.controls.append(ft.Text('Disconnected from SPS-2'))
-                else:
+                if sps2_read_task.is_online:
                     self.sps2_log.controls.append(ft.Text(f"SPS-2 Data: {sps2_data}"))
+                else:
+                    self.sps2_log.controls.append(ft.Text('Disconnected from SPS-2'))
                 self.sps2_log.update()
             except:
                 logging.exception('exception occured at SelfTest.__read_sps2_data')
