@@ -3,10 +3,10 @@ import ctypes
 import sys
 import logging
 import flet as ft
+import ui_safety  # 加这一行
 from db.models.data_log import DataLog
 from db.models.io_conf import IOConf
 from db.models.system_settings import SystemSettings
-from debug import init_debug
 from ui.common.fullscreen_alert import FullscreenAlert
 from ui.common.keyboard import keyboard
 from ui.header.index import Header
@@ -31,7 +31,6 @@ from task.sps2_read_task import sps2_read_task
 from task.plc_sync_task import plc
 from websocket.websocket_master import ws_server
 from websocket.websocket_slave import ws_client
-
 
 Logger(show_sql=False)
 
@@ -192,9 +191,7 @@ def set_content(page: ft.Page):
     page.run_task(watch_eexi_breach)
 
 
-async def main(page: ft.Page):
-    init_debug(page)
-    
+async def main(page: ft.Page):    
     def handle_error(e):
         logging.error('============global exception occured===========')
         logging.exception(e)
