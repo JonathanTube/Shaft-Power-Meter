@@ -225,7 +225,7 @@ class IOSettingPLC(ft.Container):
         try:
             if self.conf.plc_enabled:
                 plc_4_20_ma_data = await asyncio.wait_for(plc.read_4_20_ma_data(), timeout=5)
-                logging.info(f'load plc_4_20_ma_data = {plc_4_20_ma_data}')
+                logging.info(f'加载PLC,4-20毫安配置={plc_4_20_ma_data}')
 
                 self.txt_power_range_min.value = plc_4_20_ma_data["power_range_min"] // 10
                 self.txt_power_range_max.value = plc_4_20_ma_data["power_range_max"] // 10

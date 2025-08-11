@@ -44,6 +44,7 @@ class UtcTimerTask:
             pass
 
     async def stop(self):
+        self.task_running = False
         if self._task and not self._task.done():
             try:
                 self._task.cancel()

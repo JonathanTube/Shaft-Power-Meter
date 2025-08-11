@@ -1,5 +1,7 @@
+import asyncio
 import flet as ft
 import logging
+import os
 from task.sps_read_task import sps_read_task
 from task.sps2_read_task import sps2_read_task
 from websocket.websocket_slave import ws_client
@@ -32,18 +34,23 @@ class SystemExitTool:
             )
 
             logging.info('start closing all of the connections...')
-            # 关闭sps
-            await sps_read_task.close()
-            # 如果是dual才关闭
-            if gdata.configCommon.amount_of_propeller == 2:
-                await sps2_read_task.close()
 
-            # 关闭websocket
-            await ws_server.stop()
-            await ws_client.stop()
+            if gdata.configCommon.is_master:
+                # 关闭sps
+                await sps_read_task.close()
+                # 如果是dual才关闭
+                if gdata.configCommon.amount_of_propeller == 2:
+                    await sps2_read_task.close()
 
-            # 关闭PLC
-            await plc.close()
+                # 关闭websocket
+                await ws_server.stop()
+
+                # 关闭PLC
+                await plc.close()
+
+            else:
+                # 关闭websocket
+                await ws_client.stop()
 
             # 关闭GPS
             await gps.close()
@@ -64,4 +71,9 @@ class SystemExitTool:
         except:
             logging.exception('exception occured at Header.__exit_app')
         finally:
-            page.window.destroy()
+            try:
+                page.window.destroy()
+                await asyncio.sleep(2)  # 给 UI 一点时间
+            except:
+                pass
+            os._exit(0)  # 兜底强杀

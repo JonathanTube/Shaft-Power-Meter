@@ -35,9 +35,12 @@ class WebSocketMaster:
         # 主运行任务引用（后台任务）
         self._task: asyncio.Task | None = None
 
+        self.is_canceled = False
+
     async def start(self):
         """启动 WebSocket 服务（非阻塞，返回后台 Task）"""
         # 如果任务已经存在且运行中，直接返回
+        self.is_canceled = False
         if self._task and not self._task.done():
             return self._task
 
@@ -48,7 +51,7 @@ class WebSocketMaster:
     async def stop(self):
         """停止 WebSocket 服务"""
         logging.info("[Master服务端] 正在停止")
-
+        self.is_canceled = True
         if self.server:
             try:
                 self.server.close()
@@ -64,7 +67,6 @@ class WebSocketMaster:
         self.set_offline()
         self.set_client_offline()
 
-
     async def _close_client(self, websocket):
         try:
             await websocket.close()
@@ -79,7 +81,7 @@ class WebSocketMaster:
 
     async def _run(self):
         """主循环：启动服务并保持运行，发生异常后自动重启（无限重试）"""
-        while True:
+        while not self.is_canceled:
             try:
                 await self._start_server()
                 self.set_online()

@@ -19,6 +19,7 @@ class GpsSyncTask:
         self._lock = asyncio.Lock()
         self._task: asyncio.Task | None = None
         self.is_online = False  # 正在收发数据
+        self.is_canceled = False
 
     @property
     def is_connected(self) -> bool:
@@ -27,6 +28,7 @@ class GpsSyncTask:
 
     async def start(self):
         """启动任务"""
+        self.is_canceled = False
         if self._task and not self._task.done():
             return self._task
         self._task = asyncio.create_task(self._run(), name="gps-task")
@@ -35,6 +37,7 @@ class GpsSyncTask:
     async def stop(self):
         """安全停止"""
         _logger.info("[GPS] 正在停止")
+        self.is_canceled = True
         if self._task:
             self._task.cancel()
             try:
@@ -47,7 +50,7 @@ class GpsSyncTask:
 
     async def _run(self):
         """主循环（自动重连）"""
-        while True:
+        while not self.is_canceled:
             try:
                 ok = await self.connect()
                 if ok:

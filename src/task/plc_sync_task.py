@@ -163,13 +163,13 @@ class PlcSyncTask:
             self.set_offline()
 
     def set_online(self):
-        if self.online == False:
-            self.online = True
+        if self.is_online == False:
+            self.is_online = True
             AlarmSaver.recovery(AlarmType.MASTER_PLC)
 
     def set_offline(self):
-        if self.online:
-            self.online = False
+        if self.is_online:
+            self.is_online = False
             AlarmSaver.create(AlarmType.MASTER_PLC)
 
 

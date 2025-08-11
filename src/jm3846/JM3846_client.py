@@ -17,21 +17,22 @@ class JM3846AsyncClient(ABC):
         self.reader: Optional[asyncio.StreamReader] = None
         self.writer: Optional[asyncio.StreamWriter] = None
         self._lock = asyncio.Lock()
-        self._retry_times = 0
-        self._max_retries = 6
         self._bg_tasks: List[asyncio.Task] = []
+        self.is_canceled = False
 
     async def connect(self):
-        """建立连接并启动后台接收任务"""
-        self._retry_times = 0
-        while self._retry_times < self._max_retries:
+        """建立连接并启动后台接收任务（固定间隔无限重连）"""
+        self.is_canceled = False
+        while not self.is_canceled:
             try:
-                logging.info(f'[JM3846-{self.name}] 尝试第{self._retry_times + 1}次连接')
-                # 连接建立和初始化放在锁里，长循环移到锁外，避免锁死
+                logging.info(f'[JM3846-{self.name}] 尝试连接')
                 async with self._lock:
                     host, port = self.get_ip_port()
                     logging.info(f'[JM3846-{self.name}] 正在连接 {host}:{port}')
-                    self.reader, self.writer = await asyncio.wait_for(asyncio.open_connection(host, port), timeout=10)
+                    self.reader, self.writer = await asyncio.wait_for(
+                        asyncio.open_connection(host, port),
+                        timeout=10
+                    )
                     logging.info(f'[JM3846-{self.name}] 连接成功 {host}:{port}')
                     self.start_background_tasks()
                     await JM38460x45.handle(self.name, self.reader, self.writer)
@@ -41,34 +42,31 @@ class JM3846AsyncClient(ABC):
 
                 # 0x44 循环放到锁外执行
                 await JM38460x44.handle(self.name, self.reader, self.writer)
+
             except ConnectionRefusedError as e:
                 logging.exception(f'[JM3846-{self.name}] connect refused error {e}')
             except Exception as e:
                 logging.exception(f'[JM3846-{self.name}] connect error {e}')
 
             await self.release()
-            await asyncio.sleep(2 ** self._retry_times)
-            self._retry_times += 1
+            await asyncio.sleep(5)  # 固定 5 秒重试
 
     async def close(self):
-        self._retry_times = self._max_retries + 1  # 强制 connect 循环退出
+        """强制退出连接"""
+        self.is_canceled = True
         await self.release()
 
     async def release(self):
         """终止所有运行任务并关闭资源"""
         try:
-            # 停止 0x44 数据读取
             JM38460x44.stop()
-
-            # 停止后台任务
             self.stop_background_tasks()
 
-            # 关闭连接
             if self.writer:
                 try:
                     if not self.writer.is_closing():
                         try:
-                            await JM38460x45.handle(self.name, self.reader, self.writer)  # 发送 0x45 停止帧
+                            await JM38460x45.handle(self.name, self.reader, self.writer)
                         except Exception:
                             logging.warning(f'[JM3846-{self.name}] 发送 0x45 停止帧时失败（已忽略）')
 
@@ -83,7 +81,6 @@ class JM3846AsyncClient(ABC):
         except Exception:
             logging.exception(f'[JM3846-{self.name}] release 释放资源时发生异常')
         finally:
-            # 触发离线告警
             self.create_alarm_hook()
             self.set_offline_hook(True)
             self.writer = None
