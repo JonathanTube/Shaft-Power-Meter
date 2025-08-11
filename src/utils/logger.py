@@ -22,14 +22,14 @@ class Logger:
 
        # 控制台处理器
         console_handler = logging.StreamHandler()
-        console_handler.setLevel(logging.DEBUG)  # 控制台只显示 INFO 及以上
+        console_handler.setLevel(logging.INFO)  # 控制台只显示 INFO 及以上
         console_handler.setFormatter(formatter)
 
         # 文件处理器（始终启用）
         file_handler = TimedRotatingFileHandler(filename=log_file, when='midnight', backupCount=15, encoding='utf-8')
         file_handler.setFormatter(formatter)
 
-        logging.basicConfig(level=logging.DEBUG, datefmt='%Y-%m-%d %H:%M:%S', handlers=[file_handler, console_handler])
+        logging.basicConfig(level=logging.INFO, datefmt='%Y-%m-%d %H:%M:%S', handlers=[file_handler, console_handler])
 
         if show_sql:
             peewee_logger = logging.getLogger('peewee')

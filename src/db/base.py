@@ -13,12 +13,6 @@ else:
     
 DB_PATH = os.path.join(PROJECT_ROOT, '988bbc4fc383')
 
-# 配置日志
-# logging.basicConfig(level=logging.DEBUG)
-# logger = logging.getLogger('peewee')
-# logger.addHandler(logging.StreamHandler())
-# logger.setLevel(logging.DEBUG)  # ▶ 关键设置
-
 db = SqliteDatabase(DB_PATH)
 
 
