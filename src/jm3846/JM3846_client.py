@@ -26,10 +26,11 @@ class JM3846AsyncClient(ABC):
         self._retry_times = 0
         while self._retry_times < self._max_retries:
             try:
+                logging.info(f'[JM3846-{self.name}] 尝试第{self._retry_times + 1}次连接')
                 # 连接建立和初始化放在锁里，长循环移到锁外，避免锁死
                 async with self._lock:
                     host, port = self.get_ip_port()
-                    logging.info(f'[JM3846-{self.name}] Connecting to {host}:{port}')
+                    logging.info(f'[JM3846-{self.name}] 连接到 {host}:{port}')
                     self.reader, self.writer = await asyncio.wait_for(
                         asyncio.open_connection(host, port), timeout=10
                     )
@@ -54,26 +55,35 @@ class JM3846AsyncClient(ABC):
         await self.release()
 
     async def release(self):
-        """终止一切运行，关闭资源"""
+        """终止所有运行任务并关闭资源"""
         try:
-            JM38460x44.stop()  # 等待0x44任务安全退出
+            # 停止 0x44 数据读取
+            JM38460x44.stop()
 
+            # 停止后台任务
             self.stop_background_tasks()
 
+            # 关闭连接
             if self.writer:
                 try:
-                    await JM38460x45.handle(self.name, self.reader, self.writer)  # 确保在断流前发0x45
-                    self.writer.close()
-                    await self.writer.wait_closed()
-                except:
-                    logging.warning(f'[JM3846-{self.name}] failed to send 0x45 on close')
+                    if not self.writer.is_closing():
+                        try:
+                            await JM38460x45.handle(self.name, self.reader, self.writer)  # 发送 0x45 停止帧
+                        except Exception:
+                            logging.warning(f'[JM3846-{self.name}] 发送 0x45 停止帧时失败（已忽略）')
 
-                self.writer.close()
-                await self.writer.wait_closed()
+                        self.writer.close()
+                        try:
+                            await self.writer.wait_closed()
+                        except Exception:
+                            logging.warning(f'[JM3846-{self.name}] 等待连接关闭时发生异常（已忽略）')
+                except Exception:
+                    logging.warning(f'[JM3846-{self.name}] 关闭连接时出错（已忽略）')
 
-        except:
-            logging.exception('release')
+        except Exception:
+            logging.exception(f'[JM3846-{self.name}] release 释放资源时发生异常')
         finally:
+            # 触发离线告警
             self.create_alarm_hook()
             self.set_offline_hook(True)
             self.writer = None

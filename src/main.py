@@ -3,9 +3,9 @@ import ctypes
 import sys
 import logging
 import flet as ft
-import ui_safety  # 加这一行
-from peewee import fn
-from db.models.data_log import DataLog
+from task.data_cleanup_task import data_cleanup_task
+from task.task_manager import TaskManager
+import ui_safety
 from db.models.io_conf import IOConf
 from db.models.system_settings import SystemSettings
 from ui.common.fullscreen_alert import FullscreenAlert
@@ -34,27 +34,21 @@ from websocket.websocket_master import ws_server
 from websocket.websocket_slave import ws_client
 
 Logger(show_sql=False)
-
-# 加入开机启动
 add_to_startup()
 
 
-is_db_empty = len(db.get_tables()) == 0
-if is_db_empty:
-    TableInit.init()
-
-DataInit.init()
-
-gdata.set_default_value()
+task_manager = TaskManager()
 
 
-def get_theme_mode(preference: Preference):
-    # theme: Preference = Preference.get()
-    return ft.ThemeMode.LIGHT if preference.theme == 0 else ft.ThemeMode.DARK
+def check_single_instance(mutex_name: str = "shaft-power-meter"):
+    mutex = ctypes.windll.kernel32.CreateMutexW(None, False, mutex_name)
+    last_error = ctypes.windll.kernel32.GetLastError()
+    if last_error == 183:
+        ctypes.windll.user32.MessageBoxW(0, "The Software is already running!", "Notice", 0x40)
+        sys.exit(0)
 
 
 def load_language(page: ft.Page, preference: Preference):
-    # language: Preference = Preference.get()
     language_items = Language.select()
     if preference.language == 0:
         for item in language_items:
@@ -64,59 +58,13 @@ def load_language(page: ft.Page, preference: Preference):
             page.session.set(item.code, item.chinese)
 
 
-def check_single_instance(mutex_name: str = "shaft-power-meter"):
-    # 创建互斥锁
-    mutex = ctypes.windll.kernel32.CreateMutexW(None, False, mutex_name)
-    last_error = ctypes.windll.kernel32.GetLastError()
-
-    # 如果检测到已有实例，退出程序
-    if last_error == 183:  # ERROR_ALREADY_EXISTS
-        ctypes.windll.user32.MessageBoxW(0, "The Software is already running!", "Notice", 0x40)
-        sys.exit(0)
-
-
-def start_all_task():
-    cnt = DataLog.select(fn.COUNT(DataLog.id)).scalar()
-
-    system_settings: SystemSettings = SystemSettings.get()
-    asyncio.create_task(utc_timer.start())
-    asyncio.create_task(data_record_task.start())
-
-    # 如果不是第一次装机，启动设备连接
-    if cnt > 0:
-        asyncio.create_task(modbus_output.start())
-
-        # GSP 不管主机从机都有
-        if system_settings.enable_gps:
-            asyncio.create_task(gps.connect())
-
-        # 如果是主机
-        if system_settings.is_master:
-            io_conf: IOConf = IOConf.get()
-            if io_conf.plc_enabled:
-                plc.start()
-            asyncio.create_task(sps_read_task.connect())
-
-            # 不是独立的，才需要运行server
-            if not system_settings.is_individual:
-                asyncio.create_task(ws_server.start())
-
-            # start sps2 JM3846 if dual propellers.
-            if system_settings.amount_of_propeller > 1:
-                asyncio.create_task(sps2_read_task.connect())
-        else:
-            # 从机只需要启动，客户端
-            asyncio.create_task(ws_client.connect())
-
-
 def set_appearance(page: ft.Page, preference: Preference):
     page.theme = ft.Theme(scrollbar_theme=ft.ScrollbarTheme(thickness=20))
     page.title = page.session.get("lang.common.app_name")
     page.padding = 0
-    page.theme_mode = get_theme_mode(preference)
+    page.theme_mode = ft.ThemeMode.LIGHT if preference.theme == 0 else ft.ThemeMode.DARK
     page.window.resizable = False
     page.window.frameless = True
-    page.window.always_on_top = False
     page.window.left = 0
     page.window.top = 0
     if page.window.width <= 1200:
@@ -136,7 +84,6 @@ def set_content(page: ft.Page):
     content_home = Home()
     content_report = Report()
     content_setting = Setting()
-    # 主菜单切换
 
     def change_main_menu(name: str):
         if name == 'HOME':
@@ -150,25 +97,12 @@ def set_content(page: ft.Page):
         main_content.update()
 
     page.appbar = Header(on_menu_click=change_main_menu)
-
     main_content = ft.Container(padding=0, margin=0, content=content_home)
-
     fullscreen_alert = FullscreenAlert()
-
     audio_alarm_btn = AudioAlarm()
-
-    main_stack = ft.Stack(
-        controls=[
-            fullscreen_alert,
-            main_content,
-            audio_alarm_btn
-        ],
-        expand=True
-    )
+    main_stack = ft.Stack(controls=[fullscreen_alert, main_content, audio_alarm_btn], expand=True)
     page.add(main_stack)
     page.overlay.append(keyboard)
-
-    # 监听EEXI breach
 
     async def watch_eexi_breach():
         is_running = False
@@ -184,46 +118,99 @@ def set_content(page: ft.Page):
                         fullscreen_alert.hide()
                         audio_alarm_btn.hide()
                         is_running = False
-            except:
-                logging.exception('exception occured at FullscreenAlert.__watch_eexi_breach')
-            finally:
-                await asyncio.sleep(1)
+            except Exception:
+                logging.exception('watch_eexi_breach error')
+            await asyncio.sleep(1)
 
     page.run_task(watch_eexi_breach)
+
+
+async def start_all_tasks():
+    # UTC 时钟
+    await utc_timer.start()
+    task_manager.add(utc_timer)
+
+    # 数据清理
+    await data_cleanup_task.start()
+    task_manager.add(data_cleanup_task)
+
+    # 数据记录
+    await data_record_task.start()
+    task_manager.add(data_record_task)
+
+    # Modbus 输出
+    await modbus_output.start()
+    task_manager.add(modbus_output)
+
+    io_conf = IOConf.get()
+    system_settings: SystemSettings = SystemSettings.get()
+
+    # GPS
+    if system_settings.enable_gps:
+        await gps.connect()
+        task_manager.add(gps)
+
+    # PLC
+    if system_settings.is_master and io_conf.plc_enabled:
+        await plc.start()
+        task_manager.add(plc)
+
+    # SPS 读取
+    await sps_read_task.connect()
+    task_manager.add(sps_read_task)
+
+    if system_settings.amount_of_propeller > 1:
+        await sps2_read_task.connect()
+        task_manager.add(sps2_read_task)
+
+    # WS
+    if not system_settings.is_individual:
+        await ws_server.start()
+        task_manager.add(ws_server)
+    else:
+        await ws_client.connect()
+        task_manager.add(ws_client)
+
+
+async def stop_all_tasks():
+    await task_manager.stop_all()
+
+
+async def main_async_setup(page: ft.Page):
+    # initialize DB and defaults
+    is_db_empty = len(db.get_tables()) == 0
+    if is_db_empty:
+        TableInit.init()
+    DataInit.init()
+    gdata.set_default_value()
+
+    preference: Preference = Preference.get()
+    load_language(page, preference)
+    set_appearance(page, preference)
+
+    set_content(page)
+
+    # start tasks AFTER UI ready
+    await start_all_tasks()
 
 
 async def main(page: ft.Page):
     ui_safety.init_ui_safety(page)
 
     def handle_error(e):
-        logging.error('============global exception occured===========')
+        logging.error('global exception')
         logging.exception(e)
 
-    def handle_exit():
-        page.window_destroy()
-
     try:
-        preference: Preference = Preference.get()
-
-        load_language(page, preference)
-        set_appearance(page, preference)
-
         page.on_error = handle_error
-
-        set_content(page)
-
-        page.update()
-
-        page.on_close = lambda _: handle_exit()
-
-        start_all_task()
-
-    except:
-        logging.exception('exception occured at main')
+        await main_async_setup(page)
+        page.on_close = lambda _: asyncio.create_task(stop_all_tasks())
+    except Exception:
+        logging.exception('exception in main')
 
 if __name__ == "__main__":
     try:
         check_single_instance()
         ft.app(target=main)
-    except:
-        logging.exception('exception occured at __name__')
+    except Exception:
+        logging.exception("fatal")

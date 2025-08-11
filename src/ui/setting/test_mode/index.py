@@ -19,7 +19,7 @@ from db.models.user import User
 class TestMode(ft.Container):
     def __init__(self):
         super().__init__()
-        self.running = test_mode_task.is_running
+        self.running = test_mode_task.task_running
         self.preference: Preference = Preference.get()
 
         self.last_op_utc_date_time = gdata.configDateTime.utc

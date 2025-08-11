@@ -65,7 +65,7 @@ class JM3846TorqueRpm:
             ad0_mv_per_v = ad0_mv_per_v - torque_offset
             ad0_microstrain = JM3846Calculator.calculate_microstrain(ad0_mv_per_v)
             torque = JM3846Calculator.calculate_torque(ad0_microstrain)
-            logging.info(f'name=[***{self.name}***],ad0={ch0_ad}, ad0_mv_per_v={ad0_mv_per_v}, torque_offset={torque_offset}, microstrain={ad0_microstrain}, torque={torque}')
+            logging.info(f'{self.name}=>ad0={ch0_ad}, ad0_mv_per_v={ad0_mv_per_v}, torque_offset={torque_offset}, microstrain={ad0_microstrain}, torque={torque}')
             return torque
         except:
             logging.exception(

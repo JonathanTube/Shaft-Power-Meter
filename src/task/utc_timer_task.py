@@ -1,54 +1,58 @@
+# task/utc_timer_task.py
 import asyncio
-from datetime import datetime, timedelta
 import logging
-from peewee import DoesNotExist
+from datetime import datetime, timedelta
 from db.models.date_time_conf import DateTimeConf
 from common.global_data import gdata
 
-class UtcTimer:
+
+class UtcTimerTask:
     def __init__(self):
         self.task_running = False
-        self._write_interval = 60  # 每 60 秒写一次数据库
-        self._last_write_time = None
+        self._task = None
 
     async def start(self):
-        try:
-            date_time_conf = DateTimeConf.get()
-        except DoesNotExist:
-            # 如果记录不存在，新建一条
-            date_time_conf = DateTimeConf.create(
-                utc_date_time=datetime.utcnow(),
-                system_date_time=datetime.now()
-            )
-
-        gdata.configDateTime.utc = date_time_conf.utc_date_time
+        """启动UTC计时器"""
+        if self.task_running:
+            return
         self.task_running = True
-        self._last_write_time = datetime.now()
+        self._task = asyncio.create_task(self._run_loop())
 
-        while self.task_running:
-            try:
-                # 更新内存时间
-                gdata.configDateTime.utc += timedelta(seconds=1)
-                gdata.configDateTime.system = datetime.now()
+    async def _run_loop(self):
+        try:
+            # 初始化读取一次配置
+            date_time_conf: DateTimeConf = await asyncio.to_thread(DateTimeConf.get)
+            gdata.configDateTime.utc = date_time_conf.utc_date_time
 
-                # 每隔 N 秒写一次数据库
-                if (datetime.now() - self._last_write_time).total_seconds() >= self._write_interval:
+            while self.task_running:
+                try:
+                    # UTC时间 +1秒
+                    gdata.configDateTime.utc = gdata.configDateTime.utc + timedelta(seconds=1)
+                    gdata.configDateTime.system = datetime.now()
+
+                    # 更新数据库（放到线程池执行，防止阻塞UI）
                     await asyncio.to_thread(
                         DateTimeConf.update(
                             utc_date_time=gdata.configDateTime.utc,
                             system_date_time=gdata.configDateTime.system
                         ).where(DateTimeConf.id == date_time_conf.id).execute
                     )
-                    self._last_write_time = datetime.now()
+                except Exception:
+                    logging.exception("UtcTimerTask 循环异常")
+                await asyncio.sleep(1)
+        except asyncio.CancelledError:
+            pass
 
-            except asyncio.CancelledError:
-                break
-            except Exception:
-                logging.exception('exception occurred at UtcTimer.start')
-
-            await asyncio.sleep(1)
-
-    def stop(self):
+    async def stop(self):
+        """停止UTC计时器"""
         self.task_running = False
+        if self._task:
+            self._task.cancel()
+            try:
+                await self._task
+            except asyncio.CancelledError:
+                pass
+        self._task = None
 
-utc_timer = UtcTimer()
+
+utc_timer = UtcTimerTask()

@@ -11,24 +11,33 @@ class Keyboard(ft.Stack):
         self.words = ""
         self.type = 'float'
         self.expand = True
-
         self.tf: ft.TextField | None = None
+        self.gd = None
+        self.kb_open = None
+        self.kb_close = None
+        self.point = None
 
     def build(self):
         try:
-            number_keys = [ft.OutlinedButton(str(i), col={"xs": 4}, on_click=self.__on_key_click) for i in range(1, 10)]
-            number_keys.append(ft.OutlinedButton(str(0), col={"xs": 4}, on_click=self.__on_key_click))
+            # 数字按键
+            number_keys = [ft.OutlinedButton(str(i), col={"xs": 4}, on_click=self._on_key_click) for i in range(1, 10)]
+            number_keys.append(ft.OutlinedButton(str(0), col={"xs": 4}, on_click=self._on_key_click))
 
-            self.point = ft.OutlinedButton('.', col={"xs": 4}, on_click=self.__on_key_click)
+            # 小数点
+            self.point = ft.OutlinedButton('.', col={"xs": 4}, on_click=self._on_key_click)
             number_keys.append(self.point)
 
-            number_keys.append(ft.OutlinedButton(icon=ft.Icons.BACKSPACE_OUTLINED, col={"xs": 4}, on_click=self.__on_delete_one, on_long_press=self.__on_delete_all))
+            # 删除按钮
+            number_keys.append(ft.OutlinedButton(
+                icon=ft.Icons.BACKSPACE_OUTLINED, col={"xs": 4},
+                on_click=self._on_delete_one, on_long_press=self._on_delete_all
+            ))
 
             kb_header = ft.Row(
                 alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
                 controls=[
                     ft.Container(content=ft.Icon(ft.Icons.KEYBOARD_OUTLINED, size=30), padding=ft.padding.only(left=10)),
-                    ft.IconButton(icon=ft.Icons.CLOSE_ROUNDED, on_click=self.__on_close)
+                    ft.IconButton(icon=ft.Icons.CLOSE_ROUNDED, on_click=self._on_close)
                 ]
             )
             self.kb = ft.Column(
@@ -52,7 +61,7 @@ class Keyboard(ft.Stack):
                 content=self.kb
             )
 
-            self.kb_close = ft.IconButton(icon=ft.Icons.KEYBOARD_OUTLINED, on_click=self.__on_open)
+            self.kb_close = ft.IconButton(icon=ft.Icons.KEYBOARD_OUTLINED, on_click=self._on_open)
 
             self.gd = ft.GestureDetector(
                 right=10,
@@ -60,13 +69,13 @@ class Keyboard(ft.Stack):
                 expand=False,
                 mouse_cursor=ft.MouseCursor.MOVE,
                 drag_interval=10,
-                on_pan_update=self.__on_pan_update,
+                on_pan_update=self._on_pan_update,
                 content=self.kb_close
             )
 
             self.controls = [self.gd]
         except:
-            logging.exception('exception occured at Keyboard.build')
+            logging.exception('【键盘】构建界面时发生异常')
 
     def show(self):
         try:
@@ -74,46 +83,45 @@ class Keyboard(ft.Stack):
                 self.visible = True
                 self.update()
         except:
-            logging.exception("exception occured at Keyboard.show")
-
+            logging.exception("【键盘】显示时发生异常")
 
     def open(self, text_field: ft.TextField, type: Literal['int', 'float', 'ip'] = 'float'):
         if self.page:
             self.show()
-            # recovery the border color of last text field
             try:
+                # 恢复上一个输入框的边框颜色
                 if self.tf and self.tf.page:
                     self.tf.border_color = ft.Colors.BLACK
                     self.tf.update()
-            
+
                 if text_field is not None:
                     self.words = str(text_field.value)
 
                 if not self.opened:
-                    self.__on_open(None)
+                    self._on_open(None)
 
                 self.type = type
                 if self.point and self.point.page:
-                    self.point.visible = self.type == 'float' or self.type == 'ip'
+                    self.point.visible = self.type in ('float', 'ip')
                     self.point.update()
 
                 self.tf = text_field
-                # set the border color of current text field
+                # 高亮当前输入框
                 if self.tf and self.tf.page:
                     self.tf.border_color = ft.Colors.PRIMARY
                     self.tf.update()
             except:
-                logging.exception("exception occured at Keyboard.open")
+                logging.exception("【键盘】打开时发生异常")
 
     def close(self):
         try:
             self.visible = False
             self.update()
-            self.__on_close(None)
+            self._on_close(None)
         except:
-            logging.exception("exception occured at Keyboard.close")
+            logging.exception("【键盘】关闭时发生异常")
 
-    def __on_open(self, e):
+    def _on_open(self, e):
         try:
             self.opened = True
             if self.gd and self.gd.page:
@@ -124,9 +132,9 @@ class Keyboard(ft.Stack):
                 self.gd.bottom = None
                 self.gd.update()
         except:
-            logging.exception("exception occured at Keyboard.__on_open")
+            logging.exception("【键盘】打开面板时发生异常")
 
-    def __on_close(self, e):
+    def _on_close(self, e):
         try:
             self.opened = False
             if self.gd and self.gd.page:
@@ -137,53 +145,51 @@ class Keyboard(ft.Stack):
                 self.gd.bottom = 10
                 self.gd.update()
         except:
-            logging.exception("exception occured at Keyboard.__on_close")
+            logging.exception("【键盘】关闭面板时发生异常")
 
-    def __on_pan_update(self, e: ft.DragUpdateEvent):
+    def _on_pan_update(self, e: ft.DragUpdateEvent):
         try:
             if self.opened and e.control is not None:
                 e.control.top = max(0, e.control.top + e.delta_y)
                 e.control.left = max(0, e.control.left + e.delta_x)
                 e.control.update()
         except:
-            logging.exception("exception occured at Keyboard.__on_pan_update")
+            logging.exception("【键盘】拖动位置时发生异常")
 
-    def __on_key_click(self, e):
+    def _on_key_click(self, e):
         try:
             if e.control is not None:
                 txt = e.control.text
-                # 不能以点开头
                 if self.words == "" and txt == '.':
                     return
-                # 只能输入一个点
                 if self.type == 'float' and '.' in self.words and txt == '.':
                     return
                 self.words += txt
-                self.__on_change(self.words)
+                self._on_change(self.words)
         except:
-            logging.exception("exception occured at Keyboard.__on_key_click")
+            logging.exception("【键盘】点击按键时发生异常")
 
-    def __on_delete_one(self, e):
+    def _on_delete_one(self, e):
         try:
             self.words = self.words[:-1]
-            self.__on_change(self.words)
+            self._on_change(self.words)
         except:
-            logging.exception("exception occured at Keyboard.__on_delete_one")
+            logging.exception("【键盘】删除一个字符时发生异常")
 
-    def __on_delete_all(self, e):
+    def _on_delete_all(self, e):
         try:
             self.words = ""
-            self.__on_change(self.words)
+            self._on_change(self.words)
         except:
-            logging.exception("exception occured at Keyboard.__on_delete_all")
+            logging.exception("【键盘】清空输入时发生异常")
 
-    def __on_change(self, e):
+    def _on_change(self, value: str):
         try:
             if self.tf and self.tf.page:
-                self.tf.value = e
+                self.tf.value = value
                 self.tf.update()
         except:
-            logging.exception("exception occured at Keyboard.__on_change")
+            logging.exception("【键盘】更新输入值时发生异常")
 
 
 keyboard = Keyboard()

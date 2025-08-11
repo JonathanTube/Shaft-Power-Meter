@@ -1,6 +1,7 @@
 import logging
 import flet as ft
 
+from peewee import fn
 from ui.common.abstract_table import AbstractTable
 from db.models.report_info import ReportInfo
 from ui.common.toast import Toast
@@ -8,7 +9,6 @@ from ui.report.report_info_detail import ReportInfoDialog
 from ui.report.report_info_exporter import ReportInfoExporter
 from common.global_data import gdata
 from db.models.date_time_conf import DateTimeConf
-
 
 class ReportInfoTable(AbstractTable):
     def __init__(self):

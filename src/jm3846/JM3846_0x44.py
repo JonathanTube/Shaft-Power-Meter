@@ -79,19 +79,21 @@ class JM38460x44:
     async def receive_0x44(name, reader, writer):
         while JM38460x44.running:
             try:
-                response = await JM3846Util.read_frame(reader)
+                frame = await JM3846Util.read_frame(reader)
+                if frame is None:
+                    return  # 优雅退出
             except asyncio.CancelledError:
                 break
             except Exception:
                 logging.warning(f'[JM3846-{name}] receive_0x44 error')
                 break
 
-            func_code = struct.unpack(">B", response[7:8])[0]
+            func_code = struct.unpack(">B", frame[7:8])[0]
             if func_code & 0x80:
                 continue
 
             if func_code == 0x44:
-                current_frame = JM38460x44.parse_response(response, name)
+                current_frame = JM38460x44.parse_response(frame, name)
                 if current_frame + 1 >= JM38460x44.total_frames:
                     request = JM38460x44.build_request(JM38460x44.frame_size, JM38460x44.total_frames)
                     logging.info(f'[JM3846-{name}] send 0x44 req (current_frame={current_frame}) is greater than (total_frames={JM38460x44.total_frames})')

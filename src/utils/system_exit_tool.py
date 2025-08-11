@@ -52,13 +52,13 @@ class SystemExitTool:
             await modbus_output.stop()
 
             # 关闭sps_offline
-            data_record_task.stop()
+            await data_record_task.stop()
 
             # 关闭test mode
-            test_mode_task.stop()
+            await test_mode_task.stop()
 
             # 关闭时间task
-            utc_timer.stop()
+            await utc_timer.stop()
 
             logging.info('all of the connections were closed.')
         except:

@@ -43,8 +43,10 @@ class JM38460x45:
         writer.write(request)
         await writer.drain()
 
-        response = await JM3846Util.read_frame(reader)
-        logging.info(f'[JM3846-{name}] send 0x45 res hex={bytes.hex(response)}')
-        func_code = struct.unpack(">B", response[7:8])[0]
+        frame = await JM3846Util.read_frame(reader)
+        if frame is None:
+            return  # 优雅退出
+        logging.info(f'[JM3846-{name}] send 0x45 res hex={bytes.hex(frame)}')
+        func_code = struct.unpack(">B", frame[7:8])[0]
         if func_code == 0x45:
-            JM38460x45.parse_response(response)
+            JM38460x45.parse_response(frame)
