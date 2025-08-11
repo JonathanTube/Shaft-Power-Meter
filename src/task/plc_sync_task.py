@@ -147,19 +147,17 @@ class PlcSyncTask:
     async def write_instant_data(self, power: float, torque: float, thrust: float, speed: float):
         try:
             # power的单位是kw，保留一位小数，plc无法显示小数，所以除以1000 再乘以 10，也就是除以100
-            scaled_values = (
-                int(power / 100),  # 功率 kw
-                int(torque / 100),  # 扭矩 kNm
-                int(thrust / 100),  # 推力 kN
-                int(speed * 10)  # 速度 rpm * 10
-            )
+            _power = int(power / 100)  # 功率 kw
+            _torque = int(torque / 100)  # 扭矩 kNm
+            _thrust = int(thrust / 100)  # 推力 kN
+            _speed = int(speed * 10)  # 速度 rpm * 10
 
-            # logging.info(f"[***PLC***] write real time data to plc: {scaled_values}")
+            logging.info(f"[***PLC***] write real time data to plc: power={_power},torque={_torque},thrust={_thrust},speed={_speed}")
 
-            await self.plc_client.write_register(12301, scaled_values[0])
-            await self.plc_client.write_register(12311, scaled_values[1])
-            await self.plc_client.write_register(12321, scaled_values[2])
-            await self.plc_client.write_register(12331, scaled_values[3])
+            await self.plc_client.write_register(12301, _power)
+            await self.plc_client.write_register(12311, _torque)
+            await self.plc_client.write_register(12321, _thrust)
+            await self.plc_client.write_register(12331, _speed)
         except:
             logging.error(f"[***PLC***] {self.ip}:{self.port} write data failed")
 
