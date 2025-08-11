@@ -152,7 +152,7 @@ class PlcSyncTask:
             _thrust = int(thrust / 100)  # 推力 kN
             _speed = int(speed * 10)  # 速度 rpm * 10
 
-            logging.info(f"[***PLC***] write real time data to plc: power={_power},torque={_torque},thrust={_thrust},speed={_speed}")
+            logging.info(f"[***PLC***] write real time data to plc: power={_power} torque={_torque} thrust={_thrust} speed={_speed}")
 
             await self.plc_client.write_register(12301, _power)
             await self.plc_client.write_register(12311, _torque)

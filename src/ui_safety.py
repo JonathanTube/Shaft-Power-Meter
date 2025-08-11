@@ -4,15 +4,6 @@ import logging
 import functools
 import flet as ft
 
-# 日志记录到 ui_error.log 和控制台
-logging.basicConfig(
-    level=logging.ERROR,
-    format="%(asctime)s [%(levelname)s] %(message)s",
-    handlers=[
-        logging.FileHandler("ui_error.log", encoding="utf-8"),
-        logging.StreamHandler()
-    ]
-)
 
 def safe_event(handler):
     """
@@ -49,9 +40,11 @@ def safe_event(handler):
 # 全局事件安全补丁
 _original_setattr = ft.Control.__setattr__
 
+
 def safe_setattr(self, name, value):
     if name.startswith("on_") and callable(value):
         value = safe_event(value)
     _original_setattr(self, name, value)
+
 
 ft.Control.__setattr__ = safe_setattr
