@@ -11,27 +11,34 @@ class Keyboard(ft.Stack):
         self.words = ""
         self.type = 'float'
         self.expand = True
+
         self.tf: ft.TextField | None = None
-        self.gd = None
-        self.kb_open = None
-        self.kb_close = None
-        self.point = None
+        self.gd: ft.GestureDetector | None = None
+        self.point: ft.OutlinedButton | None = None
+
+    def did_mount(self):
+        """当 Keyboard 被挂载到页面时自动绑定 page"""
+        if self.page:
+            logging.info("Keyboard 已挂载到页面")
+        else:
+            logging.warning("Keyboard 挂载失败，page 未绑定")
 
     def build(self):
         try:
-            # 数字按键
             number_keys = [ft.OutlinedButton(str(i), col={"xs": 4}, on_click=self._on_key_click) for i in range(1, 10)]
             number_keys.append(ft.OutlinedButton(str(0), col={"xs": 4}, on_click=self._on_key_click))
 
-            # 小数点
             self.point = ft.OutlinedButton('.', col={"xs": 4}, on_click=self._on_key_click)
             number_keys.append(self.point)
 
-            # 删除按钮
-            number_keys.append(ft.OutlinedButton(
-                icon=ft.Icons.BACKSPACE_OUTLINED, col={"xs": 4},
-                on_click=self._on_delete_one, on_long_press=self._on_delete_all
-            ))
+            number_keys.append(
+                ft.OutlinedButton(
+                    icon=ft.Icons.BACKSPACE_OUTLINED,
+                    col={"xs": 4},
+                    on_click=self._on_delete_one,
+                    on_long_press=self._on_delete_all
+                )
+            )
 
             kb_header = ft.Row(
                 alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
@@ -40,7 +47,7 @@ class Keyboard(ft.Stack):
                     ft.IconButton(icon=ft.Icons.CLOSE_ROUNDED, on_click=self._on_close)
                 ]
             )
-            self.kb = ft.Column(
+            kb = ft.Column(
                 spacing=0,
                 controls=[
                     kb_header,
@@ -48,7 +55,7 @@ class Keyboard(ft.Stack):
                     ft.Container(content=ft.ResponsiveRow(number_keys), padding=10)
                 ]
             )
-            self.kb_open = ft.Container(
+            kb_open = ft.Container(
                 width=200,
                 border_radius=10,
                 bgcolor=ft.Colors.SURFACE,
@@ -58,10 +65,10 @@ class Keyboard(ft.Stack):
                     blur_radius=20,
                     offset=ft.Offset(0, 5)
                 ),
-                content=self.kb
+                content=kb
             )
 
-            self.kb_close = ft.IconButton(icon=ft.Icons.KEYBOARD_OUTLINED, on_click=self._on_open)
+            kb_close = ft.IconButton(icon=ft.Icons.KEYBOARD_OUTLINED, on_click=self._on_open)
 
             self.gd = ft.GestureDetector(
                 right=10,
@@ -70,95 +77,106 @@ class Keyboard(ft.Stack):
                 mouse_cursor=ft.MouseCursor.MOVE,
                 drag_interval=10,
                 on_pan_update=self._on_pan_update,
-                content=self.kb_close
+                content=kb_close
             )
 
+            self._kb_open = kb_open
+            self._kb_close = kb_close
             self.controls = [self.gd]
+
         except:
-            logging.exception('【键盘】构建界面时发生异常')
+            logging.exception('Keyboard.build 构建失败')
 
     def show(self):
+        """显示键盘"""
         try:
-            if self.page:
-                self.visible = True
-                self.update()
+            if not self.page:
+                logging.warning("Keyboard.show() 调用时 page 未绑定")
+                return
+            self.visible = True
+            self.update()
         except:
-            logging.exception("【键盘】显示时发生异常")
+            logging.exception("Keyboard.show 调用出错")
 
     def open(self, text_field: ft.TextField, type: Literal['int', 'float', 'ip'] = 'float'):
-        if self.page:
+        """打开键盘"""
+        try:
+            if not self.page:
+                logging.warning("Keyboard.open() 调用时 page 未绑定")
+                return
             self.show()
-            try:
-                # 恢复上一个输入框的边框颜色
-                if self.tf and self.tf.page:
-                    self.tf.border_color = ft.Colors.BLACK
-                    self.tf.update()
 
-                if text_field is not None:
-                    self.words = str(text_field.value)
+            # 恢复上一次的边框
+            if self.tf and self.tf.page:
+                self.tf.border_color = ft.Colors.BLACK
+                self.tf.update()
 
-                if not self.opened:
-                    self._on_open(None)
+            if text_field is not None:
+                self.words = str(text_field.value)
 
-                self.type = type
-                if self.point and self.point.page:
-                    self.point.visible = self.type in ('float', 'ip')
-                    self.point.update()
+            if not self.opened:
+                self._on_open(None)
 
-                self.tf = text_field
-                # 高亮当前输入框
-                if self.tf and self.tf.page:
-                    self.tf.border_color = ft.Colors.PRIMARY
-                    self.tf.update()
-            except:
-                logging.exception("【键盘】打开时发生异常")
+            self.type = type
+            if self.point and self.point.page:
+                self.point.visible = (self.type in ('float', 'ip'))
+                self.point.update()
+
+            self.tf = text_field
+            if self.tf and self.tf.page:
+                self.tf.border_color = ft.Colors.PRIMARY
+                self.tf.update()
+
+        except:
+            logging.exception("Keyboard.open 调用出错")
 
     def close(self):
+        """关闭键盘"""
         try:
             self.visible = False
             self.update()
             self._on_close(None)
         except:
-            logging.exception("【键盘】关闭时发生异常")
+            logging.exception("Keyboard.close 调用出错")
 
     def _on_open(self, e):
         try:
             self.opened = True
             if self.gd and self.gd.page:
-                self.gd.content = self.kb_open
+                self.gd.content = self._kb_open
                 self.gd.left = 500
                 self.gd.top = 250
                 self.gd.right = None
                 self.gd.bottom = None
                 self.gd.update()
         except:
-            logging.exception("【键盘】打开面板时发生异常")
+            logging.exception("Keyboard._on_open 出错")
 
     def _on_close(self, e):
         try:
             self.opened = False
             if self.gd and self.gd.page:
-                self.gd.content = self.kb_close
+                self.gd.content = self._kb_close
                 self.gd.left = None
                 self.gd.top = None
                 self.gd.right = 10
                 self.gd.bottom = 10
                 self.gd.update()
         except:
-            logging.exception("【键盘】关闭面板时发生异常")
+            logging.exception("Keyboard._on_close 出错")
 
     def _on_pan_update(self, e: ft.DragUpdateEvent):
         try:
-            if self.opened and e.control is not None:
+            if self.opened and e.control:
                 e.control.top = max(0, e.control.top + e.delta_y)
                 e.control.left = max(0, e.control.left + e.delta_x)
                 e.control.update()
         except:
-            logging.exception("【键盘】拖动位置时发生异常")
+            logging.exception("Keyboard._on_pan_update 出错")
 
     def _on_key_click(self, e):
         try:
-            if e.control is not None:
+            if e.control:
                 txt = e.control.text
                 if self.words == "" and txt == '.':
                     return
@@ -167,29 +185,29 @@ class Keyboard(ft.Stack):
                 self.words += txt
                 self._on_change(self.words)
         except:
-            logging.exception("【键盘】点击按键时发生异常")
+            logging.exception("Keyboard._on_key_click 出错")
 
     def _on_delete_one(self, e):
         try:
             self.words = self.words[:-1]
             self._on_change(self.words)
         except:
-            logging.exception("【键盘】删除一个字符时发生异常")
+            logging.exception("Keyboard._on_delete_one 出错")
 
     def _on_delete_all(self, e):
         try:
             self.words = ""
             self._on_change(self.words)
         except:
-            logging.exception("【键盘】清空输入时发生异常")
+            logging.exception("Keyboard._on_delete_all 出错")
 
-    def _on_change(self, value: str):
+    def _on_change(self, val):
         try:
             if self.tf and self.tf.page:
-                self.tf.value = value
+                self.tf.value = val
                 self.tf.update()
         except:
-            logging.exception("【键盘】更新输入值时发生异常")
+            logging.exception("Keyboard._on_change 出错")
 
 
 keyboard = Keyboard()

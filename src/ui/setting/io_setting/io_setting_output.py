@@ -173,6 +173,6 @@ class IOSettingOutput(ft.Container):
                     self.stop_btn.bgcolor = ft.Colors.RED
                     self.stop_btn.disabled = False
 
-            modbus_output.update_conf()
+            self.page.run_task(modbus_output.update_conf)
         except:
             logging.exception('exception occured at IOSettingOutput.before_update')

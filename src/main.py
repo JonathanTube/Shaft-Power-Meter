@@ -102,7 +102,6 @@ def set_content(page: ft.Page):
     audio_alarm_btn = AudioAlarm()
     main_stack = ft.Stack(controls=[fullscreen_alert, main_content, audio_alarm_btn], expand=True)
     page.add(main_stack)
-    page.overlay.append(keyboard)
 
     async def watch_eexi_breach():
         is_running = False
@@ -196,6 +195,8 @@ async def main_async_setup(page: ft.Page):
 
 async def main(page: ft.Page):
     ui_safety.init_ui_safety(page)
+
+    page.overlay.append(keyboard)
 
     def handle_error(e):
         logging.error('global exception')
