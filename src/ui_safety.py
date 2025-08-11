@@ -1,66 +1,262 @@
 # ui_safety.py
+import time
+import threading
 import traceback
-import logging
 import functools
+import logging
+import json
+import queue
+from typing import Callable, Optional
+
 import flet as ft
 
+# ------------- logging -------------
+logger = logging.getLogger("ui_safety")
+if not logger.handlers:
+    logging.basicConfig(
+        level=logging.INFO,
+        format="%(asctime)s [%(levelname)s] %(message)s",
+        handlers=[logging.FileHandler("ui_error.log", encoding="utf-8"), logging.StreamHandler()]
+    )
 
-def safe_event(handler):
-    """
-    安全事件包装器：防止回调异常导致整个UI卡死
-    """
+# ------------- configuration -------------
+ERROR_THROTTLE_WINDOW = 5.0
+ERROR_THROTTLE_LIMIT = 20
+HEARTBEAT_INTERVAL = 1.0
+HEARTBEAT_TIMEOUT = 3.0
+UI_SNAPSHOT_ON_THROTTLE = True
+
+# ------------- global state -------------
+_last_heartbeat = time.time()
+_error_counts = {}
+_error_lock = threading.Lock()
+_ui_queue = queue.Queue()
+_safety_running = True
+
+
+# ------------- utilities -------------
+def _now():
+    return time.time()
+
+def _log(msg):
+    logger.info(msg)
+
+def _save_ui_snapshot(page: ft.Page, prefix="ui_snapshot"):
+    try:
+        def serialize(ctrl):
+            return {
+                "type": ctrl.__class__.__name__,
+                "props": {k: str(v) for k, v in getattr(ctrl, "__dict__", {}).items() if not k.startswith("_")},
+                "children": [serialize(c) for c in getattr(ctrl, "controls", [])]
+            }
+        filename = f"{prefix}_{int(time.time())}.json"
+        with open(filename, "w", encoding="utf-8") as f:
+            json.dump(serialize(page), f, ensure_ascii=False, indent=2)
+        _log(f"UI snapshot saved: {filename}")
+    except Exception:
+        logger.exception("save_ui_snapshot failed")
+
+
+# ------------- safe_event wrapper -------------
+def safe_event(handler: Callable):
     if not callable(handler):
-        raise ValueError("safe_event 需要一个函数或方法")
+        raise ValueError("safe_event needs a callable")
 
     @functools.wraps(handler)
     def wrapper(*args, **kwargs):
         try:
             return handler(*args, **kwargs)
         except Exception as e:
-            logging.error(f"[UI Error] {handler.__name__}: {e}")
-            logging.error(traceback.format_exc())
+            logger.error("[UI Error] %s: %s", getattr(handler, "__name__", repr(handler)), e)
+            logger.error(traceback.format_exc())
 
-            # 如果事件有 page 参数，弹出提示
+            # find page in args
             page = None
-            for arg in args:
-                if isinstance(arg, ft.ControlEvent) and hasattr(arg, "page"):
-                    page = arg.page
+            for a in args:
+                if isinstance(a, ft.ControlEvent) and hasattr(a, "page"):
+                    page = a.page
                     break
-            if page:
-                try:
+            try:
+                if page:
+                    # Use new API page.open for SnackBar
                     page.open(ft.SnackBar(ft.Text(f"⚠ 出错: {e}")))
-                    page.update()
-                except:
-                    pass
+            except Exception:
+                logger.exception("failed to show snackbar")
             return None
-
     return wrapper
 
 
-# 全局事件安全补丁
+# ------------- monkey-patch Control.__setattr__ to auto-wrap on_* handlers -------------
 _original_setattr = ft.Control.__setattr__
 
-
-def safe_setattr(self, name, value):
+def _safe_setattr(self, name, value):
     if name.startswith("on_") and callable(value):
-        value = safe_event(value)
+        try:
+            value = safe_event(value)
+        except Exception:
+            logger.exception("safe_event wrap failed")
     _original_setattr(self, name, value)
 
+# apply patch once at import
+try:
+    ft.Control.__setattr__ = _safe_setattr
+except Exception:
+    logger.exception("failed to monkey-patch ft.Control.__setattr__")
 
-ft.Control.__setattr__ = safe_setattr
 
+# ------------- safe update wrapper -------------
+_original_update = getattr(ft.Control, "update", None)
 
-# -------- 安全 UI 更新补丁 --------
-_original_update = ft.Control.update
-
-def safe_update(self, *args, **kwargs):
+def _safe_update(self, *args, **kwargs):
     try:
-        if getattr(self, "page", None):  # 确保控件挂在页面上
-            return _original_update(self, *args, **kwargs)
-        else:
-            logging.warning(f"[SafeUpdate] {self} 没有挂在页面上，跳过 update()")
-    except Exception as e:
-        logging.error(f"[SafeUpdate] 控件更新失败: {e}")
-        logging.error(traceback.format_exc())
+        # if control not attached to page, skip update
+        if getattr(self, "page", None) is None:
+            logger.warning("[SafeUpdate] %s not attached to page, skip update()", getattr(self, "__repr__", lambda: str(self))())
+            return
+        return _original_update(self, *args, **kwargs)
+    except Exception:
+        logger.exception("[SafeUpdate] control.update failed")
+        # try to avoid crashing: no re-raise
 
-ft.Control.update = safe_update
+# apply if update exists
+if _original_update is not None:
+    try:
+        ft.Control.update = _safe_update
+    except Exception:
+        logger.exception("failed to monkey-patch Control.update")
+
+
+# ------------- safe invoke for background threads -------------
+def safe_invoke_on_page(page: ft.Page, fn: Callable, *args, **kwargs):
+    """
+    Schedule callable to run on UI thread via page.call_later. If that fails,
+    fallback to background queue which will execute job but must not assume UI thread.
+    """
+    def job():
+        try:
+            fn(*args, **kwargs)
+        except Exception:
+            logger.exception("exception while running safe job on page")
+
+    # prefer page.call_later if available
+    try:
+        page.call_later(lambda _: job())
+    except Exception:
+        # fallback to queue
+        _ui_queue.put(job)
+
+
+# ------------- background queue consumer (fallback jobs) -------------
+def _queue_consumer():
+    while _safety_running:
+        try:
+            job = _ui_queue.get(timeout=1.0)
+        except Exception:
+            continue
+        try:
+            job()
+        except Exception:
+            logger.exception("exception in ui fallback job")
+
+_consumer_thread = threading.Thread(target=_queue_consumer, daemon=True)
+_consumer_thread.start()
+
+
+# ------------- global on_event handler (error limit & snapshot) -------------
+def _global_on_event(e: ft.ControlEvent, page: Optional[ft.Page] = None):
+    try:
+        if getattr(e, "name", None) == "error":
+            err = str(getattr(e, "data", ""))
+            logger.error("Received Flutter error event: %r", err)
+
+            with _error_lock:
+                now = _now()
+                lst = _error_counts.get(err) or []
+                # keep only recent
+                lst = [t for t in lst if now - t <= ERROR_THROTTLE_WINDOW]
+                lst.append(now)
+                _error_counts[err] = lst
+
+                if len(lst) > ERROR_THROTTLE_LIMIT:
+                    logger.warning("Error %r occurred %d times in %.1fs — throttle activated", err, len(lst), ERROR_THROTTLE_WINDOW)
+                    if UI_SNAPSHOT_ON_THROTTLE and page is not None:
+                        _save_ui_snapshot(page, "throttle_snapshot")
+                    # drop further processing
+                    return
+            # normal flow - log once
+            logger.error("[Flutter Error] %s", err)
+    except Exception:
+        logger.exception("exception in global on_event")
+
+
+# ------------- heartbeat monitor -------------
+def _start_heartbeat(page: ft.Page, interval=HEARTBEAT_INTERVAL, timeout=HEARTBEAT_TIMEOUT):
+    def hb():
+        global _last_heartbeat
+        while _safety_running:
+            time.sleep(interval)
+            idle = time.time() - _last_heartbeat
+            if idle > timeout:
+                logger.warning("Heartbeat: page.update() not called for %.1fs — saving snapshot", idle)
+                try:
+                    _save_ui_snapshot(page, "heartbeat_snapshot")
+                except Exception:
+                    logger.exception("failed saving heartbeat snapshot")
+    t = threading.Thread(target=hb, daemon=True)
+    t.start()
+
+
+# ------------- page.update wrapper to update heartbeat -------------
+def _wrap_page_update(page: ft.Page):
+    orig = getattr(page, "update", None)
+    if not orig:
+        return
+    def _wrapped(*args, **kwargs):
+        global _last_heartbeat
+        try:
+            _last_heartbeat = time.time()
+            return orig(*args, **kwargs)
+        except Exception:
+            logger.exception("page.update raised exception")
+            try:
+                _save_ui_snapshot(page, "update_error_snapshot")
+            except Exception:
+                pass
+    try:
+        page.update = _wrapped
+    except Exception:
+        logger.exception("failed to wrap page.update")
+
+
+# ------------- initializer to hook page ----------------
+def init_ui_safety(page: ft.Page):
+    """
+    Call this at very start of your main(page) to enable protections.
+    Example:
+        def main(page):
+            init_ui_safety(page)
+            ...
+    """
+    # wrap update
+    _wrap_page_update(page)
+
+    # hook page.on_event (preserve old)
+    try:
+        orig = getattr(page, "on_event", None)
+        def _on_event(e):
+            try:
+                _global_on_event(e, page)
+            except Exception:
+                logger.exception("global on_event handler error")
+            if callable(orig):
+                try:
+                    orig(e)
+                except Exception:
+                    logger.exception("orig on_event raised")
+        page.on_event = _on_event
+    except Exception:
+        logger.exception("failed to set page.on_event")
+
+    # start heartbeat
+    _start_heartbeat(page)
+    logger.info("ui_safety initialized")

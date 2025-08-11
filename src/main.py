@@ -94,7 +94,7 @@ def start_all_task():
         if system_settings.is_master:
             io_conf: IOConf = IOConf.get()
             if io_conf.plc_enabled:
-                asyncio.create_task(plc.connect())
+                plc.start()
             asyncio.create_task(sps_read_task.connect())
 
             # 不是独立的，才需要运行server
@@ -192,7 +192,9 @@ def set_content(page: ft.Page):
     page.run_task(watch_eexi_breach)
 
 
-async def main(page: ft.Page):    
+async def main(page: ft.Page):
+    ui_safety.init_ui_safety(page)
+
     def handle_error(e):
         logging.error('============global exception occured===========')
         logging.exception(e)

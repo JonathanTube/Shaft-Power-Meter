@@ -1,170 +1,291 @@
 import asyncio
 import logging
-from peewee import fn
 from typing import Optional
+
+from peewee import fn
+
 from pymodbus.client import AsyncModbusTcpClient
+
 from common.const_alarm_type import AlarmType
 from db.models.alarm_log import AlarmLog
 from db.models.io_conf import IOConf
 from common.global_data import gdata
 from utils.alarm_saver import AlarmSaver
 
+_logger = logging.getLogger("plc")
 
 class PlcSyncTask:
     def __init__(self):
-        self._lock = asyncio.Lock()  # 线程安全锁
+        self._lock = asyncio.Lock()  # protect write/read sequences
         self.plc_client: Optional[AsyncModbusTcpClient] = None
 
-        self._retry = 0
-        self._max_retries = 6  # 最大重连次数
-        self._is_connected = False
-        self._is_canceled = False
+        self._keepalive_task: Optional[asyncio.Task] = None
+        self._connect_lock = asyncio.Lock()  # ensure single connect at time
 
+        self._is_connected = False
+        self._is_stopped = False
+
+        # reconnect/backoff policy
+        self._retries = 0
+        self._max_backoff = 32  # seconds
+
+        # local cached address/port
         self.ip = None
         self.port = None
+
+    # ---- Public API ----
+    def start(self):
+        """Start the keepalive loop (idempotent)."""
+        if self._keepalive_task and not self._keepalive_task.done():
+            return
+        self._is_stopped = False
+        self._keepalive_task = asyncio.create_task(self._keepalive_loop(), name="plc-keepalive")
+
+    async def stop(self):
+        """Stop keepalive and close client."""
+        self._is_stopped = True
+        if self._keepalive_task:
+            self._keepalive_task.cancel()
+            try:
+                await self._keepalive_task
+            except asyncio.CancelledError:
+                pass
+            self._keepalive_task = None
+        await self._close_client()
+        self._is_connected = False
 
     @property
     def is_connected(self):
         return self._is_connected
 
-    async def connect(self):
-        async with self._lock:  # 确保单线程重连
+    # ---- internal helpers ----
+    async def _keepalive_loop(self):
+        """Top-level loop: ensure one connect -> heart_beat -> on failure reconnect."""
+        backoff = 1
+        while gdata.configCommon.is_master and not self._is_stopped:
+            try:
+                await self._connect_once()
+                if self.plc_client and self.plc_client.connected:
+                    # reset backoff
+                    self._retries = 0
+                    backoff = 1
+                    await self._heart_beat_loop()
+                else:
+                    _logger.warning("[PLC] connect_once reported not connected")
+            except asyncio.CancelledError:
+                break
+            except Exception as e:
+                _logger.exception("[PLC] unexpected error in keepalive_loop: %s", e)
+                AlarmSaver.create(AlarmType.MASTER_PLC)
 
-            if self._is_connected:
-                return
+            # exponential backoff on failure
+            wait = min(backoff, self._max_backoff)
+            _logger.info("[PLC] waiting %s seconds before reconnect", wait)
+            await asyncio.sleep(wait)
+            backoff *= 2
+            self._retries += 1
 
-            self._is_canceled = False
+        _logger.info("[PLC] keepalive loop exited")
 
-            self._retry = 0
-            while gdata.configCommon.is_master and self._retry < self._max_retries:
-                # 如果是手动取消，直接跳出
-                if self._is_canceled:
-                    break
-
-                try:
-                    # 重新创建客户端
-                    io_conf: IOConf = IOConf.get()
-                    self.ip = io_conf.plc_ip
-                    self.port = io_conf.plc_port
-
-                    logging.info(f'[***PLC***] connect to plc {self.ip} {self.port}')
-
-                    self.plc_client = AsyncModbusTcpClient(
-                        host=io_conf.plc_ip,
-                        port=io_conf.plc_port,
-                        timeout=5,
-                        retries=5,
-                        reconnect_delay=5
-                    )
-
-                    await self.plc_client.connect()
-
-                    logging.info("[***PLC***] connected successfully")
-
-                    await self.heart_beat()
-                except:
-                    logging.error(f"[***PLC***] {self._retry + 1}th reconnect failed")
-                    AlarmSaver.create(AlarmType.MASTER_PLC)
-                finally:
-                    #  指数退避
-                    await asyncio.sleep(2 ** self._retry)
-                    self._retry += 1
-
-            self._is_canceled = False
-
-    async def heart_beat(self):
-        while gdata.configCommon.is_master and self.plc_client is not None and self.plc_client.connected:
-            if self._is_canceled:
-                return
+    async def _connect_once(self):
+        """Establish a single connection attempt (cleans previous connection first)."""
+        async with self._connect_lock:
+            await self._close_client()  # ensure previous client fully closed
 
             try:
-                self._is_connected = True
-                self._retry = 0
-                await self.handle_alarm_recovery()
-            except:
-                logging.error('exception occured at PlcSyncTask.heart_beat')
-                AlarmSaver.create(AlarmType.MASTER_PLC)
-            finally:
-                await asyncio.sleep(5)
+                io_conf: IOConf = IOConf.get()
+                self.ip = io_conf.plc_ip
+                self.port = io_conf.plc_port
 
-        # 到达这里，说明连接丢失
-        self._is_connected = False
-        AlarmSaver.create(AlarmType.MASTER_PLC)
+                _logger.info(f"[PLC] connecting to {self.ip}:{self.port}")
+
+                # create client and try connecting with timeout
+                client = AsyncModbusTcpClient(
+                    host=self.ip,
+                    port=self.port,
+                    timeout=5,
+                    retries=0,            # manage retries ourselves
+                    reconnect_delay=0
+                )
+                self.plc_client = client
+
+                # connect() may be a coroutine or return immediately depending on implementation,
+                # use wait_for to bound the connect operation
+                try:
+                    await asyncio.wait_for(self.plc_client.connect(), timeout=10)
+                except asyncio.TimeoutError:
+                    _logger.warning("[PLC] connect timeout")
+                    await self._close_client()
+                    AlarmSaver.create(AlarmType.MASTER_PLC)
+                    return
+
+                if not self.plc_client.connected:
+                    _logger.warning("[PLC] client reports not connected after connect()")
+                    await self._close_client()
+                    AlarmSaver.create(AlarmType.MASTER_PLC)
+                    return
+
+                self._is_connected = True
+                _logger.info("[PLC] connected successfully")
+            except Exception:
+                _logger.exception("[PLC] connect failed")
+                self._is_connected = False
+                AlarmSaver.create(AlarmType.MASTER_PLC)
+                await self._close_client()
+
+    async def _close_client(self):
+        """Safely close and drop current client if exists."""
+        if self.plc_client:
+            try:
+                if getattr(self.plc_client, "connected", False):
+                    await self.plc_client.close()
+            except Exception:
+                _logger.exception("[PLC] error closing client")
+            finally:
+                # ensure underlying resources are freed
+                try:
+                    # some implementations may provide transport attribute
+                    transport = getattr(self.plc_client, "_transport", None)
+                    if transport:
+                        try:
+                            transport.close()
+                        except Exception:
+                            pass
+                except Exception:
+                    pass
+                self.plc_client = None
+                self._is_connected = False
+
+    async def _heart_beat_loop(self):
+        """Run periodic tasks while connected."""
+        try:
+            while gdata.configCommon.is_master and self.plc_client and self.plc_client.connected and not self._is_stopped:
+                try:
+                    # reset counters
+                    self._retries = 0
+                    await self.handle_alarm_recovery()
+                except asyncio.CancelledError:
+                    raise
+                except Exception:
+                    _logger.exception("[PLC] exception occured in heart_beat")
+                    AlarmSaver.create(AlarmType.MASTER_PLC)
+                await asyncio.sleep(5)
+        finally:
+            # connection likely lost
+            self._is_connected = False
+            AlarmSaver.create(AlarmType.MASTER_PLC)
+            await self._close_client()
+            _logger.info("[PLC] heart_beat loop exit, connection closed")
+
+    # ---- read/write helpers (safe) ----
+    async def _safe_read_register(self, address: int) -> Optional[int]:
+        if not (self.plc_client and getattr(self.plc_client, "connected", False)):
+            return None
+        try:
+            # depending on pymodbus version signature may differ
+            resp = await self.plc_client.read_holding_registers(address, count=1)
+            if resp is None or getattr(resp, "isError", lambda: False)():
+                return None
+            regs = getattr(resp, "registers", None)
+            if regs and len(regs) > 0:
+                val = int(regs[0]) & 0xFFFF
+                return val
+        except Exception:
+            _logger.exception("[PLC] read_holding_registers failed at %s", address)
+        return None
+
+    async def _safe_read_coil(self, address: int) -> Optional[bool]:
+        if not (self.plc_client and getattr(self.plc_client, "connected", False)):
+            return None
+        try:
+            resp = await self.plc_client.read_coils(address, count=1)
+            if resp is None or getattr(resp, "isError", lambda: False)():
+                return None
+            bits = getattr(resp, "bits", None)
+            if bits and len(bits) > 0:
+                return bool(bits[0])
+        except Exception:
+            _logger.exception("[PLC] read_coils failed at %s", address)
+        return None
 
     async def read_4_20_ma_data(self) -> dict:
         if not self._is_connected:
             return self._empty_4_20ma_data()
 
         try:
-            return {  # 全部使用async/await
-                "power_range_min": await self._safe_read_register(12298),
-                "power_range_max": await self._safe_read_register(12299),
-                "power_range_offset": await self._safe_read_register(12300),
-
-                "torque_range_min": await self._safe_read_register(12308),
-                "torque_range_max": await self._safe_read_register(12309),
-                "torque_range_offset": await self._safe_read_register(12310),
-
-                "thrust_range_min": await self._safe_read_register(12318),
-                "thrust_range_max": await self._safe_read_register(12319),
-                "thrust_range_offset": await self._safe_read_register(12320),
-
-                "speed_range_min": await self._safe_read_register(12328),
-                "speed_range_max": await self._safe_read_register(12329),
-                "speed_range_offset": await self._safe_read_register(12330)
+            return {
+                "power_range_min": await self._safe_read_register(12298) or 0,
+                "power_range_max": await self._safe_read_register(12299) or 0,
+                "power_range_offset": await self._safe_read_register(12300) or 0,
+                "torque_range_min": await self._safe_read_register(12308) or 0,
+                "torque_range_max": await self._safe_read_register(12309) or 0,
+                "torque_range_offset": await self._safe_read_register(12310) or 0,
+                "thrust_range_min": await self._safe_read_register(12318) or 0,
+                "thrust_range_max": await self._safe_read_register(12319) or 0,
+                "thrust_range_offset": await self._safe_read_register(12320) or 0,
+                "speed_range_min": await self._safe_read_register(12328) or 0,
+                "speed_range_max": await self._safe_read_register(12329) or 0,
+                "speed_range_offset": await self._safe_read_register(12330) or 0
             }
-        except:
-            logging.error(f"[***PLC***] {self.ip}:{self.port} PLC connection error")
-
-        return self._empty_4_20ma_data()
+        except Exception:
+            _logger.exception("[PLC] read_4_20_ma_data failed")
+            return self._empty_4_20ma_data()
 
     async def write_4_20_ma_data(self, data: dict):
-
-        logging.info(f"PlcSyncTask.write_4_20_ma_data={data}")
-
         if not self._is_connected:
+            _logger.warning("[PLC] write_4_20_ma_data called while not connected")
             return
 
-        try:
-            await self.plc_client.write_register(12298, int(data["power_range_min"]))
-            await self.plc_client.write_register(12299, int(data["power_range_max"]))
-            await self.plc_client.write_register(12300, int(data["power_range_offset"]))
+        async with self._lock:
+            try:
+                # ensure integers and bounds (0..65535)
+                def safe_int(v):
+                    iv = int(v) if v is not None else 0
+                    return max(0, min(iv, 0xFFFF))
 
-            await self.plc_client.write_register(12308, int(data["torque_range_min"]))
-            await self.plc_client.write_register(12309, int(data["torque_range_max"]))
-            await self.plc_client.write_register(12310, int(data["torque_range_offset"]))
+                await self.plc_client.write_register(12298, safe_int(data.get("power_range_min", 0)))
+                await self.plc_client.write_register(12299, safe_int(data.get("power_range_max", 0)))
+                await self.plc_client.write_register(12300, safe_int(data.get("power_range_offset", 0)))
 
-            await self.plc_client.write_register(12318, int(data["thrust_range_min"]))
-            await self.plc_client.write_register(12319, int(data["thrust_range_max"]))
-            await self.plc_client.write_register(12320, int(data["thrust_range_offset"]))
+                await self.plc_client.write_register(12308, safe_int(data.get("torque_range_min", 0)))
+                await self.plc_client.write_register(12309, safe_int(data.get("torque_range_max", 0)))
+                await self.plc_client.write_register(12310, safe_int(data.get("torque_range_offset", 0)))
 
-            await self.plc_client.write_register(12328, int(data["speed_range_min"]))
-            await self.plc_client.write_register(12329, int(data["speed_range_max"]))
-            await self.plc_client.write_register(12330, int(data["speed_range_offset"]))
-        except:
-            raise f"[***PLC***] {self.ip}:{self.port} PLC write data failed"
+                await self.plc_client.write_register(12318, safe_int(data.get("thrust_range_min", 0)))
+                await self.plc_client.write_register(12319, safe_int(data.get("thrust_range_max", 0)))
+                await self.plc_client.write_register(12320, safe_int(data.get("thrust_range_offset", 0)))
+
+                await self.plc_client.write_register(12328, safe_int(data.get("speed_range_min", 0)))
+                await self.plc_client.write_register(12329, safe_int(data.get("speed_range_max", 0)))
+                await self.plc_client.write_register(12330, safe_int(data.get("speed_range_offset", 0)))
+            except Exception:
+                _logger.exception("[PLC] write_4_20_ma_data failed")
+                AlarmSaver.create(AlarmType.MASTER_PLC)
 
     async def write_instant_data(self, power: float, torque: float, thrust: float, speed: float):
-        try:
-            # power的单位是kw，保留一位小数，plc无法显示小数，所以除以1000 再乘以 10，也就是除以100
-            _power = int(power / 100)  # 功率 kw
-            _torque = int(torque / 100)  # 扭矩 kNm
-            _thrust = int(thrust / 100)  # 推力 kN
-            _speed = int(speed * 10)  # 速度 rpm * 10
+        if not self._is_connected:
+            return
+        async with self._lock:
+            try:
+                # convert and clamp to 0..65535
+                _power = max(0, min(int(power / 100), 0xFFFF))
+                _torque = max(0, min(int(torque / 100), 0xFFFF))
+                _thrust = max(0, min(int(thrust / 100), 0xFFFF))
+                _speed = max(0, min(int(speed * 10), 0xFFFF))
 
-            logging.info(f"[***PLC***] write real time data to plc: power={_power} torque={_torque} thrust={_thrust} speed={_speed}")
+                _logger.debug("[PLC] write real time data to plc: power=%s torque=%s thrust=%s speed=%s",
+                              _power, _torque, _thrust, _speed)
 
-            await self.plc_client.write_register(12301, _power)
-            await self.plc_client.write_register(12311, _torque)
-            await self.plc_client.write_register(12321, _thrust)
-            await self.plc_client.write_register(12331, _speed)
-        except:
-            logging.error(f"[***PLC***] {self.ip}:{self.port} write data failed")
+                await self.plc_client.write_register(12301, _power)
+                await self.plc_client.write_register(12311, _torque)
+                await self.plc_client.write_register(12321, _thrust)
+                await self.plc_client.write_register(12331, _speed)
+            except Exception:
+                _logger.exception("[PLC] write_instant_data failed")
 
     async def read_instant_data(self) -> dict:
         if not self._is_connected:
             return {"power": None, "torque": None, "thrust": None, "speed": None}
-
         try:
             return {
                 "power": await self._safe_read_register(12301),
@@ -172,108 +293,79 @@ class PlcSyncTask:
                 "thrust": await self._safe_read_register(12321),
                 "speed": await self._safe_read_register(12331)
             }
-        except:
-            logging.error(f"[***PLC***] {self.ip}:{self.port} PLC read data failed")
-
-        return {"power": None, "torque": None, "thrust": None, "speed": None}
+        except Exception:
+            _logger.exception("[PLC] read_instant_data failed")
+            return {"power": None, "torque": None, "thrust": None, "speed": None}
 
     async def write_alarm(self, occured: bool):
         if not self._is_connected:
             return
-
-        try:
-            await self.plc_client.write_coil(address=12288, value=occured)
-            logging.info(f"[***PLC**] PLC write alarm: {occured}")
-        except:
-            logging.error(f"[***PLC**] {self.ip}:{self.port} write alarm failed")
+        async with self._lock:
+            try:
+                await self.plc_client.write_coil(address=12288, value=bool(occured))
+                _logger.info("[PLC] write alarm: %s", occured)
+            except Exception:
+                _logger.exception("[PLC] write_alarm failed")
 
     async def write_power_overload(self, occured: bool):
         if not self._is_connected:
             return
-
-        try:
-            await self.plc_client.write_coil(address=12289, value=occured)
-            logging.info(f"[***PLC***] write power overload: {occured}")
-        except:
-            logging.error(f"[***PLC***] {self.ip}:{self.port} write power overload failed")
+        async with self._lock:
+            try:
+                await self.plc_client.write_coil(address=12289, value=bool(occured))
+                _logger.info("[PLC] write power overload: %s", occured)
+            except Exception:
+                _logger.exception("[PLC] write_power_overload failed")
 
     async def write_eexi_breach_alarm(self, occured):
-        logging.info(f'[***PLC***] write_eexi_breach_alarm={occured}')
         if not self._is_connected:
             return
-
-        try:
-            await self.plc_client.write_coil(address=12290, value=occured)
-            logging.info(f"[***PLC***] write eexi breach: {occured}")
-        except:
-            logging.error(f"[***PLC***] {self.ip}:{self.port} write eexi breach failed")
+        async with self._lock:
+            try:
+                await self.plc_client.write_coil(address=12290, value=bool(occured))
+                _logger.info("[PLC] write eexi breach: %s", occured)
+            except Exception:
+                _logger.exception("[PLC] write_eexi_breach_alarm failed")
 
     async def read_alarm(self) -> bool:
         if not self._is_connected:
-            return
-
+            return False
         try:
-            return await self._safe_read_coil(12288)
-        except:
-            logging.error(f"[***PLC***] {self.ip}:{self.port} read alarm failed")
+            v = await self._safe_read_coil(12288)
+            return bool(v)
+        except Exception:
+            _logger.exception("[PLC] read_alarm failed")
+            return False
 
     async def read_power_overload(self) -> bool:
         if not self._is_connected:
-            return
-
+            return False
         try:
-            return await self._safe_read_coil(12289)
-        except:
-            logging.error(f"[***PLC***] {self.ip}:{self.port} read power overload failed")
-
-    async def _safe_read_register(self, address: int) -> Optional[int]:
-        response = await self.plc_client.read_holding_registers(address)
-        return response.registers[0] if not response.isError() else None
-
-    async def _safe_read_coil(self, address: int) -> Optional[int]:
-        response = await self.plc_client.read_coils(address=address, count=1)
-        return response.bits[0] if not response.isError() else None
-
-    def _empty_4_20ma_data(self) -> dict:
-        return {key: 0 for key in [
-            "power_range_min", "power_range_max", "power_range_offset",
-            "torque_range_min", "torque_range_max", "torque_range_offset",
-            "thrust_range_min", "thrust_range_max", "thrust_range_offset",
-            "speed_range_min", "speed_range_max", "speed_range_offset"
-        ]}
-
-    async def close(self):
-        self._is_canceled = True
-
-        if not self._is_connected:
-            return
-
-        try:
-            logging.info('[***PLC***] close plc connection')
-            if self.plc_client and self.plc_client.connected:
-                await self.plc_client.close()
-        except:
-            logging.error("[***PLC***] close plc error occured")
-        finally:
-            self._is_connected = False
+            v = await self._safe_read_coil(12289)
+            return bool(v)
+        except Exception:
+            _logger.exception("[PLC] read_power_overload failed")
+            return False
 
     async def handle_alarm_recovery(self):
         try:
-            logging.info('[***PLC***] recovery PLC Alarm')
-            # 恢复PLC
+            _logger.info('[PLC] recovery PLC Alarm')
             AlarmSaver.recovery(AlarmType.MASTER_PLC)
-            # 是否存在报警
             if self.has_alarms():
-                await plc.write_alarm(True)
+                await self.write_alarm(True)
             else:
-                await plc.write_alarm(False)
-        except:
-            logging.error('recovery PLC alarm failed.')
+                await self.write_alarm(False)
+        except Exception:
+            _logger.exception('recovery PLC alarm failed.')
 
     def has_alarms(self) -> bool:
-        cnt = AlarmLog.select(fn.COUNT(AlarmLog.id)).where(AlarmLog.recovery_time.is_null(True)).scalar()
-        return cnt > 0
+        try:
+            cnt = AlarmLog.select(fn.COUNT(AlarmLog.id)).where(AlarmLog.recovery_time.is_null(True)).scalar()
+            return cnt > 0
+        except Exception:
+            _logger.exception("has_alarms failed")
+            return False
 
 
-# 全局单例
-plc: PlcSyncTask = PlcSyncTask()
+# global singleton instance (use `from task.plc_sync_task import plc`)
+plc = PlcSyncTask()

@@ -43,7 +43,7 @@ class SystemExitTool:
             await ws_client.close()
 
             # 关闭PLC
-            await plc.close()
+            await plc.stop()
 
             # 关闭GPS
             await gps.close()
