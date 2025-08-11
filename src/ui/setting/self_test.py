@@ -42,8 +42,8 @@ class SelfTest(ft.Tabs):
                         padding=10, auto_scroll=True, height=500, spacing=5, expand=True)
                     
                     self.tabs = [
-                        ft.Tab(text="SPS-1", content=self.sps_log, visible=self.system_settings.is_master),
-                        ft.Tab(text="SPS-2", content=self.sps2_log, visible=self.system_settings.is_master and self.system_settings.amount_of_propeller == 2),
+                        ft.Tab(text="SPS", content=self.sps_log, visible=self.system_settings.is_master),
+                        ft.Tab(text="SPS2", content=self.sps2_log, visible=self.system_settings.is_master and self.system_settings.amount_of_propeller == 2),
                         ft.Tab(text="HMI Server", content=self.hmi_server_log, visible=not self.system_settings.is_master),
                         ft.Tab(text="GPS", content=self.gps_log),
                         ft.Tab(text="PLC", content=self.plc_log, visible=self.conf.plc_enabled)
@@ -119,9 +119,9 @@ class SelfTest(ft.Tabs):
             try:
                 sps_data = f'ad0={gdata.configSPS.ad0}, ad1={gdata.configSPS.ad1}, speed={gdata.configSPS.speed}'
                 if gdata.configSPS.is_offline:
-                    self.sps_log.controls.append(ft.Text('Disconnected from SPS-1'))
+                    self.sps_log.controls.append(ft.Text('Disconnected from SPS'))
                 else:
-                    self.sps_log.controls.append(ft.Text(f"SPS-1 Data: {sps_data}"))
+                    self.sps_log.controls.append(ft.Text(f"SPS Data: {sps_data}"))
                 self.sps_log.update()
             except:
                 logging.exception('exception occured at SelfTest.__read_sps_data')
