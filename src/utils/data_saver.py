@@ -37,7 +37,7 @@ class DataSaver:
             )
 
             # 主站且PLC连接时写入瞬时数据
-            if gdata.configCommon.is_master and plc.is_connected:
+            if gdata.configCommon.is_master:
                 DataSaver._safe_create_task(plc.write_instant_data(power, torque, thrust, speed))
 
             # 更新计数器

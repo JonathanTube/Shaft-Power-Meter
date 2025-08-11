@@ -58,7 +58,7 @@ class JM3846Thrust:
             # 减去偏移量
             ad1_mv_per_v = ad1_mv_per_v - thrust_offset
             thrust = JM3846Calculator.calculate_thrust(ad1_mv_per_v)
-            logging.info(f'{self.name}=>ad1={ch1_ad},ad1_mv_per_v={ad1_mv_per_v}, thrust_offset={thrust_offset}, thrust={thrust}')
+            # logging.info(f'{self.name}=>ad1={ch1_ad},ad1_mv_per_v={ad1_mv_per_v}, thrust_offset={thrust_offset}, thrust={thrust}')
 
             if self.name == 'sps':
                 gdata.configSPS.ad1 = ch1_ad

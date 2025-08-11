@@ -1,5 +1,6 @@
 import ipaddress
 import logging
+import asyncio
 import flet as ft
 from common.const_alarm_type import AlarmType
 from common.operation_type import OperationType
@@ -19,9 +20,6 @@ class IOSettingPLC(ft.Container):
     def __init__(self, conf: IOConf):
         super().__init__()
         self.conf = conf
-
-        self.loop_task = None
-        self.task_running = False
 
     def build(self):
         try:
@@ -69,6 +67,7 @@ class IOSettingPLC(ft.Container):
                     on_click=lambda e: self.page.run_task(self.on_fetch)
                 )
 
+                # ----------------- 输入框 -----------------
                 self.plc_ip = ft.TextField(
                     label=self.page.session.get("lang.setting.ip"),
                     value=self.conf.plc_ip,
@@ -85,135 +84,40 @@ class IOSettingPLC(ft.Container):
                     read_only=True, on_click=lambda e: keyboard.open(e.control, 'int')
                 )
 
-                self.txt_power_range_min = ft.TextField(
-                    label=self.page.session.get("lang.setting.4_20_ma_power_min"),
-                    suffix_text='kW',
-                    col={'sm': 4},
-                    read_only=True,
-                    value=0,
-                    can_request_focus=False,
-                    on_click=lambda e: keyboard.open(e.control, 'int')
-                )
-                self.txt_power_range_max = ft.TextField(
-                    label=self.page.session.get("lang.setting.4_20_ma_power_max"),
-                    suffix_text='kW',
-                    col={'sm': 4},
-                    read_only=True,
-                    value=0,
-                    can_request_focus=False,
-                    on_click=lambda e: keyboard.open(e.control, 'int')
-                )
-                self.txt_power_range_offset = ft.TextField(
-                    label=self.page.session.get("lang.setting.4_20_ma_power_offset"),
-                    suffix_text='kW',
-                    col={'sm': 4},
-                    read_only=True,
-                    value=0,
-                    can_request_focus=False,
-                    on_click=lambda e: keyboard.open(e.control, 'int')
-                )
+                # 范围输入框批量创建
+                def range_field(label, unit):
+                    return ft.TextField(
+                        label=label,
+                        suffix_text=unit,
+                        col={'sm': 4},
+                        read_only=True,
+                        value=0,
+                        can_request_focus=False,
+                        on_click=lambda e: keyboard.open(e.control, 'int')
+                    )
 
-                self.txt_torque_range_min = ft.TextField(
-                    label=self.page.session.get("lang.setting.4_20_ma_torque_min"),
-                    suffix_text='kNm',
-                    col={'sm': 4},
-                    read_only=True,
-                    value=0,
-                    can_request_focus=False,
-                    on_click=lambda e: keyboard.open(e.control, 'int')
-                )
-                self.txt_torque_range_max = ft.TextField(
-                    label=self.page.session.get("lang.setting.4_20_ma_torque_max"),
-                    suffix_text='kNm',
-                    col={'sm': 4},
-                    read_only=True,
-                    value=0,
-                    can_request_focus=False,
-                    on_click=lambda e: keyboard.open(e.control, 'int')
-                )
-                self.txt_torque_range_offset = ft.TextField(
-                    label=self.page.session.get("lang.setting.4_20_ma_torque_offset"),
-                    suffix_text='kNm',
-                    col={'sm': 4},
-                    read_only=True,
-                    value=0,
-                    can_request_focus=False,
-                    on_click=lambda e: keyboard.open(e.control, 'int')
-                )
+                self.txt_power_range_min = range_field(self.page.session.get("lang.setting.4_20_ma_power_min"), 'kW')
+                self.txt_power_range_max = range_field(self.page.session.get("lang.setting.4_20_ma_power_max"), 'kW')
+                self.txt_power_range_offset = range_field(self.page.session.get("lang.setting.4_20_ma_power_offset"), 'kW')
 
-                self.txt_thrust_range_min = ft.TextField(
-                    label=self.page.session.get("lang.setting.4_20_ma_thrust_min"),
-                    suffix_text='kN',
-                    col={'sm': 4},
-                    read_only=True,
-                    value=0,
-                    can_request_focus=False,
-                    on_click=lambda e: keyboard.open(e.control, 'int')
-                )
-                self.txt_thrust_range_max = ft.TextField(
-                    label=self.page.session.get("lang.setting.4_20_ma_thrust_max"),
-                    suffix_text='kN',
-                    col={'sm': 4},
-                    read_only=True,
-                    value=0,
-                    can_request_focus=False,
-                    on_click=lambda e: keyboard.open(e.control, 'int')
-                )
-                self.txt_thrust_range_offset = ft.TextField(
-                    label=self.page.session.get("lang.setting.4_20_ma_thrust_offset"),
-                    suffix_text='kN',
-                    col={'sm': 4},
-                    read_only=True,
-                    value=0,
-                    can_request_focus=False,
-                    on_click=lambda e: keyboard.open(e.control, 'int')
-                )
+                self.txt_torque_range_min = range_field(self.page.session.get("lang.setting.4_20_ma_torque_min"), 'kNm')
+                self.txt_torque_range_max = range_field(self.page.session.get("lang.setting.4_20_ma_torque_max"), 'kNm')
+                self.txt_torque_range_offset = range_field(self.page.session.get("lang.setting.4_20_ma_torque_offset"), 'kNm')
 
-                self.txt_speed_range_min = ft.TextField(
-                    label=self.page.session.get("lang.setting.4_20_ma_speed_min"),
-                    suffix_text='rpm',
-                    col={'sm': 4},
-                    read_only=True,
-                    value=0,
-                    can_request_focus=False,
-                    on_click=lambda e: keyboard.open(e.control, 'int')
-                )
-                self.txt_speed_range_max = ft.TextField(
-                    label=self.page.session.get("lang.setting.4_20_ma_speed_max"),
-                    suffix_text='rpm',
-                    col={'sm': 4},
-                    read_only=True,
-                    value=0,
-                    can_request_focus=False,
-                    on_click=lambda e: keyboard.open(e.control, 'int')
-                )
-                self.txt_speed_range_offset = ft.TextField(
-                    label=self.page.session.get("lang.setting.4_20_ma_speed_offset"),
-                    suffix_text='rpm',
-                    col={'sm': 4},
-                    read_only=True,
-                    value=0,
-                    can_request_focus=False,
-                    on_click=lambda e: keyboard.open(e.control, 'int')
-                )
+                self.txt_thrust_range_min = range_field(self.page.session.get("lang.setting.4_20_ma_thrust_min"), 'kN')
+                self.txt_thrust_range_max = range_field(self.page.session.get("lang.setting.4_20_ma_thrust_max"), 'kN')
+                self.txt_thrust_range_offset = range_field(self.page.session.get("lang.setting.4_20_ma_thrust_offset"), 'kN')
+
+                self.txt_speed_range_min = range_field(self.page.session.get("lang.setting.4_20_ma_speed_min"), 'rpm')
+                self.txt_speed_range_max = range_field(self.page.session.get("lang.setting.4_20_ma_speed_max"), 'rpm')
+                self.txt_speed_range_offset = range_field(self.page.session.get("lang.setting.4_20_ma_speed_offset"), 'rpm')
 
                 self.range_items = ft.ResponsiveRow(
                     controls=[
-                        self.txt_power_range_min,
-                        self.txt_power_range_max,
-                        self.txt_power_range_offset,
-
-                        self.txt_torque_range_min,
-                        self.txt_torque_range_max,
-                        self.txt_torque_range_offset,
-
-                        self.txt_thrust_range_min,
-                        self.txt_thrust_range_max,
-                        self.txt_thrust_range_offset,
-
-                        self.txt_speed_range_min,
-                        self.txt_speed_range_max,
-                        self.txt_speed_range_offset
+                        self.txt_power_range_min, self.txt_power_range_max, self.txt_power_range_offset,
+                        self.txt_torque_range_min, self.txt_torque_range_max, self.txt_torque_range_offset,
+                        self.txt_thrust_range_min, self.txt_thrust_range_max, self.txt_thrust_range_offset,
+                        self.txt_speed_range_min, self.txt_speed_range_max, self.txt_speed_range_offset
                     ]
                 )
 
@@ -226,15 +130,12 @@ class IOSettingPLC(ft.Container):
                             ft.Row(
                                 alignment=ft.alignment.center_left,
                                 col={'sm': 4},
-                                controls=[
-                                    self.connect_btn,
-                                    self.close_btn,
-                                    self.fetch_btn
-                                ],
+                                controls=[self.connect_btn, self.close_btn, self.fetch_btn],
                             ),
                             self.range_items
                         ])
                 )
+
                 self.custom_card = CustomCard(
                     self.page.session.get("lang.setting.plc_conf"),
                     ft.Column(
@@ -253,23 +154,21 @@ class IOSettingPLC(ft.Container):
             if self.page and self.page.session:
                 if self.connect_btn:
                     self.connect_btn.text = self.page.session.get("lang.setting.connect")
-                    self.connect_btn.visible = not plc.is_connected
+                    self.connect_btn.visible = not plc.is_online
                     self.connect_btn.disabled = False
                     self.connect_btn.bgcolor = ft.Colors.GREEN
 
                 if self.close_btn:
                     self.close_btn.text = self.page.session.get("lang.setting.disconnect")
-                    self.close_btn.visible = plc.is_connected
+                    self.close_btn.visible = plc.is_online
                     self.close_btn.disabled = False
                     self.close_btn.bgcolor = ft.Colors.RED
 
                 if self.fetch_btn:
                     self.fetch_btn.text = self.page.session.get("lang.setting.fetch_data")
-                    self.fetch_btn.visible = plc.is_connected
+                    self.fetch_btn.visible = plc.is_online
                     self.fetch_btn.disabled = False
                     self.fetch_btn.bgcolor = ft.Colors.BLUE
-
-                self.page.run_task(self.load_range_data)
         except:
             logging.exception('exception occured at IOSettingPLC.before_update')
 
@@ -321,13 +220,13 @@ class IOSettingPLC(ft.Container):
     async def on_fetch(self):
         if self.page:
             await self.load_range_data()
-            self.range_items.update()
 
     async def load_range_data(self):
         try:
-            if self.conf.plc_enabled and plc.is_connected:
-                plc_4_20_ma_data = await plc.read_4_20_ma_data()
+            if self.conf.plc_enabled:
+                plc_4_20_ma_data = await asyncio.wait_for(plc.read_4_20_ma_data(), timeout=5)
                 logging.info(f'load plc_4_20_ma_data = {plc_4_20_ma_data}')
+
                 self.txt_power_range_min.value = plc_4_20_ma_data["power_range_min"] // 10
                 self.txt_power_range_max.value = plc_4_20_ma_data["power_range_max"] // 10
                 self.txt_power_range_offset.value = plc_4_20_ma_data["power_range_offset"] // 10
@@ -343,6 +242,10 @@ class IOSettingPLC(ft.Container):
                 self.txt_speed_range_min.value = plc_4_20_ma_data["speed_range_min"] // 10
                 self.txt_speed_range_max.value = plc_4_20_ma_data["speed_range_max"] // 10
                 self.txt_speed_range_offset.value = plc_4_20_ma_data["speed_range_offset"] // 10
+
+                self.range_items.update()
+        except asyncio.TimeoutError:
+            logging.warning("读取 PLC 4-20mA 数据超时")
         except:
             logging.exception('exception occured at load_range_data')
 
@@ -369,7 +272,6 @@ class IOSettingPLC(ft.Container):
 
     async def __write_to_plc(self):
         try:
-            # 传递给PLC的单位最小是0.1,PLC无法显示0.1，所以乘以10, 所以量程和偏移量也要乘以10
             data = {
                 "power_range_min": int(self.txt_power_range_min.value) * 10,
                 "power_range_max": int(self.txt_power_range_max.value) * 10,
@@ -387,7 +289,8 @@ class IOSettingPLC(ft.Container):
                 "speed_range_max": int(self.txt_speed_range_max.value) * 10,
                 "speed_range_offset": int(self.txt_speed_range_offset.value) * 10
             }
-            await plc.write_4_20_ma_data(data)
-
+            await asyncio.wait_for(plc.write_4_20_ma_data(data), timeout=5)
+        except asyncio.TimeoutError:
+            logging.warning("写入 PLC 4-20mA 数据超时")
         except:
             logging.exception("plc save data error")

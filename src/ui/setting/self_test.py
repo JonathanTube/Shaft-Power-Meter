@@ -90,7 +90,7 @@ class SelfTest(ft.Tabs):
                 if self.plc_log is None or self.plc_log.page is None:
                     return
 
-                if plc.is_connected:
+                if plc.is_online:
                     plc_4_20_ma_data = await plc.read_4_20_ma_data()
                     self.plc_log.controls.append(ft.Text(f"4-20mA: {plc_4_20_ma_data}"))
                     self.plc_log.controls.append(ft.Text(f"alarm: {await plc.read_alarm()}"))
@@ -108,7 +108,7 @@ class SelfTest(ft.Tabs):
     async def __read_gps_data(self):
         while self.task_running:
             try:
-                if gps.is_connected:
+                if gps.is_online:
                     self.gps_log.controls.append(ft.Text(f"GPS Data: {gdata.configGps.raw_data}"))
                 else:
                     self.gps_log.controls.append(ft.Text("Disconnected from GPS"))

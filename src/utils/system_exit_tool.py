@@ -43,7 +43,7 @@ class SystemExitTool:
             await ws_client.close()
 
             # 关闭PLC
-            await plc.stop()
+            await plc.close()
 
             # 关闭GPS
             await gps.close()
@@ -55,7 +55,7 @@ class SystemExitTool:
             await data_record_task.stop()
 
             # 关闭test mode
-            await test_mode_task.stop()
+            test_mode_task.stop()
 
             # 关闭时间task
             await utc_timer.stop()

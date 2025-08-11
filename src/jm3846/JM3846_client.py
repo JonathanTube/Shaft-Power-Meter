@@ -30,10 +30,9 @@ class JM3846AsyncClient(ABC):
                 # 连接建立和初始化放在锁里，长循环移到锁外，避免锁死
                 async with self._lock:
                     host, port = self.get_ip_port()
-                    logging.info(f'[JM3846-{self.name}] 连接到 {host}:{port}')
-                    self.reader, self.writer = await asyncio.wait_for(
-                        asyncio.open_connection(host, port), timeout=10
-                    )
+                    logging.info(f'[JM3846-{self.name}] 正在连接 {host}:{port}')
+                    self.reader, self.writer = await asyncio.wait_for(asyncio.open_connection(host, port), timeout=10)
+                    logging.info(f'[JM3846-{self.name}] 连接成功 {host}:{port}')
                     self.start_background_tasks()
                     await JM38460x45.handle(self.name, self.reader, self.writer)
                     await JM38460x03.handle(self.name, self.reader, self.writer)
@@ -42,9 +41,10 @@ class JM3846AsyncClient(ABC):
 
                 # 0x44 循环放到锁外执行
                 await JM38460x44.handle(self.name, self.reader, self.writer)
-
-            except:
-                logging.exception(f'[JM3846-{self.name}] connect error')
+            except ConnectionRefusedError as e:
+                logging.exception(f'[JM3846-{self.name}] connect refused error {e}')
+            except Exception as e:
+                logging.exception(f'[JM3846-{self.name}] connect error {e}')
 
             await self.release()
             await asyncio.sleep(2 ** self._retry_times)

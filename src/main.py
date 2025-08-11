@@ -141,17 +141,17 @@ async def start_all_tasks():
     await modbus_output.start()
     task_manager.add(modbus_output)
 
-    io_conf = IOConf.get()
+    io_conf: IOConf = IOConf.get()
     system_settings: SystemSettings = SystemSettings.get()
 
     # GPS
     if system_settings.enable_gps:
-        await gps.connect()
+        await gps.start()
         task_manager.add(gps)
 
     # PLC
     if system_settings.is_master and io_conf.plc_enabled:
-        await plc.start()
+        await plc.connect()
         task_manager.add(plc)
 
     # SPS 读取

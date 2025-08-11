@@ -22,7 +22,7 @@ class AlarmSaver:
                 occured_time=gdata.configDateTime.utc,
                 is_from_master=gdata.configCommon.is_master
             )
-            logging.info(f'[***save alarm***] alarm_type={alarm_type}, save alarm log')
+            logging.info(f'[create alarm] {alarm_type}')
 
     @staticmethod
     def recovery(alarm_type: AlarmType):
@@ -32,6 +32,7 @@ class AlarmSaver:
                     recovery_time=gdata.configDateTime.utc,
                     is_sync=False
                 ).where(AlarmLog.alarm_type == alarm_type).execute()
+                logging.info(f'[recovery alarm] {alarm_type}')
 
     @staticmethod
     def has_alarm(alarm_type: AlarmType) -> tuple[int, int]:

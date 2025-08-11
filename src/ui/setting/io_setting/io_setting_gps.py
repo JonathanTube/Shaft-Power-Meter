@@ -96,7 +96,7 @@ class IOSettingGPS(ft.Container):
                 operation_type=OperationType.CONNECT_TO_GPS,
                 operation_content=user.user_name
             )
-            self.page.run_task(gps.connect)
+            self.page.run_task(gps.start)
         except:
             logging.exception("exception occured at IOSettingGPS.__on_connect")
 
@@ -113,7 +113,7 @@ class IOSettingGPS(ft.Container):
                 operation_type=OperationType.DISCONNECT_FROM_GPS,
                 operation_content=user.user_name
             )
-            self.page.run_task(gps.close)
+            self.page.run_task(gps.stop)
             if gdata.configCommon.is_master:
                 AlarmSaver.create(AlarmType.MASTER_GPS)
             else:
@@ -134,13 +134,13 @@ class IOSettingGPS(ft.Container):
         try:
             if self.page and self.page.session:
                 if self.connect_btn:
-                    self.connect_btn.visible = not gps.is_connected
+                    self.connect_btn.visible = not gps.is_online
                     self.connect_btn.text = self.page.session.get("lang.setting.connect")
                     self.connect_btn.bgcolor = ft.Colors.GREEN
                     self.connect_btn.disabled = False
 
                 if self.close_btn:
-                    self.close_btn.visible = gps.is_connected
+                    self.close_btn.visible = gps.is_online
                     self.close_btn.text = self.page.session.get("lang.setting.disconnect")
                     self.close_btn.bgcolor = ft.Colors.RED
                     self.close_btn.disabled = False
