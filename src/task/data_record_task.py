@@ -81,12 +81,10 @@ class DataRecordTask:
         )
 
     async def stop(self):
-        """停止数据记录任务"""
-        self.task_running = False
-        if self._task:
+        if self._task and not self._task.done():
             self._task.cancel()
             try:
-                await self._task
+                await asyncio.sleep(0)  # 给任务调度机会
             except asyncio.CancelledError:
                 pass
         self._task = None

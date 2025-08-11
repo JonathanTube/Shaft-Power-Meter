@@ -66,10 +66,20 @@ class JM38460x44:
 
     @staticmethod
     async def handle(name, reader, writer):
+        if writer is None or writer.is_closing():
+            logging.warning(f"[{name}] connection closed, stopping handle")
+            return
+        
         request = JM38460x44.build_request(JM38460x44.frame_size, JM38460x44.total_frames)
         logging.info(f'[JM3846-{name}] send 0x44 req hex={bytes.hex(request)}')
-        writer.write(request)
-        await writer.drain()
+
+        try:
+            writer.write(request)
+            await writer.drain()
+        except (ConnectionResetError, BrokenPipeError) as e:
+            logging.error(f"[{name}] connection error: {e}")
+        except Exception:
+            logging.exception(f"[{name}] unexpected error in drain")
 
         JM38460x44.running = True
         JM38460x44.loop_task = asyncio.create_task(JM38460x44.receive_0x44(name, reader, writer))

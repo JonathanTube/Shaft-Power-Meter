@@ -149,7 +149,7 @@ class SelfTest(ft.Tabs):
     async def __read_hmi_server_data(self):
         while self.task_running:
             try:
-                if ws_client.is_connected:
+                if ws_client.is_online:
                     sps_data = f'sps: torque={gdata.configSPS.torque}, thrust={gdata.configSPS.thrust}, speed={gdata.configSPS.speed}'
                     self.hmi_server_log.controls.append(ft.Text(f"HMI Server Data: {sps_data}"))
                     if gdata.configCommon.amount_of_propeller == 2:

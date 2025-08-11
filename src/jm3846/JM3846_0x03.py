@@ -60,10 +60,20 @@ class JM38460x03:
 
     async def handle(name, reader, writer):
         """功能码0x03：读取配置参数"""
+        if writer is None or writer.is_closing():
+            logging.warning(f"[{name}] connection closed, stopping handle")
+            return
+
         request = JM38460x03.build_request()
         logging.info(f'[JM3846-{name}] send 0x03 req hex={bytes.hex(request)}')
-        writer.write(request)
-        await writer.drain()
+
+        try:
+            writer.write(request)
+            await writer.drain()
+        except (ConnectionResetError, BrokenPipeError) as e:
+            logging.error(f"[{name}] connection error: {e}")
+        except Exception:
+            logging.exception(f"[{name}] unexpected error in drain")
 
         frame = await JM3846Util.read_frame(reader)
 

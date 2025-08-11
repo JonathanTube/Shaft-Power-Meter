@@ -1,0 +1,51 @@
+{
+  "type": "Page",
+  "props": {
+    "tooltip": "None",
+    "badge": "None",
+    "parent": "None",
+    "update": "<function _wrap_page_update.<locals>._wrapped at 0x0000023A0534FEC0>",
+    "on_event": "<function init_ui_safety.<locals>._on_event at 0x0000023A0537C040>"
+  },
+  "children": [
+    {
+      "type": "Stack",
+      "props": {
+        "tooltip": "None",
+        "badge": "None",
+        "parent": "view {'padding': '0'}"
+      },
+      "children": [
+        {
+          "type": "FullscreenAlert",
+          "props": {
+            "tooltip": "None",
+            "badge": "None",
+            "parent": "stack {'expand': 1}",
+            "task": "None",
+            "running": "False"
+          },
+          "children": []
+        },
+        {
+          "type": "Container",
+          "props": {
+            "tooltip": "None",
+            "badge": "None",
+            "parent": "stack {'expand': 1}"
+          },
+          "children": []
+        },
+        {
+          "type": "AudioAlarm",
+          "props": {
+            "tooltip": "None",
+            "badge": "None",
+            "parent": "stack {'expand': 1}"
+          },
+          "children": []
+        }
+      ]
+    }
+  ]
+}

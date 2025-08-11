@@ -44,12 +44,10 @@ class UtcTimerTask:
             pass
 
     async def stop(self):
-        """停止UTC计时器"""
-        self.task_running = False
-        if self._task:
-            self._task.cancel()
+        if self._task and not self._task.done():
             try:
-                await self._task
+                self._task.cancel()
+                await asyncio.sleep(0)  # 给任务调度机会
             except asyncio.CancelledError:
                 pass
         self._task = None

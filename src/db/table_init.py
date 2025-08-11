@@ -60,7 +60,7 @@ class TableInit:
 
     @staticmethod
     def handle_change_running_mode():
-        logging.info('truncate table due to switching running mode.')
+        logging.info('模式切换，清空相关表数据')
         BreachReason.truncate_table()
         DataLog.truncate_table()
         EventLog.truncate_table()

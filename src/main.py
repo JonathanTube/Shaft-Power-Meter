@@ -155,19 +155,19 @@ async def start_all_tasks():
         task_manager.add(plc)
 
     # SPS 读取
-    await sps_read_task.connect()
-    task_manager.add(sps_read_task)
-
-    if system_settings.amount_of_propeller > 1:
-        await sps2_read_task.connect()
-        task_manager.add(sps2_read_task)
+    if system_settings.is_master:
+        asyncio.create_task(sps_read_task.connect())  # 后台连接
+        task_manager.add(sps_read_task)
+        if system_settings.amount_of_propeller > 1:
+            asyncio.create_task(sps2_read_task.connect())  # 后台连接
+            task_manager.add(sps2_read_task)
 
     # WS
     if not system_settings.is_individual:
         await ws_server.start()
         task_manager.add(ws_server)
     else:
-        await ws_client.connect()
+        await ws_client.start()
         task_manager.add(ws_client)
 
 

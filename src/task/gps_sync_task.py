@@ -61,9 +61,16 @@ class GpsSyncTask:
                 await asyncio.sleep(3)
 
     async def connect(self):
-        """连接到 GPS（失败不抛出异常，直接设置离线）"""
+        """连接到 GPS"""
         async with self._lock:
-            io_conf: IOConf = await asyncio.to_thread(IOConf.get)
+            try:
+                io_conf: IOConf = await asyncio.to_thread(IOConf.get)
+            except IOConf.DoesNotExist:
+                _logger.error("[GPS] 未找到 IOConf 配置，跳过连接")
+                self.set_offline()
+                await asyncio.sleep(5)  # 等待一会再重试
+                return False
+
             _logger.info(f"[GPS] 正在连接 {io_conf.gps_ip}:{io_conf.gps_port}")
             try:
                 self.reader, self.writer = await asyncio.wait_for(
@@ -72,30 +79,19 @@ class GpsSyncTask:
                 )
                 _logger.info(f"[GPS] 连接成功 {io_conf.gps_ip}:{io_conf.gps_port}")
                 return True
-            except (OSError, asyncio.TimeoutError) as e:
-                _logger.warning(f"[GPS] 连接失败: {e}")
-                self.set_offline()
-                return False
+            except ConnectionRefusedError as e:
+                _logger.error(f"[GPS] 连接失败: {e}")
             except Exception as e:
-                _logger.exception(f"[GPS] 未知连接异常: {e}")
-                self.set_offline()
-                return False
+                _logger.error(f"[GPS] 连接失败: {e}")
+            self.set_offline()
+            return False
 
     async def _receive_loop(self):
-        """接收数据循环（防止死机）"""
+        """接收数据循环（防止并发读取冲突）"""
         while self.is_connected:
             try:
-                done, _ = await asyncio.wait(
-                    {asyncio.create_task(self.reader.readline())},
-                    timeout=5,
-                    return_when=asyncio.FIRST_COMPLETED
-                )
-
-                if not done:
-                    # 超时，无数据，不改 is_online
-                    continue
-
-                data = done.pop().result()
+                # 串行读取一行数据，避免并发调用 readuntil()/readline()
+                data = await asyncio.wait_for(self.reader.readline(), timeout=5)
                 if not data:
                     _logger.warning("[GPS] 检测到服务端关闭连接")
                     self.set_offline()
@@ -105,6 +101,9 @@ class GpsSyncTask:
                 await asyncio.to_thread(self.parse_nmea_sentence, line)
                 self.set_online()
 
+            except asyncio.TimeoutError:
+                # 超时无数据，不改变在线状态
+                continue
             except (asyncio.IncompleteReadError, ConnectionResetError):
                 _logger.warning("[GPS] 连接被重置")
                 self.set_offline()
@@ -117,11 +116,10 @@ class GpsSyncTask:
                 break
 
     async def close(self):
-        """关闭连接"""
         if self.writer and not self.writer.is_closing():
             try:
                 self.writer.close()
-                await self.writer.wait_closed()
+                # 不 await wait_closed()
             except Exception:
                 _logger.exception("[GPS] 关闭连接时出错")
         self.reader = None

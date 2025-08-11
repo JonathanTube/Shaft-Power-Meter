@@ -1,5 +1,3 @@
-
-# ====================== 客户端类 ======================
 import asyncio
 import websockets
 import logging
@@ -21,30 +19,19 @@ date_time_format = '%Y-%m-%d %H:%M:%S'
 class WebSocketSlave:
     def __init__(self):
         self._lock = asyncio.Lock()
-
         self.websocket = None
-
-        self._retry = 0
-
-        self._is_connected = False
-
+        self.is_online = False  # 当前连接状态
         self._is_canceled = False
 
-        self._max_retries = 6  # 最大重连次数
-
-    @property
-    def is_connected(self):
-        return self._is_connected
-
-    async def connect(self):
-        async with self._lock:  # 确保单线程重连
-            self._retry = 0
-            if self._is_connected:
+    async def start(self):
+        """启动客户端（无限重连版）"""
+        async with self._lock:
+            if self.is_online:
                 return
 
             self._is_canceled = False
 
-            while not gdata.configCommon.is_master and self._retry < self._max_retries:
+            while not gdata.configCommon.is_master:
                 # 如果是手动取消，直接跳出
                 if self._is_canceled:
                     break
@@ -53,44 +40,39 @@ class WebSocketSlave:
                     io_conf: IOConf = IOConf.get()
                     uri = f"ws://{io_conf.hmi_server_ip}:{io_conf.hmi_server_port}"
                     self.websocket = await websockets.connect(uri)
-                    logging.info(f"[***HMI client***] connected to {uri}")
+                    logging.info(f"[Slave客户端] 已连接到 {uri}")
 
-                    self._is_connected = True
+                    self.is_online = True
                     AlarmSaver.recovery(AlarmType.SLAVE_MASTER)
 
-                    # 定期检查gps,alarm,并发送给master
+                    # 启动接收 & 发送任务
                     asyncio.create_task(self.send_gps_alarm_to_master())
+                    asyncio.create_task(self.receive_data_from_master())
 
-                    # 启动后台接收任务，loop
-                    await self.receive_data_from_master()
-
-                    logging.info(f"[***HMI client***] disconnected from {uri}")
+                    return  # 成功连接直接退出重连循环
                 except:
-                    logging.error(f"[***HMI client***] failed to connect to {uri}")
-                    self._is_connected = False
+                    logging.error(f"[Slave客户端] 连接失败，5 秒后重试")
+                    self.is_online = False
                     AlarmSaver.create(AlarmType.SLAVE_MASTER)
-                finally:
-                    #  指数退避
-                    await asyncio.sleep(2 ** self._retry)
-                    self._retry += 1
 
-            # 执行到这了，说明已经退出了
-            self._is_canceled = False
+                await asyncio.sleep(5)  # 固定重连间隔
 
     async def send_eexi_breach_alarm_to_master(self, occured):
         if gdata.configCommon.is_master:
             return
-        if not self._is_connected:
+        if not self.is_online:
             return
-        # 序列化数据
-        packed_data = msgpack.packb({
-            'type': 'alarm_eexi_breach',
-            'data': occured
-        })
-        await self.websocket.send(packed_data)
+        try:
+            packed_data = msgpack.packb({
+                'type': 'alarm_eexi_breach',
+                'data': occured
+            })
+            await self.websocket.send(packed_data)
+        except:
+            logging.error("[Slave客户端] send_eexi_breach_alarm_to_master error")
 
     async def send_gps_alarm_to_master(self):
-        while not gdata.configCommon.is_master and self._is_connected:
+        while not gdata.configCommon.is_master and self.is_online:
             try:
                 alarm_logs: list[AlarmLog] = AlarmLog.select(
                     AlarmLog.id,
@@ -101,7 +83,6 @@ class WebSocketSlave:
                 ).where(
                     AlarmLog.is_sync == False,
                     AlarmLog.is_from_master == False,
-                    # 彼此的连接错误不同步
                     AlarmLog.alarm_type != AlarmType.SLAVE_MASTER
                 )
                 alarm_logs_dict = []
@@ -114,7 +95,6 @@ class WebSocketSlave:
                         'acknowledge_time': DateTimeUtil.format_date(alarm_log.acknowledge_time)
                     })
                 if len(alarm_logs) > 0:
-                    # 序列化数据
                     packed_data = msgpack.packb({
                         'type': 'alarm_logs_from_slave',
                         'data': alarm_logs_dict
@@ -123,13 +103,12 @@ class WebSocketSlave:
                     for alarm_log in alarm_logs:
                         AlarmLog.update(is_sync=True).where(AlarmLog.id == alarm_log.id).execute()
             except:
-                logging.error("[***HMI client***] send_gps_alarm_to_master error")
+                logging.error("[Slave客户端] send_gps_alarm_to_master error")
             finally:
                 await asyncio.sleep(5)
 
     async def receive_data_from_master(self):
-        while not gdata.configCommon.is_master and self._is_connected:
-
+        while not gdata.configCommon.is_master and self.is_online:
             if self._is_canceled:
                 return
 
@@ -146,21 +125,19 @@ class WebSocketSlave:
 
                 gdata.configSPS.is_offline = False
                 gdata.configSPS2.is_offline = False
-                self._retry = 0
             except (websockets.ConnectionClosedError, websockets.ConnectionClosedOK, websockets.ConnectionClosed):
-                logging.error("[***HMI client***] ConnectionClosedError")
+                logging.error("[Slave客户端] 连接断开")
                 gdata.configSPS.is_offline = True
                 gdata.configSPS2.is_offline = True
-                self._is_connected = False
+                self.is_online = False
                 AlarmSaver.create(AlarmType.SLAVE_MASTER)
                 break
             except:
-                logging.exception("[***HMI client***] exception occured at _receive_loop")
+                logging.exception("[Slave客户端] 接收数据异常")
 
     def __handle_jm3846_data(self, data):
-        """处理从服务端接收到的数据"""
         if gdata.configTest.test_mode_running:
-            logging.info('[***HMI client***] test mode is running, skip handle jm3846 data from websocket.')
+            logging.info('[Slave客户端] 测试模式运行中，跳过SPS数据处理')
             return
 
         name = data['name']
@@ -189,7 +166,6 @@ class WebSocketSlave:
         model.save()
 
     def __handle_alarm_logs_from_master(self, data):
-        """处理alarm数据"""
         alarm_logs = data['data']
         for alarm_log in alarm_logs:
             outer_id = alarm_log['id']
@@ -198,7 +174,6 @@ class WebSocketSlave:
             recovery_time = alarm_log['recovery_time']
             acknowledge_time = alarm_log['acknowledge_time']
 
-            # 查找是否存在
             cnt: int = AlarmLog.select(fn.COUNT(AlarmLog.id)).where(AlarmLog.outer_id == outer_id).scalar()
 
             if cnt > 0:
@@ -216,10 +191,10 @@ class WebSocketSlave:
                     outer_id=outer_id
                 )
 
-    async def close(self):
+    async def stop(self):
         self._is_canceled = True
 
-        if not self._is_connected:
+        if not self.is_online:
             return
 
         try:
@@ -227,9 +202,9 @@ class WebSocketSlave:
                 await self.websocket.close()
                 await self.websocket.wait_closed()
         except:
-            logging.error("[***HMI client***] failed to close websocket connection")
+            logging.error("[Slave客户端] 关闭连接失败")
         finally:
-            self._is_connected = False
+            self.is_online = False
 
 
 ws_client = WebSocketSlave()

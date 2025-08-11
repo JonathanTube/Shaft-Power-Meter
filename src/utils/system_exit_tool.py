@@ -40,7 +40,7 @@ class SystemExitTool:
 
             # 关闭websocket
             await ws_server.stop()
-            await ws_client.close()
+            await ws_client.stop()
 
             # 关闭PLC
             await plc.close()
@@ -60,7 +60,7 @@ class SystemExitTool:
             # 关闭时间task
             await utc_timer.stop()
 
-            logging.info('all of the connections were closed.')
+            logging.info('关闭所有外部资源连接')
         except:
             logging.exception('exception occured at Header.__exit_app')
         finally:
