@@ -193,7 +193,7 @@ def set_content(page: ft.Page):
 
 
 async def main(page: ft.Page):
-    # init_debug(page)
+    init_debug(page)
     
     def handle_error(e):
         logging.error('============global exception occured===========')
