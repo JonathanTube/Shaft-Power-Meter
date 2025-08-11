@@ -34,7 +34,9 @@ class SystemExitTool:
             logging.info('start closing all of the connections...')
             # 关闭sps
             await sps_read_task.close()
-            await sps2_read_task.close()
+            # 如果是dual才关闭
+            if gdata.configCommon.amount_of_propeller == 2:
+                await sps2_read_task.close()
 
             # 关闭websocket
             await ws_server.stop()
