@@ -79,7 +79,9 @@ class AlarmButton(ft.TextButton):
                     )
                 else:
                     self.badge = None
-                self.update()
+
+                if self.page:
+                    self.update()
         except:
             logging.exception('exception occured at AlarmButton.toggle_badge')
 

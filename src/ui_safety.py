@@ -48,3 +48,19 @@ def safe_setattr(self, name, value):
 
 
 ft.Control.__setattr__ = safe_setattr
+
+
+# -------- 安全 UI 更新补丁 --------
+_original_update = ft.Control.update
+
+def safe_update(self, *args, **kwargs):
+    try:
+        if getattr(self, "page", None):  # 确保控件挂在页面上
+            return _original_update(self, *args, **kwargs)
+        else:
+            logging.warning(f"[SafeUpdate] {self} 没有挂在页面上，跳过 update()")
+    except Exception as e:
+        logging.error(f"[SafeUpdate] 控件更新失败: {e}")
+        logging.error(traceback.format_exc())
+
+ft.Control.update = safe_update

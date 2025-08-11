@@ -9,11 +9,10 @@ from websocket.websocket_slave import ws_client
 from common.global_data import gdata
 
 
-
 class SelfTest(ft.Tabs):
     def __init__(self):
         super().__init__()
-        self.system_settings:SystemSettings = SystemSettings.get()
+        self.system_settings: SystemSettings = SystemSettings.get()
         self.conf: IOConf = IOConf.get()
         self.plc_task = None
         self.sps_task = None
@@ -24,32 +23,32 @@ class SelfTest(ft.Tabs):
         self.task_running = False
 
     def build(self):
-            try:
-                if self.page and self.page.session:
-                    self.plc_log = ft.ListView(
-                        padding=10, auto_scroll=True, height=500, spacing=5, expand=True)
-                    
-                    self.sps_log = ft.ListView(
-                        padding=10, auto_scroll=True, height=500, spacing=5, expand=True)
-                    
-                    self.sps2_log = ft.ListView(
-                        padding=10, auto_scroll=True, height=500, spacing=5, expand=True)
-                    
-                    self.gps_log = ft.ListView(
-                        padding=10, auto_scroll=True, height=500, spacing=5, expand=True)
-                    
-                    self.hmi_server_log = ft.ListView(
-                        padding=10, auto_scroll=True, height=500, spacing=5, expand=True)
-                    
-                    self.tabs = [
-                        ft.Tab(text="SPS", content=self.sps_log, visible=self.system_settings.is_master),
-                        ft.Tab(text="SPS2", content=self.sps2_log, visible=self.system_settings.is_master and self.system_settings.amount_of_propeller == 2),
-                        ft.Tab(text="HMI Server", content=self.hmi_server_log, visible=not self.system_settings.is_master),
-                        ft.Tab(text="GPS", content=self.gps_log),
-                        ft.Tab(text="PLC", content=self.plc_log, visible=self.conf.plc_enabled)
-                    ]
-            except:
-                logging.exception('exception occured at SelfTest.build')
+        try:
+            if self.page and self.page.session:
+                self.plc_log = ft.ListView(
+                    padding=10, auto_scroll=True, height=500, spacing=5, expand=True)
+
+                self.sps_log = ft.ListView(
+                    padding=10, auto_scroll=True, height=500, spacing=5, expand=True)
+
+                self.sps2_log = ft.ListView(
+                    padding=10, auto_scroll=True, height=500, spacing=5, expand=True)
+
+                self.gps_log = ft.ListView(
+                    padding=10, auto_scroll=True, height=500, spacing=5, expand=True)
+
+                self.hmi_server_log = ft.ListView(
+                    padding=10, auto_scroll=True, height=500, spacing=5, expand=True)
+
+                self.tabs = [
+                    ft.Tab(text="SPS", content=self.sps_log, visible=self.system_settings.is_master),
+                    ft.Tab(text="SPS2", content=self.sps2_log, visible=self.system_settings.is_master and self.system_settings.amount_of_propeller == 2),
+                    ft.Tab(text="HMI Server", content=self.hmi_server_log, visible=not self.system_settings.is_master),
+                    ft.Tab(text="GPS", content=self.gps_log),
+                    ft.Tab(text="PLC", content=self.plc_log, visible=self.conf.plc_enabled)
+                ]
+        except:
+            logging.exception('exception occured at SelfTest.build')
 
     def did_mount(self):
         self.task_running = True
@@ -87,6 +86,9 @@ class SelfTest(ft.Tabs):
     async def __read_plc_data(self):
         while self.task_running:
             try:
+                if self.plc_log is None or self.plc_log.page is None:
+                    return
+
                 if plc.is_connected:
                     plc_4_20_ma_data = await plc.read_4_20_ma_data()
                     self.plc_log.controls.append(ft.Text(f"4-20mA: {plc_4_20_ma_data}"))
@@ -95,6 +97,7 @@ class SelfTest(ft.Tabs):
                     self.plc_log.controls.append(ft.Text(f"instant data: {await plc.read_instant_data()}"))
                 else:
                     self.plc_log.controls.append(ft.Text("disconnected from PLC"))
+
                 self.plc_log.update()
             except:
                 logging.exception('exception occured at SelfTest.__read_plc_data')
@@ -158,5 +161,3 @@ class SelfTest(ft.Tabs):
                 logging.exception('exception occured at SelfTest.__read_hmi_server_data')
             finally:
                 await asyncio.sleep(2)
-
-
