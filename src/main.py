@@ -127,7 +127,7 @@ def set_appearance(page: ft.Page, preference: Preference):
     else:
         page.window.maximizable = False
         page.window.width = 1024
-        page.window.height = 800
+        page.window.height = 600
         page.window.resizable = False
     page.window.prevent_close = True
 

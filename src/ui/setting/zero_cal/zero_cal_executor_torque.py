@@ -11,7 +11,7 @@ class ZeroCalExecutorTorque(ft.Card):
         super().__init__()
         self.name = name
         self.expand = True
-        self.height = 320
+        self.height = 300
         self.horizontal_alignment = ft.CrossAxisAlignment.CENTER
         self.index = 0
         self.countdown_task = None
@@ -49,8 +49,8 @@ class ZeroCalExecutorTorque(ft.Card):
             self.items = ft.GridView(
                 padding=ft.padding.all(10),
                 expand=True,
-                runs_count=3,  # 每行2个子元素
-                child_aspect_ratio=1.6,
+                runs_count=3,  # 每行3个子元素
+                child_aspect_ratio=1.8,
                 spacing=10,  # 子元素间距
                 run_spacing=10,
                 controls=[ft.Container(

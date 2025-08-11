@@ -50,7 +50,7 @@ class ZeroCalExecutor(ft.Container):
                         ]
                     ),
                     self.zeroCalExecutorResult,
-                    ft.Container(width=100, height=20),
+                    ft.Container(width=100, height=10),
                     ft.Row(
                         alignment=ft.MainAxisAlignment.CENTER,
                         controls=[

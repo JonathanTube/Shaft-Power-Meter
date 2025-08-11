@@ -11,7 +11,7 @@ class ZeroCalExecutorThrust(ft.Card):
         super().__init__()
         self.name = name
         self.expand = True
-        self.height = 320
+        self.height = 300
         self.horizontal_alignment = ft.CrossAxisAlignment.CENTER
         self.tick_task = None
         self.on_finish_callback = on_finish_callback
