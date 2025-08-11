@@ -1,5 +1,6 @@
 import logging
 import flet as ft
+from db.models.system_settings import SystemSettings
 from db.models.zero_cal_info import ZeroCalInfo
 from ui.common.permission_check import PermissionCheck
 from ui.setting.zero_cal.zero_cal_executor_result import ZeroCalExecutorResult
@@ -20,6 +21,9 @@ class ZeroCalExecutor(ft.Container):
         self.torque_offset = 0
         self.thrust_offset = 0
 
+        system_settings: SystemSettings = SystemSettings.get()
+        self.display_thrust = system_settings.display_thrust
+
     def build(self):
         try:
             self.zeroCalExecutorTips = ZeroCalExecutorTips(self.name)
@@ -38,16 +42,20 @@ class ZeroCalExecutor(ft.Container):
                 on_click=lambda e: self.page.open(PermissionCheck(self.on_accept, 0))
             )
 
+            controls = [
+                self.zeroCalExecutorTorque
+            ]
+
+            if self.display_thrust:
+                controls.append(self.zeroCalExecutorThrust)
+
             self.content = ft.Column(
                 spacing=0,
                 controls=[
                     self.zeroCalExecutorTips,
                     ft.Row(
                         spacing=0,
-                        controls=[
-                            self.zeroCalExecutorTorque,
-                            self.zeroCalExecutorThrust
-                        ]
+                        controls=controls
                     ),
                     self.zeroCalExecutorResult,
                     ft.Container(width=100, height=10),
@@ -90,7 +98,10 @@ class ZeroCalExecutor(ft.Container):
         self.zeroCalExecutorResult.update_thrust_result(0)
 
     def is_all_finish(self):
-        return self.is_torque_finish and self.is_thrust_finish
+        # 如果没有推力，不需要调零
+        if self.display_thrust:
+            return self.is_torque_finish and self.is_thrust_finish
+        return self.is_torque_finish
 
     def update_buttons(self):
         finished = self.is_all_finish()

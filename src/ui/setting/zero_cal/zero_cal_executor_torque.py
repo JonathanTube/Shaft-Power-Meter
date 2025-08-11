@@ -2,6 +2,7 @@ import asyncio
 import logging
 import flet as ft
 from common.global_data import gdata
+from db.models.system_settings import SystemSettings
 from jm3846.JM3846_calculator import JM3846Calculator
 from jm3846.JM3846_torque_rpm_util import JM3846TorqueRpmUtil
 
@@ -19,6 +20,9 @@ class ZeroCalExecutorTorque(ft.Card):
         self.sum_torque_offset = 0
         self.on_finish = on_finish_callback
         self.on_abort_callback = on_abort_callback
+
+        system_settings: SystemSettings = SystemSettings.get()
+        self.display_thrust = system_settings.display_thrust
 
     def build(self):
         try:
@@ -49,8 +53,8 @@ class ZeroCalExecutorTorque(ft.Card):
             self.items = ft.GridView(
                 padding=ft.padding.all(10),
                 expand=True,
-                runs_count=3,  # 每行3个子元素
-                child_aspect_ratio=1.8,
+                runs_count=3 if self.display_thrust else 6,  # 每行3个子元素
+                child_aspect_ratio=1.8 if self.display_thrust else 1,
                 spacing=10,  # 子元素间距
                 run_spacing=10,
                 controls=[ft.Container(

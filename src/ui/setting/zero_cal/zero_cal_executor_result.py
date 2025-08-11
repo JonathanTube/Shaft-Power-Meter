@@ -1,33 +1,36 @@
 import logging
 import flet as ft
 
+from db.models.system_settings import SystemSettings
+
 
 class ZeroCalExecutorResult(ft.Card):
     def __init__(self, name: str):
         super().__init__()
         self.name = name
 
+        system_settings: SystemSettings = SystemSettings.get()
+        self.display_thrust = system_settings.display_thrust
+
     def build(self):
         try:
             self.torque_offset = ft.Text(value="/")
             self.thrust_offset = ft.Text(value="/")
+
+            controls = [
+                ft.Text(self.page.session.get("lang.zero_cal.new_torque_offset")),
+                self.torque_offset
+            ]
+            if self.display_thrust:
+                controls.append(ft.Text(self.page.session.get("lang.zero_cal.new_thrust_offset")))
+                controls.append(self.thrust_offset)
 
             self.content = ft.Container(
                 padding=ft.padding.symmetric(0, 10),
                 content=ft.Row(
                     height=40,
                     expand=True,
-                    controls=[
-                        ft.Text(
-                            self.page.session.get("lang.zero_cal.new_torque_offset")
-                        ),
-
-                        self.torque_offset,
-
-                        ft.Text(self.page.session.get("lang.zero_cal.new_thrust_offset")),
-
-                        self.thrust_offset
-                    ]
+                    controls=controls
                 )
             )
         except:
