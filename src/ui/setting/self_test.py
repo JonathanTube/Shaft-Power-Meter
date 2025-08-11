@@ -44,7 +44,7 @@ class SelfTest(ft.Tabs):
                     ft.Tab(text="SPS", content=self.sps_log, visible=self.system_settings.is_master),
                     ft.Tab(text="SPS2", content=self.sps2_log, visible=self.system_settings.is_master and self.system_settings.amount_of_propeller == 2),
                     ft.Tab(text="HMI Server", content=self.hmi_server_log, visible=not self.system_settings.is_master),
-                    ft.Tab(text="GPS", content=self.gps_log),
+                    ft.Tab(text="GPS", content=self.gps_log, visible=self.system_settings.enable_gps),
                     ft.Tab(text="PLC", content=self.plc_log, visible=self.conf.plc_enabled)
                 ]
         except:
@@ -63,7 +63,8 @@ class SelfTest(ft.Tabs):
         else:
             self.hmi_server_task = self.page.run_task(self.__read_hmi_server_data)
 
-        self.gps_task = self.page.run_task(self.__read_gps_data)
+        if self.system_settings.enable_gps:
+            self.gps_task = self.page.run_task(self.__read_gps_data)
 
     def will_unmount(self):
         self.task_running = False
@@ -80,7 +81,7 @@ class SelfTest(ft.Tabs):
         elif self.hmi_server_task:
             self.hmi_server_task.cancel()
 
-        if self.gps_task:
+        if self.system_settings.enable_gps and self.gps_task:
             self.gps_task.cancel()
 
     async def __read_plc_data(self):
