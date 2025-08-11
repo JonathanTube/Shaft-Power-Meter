@@ -120,7 +120,7 @@ class SelfTest(ft.Tabs):
     async def __read_sps_data(self):
         while self.task_running:
             try:
-                sps_data = f'ad0={gdata.configSPS.ad0}, ad1={gdata.configSPS.ad1}, speed={gdata.configSPS.speed}'
+                sps_data = f'ad0={round(gdata.configSPS.ad0, 1)},ad1={round(gdata.configSPS.ad1, 1)},speed={round(gdata.configSPS.speed, 1)},torque={round(gdata.configSPS.torque, 1)},thrust={round(gdata.configSPS.thrust, 1)}'
                 if gdata.configSPS.is_offline:
                     self.sps_log.controls.append(ft.Text('Disconnected from SPS'))
                 else:
@@ -134,7 +134,7 @@ class SelfTest(ft.Tabs):
     async def __read_sps2_data(self):
         while self.task_running:
             try:
-                sps2_data = f'ad0={gdata.configSPS2.ad0}, ad1={gdata.configSPS2.ad1}, speed={gdata.configSPS2.speed}'
+                sps2_data = f'ad0={round(gdata.configSPS2.ad0, 1)},ad1={round(gdata.configSPS2.ad1, 1)},speed={round(gdata.configSPS2.speed, 1)},torque={round(gdata.configSPS2.torque, 1)},thrust={round(gdata.configSPS2.thrust, 1)}'
                 if gdata.configSPS2.is_offline:
                     self.sps2_log.controls.append(ft.Text('Disconnected from SPS-2'))
                 else:
