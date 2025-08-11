@@ -1,10 +1,10 @@
 
 # ====================== 客户端类 ======================
 import asyncio
-from datetime import datetime
 import websockets
 import logging
 import msgpack
+from peewee import fn
 from common.const_alarm_type import AlarmType
 from db.models.alarm_log import AlarmLog
 from db.models.io_conf import IOConf
@@ -12,6 +12,7 @@ from db.models.propeller_setting import PropellerSetting
 from utils.alarm_saver import AlarmSaver
 from playhouse.shortcuts import dict_to_model
 from common.global_data import gdata
+from utils.datetime_util import DateTimeUtil
 
 
 date_time_format = '%Y-%m-%d %H:%M:%S'
@@ -94,8 +95,8 @@ class WebSocketSlave:
                 alarm_logs: list[AlarmLog] = AlarmLog.select(
                     AlarmLog.id,
                     AlarmLog.alarm_type,
-                    AlarmLog.is_recovery,
-                    AlarmLog.utc_date_time,
+                    AlarmLog.occured_time,
+                    AlarmLog.recovery_time,
                     AlarmLog.acknowledge_time
                 ).where(
                     AlarmLog.is_sync == False,
@@ -108,9 +109,9 @@ class WebSocketSlave:
                     alarm_logs_dict.append({
                         'id': alarm_log.id,
                         'alarm_type': alarm_log.alarm_type,
-                        'is_recovery': 1 if alarm_log.is_recovery else 0,
-                        'utc_date_time': alarm_log.utc_date_time.strftime(date_time_format) if alarm_log.utc_date_time else "",
-                        'acknowledge_time': alarm_log.acknowledge_time.strftime(date_time_format) if alarm_log.acknowledge_time else ""
+                        'occured_time': DateTimeUtil.format_date(alarm_log.occured_time),
+                        'recovery_time': DateTimeUtil.format_date(alarm_log.recovery_time),
+                        'acknowledge_time': DateTimeUtil.format_date(alarm_log.acknowledge_time)
                     })
                 if len(alarm_logs) > 0:
                     # 序列化数据
@@ -193,28 +194,26 @@ class WebSocketSlave:
         for alarm_log in alarm_logs:
             outer_id = alarm_log['id']
             alarm_type = alarm_log['alarm_type']
-            is_recovery = alarm_log['is_recovery']
-            utc_date_time = alarm_log['utc_date_time']
+            occured_time = alarm_log['occured_time']
+            recovery_time = alarm_log['recovery_time']
             acknowledge_time = alarm_log['acknowledge_time']
 
-            ack_time = None
-            if acknowledge_time:
-                ack_time = datetime.strptime(acknowledge_time, date_time_format)
-
-            udt = None
-            if utc_date_time:
-                udt = datetime.strptime(utc_date_time, date_time_format)
-
             # 查找是否存在
-            cnt = AlarmLog.select().where(AlarmLog.outer_id == outer_id).count()
+            cnt: int = AlarmLog.select(fn.COUNT(AlarmLog.id)).where(AlarmLog.outer_id == outer_id).scalar()
 
             if cnt > 0:
-                AlarmLog.update(acknowledge_time=ack_time).where(AlarmLog.outer_id == outer_id).execute()
+                AlarmLog.update(
+                    recovery_time=DateTimeUtil.parse_date(recovery_time),
+                    acknowledge_time=DateTimeUtil.parse_date(acknowledge_time)
+                ).where(AlarmLog.outer_id == outer_id).execute()
             else:
                 AlarmLog.create(
-                    utc_date_time=udt, acknowledge_time=ack_time,
-                    alarm_type=alarm_type, is_recovery=is_recovery,
-                    is_from_master=True, outer_id=outer_id
+                    alarm_type=alarm_type,
+                    occured_time=DateTimeUtil.parse_date(occured_time),
+                    recovery_time=DateTimeUtil.parse_date(recovery_time),
+                    acknowledge_time=DateTimeUtil.parse_date(acknowledge_time),
+                    is_from_master=True,
+                    outer_id=outer_id
                 )
 
     async def close(self):

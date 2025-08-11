@@ -32,17 +32,8 @@ class AlarmButton(ft.TextButton):
 
     def handle_data(self):
         try:
-            cnts = (
-                AlarmLog.select(
-                    fn.COUNT(Case(None, [(AlarmLog.is_recovery == False, 1)])).alias('cnt_occured'),
-                    fn.COUNT(Case(None, [(AlarmLog.is_recovery == True, 1)])).alias('cnt_recovery')
-                ).dicts().get()
-            )
-            self.alarm_count = cnts['cnt_occured'] - cnts['cnt_recovery']
-            self.not_ack_count = AlarmLog.select().where(
-                AlarmLog.is_recovery == False,
-                AlarmLog.acknowledge_time.is_null()
-            ).count()
+            self.alarm_count = AlarmLog.select(fn.COUNT(AlarmLog.id)).where(AlarmLog.recovery_time.is_null()).scalar()
+            self.not_ack_count = AlarmLog.select(fn.COUNT(AlarmLog.id)).where(AlarmLog.acknowledge_time.is_null()).scalar()
         except:
             logging.exception('exception occured at AlarmButton.handle_data')
             self.alarm_count = 0

@@ -1479,6 +1479,16 @@ class DataInit:
                     "english": "Engine Shaft Power, % of A"
                 },
                 {
+                    "code": "lang.alarm.occured_time",
+                    "chinese": "发生时间",
+                    "english": "Event Time"
+                },
+                {
+                    "code": "lang.alarm.recovery_time",
+                    "chinese": "恢复时间",
+                    "english": "Recovery Time"
+                },
+                {
                     "code": "lang.alarm.master_plc_disconnected",
                     "chinese": "PLC断开",
                     "english": "Master PLC Disconnected"

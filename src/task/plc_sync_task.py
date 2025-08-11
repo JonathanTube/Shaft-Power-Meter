@@ -1,6 +1,6 @@
 import asyncio
 import logging
-from peewee import fn, Case
+from peewee import fn
 from typing import Optional
 from pymodbus.client import AsyncModbusTcpClient
 from common.const_alarm_type import AlarmType
@@ -271,14 +271,8 @@ class PlcSyncTask:
             logging.error('recovery PLC alarm failed.')
 
     def has_alarms(self) -> bool:
-        cnts = (
-            AlarmLog.select(
-                fn.COUNT(Case(None, [(AlarmLog.is_recovery == False, 1)])).alias('cnt_occured'),
-                fn.COUNT(Case(None, [(AlarmLog.is_recovery == True, 1)])).alias('cnt_recovery')
-            ).dicts().get()
-        )
-
-        return cnts['cnt_occured'] > cnts['cnt_recovery']
+        cnt = AlarmLog.select(fn.COUNT(AlarmLog.id)).where(AlarmLog.recovery_time.is_null(True)).scalar()
+        return cnt > 0
 
 
 # 全局单例

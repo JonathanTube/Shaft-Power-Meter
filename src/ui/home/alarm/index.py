@@ -9,7 +9,6 @@ from ui.common.datetime_search import DatetimeSearch
 from ui.common.toast import Toast
 from ui.home.alarm.alarm_table import AlarmTable
 from common.global_data import gdata
-from common.const_alarm_type import AlarmType
 from ui.home.alarm.alarm_util import AlarmUtil
 
 
@@ -72,27 +71,28 @@ class AlarmList(ft.Container):
                 end_date = self.search.date_time_range.end_date.value
                 if start_date and end_date:
                     query = AlarmLog.select(
-                        AlarmLog.utc_date_time,
                         AlarmLog.alarm_type,
-                        AlarmLog.is_recovery,
+                        AlarmLog.occured_time,
+                        AlarmLog.recovery_time,
                         AlarmLog.acknowledge_time
                     ).where(
-                        AlarmLog.utc_date_time >= start_date,
-                        AlarmLog.utc_date_time <= end_date
+                        AlarmLog.occured_time >= start_date,
+                        AlarmLog.occured_time <= end_date
                     ).order_by(AlarmLog.id.desc()).limit(1000)
                 else:
                     query = AlarmLog.select(
-                        AlarmLog.utc_date_time,
                         AlarmLog.alarm_type,
-                        AlarmLog.is_recovery,
+                        AlarmLog.occured_time,
+                        AlarmLog.recovery_time,
                         AlarmLog.acknowledge_time
                     ).order_by(AlarmLog.id.desc()).limit(1000)
                 data = []
                 for item in query:
                     data.append({
-                        "utc_date_time": item.utc_date_time,
-                        "alarm_type": AlarmUtil.get_event_name(self.page, item.alarm_type, item.is_recovery),
-                        "acknowledge_time": item.acknowledge_time
+                        "alarm type": AlarmUtil.get_event_name(self.page, item.alarm_type),
+                        "event time": item.occured_time,
+                        "recovery time": item.recovery_time,
+                        "acknowledge time": item.acknowledge_time
                     })
                 df = pd.DataFrame(data)
                 with pd.ExcelWriter(e.path, engine="xlsxwriter") as writer:  # 显式指定引擎

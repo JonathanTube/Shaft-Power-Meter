@@ -1,9 +1,11 @@
 import logging
+import flet as ft
 from ui.common.abstract_table import AbstractTable
 from db.models.alarm_log import AlarmLog
 from common.global_data import gdata
 from db.models.date_time_conf import DateTimeConf
 from ui.home.alarm.alarm_util import AlarmUtil
+from utils.datetime_util import DateTimeUtil
 
 
 class AlarmTable(AbstractTable):
@@ -35,25 +37,30 @@ class AlarmTable(AbstractTable):
         try:
             sql = AlarmLog.select(
                 AlarmLog.id,
-                AlarmLog.utc_date_time,
                 AlarmLog.alarm_type,
-                AlarmLog.is_recovery,
+                AlarmLog.occured_time,
+                AlarmLog.recovery_time,
                 AlarmLog.acknowledge_time,
             )
             start_date = self.kwargs.get('start_date')
             end_date = self.kwargs.get('end_date')
             if start_date and end_date:
-                sql = sql.where(AlarmLog.utc_date_time >= start_date, AlarmLog.utc_date_time <= end_date)
+                sql = sql.where(AlarmLog.occured_time >= start_date, AlarmLog.occured_time <= end_date)
             data: list[AlarmLog] = sql.order_by(AlarmLog.id.desc()).paginate(self.current_page, self.page_size)
 
             data_list = []
 
             for item in data:
+                recovery_block = "⚠️"
+                if item.recovery_time:
+                    recovery_block = DateTimeUtil.format_date(item.recovery_time, self.date_time_format)
+
                 data_list.append([
                     item.id,
-                    item.utc_date_time.strftime(self.date_time_format),
-                    AlarmUtil.get_event_name(self.page, item.alarm_type, item.is_recovery),
-                    item.acknowledge_time.strftime(self.date_time_format) if item.acknowledge_time else ""
+                    AlarmUtil.get_event_name(self.page, item.alarm_type),
+                    DateTimeUtil.format_date(item.occured_time, self.date_time_format),
+                    recovery_block,
+                    DateTimeUtil.format_date(item.acknowledge_time, self.date_time_format)
                 ])
 
             return data_list
@@ -73,13 +80,14 @@ class AlarmTable(AbstractTable):
             session = self.page.session
             return [
                 session.get("lang.common.no"),
-                session.get("lang.common.utc_date_time"),
                 session.get("lang.common.event_name"),
+                session.get("lang.alarm.occured_time"),
+                session.get("lang.alarm.recovery_time"),
                 session.get("lang.common.acknowledge_time")
             ]
         except:
             logging.exception("exception occured at AlarmTable.get_columns")
 
         return [
-            '', '', '', ''
+            '', '', '', '', ''
         ]
