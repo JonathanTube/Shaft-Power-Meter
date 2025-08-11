@@ -146,7 +146,7 @@ class Permission(ft.Container):
                 Toast.show_warning(self.page, self.page.session.get("lang.permission.password_not_match"))
                 return
 
-            if User.select().where(User.user_name == self.user_name.value.strip()).count() > 0:
+            if User.select().where(User.user_name == self.user_name.value.strip()).exists():
                 Toast.show_warning(self.page, self.page.session.get("lang.permission.user_name_exists"))
                 return
 

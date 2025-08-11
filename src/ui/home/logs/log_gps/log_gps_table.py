@@ -2,6 +2,8 @@ from db.models.gps_log import GpsLog
 from ui.common.abstract_table import AbstractTable
 from common.global_data import gdata
 from db.models.date_time_conf import DateTimeConf
+from peewee import fn
+
 
 class LogGpsTable(AbstractTable):
     def __init__(self):
@@ -12,11 +14,16 @@ class LogGpsTable(AbstractTable):
     def load_total(self):
         start_date = self.kwargs.get('start_date')
         end_date = self.kwargs.get('end_date')
-        sql = GpsLog.select()
-        if start_date and end_date:
-            sql = sql.where(GpsLog.utc_date_time >= start_date, GpsLog.utc_date_time <= end_date)
 
-        return sql.count()
+        query = GpsLog.select(fn.COUNT(GpsLog.id))
+
+        if start_date and end_date:
+            query = query.where(
+                (GpsLog.utc_date_time >= start_date) &
+                (GpsLog.utc_date_time <= end_date)
+            )
+
+        return query.scalar()  # 直接返回整数
 
     def load_data(self):
         sql = GpsLog.select(

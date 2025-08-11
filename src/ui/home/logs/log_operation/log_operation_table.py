@@ -15,15 +15,25 @@ class LogOperationTable(AbstractTable):
         start_date = self.kwargs.get('start_date')
         end_date = self.kwargs.get('end_date')
         operation_type = self.kwargs.get('operation_type')
+
         sql = OperationLog.select()
+
+        # 时间范围过滤
         if start_date and end_date:
-            sql = sql.where(OperationLog.utc_date_time >= start_date, OperationLog.utc_date_time <= end_date)
-        if operation_type != -1 or operation_type != None:
+            sql = sql.where(
+                (OperationLog.utc_date_time >= start_date) &
+                (OperationLog.utc_date_time <= end_date)
+            )
+
+        # 操作类型过滤（排除 None 和 -1）
+        if operation_type is not None and operation_type != -1:
             sql = sql.where(OperationLog.operation_type == operation_type)
 
         cnt = sql.count()
+
         if cnt > 0:
             self.table_width = None
+
         return cnt
 
     def load_data(self):

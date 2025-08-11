@@ -8,6 +8,8 @@ from db.models.operation_log import OperationLog
 from common.operation_type import OperationType
 from common.global_data import gdata
 from playhouse.shortcuts import model_to_dict
+from peewee import fn
+
 
 class PermissionTable(AbstractTable):
     def __init__(self, user: User):
@@ -18,10 +20,10 @@ class PermissionTable(AbstractTable):
     def load_total(self):
         role = self.kwargs.get("role")
         role = int(role) if role else -1
+        query = User.select(fn.COUNT(User.id)).where(User.user_role >= self.op_user.user_role)
         if role != -1:
-            return User.select().where(User.user_role >= self.op_user.user_role, User.user_role == role).count()
-        else:
-            return User.select().where(User.user_role >= self.op_user.user_role).count()
+            query = query.where(User.user_role == role)
+        return query.scalar() or 0
 
     def load_data(self):
         role = self.kwargs.get("role")
@@ -133,7 +135,6 @@ class PermissionTable(AbstractTable):
         except:
             logging.exception('exception occured at PermissionTable.__show_edit_user')
 
-
     def __on_confirm_edit(self, e, user_id: int):
         try:
             if self.__is_empty(self.user_name.value):
@@ -170,7 +171,6 @@ class PermissionTable(AbstractTable):
         except:
             logging.exception('exception occured at PermissionTable.__on_confirm_edit')
 
-
     def __is_empty(self, value: str):
         return value == None or value.strip() == ""
 
@@ -179,7 +179,7 @@ class PermissionTable(AbstractTable):
             self.del_dialog = ft.AlertDialog(
                 title=ft.Text(self.page.session.get("lang.permission.delete_user")),
                 actions=[ft.TextButton(self.page.session.get("lang.button.cancel"), on_click=lambda e: e.page.close(self.del_dialog)),
-                        ft.TextButton(self.page.session.get("lang.button.confirm"), on_click=lambda e: self.__on_delete_confirm(e, user_id))]
+                         ft.TextButton(self.page.session.get("lang.button.confirm"), on_click=lambda e: self.__on_delete_confirm(e, user_id))]
             )
             self.page.open(self.del_dialog)
         except:

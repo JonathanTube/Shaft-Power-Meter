@@ -2,6 +2,7 @@ from db.models.zero_cal_info import ZeroCalInfo
 from ui.common.abstract_table import AbstractTable
 from common.global_data import gdata
 from db.models.date_time_conf import DateTimeConf
+from peewee import fn
 
 
 class ZeroCalTable(AbstractTable):
@@ -14,12 +15,18 @@ class ZeroCalTable(AbstractTable):
         try:
             start_date = self.kwargs.get('start_date')
             end_date = self.kwargs.get('end_date')
-            sql = ZeroCalInfo.select()
-            if start_date and end_date:
-                sql = sql.where(ZeroCalInfo.utc_date_time >=
-                                start_date, ZeroCalInfo.utc_date_time <= end_date)
 
-            return sql.count()
+            query = ZeroCalInfo.select(fn.COUNT(ZeroCalInfo.id))
+
+            conditions = []
+            if start_date and end_date:
+                conditions.append(ZeroCalInfo.utc_date_time >= start_date)
+                conditions.append(ZeroCalInfo.utc_date_time <= end_date)
+
+            if conditions:
+                query = query.where(*conditions)
+
+            return query.scalar() or 0
         except:
             return 0
 
@@ -43,8 +50,7 @@ class ZeroCalTable(AbstractTable):
                 [
                     item.id,
                     item.name,
-                    item.utc_date_time.strftime(
-                        f'{self.dtc.date_format} %H:%M:%S'),
+                    item.utc_date_time.strftime(f'{self.dtc.date_format} %H:%M:%S'),
                     round(item.torque_offset, 10) if item.torque_offset else 0,
                     round(item.thrust_offset, 10) if item.thrust_offset else 0
                 ] for item in data
@@ -65,5 +71,5 @@ class ZeroCalTable(AbstractTable):
                 session.get("lang.zero_cal.torque_offset"),
                 session.get("lang.zero_cal.thrust_offset")
             ]
-        
+
         return []

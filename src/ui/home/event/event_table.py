@@ -6,6 +6,7 @@ from ui.common.abstract_table import AbstractTable
 from ui.home.event.event_form import EventForm
 from ui.home.event.event_note import EventNote
 from db.models.date_time_conf import DateTimeConf
+from peewee import fn
 
 
 class EventTable(AbstractTable):
@@ -20,14 +21,19 @@ class EventTable(AbstractTable):
         try:
             start_date = self.kwargs.get('start_date')
             end_date = self.kwargs.get('end_date')
-            sql = EventLog.select()
-            if start_date and end_date:
-                sql = sql.where(EventLog.started_at >= start_date, EventLog.started_at <= end_date)
 
-            return sql.count()
+            query = EventLog.select(fn.COUNT(EventLog.id))
+
+            if start_date and end_date:
+                query = query.where(
+                    (EventLog.started_at >= start_date) &
+                    (EventLog.started_at <= end_date)
+                )
+
+            return query.scalar() or 0
         except:
-            logging.exception('exception occured at EventTable.load_total')
-        return 0
+            logging.exception('exception occurred at EventTable.load_total')
+            return 0
 
     def load_data(self):
         try:
@@ -66,7 +72,6 @@ class EventTable(AbstractTable):
         except:
             logging.exception('exception occured at EventTable.load_data')
 
-
     def get_columns(self):
         try:
             session = self.page.session
@@ -84,7 +89,6 @@ class EventTable(AbstractTable):
             ]
         except:
             logging.exception('exception occured at EventTable.get_columns')
-
 
     def create_columns(self):
         return self.get_columns()

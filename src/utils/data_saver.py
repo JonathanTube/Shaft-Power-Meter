@@ -1,5 +1,6 @@
 import asyncio
 import logging
+from peewee import fn
 from datetime import timedelta
 from common.const_alarm_type import AlarmType
 from db.models.counter_log import CounterLog
@@ -11,6 +12,7 @@ from utils.formula_cal import FormulaCalculator
 from utils.alarm_saver import AlarmSaver
 from task.modbus_output_task import modbus_output
 from websocket.websocket_master import ws_server
+
 
 class DataSaver:
     @staticmethod
@@ -41,7 +43,6 @@ class DataSaver:
             DataSaver.save_counter_interval(name, speed, power)
             # 广播给客户端数据
 
-            
             asyncio.create_task(
                 ws_server.broadcast({
                     'type': 'sps_data',
@@ -104,7 +105,13 @@ class DataSaver:
 
     @staticmethod
     def save_counter_total(name: str, speed: float, power: float):
-        cnt = CounterLog.select().where(CounterLog.sps_name == name, CounterLog.counter_type == 2).count()
+        cnt = (
+            CounterLog.select(fn.COUNT(CounterLog.id))
+            .where(
+                CounterLog.sps_name == name,
+                CounterLog.counter_type == 2
+            ).scalar()
+        )
         if cnt == 0:
             CounterLog.create(
                 sps_name=name,
@@ -127,7 +134,14 @@ class DataSaver:
 
     @staticmethod
     def save_counter_interval(name: str, speed: float, power: float):
-        cnt = CounterLog.select().where(CounterLog.sps_name == name, CounterLog.counter_type == 1, CounterLog.counter_status == "running").count()
+        cnt = (
+            CounterLog.select(fn.COUNT(CounterLog.id))
+            .where(
+                CounterLog.sps_name == name,
+                CounterLog.counter_type == 1,
+                CounterLog.counter_status == "running"
+            ).scalar()
+        )
         # the intervar counter hasn't been started since the cnt is 0
         if cnt == 0:
             return

@@ -8,6 +8,7 @@ from db.models.system_settings import SystemSettings
 from db.models.date_time_conf import DateTimeConf
 import logging
 from typing import Literal
+from peewee import fn
 
 
 class TrendView(ft.Container):
@@ -68,7 +69,14 @@ class TrendView(ft.Container):
             pass
 
     def handle_data(self, start_date: str, end_date: str, name: Literal['sps', 'sps2']):
-        cnt = DataLog.select().where(DataLog.utc_date_time >= start_date, DataLog.utc_date_time <= end_date).where(DataLog.name == name).count()
+        cnt = (
+            DataLog.select(fn.COUNT(DataLog.id))
+            .where(
+                (DataLog.utc_date_time >= start_date) &
+                (DataLog.utc_date_time <= end_date) &
+                (DataLog.name == name)
+            ).scalar() or 0
+        )
         logging.info(f"trendview query data count: {cnt}")
         max_data_count = 8000
         # 假设chart最优显示8000条数据,那么需要分段查询

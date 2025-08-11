@@ -4,6 +4,7 @@ import sys
 import logging
 import flet as ft
 import ui_safety  # 加这一行
+from peewee import fn
 from db.models.data_log import DataLog
 from db.models.io_conf import IOConf
 from db.models.system_settings import SystemSettings
@@ -75,7 +76,7 @@ def check_single_instance(mutex_name: str = "shaft-power-meter"):
 
 
 def start_all_task():
-    cnt = DataLog.select().count()
+    cnt = DataLog.select(fn.COUNT(DataLog.id)).scalar()
 
     system_settings: SystemSettings = SystemSettings.get()
     asyncio.create_task(utc_timer.start())

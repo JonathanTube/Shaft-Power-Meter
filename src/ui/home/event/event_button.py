@@ -5,6 +5,7 @@ from typing import Callable
 
 from db.models.event_log import EventLog
 from db.models.system_settings import SystemSettings
+from peewee import fn
 
 
 class EventButton(ft.TextButton):
@@ -33,7 +34,7 @@ class EventButton(ft.TextButton):
         while self.task_running:
             try:
                 if self.page:
-                    count = EventLog.select().where(EventLog.breach_reason == None).count()
+                    count = (EventLog.select(fn.COUNT(EventLog.id)).where(EventLog.breach_reason.is_null(True)).scalar() or 0)
                     if count > 0:
                         self.badge = ft.Badge(text=str(count), bgcolor=ft.Colors.RED, text_color=ft.Colors.WHITE, label_visible=True)
                     else:

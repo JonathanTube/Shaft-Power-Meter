@@ -4,6 +4,7 @@ from ui.common.abstract_table import AbstractTable
 from common.global_data import gdata
 from db.models.date_time_conf import DateTimeConf
 from utils.unit_parser import UnitParser
+from peewee import fn
 
 
 class LogDataTable(AbstractTable):
@@ -16,16 +17,19 @@ class LogDataTable(AbstractTable):
         try:
             start_date = self.kwargs.get('start_date')
             end_date = self.kwargs.get('end_date')
-            sql = DataLog.select()
+
+            query = DataLog.select(fn.COUNT(DataLog.id))
+
             if start_date and end_date:
-                sql = sql.where(DataLog.utc_date_time >= start_date,
-                                DataLog.utc_date_time <= end_date)
+                query = query.where(
+                    (DataLog.utc_date_time >= start_date) &
+                    (DataLog.utc_date_time <= end_date)
+                )
 
-            return sql.count()
+            return query.scalar() or 0
         except:
-            logging.exception('exception occured at LogDataTable.load_total')
-
-        return 0
+            logging.exception('exception occurred at LogDataTable.load_total')
+            return 0
 
     def load_data(self):
         try:
@@ -72,10 +76,10 @@ class LogDataTable(AbstractTable):
         return self.get_columns()
 
     def get_columns(self):
-        try:    
+        try:
             if self.page is None:
                 return []
-            
+
             if self.page.session is None:
                 return []
 

@@ -5,7 +5,7 @@ from db.models.report_info import ReportInfo
 from datetime import timedelta, datetime
 from db.models.data_log import DataLog
 from utils.formula_cal import FormulaCalculator
-from peewee import fn
+from peewee import fn, Case
 import logging
 
 
@@ -47,31 +47,41 @@ class EEXIBreach:
         count_power_above_eexi = 0
 
         if not is_twins:
-            count_power_below_eexi = DataLog.select().where(
-                DataLog.utc_date_time >= start_time,
-                DataLog.power <= gdata.configCommon.eexi_limited_power
-            ).count()
+            count_power_below_eexi = (
+                DataLog.select(fn.COUNT(DataLog.id))
+                .where(
+                    DataLog.utc_date_time >= start_time,
+                    DataLog.power <= gdata.configCommon.eexi_limited_power
+                ).scalar()
+            )
 
-            count_power_above_eexi = DataLog.select().where(
-                DataLog.utc_date_time >= start_time,
-                DataLog.power > gdata.configCommon.eexi_limited_power
-            ).count()
+            count_power_above_eexi = (
+                DataLog.select(fn.COUNT(DataLog.id))
+                .where(
+                    DataLog.utc_date_time >= start_time,
+                    DataLog.power > gdata.configCommon.eexi_limited_power
+                ).scalar()
+            )
         else:
-            count_power_below_eexi = DataLog.select().where(
-                DataLog.utc_date_time >= start_time
-            ).group_by(
-                DataLog.utc_date_time
-            ).having(
-                fn.SUM(DataLog.power) <= gdata.configCommon.eexi_limited_power
-            ).count()
+            limit_power = gdata.configCommon.eexi_limited_power
 
-            count_power_above_eexi = DataLog.select().where(
-                DataLog.utc_date_time >= start_time
-            ).group_by(
-                DataLog.utc_date_time
-            ).having(
-                fn.SUM(DataLog.power) > gdata.configCommon.eexi_limited_power
-            ).count()
+            query = (
+                DataLog.select(fn.SUM(DataLog.power).alias('total_power'))
+                .where(DataLog.utc_date_time >= start_time)
+                .group_by(DataLog.utc_date_time)
+            )
+
+            count_query = (
+                query.select(
+                    fn.SUM(Case(None, [(query.c.total_power <= limit_power, 1)], 0)).alias('below_count'),
+                    fn.SUM(Case(None, [(query.c.total_power > limit_power, 1)], 0)).alias('above_count')
+                )
+            )
+
+            result = count_query.dicts().get()
+
+            count_power_below_eexi = result['below_count']
+            count_power_above_eexi = result['above_count']
 
         # 如果相等，说明没有数据，跳过所有判断，保持原样
         if count_power_below_eexi == count_power_above_eexi:

@@ -6,6 +6,7 @@ from common.global_data import gdata
 from db.models.date_time_conf import DateTimeConf
 from ui.home.alarm.alarm_util import AlarmUtil
 from utils.datetime_util import DateTimeUtil
+from peewee import fn
 
 
 class AlarmTable(AbstractTable):
@@ -23,15 +24,18 @@ class AlarmTable(AbstractTable):
         try:
             start_date = self.kwargs.get('start_date')
             end_date = self.kwargs.get('end_date')
-            sql = AlarmLog.select()
-            if start_date and end_date:
-                sql = sql.where(AlarmLog.utc_date_time >= start_date, AlarmLog.utc_date_time <= end_date)
 
-            return sql.count()
+            query = AlarmLog.select(fn.COUNT(AlarmLog.id))
+            if start_date and end_date:
+                query = query.where(
+                    (AlarmLog.utc_date_time >= start_date) &
+                    (AlarmLog.utc_date_time <= end_date)
+                )
+
+            return query.scalar() or 0  # scalar() 直接返回 count 数字
         except:
             logging.exception("exception occured at AlarmTable.load_total")
-
-        return 0
+            return 0
 
     def load_data(self):
         try:

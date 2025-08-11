@@ -25,13 +25,14 @@ class ReportInfoTable(AbstractTable):
             start_date = self.kwargs.get('start_date')
             end_date = self.kwargs.get('end_date')
 
-            sql = ReportInfo.select()
-            if start_date and end_date:
-                sql = sql.where(
-                    ReportInfo.created_at >= start_date,
-                    ReportInfo.created_at <= end_date
-                )
-            return sql.count()
+            query = ReportInfo.select(fn.COUNT(ReportInfo.id))
+
+            if start_date:
+                query = query.where(ReportInfo.created_at >= start_date)
+            if end_date:
+                query = query.where(ReportInfo.created_at <= end_date)
+
+            return query.scalar() or 0
         except:
             logging.exception('exception occured at ReportInfoTable.load_total')
 
