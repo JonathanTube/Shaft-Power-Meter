@@ -89,11 +89,12 @@ class SelfTest(ft.Tabs):
                     return
 
                 if plc.is_online:
-                    plc_4_20_ma_data = await plc.read_4_20_ma_data()
-                    self.plc_log.controls.append(ft.Text(f"4-20mA: {plc_4_20_ma_data}"))
-                    self.plc_log.controls.append(ft.Text(f"alarm: {await plc.read_alarm()}"))
-                    self.plc_log.controls.append(ft.Text(f"overload: {await plc.read_power_overload()}"))
-                    self.plc_log.controls.append(ft.Text(f"instant data: {await plc.read_instant_data()}"))
+                    content = f"4-20mA: {await plc.read_4_20_ma_data()},"
+                    content += f"instant data: {await plc.read_instant_data()},"
+                    content += f"alarm: {await plc.read_alarm()},"
+                    content += f"eexi breach: {await plc.read_eexi_breach_alarm()}"
+
+                    self.plc_log.controls.append(content)
                 else:
                     self.plc_log.controls.append(ft.Text("disconnected from PLC"))
 

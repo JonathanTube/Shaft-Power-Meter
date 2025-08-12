@@ -179,6 +179,15 @@ class PlcSyncTask:
         except Exception as e:
             logging.error(f"[PLC] 写入功率超载报警失败: {e}")
 
+    async def read_eexi_breach_alarm(self) -> bool:
+        if not self.is_connected:
+            return None
+
+        try:
+            return await self.read_coil(12290)
+        except:
+            logging.error(f"[PLC] 读取 EEXI 超限报警失败")
+
     async def write_eexi_breach_alarm(self, occured: bool):
         """写入 EEXI 超限报警"""
         if not self.is_connected():
