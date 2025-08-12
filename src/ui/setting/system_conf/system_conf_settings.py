@@ -195,6 +195,7 @@ class SystemConfSettings(ft.Container):
         if is_master_new != is_master_old or is_individual_new != is_individual_old or enable_gps_new != enable_gps_old:
             self.system_settings.save()
             gdata.configCommon.is_master = self.system_settings.is_master
+            gdata.configCommon.enable_gps = self.system_settings.enable_gps
             raise SystemError("running mode changed")
 
 
@@ -217,6 +218,8 @@ class SystemConfSettings(ft.Container):
         self.system_settings.save()
 
         gdata.configCommon.is_master = self.system_settings.is_master
+
+        gdata.configCommon.enable_gps = self.system_settings.enable_gps
 
         gdata.configCommon.amount_of_propeller = self.system_settings.amount_of_propeller
 

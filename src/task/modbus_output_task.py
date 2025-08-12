@@ -13,7 +13,6 @@ from pymodbus.server import StartAsyncSerialServer
 from pymodbus.datastore import ModbusSlaveContext, ModbusServerContext, ModbusSequentialDataBlock
 
 from db.models.io_conf import IOConf
-from db.models.system_settings import SystemSettings
 from db.models.counter_log import CounterLog
 from common.global_data import gdata
 
@@ -34,7 +33,6 @@ class ModbusOutputTask:
         self._is_started = False
 
         self.io_conf: Optional[IOConf] = None
-        self.amount_of_propeller = 1
 
         # 锁：防止并发 setValues 导致竞态
         self._ctx_lock = asyncio.Lock()
@@ -49,8 +47,6 @@ class ModbusOutputTask:
         """异步读取最新 IO 配置与系统设置"""
         try:
             self.io_conf = await asyncio.to_thread(IOConf.get)
-            sys_conf = await asyncio.to_thread(SystemSettings.get)
-            self.amount_of_propeller = getattr(sys_conf, "amount_of_propeller", 1)
         except Exception:
             logger.exception("读取 Modbus 输出配置失败")
 
@@ -171,7 +167,7 @@ class ModbusOutputTask:
         # 这里先放占位 0，外部会替换
         vals32 = [sps_torque, sps_thrust, sps_speed, sps_power, 0, 0]
 
-        if self.amount_of_propeller > 1:
+        if gdata.configCommon.amount_of_propeller == 2:
             sps2_torque = int(getattr(gdata.configSPS2, "torque", 0) / 100) if getattr(io, "output_torque", False) else 0
             sps2_thrust = int(getattr(gdata.configSPS2, "thrust", 0) / 100) if getattr(io, "output_thrust", False) else 0
             sps2_speed = int(getattr(gdata.configSPS2, "speed", 0) * 10) if getattr(io, "output_speed", False) else 0
@@ -242,7 +238,7 @@ class ModbusOutputTask:
                 # sps avg & energy
                 sps_avg, sps_energy = await asyncio.to_thread(self._get_avg_power_and_energy_sync, "sps")
                 # 如果存在 sps2，则计算
-                if self.amount_of_propeller > 1:
+                if gdata.configCommon.amount_of_propeller == 2:
                     sps2_avg, sps2_energy = await asyncio.to_thread(self._get_avg_power_and_energy_sync, "sps2")
                 else:
                     sps2_avg, sps2_energy = 0, 0
@@ -268,7 +264,7 @@ class ModbusOutputTask:
                     # 若寄存器长度不够，忽略
                     logger.debug("替换 sps avg/energy 时超出长度，忽略")
 
-                if self.amount_of_propeller > 1:
+                if gdata.configCommon.amount_of_propeller == 2:
                     # sps2 avg/energy 偏移：在 sps 部分后面，假设 sps 占 6 个 32-bit（12 个寄存器）
                     # sps 部分 6 个 32-bit => 12 寄存器，sps2 avg 偏移 = 12 + 4*2 = 20 （视实际顺序）
                     try:

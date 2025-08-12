@@ -30,8 +30,8 @@ class IOSetting(ft.Container):
 
     def build(self):
         try:
-            self.system_settings = asyncio.to_thread(SystemSettings.get)
-            self.conf = asyncio.to_thread(IOConf.get)
+            self.system_settings = SystemSettings.get()
+            self.conf = IOConf.get()
             if self.page and self.page.session:
                 self.output_conf = IOSettingOutput(self.conf)
 

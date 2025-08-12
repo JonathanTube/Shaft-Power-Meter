@@ -4,7 +4,6 @@ import logging
 from peewee import fn
 from db.models.counter_log import CounterLog
 from db.models.data_log import DataLog
-from db.models.system_settings import SystemSettings
 from common.global_data import gdata
 from db.models.event_log import EventLog
 from db.models.report_info import ReportInfo
@@ -106,19 +105,11 @@ class TestModeTask:
         """后台任务：按范围生成随机数据（异步）"""
         try:
             # 在循环里尽量把阻塞操作放到线程池
-            try:
-                system_settings: SystemSettings = await asyncio.to_thread(SystemSettings.get)
-                amount_of_propeller = system_settings.amount_of_propeller
-            except Exception:
-                # 如果读取配置失败，默认为单推进
-                _logger.exception("[TestMode] 读取 SystemSettings 失败，使用 amount_of_propeller=1")
-                amount_of_propeller = 1
-
             while self.is_running:
                 # 生成并保存到内存（对 gdata 的赋值很快，允许在事件循环中做）
                 try:
                     self._save_generated_data('sps')
-                    if amount_of_propeller == 2:
+                    if gdata.configCommon.amount_of_propeller == 2:
                         self._save_generated_data('sps2')
                 except Exception:
                     _logger.exception("[TestMode] 生成或保存随机数据时出错")
