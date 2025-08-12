@@ -150,9 +150,9 @@ class TestModeTask:
                 min_thr, max_thr = self.min_thrust, self.max_thrust
 
             # random.uniform 在 min==max 时也会返回相同数值
-            instant_torque = int(random.uniform(min_t, max_t))
-            instant_speed = int(random.uniform(min_s, max_s))
-            instant_thrust = int(random.uniform(min_thr, max_thr))
+            instant_torque = round(random.uniform(min_t, max_t), 1)
+            instant_speed = round(random.uniform(min_s, max_s), 1)
+            instant_thrust = round(random.uniform(min_thr, max_thr), 1)
 
             if name == 'sps':
                 gdata.configSPS.torque = instant_torque

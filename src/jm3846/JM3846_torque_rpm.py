@@ -44,14 +44,13 @@ class JM3846TorqueRpm:
                     gdata.configSPS.ad0 = ch0_ad
                     gdata.configSPS.torque = self.cal_torque(ch0_ad)
                 if rpm:
-
-                    gdata.configSPS.speed = round(rpm / 10)
+                    gdata.configSPS.speed = rpm
             else:
                 if ch0_ad:
                     gdata.configSPS2.ad0 = ch0_ad
                     gdata.configSPS2.torque = self.cal_torque(ch0_ad)
                 if rpm:
-                    gdata.configSPS2.speed = round(rpm / 10)
+                    gdata.configSPS2.speed = rpm
 
         except:
             logging.exception(

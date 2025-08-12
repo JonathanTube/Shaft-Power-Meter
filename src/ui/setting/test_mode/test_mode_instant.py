@@ -99,7 +99,7 @@ class TestModeInstant(ft.ResponsiveRow):
 
                 if gdata.configCommon.amount_of_propeller == 2:
                     if self.sps2_speed and self.sps2_speed.page:
-                        self.sps2_speed.value = f'{gdata.sps2_speed} rpm'
+                        self.sps2_speed.value = f'{gdata.configSPS2.speed} rpm'
                         self.sps2_speed.update()
 
                     if self.sps2_torque and self.sps2_torque.page:
