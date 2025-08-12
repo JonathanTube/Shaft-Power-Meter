@@ -89,10 +89,15 @@ class SelfTest(ft.Tabs):
                     return
 
                 if plc.is_online:
-                    content = f"4-20mA: {await plc.read_4_20_ma_data()},"
-                    content += f"instant data: {await plc.read_instant_data()},"
-                    content += f"alarm: {await plc.read_alarm()},"
-                    content += f"eexi breach: {await plc.read_eexi_breach_alarm()}"
+                    content_parts = [
+                        f"4-20mA: {await plc.read_4_20_ma_data()}",
+                        f"instant data: {await plc.read_instant_data()}",
+                        f"overload: {await plc.read_power_overload()}",
+                        f"alarm: {await plc.read_alarm()}",
+                        f"eexi breach: {await plc.read_eexi_breach_alarm()}"
+                    ]
+
+                    content = ", ".join(content_parts)
 
                     self.plc_log.controls.append(content)
                 else:
