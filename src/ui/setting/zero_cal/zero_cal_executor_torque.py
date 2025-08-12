@@ -87,7 +87,7 @@ class ZeroCalExecutorTorque(ft.Card):
         except:
             logging.exception('exception occured at ZeroCalExecutor.build')
 
-    async def on_fetch(self, e):
+    def on_fetch(self, e):
         # 开始采集thrust-ad1
         if self.name == 'sps':
             gdata.configSPS.zero_cal_torque_running = True

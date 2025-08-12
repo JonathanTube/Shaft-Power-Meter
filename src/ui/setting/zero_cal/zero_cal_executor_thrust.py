@@ -17,6 +17,10 @@ class ZeroCalExecutorThrust(ft.Card):
         self.on_finish_callback = on_finish_callback
         self.on_abort_callback = on_abort_callback
 
+        self.abort_button = None
+        self.fetch_button = None
+        self.seconds_tick = None
+
     def build(self):
         try:
             s = self.page.session
