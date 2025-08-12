@@ -99,7 +99,7 @@ class SelfTest(ft.Tabs):
 
                     content = ", ".join(content_parts)
 
-                    self.plc_log.controls.append(content)
+                    self.plc_log.controls.append(ft.Text(content))
                 else:
                     self.plc_log.controls.append(ft.Text("disconnected from PLC"))
 
