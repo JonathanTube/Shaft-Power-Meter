@@ -10,12 +10,12 @@ from utils.alarm_saver import AlarmSaver
 # 寄存器映射表（高位在前、低位在后）
 REGISTER_MAP = {
     # 功率配置区（4-20mA 对应范围）
-    "power_range_min": (12299, 12298),   # %MW11 (高), %MW10 (低)
-    "power_range_max": (12301, 12300),   # %MW13 (高), %MW12 (低)
-    "power_range_offset": (12303, 12302),  # %MW15 (高), %MW14 (低)
+    "power_range_min": (12349, 12348),   # %MW11 (高), %MW10 (低)
+    "power_range_max": (12353, 12352),   # %MW13 (高), %MW12 (低)
+    "power_range_offset": (12357, 12356),  # %MW15 (高), %MW14 (低)
 
     # 实时功率（模拟量）
-    "instant_power": (12305, 12304)      # %MW17 (高), %MW16 (低)
+    "instant_power": (12361, 12360)      # %MW17 (高), %MW16 (低)
 }
 
 
