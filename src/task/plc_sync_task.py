@@ -12,7 +12,7 @@ REGISTER_MAP = {
     # 功率配置区（4-20mA 对应范围）
     "power_range_min": (12299, 12298),   # %MW11 (高), %MW10 (低)
     "power_range_max": (12301, 12300),   # %MW13 (高), %MW12 (低)
-    "power_range_offset": (12303, 12302),# %MW15 (高), %MW14 (低)
+    "power_range_offset": (12303, 12302),  # %MW15 (高), %MW14 (低)
 
     # 实时功率（模拟量）
     "instant_power": (12305, 12304)      # %MW17 (高), %MW16 (低)
@@ -99,6 +99,20 @@ class PlcSyncTask:
         except Exception as e:
             logging.error(f"[PLC] 写入 4-20mA 数据失败: {e}")
 
+    async def read_instant_data(self) -> dict:
+        if not self.is_connected():
+            return {"power": None, "torque": None, "thrust": None, "speed": None}
+
+        try:
+            return {
+                "power": await self.read_register_32(*REGISTER_MAP["instant_power"]),
+                "torque": await self.read_register(12311),
+                "thrust": await self.read_register(12321),
+                "speed": await self.read_register(12331)
+            }
+        except:
+            logging.error(f"[PLC] 实时数据失败")
+
     async def write_instant_data(self, power: float, torque: float, thrust: float, speed: float):
         """
         写入实时数据到PLC
@@ -126,6 +140,15 @@ class PlcSyncTask:
             logging.error(f"[PLC] 写入实时数据失败: {e}")
             self.set_offline()
 
+    async def read_alarm(self) -> bool:
+        if not self.is_connected():
+            return None
+
+        try:
+            return await self._safe_read_coil(12288)
+        except:
+            logging.error(f"[***PLC***] {self.ip}:{self.port} read alarm failed")
+
     async def write_alarm(self, occured: bool):
         """写入报警状态"""
         if not self.is_connected():
@@ -134,6 +157,15 @@ class PlcSyncTask:
             await self.plc_client.write_coil(address=12288, value=occured)
         except Exception as e:
             logging.error(f"[PLC] 写入报警状态失败: {e}")
+
+    async def read_power_overload(self) -> bool:
+        if not self.is_connected:
+            return None
+
+        try:
+            return await self._safe_read_coil(12289)
+        except:
+            logging.error(f"[***PLC***] {self.ip}:{self.port} read power overload failed")
 
     async def write_power_overload(self, occured: bool):
         """写入功率超载报警"""
