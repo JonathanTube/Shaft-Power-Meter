@@ -111,7 +111,9 @@ class PlcSyncTask:
                 "speed": await self.read_register(12331)
             }
         except:
-            logging.error(f"[PLC] 实时数据失败")
+            logging.error(f"[PLC] 读取实时数据失败")
+
+        return {"power": None, "torque": None, "thrust": None, "speed": None}
 
     async def write_instant_data(self, power: float, torque: float, thrust: float, speed: float):
         """
@@ -145,9 +147,10 @@ class PlcSyncTask:
             return None
 
         try:
-            return await self._safe_read_coil(12288)
+            return await self.read_coil(12288)
         except:
-            logging.error(f"[***PLC***] {self.ip}:{self.port} read alarm failed")
+            logging.error(f"[PLC] 读取报警状态失败")
+        return None
 
     async def write_alarm(self, occured: bool):
         """写入报警状态"""
@@ -163,9 +166,9 @@ class PlcSyncTask:
             return None
 
         try:
-            return await self._safe_read_coil(12289)
+            return await self.read_coil(12289)
         except:
-            logging.error(f"[***PLC***] {self.ip}:{self.port} read power overload failed")
+            logging.error(f"[PLC] 读取功率超载报警失败")
 
     async def write_power_overload(self, occured: bool):
         """写入功率超载报警"""
@@ -203,6 +206,15 @@ class PlcSyncTask:
         low = value & 0xFFFF
         await self.plc_client.write_register(high_addr, high)
         await self.plc_client.write_register(low_addr, low)
+
+    async def read_coil(self, address: int) -> Optional[bool]:
+        resp = await self.plc_client.read_coils(address, count=1)
+        if resp is None or getattr(resp, "isError", lambda: False)():
+            return None
+        bits = getattr(resp, "bits", None)
+        if bits and len(bits) > 0:
+            return bool(bits[0])
+        return None
 
     def is_connected(self) -> bool:
         """检查客户端是否可用"""
