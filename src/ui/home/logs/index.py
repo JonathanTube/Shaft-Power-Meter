@@ -18,7 +18,7 @@ class Logs(ft.Container):
                 ft.Tab(text=self.page.session.get("lang.log.data_log"), content=LogDataList()),
                 ft.Tab(text=self.page.session.get("lang.log.operation_log"), content=LogOperation())
             ]
-
+    
             if self.system_settings.enable_gps:
                 tabs.insert(1, ft.Tab(text=self.page.session.get("lang.log.gps_log"), content=LogGpsList()))
 

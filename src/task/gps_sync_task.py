@@ -132,9 +132,6 @@ class GpsSyncTask:
         """解析 NMEA 数据"""
         try:
             gdata.configGps.raw_data = sentence
-            cutoff = gdata.configDateTime.utc - timedelta(weeks=12)
-            GpsLog.delete().where(GpsLog.utc_date_time < cutoff).execute()
-
             msg = pynmea2.parse(sentence)
             if isinstance(msg, pynmea2.types.talker.RMC):
                 utc_date = msg.datestamp

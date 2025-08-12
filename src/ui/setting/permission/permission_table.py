@@ -1,6 +1,7 @@
 import logging
 import flet as ft
 import hashlib
+import asyncio
 from ui.common.abstract_table import AbstractTable
 from db.models.user import User
 from ui.common.toast import Toast
@@ -17,27 +18,39 @@ class PermissionTable(AbstractTable):
         self.op_user = user
         self.table_width = gdata.configCommon.default_table_width - 150
 
-    def load_total(self):
+    async def load_total_async(self):
         role = self.kwargs.get("role")
         role = int(role) if role else -1
-        query = User.select(fn.COUNT(User.id)).where(User.user_role >= self.op_user.user_role)
-        if role != -1:
-            query = query.where(User.user_role == role)
-        return query.scalar() or 0
+
+        def _query():
+            q = User.select(fn.COUNT(User.id)).where(User.user_role >= self.op_user.user_role)
+            if role != -1:
+                q = q.where(User.user_role == role)
+            return q.scalar() or 0
+        return await asyncio.to_thread(_query)
+
+    def load_total(self):
+        # 这里保留同步接口给 AbstractTable 用
+        return asyncio.run(self.load_total_async())
+
+    async def load_data_async(self):
+        role = self.kwargs.get("role")
+        role = int(role) if role else -1
+
+        def _query():
+            q = User.select(
+                User.id,
+                User.user_name,
+                User.user_pwd,
+                User.user_role
+            ).where(User.user_role >= self.op_user.user_role).order_by(User.id.desc()).paginate(self.current_page, self.page_size)
+            if role != -1:
+                q = q.where(User.user_role == role)
+            return [[item.id, item.user_name, '******', self.__get_role_name(item.user_role)] for item in q]
+        return await asyncio.to_thread(_query)
 
     def load_data(self):
-        role = self.kwargs.get("role")
-        role = int(role) if role else -1
-        users = User.select(
-            User.id,
-            User.user_name,
-            User.user_pwd,
-            User.user_role
-        ).where(User.user_role >= self.op_user.user_role).order_by(User.id.desc()).paginate(self.current_page, self.page_size)
-        if role != -1:
-            users = users.where(User.user_role == role)
-
-        return [[item.id, item.user_name, '******', self.__get_role_name(item.user_role)] for item in users]
+        return asyncio.run(self.load_data_async())
 
     def __get_role_name(self, role: int):
         if role == 0:
@@ -128,14 +141,14 @@ class PermissionTable(AbstractTable):
                 ),
                 actions=[
                     ft.TextButton(e.page.session.get("lang.button.cancel"), on_click=lambda e: e.page.close(self.edit_dialog)),
-                    ft.TextButton(e.page.session.get("lang.button.save"), on_click=lambda e: self.__on_confirm_edit(e, items[0]))
+                    ft.TextButton(e.page.session.get("lang.button.save"), on_click=lambda e: asyncio.create_task(self.__on_confirm_edit_async(e, items[0])))
                 ]
             )
             self.page.open(self.edit_dialog)
         except:
             logging.exception('exception occured at PermissionTable.__show_edit_user')
 
-    def __on_confirm_edit(self, e, user_id: int):
+    async def __on_confirm_edit_async(self, e, user_id: int):
         try:
             if self.__is_empty(self.user_name.value):
                 Toast.show_warning(e.page, e.page.session.get("lang.permission.user_name_required"))
@@ -149,16 +162,25 @@ class PermissionTable(AbstractTable):
                 Toast.show_warning(e.page, e.page.session.get("lang.permission.confirm_user_pwd_required"))
                 return
 
-            if self.role.value == None:
+            if self.role.value is None:
                 Toast.show_warning(e.page, e.page.session.get("lang.permission.user_role_required"))
                 return
 
             if self.password.value.strip() != self.confirm_password.value.strip():
                 Toast.show_warning(e.page, e.page.session.get("lang.permission.password_not_match"))
                 return
+
             encrypt_password = hashlib.sha256(self.password.value.strip().encode()).hexdigest()
-            User.update(user_pwd=encrypt_password, user_role=self.role.value).where(User.id == user_id).execute()
-            OperationLog.create(
+
+            await asyncio.to_thread(
+                lambda: User.update(
+                    user_pwd=encrypt_password,
+                    user_role=int(self.role.value)
+                ).where(User.id == user_id).execute()
+            )
+
+            await asyncio.to_thread(
+                OperationLog.create,
                 user_id=self.op_user.id,
                 utc_date_time=gdata.configDateTime.utc,
                 operation_type=OperationType.USER_UPDATE,
@@ -172,29 +194,34 @@ class PermissionTable(AbstractTable):
             logging.exception('exception occured at PermissionTable.__on_confirm_edit')
 
     def __is_empty(self, value: str):
-        return value == None or value.strip() == ""
+        return value is None or value.strip() == ""
 
     def __on_delete(self, e, user_id: int):
         try:
             self.del_dialog = ft.AlertDialog(
                 title=ft.Text(self.page.session.get("lang.permission.delete_user")),
-                actions=[ft.TextButton(self.page.session.get("lang.button.cancel"), on_click=lambda e: e.page.close(self.del_dialog)),
-                         ft.TextButton(self.page.session.get("lang.button.confirm"), on_click=lambda e: self.__on_delete_confirm(e, user_id))]
+                actions=[
+                    ft.TextButton(self.page.session.get("lang.button.cancel"), on_click=lambda e: e.page.close(self.del_dialog)),
+                    ft.TextButton(self.page.session.get("lang.button.confirm"), on_click=lambda e: asyncio.create_task(self.__on_delete_confirm_async(e, user_id)))
+                ]
             )
             self.page.open(self.del_dialog)
         except:
             logging.exception('exception occured at PermissionTable.__on_delete')
 
-    def __on_delete_confirm(self, e, user_id: int):
+    async def __on_delete_confirm_async(self, e, user_id: int):
         try:
             self.page.close(self.del_dialog)
-            OperationLog.create(
+
+            await asyncio.to_thread(
+                OperationLog.create,
                 user_id=self.op_user.id,
                 utc_date_time=gdata.configDateTime.utc,
                 operation_type=OperationType.USER_DELETE,
                 operation_content=model_to_dict(User.select(User.id, User.user_name).where(User.id == user_id).get())
             )
-            User.delete().where(User.id == user_id).execute()
+
+            await asyncio.to_thread(lambda: User.delete().where(User.id == user_id).execute())
             self.search()
             Toast.show_success(self.page)
         except:
