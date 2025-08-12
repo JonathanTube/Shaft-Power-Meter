@@ -10,6 +10,8 @@ from task.sps2_read_task import sps2_read_task
 
 
 class SelfTest(ft.Tabs):
+    MAX_LOG_LINES = 60  # 限制每个日志 ListView 的最大行数
+
     def __init__(self):
         super().__init__()
         self.plc_task = None
@@ -47,6 +49,13 @@ class SelfTest(ft.Tabs):
                 ]
         except:
             logging.exception('exception occured at SelfTest.build')
+
+    def append_log(self, log_view: ft.ListView, text: str):
+        """追加日志到 ListView，并限制最大行数"""
+        log_view.controls.append(ft.Text(text))
+        if len(log_view.controls) > self.MAX_LOG_LINES:
+            del log_view.controls[0]  # 删除最旧的一行
+        log_view.update()
 
     def did_mount(self):
         self.task_running = True
@@ -96,14 +105,9 @@ class SelfTest(ft.Tabs):
                         f"alarm: {await plc.read_alarm()}",
                         f"eexi breach: {await plc.read_eexi_breach_alarm()}"
                     ]
-
-                    content = ", ".join(content_parts)
-
-                    self.plc_log.controls.append(ft.Text(content))
+                    self.append_log(self.plc_log, ", ".join(content_parts))
                 else:
-                    self.plc_log.controls.append(ft.Text("disconnected from PLC"))
-
-                self.plc_log.update()
+                    self.append_log(self.plc_log, "disconnected from PLC")
             except:
                 logging.exception('exception occured at SelfTest.__read_plc_data')
             finally:
@@ -113,10 +117,9 @@ class SelfTest(ft.Tabs):
         while self.task_running:
             try:
                 if gps.is_online:
-                    self.gps_log.controls.append(ft.Text(f"GPS Data: {gdata.configGps.raw_data}"))
+                    self.append_log(self.gps_log, f"GPS Data: {gdata.configGps.raw_data}")
                 else:
-                    self.gps_log.controls.append(ft.Text("Disconnected from GPS"))
-                self.gps_log.update()
+                    self.append_log(self.gps_log, "Disconnected from GPS")
             except:
                 logging.exception('exception occured at SelfTest.__read_gps_data')
             finally:
@@ -127,10 +130,9 @@ class SelfTest(ft.Tabs):
             try:
                 sps_data = f'ad0={round(gdata.configSPS.ad0, 1)},ad1={round(gdata.configSPS.ad1, 1)},speed={round(gdata.configSPS.speed, 1)},torque={round(gdata.configSPS.torque, 1)},thrust={round(gdata.configSPS.thrust, 1)}'
                 if sps_read_task.is_online:
-                    self.sps_log.controls.append(ft.Text(f"SPS Data: {sps_data}"))
+                    self.append_log(self.sps_log, f"SPS Data: {sps_data}")
                 else:
-                    self.sps_log.controls.append(ft.Text('Disconnected from SPS'))
-                self.sps_log.update()
+                    self.append_log(self.sps_log, "Disconnected from SPS")
             except:
                 logging.exception('exception occured at SelfTest.__read_sps_data')
             finally:
@@ -141,10 +143,9 @@ class SelfTest(ft.Tabs):
             try:
                 sps2_data = f'ad0={round(gdata.configSPS2.ad0, 1)},ad1={round(gdata.configSPS2.ad1, 1)},speed={round(gdata.configSPS2.speed, 1)},torque={round(gdata.configSPS2.torque, 1)},thrust={round(gdata.configSPS2.thrust, 1)}'
                 if sps2_read_task.is_online:
-                    self.sps2_log.controls.append(ft.Text(f"SPS-2 Data: {sps2_data}"))
+                    self.append_log(self.sps2_log, f"SPS-2 Data: {sps2_data}")
                 else:
-                    self.sps2_log.controls.append(ft.Text('Disconnected from SPS-2'))
-                self.sps2_log.update()
+                    self.append_log(self.sps2_log, "Disconnected from SPS-2")
             except:
                 logging.exception('exception occured at SelfTest.__read_sps2_data')
             finally:
@@ -155,13 +156,12 @@ class SelfTest(ft.Tabs):
             try:
                 if ws_client.is_online:
                     sps_data = f'sps: torque={gdata.configSPS.torque}, thrust={gdata.configSPS.thrust}, speed={gdata.configSPS.speed}'
-                    self.hmi_server_log.controls.append(ft.Text(f"HMI Server Data: {sps_data}"))
+                    self.append_log(self.hmi_server_log, f"HMI Server Data: {sps_data}")
                     if gdata.configCommon.amount_of_propeller == 2:
                         sps2_data = f'sps2: torque={gdata.configSPS2.torque}, thrust={gdata.configSPS2.thrust}, speed={gdata.configSPS2.speed}'
-                        self.hmi_server_log.controls.append(ft.Text(f"HMI Server Data: {sps2_data}"))
+                        self.append_log(self.hmi_server_log, f"HMI Server Data: {sps2_data}")
                 else:
-                    self.hmi_server_log.controls.append(ft.Text(f"Disconnected from HMI Server."))
-                self.hmi_server_log.update()
+                    self.append_log(self.hmi_server_log, "Disconnected from HMI Server.")
             except:
                 logging.exception('exception occured at SelfTest.__read_hmi_server_data')
             finally:
