@@ -7,6 +7,18 @@ from db.models.io_conf import IOConf
 from utils.alarm_saver import AlarmSaver
 
 
+# 寄存器映射表（高位在前、低位在后）
+REGISTER_MAP = {
+    # 功率配置区（4-20mA 对应范围）
+    "power_range_min": (12299, 12298),   # %MW11 (高), %MW10 (低)
+    "power_range_max": (12301, 12300),   # %MW13 (高), %MW12 (低)
+    "power_range_offset": (12303, 12302),# %MW15 (高), %MW14 (低)
+
+    # 实时功率（模拟量）
+    "instant_power": (12305, 12304)      # %MW17 (高), %MW16 (低)
+}
+
+
 class PlcSyncTask:
     def __init__(self):
         self._lock = asyncio.Lock()  # 连接锁，防止并发连接
@@ -41,9 +53,12 @@ class PlcSyncTask:
 
         try:
             return {
-                "power_range_min": await self.read_register(12298),
-                "power_range_max": await self.read_register(12299),
-                "power_range_offset": await self.read_register(12300),
+                # 功率范围 32 位
+                "power_range_min": await self.read_register_32(*REGISTER_MAP["power_range_min"]),
+                "power_range_max": await self.read_register_32(*REGISTER_MAP["power_range_max"]),
+                "power_range_offset": await self.read_register_32(*REGISTER_MAP["power_range_offset"]),
+
+                # 其他保持原逻辑
                 "torque_range_min": await self.read_register(12308),
                 "torque_range_max": await self.read_register(12309),
                 "torque_range_offset": await self.read_register(12310),
@@ -66,9 +81,12 @@ class PlcSyncTask:
         logging.info(f"[PLC] 写入 4-20mA 数据: {data}")
 
         try:
-            await self.plc_client.write_register(12298, int(data["power_range_min"]))
-            await self.plc_client.write_register(12299, int(data["power_range_max"]))
-            await self.plc_client.write_register(12300, int(data["power_range_offset"]))
+            # 功率相关（32 位）
+            await self.write_register_32(*REGISTER_MAP["power_range_min"], int(data["power_range_min"]))
+            await self.write_register_32(*REGISTER_MAP["power_range_max"], int(data["power_range_max"]))
+            await self.write_register_32(*REGISTER_MAP["power_range_offset"], int(data["power_range_offset"]))
+
+            # 其他保持原逻辑
             await self.plc_client.write_register(12308, int(data["torque_range_min"]))
             await self.plc_client.write_register(12309, int(data["torque_range_max"]))
             await self.plc_client.write_register(12310, int(data["torque_range_offset"]))
@@ -84,8 +102,8 @@ class PlcSyncTask:
     async def write_instant_data(self, power: float, torque: float, thrust: float, speed: float):
         """
         写入实时数据到PLC
-        - 返回 True 表示写入成功（可认为PLC在线）
-        - 返回 False 表示写入失败（PLC可能断线）
+        - 功率为 32 位，高位在前低位在后
+        - 其他保持原逻辑
         """
         if not self.is_connected():
             return False
@@ -96,7 +114,10 @@ class PlcSyncTask:
             _thrust = int(thrust / 100)
             _speed = int(speed * 10)
 
-            await self.plc_client.write_register(12301, _power)
+            # 写入功率（32 位）
+            await self.write_register_32(*REGISTER_MAP["instant_power"], _power)
+
+            # 其他保持原逻辑
             await self.plc_client.write_register(12311, _torque)
             await self.plc_client.write_register(12321, _thrust)
             await self.plc_client.write_register(12331, _speed)
@@ -133,9 +154,23 @@ class PlcSyncTask:
             logging.error(f"[PLC] 写入 EEXI 超限报警失败: {e}")
 
     async def read_register(self, address: int) -> Optional[int]:
-        """安全读取保持寄存器"""
         resp = await asyncio.wait_for(self.plc_client.read_holding_registers(address), timeout=2)
         return resp.registers[0] if not resp.isError() else None
+
+    async def read_register_32(self, high_addr: int, low_addr: int) -> Optional[int]:
+        """读取 32 位（高位在前）"""
+        high = await self.read_register(high_addr)
+        low = await self.read_register(low_addr)
+        if high is None or low is None:
+            return None
+        return (high << 16) | low
+
+    async def write_register_32(self, high_addr: int, low_addr: int, value: int):
+        """写入 32 位（高位在前）"""
+        high = (value >> 16) & 0xFFFF
+        low = value & 0xFFFF
+        await self.plc_client.write_register(high_addr, high)
+        await self.plc_client.write_register(low_addr, low)
 
     def is_connected(self) -> bool:
         """检查客户端是否可用"""
