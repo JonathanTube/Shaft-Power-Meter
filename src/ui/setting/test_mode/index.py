@@ -173,7 +173,7 @@ class TestMode(ft.Container):
             if not self.running:
                 return
 
-            test_mode_task.stop()
+            self.page.run_task(test_mode_task.stop)
             self.range_card.disable()
             self.page.close(self.dlg_stop_modal)
             self.running = False

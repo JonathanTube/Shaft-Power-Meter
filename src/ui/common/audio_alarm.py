@@ -23,11 +23,11 @@ class AudioAlarm(ft.Container):
                 bgcolor=ft.Colors.RED,
                 visible=False,
                 color=ft.Colors.WHITE,
-                on_click=lambda e: self.page.open(
-                    PermissionCheck(self.on_mute, 1))
+                on_click=lambda e: self.page.open(PermissionCheck(self.on_mute, 1))
             )
         except:
             logging.exception('exception occured at AudioAlarm.build')
+            self.content = ft.Text("")
 
     def show(self):
         try:
@@ -69,9 +69,12 @@ class AudioAlarm(ft.Container):
         except:
             logging.exception('exception occured at AudioAlarm.on_mute')
 
-    def notify_eexi_breach(self, occured):
-        if gdata.configCommon.is_master:
-            # write_eexi_breach_alarm内部会判断是否连接plc
-            self.page.run_task(plc.write_eexi_breach_alarm, occured)
-        else:
-            self.page.run_task(ws_client.send_eexi_breach_alarm_to_master, occured)
+    def notify_eexi_breach(self, occured: bool):
+        try:
+            if gdata.configCommon.is_master:
+                # 避免重复启动相同任务
+                self.page.run_task(plc.write_eexi_breach_alarm, occured)
+            else:
+                self.page.run_task(ws_client.send_eexi_breach_alarm_to_master, occured)
+        except Exception:
+            logging.exception("Exception in AudioAlarm.notify_eexi_breach")

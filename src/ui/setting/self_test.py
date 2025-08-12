@@ -10,7 +10,7 @@ from task.sps2_read_task import sps2_read_task
 
 
 class SelfTest(ft.Tabs):
-    MAX_LOG_LINES = 60  # 限制每个日志 ListView 的最大行数
+    MAX_LOG_LINES = 20  # 限制每个日志 ListView 的最大行数
 
     def __init__(self):
         super().__init__()
