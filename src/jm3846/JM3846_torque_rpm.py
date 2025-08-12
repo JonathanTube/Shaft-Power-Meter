@@ -3,6 +3,7 @@ import logging
 from common.global_data import gdata
 from jm3846.JM3846_calculator import JM3846Calculator
 from jm3846.JM3846_torque_rpm_util import JM3846TorqueRpmUtil
+from utils.unit_parser import UnitParser
 
 
 class JM3846TorqueRpm:
@@ -43,13 +44,14 @@ class JM3846TorqueRpm:
                     gdata.configSPS.ad0 = ch0_ad
                     gdata.configSPS.torque = self.cal_torque(ch0_ad)
                 if rpm:
-                    gdata.configSPS.speed = round(rpm / 10, 2)
+
+                    gdata.configSPS.speed = round(rpm / 10)
             else:
                 if ch0_ad:
                     gdata.configSPS2.ad0 = ch0_ad
                     gdata.configSPS2.torque = self.cal_torque(ch0_ad)
                 if rpm:
-                    gdata.configSPS2.speed = round(rpm / 10, 2)
+                    gdata.configSPS2.speed = round(rpm / 10)
 
         except:
             logging.exception(
