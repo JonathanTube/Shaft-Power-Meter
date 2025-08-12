@@ -169,6 +169,10 @@ class ZeroCalExecutorTorque(ft.Card):
                 self.fetch_button.disabled = False
                 self.fetch_button.update()
 
+            if self.abort_button and self.abort_button.page:
+                self.abort_button.visible = False
+                self.abort_button.update()
+
             for idx in range(0, 6, 1):
                 self.set_mv_per_v(idx, '')
 

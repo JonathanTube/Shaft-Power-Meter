@@ -118,9 +118,7 @@ class ZeroCalExecutorThrust(ft.Card):
                 self.on_abort_callback()
 
         except:
-            logging.exception(
-                "exception occured at ZeroCalExecutorThrust.on_abort"
-            )
+            logging.exception("exception occured at ZeroCalExecutorThrust.on_abort")
 
     async def on_tick(self):
         try:
