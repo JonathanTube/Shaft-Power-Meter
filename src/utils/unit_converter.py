@@ -3,52 +3,52 @@ import math
 
 class UnitConverter:
     @staticmethod
-    def kw_to_w(value: float):
+    def kw_to_w(value: float | int):
         # 1 kW = 1000 W
         return round(value * 1000)
 
     @staticmethod
-    def knm_to_nm(value: float):
+    def knm_to_nm(value: float | int):
         # 1 kNm = 1000 Nm
         return round(value * 1000)
 
     @staticmethod
-    def kn_to_n(value: float):
+    def kn_to_n(value: float | int):
         # 1 kN = 1000 N
         return round(value * 1000)
 
     # https://www.unitconverters.net/power/watts-to-hp.htm
     @staticmethod
-    def w_to_shp(value: float):
+    def w_to_shp(value: float | int):
         # 1 W = 0.0013596216 sHp
         return round(value * 0.0013596216)
 
     @staticmethod
-    def shp_to_w(value: float):
+    def shp_to_w(value: float | int):
         # 1 sHp = 735.4987593 W
         return round(value * 735.4987593)
 
     @staticmethod
-    def nm_to_tm(value: float):
+    def nm_to_tm(value: float | int):
         # 1 Nm = 0.0001019716213 Tm
         return round(value * 0.0001019716213)
 
     @staticmethod
-    def tm_to_nm(value: float):
+    def tm_to_nm(value: float | int):
         # 1 Tm = 9806.65 Nm
         return round(value * 9806.65)
 
     @staticmethod
-    def n_to_t(value: float):
+    def n_to_t(value: float | int):
         # 1 N = 0.0001019716213 T
         return round(value * 0.0001019716213)
 
     @staticmethod
-    def t_to_n(value: float):
+    def t_to_n(value: float | int):
         # 1 T = 9,806.649999 N
         return round(value * 9806.649999)
 
     @staticmethod
-    def kwh_to_shph(value: float):
+    def kwh_to_shph(value: float | int):
         # 1 kWh =  1.3410220896 sHp·h
         return round(value * 1.3410220896)

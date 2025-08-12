@@ -82,7 +82,7 @@ class SystemConfSettings(ft.Container):
                     visible=self.system_settings.sha_po_li,
                     read_only=True,
                     can_request_focus=False,
-                    on_click=lambda e: keyboard.open(e.control, 'float')
+                    on_click=lambda e: keyboard.open(e.control, 'int')
                 )
 
                 eexi_limited_power_value, eexi_limited_power_unit = self.__get_eexi_limited_power()
@@ -94,7 +94,7 @@ class SystemConfSettings(ft.Container):
                     visible=self.system_settings.sha_po_li,
                     read_only=True,
                     can_request_focus=False,
-                    on_click=lambda e: keyboard.open(e.control, 'float')
+                    on_click=lambda e: keyboard.open(e.control, 'int')
                 )
 
                 self.eexi_breach_checking_duration = ft.TextField(
@@ -159,17 +159,17 @@ class SystemConfSettings(ft.Container):
         self.enable_gps.value = False
         self.enable_gps.update()
 
-    def __get_unlimited_power(self) -> tuple[float, str]:
+    def __get_unlimited_power(self) -> tuple[int, str]:
         _unlimited_power = self.system_settings.unlimited_power
         if self.preference.system_unit == 0:
-            return (_unlimited_power / 1000, "kW")
+            return (round(_unlimited_power / 1000), "kW")
         else:
             return (UnitConverter.w_to_shp(_unlimited_power), "sHp")
 
-    def __get_eexi_limited_power(self) -> tuple[float, str]:
+    def __get_eexi_limited_power(self) -> tuple[int, str]:
         _eexi_limited_power = self.system_settings.eexi_limited_power
         if self.preference.system_unit == 0:
-            return (_eexi_limited_power / 1000, "kW")
+            return (round(_eexi_limited_power / 1000), "kW")
         else:
             return (UnitConverter.w_to_shp(_eexi_limited_power), "sHp")
 
@@ -204,11 +204,11 @@ class SystemConfSettings(ft.Container):
 
         unit = self.preference.system_unit
         if unit == 0:
-            self.system_settings.unlimited_power = float(self.unlimited_power.value) * 1000
-            self.system_settings.eexi_limited_power = float(self.eexi_limited_power.value) * 1000
+            self.system_settings.unlimited_power = self.unlimited_power.value * 1000
+            self.system_settings.eexi_limited_power = self.eexi_limited_power.value * 1000
         else:
-            self.system_settings.unlimited_power = UnitConverter.shp_to_w(float(self.unlimited_power.value))
-            self.system_settings.eexi_limited_power = UnitConverter.shp_to_w(float(self.eexi_limited_power.value))
+            self.system_settings.unlimited_power = UnitConverter.shp_to_w(self.unlimited_power.value)
+            self.system_settings.eexi_limited_power = UnitConverter.shp_to_w(self.eexi_limited_power.value)
 
         self.system_settings.eexi_breach_checking_duration = self.eexi_breach_checking_duration.value
 
