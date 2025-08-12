@@ -4,11 +4,11 @@ from db.models.data_log import DataLog
 from ui.common.datetime_search import DatetimeSearch
 from ui.home.trendview.diagram import TrendViewDiagram
 from ui.common.toast import Toast
-from db.models.system_settings import SystemSettings
 from db.models.date_time_conf import DateTimeConf
 import logging
 from typing import Literal
 from peewee import fn
+from common.global_data import gdata
 
 
 class TrendView(ft.Container):
@@ -17,8 +17,7 @@ class TrendView(ft.Container):
         self.expand = True
         self.padding = 10
 
-        system_settings: SystemSettings = SystemSettings.get()
-        self.is_twins = system_settings.amount_of_propeller == 2
+        self.is_twins = gdata.configCommon.amount_of_propeller == 2
         datetime_conf: DateTimeConf = DateTimeConf.get()
         self.date_format = datetime_conf.date_format
 

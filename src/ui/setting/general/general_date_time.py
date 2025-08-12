@@ -4,7 +4,6 @@ import logging
 import flet as ft
 from common.global_data import gdata
 from db.models.data_log import DataLog
-from db.models.system_settings import SystemSettings
 from ui.common.custom_card import CustomCard
 from db.models.date_time_conf import DateTimeConf
 from db.models.operation_log import OperationLog
@@ -17,7 +16,6 @@ class GeneralDateTime(ft.Container):
         super().__init__()
         self.expand = True
         self.date_time_conf: DateTimeConf = DateTimeConf.get()
-        self.system_settings: SystemSettings = SystemSettings.get()
 
     def build(self):
         try:
@@ -63,7 +61,7 @@ class GeneralDateTime(ft.Container):
                 self.sync_with_gps = ft.Checkbox(
                     label=s.get("lang.setting.sync_with_gps"),
                     col={"md": 6},
-                    visible=self.system_settings.enable_gps,
+                    visible=gdata.configCommon.enable_gps,
                     value=self.date_time_conf.sync_with_gps
                 )
 

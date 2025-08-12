@@ -2,9 +2,9 @@ import logging
 import flet as ft
 from utils.unit_parser import UnitParser
 from db.models.preference import Preference
-from db.models.system_settings import SystemSettings
 from common.global_data import gdata
 from typing import Literal
+from common.global_data import gdata
 
 
 class ThrustBlock(ft.Container):
@@ -15,19 +15,13 @@ class ThrustBlock(ft.Container):
         self.name = name
 
         self.system_unit = 0
-        self.visible = False
-
-        try:
-            preference: Preference = Preference.get()
-            self.system_unit = preference.system_unit
-
-            system_settings: SystemSettings = SystemSettings.get()
-            self.visible = system_settings.display_thrust
-        except:
-            pass
+        self.visible = gdata.configCommon.show_thrust
 
     def build(self):
         try:
+            preference: Preference = Preference.get()
+            self.system_unit = preference.system_unit
+            
             if self.page is None or self.page.session is None:
                 return
 
@@ -44,7 +38,6 @@ class ThrustBlock(ft.Container):
             )
         except:
             logging.exception('exception occured at ThrustBlock.build')
-
 
     def reload(self):
         try:

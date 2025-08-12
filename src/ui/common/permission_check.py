@@ -2,9 +2,9 @@ import asyncio
 import logging
 import flet as ft
 from typing import Callable
-from db.models.system_settings import SystemSettings
 from db.models.user import User
 from ui.common.toast import Toast
+from common.global_data import gdata
 
 
 class PermissionCheck(ft.AlertDialog):
@@ -19,8 +19,6 @@ class PermissionCheck(ft.AlertDialog):
         self.shadow_color = ft.Colors.PRIMARY
         self.elevation = 8
 
-        self.system_settings: SystemSettings = None
-
     def get_role_name(self):
         if self.user_role == 0:
             return "Admin"
@@ -33,7 +31,6 @@ class PermissionCheck(ft.AlertDialog):
 
     def build(self):
         try:
-            self.system_settings = asyncio.to_thread(SystemSettings.get)
             if self.page and self.page.session:
                 s = self.page.session
                 self.title = ft.Text(f"{self.get_role_name()}-{s.get('lang.permission.authentication')}")
@@ -94,7 +91,7 @@ class PermissionCheck(ft.AlertDialog):
             users = []
             if self.user_role == 0:  # admin rights
                 users = User.select().where(User.user_role == 0).execute()
-            elif self.system_settings.hide_admin_account:
+            elif gdata.configCommon.hide_admin_account:
                 users = User.select().where(User.user_role <= self.user_role, User.user_role > 0).execute()
             else:
                 users = User.select().where(User.user_role <= self.user_role).execute()

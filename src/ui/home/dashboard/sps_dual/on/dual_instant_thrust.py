@@ -6,6 +6,7 @@ from utils.unit_parser import UnitParser
 from db.models.system_settings import SystemSettings
 from common.global_data import gdata
 from db.models.preference import Preference
+from common.global_data import gdata
 
 
 class DualInstantThrust(ft.Container):
@@ -17,19 +18,15 @@ class DualInstantThrust(ft.Container):
         self.font_size_of_value = 16
         self.font_size_of_unit = 12
 
-        self.visible = False
-        self.unit = 0
-        try:
-            system_settings: SystemSettings = SystemSettings.get()
-            self.visible = system_settings.display_thrust
+        self.visible = gdata.configCommon.show_thrust
 
-            preference: Preference = Preference.get()
-            self.unit = preference.system_unit
-        except:
-            pass
+        self.unit = 0
 
     def build(self):
         try:
+            preference: Preference = Preference.get()
+            self.unit = preference.system_unit
+
             if self.page is None or self.page.session is None:
                 return
 
@@ -72,12 +69,11 @@ class DualInstantThrust(ft.Container):
         except:
             logging.exception('exception occured at DualInstantThrust.reload')
 
-
     def __create_thrust_sps(self):
         try:
             if self.page is None or self.page.session is None:
                 return
-    
+
             self.sps_label = ft.Text(
                 value=self.page.session.get("lang.common.sps"),
                 text_align=ft.TextAlign.RIGHT,
@@ -92,7 +88,7 @@ class DualInstantThrust(ft.Container):
                 weight=ft.FontWeight.W_500
             )
             self.thrust_sps_unit = ft.Text(
-                value='kN', 
+                value='kN',
                 width=40,
                 text_align=ft.TextAlign.LEFT,
                 size=self.font_size_of_unit,
@@ -111,8 +107,8 @@ class DualInstantThrust(ft.Container):
     def __create_thrust_sps2(self):
         try:
             if self.page is None or self.page.session is None:
-                    return
-        
+                return
+
             self.sps2_label = ft.Text(
                 value=self.page.session.get("lang.common.sps2"),
                 text_align=ft.TextAlign.END,
@@ -127,7 +123,7 @@ class DualInstantThrust(ft.Container):
                 weight=ft.FontWeight.W_500
             )
             self.thrust_sps2_unit = ft.Text(
-                value='kN', 
+                value='kN',
                 width=40,
                 text_align=ft.TextAlign.LEFT,
                 size=self.font_size_of_unit,

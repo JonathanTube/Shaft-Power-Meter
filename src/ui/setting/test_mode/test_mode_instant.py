@@ -1,7 +1,6 @@
 import logging
 import flet as ft
 import asyncio
-from db.models.system_settings import SystemSettings
 from db.models.preference import Preference
 from ui.common.custom_card import CustomCard
 from common.global_data import gdata
@@ -11,7 +10,6 @@ from utils.unit_parser import UnitParser
 class TestModeInstant(ft.ResponsiveRow):
     def __init__(self):
         super().__init__()
-        self.system_settings: SystemSettings = SystemSettings.get()
         preference: Preference = Preference.get()
         self.system_unit = preference.system_unit
 
@@ -38,7 +36,7 @@ class TestModeInstant(ft.ResponsiveRow):
                         self.sps_power
                     ]
                 )
-                if self.system_settings.amount_of_propeller == 1:
+                if gdata.configCommon.amount_of_propeller == 1:
                     self.controls = [
                         CustomCard(f'sps {self.page.session.get('lang.setting.test_mode.instant_mock_data')}', self.sps_instant_data_card)
                     ]
@@ -99,7 +97,7 @@ class TestModeInstant(ft.ResponsiveRow):
                     self.sps_power.value = f'{sps_power_value} {sps_power_unit}'
                     self.sps_power.update()
 
-                if self.system_settings.amount_of_propeller == 2:
+                if gdata.configCommon.amount_of_propeller == 2:
                     if self.sps2_speed and self.sps2_speed.page:
                         self.sps2_speed.value = f'{gdata.sps2_speed} rpm'
                         self.sps2_speed.update()

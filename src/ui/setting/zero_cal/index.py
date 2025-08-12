@@ -4,7 +4,7 @@ import flet as ft
 from ui.setting.zero_cal.zero_cal_executor_sps import ZeroCalExecutorSPS
 from ui.setting.zero_cal.zero_cal_executor_sps2 import ZeroCalExecutorSPS2
 from ui.setting.zero_cal.zero_cal_his import ZeroCalHis
-from db.models.system_settings import SystemSettings
+from common.global_data import gdata
 
 
 class ZeroCal(ft.Container):
@@ -12,7 +12,6 @@ class ZeroCal(ft.Container):
         super().__init__()
         self.expand = True
         self.alignment = ft.alignment.center
-        self.system_settings: SystemSettings = SystemSettings.get()
 
     def __on_change(self, e):
         data = int(e.data)
@@ -22,7 +21,7 @@ class ZeroCal(ft.Container):
     def build(self):
         try:
             if self.page and self.page.session:
-                if not self.system_settings.is_master:
+                if not gdata.configCommon.is_master:
                     self.content = ft.Text(value=self.page.session.get('lang.setting.zero_cal.disabled'), size=20)
                     return
 
@@ -52,7 +51,7 @@ class ZeroCal(ft.Container):
                     self.executor_sps
                 ]
 
-                if self.system_settings.amount_of_propeller > 1:
+                if gdata.configCommon.amount_of_propeller > 1:
                     tabs.append(self.executor_sps2)
 
                 self.content = ft.Tabs(

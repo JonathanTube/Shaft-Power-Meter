@@ -3,11 +3,11 @@ from fpdf import FPDF
 from db.models.event_log import EventLog
 from db.models.report_info import ReportInfo
 from db.models.ship_info import ShipInfo
-from db.models.system_settings import SystemSettings
 from db.models.preference import Preference
 from db.models.report_detail import ReportDetail
 from utils.unit_parser import UnitParser
 from db.models.date_time_conf import DateTimeConf
+from common.global_data import gdata
 
 
 class ReportInfoExporter(FPDF):
@@ -25,9 +25,8 @@ class ReportInfoExporter(FPDF):
         try:
             self.ship_info: ShipInfo = ShipInfo.get()
             self.preference: Preference = Preference.get()
-            self.system_settings: SystemSettings = SystemSettings.get()
 
-            self.is_dual = self.system_settings.amount_of_propeller == 2
+            self.is_dual = gdata.configCommon.amount_of_propeller == 2
             self.report_info: ReportInfo = ReportInfo.get_by_id(id)
             self.event_log: EventLog = self.report_info.event_log
             self.report_details: list[ReportDetail] = ReportDetail.select().where(
@@ -54,8 +53,8 @@ class ReportInfoExporter(FPDF):
         except:
             logging.exception('exception occured at ReportInfoExporter.__load_data')
 
-
     # 设置标题
+
     def __handle_report_title(self):
         # 设置字体和样式
         self.set_font(family="Arial", style='B', size=16)
@@ -81,12 +80,12 @@ class ReportInfoExporter(FPDF):
 
         system_unit = self.preference.system_unit
         self.__insert_label("Un-limited Power", w=self.per_cell_width)
-        unlimited_power = self.system_settings.unlimited_power
+        unlimited_power = gdata.configCommon.unlimited_power
         unlimited_power, unlimited_unit = UnitParser.parse_power(unlimited_power, system_unit, shrink=False)
         self.__insert_value(f"{unlimited_power} {unlimited_unit}", w=self.per_cell_width)
 
         self.__insert_label("Limited Power", w=self.per_cell_width)
-        limited_power = self.system_settings.eexi_limited_power
+        limited_power = gdata.configCommon.eexi_limited_power
         limited_power, limited_unit = UnitParser.parse_power(limited_power, system_unit, shrink=False)
         self.__insert_value(f"{limited_power} {limited_unit}", w=self.per_cell_width)
         self.ln()

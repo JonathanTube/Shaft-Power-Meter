@@ -1,8 +1,6 @@
 import asyncio
 import logging
 import flet as ft
-from db.models.io_conf import IOConf
-from db.models.system_settings import SystemSettings
 from task.plc_sync_task import plc
 from task.gps_sync_task import gps
 from websocket.websocket_slave import ws_client
@@ -22,13 +20,8 @@ class SelfTest(ft.Tabs):
 
         self.task_running = False
 
-        self.system_settings: SystemSettings = None
-        self.conf: IOConf = None
-
     def build(self):
         try:
-            self.system_settings = asyncio.to_thread(SystemSettings.get)
-            self.conf = asyncio.to_thread(IOConf.get)
             if self.page and self.page.session:
                 self.plc_log = ft.ListView(
                     padding=10, auto_scroll=True, height=500, spacing=5, expand=True)
@@ -46,11 +39,11 @@ class SelfTest(ft.Tabs):
                     padding=10, auto_scroll=True, height=500, spacing=5, expand=True)
 
                 self.tabs = [
-                    ft.Tab(text="SPS", content=self.sps_log, visible=self.system_settings.is_master),
-                    ft.Tab(text="SPS2", content=self.sps2_log, visible=self.system_settings.is_master and self.system_settings.amount_of_propeller == 2),
-                    ft.Tab(text="HMI Server", content=self.hmi_server_log, visible=not self.system_settings.is_master),
-                    ft.Tab(text="GPS", content=self.gps_log, visible=self.system_settings.enable_gps),
-                    ft.Tab(text="PLC", content=self.plc_log, visible=self.conf.plc_enabled)
+                    ft.Tab(text="SPS", content=self.sps_log, visible=gdata.configCommon.is_master),
+                    ft.Tab(text="SPS2", content=self.sps2_log, visible=gdata.configCommon.is_master and gdata.configCommon.amount_of_propeller == 2),
+                    ft.Tab(text="HMI Server", content=self.hmi_server_log, visible=not gdata.configCommon.is_master),
+                    ft.Tab(text="GPS", content=self.gps_log, visible=gdata.configCommon.enable_gps),
+                    ft.Tab(text="PLC", content=self.plc_log, visible=gdata.configCommon.enable_plc)
                 ]
         except:
             logging.exception('exception occured at SelfTest.build')
@@ -58,26 +51,26 @@ class SelfTest(ft.Tabs):
     def did_mount(self):
         self.task_running = True
 
-        if self.conf.plc_enabled:
+        if gdata.configCommon.enable_plc:
             self.plc_task = self.page.run_task(self.__read_plc_data)
 
-        if self.system_settings.is_master:
+        if gdata.configCommon.is_master:
             self.sps_task = self.page.run_task(self.__read_sps_data)
             if gdata.configCommon.amount_of_propeller == 2:
                 self.sps2_task = self.page.run_task(self.__read_sps2_data)
         else:
             self.hmi_server_task = self.page.run_task(self.__read_hmi_server_data)
 
-        if self.system_settings.enable_gps:
+        if gdata.configCommon.enable_gps:
             self.gps_task = self.page.run_task(self.__read_gps_data)
 
     def will_unmount(self):
         self.task_running = False
 
-        if self.conf.plc_enabled and self.plc_task:
+        if gdata.configCommon.enable_plc and self.plc_task:
             self.plc_task.cancel()
 
-        if self.system_settings.is_master:
+        if gdata.configCommon.is_master:
             if self.sps_task:
                 self.sps_task.cancel()
 
@@ -86,7 +79,7 @@ class SelfTest(ft.Tabs):
         elif self.hmi_server_task:
             self.hmi_server_task.cancel()
 
-        if self.system_settings.enable_gps and self.gps_task:
+        if gdata.configCommon.enable_gps and self.gps_task:
             self.gps_task.cancel()
 
     async def __read_plc_data(self):

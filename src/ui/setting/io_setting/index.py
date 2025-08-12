@@ -2,7 +2,6 @@ import asyncio
 import logging
 import flet as ft
 from db.models.io_conf import IOConf
-from db.models.system_settings import SystemSettings
 from db.models.user import User
 from ui.common.toast import Toast
 from ui.common.permission_check import PermissionCheck
@@ -25,12 +24,10 @@ class IOSetting(ft.Container):
         self.is_saving = False
         self.task_running = False
         self.loop_task = None
-        self.system_settings: SystemSettings = None
         self.conf: IOConf = None
 
     def build(self):
         try:
-            self.system_settings = SystemSettings.get()
             self.conf = IOConf.get()
             if self.page and self.page.session:
                 self.output_conf = IOSettingOutput(self.conf)
@@ -48,16 +45,16 @@ class IOSetting(ft.Container):
 
                 controls = []
 
-                if self.system_settings.enable_gps:
+                if gdata.configCommon.enable_gps:
                     self.gps_conf = IOSettingGPS(self.conf)
                     controls.append(self.gps_conf)
 
-                if self.system_settings.is_master:
+                if gdata.configCommon.is_master:
                     self.plc_conf = IOSettingPLC(self.conf)
                     controls.append(self.plc_conf)
                     self.sps_conf = IOSettingSPS(self.conf)
                     controls.append(self.sps_conf)
-                    if not self.system_settings.is_individual:
+                    if not gdata.configCommon.is_individual:
                         self.master_server_conf = IOSettingMasterServer()
                         controls.append(self.master_server_conf)
                 else:
@@ -88,13 +85,13 @@ class IOSetting(ft.Container):
             self.is_saving = True
             self.__change_buttons()
 
-            if self.system_settings.is_master:
+            if gdata.configCommon.is_master:
                 self.plc_conf.save_data()
                 self.sps_conf.save_data()
             else:
                 self.interface_conf.save_data()
 
-            if self.system_settings.enable_gps:
+            if gdata.configCommon.enable_gps:
                 self.gps_conf.save_data()
 
             self.output_conf.save_data()
@@ -116,7 +113,7 @@ class IOSetting(ft.Container):
     def __reset_data(self, e):
         try:
             keyboard.close()
-            self.conf = asyncio.to_thread(IOConf.get)
+            self.conf = IOConf.get()
             self.content.clean()
             self.build()
             Toast.show_success(e.page)

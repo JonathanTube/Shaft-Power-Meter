@@ -3,7 +3,6 @@ import flet as ft
 from ui.common.simple_card import SimpleCard
 from utils.unit_parser import UnitParser
 from db.models.preference import Preference
-from db.models.system_settings import SystemSettings
 from common.global_data import gdata
 
 
@@ -13,8 +12,7 @@ class SingleInstantThrust(ft.Container):
         self.expand = True
         preference: Preference = Preference.get()
         self.system_unit = preference.system_unit
-        system_settings: SystemSettings = SystemSettings.get()
-        self.visible = system_settings.display_thrust
+        self.visible = gdata.configCommon.show_thrust
 
     def build(self):
         try:

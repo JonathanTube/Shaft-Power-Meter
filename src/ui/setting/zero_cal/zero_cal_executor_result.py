@@ -1,16 +1,12 @@
 import logging
 import flet as ft
-
-from db.models.system_settings import SystemSettings
+from common.global_data import gdata
 
 
 class ZeroCalExecutorResult(ft.Card):
     def __init__(self, name: str):
         super().__init__()
         self.name = name
-
-        system_settings: SystemSettings = SystemSettings.get()
-        self.display_thrust = system_settings.display_thrust
 
     def build(self):
         try:
@@ -21,7 +17,7 @@ class ZeroCalExecutorResult(ft.Card):
                 ft.Text(self.page.session.get("lang.zero_cal.new_torque_offset")),
                 self.torque_offset
             ]
-            if self.display_thrust:
+            if gdata.configCommon.show_thrust:
                 controls.append(ft.Text(self.page.session.get("lang.zero_cal.new_thrust_offset")))
                 controls.append(self.thrust_offset)
 

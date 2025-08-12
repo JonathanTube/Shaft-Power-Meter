@@ -1,6 +1,5 @@
 import logging
 import flet as ft
-from db.models.system_settings import SystemSettings
 from db.models.zero_cal_info import ZeroCalInfo
 from ui.common.permission_check import PermissionCheck
 from ui.setting.zero_cal.zero_cal_executor_result import ZeroCalExecutorResult
@@ -21,8 +20,7 @@ class ZeroCalExecutor(ft.Container):
         self.torque_offset = 0
         self.thrust_offset = 0
 
-        system_settings: SystemSettings = SystemSettings.get()
-        self.display_thrust = system_settings.display_thrust
+        self.display_thrust = gdata.configCommon.show_thrust
 
     def build(self):
         try:

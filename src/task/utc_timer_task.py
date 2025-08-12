@@ -26,6 +26,8 @@ class UtcTimerTask:
 
             while self.task_running:
                 try:
+                    if gdata.configDateTime.utc is None:
+                        continue
                     # UTC时间 +1秒
                     gdata.configDateTime.utc = gdata.configDateTime.utc + timedelta(seconds=1)
                     gdata.configDateTime.system = datetime.now()

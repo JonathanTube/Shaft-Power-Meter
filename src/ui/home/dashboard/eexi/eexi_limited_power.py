@@ -1,7 +1,6 @@
 import logging
 import flet as ft
 from ui.common.meter_half import MeterHalf
-from db.models.system_settings import SystemSettings
 from common.global_data import gdata
 
 
@@ -13,10 +12,8 @@ class EEXILimitedPower(ft.Container):
         self.container_width = width
         self.container_height = height
 
-        system_settings: SystemSettings = SystemSettings.get()
-
-        self.unlimited_power = system_settings.unlimited_power
-        self.eexi_power = system_settings.eexi_limited_power
+        self.unlimited_power = gdata.configCommon.unlimited_power
+        self.eexi_power = gdata.configCommon.eexi_limited_power
         self.normal_power = self.eexi_power * 0.9
 
     def build(self):

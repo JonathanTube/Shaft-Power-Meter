@@ -23,11 +23,11 @@ class SystemConfSettings(ft.Container):
         try:
             if self.page and self.page.session:
                 self.mode_master = ft.Radio(
-                    value='master', 
+                    value='master',
                     label=self.page.session.get("lang.setting.master")
                 )
                 self.mode_slave = ft.Radio(
-                    value='slave', 
+                    value='slave',
                     label=self.page.session.get("lang.setting.slave")
                 )
                 self.running_mode = ft.RadioGroup(
@@ -165,7 +165,6 @@ class SystemConfSettings(ft.Container):
             return (_unlimited_power / 1000, "kW")
         else:
             return (UnitConverter.w_to_shp(_unlimited_power), "sHp")
-        
 
     def __get_eexi_limited_power(self) -> tuple[float, str]:
         _eexi_limited_power = self.system_settings.eexi_limited_power
@@ -194,10 +193,8 @@ class SystemConfSettings(ft.Container):
         # 如果运行模式被切换
         if is_master_new != is_master_old or is_individual_new != is_individual_old or enable_gps_new != enable_gps_old:
             self.system_settings.save()
-            gdata.configCommon.is_master = self.system_settings.is_master
-            gdata.configCommon.enable_gps = self.system_settings.enable_gps
+            gdata.set_default_value()
             raise SystemError("running mode changed")
-
 
         self.system_settings.amount_of_propeller = self.amount_of_propeller_radios.value
         self.system_settings.display_thrust = self.display_thrust.value
@@ -210,24 +207,14 @@ class SystemConfSettings(ft.Container):
             self.system_settings.unlimited_power = float(self.unlimited_power.value) * 1000
             self.system_settings.eexi_limited_power = float(self.eexi_limited_power.value) * 1000
         else:
-            self.system_settings.unlimited_power =  UnitConverter.shp_to_w(float(self.unlimited_power.value))
+            self.system_settings.unlimited_power = UnitConverter.shp_to_w(float(self.unlimited_power.value))
             self.system_settings.eexi_limited_power = UnitConverter.shp_to_w(float(self.eexi_limited_power.value))
 
         self.system_settings.eexi_breach_checking_duration = self.eexi_breach_checking_duration.value
 
         self.system_settings.save()
 
-        gdata.configCommon.is_master = self.system_settings.is_master
-
-        gdata.configCommon.enable_gps = self.system_settings.enable_gps
-
-        gdata.configCommon.amount_of_propeller = self.system_settings.amount_of_propeller
-
-        gdata.configCommon.shapoli = self.system_settings.sha_po_li
-
-        gdata.configCommon.eexi_breach_checking_duration = int(self.system_settings.eexi_breach_checking_duration)
-
-        gdata.configCommon.eexi_limited_power = float(self.system_settings.eexi_limited_power)
+        gdata.set_default_value()
 
         OperationLog.create(
             user_id=user.id,

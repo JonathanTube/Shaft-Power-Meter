@@ -12,7 +12,7 @@ from ui.home.logs.index import Logs
 from ui.home.propeller_curve.index import PropellerCurve
 from ui.home.trendview.index import TrendView
 from ui.home.event.index import EventList
-from db.models.system_settings import SystemSettings
+from common.global_data import gdata
 
 
 class Home(ft.Container):
@@ -23,8 +23,6 @@ class Home(ft.Container):
         self.current_index = 0
 
         self.is_switching = False
-
-        self.system_settings: SystemSettings = SystemSettings.get()
 
         self.default_button_style = ft.ButtonStyle(
             shape=ft.RoundedRectangleBorder(radius=ft.border_radius.all(10)),
@@ -65,7 +63,7 @@ class Home(ft.Container):
                 icon=ft.Icons.STACKED_LINE_CHART_OUTLINED,
                 icon_color=ft.Colors.INVERSE_SURFACE,
                 style=self.default_button_style,
-                visible=self.system_settings.display_propeller_curve,
+                visible=gdata.configCommon.show_propeller_curve,
                 on_click=lambda e: self.__on_click(3)
             )
             self.alarm_button = AlarmButton(style=self.default_button_style, on_click=lambda _: self.__on_click(4))

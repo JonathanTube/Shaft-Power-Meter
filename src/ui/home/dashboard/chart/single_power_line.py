@@ -5,7 +5,6 @@ from ui.common.simple_card import SimpleCard
 from utils.unit_parser import UnitParser
 from common.global_data import gdata
 from db.models.preference import Preference
-from db.models.system_settings import SystemSettings
 from db.models.limitations import Limitations
 
 
@@ -15,22 +14,21 @@ class SinglePowerLine(ft.Container):
 
         self.expand = True
 
+        self.chart = None
+
         preference: Preference = Preference.get()
         self.system_unit = preference.system_unit
 
-        system_settings: SystemSettings = SystemSettings.get()
-        self.sha_po_li = system_settings.sha_po_li
-
-        if self.sha_po_li:
-            self.threshold_power = system_settings.eexi_limited_power
-            self.max_power = system_settings.unlimited_power
-        else:
-            limitations: Limitations = Limitations.get()
-            self.threshold_power = limitations.power_warning
-            self.max_power = limitations.power_max
+        self.threshold_power = gdata.configCommon.eexi_limited_power
+        self.max_power = gdata.configCommon.unlimited_power
 
     def build(self):
         try:
+            if not gdata.configCommon.shapoli:
+                limitations: Limitations = Limitations.get()
+                self.threshold_power = limitations.power_warning
+                self.max_power = limitations.power_max
+
             self.data_line = ft.LineChartData(
                 above_line_bgcolor=ft.Colors.SURFACE,
                 curved=False,
@@ -40,14 +38,14 @@ class SinglePowerLine(ft.Container):
             )
 
             self.threshold_filled = ft.LineChartData(
-                visible=self.sha_po_li,
+                visible=gdata.configCommon.shapoli,
                 above_line_bgcolor=ft.Colors.RED,
                 color=ft.Colors.TRANSPARENT,
                 data_points=[]
             )
 
             self.threshold_line = ft.LineChartData(
-                visible=self.sha_po_li,
+                visible=gdata.configCommon.shapoli,
                 color=ft.Colors.RED,
                 stroke_width=1,
                 data_points=[]
@@ -108,7 +106,7 @@ class SinglePowerLine(ft.Container):
 
             if self.threshold_filled:
                 self.threshold_filled.data_points = self.get_threshold_data()
-            
+
             if self.threshold_line:
                 self.threshold_line.data_points = self.get_threshold_data()
 
@@ -141,7 +139,6 @@ class SinglePowerLine(ft.Container):
                     self.chart.bottom_axis.labels_interval = (len(labels) + size) // size
         except:
             logging.exception('exception occured at SinglePowerLine.__handle_bottom_axis')
-
 
     def __handle_data_line(self):
         try:
@@ -180,4 +177,3 @@ class SinglePowerLine(ft.Container):
             logging.exception('exception occured at SinglePowerLine.__handle_data_line')
 
         return []
-

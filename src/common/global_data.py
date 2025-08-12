@@ -1,6 +1,7 @@
 from dataclasses import dataclass, field
 from datetime import datetime
 from db.models.factor_conf import FactorConf
+from db.models.io_conf import IOConf
 from db.models.offline_default_value import OfflineDefaultValue
 from db.models.system_settings import SystemSettings
 from db.models.propeller_setting import PropellerSetting
@@ -11,10 +12,27 @@ from db.models.zero_cal_info import ZeroCalInfo
 @dataclass
 class ConfigCommon:
     is_master = False
+
+    is_individual = False
+
+    enable_gps = False
+
+    hide_admin_account = False
+
     amount_of_propeller = 1
+
     shapoli = False
-    eexi_breach_checking_duration = 5
+
+    enable_plc = False
+
+    show_thrust = False
+
+    show_propeller_curve = False
+
     eexi_limited_power = 999999
+    unlimited_power = 999999
+
+    eexi_breach_checking_duration = 5
 
     default_table_width = 990
     is_overload_alarm = False
@@ -22,10 +40,19 @@ class ConfigCommon:
     def set_default_value(self):
         systemSettings: SystemSettings = SystemSettings.get()
         self.is_master = systemSettings.is_master
+        self.enable_gps = systemSettings.enable_gps
+        self.hide_admin_account = systemSettings.hide_admin_account
         self.amount_of_propeller = systemSettings.amount_of_propeller
         self.shapoli = systemSettings.sha_po_li
         self.eexi_breach_checking_duration = systemSettings.eexi_breach_checking_duration
         self.eexi_limited_power = systemSettings.eexi_limited_power
+        self.unlimited_power = systemSettings.unlimited_power
+        self.show_thrust = systemSettings.display_thrust
+        self.show_propeller_curve = systemSettings.display_propeller_curve
+        self.is_individual = systemSettings.is_individual
+
+        io_conf: IOConf = IOConf.get()
+        self.enable_plc = io_conf.plc_enabled
 
 
 @dataclass
@@ -38,6 +65,8 @@ class ConfigDateTime:
     def set_default_value(self):
         dateTimeConf: DateTimeConf = DateTimeConf.get()
         self.sync_with_gps = dateTimeConf.sync_with_gps
+        self.utc = dateTimeConf.utc_date_time
+        self.system = dateTimeConf.system_date_time
 
 
 @dataclass

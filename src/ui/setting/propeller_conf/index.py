@@ -5,7 +5,6 @@ from db.models.operation_log import OperationLog
 from common.operation_type import OperationType
 from common.global_data import gdata
 from playhouse.shortcuts import model_to_dict
-from db.models.system_settings import SystemSettings
 from db.models.user import User
 from ui.common.keyboard import keyboard
 from ui.common.permission_check import PermissionCheck
@@ -24,21 +23,20 @@ class PropellerConf(ft.Container):
         super().__init__()
         self.expand = True
         self.alignment = ft.alignment.center
-        self.system_settings: SystemSettings = SystemSettings.get()
         self.ps: PropellerSetting = PropellerSetting.get()
         self.is_saving = False
 
     def build(self):
         if self.page and self.page.session:
             try:
-                if not self.system_settings.is_master:
+                if not gdata.configCommon.is_master:
                     self.content = ft.Text(
                         value=self.page.session.get('lang.propeller_curve.disabled_under_slave_mode'),
                         size=20
                     )
                     return
 
-                if not self.system_settings.display_propeller_curve:
+                if not gdata.configCommon.show_propeller_curve:
                     self.content = ft.Text(
                         self.page.session.get('lang.propeller_curve.propeller_curve_disabled')
                     )
@@ -69,7 +67,7 @@ class PropellerConf(ft.Container):
                     self.page.session.get("lang.button.push_to_slave"),
                     height=40,
                     icon_color=ft.Colors.GREEN,
-                    visible=self.system_settings.is_master and not self.system_settings.is_individual,
+                    visible=gdata.configCommon.is_master and not gdata.configCommon.is_individual,
                     icon=ft.Icons.SYNC_OUTLINED,
                     on_click=self.__on_push
                 )

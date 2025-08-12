@@ -2,16 +2,16 @@ import logging
 import flet as ft
 from utils.unit_parser import UnitParser
 from db.models.preference import Preference
-from db.models.system_settings import SystemSettings
+from common.global_data import gdata
 
 
 class PowerUnlimited(ft.Container):
     def __init__(self):
         super().__init__()
         self.expand = True
-        system_settings: SystemSettings = SystemSettings.get()
-        self.is_dual = system_settings.amount_of_propeller == 2
-        self.power = system_settings.unlimited_power
+
+        self.is_dual = gdata.configCommon.amount_of_propeller == 2
+        self.power = gdata.configCommon.unlimited_power
 
         preference: Preference = Preference.get()
         self.system_unit = preference.system_unit
@@ -46,4 +46,3 @@ class PowerUnlimited(ft.Container):
                 ))
         except:
             logging.exception('exception occured at PowerUnlimited.build')
-

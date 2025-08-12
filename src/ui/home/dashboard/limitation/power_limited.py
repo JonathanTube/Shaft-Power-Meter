@@ -2,21 +2,23 @@ import logging
 import flet as ft
 from utils.unit_parser import UnitParser
 from db.models.preference import Preference
-from db.models.system_settings import SystemSettings
+from common.global_data import gdata
 
 
 class PowerLimited(ft.Container):
     def __init__(self):
         super().__init__()
         self.expand = True
-        preference: Preference = Preference.get()
-        self.system_unit = preference.system_unit
 
-        system_settings: SystemSettings = SystemSettings.get()
-        self.power = system_settings.eexi_limited_power
+        self.system_unit = 0
+
+        self.power = gdata.configCommon.eexi_limited_power
 
     def build(self):
         try:
+            preference: Preference = Preference.get()
+            self.system_unit = preference.system_unit
+
             if self.page is None or self.page.session is None:
                 return
 
