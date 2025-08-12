@@ -115,7 +115,7 @@ class InterfaceConf(ft.Container):
                 operation_type=OperationType.DISCONNECT_FROM_HMI_SERVER,
                 operation_content=user.user_name
             )
-            self.page.run_task(ws_client.close)
+            self.page.run_task(ws_client.stop)
             AlarmSaver.create(AlarmType.SLAVE_MASTER)
         except: 
             logging.exception("exception occured at InterfaceConf.__on_close")
