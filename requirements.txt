@@ -9,3 +9,4 @@ pymodbus==3.8.6
 screen_brightness_control==0.24.2
 pandas==2.2.3
 winshell==0.6
+websockets==15.0.1
