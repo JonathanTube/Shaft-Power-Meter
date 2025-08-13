@@ -15,9 +15,9 @@ class SystemSettings(BaseModel):
 
     sha_po_li = BooleanField(verbose_name="是否开启ShaPoLi功能", default=False)
 
-    unlimited_power = FloatField(null=False, verbose_name="最大功率")
+    unlimited_power = IntegerField(null=False, verbose_name="最大功率")
 
-    eexi_limited_power = FloatField(null=False, verbose_name="EEXI 限制最大功率")
+    eexi_limited_power = IntegerField(null=False, verbose_name="EEXI 限制最大功率")
 
     eexi_breach_checking_duration = IntegerField(null=False, verbose_name="EEXI 超限检查时长")
 

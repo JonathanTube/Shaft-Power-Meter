@@ -41,9 +41,15 @@ class JM3846AsyncClient(ABC):
                 await JM38460x44.handle(self.name, self.reader, self.writer, self.set_online, self.set_offline)
 
             except ConnectionRefusedError as e:
-                logging.error(f'[JM3846-{self.name}] connect refused error {e}')
+                logging.error(f'[JM3846-{self.name}] 连接被拒绝: {e}')
+            except asyncio.TimeoutError:
+                logging.info(f'[JM3846-{self.name}] 连接超时')
+                pass
+            except asyncio.CancelledError:
+                logging.info(f'[JM3846-{self.name}] 连接任务被取消')
+                break
             except Exception as e:
-                logging.exception(f'[JM3846-{self.name}] connect error {e}')
+                logging.exception(f'[JM3846-{self.name}] 连接异常: {e}')
 
             await self.release()
             await asyncio.sleep(5)  # 固定 5 秒重试

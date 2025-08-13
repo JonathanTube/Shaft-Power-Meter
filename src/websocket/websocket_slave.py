@@ -138,19 +138,19 @@ class WebSocketSlave:
             if name == 'sps':
                 gdata.configSPS.torque = data['torque']
             elif name == 'sps2':
-                gdata.configSPS2.sps2_torque = data['torque']
+                gdata.configSPS2.torque = data['torque']
 
         if 'thrust' in data:
             if name == 'sps':
                 gdata.configSPS.thrust = data['thrust']
             elif name == 'sps2':
-                gdata.configSPS2.sps2_thrust = data['thrust']
+                gdata.configSPS2.thrust = data['thrust']
 
         if 'rpm' in data:
             if name == 'sps':
                 gdata.configSPS.speed = data['rpm']
             elif name == 'sps2':
-                gdata.configSPS2.sps2_speed = data['rpm']
+                gdata.configSPS2.speed = data['rpm']
 
     def __handle_propeller_setting(self, settings):
         data = settings['data']

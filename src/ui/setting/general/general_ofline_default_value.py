@@ -27,7 +27,7 @@ class GeneralOflineDefaultValue(ft.Container):
                     col={"xs": 6},
                     read_only=True,
                     can_request_focus=False,
-                    on_click=lambda e: keyboard.open(e.control))
+                    on_click=lambda e: keyboard.open(e.control, type="int"))
 
                 self.thrust_default_value = ft.TextField(
                     suffix_text="N",
@@ -36,7 +36,7 @@ class GeneralOflineDefaultValue(ft.Container):
                     col={"xs": 6},
                     read_only=True,
                     can_request_focus=False,
-                    on_click=lambda e: keyboard.open(e.control))
+                    on_click=lambda e: keyboard.open(e.control, type="int"))
 
                 self.speed_default_value = ft.TextField(
                     suffix_text="rpm",
@@ -45,7 +45,7 @@ class GeneralOflineDefaultValue(ft.Container):
                     col={"xs": 6},
                     read_only=True,
                     can_request_focus=False,
-                    on_click=lambda e: keyboard.open(e.control))
+                    on_click=lambda e: keyboard.open(e.control, type="int"))
 
                 self.custom_card = CustomCard(
                     self.page.session.get("lang.setting.offline_default_value"),
@@ -69,13 +69,13 @@ class GeneralOflineDefaultValue(ft.Container):
                 if self.torque_default_value is not None:
                     self.torque_default_value.label = s.get("lang.common.torque")
 
-                if self.thrust_default_value is not None:    
+                if self.thrust_default_value is not None:
                     self.thrust_default_value.label = s.get("lang.common.thrust")
 
-                if self.speed_default_value is not None:    
+                if self.speed_default_value is not None:
                     self.speed_default_value.label = s.get("lang.common.speed")
 
-                if self.custom_card is not None:    
+                if self.custom_card is not None:
                     self.custom_card.set_title(s.get("lang.setting.offline_default_value"))
         except:
             logging.exception('exception occured at GeneralOflineDefaultValue.before_update')
@@ -84,9 +84,9 @@ class GeneralOflineDefaultValue(ft.Container):
         if self.odv is None:
             return
 
-        self.odv.torque_default_value = float(self.torque_default_value.value or 0)
-        self.odv.thrust_default_value = float(self.thrust_default_value.value or 0)
-        self.odv.speed_default_value = float(self.speed_default_value.value or 0)
+        self.odv.torque_default_value = self.torque_default_value.value
+        self.odv.thrust_default_value = self.thrust_default_value.value
+        self.odv.speed_default_value = self.speed_default_value.value
 
         if self.system_unit == 0:
             self.odv.torque_default_value = UnitConverter.knm_to_nm(self.odv.torque_default_value)
