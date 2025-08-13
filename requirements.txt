@@ -11,3 +11,4 @@ pandas==2.2.3
 winshell==0.6
 websockets==15.0.1
 msgpack==1.1.0
+pynmea2==1.19.0
