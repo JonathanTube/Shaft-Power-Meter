@@ -90,6 +90,7 @@ class JM38460x44:
         while JM38460x44.running:
             try:
                 frame = await JM3846Util.read_frame(reader)
+                logging.info(f'[JM3846-{name}] receive_0x44 res={bytes.hex(frame)}')
                 if frame is None:
                     continue
             except asyncio.TimeoutError:
@@ -98,7 +99,7 @@ class JM38460x44:
                 on_error()
                 break
             except:
-                logging.warning(f'[JM3846-{name}] receive_0x44 error')
+                logging.exception(f'[JM3846-{name}] receive_0x44 error')
                 on_error()
                 break
 
