@@ -52,7 +52,7 @@ class IOSettingSPS(ft.Container):
                     bgcolor=ft.Colors.GREEN,
                     color=ft.Colors.WHITE,
                     col={'sm': 4},
-                    visible=sps_read_task.is_online == None or sps_read_task == False,
+                    visible=sps_read_task.is_online == None or sps_read_task.is_online == False,
                     style=ft.ButtonStyle(
                         shape=ft.RoundedRectangleBorder(radius=5)
                     ),
@@ -331,7 +331,7 @@ class IOSettingSPS(ft.Container):
             if self.page and self.page.session:
                 if self.sps_connect:
                     self.sps_connect.text = self.page.session.get("lang.setting.connect")
-                    self.sps_connect.visible = sps_read_task.is_online == None or sps_read_task == False
+                    self.sps_connect.visible = sps_read_task.is_online == None or sps_read_task.is_online == False
                     self.sps_connect.bgcolor = ft.Colors.GREEN
                     self.sps_connect.disabled = False
 
