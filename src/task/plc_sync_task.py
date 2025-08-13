@@ -130,6 +130,7 @@ class PlcSyncTask:
             _thrust = int(thrust / 100)
             _speed = int(speed * 10)
 
+            logging.info(f"[PLC] 写入实时数据power={_power},torque={_torque},_thrust={_thrust},_speed={_speed}")
             # 写入功率（32 位）
             await self.write_register_32(*REGISTER_MAP["instant_power"], _power)
 

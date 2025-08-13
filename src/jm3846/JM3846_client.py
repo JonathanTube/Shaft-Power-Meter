@@ -52,7 +52,7 @@ class JM3846AsyncClient(ABC):
                 logging.exception(f'[JM3846-{self.name}] 连接异常: {e}')
 
             await self.release()
-            await asyncio.sleep(5)  # 固定 5 秒重试
+            await asyncio.sleep(60)  # 固定60秒重试
 
     async def close(self):
         """强制退出连接"""

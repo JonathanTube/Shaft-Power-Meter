@@ -2,13 +2,14 @@ import asyncio
 import logging
 import struct
 from common.global_data import gdata
+from jm3846.JM3846_0x45 import JM38460x45
 from jm3846.JM3846_torque_rpm import jm3846_torque_rpm
 from jm3846.JM3846_thrust import jm3846_thrust
 from jm3846.JM3846_util import JM3846Util
 
 
 class JM38460x44:
-    frame_size = 120
+    frame_size = 0x0060
     total_frames = 0xFFFF
     running = False
     loop_task: asyncio.Task = None
@@ -17,7 +18,7 @@ class JM38460x44:
     def build_request(frame_size: int, total_frames: int) -> bytes:
         return struct.pack(
             '>HHHBBHHH',
-            0x0044,
+            0x0004,
             0x0000,
             8,
             0xFF,
@@ -91,13 +92,21 @@ class JM38460x44:
             try:
                 frame = await JM3846Util.read_frame(reader)
                 if frame is None:
-                    on_error()
-                    return  # 优雅退出
+                    logging.info(f'[JM3846-{name}] 0x44响应请求头为空,重新请求0x44')
+                    await JM38460x44.send_0x44_again(name, reader, writer)
+                    continue
+                else:
+                    # logging.info(f'[JM3846-{name}] 0x44响应=ok')
+                    pass
+
+            except asyncio.TimeoutError:
+                logging.warning(f'[JM3846-{name}] 0x44响应 超时')
+                continue
             except asyncio.CancelledError:
                 on_error()
                 break
-            except Exception:
-                logging.warning(f'[JM3846-{name}] receive_0x44 error')
+            except:
+                logging.exception(f'[JM3846-{name}] 0x44响应 error')
                 on_error()
                 break
 
@@ -107,12 +116,20 @@ class JM38460x44:
 
             if func_code == 0x44:
                 current_frame = JM38460x44.parse_response(frame, name)
+                # logging.info(f'[JM3846-{name}] 0x44响应, 当前帧={current_frame},最大帧={JM38460x44.total_frames}')
                 if current_frame + 1 >= JM38460x44.total_frames:
-                    request = JM38460x44.build_request(JM38460x44.frame_size, JM38460x44.total_frames)
-                    logging.info(f'[JM3846-{name}] send 0x44 req (current_frame={current_frame}) is greater than (total_frames={JM38460x44.total_frames})')
-                    writer.write(request)
-                    await writer.drain()
+                    logging.info(f'[JM3846-{name}] 0x44响应, 当前帧={current_frame}大于总帧数={JM38460x44.total_frames},重新请求0x44')
+                    await JM38460x44.send_0x44_again(name, reader, writer)
                 on_success()
+
+    @staticmethod
+    async def send_0x44_again(name, reader, writer):
+        # 断开
+        await JM38460x45.handle(name, reader, writer)
+        # 重新请求
+        request = JM38460x44.build_request(JM38460x44.frame_size, JM38460x44.total_frames)
+        writer.write(request)
+        await writer.drain()
 
     @staticmethod
     def stop():

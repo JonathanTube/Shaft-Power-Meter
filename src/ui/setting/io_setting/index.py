@@ -103,6 +103,7 @@ class IOSetting(ft.Container):
                 operation_content=model_to_dict(self.conf)
             )
             self.conf.save()
+            gdata.set_default_value()
             Toast.show_success(self.page)
         except Exception as e:
             Toast.show_error(self.page, str(e))

@@ -3,21 +3,11 @@ import time
 import threading
 import traceback
 import functools
-import logging
-import json
 import queue
 from typing import Callable, Optional
+import logging
 
 import flet as ft
-
-# ------------- logging -------------
-logger = logging.getLogger("ui_safety")
-if not logger.handlers:
-    logging.basicConfig(
-        level=logging.INFO,
-        format="%(asctime)s [%(levelname)s] %(message)s",
-        handlers=[logging.FileHandler("ui_error.log", encoding="utf-8"), logging.StreamHandler()]
-    )
 
 # ------------- configuration -------------
 ERROR_THROTTLE_WINDOW = 5.0
@@ -38,24 +28,6 @@ _safety_running = True
 def _now():
     return time.time()
 
-def _log(msg):
-    logger.info(msg)
-
-def _save_ui_snapshot(page: ft.Page, prefix="ui_snapshot"):
-    try:
-        def serialize(ctrl):
-            return {
-                "type": ctrl.__class__.__name__,
-                "props": {k: str(v) for k, v in getattr(ctrl, "__dict__", {}).items() if not k.startswith("_")},
-                "children": [serialize(c) for c in getattr(ctrl, "controls", [])]
-            }
-        filename = f"{prefix}_{int(time.time())}.json"
-        with open(filename, "w", encoding="utf-8") as f:
-            json.dump(serialize(page), f, ensure_ascii=False, indent=2)
-        _log(f"UI snapshot saved: {filename}")
-    except Exception:
-        logger.exception("save_ui_snapshot failed")
-
 
 # ------------- safe_event wrapper -------------
 def safe_event(handler: Callable):
@@ -67,8 +39,8 @@ def safe_event(handler: Callable):
         try:
             return handler(*args, **kwargs)
         except Exception as e:
-            logger.error("[UI Error] %s: %s", getattr(handler, "__name__", repr(handler)), e)
-            logger.error(traceback.format_exc())
+            logging.error("[UI Error] %s: %s", getattr(handler, "__name__", repr(handler)), e)
+            logging.error(traceback.format_exc())
 
             # find page in args
             page = None
@@ -81,7 +53,7 @@ def safe_event(handler: Callable):
                     # Use new API page.open for SnackBar
                     page.open(ft.SnackBar(ft.Text(f"⚠ 出错: {e}")))
             except Exception:
-                logger.exception("failed to show snackbar")
+                logging.exception("failed to show snackbar")
             return None
     return wrapper
 
@@ -89,41 +61,45 @@ def safe_event(handler: Callable):
 # ------------- monkey-patch Control.__setattr__ to auto-wrap on_* handlers -------------
 _original_setattr = ft.Control.__setattr__
 
+
 def _safe_setattr(self, name, value):
     if name.startswith("on_") and callable(value):
         try:
             value = safe_event(value)
         except Exception:
-            logger.exception("safe_event wrap failed")
+            logging.exception("safe_event wrap failed")
     _original_setattr(self, name, value)
+
 
 # apply patch once at import
 try:
     ft.Control.__setattr__ = _safe_setattr
 except Exception:
-    logger.exception("failed to monkey-patch ft.Control.__setattr__")
+    logging.exception("failed to monkey-patch ft.Control.__setattr__")
 
 
 # ------------- safe update wrapper -------------
 _original_update = getattr(ft.Control, "update", None)
 
+
 def _safe_update(self, *args, **kwargs):
     try:
         # if control not attached to page, skip update
         if getattr(self, "page", None) is None:
-            logger.warning("[SafeUpdate] %s not attached to page, skip update()", getattr(self, "__repr__", lambda: str(self))())
+            logging.warning("[SafeUpdate] %s not attached to page, skip update()", getattr(self, "__repr__", lambda: str(self))())
             return
         return _original_update(self, *args, **kwargs)
     except Exception:
-        logger.exception("[SafeUpdate] control.update failed")
+        logging.exception("[SafeUpdate] control.update failed")
         # try to avoid crashing: no re-raise
+
 
 # apply if update exists
 if _original_update is not None:
     try:
         ft.Control.update = _safe_update
     except Exception:
-        logger.exception("failed to monkey-patch Control.update")
+        logging.exception("failed to monkey-patch Control.update")
 
 
 # ------------- safe invoke for background threads -------------
@@ -136,7 +112,7 @@ def safe_invoke_on_page(page: ft.Page, fn: Callable, *args, **kwargs):
         try:
             fn(*args, **kwargs)
         except Exception:
-            logger.exception("exception while running safe job on page")
+            logging.exception("exception while running safe job on page")
 
     # prefer page.call_later if available
     try:
@@ -156,7 +132,8 @@ def _queue_consumer():
         try:
             job()
         except Exception:
-            logger.exception("exception in ui fallback job")
+            logging.exception("exception in ui fallback job")
+
 
 _consumer_thread = threading.Thread(target=_queue_consumer, daemon=True)
 _consumer_thread.start()
@@ -167,7 +144,7 @@ def _global_on_event(e: ft.ControlEvent, page: Optional[ft.Page] = None):
     try:
         if getattr(e, "name", None) == "error":
             err = str(getattr(e, "data", ""))
-            logger.error("Received Flutter error event: %r", err)
+            logging.error("Received Flutter error event: %r", err)
 
             with _error_lock:
                 now = _now()
@@ -178,15 +155,15 @@ def _global_on_event(e: ft.ControlEvent, page: Optional[ft.Page] = None):
                 _error_counts[err] = lst
 
                 if len(lst) > ERROR_THROTTLE_LIMIT:
-                    logger.warning("Error %r occurred %d times in %.1fs — throttle activated", err, len(lst), ERROR_THROTTLE_WINDOW)
+                    # logging.warning("Error %r occurred %d times in %.1fs — throttle activated", err, len(lst), ERROR_THROTTLE_WINDOW)
                     if UI_SNAPSHOT_ON_THROTTLE and page is not None:
-                        _save_ui_snapshot(page, "throttle_snapshot")
+                        logging.error('page is none')
                     # drop further processing
                     return
             # normal flow - log once
-            logger.error("[Flutter Error] %s", err)
+            logging.error("[Flutter Error] %s", err)
     except Exception:
-        logger.exception("exception in global on_event")
+        logging.exception("exception in global on_event")
 
 
 # ------------- heartbeat monitor -------------
@@ -197,11 +174,8 @@ def _start_heartbeat(page: ft.Page, interval=HEARTBEAT_INTERVAL, timeout=HEARTBE
             time.sleep(interval)
             idle = time.time() - _last_heartbeat
             if idle > timeout:
-                logger.warning("Heartbeat: page.update() not called for %.1fs — saving snapshot", idle)
-                try:
-                    _save_ui_snapshot(page, "heartbeat_snapshot")
-                except Exception:
-                    logger.exception("failed saving heartbeat snapshot")
+                logging.warning("Heartbeat: page.update() not called for %.1fs", idle)
+
     t = threading.Thread(target=hb, daemon=True)
     t.start()
 
@@ -211,21 +185,18 @@ def _wrap_page_update(page: ft.Page):
     orig = getattr(page, "update", None)
     if not orig:
         return
+
     def _wrapped(*args, **kwargs):
         global _last_heartbeat
         try:
             _last_heartbeat = time.time()
             return orig(*args, **kwargs)
         except Exception:
-            logger.exception("page.update raised exception")
-            try:
-                _save_ui_snapshot(page, "update_error_snapshot")
-            except Exception:
-                pass
+            logging.exception("page.update raised exception")
     try:
         page.update = _wrapped
     except Exception:
-        logger.exception("failed to wrap page.update")
+        logging.exception("failed to wrap page.update")
 
 
 # ------------- initializer to hook page ----------------
@@ -243,20 +214,21 @@ def init_ui_safety(page: ft.Page):
     # hook page.on_event (preserve old)
     try:
         orig = getattr(page, "on_event", None)
+
         def _on_event(e):
             try:
                 _global_on_event(e, page)
             except Exception:
-                logger.exception("global on_event handler error")
+                logging.exception("global on_event handler error")
             if callable(orig):
                 try:
                     orig(e)
                 except Exception:
-                    logger.exception("orig on_event raised")
+                    logging.exception("orig on_event raised")
         page.on_event = _on_event
     except Exception:
-        logger.exception("failed to set page.on_event")
+        logging.exception("failed to set page.on_event")
 
     # start heartbeat
     _start_heartbeat(page)
-    logger.info("ui_safety initialized")
+    logging.info("ui_safety initialized")
