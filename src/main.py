@@ -40,7 +40,7 @@ add_to_startup()
 task_manager = TaskManager()
 
 
-def check_single_instance(mutex_name: str = "shaft-power-meter"):
+def check_single_instance(mutex_name: str = "shaft-power-meter-1"):
     mutex = ctypes.windll.kernel32.CreateMutexW(None, False, mutex_name)
     last_error = ctypes.windll.kernel32.GetLastError()
     if last_error == 183:
@@ -64,7 +64,7 @@ def set_appearance(page: ft.Page, preference: Preference):
     page.padding = 0
     page.theme_mode = ft.ThemeMode.LIGHT if preference.theme == 0 else ft.ThemeMode.DARK
     page.window.resizable = False
-    page.window.frameless = True
+    # page.window.frameless = True
     page.window.left = 0
     page.window.top = 0
     if page.window.width <= 1200:
