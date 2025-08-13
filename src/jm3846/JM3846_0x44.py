@@ -10,7 +10,7 @@ from jm3846.JM3846_util import JM3846Util
 
 class JM38460x44:
     frame_size = 60
-    total_frames = 10
+    total_frames = 0xFFFF
     running = False
     loop_task: asyncio.Task = None
 
