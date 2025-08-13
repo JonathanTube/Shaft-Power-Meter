@@ -25,8 +25,9 @@ class JM3846TorqueRpmUtil:
                 part_length = values_length / channel_count
                 for i in range(0, values_length, channel_count):
                     chunk = data_list[i: i + channel_count]
-                    ch0_sum += chunk[0]
-                    rpm_sum += chunk[2]
+                    if len(chunk) == channel_count:
+                        ch0_sum += chunk[0]
+                        rpm_sum += chunk[2]
 
             elif ch_sel_1 != 4 and ch_sel_0 != 0 and speed_sel == 1:
                 rpm_sum = 0
@@ -34,7 +35,8 @@ class JM3846TorqueRpmUtil:
                 part_length = values_length / channel_count
                 for i in range(0, values_length, channel_count):
                     chunk = data_list[i: i + channel_count]
-                    rpm_sum += chunk[1]
+                    if len(chunk) == channel_count:
+                        rpm_sum += chunk[1]
 
             elif ch_sel_1 != 0 and ch_sel_0 != 1 and speed_sel == 1:
                 ch0_sum = 0
@@ -43,8 +45,9 @@ class JM3846TorqueRpmUtil:
                 part_length = values_length / channel_count
                 for i in range(0, values_length, channel_count):
                     chunk = data_list[i: i + channel_count]
-                    ch0_sum += chunk[0]
-                    rpm_sum += chunk[1]
+                    if len(chunk) == channel_count:
+                        ch0_sum += chunk[0]
+                        rpm_sum += chunk[1]
 
             elif ch_sel_1 != 1 and ch_sel_0 != 1 and speed_sel == 0:
                 ch0_sum = 0
@@ -52,7 +55,8 @@ class JM3846TorqueRpmUtil:
                 part_length = values_length / channel_count
                 for i in range(0, values_length, channel_count):
                     chunk = data_list[i: i + channel_count]
-                    ch0_sum += chunk[0]
+                    if len(chunk) == channel_count:
+                        ch0_sum += chunk[0]
 
             ch0_ad = ch0_sum / part_length if ch0_sum else None
             rpm = rpm_sum / part_length if rpm_sum else None

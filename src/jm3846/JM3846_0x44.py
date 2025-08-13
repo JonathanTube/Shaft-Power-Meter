@@ -92,14 +92,16 @@ class JM38460x44:
             try:
                 frame = await JM3846Util.read_frame(reader)
                 if frame is None:
-                    logging.info(f'[JM3846-{name}] 0x44响应, 当前帧={current_frame}大于总帧数={JM38460x44.total_frames},重新请求0x44')
+                    logging.info(f'[JM3846-{name}] 0x44响应请求头为空,重新请求0x44')
                     await JM38460x44.send_0x44_again(name, reader, writer)
                     continue
                 else:
-                    logging.info(f'[JM3846-{name}] 0x44响应=ok')
+                    # logging.info(f'[JM3846-{name}] 0x44响应=ok')
+                    pass
 
             except asyncio.TimeoutError:
                 logging.warning(f'[JM3846-{name}] 0x44响应 超时')
+                continue
             except asyncio.CancelledError:
                 on_error()
                 break

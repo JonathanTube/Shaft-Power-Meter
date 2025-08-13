@@ -21,7 +21,8 @@ class JM3846ThrustUtil:
                 part_length = values_length / channel_count
                 for i in range(0, values_length, channel_count):
                     chunk = data_list[i: i + channel_count]
-                    ch1_sum += chunk[1]
+                    if len(chunk) == channel_count:
+                        ch1_sum += chunk[1]
 
                 return ch1_sum / part_length
 
@@ -30,7 +31,8 @@ class JM3846ThrustUtil:
                 part_length = values_length / channel_count
                 for i in range(0, values_length, channel_count):
                     chunk = data_list[i: i + channel_count]
-                    ch1_sum += chunk[0]
+                    if len(chunk) == channel_count:
+                        ch1_sum += chunk[0]
 
                 return ch1_sum / part_length
 
@@ -39,7 +41,8 @@ class JM3846ThrustUtil:
                 part_length = values_length / channel_count
                 for i in range(0, values_length, channel_count):
                     chunk = data_list[i: i + channel_count]
-                    ch1_sum += chunk[1]
+                    if len(chunk) == channel_count:
+                        ch1_sum += chunk[1]
 
                 return ch1_sum / part_length
 
