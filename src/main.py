@@ -64,7 +64,7 @@ def set_appearance(page: ft.Page, preference: Preference):
     page.padding = 0
     page.theme_mode = ft.ThemeMode.LIGHT if preference.theme == 0 else ft.ThemeMode.DARK
     page.window.resizable = False
-    page.window.frameless = True
+    # page.window.frameless = True
     page.window.left = 0
     page.window.top = 0
     if page.window.width <= 1200:
