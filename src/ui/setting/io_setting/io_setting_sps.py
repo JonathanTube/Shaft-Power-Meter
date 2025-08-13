@@ -52,7 +52,7 @@ class IOSettingSPS(ft.Container):
                     bgcolor=ft.Colors.GREEN,
                     color=ft.Colors.WHITE,
                     col={'sm': 4},
-                    visible=False,
+                    visible=sps_read_task.is_online == None or sps_read_task == False,
                     style=ft.ButtonStyle(
                         shape=ft.RoundedRectangleBorder(radius=5)
                     ),
@@ -64,7 +64,7 @@ class IOSettingSPS(ft.Container):
                     bgcolor=ft.Colors.RED,
                     color=ft.Colors.WHITE,
                     col={'sm': 4},
-                    visible=False,
+                    visible=sps_read_task.is_online == True,
                     style=ft.ButtonStyle(
                         shape=ft.RoundedRectangleBorder(radius=5)
                     ),
@@ -94,7 +94,7 @@ class IOSettingSPS(ft.Container):
                     bgcolor=ft.Colors.GREEN,
                     color=ft.Colors.WHITE,
                     col={'sm': 4},
-                    visible=False,
+                    visible=sps2_read_task.is_online == None or sps2_read_task == False,
                     style=ft.ButtonStyle(
                         shape=ft.RoundedRectangleBorder(radius=5)
                     ),
@@ -106,7 +106,7 @@ class IOSettingSPS(ft.Container):
                     bgcolor=ft.Colors.RED,
                     color=ft.Colors.WHITE,
                     col={'sm': 4},
-                    visible=False,
+                    visible=sps2_read_task.is_online == True,
                     style=ft.ButtonStyle(
                         shape=ft.RoundedRectangleBorder(radius=5)
                     ),
@@ -331,26 +331,26 @@ class IOSettingSPS(ft.Container):
             if self.page and self.page.session:
                 if self.sps_connect:
                     self.sps_connect.text = self.page.session.get("lang.setting.connect")
-                    self.sps_connect.visible = not sps_read_task.is_online
+                    self.sps_connect.visible = sps_read_task.is_online == None or sps_read_task == False
                     self.sps_connect.bgcolor = ft.Colors.GREEN
                     self.sps_connect.disabled = False
 
                 if self.sps_disconnect:
                     self.sps_disconnect.text = self.page.session.get("lang.setting.disconnect")
-                    self.sps_disconnect.visible = sps_read_task.is_online
+                    self.sps_disconnect.visible = sps_read_task.is_online == True
                     self.sps_disconnect.bgcolor = ft.Colors.RED
                     self.sps_disconnect.disabled = False
 
                 if gdata.configCommon.amount_of_propeller == 2:
                     if self.sps2_connect:
                         self.sps2_connect.text = self.page.session.get("lang.setting.connect")
-                        self.sps2_connect.visible = not sps2_read_task.is_online
+                        self.sps2_connect.visible = sps2_read_task.is_online == None or sps2_read_task == False
                         self.sps2_connect.bgcolor = ft.Colors.GREEN
                         self.sps2_connect.disabled = False
 
                     if self.sps2_disconnect:
                         self.sps2_disconnect.text = self.page.session.get("lang.setting.disconnect")
-                        self.sps2_disconnect.visible = sps2_read_task.is_online
+                        self.sps2_disconnect.visible = sps2_read_task.is_online == True
                         self.sps2_disconnect.bgcolor = ft.Colors.RED
                         self.sps2_disconnect.disabled = False
         except:

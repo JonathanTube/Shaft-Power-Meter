@@ -22,6 +22,13 @@ class SelfTest(ft.Tabs):
 
         self.task_running = False
 
+        self.tab_sps: ft.Tab = None
+        self.tab_gps: ft.Tab = None
+        self.tab_sps2: ft.Tab = None
+        self.tab_hmi_server: ft.Tab = None
+        self.tab_gps: ft.Tab = None
+        self.tab_pl: ft.Tab = None
+
     def build(self):
         try:
             if self.page and self.page.session:
@@ -40,12 +47,18 @@ class SelfTest(ft.Tabs):
                 self.hmi_server_log = ft.ListView(
                     padding=10, auto_scroll=True, height=500, spacing=5, expand=True)
 
+                self.tab_sps = ft.Tab(text="SPS", content=self.sps_log, visible=gdata.configCommon.is_master)
+                self.tab_sps2 = ft.Tab(text="SPS2", content=self.sps2_log, visible=gdata.configCommon.is_master and gdata.configCommon.amount_of_propeller == 2)
+                self.tab_hmi_server = ft.Tab(text="HMI Server", content=self.hmi_server_log, visible=not gdata.configCommon.is_master)
+                self.tab_gps = ft.Tab(text="GPS", content=self.gps_log, visible=gdata.configCommon.enable_gps)
+                self.tab_plc = ft.Tab(text="PLC", content=self.plc_log, visible=gdata.configCommon.enable_plc)
                 self.tabs = [
-                    ft.Tab(text="SPS", content=self.sps_log, visible=gdata.configCommon.is_master),
-                    ft.Tab(text="SPS2", content=self.sps2_log, visible=gdata.configCommon.is_master and gdata.configCommon.amount_of_propeller == 2),
-                    ft.Tab(text="HMI Server", content=self.hmi_server_log, visible=not gdata.configCommon.is_master),
-                    ft.Tab(text="GPS", content=self.gps_log, visible=gdata.configCommon.enable_gps),
-                    ft.Tab(text="PLC", content=self.plc_log, visible=gdata.configCommon.enable_plc)
+                    self.tab_sps,
+                    self.tab_gps,
+                    self.tab_sps2,
+                    self.tab_hmi_server,
+                    self.tab_gps,
+                    self.tab_plc
                 ]
         except:
             logging.exception('exception occured at SelfTest.build')
@@ -56,6 +69,22 @@ class SelfTest(ft.Tabs):
         if len(log_view.controls) > self.MAX_LOG_LINES:
             del log_view.controls[0]  # 删除最旧的一行
         log_view.update()
+
+    def before_update(self):
+        if self.tab_sps:
+            self.tab_sps.visible = gdata.configCommon.is_master
+
+        if self.tab_sps2:
+            self.tab_sps2.visible = gdata.configCommon.is_master and gdata.configCommon.amount_of_propeller == 2
+
+        if self.tab_hmi_server:
+            self.tab_hmi_server.visible = not gdata.configCommon.is_master
+
+        if self.tab_gps:
+            self.tab_gps.visible = gdata.configCommon.enable_gps
+
+        if self.tab_plc:
+            self.tab_plc.visible = gdata.configCommon.enable_plc
 
     def did_mount(self):
         self.task_running = True

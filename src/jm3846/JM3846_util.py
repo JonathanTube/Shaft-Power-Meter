@@ -13,7 +13,7 @@ class JM3846Util:
             logging.warning("[JM3846] 连接断开（读取头部失败）")
             return None
         except asyncio.TimeoutError:
-            logging.warning("[JM3846] 读取头部超时")
+            # logging.warning("[JM3846] 读取头部超时")
             return None
 
         length = struct.unpack('>H', header[4:6])[0]

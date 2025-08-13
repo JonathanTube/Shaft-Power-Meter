@@ -3,7 +3,6 @@ import time
 import threading
 import traceback
 import functools
-import json
 import queue
 from typing import Callable, Optional
 import logging
@@ -28,26 +27,6 @@ _safety_running = True
 # ------------- utilities -------------
 def _now():
     return time.time()
-
-
-def _log(msg):
-    logging.info(msg)
-
-
-def _save_ui_snapshot(page: ft.Page, prefix="ui_snapshot"):
-    try:
-        def serialize(ctrl):
-            return {
-                "type": ctrl.__class__.__name__,
-                "props": {k: str(v) for k, v in getattr(ctrl, "__dict__", {}).items() if not k.startswith("_")},
-                "children": [serialize(c) for c in getattr(ctrl, "controls", [])]
-            }
-        filename = f"{prefix}_{int(time.time())}.json"
-        with open(filename, "w", encoding="utf-8") as f:
-            json.dump(serialize(page), f, ensure_ascii=False, indent=2)
-        _log(f"UI snapshot saved: {filename}")
-    except Exception:
-        logging.exception("save_ui_snapshot failed")
 
 
 # ------------- safe_event wrapper -------------
@@ -176,9 +155,9 @@ def _global_on_event(e: ft.ControlEvent, page: Optional[ft.Page] = None):
                 _error_counts[err] = lst
 
                 if len(lst) > ERROR_THROTTLE_LIMIT:
-                    logging.warning("Error %r occurred %d times in %.1fs — throttle activated", err, len(lst), ERROR_THROTTLE_WINDOW)
+                    # logging.warning("Error %r occurred %d times in %.1fs — throttle activated", err, len(lst), ERROR_THROTTLE_WINDOW)
                     if UI_SNAPSHOT_ON_THROTTLE and page is not None:
-                        _save_ui_snapshot(page, "throttle_snapshot")
+                        logging.error('page is none')
                     # drop further processing
                     return
             # normal flow - log once
@@ -196,10 +175,7 @@ def _start_heartbeat(page: ft.Page, interval=HEARTBEAT_INTERVAL, timeout=HEARTBE
             idle = time.time() - _last_heartbeat
             if idle > timeout:
                 logging.warning("Heartbeat: page.update() not called for %.1fs — saving snapshot", idle)
-                try:
-                    _save_ui_snapshot(page, "heartbeat_snapshot")
-                except Exception:
-                    logging.exception("failed saving heartbeat snapshot")
+
     t = threading.Thread(target=hb, daemon=True)
     t.start()
 
@@ -217,10 +193,6 @@ def _wrap_page_update(page: ft.Page):
             return orig(*args, **kwargs)
         except Exception:
             logging.exception("page.update raised exception")
-            try:
-                _save_ui_snapshot(page, "update_error_snapshot")
-            except Exception:
-                pass
     try:
         page.update = _wrapped
     except Exception:
