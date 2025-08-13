@@ -156,10 +156,10 @@ async def start_all_tasks():
 
     # SPS 读取
     if system_settings.is_master:
-        asyncio.create_task(sps_read_task.connect())  # 后台连接
+        await sps_read_task.connect()
         task_manager.add(sps_read_task)
-        if system_settings.amount_of_propeller > 1:
-            asyncio.create_task(sps2_read_task.connect())  # 后台连接
+        if system_settings.amount_of_propeller == 2:
+            await sps2_read_task.connect()
             task_manager.add(sps2_read_task)
 
     # WS

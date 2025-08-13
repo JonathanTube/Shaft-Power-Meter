@@ -155,7 +155,7 @@ class PropellerConf(ft.Container):
                 data = model_to_dict(settings)
                 del data['created_at']
                 del data['update_at']
-                self.page.run_task(ws_server.broadcast, {
+                self.page.run_task(ws_server.send, {
                     'type': 'propeller_setting',
                     "data": data
                 })

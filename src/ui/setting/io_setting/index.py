@@ -133,7 +133,7 @@ class IOSetting(ft.Container):
     async def __loop(self):
         while self.task_running:
             try:
-                if self.gps_conf:
+                if gdata.configCommon.enable_gps and self.gps_conf:
                     self.gps_conf.update()
 
                 if self.output_conf:

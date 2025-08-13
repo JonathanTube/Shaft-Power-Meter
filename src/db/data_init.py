@@ -1499,16 +1499,6 @@ class DataInit:
                     "english": "Master PLC Connected"
                 },
                 {
-                    "code": "lang.alarm.slave_gps_disconnected",
-                    "chinese": "从机GPS断开",
-                    "english": "Slave GPS Disconnected"
-                },
-                {
-                    "code": "lang.alarm.slave_gps_connected",
-                    "chinese": "从机GPS连接",
-                    "english": "Slave GPS Connected"
-                },
-                {
                     "code": "lang.alarm.master_gps_connected",
                     "chinese": "主机GPS连接",
                     "english": "Master GPS Connected"

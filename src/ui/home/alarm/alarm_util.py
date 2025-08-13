@@ -13,9 +13,6 @@ class AlarmUtil:
                 case AlarmType.MASTER_PLC:
                     return session.get("lang.alarm.master_plc_disconnected")
 
-                case AlarmType.SLAVE_GPS:
-                    return session.get("lang.alarm.slave_gps_disconnected")
-
                 case AlarmType.MASTER_GPS:
                     return session.get("lang.alarm.master_gps_disconnected")
 

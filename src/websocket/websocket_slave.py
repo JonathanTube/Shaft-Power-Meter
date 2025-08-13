@@ -17,186 +17,113 @@ class WebSocketSlave:
     def __init__(self):
         self._lock = asyncio.Lock()
         self.websocket = None
-        self.is_online = False  # 当前连接状态
+        self.is_online = False  # 当前连接是否建立成功
         self.is_canceled = False
 
     async def start(self):
-        """启动客户端（无限重连版）"""
+        """启动客户端（无限重连）"""
         async with self._lock:
             if self.is_online:
                 return
-
             self.is_canceled = False
 
-            while not gdata.configCommon.is_master:
-                # 如果是手动取消，直接跳出
-                if self.is_canceled:
-                    break
-
-                try:
-                    io_conf: IOConf = IOConf.get()
-                    uri = f"ws://{io_conf.hmi_server_ip}:{io_conf.hmi_server_port}"
-                    self.websocket = await websockets.connect(uri)
-                    logging.info(f"[Slave客户端] 已连接到 {uri}")
-
-                    self.is_online = True
-                    AlarmSaver.recovery(AlarmType.SLAVE_MASTER)
-
-                    # 启动接收 & 发送任务
-                    asyncio.create_task(self.send_gps_alarm_to_master())
-                    asyncio.create_task(self.receive_data_from_master())
-
-                    return  # 成功连接直接退出重连循环
-                except:
-                    logging.error(f"[Slave客户端] 连接失败，5 秒后重试")
-                    self.is_online = False
-                    AlarmSaver.create(AlarmType.SLAVE_MASTER)
-
-                await asyncio.sleep(5)  # 固定重连间隔
-
-    async def send_eexi_breach_alarm_to_master(self, occured):
-        if gdata.configCommon.is_master:
-            return
-        if not self.is_online:
-            return
-        try:
-            packed_data = msgpack.packb({
-                'type': 'alarm_eexi_breach',
-                'data': occured
-            })
-            await self.websocket.send(packed_data)
-        except:
-            logging.error("[Slave客户端] send_eexi_breach_alarm_to_master error")
-
-    async def send_gps_alarm_to_master(self):
-        while not gdata.configCommon.is_master and self.is_online:
+        while not gdata.configCommon.is_master and not self.is_canceled:
             try:
-                alarm_logs: list[AlarmLog] = AlarmLog.select(
-                    AlarmLog.id,
-                    AlarmLog.alarm_type,
-                    AlarmLog.occured_time,
-                    AlarmLog.recovery_time,
-                    AlarmLog.acknowledge_time
-                ).where(
-                    AlarmLog.is_sync == False,
-                    AlarmLog.is_from_master == False,
-                    AlarmLog.alarm_type != AlarmType.SLAVE_MASTER
+                io_conf: IOConf = IOConf.get()
+                uri = f"ws://{io_conf.hmi_server_ip}:{io_conf.hmi_server_port}"
+                self.websocket = await websockets.connect(uri)
+                self.set_online()
+                logging.info(f"[Slave] 已连接到 {uri}")
+
+                # 并行收发
+                await asyncio.gather(
+                    self.send_gps_alarm_to_master(),
+                    self.receive_data_from_master()
                 )
-                alarm_logs_dict = []
-                for alarm_log in alarm_logs:
-                    alarm_logs_dict.append({
-                        'id': alarm_log.id,
-                        'alarm_type': alarm_log.alarm_type,
-                        'occured_time': DateTimeUtil.format_date(alarm_log.occured_time),
-                        'recovery_time': DateTimeUtil.format_date(alarm_log.recovery_time),
-                        'acknowledge_time': DateTimeUtil.format_date(alarm_log.acknowledge_time)
-                    })
-                if len(alarm_logs) > 0:
-                    packed_data = msgpack.packb({
-                        'type': 'alarm_logs_from_slave',
-                        'data': alarm_logs_dict
-                    })
-                    await self.websocket.send(packed_data)
-                    for alarm_log in alarm_logs:
-                        AlarmLog.update(is_sync=True).where(AlarmLog.id == alarm_log.id).execute()
-            except:
-                logging.error("[Slave客户端] send_gps_alarm_to_master error")
-            finally:
+            except Exception as e:
+                logging.error(f"[Slave] 连接失败: {e}")
+                self.set_offline()
                 await asyncio.sleep(5)
 
-    async def receive_data_from_master(self):
-        while not gdata.configCommon.is_master and self.is_online:
-            if self.is_canceled:
-                return
+    def set_online(self):
+        self.is_online = True
+        AlarmSaver.recovery(AlarmType.SLAVE_MASTER)
 
-            try:
-                raw_data = await self.websocket.recv()
-                data = msgpack.unpackb(raw_data)
+    def set_offline(self):
+        self.is_online = False
+        AlarmSaver.create(AlarmType.SLAVE_MASTER, True)
 
-                if data['type'] == 'sps_data':
-                    self.__handle_jm3846_data(data)
-                elif data['type'] == 'alarm_logs_from_master':
-                    self.__handle_alarm_logs_from_master(data)
-                elif data['type'] == 'propeller_setting':
-                    self.__handle_propeller_setting(data)
-            except (websockets.ConnectionClosedError, websockets.ConnectionClosedOK, websockets.ConnectionClosed):
-                logging.error("[Slave客户端] 连接断开")
-                self.is_online = False
-                AlarmSaver.create(AlarmType.SLAVE_MASTER)
-                break
-            except:
-                logging.exception("[Slave客户端] 接收数据异常")
-
-    def __handle_jm3846_data(self, data):
-        if gdata.configTest.test_mode_running:
-            logging.info('[Slave客户端] 测试模式运行中，跳过SPS数据处理')
+    async def send_eexi_breach_alarm_to_master(self, occured):
+        if not (self.is_online and not gdata.configCommon.is_master):
             return
+        try:
+            await self.websocket.send(msgpack.packb(occured))
+        except:
+            logging.error("[Slave] send_eexi_breach_alarm_to_master error")
 
-        name = data['name']
+    async def receive_data_from_master(self):
+        try:
+            async for raw_data in self.websocket:
+                receive_data = msgpack.unpackb(raw_data)
+                type = receive_data['type']
+                if type == 'sps':
+                    self._handle_sps_data(receive_data['data'])
+                elif type == 'sps2':
+                    self._handle_sps2_data(receive_data['data'])
+                elif type == 'alarms':
+                    self._handle_alarm(receive_data['data'])
+                elif type == 'propeller_setting':
+                    dict_to_model(PropellerSetting, receive_data['data']).save()
+        except (websockets.ConnectionClosed, websockets.ConnectionClosedError, websockets.ConnectionClosedOK):
+            logging.error("[Slave] 连接断开")
+            self.set_offline()
+        except:
+            logging.exception("[Slave] 接收数据异常")
+            self.set_offline()
 
-        if 'torque' in data:
-            if name == 'sps':
-                gdata.configSPS.torque = data['torque']
-            elif name == 'sps2':
-                gdata.configSPS2.torque = data['torque']
+    def _handle_sps_data(self, data):
+        if gdata.configTest.test_mode_running:
+            # logging.info('[Slave] 测试模式运行中，跳过SPS数据处理')
+            return
+        gdata.configSPS.torque = data['torque']
+        gdata.configSPS.thrust = data['thrust']
+        gdata.configSPS.speed = data['speed']
 
-        if 'thrust' in data:
-            if name == 'sps':
-                gdata.configSPS.thrust = data['thrust']
-            elif name == 'sps2':
-                gdata.configSPS2.thrust = data['thrust']
+    def _handle_sps2_data(self, data):
+        if gdata.configTest.test_mode_running:
+            # logging.info('[Slave] 测试模式运行中，跳过SPS数据处理')
+            return
+        gdata.configSPS2.torque = data['torque']
+        gdata.configSPS2.thrust = data['thrust']
+        gdata.configSPS2.speed = data['speed']
 
-        if 'rpm' in data:
-            if name == 'sps':
-                gdata.configSPS.speed = data['rpm']
-            elif name == 'sps2':
-                gdata.configSPS2.speed = data['rpm']
-
-    def __handle_propeller_setting(self, settings):
-        data = settings['data']
-        model: PropellerSetting = dict_to_model(PropellerSetting, data)
-        model.save()
-
-    def __handle_alarm_logs_from_master(self, data):
-        alarm_logs = data['data']
-        for alarm_log in alarm_logs:
-            outer_id = alarm_log['id']
-            alarm_type = alarm_log['alarm_type']
-            occured_time = alarm_log['occured_time']
-            recovery_time = alarm_log['recovery_time']
-            acknowledge_time = alarm_log['acknowledge_time']
-
-            cnt: int = AlarmLog.select(fn.COUNT(AlarmLog.id)).where(AlarmLog.outer_id == outer_id).scalar()
-
-            if cnt > 0:
+    def _handle_alarm(self, data):
+        for alarm in data['data']:
+            cnt = AlarmLog.select(fn.COUNT(AlarmLog.id)).where(AlarmLog.alarm_uuid == alarm['alarm_uuid']).scalar()
+            if cnt:
                 AlarmLog.update(
-                    recovery_time=DateTimeUtil.parse_date(recovery_time),
-                    acknowledge_time=DateTimeUtil.parse_date(acknowledge_time)
-                ).where(AlarmLog.outer_id == outer_id).execute()
+                    recovery_time=DateTimeUtil.parse_date(alarm['recovery_time']),
+                    acknowledge_time=DateTimeUtil.parse_date(alarm['acknowledge_time'])
+                ).where(AlarmLog.alarm_uuid == alarm['alarm_uuid']).execute()
             else:
                 AlarmLog.create(
-                    alarm_type=alarm_type,
-                    occured_time=DateTimeUtil.parse_date(occured_time),
-                    recovery_time=DateTimeUtil.parse_date(recovery_time),
-                    acknowledge_time=DateTimeUtil.parse_date(acknowledge_time),
-                    is_from_master=True,
-                    outer_id=outer_id
+                    alarm_uuid=alarm['alarm_uuid'],
+                    alarm_type=alarm['alarm_type'],
+                    occured_time=DateTimeUtil.parse_date(alarm['occured_time']),
+                    recovery_time=DateTimeUtil.parse_date(alarm['recovery_time']),
+                    acknowledge_time=DateTimeUtil.parse_date(alarm['acknowledge_time'])
                 )
 
     async def stop(self):
         self.is_canceled = True
-
         if not self.is_online:
             return
-
         try:
-            if self.websocket:
-                await self.websocket.close()
-                await self.websocket.wait_closed()
+            await self.websocket.close()
         except:
-            logging.error("[Slave客户端] 关闭连接失败")
+            logging.error("[Slave] 关闭连接失败")
         finally:
-            self.is_online = False
+            self.set_offline()
 
 
 ws_client = WebSocketSlave()

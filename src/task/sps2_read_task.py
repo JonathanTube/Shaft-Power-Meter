@@ -39,10 +39,10 @@ class Sps2ReadTask(JM3846AsyncClient):
         """创建报警（异步执行数据库写入）"""
         try:
             loop = asyncio.get_running_loop()
-            loop.run_in_executor(None, AlarmSaver.create, AlarmType.SLAVE_SPS)
+            loop.run_in_executor(None, AlarmSaver.create, AlarmType.MASTER_SPS, True)
         except RuntimeError:
             # 没有事件循环时（比如同步关闭阶段），直接调用
-            AlarmSaver.create(AlarmType.SLAVE_SPS)
+            AlarmSaver.create(AlarmType.MASTER_SPS, True)
         except Exception:
             logger.exception("[Sps2ReadTask] 创建报警失败")
 
@@ -50,9 +50,9 @@ class Sps2ReadTask(JM3846AsyncClient):
         """恢复报警（异步执行数据库写入）"""
         try:
             loop = asyncio.get_running_loop()
-            loop.run_in_executor(None, AlarmSaver.recovery, AlarmType.SLAVE_SPS)
+            loop.run_in_executor(None, AlarmSaver.recovery, AlarmType.MASTER_SPS)
         except RuntimeError:
-            AlarmSaver.recovery(AlarmType.SLAVE_SPS)
+            AlarmSaver.recovery(AlarmType.MASTER_SPS)
         except Exception:
             logger.exception("[Sps2ReadTask] 恢复报警失败")
 

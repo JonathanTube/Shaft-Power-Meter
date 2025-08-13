@@ -1,9 +1,11 @@
 import logging
 import threading
+import uuid
 from peewee import fn
 from common.const_alarm_type import AlarmType
 from db.models.alarm_log import AlarmLog
 from common.global_data import gdata
+from utils.alarm_sender import AlarmSender
 
 
 class AlarmSaver:
@@ -11,18 +13,20 @@ class AlarmSaver:
     _lock = threading.Lock()
 
     @staticmethod
-    def create(alarm_type: AlarmType):
+    def create(alarm_type: AlarmType, out_of_sync: bool):
         # 加锁（使用with语句确保锁自动释放）
         with AlarmSaver._lock:
             if AlarmSaver.has_alarm(alarm_type):
                 return
 
             AlarmLog.create(
+                alarm_uuid=uuid.uuid4().hex,
                 alarm_type=alarm_type,
                 occured_time=gdata.configDateTime.utc,
-                is_from_master=gdata.configCommon.is_master
+                out_of_sync=out_of_sync
             )
             logging.info(f'[创建alarm] {alarm_type}')
+            AlarmSender.send_alarms_to_slave()
 
     @staticmethod
     def recovery(alarm_type: AlarmType):
@@ -30,9 +34,10 @@ class AlarmSaver:
             if AlarmSaver.has_alarm(alarm_type):
                 AlarmLog.update(
                     recovery_time=gdata.configDateTime.utc,
-                    is_sync=False
+                    is_synchronized=False
                 ).where(AlarmLog.alarm_type == alarm_type).execute()
                 logging.info(f'[恢复alarm] {alarm_type}')
+                AlarmSender.send_alarms_to_slave()
 
     @staticmethod
     def has_alarm(alarm_type: AlarmType) -> tuple[int, int]:

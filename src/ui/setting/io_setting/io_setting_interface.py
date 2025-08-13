@@ -116,10 +116,9 @@ class InterfaceConf(ft.Container):
                 operation_content=user.user_name
             )
             self.page.run_task(ws_client.stop)
-            AlarmSaver.create(AlarmType.SLAVE_MASTER)
-        except: 
+            AlarmSaver.create(AlarmType.SLAVE_MASTER, True)
+        except:
             logging.exception("exception occured at InterfaceConf.__on_close")
-
 
     def save_data(self):
         try:

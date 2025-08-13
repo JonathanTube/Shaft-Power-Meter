@@ -44,14 +44,16 @@ class DataSaver:
             DataSaver.save_counter_total(name, speed, power)
             DataSaver.save_counter_interval(name, speed, power)
 
-            # 广播给客户端数据
-            DataSaver._safe_create_task(ws_server.broadcast({
-                'type': 'sps_data',
-                'name': name,
-                'torque': torque,
-                'thrust': thrust,
-                'rpm': speed
-            }))
+            # 发送数据到客户端
+            if gdata.configCommon.is_master:
+                DataSaver._safe_create_task(ws_server.send({
+                    'type': name,
+                    'data': {
+                        'torque': torque,
+                        'thrust': thrust,
+                        'speed': speed
+                    }
+                }))
 
             # 更新内存缓存
             if name == 'sps':
@@ -100,7 +102,7 @@ class DataSaver:
 
         if gdata.configPropperCurve.alarm_enabled_of_overload_curve:
             if overload:
-                AlarmSaver.create(AlarmType.POWER_OVERLOAD)
+                AlarmSaver.create(AlarmType.POWER_OVERLOAD, True)
                 DataSaver._safe_create_task(plc.write_power_overload(True))
             else:
                 AlarmSaver.recovery(AlarmType.POWER_OVERLOAD)
