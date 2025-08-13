@@ -174,7 +174,7 @@ def _start_heartbeat(page: ft.Page, interval=HEARTBEAT_INTERVAL, timeout=HEARTBE
             time.sleep(interval)
             idle = time.time() - _last_heartbeat
             if idle > timeout:
-                logging.warning("Heartbeat: page.update() not called for %.1fs — saving snapshot", idle)
+                logging.warning("Heartbeat: page.update() not called for %.1fs", idle)
 
     t = threading.Thread(target=hb, daemon=True)
     t.start()

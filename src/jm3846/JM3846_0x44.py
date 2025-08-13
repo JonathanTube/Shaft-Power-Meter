@@ -9,7 +9,7 @@ from jm3846.JM3846_util import JM3846Util
 
 
 class JM38460x44:
-    frame_size = 24
+    frame_size = 10
     total_frames = 0xFFFF
     running = False
     loop_task: asyncio.Task = None
@@ -92,19 +92,19 @@ class JM38460x44:
             try:
                 frame = await JM3846Util.read_frame(reader)
                 if frame is None:
-                    logging.info(f'[JM3846-{name}] receive_0x44 当前frame为空，重新发送请求0x44')
+                    logging.info(f'[JM3846-{name}] 0x44响应, 当前帧={current_frame}大于总帧数={JM38460x44.total_frames},重新请求0x44')
                     await JM38460x44.send_0x44_again(name, reader, writer)
                     continue
                 else:
-                    logging.info(f'[JM3846-{name}] receive_0x44 res={bytes.hex(frame)}')
+                    logging.info(f'[JM3846-{name}] 0x44响应={bytes.hex(frame[0, 10])}...')
 
             except asyncio.TimeoutError:
-                logging.warning(f'[JM3846-{name}] receive_0x44 超时')
+                logging.warning(f'[JM3846-{name}] 0x44响应 超时')
             except asyncio.CancelledError:
                 on_error()
                 break
             except:
-                logging.exception(f'[JM3846-{name}] receive_0x44 error')
+                logging.exception(f'[JM3846-{name}] 0x44响应 error')
                 on_error()
                 break
 
@@ -115,7 +115,7 @@ class JM38460x44:
             if func_code == 0x44:
                 current_frame = JM38460x44.parse_response(frame, name)
                 if current_frame + 1 >= JM38460x44.total_frames:
-                    logging.info(f'[JM3846-{name}] send 0x44 req (current_frame={current_frame}) is greater than (total_frames={JM38460x44.total_frames})')
+                    logging.info(f'[JM3846-{name}] 0x44响应, 当前帧={current_frame}大于总帧数={JM38460x44.total_frames},重新请求0x44')
                     await JM38460x44.send_0x44_again(name, reader, writer)
                 on_success()
 
