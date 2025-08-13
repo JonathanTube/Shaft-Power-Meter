@@ -93,7 +93,9 @@ class JM38460x44:
                 if frame is None:
                     logging.info(f'[JM3846-{name}] receive_0x44 当前frame为空,跳过')
                     continue
-
+                else:
+                    logging.info(f'[JM3846-{name}] receive_0x44 res={bytes.hex(frame)}')
+                    
             except asyncio.TimeoutError:
                 logging.warning(f'[JM3846-{name}] receive_0x44 超时')
             except asyncio.CancelledError:
