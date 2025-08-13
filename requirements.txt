@@ -1,0 +1,11 @@
+flet==0.27.6
+peewee==3.17.9
+flet_contrib==2024.12.3
+python-dateutil==2.9.0.post0
+fpdf==1.7.2
+numpy==2.2.4
+matplotlib==3.10.1
+pymodbus==3.8.6
+screen_brightness_control==0.24.2
+pandas==2.2.3
+winshell==0.6

@@ -9,7 +9,7 @@ from jm3846.JM3846_util import JM3846Util
 
 
 class JM38460x44:
-    frame_size = 60
+    frame_size = 0x0060
     total_frames = 0xFFFF
     running = False
     loop_task: asyncio.Task = None
@@ -18,7 +18,7 @@ class JM38460x44:
     def build_request(frame_size: int, total_frames: int) -> bytes:
         return struct.pack(
             '>HHHBBHHH',
-            0x0044,
+            0x0004,
             0x0000,
             8,
             0xFF,
