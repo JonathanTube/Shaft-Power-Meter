@@ -2,6 +2,7 @@ import asyncio
 import logging
 import struct
 from common.global_data import gdata
+from jm3846.JM3846_0x45 import JM38460x45
 from jm3846.JM3846_torque_rpm import jm3846_torque_rpm
 from jm3846.JM3846_thrust import jm3846_thrust
 from jm3846.JM3846_util import JM3846Util
@@ -91,11 +92,12 @@ class JM38460x44:
             try:
                 frame = await JM3846Util.read_frame(reader)
                 if frame is None:
-                    logging.info(f'[JM3846-{name}] receive_0x44 当前frame为空,跳过')
+                    logging.info(f'[JM3846-{name}] receive_0x44 当前frame为空，重新发送请求0x44')
+                    await JM38460x44.send_0x44_again(name, reader, writer)
                     continue
                 else:
                     logging.info(f'[JM3846-{name}] receive_0x44 res={bytes.hex(frame)}')
-                    
+
             except asyncio.TimeoutError:
                 logging.warning(f'[JM3846-{name}] receive_0x44 超时')
             except asyncio.CancelledError:
@@ -113,11 +115,18 @@ class JM38460x44:
             if func_code == 0x44:
                 current_frame = JM38460x44.parse_response(frame, name)
                 if current_frame + 1 >= JM38460x44.total_frames:
-                    request = JM38460x44.build_request(JM38460x44.frame_size, JM38460x44.total_frames)
                     logging.info(f'[JM3846-{name}] send 0x44 req (current_frame={current_frame}) is greater than (total_frames={JM38460x44.total_frames})')
-                    writer.write(request)
-                    await writer.drain()
+                    await JM38460x44.send_0x44_again(name, reader, writer)
                 on_success()
+
+    @staticmethod
+    async def send_0x44_again(name, reader, writer):
+        # 断开
+        await JM38460x45.handle(name, reader, writer)
+        # 重新请求
+        request = JM38460x44.build_request(JM38460x44.frame_size, JM38460x44.total_frames)
+        writer.write(request)
+        await writer.drain()
 
     @staticmethod
     def stop():
