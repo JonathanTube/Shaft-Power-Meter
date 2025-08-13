@@ -116,6 +116,7 @@ class JM38460x44:
 
             if func_code == 0x44:
                 current_frame = JM38460x44.parse_response(frame, name)
+                logging.info(f'[JM3846-{name}] 0x44响应, 当前帧={current_frame},最大帧={JM38460x44.total_frames}')
                 if current_frame + 1 >= JM38460x44.total_frames:
                     logging.info(f'[JM3846-{name}] 0x44响应, 当前帧={current_frame}大于总帧数={JM38460x44.total_frames},重新请求0x44')
                     await JM38460x44.send_0x44_again(name, reader, writer)
