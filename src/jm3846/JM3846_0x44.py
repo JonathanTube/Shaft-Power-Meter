@@ -91,12 +91,13 @@ class JM38460x44:
             try:
                 frame = await JM3846Util.read_frame(reader)
                 if frame is None:
-                    on_error()
-                    return  # 优雅退出
+                    continue
+            except asyncio.TimeoutError:
+                logging.warning(f'[JM3846-{name}] receive_0x44 超时')
             except asyncio.CancelledError:
                 on_error()
                 break
-            except Exception:
+            except:
                 logging.warning(f'[JM3846-{name}] receive_0x44 error')
                 on_error()
                 break

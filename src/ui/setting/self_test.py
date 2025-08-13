@@ -54,7 +54,6 @@ class SelfTest(ft.Tabs):
                 self.tab_plc = ft.Tab(text="PLC", content=self.plc_log, visible=gdata.configCommon.enable_plc)
                 self.tabs = [
                     self.tab_sps,
-                    self.tab_gps,
                     self.tab_sps2,
                     self.tab_hmi_server,
                     self.tab_gps,
