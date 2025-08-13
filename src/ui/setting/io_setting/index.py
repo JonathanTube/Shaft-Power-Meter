@@ -133,12 +133,29 @@ class IOSetting(ft.Container):
     async def __loop(self):
         while self.task_running:
             try:
-                self.update()
+                if self.gps_conf:
+                    self.gps_conf.update()
+
+                if self.output_conf:
+                    self.output_conf.update()
+
+                if gdata.configCommon.is_master:
+                    if not gdata.configCommon.is_individual and self.master_server_conf:
+                        self.master_server_conf.update()
+
+                    if self.plc_conf:
+                        self.plc_conf.update()
+
+                    if self.sps_conf:
+                        self.sps_conf.update()
+                else:
+                    if self.interface_conf:
+                        self.interface_conf.update()
             except:
                 logging.exception("exception occured at IOSetting.__loop")
                 return
             finally:
-                await asyncio.sleep(5)
+                await asyncio.sleep(8)
 
     def did_mount(self):
         self.task_running = True

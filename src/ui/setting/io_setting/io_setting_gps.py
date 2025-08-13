@@ -45,22 +45,22 @@ class IOSettingGPS(ft.Container):
                     text=self.page.session.get("lang.setting.connect"),
                     bgcolor=ft.Colors.GREEN,
                     color=ft.Colors.WHITE,
-                    visible=False,
+                    visible=gps.is_online == None or gps.is_online == False,
                     style=ft.ButtonStyle(
                         shape=ft.RoundedRectangleBorder(radius=5)
                     ),
-                    on_click=lambda e: self.page.open(PermissionCheck(self.__on_connect, 2))
+                    on_click=lambda e: self.page.open(PermissionCheck(self._on_connect, 2))
                 )
 
                 self.close_btn = ft.FilledButton(
                     text=self.page.session.get("lang.setting.disconnect"),
                     bgcolor=ft.Colors.RED,
                     color=ft.Colors.WHITE,
-                    visible=False,
+                    visible=gps.is_online == True,
                     style=ft.ButtonStyle(
                         shape=ft.RoundedRectangleBorder(radius=5)
                     ),
-                    on_click=lambda e: self.page.open(PermissionCheck(self.__on_close, 2))
+                    on_click=lambda e: self.page.open(PermissionCheck(self._on_close, 2))
                 )
 
                 self.custom_card = CustomCard(
@@ -76,7 +76,7 @@ class IOSettingGPS(ft.Container):
         except:
             logging.exception('exception occured at IOSettingGPS.build')
 
-    def __on_connect(self, user: User):
+    def _on_connect(self, user: User):
         try:
             self.save_data()
             self.conf.save()
@@ -100,7 +100,7 @@ class IOSettingGPS(ft.Container):
         except:
             logging.exception("exception occured at IOSettingGPS.__on_connect")
 
-    def __on_close(self, user: User):
+    def _on_close(self, user: User):
         try:
             self.close_btn.text = 'loading...'
             self.close_btn.disabled = True
@@ -134,13 +134,13 @@ class IOSettingGPS(ft.Container):
         try:
             if self.page and self.page.session:
                 if self.connect_btn:
-                    self.connect_btn.visible = not gps.is_online
+                    self.connect_btn.visible = gps.is_online == None or gps.is_online == False
                     self.connect_btn.text = self.page.session.get("lang.setting.connect")
                     self.connect_btn.bgcolor = ft.Colors.GREEN
                     self.connect_btn.disabled = False
 
                 if self.close_btn:
-                    self.close_btn.visible = gps.is_online
+                    self.close_btn.visible = gps.is_online == True
                     self.close_btn.text = self.page.session.get("lang.setting.disconnect")
                     self.close_btn.bgcolor = ft.Colors.RED
                     self.close_btn.disabled = False

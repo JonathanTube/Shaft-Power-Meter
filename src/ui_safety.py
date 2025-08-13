@@ -1,4 +1,3 @@
-# ui_safety.py
 import time
 import threading
 import traceback
@@ -166,20 +165,6 @@ def _global_on_event(e: ft.ControlEvent, page: Optional[ft.Page] = None):
         logging.exception("exception in global on_event")
 
 
-# ------------- heartbeat monitor -------------
-def _start_heartbeat(page: ft.Page, interval=HEARTBEAT_INTERVAL, timeout=HEARTBEAT_TIMEOUT):
-    def hb():
-        global _last_heartbeat
-        while _safety_running:
-            time.sleep(interval)
-            idle = time.time() - _last_heartbeat
-            if idle > timeout:
-                logging.warning("Heartbeat: page.update() not called for %.1fs", idle)
-
-    t = threading.Thread(target=hb, daemon=True)
-    t.start()
-
-
 # ------------- page.update wrapper to update heartbeat -------------
 def _wrap_page_update(page: ft.Page):
     orig = getattr(page, "update", None)
@@ -229,6 +214,4 @@ def init_ui_safety(page: ft.Page):
     except Exception:
         logging.exception("failed to set page.on_event")
 
-    # start heartbeat
-    _start_heartbeat(page)
     logging.info("ui_safety initialized")

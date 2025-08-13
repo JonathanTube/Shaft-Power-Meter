@@ -1,6 +1,5 @@
 import logging
-import time
-
+import asyncio
 import flet as ft
 
 
@@ -9,7 +8,6 @@ class Toast:
     def show_success(page: ft.Page, message: str = None):
         if page is None or page.session is None:
             return
-
         msg = message if message is not None else page.session.get("lang.toast.success")
         Toast.show_toast(page, msg, ft.Colors.GREEN_500, ft.Colors.WHITE)
 
@@ -28,7 +26,14 @@ class Toast:
         Toast.show_toast(page, msg, ft.Colors.RED_500, ft.Colors.WHITE, auto_hide=auto_hide)
 
     @staticmethod
-    def show_toast(page: ft.Page, message: str, bg_color: ft.Colors, color: ft.Colors, duration=2, auto_hide: bool = True):
+    def show_toast(
+        page: ft.Page,
+        message: str,
+        bg_color: ft.Colors,
+        color: ft.Colors,
+        duration: float = 2,
+        auto_hide: bool = True
+    ):
         try:
             if page and page.overlay:
                 # 创建 Toast 控件
@@ -37,7 +42,8 @@ class Toast:
                     content=ft.Row(
                         expand=False,
                         alignment=ft.MainAxisAlignment.CENTER,
-                        controls=[ft.Text(message, size=16, color=color)]),
+                        controls=[ft.Text(message, size=16, color=color)]
+                    ),
                     bgcolor=bg_color,
                     padding=10,
                     border_radius=5,
@@ -51,28 +57,21 @@ class Toast:
                 toast.opacity = 1
                 page.update()
 
-            # -- 在 Toast.show_toast 中，替换 auto_hide 部分为：
             if auto_hide:
-                def _hide_toast(p: ft.Page):
+                async def _hide_toast():
                     try:
-                        time.sleep(duration)  # 这个 sleep 在后台线程执行，不会阻塞主线程
-                        try:
-                            toast.opacity = 0
-                            if toast in p.overlay:
-                                p.overlay.remove(toast)
-                            p.update()
-                        except Exception:
-                            logging.exception("toast hide error")
+                        await asyncio.sleep(duration)  # 异步延迟，不阻塞UI
+                        toast.opacity = 0
+                        if toast in page.overlay:
+                            page.overlay.remove(toast)
+                        page.update()
                     except Exception:
-                        logging.exception("toast background error")
+                        logging.exception("toast hide error")
 
-                # 用 page.run_task 在后台线程执行 _hide_toast
                 try:
-                    page.run_task(_hide_toast, page)
+                    page.run_task(_hide_toast)
                 except Exception:
-                    # 如果 run_task 不可用或失败，降级为线程（保底）
-                    import threading
-                    threading.Thread(target=_hide_toast, args=(page,), daemon=True).start()
+                    logging.exception("toast background error")
 
-        except:
+        except Exception:
             logging.exception("toast error")
