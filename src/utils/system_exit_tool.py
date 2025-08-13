@@ -82,7 +82,7 @@ class SystemExitTool:
             SystemExitTool._safe_schedule_stop(utc_timer.stop())
 
             # 关闭test mode
-            test_mode_task.stop()
+            SystemExitTool._safe_schedule_stop(test_mode_task.stop())
 
             logging.info('关闭所有外部资源连接')
         except:
