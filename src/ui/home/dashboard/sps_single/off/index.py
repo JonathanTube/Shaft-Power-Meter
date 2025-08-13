@@ -44,8 +44,7 @@ class SingleShaPoLiOff(ft.Stack):
             except:
                 logging.exception("exception occured at SingleShaPoLiOff.load_data")
                 break
-            finally:
-                await asyncio.sleep(interval)
+            await asyncio.sleep(interval)
 
     def did_mount(self):
         self.task_running = True

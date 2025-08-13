@@ -3,17 +3,20 @@ import logging
 import msgpack
 import websockets
 from common.const_alarm_type import AlarmType
+from db.models.alarm_log import AlarmLog
 from utils.alarm_saver import AlarmSaver
 from task.plc_sync_task import plc
+from common.global_data import gdata
 
 
 class WebSocketMaster:
     def __init__(self):
         self.client = None
         self.server = None
-        self.is_online = False          # Master 是否已成功监听
+        self.is_online = False
         self.is_canceled = False
         self._task = None
+        self._periodic_task_handle = None  # 定时任务句柄
 
     async def start(self):
         """启动 Master 监听"""
@@ -33,14 +36,14 @@ class WebSocketMaster:
         if self._task:
             self._task.cancel()
             self._task = None
+        if self._periodic_task_handle:
+            self._periodic_task_handle.cancel()
+            self._periodic_task_handle = None
         self.server = None
         self.client = None
         self.set_offline()
-        logging.warning("[Master] 客户端已断开")
-        AlarmSaver.create(AlarmType.SLAVE_MASTER, True)
 
     async def _run(self):
-        """启动循环，自动重试监听"""
         while not self.is_canceled:
             try:
                 await self._start_server()
@@ -54,25 +57,24 @@ class WebSocketMaster:
             await asyncio.sleep(3)
 
     async def _start_server(self):
-        """启动 WebSocket 服务器"""
         host, port = "0.0.0.0", 8001
         logging.info(f"[Master] 启动 ws://{host}:{port}")
         try:
             self.server = await websockets.serve(self._client_handler, host, port)
             self.set_online()
+            # 启动定时任务
+            self._periodic_task_handle = asyncio.create_task(self._sync_alarms_to_slave())
         except Exception as e:
             logging.error(f"[Master] 监听失败: {e}")
             self.set_offline()
             raise
 
     async def _client_handler(self, ws):
-        """处理唯一客户端连接"""
         self.client = ws
         logging.info("[Master] 客户端已连接")
         AlarmSaver.recovery(AlarmType.SLAVE_MASTER)
         try:
             async for msg in ws:
-                # 接收eexi breach alarm 写入plc
                 occured: bool = msgpack.unpackb(msg, raw=False)
                 await plc.write_eexi_breach_alarm(occured)
         except websockets.exceptions.ConnectionClosed:
@@ -83,14 +85,47 @@ class WebSocketMaster:
             self.client = None
             self.set_client_offline()
 
+    async def _sync_alarms_to_slave(self):
+        """每 2 秒执行一次的任务"""
+        try:
+            while not self.is_canceled and self.is_online:
+                # 查找未同步的数据
+                alarms: list[AlarmLog] = AlarmLog.select(
+                    AlarmLog.alarm_type,
+                    AlarmLog.occured_time,
+                    AlarmLog.recovery_time,
+                    AlarmLog.acknowledge_time
+                ).where(
+                    AlarmLog.out_of_sync == False,
+                    AlarmLog.is_synced == False
+                ).limit(100)
+
+                arr = []
+                for alarm in alarms:
+                    arr.append({
+                        'alarm_uuid': alarm.alarm_uuid,
+                        'alarm_type': alarm.alarm_type,
+                        'occured_time': gdata.configDateTime.utc,
+                        'out_of_sync': True
+                    })
+
+                await self.send({
+                    'type': 'alarms',
+                    'data': arr
+                })
+
+                await asyncio.sleep(2)
+        except asyncio.CancelledError:
+            pass
+        except Exception:
+            logging.exception("[Master] 定时任务异常")
+
     async def send(self, data) -> bool:
-        """向客户端发送数据"""
         if self.is_online and self.client:
             await self.client.send(msgpack.packb(data))
             return True
         return False
 
-    # ===== 状态维护 =====
     def set_online(self):
         self.is_online = True
         logging.info("[Master] 监听已启动")
@@ -100,6 +135,7 @@ class WebSocketMaster:
         self.is_online = False
         logging.warning("[Master] 监听已停止")
         AlarmSaver.create(AlarmType.MASTER_SERVER, True)
+        AlarmSaver.create(AlarmType.SLAVE_MASTER, True)
 
 
 ws_server = WebSocketMaster()

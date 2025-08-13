@@ -185,5 +185,4 @@ class Home(ft.Container):
                 self.__on_click(int(random() * 10) % 7)
             except:
                 return
-            finally:
-                await asyncio.sleep(random())
+            await asyncio.sleep(random())

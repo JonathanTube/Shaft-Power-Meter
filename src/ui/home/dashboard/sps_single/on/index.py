@@ -48,8 +48,7 @@ class SingleShaPoLiOn(ft.Container):
             except:
                 logging.exception("exception occured at SingleShaPoLiOn.load_data")
                 break
-            finally:
-                await asyncio.sleep(interval)
+            await asyncio.sleep(interval)
 
     def did_mount(self):
         self.task_running = True

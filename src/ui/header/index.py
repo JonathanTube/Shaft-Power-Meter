@@ -175,9 +175,7 @@ class Header(ft.AppBar):
                     self.utc_date_time.update()
             except:
                 logging.exception('exception occured at Header.sync_utc_date_time')
-
-            finally:
-                await asyncio.sleep(1)
+            await asyncio.sleep(1)
 
     def before_update(self):
         try:

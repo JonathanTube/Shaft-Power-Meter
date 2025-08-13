@@ -138,8 +138,8 @@ class SelfTest(ft.Tabs):
                     self.append_log(self.plc_log, "disconnected from PLC")
             except:
                 logging.exception('exception occured at SelfTest.__read_plc_data')
-            finally:
-                await asyncio.sleep(2)
+
+            await asyncio.sleep(2)
 
     async def __read_gps_data(self):
         while self.task_running:
@@ -150,8 +150,7 @@ class SelfTest(ft.Tabs):
                     self.append_log(self.gps_log, "Disconnected from GPS")
             except:
                 logging.exception('exception occured at SelfTest.__read_gps_data')
-            finally:
-                await asyncio.sleep(2)
+            await asyncio.sleep(2)
 
     async def __read_sps_data(self):
         while self.task_running:
@@ -163,8 +162,7 @@ class SelfTest(ft.Tabs):
                     self.append_log(self.sps_log, "Disconnected from SPS")
             except:
                 logging.exception('exception occured at SelfTest.__read_sps_data')
-            finally:
-                await asyncio.sleep(2)
+            await asyncio.sleep(2)
 
     async def __read_sps2_data(self):
         while self.task_running:
@@ -176,8 +174,8 @@ class SelfTest(ft.Tabs):
                     self.append_log(self.sps2_log, "Disconnected from SPS-2")
             except:
                 logging.exception('exception occured at SelfTest.__read_sps2_data')
-            finally:
-                await asyncio.sleep(2)
+
+            await asyncio.sleep(2)
 
     async def __read_hmi_server_data(self):
         while self.task_running:
@@ -192,5 +190,5 @@ class SelfTest(ft.Tabs):
                     self.append_log(self.hmi_server_log, "Disconnected from HMI Server.")
             except:
                 logging.exception('exception occured at SelfTest.__read_hmi_server_data')
-            finally:
-                await asyncio.sleep(2)
+
+            await asyncio.sleep(2)

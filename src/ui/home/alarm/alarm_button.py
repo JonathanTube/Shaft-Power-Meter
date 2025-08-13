@@ -116,8 +116,7 @@ class AlarmButton(ft.TextButton):
                 logging.exception("exception occured at AlarmButton.__loop")
                 self.task_running = False
                 break
-            finally:
-                await asyncio.sleep(1)
+            await asyncio.sleep(1)
 
     def did_mount(self):
         if self.page:

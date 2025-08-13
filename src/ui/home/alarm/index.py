@@ -169,8 +169,7 @@ class AlarmList(ft.Container):
                             self.table.search()
             except:
                 logging.exception("exception occured at AlarmList")
-            finally:
-                await asyncio.sleep(5)
+            await asyncio.sleep(5)
 
     def did_mount(self):
         self.task_running = True

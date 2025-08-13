@@ -207,8 +207,7 @@ class TestMode(ft.Container):
                     self.update()
             except:
                 return
-            finally:
-                await asyncio.sleep(1)
+            await asyncio.sleep(1)
 
     def did_mount(self):
         self.task_running = True

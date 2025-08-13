@@ -62,8 +62,8 @@ class DataRecordTask:
 
             except Exception:
                 logging.exception("DataRecordTask 循环异常")
-            finally:
-                await asyncio.sleep(2)  # 控制循环频率
+
+            await asyncio.sleep(2)  # 控制循环频率
 
     def save_sps_online_data(self):
         DataSaver.save(

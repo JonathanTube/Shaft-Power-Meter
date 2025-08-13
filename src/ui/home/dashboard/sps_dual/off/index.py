@@ -46,8 +46,7 @@ class DualShaPoLiOff(ft.Container):
             except:
                 logging.exception('exception occured at DualShaPoLiOff.load_data')
                 break
-            finally:
-                await asyncio.sleep(interval)
+            await asyncio.sleep(interval)
             
 
     def did_mount(self):

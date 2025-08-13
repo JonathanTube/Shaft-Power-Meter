@@ -43,8 +43,7 @@ class EventButton(ft.TextButton):
                 logging.exception("exception occured at EventButton.__loop")
                 self.task_running = False
                 break
-            finally:
-                await asyncio.sleep(5)
+            await asyncio.sleep(5)
 
     def did_mount(self):
         self.task = self.page.run_task(self.__loop)

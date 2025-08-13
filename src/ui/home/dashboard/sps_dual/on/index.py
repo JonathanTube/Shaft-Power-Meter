@@ -53,8 +53,7 @@ class DualShaPoLiOn(ft.Container):
             except:
                 logging.exception("exception occured at DualShaPoLiOn.load_data")
                 break
-            finally:
-                await asyncio.sleep(interval)
+            await asyncio.sleep(interval)
 
     def did_mount(self):
         self.task_running = True

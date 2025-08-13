@@ -135,8 +135,8 @@ class IntervalCounter(ft.Container):
                 self.__calculate()
             except:
                 logging.exception("exception occured at IntervalCounter.__running")
-            finally:
-                await asyncio.sleep(self.interval)
+
+            await asyncio.sleep(self.interval)
 
     def __calculate(self):
         try:

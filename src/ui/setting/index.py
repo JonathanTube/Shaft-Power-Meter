@@ -193,7 +193,6 @@ class Setting(ft.Container):
                 self.__switch_content(idx=idx)
                 self.rail.selected_index = idx
                 self.rail.update()
+                await asyncio.sleep(random())
             except:
                 return
-            finally:
-                await asyncio.sleep(random())

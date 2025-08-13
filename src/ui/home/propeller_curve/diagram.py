@@ -223,8 +223,7 @@ class PropellerCurveDiagram(ft.Container):
                     self.chart.update()
             except:
                 logging.exception("exception occured at update_sps_points")
-            finally:
-                await asyncio.sleep(interval)
+            await asyncio.sleep(interval)
 
     def did_mount(self):
         self.task_running = True

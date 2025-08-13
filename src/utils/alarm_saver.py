@@ -5,7 +5,6 @@ from peewee import fn
 from common.const_alarm_type import AlarmType
 from db.models.alarm_log import AlarmLog
 from common.global_data import gdata
-from utils.alarm_sender import AlarmSender
 
 
 class AlarmSaver:
@@ -26,7 +25,6 @@ class AlarmSaver:
                 out_of_sync=out_of_sync
             )
             logging.info(f'[创建alarm] {alarm_type}')
-            AlarmSender.send_alarms_to_slave()
 
     @staticmethod
     def recovery(alarm_type: AlarmType):
@@ -37,7 +35,6 @@ class AlarmSaver:
                     is_synchronized=False
                 ).where(AlarmLog.alarm_type == alarm_type).execute()
                 logging.info(f'[恢复alarm] {alarm_type}')
-                AlarmSender.send_alarms_to_slave()
 
     @staticmethod
     def has_alarm(alarm_type: AlarmType) -> tuple[int, int]:

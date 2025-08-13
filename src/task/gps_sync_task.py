@@ -52,10 +52,10 @@ class GpsSyncTask:
                 break
             except Exception:
                 _logger.exception("[GPS] 运行异常")
-            finally:
-                await self.close()
-                self.set_offline()
-                await asyncio.sleep(3)
+
+            await self.close()
+            self.set_offline()
+            await asyncio.sleep(3)
 
     async def connect(self):
         async with self._lock:
