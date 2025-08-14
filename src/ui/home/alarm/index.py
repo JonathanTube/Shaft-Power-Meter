@@ -138,7 +138,7 @@ class AlarmList(ft.Container):
             for row in selected_rows:
                 AlarmLog.update(
                     acknowledge_time=gdata.configDateTime.utc,
-                    is_synchronized=False
+                    is_synced=False
                 ).where(
                     AlarmLog.id == row.cells[0].data,
                     AlarmLog.out_of_sync == True,

@@ -32,7 +32,7 @@ class AlarmSaver:
             if AlarmSaver.has_alarm(alarm_type):
                 AlarmLog.update(
                     recovery_time=gdata.configDateTime.utc,
-                    is_synchronized=False
+                    is_synced=False
                 ).where(AlarmLog.alarm_type == alarm_type).execute()
                 logging.info(f'[恢复alarm] {alarm_type}')
 

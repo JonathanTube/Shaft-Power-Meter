@@ -55,6 +55,7 @@ class SystemConfSettings(ft.Container):
 
                 self.enable_gps = ft.Checkbox(
                     col={"md": 6}, label=self.page.session.get("lang.setting.enable_gps"),
+                    visible=gdata.configCommon.is_master,
                     value=self.system_settings.enable_gps
                 )
 
@@ -156,6 +157,7 @@ class SystemConfSettings(ft.Container):
         self.is_individual.value = e.data == 'slave'
         self.is_individual.update()
 
+        self.enable_gps.visible = e.data == 'master'
         self.enable_gps.value = False
         self.enable_gps.update()
 
@@ -225,9 +227,9 @@ class SystemConfSettings(ft.Container):
 
     def before_update(self):
         try:
-            system_settings: SystemSettings = SystemSettings.get()
-            self.unlimited_power.visible = system_settings.sha_po_li
-            self.eexi_limited_power.visible = system_settings.sha_po_li
-            self.eexi_breach_checking_duration.visible = system_settings.sha_po_li
+            self.unlimited_power.visible = gdata.configCommon.shapoli
+            self.eexi_limited_power.visible = gdata.configCommon.shapoli
+            self.eexi_breach_checking_duration.visible = gdata.configCommon.shapoli
+            self.enable_gps.visible = gdata.configCommon.is_master
         except:
             logging.exception('exception occured at SystemConfSettings.before_update')
