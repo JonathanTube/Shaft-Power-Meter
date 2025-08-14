@@ -130,7 +130,7 @@ class DataInit:
                 # hex red color
                 line_color_of_overload_curve="#ff0000",
 
-                alarm_enabled_of_overload_curve=False
+                enable_power_overload_alarm=False
             )
 
     def __init_preference():

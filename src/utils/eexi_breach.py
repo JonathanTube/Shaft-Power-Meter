@@ -99,7 +99,7 @@ class EEXIBreach:
     def __handle_breach_event(start_time: datetime):
         # 如果还没有创建报告，则创建报告
         if EEXIBreach.report_id is None:
-            gdata.configPropperCurve.eexi_breach = True
+            gdata.configCommon.is_eexi_breaching = True
 
             event_log: EventLog = EventLog.create(started_at=start_time, started_position=gdata.configGps.location)
 
@@ -122,7 +122,7 @@ class EEXIBreach:
     @staticmethod
     def __handle_recovery_event(start_time: datetime):
         if EEXIBreach.report_id is not None:
-            gdata.configPropperCurve.eexi_breach = False
+            gdata.configCommon.is_eexi_breaching = False
             event_log: EventLog = EventLog.select().where(EventLog.ended_at == None).order_by(EventLog.id.asc()).first()
 
             if event_log is not None:

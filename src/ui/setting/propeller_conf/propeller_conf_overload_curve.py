@@ -27,7 +27,7 @@ class PropellerConfOverloadCurve(ft.Container):
                 self.overload_alarm = ft.Checkbox(
                     label=self.page.session.get("lang.setting.enable_overload_alarm"), 
                     col={"xs": 6}, 
-                    value=self.ps.alarm_enabled_of_overload_curve
+                    value=self.ps.enable_power_overload_alarm
                 )
 
                 self.line_color_of_overload_curve = ColorDialog(color=self.ps.line_color_of_overload_curve)
@@ -45,8 +45,8 @@ class PropellerConfOverloadCurve(ft.Container):
 
     def save_data(self):
         self.ps.value_of_overload_curve = self.overload_curve.value
-        self.ps.alarm_enabled_of_overload_curve = self.overload_alarm.value
+        self.ps.enable_power_overload_alarm = self.overload_alarm.value
         self.ps.line_color_of_overload_curve = self.line_color_of_overload_curve.color
 
-        gdata.configPropperCurve.alarm_enabled_of_overload_curve = self.overload_alarm.value
+        gdata.configPropperCurve.enable_power_overload_alarm = self.overload_alarm.value
         gdata.configPropperCurve.power_of_overload = self.ps.value_of_overload_curve

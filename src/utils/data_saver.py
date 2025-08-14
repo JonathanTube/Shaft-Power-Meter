@@ -100,7 +100,7 @@ class DataSaver:
 
         overload = actual_power_percentage > overload_power_percentage
 
-        if gdata.configPropperCurve.alarm_enabled_of_overload_curve:
+        if gdata.configPropperCurve.enable_power_overload_alarm:
             if overload:
                 AlarmSaver.create(AlarmType.POWER_OVERLOAD)
                 DataSaver._safe_create_task(plc.write_power_overload(True))

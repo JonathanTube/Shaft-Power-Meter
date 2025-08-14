@@ -35,7 +35,9 @@ class ConfigCommon:
     eexi_breach_checking_duration = 5
 
     default_table_width = 990
-    is_overload_alarm = False
+
+    # 是否功率突破EEXI
+    is_eexi_breaching = False
 
     def set_default_value(self):
         systemSettings: SystemSettings = SystemSettings.get()
@@ -195,7 +197,7 @@ class ConfigPropperCurve:
     speed_of_torque_load_limit = 0
     power_of_torque_load_limit = 0
     power_of_overload = 0
-    eexi_breach = False
+    enable_power_overload_alarm = False
 
     def set_default_value(self):
         propellerSetting: PropellerSetting = PropellerSetting.get()
@@ -204,7 +206,7 @@ class ConfigPropperCurve:
         self.speed_of_torque_load_limit = propellerSetting.rpm_right_of_torque_load_limit_curve
         self.power_of_torque_load_limit = propellerSetting.bhp_right_of_torque_load_limit_curve + propellerSetting.value_of_overload_curve
         self.power_of_overload = propellerSetting.value_of_overload_curve
-        self.alarm_enabled_of_overload_curve = propellerSetting.alarm_enabled_of_overload_curve
+        self.enable_power_overload_alarm = propellerSetting.enable_power_overload_alarm
 
 
 @dataclass
