@@ -155,11 +155,16 @@ class SelfTest(ft.Tabs):
     async def __read_sps_data(self):
         while self.task_running:
             try:
+                if gdata.configTest.test_mode_running:
+                    self.append_log(self.sps_log, "Test mode is running")
+                    return
+
                 sps_data = f'ad0={round(gdata.configSPS.ad0, 1)},ad1={round(gdata.configSPS.ad1, 1)},speed={round(gdata.configSPS.speed, 1)},torque={round(gdata.configSPS.torque, 1)},thrust={round(gdata.configSPS.thrust, 1)}'
                 if sps_read_task.is_online:
                     self.append_log(self.sps_log, f"SPS Data: {sps_data}")
                 else:
                     self.append_log(self.sps_log, "Disconnected from SPS")
+                    return
             except:
                 logging.exception('exception occured at SelfTest.__read_sps_data')
             await asyncio.sleep(2)

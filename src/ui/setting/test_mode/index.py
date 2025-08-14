@@ -193,7 +193,7 @@ class TestMode(ft.Container):
             gdata.configTest.test_mode_running = False
             gdata.configCommon.is_eexi_breaching = False
             # 这里只需要回复power_overload的告警，alarm不需要管。
-            asyncio.create_task(plc.write_power_overload(False))
+            self.page.run_task(plc.write_power_overload, False)
             Toast.show_success(self.page)
         except:
             Toast.show_error(self.page, "stop test mode failed.")
