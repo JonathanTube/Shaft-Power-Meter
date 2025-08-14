@@ -3,8 +3,6 @@ import logging
 import flet as ft
 from random import random
 from common.global_data import gdata
-from db.models.date_time_conf import DateTimeConf
-from db.models.user import User
 from ui.common.permission_check import PermissionCheck
 from ui.common.toast import Toast
 from ui.header.shapoli import ShaPoLi
@@ -36,8 +34,6 @@ class Header(ft.AppBar):
         self._auto_run_running = False
 
         self.is_switching = False
-
-        self.date_format = None
 
     def build(self):
         try:
@@ -100,7 +96,7 @@ class Header(ft.AppBar):
         except:
             logging.exception('exception occured at Header.build')
 
-    def __on_exit(self, user: User):
+    def __on_exit(self, user):
         if self.page and self.page.session:
             msg = self.page.session.get("lang.toast.system_exit")
             Toast.show_error(self.page, msg, auto_hide=False)
@@ -171,7 +167,7 @@ class Header(ft.AppBar):
         while self.task_running:
             try:
                 if gdata.configDateTime.utc and self.utc_date_time and self.utc_date_time.page:
-                    self.utc_date_time.text = gdata.configDateTime.utc.strftime(f"{self.date_format} %H:%M:%S")
+                    self.utc_date_time.text = gdata.configDateTime.utc.strftime(f"{gdata.configDateTime.date_format} %H:%M:%S")
                     self.utc_date_time.update()
             except:
                 logging.exception('exception occured at Header.sync_utc_date_time')
@@ -179,13 +175,11 @@ class Header(ft.AppBar):
 
     def before_update(self):
         try:
-            datetime_conf: DateTimeConf = DateTimeConf.get()
-            self.date_format = datetime_conf.date_format
             if self.page and self.page.session:
                 if self.report is not None:
                     self.report.visible = gdata.configCommon.shapoli
 
-                if self.shapoli is not None:    
+                if self.shapoli is not None:
                     self.shapoli.visible = gdata.configCommon.shapoli
 
                 if self.app_name is not None:
