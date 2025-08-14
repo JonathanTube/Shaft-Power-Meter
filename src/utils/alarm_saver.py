@@ -12,7 +12,7 @@ class AlarmSaver:
     _lock = threading.Lock()
 
     @staticmethod
-    def create(alarm_type: AlarmType, out_of_sync: bool):
+    def create(alarm_type: AlarmType, out_of_sync: bool = False):
         # 加锁（使用with语句确保锁自动释放）
         with AlarmSaver._lock:
             if AlarmSaver.has_alarm(alarm_type):

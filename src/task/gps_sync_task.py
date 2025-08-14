@@ -130,7 +130,7 @@ class GpsSyncTask:
 
     def set_offline(self):
         self.is_online = False
-        AlarmSaver.create(AlarmType.MASTER_GPS, False)
+        AlarmSaver.create(AlarmType.MASTER_GPS)
 
 
 gps = GpsSyncTask()

@@ -33,6 +33,6 @@ class SpsReadTask(JM3846AsyncClient):
         """设置离线状态（非阻塞）"""
         if self.is_online is None or self.is_online == True:
             self.is_online = False
-            AlarmSaver.create(AlarmType.MASTER_SPS, False)
+            AlarmSaver.create(AlarmType.MASTER_SPS)
 
 sps_read_task = SpsReadTask()

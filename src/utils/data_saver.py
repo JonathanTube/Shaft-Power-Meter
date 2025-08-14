@@ -102,7 +102,7 @@ class DataSaver:
 
         if gdata.configPropperCurve.alarm_enabled_of_overload_curve:
             if overload:
-                AlarmSaver.create(AlarmType.POWER_OVERLOAD, True)
+                AlarmSaver.create(AlarmType.POWER_OVERLOAD)
                 DataSaver._safe_create_task(plc.write_power_overload(True))
             else:
                 AlarmSaver.recovery(AlarmType.POWER_OVERLOAD)

@@ -115,7 +115,7 @@ class IOSettingGPS(ft.Container):
                 operation_content=user.user_name
             )
             self.page.run_task(gps.stop)
-            AlarmSaver.create(AlarmType.MASTER_GPS, True)
+            AlarmSaver.create(AlarmType.MASTER_GPS)
         except:
             logging.exception("exception occured at IOSettingGPS.__on_close")
 

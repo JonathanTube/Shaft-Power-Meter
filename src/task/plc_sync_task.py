@@ -254,7 +254,7 @@ class PlcSyncTask:
 
     def set_offline(self):
         self.is_online = False
-        AlarmSaver.create(AlarmType.MASTER_PLC, True)
+        AlarmSaver.create(AlarmType.MASTER_PLC)
 
 
 # 全局单例
