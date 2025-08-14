@@ -1,5 +1,8 @@
 import logging
 import flet as ft
+from peewee import fn
+from common.const_alarm_type import AlarmType
+from db.models.alarm_log import AlarmLog
 from ui.common.meter_half import MeterHalf
 from common.global_data import gdata
 
@@ -22,7 +25,7 @@ class EEXILimitedPower(ft.Container):
                 return
 
             if self.page.window.height <= 600:
-                meter_radius = self.container_height * 0.6
+                meter_radius = self.container_height * 0.55
             else:
                 meter_radius = self.container_height * 0.56
             green = self.normal_power
@@ -39,7 +42,27 @@ class EEXILimitedPower(ft.Container):
                 controls=[self.unlimited_mode, self.unlimited_mode_icon]
             )
 
-            row = ft.Row(alignment=ft.MainAxisAlignment.SPACE_BETWEEN, controls=[self.title, self.unlimited_mode_row])
+            top_items = ft.Row(alignment=ft.MainAxisAlignment.SPACE_BETWEEN, controls=[self.title, self.unlimited_mode_row])
+
+            self.common_alarm_text = ft.Text("Common Alarm")
+            self.common_alarm_dot = ft.Text("🔴")
+            self.common_alarm_group = ft.Row(
+                controls=[self.common_alarm_text, self.common_alarm_dot],
+                alignment=ft.MainAxisAlignment.END,
+                vertical_alignment=ft.CrossAxisAlignment.CENTER
+            )
+
+            self.gps_status_text = ft.Text("GPS Status")
+            self.gps_status_dot = ft.Text("🟢")
+            self.gps_status_group = ft.Row(
+                controls=[self.gps_status_text, self.gps_status_dot],
+                alignment=ft.MainAxisAlignment.END,
+                vertical_alignment=ft.CrossAxisAlignment.CENTER
+            )
+
+            identifications = ft.Column(expand=True, alignment=ft.alignment.top_right, controls=[self.common_alarm_group, self.gps_status_group])
+
+            center_items = ft.Row(expand=True, controls=[self.meter_half, identifications])
 
             self.content = ft.Container(
                 border=ft.border.all(
@@ -49,9 +72,9 @@ class EEXILimitedPower(ft.Container):
                 border_radius=10,
                 padding=ft.padding.all(10),
                 content=ft.Column(
-                    spacing=20,
+                    spacing=10,
                     horizontal_alignment=ft.CrossAxisAlignment.CENTER,
-                    controls=[row, self.meter_half]
+                    controls=[top_items, center_items]
                 )
             )
         except:
@@ -74,8 +97,20 @@ class EEXILimitedPower(ft.Container):
                         self.meter_half.set_center_value(percentage_of_eexi)
 
                 self.update_mode()
+                self.update_idenfications()
         except:
             logging.exception('exception occured at EEXILimitedPower.reload')
+
+    def update_idenfications(self):
+        if self.common_alarm_dot and self.common_alarm_dot.page:
+            cnt_common_alarm = AlarmLog.select(fn.COUNT(AlarmLog.id)).where(AlarmLog.alarm_type != AlarmType.MASTER_GPS, AlarmLog.recovery_time == None).scalar()
+            self.common_alarm_dot.value = '🔴' if cnt_common_alarm > 0 else '🟢'
+            self.common_alarm_dot.update()
+
+        if self.gps_status_dot and self.gps_status_dot.page:
+            cnt_gps_alarm = AlarmLog.select(fn.COUNT(AlarmLog.id)).where(AlarmLog.alarm_type == AlarmType.MASTER_GPS, AlarmLog.recovery_time == None).scalar()
+            self.gps_status_dot.value = '🔴' if cnt_gps_alarm > 0 else '🟢'
+            self.gps_status_dot.update()
 
     def update_mode(self):
         try:

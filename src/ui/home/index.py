@@ -12,7 +12,6 @@ from ui.home.logs.index import Logs
 from ui.home.propeller_curve.index import PropellerCurve
 from ui.home.trendview.index import TrendView
 from ui.home.event.index import EventList
-from common.global_data import gdata
 
 
 class Home(ft.Container):
@@ -66,8 +65,6 @@ class Home(ft.Container):
                 visible=gdata.configCommon.show_propeller_curve,
                 on_click=lambda e: self.__on_click(3)
             )
-            self.alarm_button = AlarmButton(style=self.default_button_style, on_click=lambda _: self.__on_click(4))
-            self.event_button = EventButton(style=self.default_button_style, on_click=lambda _: self.__on_click(5))
 
             self.logs = ft.TextButton(
                 text=self.page.session.get("lang.home.tab.logs"),
@@ -77,18 +74,24 @@ class Home(ft.Container):
                 on_click=lambda e: self.__on_click(6)
             )
 
-            self.row_items = ft.Row(
-                spacing=5,
-                controls=[
-                    self.dashboard,
-                    self.counter,
-                    self.trendview,
-                    self.propeller_curve,
-                    self.alarm_button,
-                    self.event_button,
-                    self.logs
-                ]
-            )
+            controls = [
+                self.dashboard,
+                self.counter,
+                self.trendview,
+                self.propeller_curve
+            ]
+
+            if gdata.configCommon.is_master:
+                self.alarm_button = AlarmButton(style=self.default_button_style, on_click=lambda _: self.__on_click(4))
+                controls.append(self.alarm_button)
+
+            if gdata.configCommon.shapoli:
+                self.event_button = EventButton(style=self.default_button_style, on_click=lambda _: self.__on_click(5))
+                controls.append(self.event_button)
+
+            controls.append(self.logs)
+
+            self.row_items = ft.Row(spacing=5, controls=controls)
 
             self.main_container = ft.Container(
                 expand=True,

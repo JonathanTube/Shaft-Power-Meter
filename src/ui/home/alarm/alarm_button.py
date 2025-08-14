@@ -2,8 +2,7 @@ import asyncio
 import logging
 import flet as ft
 from typing import Callable
-from peewee import fn, Case
-
+from peewee import fn
 from db.models.alarm_log import AlarmLog
 
 

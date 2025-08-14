@@ -5,7 +5,6 @@ from typing import Callable
 
 from db.models.event_log import EventLog
 from peewee import fn
-from common.global_data import gdata
 
 
 class EventButton(ft.TextButton):
@@ -25,7 +24,6 @@ class EventButton(ft.TextButton):
     def build(self):
         try:
             self.text = self.page.session.get("lang.home.tab.event")
-            self.visible = gdata.configCommon.shapoli
         except:
             logging.exception('exception occured at EventButton.build')
 
