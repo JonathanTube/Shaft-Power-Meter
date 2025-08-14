@@ -1,4 +1,4 @@
-from peewee import IntegerField
+from peewee import IntegerField, FloatField
 from ..base import BaseModel
 
 
@@ -7,7 +7,7 @@ class OfflineDefaultValue(BaseModel):
 
     thrust_default_value = IntegerField(verbose_name="推力默认值 (N)")
 
-    speed_default_value = IntegerField(verbose_name="速度默认值 (RPM)")
+    speed_default_value = FloatField(verbose_name="速度默认值 (RPM)")
 
     class Meta:
         table_name = 'offline_default_value'

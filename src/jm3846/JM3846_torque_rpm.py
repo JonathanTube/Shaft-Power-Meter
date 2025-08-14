@@ -32,7 +32,8 @@ class JM3846TorqueRpm:
 
             # 处理数据
             result = JM3846TorqueRpmUtil.get_avg(self.accumulated_data, name)
-            self.handle_result(result[0], result[1])
+            if not gdata.configTest.test_mode_running:
+                self.handle_result(result[0], result[1])
 
     def stop(self):
         self._is_running = False

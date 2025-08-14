@@ -45,7 +45,7 @@ class GeneralOflineDefaultValue(ft.Container):
                     col={"xs": 6},
                     read_only=True,
                     can_request_focus=False,
-                    on_click=lambda e: keyboard.open(e.control, type="int"))
+                    on_click=lambda e: keyboard.open(e.control))
 
                 self.custom_card = CustomCard(
                     self.page.session.get("lang.setting.offline_default_value"),

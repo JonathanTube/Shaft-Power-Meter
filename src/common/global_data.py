@@ -103,7 +103,7 @@ class ConfigOffline:
 
 @dataclass
 class ConfigSPS:
-    speed = 0
+    speed = 0.0
     power = 0
     torque = 0
     thrust = 0
@@ -139,7 +139,7 @@ class ConfigSPS:
 
 @dataclass
 class ConfigSPS2:
-    speed = 0
+    speed = 0.0
     power = 0
     torque = 0
     thrust = 0

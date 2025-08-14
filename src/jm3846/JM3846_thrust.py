@@ -41,7 +41,8 @@ class JM3846Thrust:
 
             # 处理数据
             ch1_ad = JM3846ThrustUtil.get_avg(self.accumulated_data, self.name)
-            self.handle_result(ch1_ad)
+            if not gdata.configTest.test_mode_running:
+                self.handle_result(ch1_ad)
 
     def stop(self):
         self._is_running = False

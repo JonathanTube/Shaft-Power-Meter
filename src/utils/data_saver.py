@@ -51,7 +51,8 @@ class DataSaver:
                     'data': {
                         'torque': torque,
                         'thrust': thrust,
-                        'speed': speed
+                        'speed': speed,
+                        'gps': gdata.configGps.location
                     }
                 }))
 

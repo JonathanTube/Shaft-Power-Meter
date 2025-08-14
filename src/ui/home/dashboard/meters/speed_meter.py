@@ -7,7 +7,7 @@ from typing import Literal
 
 
 class SpeedMeter(ft.Container):
-    def __init__(self, name: Literal["sps", "sps2"], radius : float = 0):
+    def __init__(self, name: Literal["sps", "sps2"], radius: float = 0):
         super().__init__()
         self.expand = False
         self.name = name
@@ -23,10 +23,9 @@ class SpeedMeter(ft.Container):
             limit = limitations.speed_warning
 
             heading = self.page.session.get("lang.common.speed")
-            self.content = MeterRound(heading=heading, radius=self.radius, unit="rpm", max=max, limit=limit)
+            self.content: MeterRound = MeterRound(heading=heading, radius=self.radius, unit="rpm", max=max, limit=limit)
         except:
             logging.exception('exception occured at SpeedMeter.build')
-
 
     def reload(self):
         try:

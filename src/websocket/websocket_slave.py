@@ -87,6 +87,7 @@ class WebSocketSlave:
         gdata.configSPS.torque = data['torque']
         gdata.configSPS.thrust = data['thrust']
         gdata.configSPS.speed = data['speed']
+        gdata.configGps.location = data['gps']
 
     def _handle_sps2_data(self, data):
         if gdata.configTest.test_mode_running:
@@ -95,6 +96,8 @@ class WebSocketSlave:
         gdata.configSPS2.torque = data['torque']
         gdata.configSPS2.thrust = data['thrust']
         gdata.configSPS2.speed = data['speed']
+        # 这里gps不处理了，sps已经处理过一次了
+        # gdata.configGps.location = data['gps']
 
     async def _handle_alarm(self, data):
         for alarm in data:
