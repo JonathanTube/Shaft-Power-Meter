@@ -75,8 +75,13 @@ class WebSocketMaster:
         AlarmSaver.recovery(AlarmType.SLAVE_MASTER)
         try:
             async for msg in ws:
-                occured: bool = msgpack.unpackb(msg, raw=False)
-                await plc.write_eexi_breach_alarm(occured)
+                res = msgpack.unpackb(msg, raw=False)
+                type = res['type']
+                if type == 'eexi_breach':
+                    await plc.write_eexi_breach_alarm(res['data'])
+                if type == 'alarm_ack':
+                    self._handle_alarm_ack(res['data'])
+
         except websockets.exceptions.ConnectionClosed:
             logging.info("[Master] 客户端断开")
         except Exception:
@@ -84,6 +89,12 @@ class WebSocketMaster:
         finally:
             self.client = None
             self.set_client_offline()
+
+    def _handle_alarm_ack(self, alarm_uuid):
+        try:
+            AlarmLog.update(is_synced=True).where(AlarmLog.alarm_uuid == alarm_uuid).execte()
+        except Exception as e:
+            logging.exception(f"[PLC] alarm ack 失败, alarm_uuid={alarm_uuid}", e)
 
     async def _sync_alarms_to_slave(self):
         """每 2 秒执行一次的任务"""

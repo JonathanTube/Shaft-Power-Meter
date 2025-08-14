@@ -25,8 +25,8 @@ class UnitParser:
 
     @staticmethod
     def parse_speed(speed: float) -> tuple[int, str]:
-        _speed = speed if speed is not None else 0
-        return [round(_speed), 'rpm']
+        _speed = float(speed) if speed is not None else 0.0
+        return [round(_speed, 1), 'rpm']
 
     @staticmethod
     def parse_torque(torque: float, system_unit: int, shrink: bool = False) -> tuple[int, str]:

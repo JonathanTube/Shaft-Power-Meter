@@ -57,8 +57,6 @@ class EEXILimitedPower(ft.Container):
         except:
             logging.exception('exception occured at EEXILimitedPower.reload')
 
-
-
     def reload(self):
         try:
             if self.page:
@@ -72,7 +70,7 @@ class EEXILimitedPower(ft.Container):
                 if self.meter_half is not None:
                     self.meter_half.set_outer_value(active_value, inactive_value)
                     if self.eexi_power > 0:
-                        percentage_of_eexi = int(active_value / self.eexi_power * 100)
+                        percentage_of_eexi = round(active_value / self.eexi_power * 100)
                         self.meter_half.set_center_value(percentage_of_eexi)
 
                 self.update_mode()
@@ -94,7 +92,7 @@ class EEXILimitedPower(ft.Container):
                 else:
                     self.unlimited_mode_icon.color = ft.Colors.RED
                     self.unlimited_mode.color = ft.Colors.RED
-                
+
                 if self.unlimited_mode_row and self.unlimited_mode_row.page:
                     self.unlimited_mode_row.update()
         except:
