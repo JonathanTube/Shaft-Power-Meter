@@ -19,10 +19,16 @@ class JM3846AsyncClient(ABC):
         self._lock = asyncio.Lock()
         self._bg_tasks: List[asyncio.Task] = []
         self.is_canceled = False
+        self._connect_task: Optional[asyncio.Task] = None
 
-    async def connect(self):
-        """建立连接并启动后台接收任务（固定间隔无限重连）"""
-        self.is_canceled = False
+    async def start(self):
+        """启动异步连接任务（不阻塞外部）"""
+        if self._connect_task is None or self._connect_task.done():
+            self.is_canceled = False
+            self._connect_task = asyncio.create_task(self._connect_loop())
+
+    async def _connect_loop(self):
+        """后台循环连接任务"""
         while not self.is_canceled:
             try:
                 async with self._lock:
@@ -44,7 +50,6 @@ class JM3846AsyncClient(ABC):
                 logging.error(f'[JM3846-{self.name}] 连接被拒绝: {e}')
             except asyncio.TimeoutError:
                 logging.info(f'[JM3846-{self.name}] 连接超时')
-                pass
             except asyncio.CancelledError:
                 logging.info(f'[JM3846-{self.name}] 连接任务被取消')
                 break
@@ -52,11 +57,18 @@ class JM3846AsyncClient(ABC):
                 logging.exception(f'[JM3846-{self.name}] 连接异常: {e}')
 
             await self.release()
-            await asyncio.sleep(60)  # 固定60秒重试
+            if not self.is_canceled:
+                await asyncio.sleep(60)  # 固定60秒重试
 
     async def close(self):
         """强制退出连接"""
         self.is_canceled = True
+        if self._connect_task and not self._connect_task.done():
+            self._connect_task.cancel()
+            try:
+                await self._connect_task
+            except asyncio.CancelledError:
+                pass
         await self.release()
 
     async def release(self):
@@ -74,12 +86,9 @@ class JM3846AsyncClient(ABC):
                             logging.warning(f'[JM3846-{self.name}] 发送 0x45 停止帧时失败（已忽略）')
 
                         self.writer.close()
-                        # 改为（安全）
                         try:
-                            loop = asyncio.get_running_loop()
-                            loop.create_task(self.writer.wait_closed())
-                        except RuntimeError:
-                            # 没有运行 loop，忽略等待
+                            await self.writer.wait_closed()
+                        except Exception:
                             pass
                 except Exception:
                     logging.warning(f'[JM3846-{self.name}] 关闭连接时出错（已忽略）')
@@ -92,7 +101,6 @@ class JM3846AsyncClient(ABC):
             self.set_offline()
 
     # ---- 抽象方法 ----
-
     @abstractmethod
     def get_ip_port(self) -> tuple[str, int]:
         pass

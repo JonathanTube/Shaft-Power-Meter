@@ -6,7 +6,7 @@ from common.const_alarm_type import AlarmType
 from db.models.alarm_log import AlarmLog
 from utils.alarm_saver import AlarmSaver
 from task.plc_sync_task import plc
-from common.global_data import gdata
+from utils.datetime_util import DateTimeUtil
 
 
 class WebSocketMaster:
@@ -102,6 +102,7 @@ class WebSocketMaster:
             while not self.is_canceled and self.is_online:
                 # 查找未同步的数据
                 alarms: list[AlarmLog] = AlarmLog.select(
+                    AlarmLog.alarm_uuid,
                     AlarmLog.alarm_type,
                     AlarmLog.occured_time,
                     AlarmLog.recovery_time,
@@ -116,8 +117,9 @@ class WebSocketMaster:
                     arr.append({
                         'alarm_uuid': alarm.alarm_uuid,
                         'alarm_type': alarm.alarm_type,
-                        'occured_time': gdata.configDateTime.utc,
-                        'out_of_sync': True
+                        'occured_time': DateTimeUtil.format_date(alarm.occured_time),
+                        'recovery_time': DateTimeUtil.format_date(alarm.recovery_time),
+                        'acknowledge_time': DateTimeUtil.format_date(alarm.acknowledge_time)
                     })
 
                 await self.send({

@@ -110,7 +110,8 @@ class WebSocketSlave:
                     alarm_type=alarm['alarm_type'],
                     occured_time=DateTimeUtil.parse_date(alarm['occured_time']),
                     recovery_time=DateTimeUtil.parse_date(alarm['recovery_time']),
-                    acknowledge_time=DateTimeUtil.parse_date(alarm['acknowledge_time'])
+                    acknowledge_time=DateTimeUtil.parse_date(alarm['acknowledge_time']),
+                    out_of_sync=True
                 )
             # 每条处理完毕，需要回复服务器
             await self.ack_alarm(alarm['alarm_uuid'])

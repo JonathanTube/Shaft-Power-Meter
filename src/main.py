@@ -156,10 +156,10 @@ async def start_all_tasks():
 
     # SPS 读取
     if system_settings.is_master:
-        await sps_read_task.connect()
+        await sps_read_task.start()
         task_manager.add(sps_read_task)
         if system_settings.amount_of_propeller == 2:
-            await sps2_read_task.connect()
+            await sps2_read_task.start()
             task_manager.add(sps2_read_task)
 
     # WS
