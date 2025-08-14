@@ -1,4 +1,3 @@
-import asyncio
 import logging
 import flet as ft
 from typing import Callable

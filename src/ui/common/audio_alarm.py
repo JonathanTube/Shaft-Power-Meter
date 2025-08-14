@@ -1,7 +1,6 @@
 import asyncio
 import logging
 import flet as ft
-from db.models.user import User
 from db.models.event_log import EventLog
 from ui.common.permission_check import PermissionCheck
 from task.utc_timer_task import gdata
@@ -24,16 +23,16 @@ class AudioAlarm(ft.Container):
                 bgcolor=ft.Colors.RED,
                 visible=False,
                 color=ft.Colors.WHITE,
-                on_click=lambda e: self.page.open(PermissionCheck(self.on_mute, 1))
+                on_click=lambda e: self.page.open(PermissionCheck(self.handle_mute, 1))
             )
         except:
             logging.exception('exception occured at AudioAlarm.build')
             self.content = ft.Text("")
 
-    def show(self):
+    async def show(self):
         try:
             # 向plc发送报警-打开
-            self.notify_eexi_breach(True)
+            await self.notify_eexi_breach(True)
             if self.content and self.content.page:
                 self.content.visible = True
                 self.content.disabled = False
@@ -43,21 +42,24 @@ class AudioAlarm(ft.Container):
         except:
             logging.exception('exception occured at AudioAlarm.show')
 
-    def hide(self):
+    async def hide(self):
         try:
             # 向plc发送报警-关闭
-            self.notify_eexi_breach(False)
+            await self.notify_eexi_breach(False)
             if self.content and self.content.page:
                 self.content.visible = False
                 self.content.update()
         except:
             logging.exception('exception occured at AudioAlarm.hide')
 
-    def on_mute(self, user: User):
+    def handle_mute(self, _):
+        self.page.run_task(self.on_mute)
+
+    async def on_mute(self):
         try:
             # 向plc发送报警-关闭
-            self.notify_eexi_breach(False)
-            event_log: EventLog = EventLog.select().order_by(EventLog.id.desc()).first()
+            await self.notify_eexi_breach(False)
+            event_log: EventLog = await asyncio.to_thread(lambda: EventLog.select().order_by(EventLog.id.desc()).first())
             if event_log:
                 event_log.acknowledged_at = gdata.configDateTime.utc
                 event_log.save()
@@ -70,12 +72,12 @@ class AudioAlarm(ft.Container):
         except:
             logging.exception('exception occured at AudioAlarm.on_mute')
 
-    def notify_eexi_breach(self, occured: bool):
+    async def notify_eexi_breach(self, occured: bool):
         try:
             if gdata.configCommon.is_master:
                 # 避免重复启动相同任务
-                asyncio.create_task(plc.write_eexi_breach_alarm(occured))
+                await plc.write_eexi_breach_alarm(occured)
             else:
-                asyncio.create_task(ws_client.send_eexi_breach_alarm_to_master(occured))
+                await ws_client.send_eexi_breach_alarm_to_master(occured)
         except Exception:
             logging.exception("Exception in AudioAlarm.notify_eexi_breach")

@@ -124,7 +124,7 @@ class GeneralDateTime(ft.Container):
         except:
             logging.exception('exception occured at GeneralDateTime.__handle_time_change')
 
-    async def save_data_async(self, user_id: int):
+    async def save_data(self, user_id: int):
         """异步保存，避免阻塞 UI"""
         if not self.page or not self.date_time_conf:
             return
@@ -141,6 +141,7 @@ class GeneralDateTime(ft.Container):
             self.date_time_conf.date_format = self.date_format.value
             self.date_time_conf.sync_with_gps = self.sync_with_gps.value
             gdata.configDateTime.sync_with_gps = self.sync_with_gps.value
+            gdata.configDateTime.date_format = self.date_format.value
 
             # 异步保存数据库
             await asyncio.to_thread(self.date_time_conf.save)

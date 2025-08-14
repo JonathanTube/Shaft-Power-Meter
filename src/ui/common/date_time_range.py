@@ -1,15 +1,9 @@
 import logging
 import flet as ft
-
-from db.models.date_time_conf import DateTimeConf
+from common.global_data import gdata
 
 
 class DateTimeRange(ft.Row):
-    def __init__(self):
-        super().__init__()
-        datetime_conf: DateTimeConf = DateTimeConf.get()
-        self.date_format = datetime_conf.date_format
-
     def build(self):
         try:
             if self.page and self.page.session:
@@ -40,7 +34,7 @@ class DateTimeRange(ft.Row):
         try:
             if e.control is not None and e.control.value is not None:
                 if self.start_date and self.start_date.page:
-                    self.start_date.value = e.control.value.strftime(self.date_format)
+                    self.start_date.value = e.control.value.strftime(gdata.configDateTime.date_format)
                     self.start_date.update()
         except:
             logging.exception('exception occured at DateTimeRange.__handle_start_date_change')
@@ -49,7 +43,7 @@ class DateTimeRange(ft.Row):
         try:
             if e.control is not None and e.control.value is not None:
                 if self.end_date and self.end_date.page:
-                    self.end_date.value = e.control.value.strftime(self.date_format)
+                    self.end_date.value = e.control.value.strftime(gdata.configDateTime.date_format)
                     self.end_date.update()
         except:
             logging.exception('exception occured at DateTimeRange.__handle_end_date_change')

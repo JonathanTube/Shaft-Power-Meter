@@ -63,12 +63,14 @@ class ConfigDateTime:
     sync_with_gps = False
     utc: datetime = None
     system: datetime = None
+    date_format: str = None
 
     def set_default_value(self):
         dateTimeConf: DateTimeConf = DateTimeConf.get()
         self.sync_with_gps = dateTimeConf.sync_with_gps
         self.utc = dateTimeConf.utc_date_time
         self.system = dateTimeConf.system_date_time
+        self.date_format = dateTimeConf.date_format
 
 
 @dataclass

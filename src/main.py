@@ -110,12 +110,12 @@ def set_content(page: ft.Page):
                 if gdata.configCommon.is_eexi_breaching:
                     if not is_running:
                         fullscreen_alert.show()
-                        audio_alarm_btn.show()
+                        await audio_alarm_btn.show()
                         is_running = True
                 else:
                     if is_running:
                         fullscreen_alert.hide()
-                        audio_alarm_btn.hide()
+                        await audio_alarm_btn.hide()
                         is_running = False
             except Exception:
                 logging.exception('watch_eexi_breach error')

@@ -3,6 +3,7 @@ import logging
 import flet as ft
 from typing import Callable
 from peewee import fn
+from common.global_data import gdata
 from db.models.alarm_log import AlarmLog
 
 
@@ -24,6 +25,10 @@ class AlarmButton(ft.TextButton):
 
     def build(self):
         try:
+            self.visible = gdata.configCommon.is_master
+            if not self.visible:
+                return
+
             if self.page and self.page.session:
                 self.text = self.page.session.get("lang.home.tab.alarm")
         except:
@@ -118,6 +123,8 @@ class AlarmButton(ft.TextButton):
             await asyncio.sleep(1)
 
     def did_mount(self):
+        if not gdata.configCommon.is_master:
+            return
         if self.page:
             self.task = self.page.run_task(self.__loop)
 

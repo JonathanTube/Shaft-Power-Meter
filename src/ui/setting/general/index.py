@@ -100,7 +100,7 @@ class General(ft.Container):
             self.limitation_max.save_data(user_id)
             self.limitation_warning.save_data(user_id)
             self.general_ofline_default_value.save_data(user_id)
-            self.general_date_time.save_data(user_id)
+            self.page.run_task(self.general_date_time.save_data, user_id)
             Toast.show_success(self.page)
         except:
             logging.exception("general save data error")
@@ -117,4 +117,3 @@ class General(ft.Container):
             self.update()
         except:
             logging.exception('exception occured at General.__reset_data')
-
