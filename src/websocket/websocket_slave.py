@@ -34,12 +34,7 @@ class WebSocketSlave:
                 self.websocket = await websockets.connect(uri)
                 self.set_online()
                 logging.info(f"[Slave] 已连接到 {uri}")
-
-                # 并行收发
-                await asyncio.gather(
-                    self.send_gps_alarm_to_master(),
-                    self.receive_data_from_master()
-                )
+                await self.receive_data_from_master()
             except Exception as e:
                 logging.error(f"[Slave] 连接失败: {e}")
                 self.set_offline()
@@ -57,7 +52,11 @@ class WebSocketSlave:
         if not (self.is_online and not gdata.configCommon.is_master):
             return
         try:
-            await self.websocket.send(msgpack.packb(occured))
+            eexi_breach_msg = {
+                "type": "eexi_breach",
+                "data": occured
+            }
+            await self.websocket.send(msgpack.packb(eexi_breach_msg))
         except:
             logging.error("[Slave] send_eexi_breach_alarm_to_master error")
 
@@ -71,7 +70,7 @@ class WebSocketSlave:
                 elif type == 'sps2':
                     self._handle_sps2_data(receive_data['data'])
                 elif type == 'alarms':
-                    self._handle_alarm(receive_data['data'])
+                    await self._handle_alarm(receive_data['data'])
                 elif type == 'propeller_setting':
                     dict_to_model(PropellerSetting, receive_data['data']).save()
         except (websockets.ConnectionClosed, websockets.ConnectionClosedError, websockets.ConnectionClosedOK):
@@ -97,7 +96,7 @@ class WebSocketSlave:
         gdata.configSPS2.thrust = data['thrust']
         gdata.configSPS2.speed = data['speed']
 
-    def _handle_alarm(self, data):
+    async def _handle_alarm(self, data):
         for alarm in data['data']:
             cnt = AlarmLog.select(fn.COUNT(AlarmLog.id)).where(AlarmLog.alarm_uuid == alarm['alarm_uuid']).scalar()
             if cnt:
@@ -113,6 +112,21 @@ class WebSocketSlave:
                     recovery_time=DateTimeUtil.parse_date(alarm['recovery_time']),
                     acknowledge_time=DateTimeUtil.parse_date(alarm['acknowledge_time'])
                 )
+            # 每条处理完毕，需要回复服务器
+            await self.ack_alarm(alarm['alarm_uuid'])
+
+    async def ack_alarm(self, alarm_uuid):
+        """发送告警处理确认"""
+        try:
+            ack_msg = {
+                "type": "alarm_ack",
+                "data": {"alarm_uuid": alarm_uuid}
+            }
+            # 发送 msgpack 格式数据
+            if self.websocket and self.is_online:
+                await self.websocket.send(msgpack.packb(ack_msg))
+        except Exception as e:
+            logging.error(f"[Slave] 发送告警确认失败 {alarm_uuid}: {e}")
 
     async def stop(self):
         self.is_canceled = True

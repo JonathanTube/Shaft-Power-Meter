@@ -93,7 +93,7 @@ class SystemExitTool:
                 page.window.destroy()
             except:
                 os._exit(0)  # 兜底强杀
-                
+
             try:
                 sys.exit(0)
             except:

@@ -63,8 +63,6 @@ class JM3846TorqueRpmUtil:
 
             return (ch0_ad, rpm)
         except:
-            logging.exception(
-                'exception occured at JM3846TorqueRpm.convert_data'
-            )
+            logging.exception('exception occured at JM3846TorqueRpm.convert_data')
 
         return (0, 0)

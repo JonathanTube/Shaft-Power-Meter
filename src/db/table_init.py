@@ -65,7 +65,6 @@ class TableInit:
         DataLog.truncate_table()
         EventLog.truncate_table()
         GpsLog.truncate_table()
-        IOConf.truncate_table()
         ReportDetail.truncate_table()
         ReportInfo.truncate_table()
         ZeroCalInfo.truncate_table()
