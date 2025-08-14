@@ -97,7 +97,7 @@ class WebSocketSlave:
         gdata.configSPS2.speed = data['speed']
 
     async def _handle_alarm(self, data):
-        for alarm in data['data']:
+        for alarm in data:
             cnt = AlarmLog.select(fn.COUNT(AlarmLog.id)).where(AlarmLog.alarm_uuid == alarm['alarm_uuid']).scalar()
             if cnt:
                 AlarmLog.update(
@@ -121,7 +121,7 @@ class WebSocketSlave:
         try:
             ack_msg = {
                 "type": "alarm_ack",
-                "data": {"alarm_uuid": alarm_uuid}
+                "data": alarm_uuid
             }
             # 发送 msgpack 格式数据
             if self.websocket and self.is_online:
