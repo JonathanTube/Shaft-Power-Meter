@@ -20,7 +20,7 @@ class MeterRound(ft.Container):
 
         self.color = color
 
-    def set_data(self, actual_value: int, display_value: int, display_unit: str):
+    def set_data(self, actual_value: float, display_value: float, display_unit: str):
         try:
             if self.max_value == 0:
                 return
@@ -49,7 +49,7 @@ class MeterRound(ft.Container):
 
             # update center text
             if self.center_text and self.center_text.page:
-                self.center_text.value = display_value
+                self.center_text.value = round(display_value, 1)
                 self.center_text.update()
         except:
             logging.exception('exception occured at MeterRound.set_data')
