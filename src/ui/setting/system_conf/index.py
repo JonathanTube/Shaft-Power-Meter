@@ -95,7 +95,7 @@ class SystemConf(ft.Container):
             Toast.show_error(self.page, msg, auto_hide=False)
             # 清理数据
             TableInit.handle_change_running_mode()
-            asyncio.create_task(SystemExitTool.exit_app(self.page, user))
+            self.page.run_task(SystemExitTool.exit_app, self.page, user)
 
         except:
             logging.exception("system conf save data error")
