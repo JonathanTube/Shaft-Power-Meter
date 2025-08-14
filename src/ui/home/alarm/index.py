@@ -141,7 +141,7 @@ class AlarmList(ft.Container):
                     is_synced=False
                 ).where(
                     AlarmLog.id == row.cells[0].data,
-                    AlarmLog.out_of_sync == True,
+                    AlarmLog.out_of_sync == False,
                     AlarmLog.acknowledge_time == None
                 ).execute()
 
