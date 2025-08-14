@@ -1,3 +1,4 @@
+import asyncio
 import logging
 import flet as ft
 from db.models.user import User
@@ -73,8 +74,8 @@ class AudioAlarm(ft.Container):
         try:
             if gdata.configCommon.is_master:
                 # 避免重复启动相同任务
-                self.page.run_task(plc.write_eexi_breach_alarm, occured)
+                asyncio.create_task(plc.write_eexi_breach_alarm(occured))
             else:
-                self.page.run_task(ws_client.send_eexi_breach_alarm_to_master, occured)
+                asyncio.create_task(ws_client.send_eexi_breach_alarm_to_master(occured))
         except Exception:
             logging.exception("Exception in AudioAlarm.notify_eexi_breach")

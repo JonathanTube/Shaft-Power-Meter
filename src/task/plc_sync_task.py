@@ -240,7 +240,7 @@ class PlcSyncTask:
         try:
             logging.info('[PLC] 正在关闭PLC连接')
             if self.plc_client:
-                await self.plc_client.close()
+                self.plc_client.close()
         except Exception as e:
             logging.exception('[PLC] 关闭PLC连接失败: %s', e)
         finally:

@@ -1,3 +1,4 @@
+import asyncio
 import ipaddress
 import logging
 import flet as ft
@@ -98,7 +99,7 @@ class InterfaceConf(ft.Container):
                 operation_content=user.user_name
             )
 
-            self.page.run_task(ws_client.start)
+            asyncio.create_task(ws_client.start())
         except:
             logging.exception("exception occured at InterfaceConf.__on_connect")
 

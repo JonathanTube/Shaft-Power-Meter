@@ -147,7 +147,7 @@ class TestMode(ft.Container):
             if self.running:
                 return
 
-            self.page.run_task(test_mode_task.start)
+            asyncio.create_task(test_mode_task.start())
 
             self.range_card.enable()
 
@@ -193,7 +193,7 @@ class TestMode(ft.Container):
             gdata.configTest.test_mode_running = False
             gdata.configPropperCurve.eexi_breach = False
             # 这里只需要回复power_overload的告警，alarm不需要管。
-            self.page.run_task(plc.write_power_overload, False)
+            asyncio.create_task(plc.write_power_overload(False))
             Toast.show_success(self.page)
         except:
             Toast.show_error(self.page, "stop test mode failed.")

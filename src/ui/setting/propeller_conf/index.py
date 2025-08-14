@@ -1,3 +1,4 @@
+import asyncio
 import flet as ft
 import logging
 from db.models.propeller_setting import PropellerSetting
@@ -155,10 +156,10 @@ class PropellerConf(ft.Container):
                 data = model_to_dict(settings)
                 del data['created_at']
                 del data['update_at']
-                self.page.run_task(ws_server.send, {
+                asyncio.create_task(ws_server.send({
                     'type': 'propeller_setting',
                     "data": data
-                })
+                }))
                 Toast.show_success(self.page)
         except:
             logging.exception('exception occured at PropellerConf.__on_push')

@@ -1,3 +1,4 @@
+import asyncio
 import flet as ft
 import time
 import flet as ft
@@ -92,16 +93,13 @@ class SystemConf(ft.Container):
             # 退出系统
             msg = self.page.session.get("lang.toast.system_exit")
             Toast.show_error(self.page, msg, auto_hide=False)
-            self.page.run_task(self.beforeExit, user)
+            # 清理数据
+            TableInit.handle_change_running_mode()
+            asyncio.create_task(SystemExitTool.exit_app(self.page, user))
 
         except:
             logging.exception("system conf save data error")
             Toast.show_error(self.page)
-
-    async def beforeExit(self, user: User):
-        await SystemExitTool.exit_app(self.page, user)
-        # 清理数据
-        TableInit.handle_change_running_mode()
 
     def __reset_data(self, e):
         try:

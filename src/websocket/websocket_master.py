@@ -88,11 +88,10 @@ class WebSocketMaster:
             logging.exception("[Master] 客户端异常断开")
         finally:
             self.client = None
-            self.set_client_offline()
 
     def _handle_alarm_ack(self, alarm_uuid):
         try:
-            AlarmLog.update(is_synced=True).where(AlarmLog.alarm_uuid == alarm_uuid).execte()
+            AlarmLog.update(is_synced=True).where(AlarmLog.alarm_uuid == alarm_uuid).execute()
         except Exception as e:
             logging.exception(f"[PLC] alarm ack 失败, alarm_uuid={alarm_uuid}", e)
 

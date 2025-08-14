@@ -1,3 +1,4 @@
+import asyncio
 import ipaddress
 import logging
 import flet as ft
@@ -230,8 +231,7 @@ class IOSettingSPS(ft.Container):
                 operation_type=OperationType.CONNECT_TO_SPS,
                 operation_content=user.user_name
             )
-
-            self.page.run_task(sps_read_task.connect)
+            self.page.run_task(sps_read_task.start)
         except:
             logging.exception("exception occured at __connect_to_sps")
 
@@ -270,7 +270,7 @@ class IOSettingSPS(ft.Container):
                 operation_type=OperationType.CONNECT_TO_SPS2,
                 operation_content=user.user_name
             )
-            self.page.run_task(sps2_read_task.connect)
+            asyncio.create_task(sps2_read_task.connect())
         except:
             logging.exception("exception occured at __connect_to_sps2")
 

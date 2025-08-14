@@ -1,3 +1,4 @@
+import asyncio
 import logging
 import flet as ft
 import serial.tools.list_ports
@@ -134,7 +135,7 @@ class IOSettingOutput(ft.Container):
                 Toast.show_warning(self.page, self.page.session.get('lang.setting.io_conf.serial_port_can_not_be_empty'))
                 return
 
-            self.page.run_task(modbus_output.start)
+            asyncio.create_task(modbus_output.start())
         except:
             logging.exception('exception occured at IOSettingOutput.on_start')
 
