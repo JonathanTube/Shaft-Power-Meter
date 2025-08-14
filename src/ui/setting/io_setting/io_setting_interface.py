@@ -99,7 +99,7 @@ class InterfaceConf(ft.Container):
                 operation_content=user.user_name
             )
 
-            asyncio.create_task(ws_client.start())
+            self.page.run_task(ws_client.start)
         except:
             logging.exception("exception occured at InterfaceConf.__on_connect")
 
