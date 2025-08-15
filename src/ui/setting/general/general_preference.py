@@ -142,5 +142,6 @@ class GeneralPreference(ft.Container):
             self.page.window.full_screen = new_fullscreen
 
         theme = int(self.preference.theme)
-        self.page.theme_mode = ft.ThemeMode.LIGHT if theme == 0 else ft.ThemeMode.DARK
-        self.page.update()
+        if self.page:
+            self.page.theme_mode = ft.ThemeMode.LIGHT if theme == 0 else ft.ThemeMode.DARK
+            self.page.update()

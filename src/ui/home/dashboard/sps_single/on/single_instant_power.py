@@ -42,6 +42,7 @@ class SingleInstantPower(ft.Container):
             power = UnitParser.parse_power(gdata.configSPS.power, self.system_unit)
             self.power_value.value = power[0]
             self.power_unit.value = power[1]
-            self.content.update()
+            if self.content and self.content.page:
+                self.content.update()
         except:
             logging.exception('exception occured at SingleInstantPower.reload')

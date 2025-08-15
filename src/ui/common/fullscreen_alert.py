@@ -41,18 +41,21 @@ class FullscreenAlert(ft.Container):
             if self.task:
                 self.task.cancel()
             self.visible = False
-            self.update()
+            if self.page:
+                self.update()
 
     async def _blink(self):
         try:
             while self.running:
                 await asyncio.sleep(1)
                 self.visible = not self.visible
-                self.update()
+                if self.page:
+                    self.update()
         except asyncio.CancelledError:
             pass
         except Exception:
             logging.exception("Exception in FullscreenAlert._blink")
         finally:
             self.visible = False
-            self.update()
+            if self.page:
+                self.update()

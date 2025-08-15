@@ -161,6 +161,7 @@ class GeneralDateTime(ft.Container):
                 DataLog.delete().where(DataLog.utc_date_time >= gdata.configDateTime.utc).execute
             )
 
-            self.page.update()
+            if self.page:
+                self.page.update()
         except:
             logging.exception("exception occured at GeneralDateTime.save_data_async")

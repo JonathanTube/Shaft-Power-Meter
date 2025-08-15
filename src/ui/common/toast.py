@@ -64,7 +64,8 @@ class Toast:
                         toast.opacity = 0
                         if toast in page.overlay:
                             page.overlay.remove(toast)
-                        page.update()
+                        if page:
+                            page.update()
                     except Exception:
                         logging.exception("toast hide error")
 

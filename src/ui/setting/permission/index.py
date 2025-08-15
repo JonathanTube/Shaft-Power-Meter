@@ -162,8 +162,9 @@ class Permission(ft.Container):
                 operation_content=model_to_dict(User.select(User.id, User.user_name).where(User.id == user.id).get())
             )
             self.page.close(self.add_dialog)
-            self.permission_table.search(role=self.dropdown.value)
-            self.permission_table.update()
+            if self.permission_table and self.permission_table.page:
+                self.permission_table.search(role=self.dropdown.value)
+                self.permission_table.update()
         except:
             logging.exception('exception occured at Permission.__on_add_user_confirm')
 
@@ -172,8 +173,9 @@ class Permission(ft.Container):
 
     def __on_dropdown_change(self, e):
         try:
-            self.permission_table.search(role=e.control.value)
-            self.permission_table.update()
+            if self.permission_table and self.permission_table.page:
+                self.permission_table.search(role=e.control.value)
+                self.permission_table.update()
         except:
             logging.exception('exception occured at Permission.__on_dropdown_change')
 
@@ -183,7 +185,8 @@ class Permission(ft.Container):
                 time_diff = gdata.configDateTime.utc - self.last_op_utc_date_time
                 if time_diff.total_seconds() > 60 * 10:
                     self.__create_lock_button()
-                    self.update()
+                    if self.page:
+                        self.update()
             except:
                 return
             await asyncio.sleep(1)

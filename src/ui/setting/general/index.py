@@ -90,10 +90,13 @@ class General(ft.Container):
             self.is_saving = True
             self.__change_buttons()
 
-            self.save_btn.disabled = True
-            self.save_btn.update()
-            self.reset_btn.disabled = True
-            self.reset_btn.update()
+            if self.save_btn and self.save_btn.page:
+                self.save_btn.disabled = True
+                self.save_btn.update()
+
+            if self.reset_btn and self.reset_btn.page:
+                self.reset_btn.disabled = True
+                self.reset_btn.update()
 
             user_id = user.id
             self.general_preference.save_data(user_id)
@@ -111,9 +114,10 @@ class General(ft.Container):
 
     def __reset_data(self, e):
         try:
-            keyboard.close()
-            self.content.clean()
-            self.build()
-            self.update()
+            if self.page:
+                keyboard.close()
+                self.content.clean()
+                self.build()
+                self.update()
         except:
             logging.exception('exception occured at General.__reset_data')

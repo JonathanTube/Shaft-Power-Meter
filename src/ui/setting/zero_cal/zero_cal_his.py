@@ -43,7 +43,7 @@ class ZeroCalHis(ft.Container):
 
     def __on_export(self, e):
         try:
-            if self.page is not None:
+            if self.page:
                 self.file_picker = ft.FilePicker()
                 self.page.overlay.append(self.file_picker)
                 self.page.update()

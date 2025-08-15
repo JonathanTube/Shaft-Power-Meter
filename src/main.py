@@ -94,7 +94,9 @@ def set_content(page: ft.Page):
         elif name == 'SETTING':
             content_setting.set_index_0()
             main_content.content = content_setting
-        main_content.update()
+
+        if main_content and main_content.page:
+            main_content.update()
 
     page.appbar = Header(on_menu_click=change_main_menu)
     main_content = ft.Container(padding=0, margin=0, content=content_home)

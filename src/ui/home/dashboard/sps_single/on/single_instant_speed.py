@@ -24,9 +24,12 @@ class SingleInstantSpeed(ft.Container):
     def reload(self):
         try:
             speed = UnitParser.parse_speed(gdata.configSPS.speed)
-            self.speed_value.value = speed[0]
-            self.speed_value.update()
-            self.speed_unit.value = speed[1]
-            self.speed_unit.update()
+            if self.speed_value and self.speed_value.page:
+                self.speed_value.value = speed[0]
+                self.speed_value.update()
+            
+            if self.speed_unit and self.speed_unit.page:
+                self.speed_unit.value = speed[1]
+                self.speed_unit.update()
         except:
             logging.exception('exception occured at SingleInstantPower.reload')

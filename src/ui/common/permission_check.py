@@ -130,9 +130,9 @@ class PermissionCheck(ft.AlertDialog):
                     if not user.check_password(user_pwd):
                         Toast.show_error(self.page, s.get("lang.permission.user_name_or_pwd_is_incorrect"))
                         return
-
-                    self.page.close(self)
-                    self.page.update()
+                    if self.page:
+                        self.page.close(self)
+                        self.page.update()
                     self.on_confirm(user)
         except:
             logging.exception('exception occured at PermissionCheck.__on_confirm')

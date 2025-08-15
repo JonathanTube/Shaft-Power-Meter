@@ -181,10 +181,11 @@ class IOSettingPLC(ft.Container):
             return
 
         try:
-            self.connect_btn.text = 'loading...'
-            self.connect_btn.disabled = True
-            self.connect_btn.bgcolor = ft.Colors.GREY
-            self.connect_btn.update()
+            if self.connect_btn and self.connect_btn.page:
+                self.connect_btn.text = 'loading...'
+                self.connect_btn.disabled = True
+                self.connect_btn.bgcolor = ft.Colors.GREY
+                self.connect_btn.update()
 
             OperationLog.create(
                 user_id=user.id,
@@ -198,13 +199,15 @@ class IOSettingPLC(ft.Container):
 
     def __on_close(self, user: User):
         try:
-            self.close_btn.text = 'loading...'
-            self.close_btn.disabled = True
-            self.close_btn.bgcolor = ft.Colors.GREY
-            self.close_btn.update()
+            if self.close_btn and self.close_btn.page:
+                self.close_btn.text = 'loading...'
+                self.close_btn.disabled = True
+                self.close_btn.bgcolor = ft.Colors.GREY
+                self.close_btn.update()
 
-            self.fetch_btn.visible = False
-            self.fetch_btn.update()
+            if self.fetch_btn and self.fetch_btn.page:
+                self.fetch_btn.visible = False
+                self.fetch_btn.update()
 
             OperationLog.create(
                 user_id=user.id,
@@ -242,7 +245,8 @@ class IOSettingPLC(ft.Container):
                 self.txt_speed_range_max.value = plc_4_20_ma_data["speed_range_max"] // 10
                 self.txt_speed_range_offset.value = plc_4_20_ma_data["speed_range_offset"] // 10
 
-                self.range_items.update()
+                if self.range_items and self.range_items.page:
+                    self.range_items.update()
         except asyncio.TimeoutError:
             logging.warning("读取 PLC 4-20mA 数据超时")
         except:

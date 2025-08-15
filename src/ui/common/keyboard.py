@@ -94,7 +94,8 @@ class Keyboard(ft.Stack):
                 logging.warning("Keyboard.show() 调用时 page 未绑定")
                 return
             self.visible = True
-            self.update()
+            if self.page:
+                self.update()
         except:
             logging.exception("Keyboard.show 调用出错")
 
@@ -134,7 +135,8 @@ class Keyboard(ft.Stack):
         """关闭键盘"""
         try:
             self.visible = False
-            self.update()
+            if self.page:
+                self.update()
             self._on_close(None)
         except:
             logging.exception("Keyboard.close 调用出错")
@@ -167,7 +169,7 @@ class Keyboard(ft.Stack):
 
     def _on_pan_update(self, e: ft.DragUpdateEvent):
         try:
-            if self.opened and e.control:
+            if self.opened and e.control and e.control.page:
                 e.control.top = max(0, e.control.top + e.delta_y)
                 e.control.left = max(0, e.control.left + e.delta_x)
                 e.control.update()

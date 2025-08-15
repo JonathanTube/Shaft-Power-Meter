@@ -102,7 +102,8 @@ class ReportInfoTable(AbstractTable):
             if self.page and self.page.overlay:
                 self.file_picker = ft.FilePicker()
                 self.page.overlay.append(self.file_picker)
-                self.page.update()
+                if self.page:
+                    self.page.update()
                 self.file_picker.save_file(file_name=f"{report_name}.pdf", allowed_extensions=["pdf"])
                 self.file_picker.on_result = lambda e: self.__on_result(e, id)
         except:

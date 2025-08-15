@@ -220,10 +220,11 @@ class IOSettingSPS(ft.Container):
             return
 
         try:
-            self.sps_connect.text = 'loading...'
-            self.sps_connect.bgcolor = ft.Colors.GREY
-            self.sps_connect.disabled = True
-            self.sps_connect.update()
+            if self.sps_connect and self.sps_connect.page:
+                self.sps_connect.text = 'loading...'
+                self.sps_connect.bgcolor = ft.Colors.GREY
+                self.sps_connect.disabled = True
+                self.sps_connect.update()
 
             OperationLog.create(
                 user_id=user.id,
@@ -237,10 +238,12 @@ class IOSettingSPS(ft.Container):
 
     def __close_sps(self, user: User):
         try:
-            self.sps_disconnect.text = 'loading...'
-            self.sps_disconnect.bgcolor = ft.Colors.GREY
-            self.sps_disconnect.disabled = True
-            self.sps_disconnect.update()
+            if self.sps_disconnect and self.sps_disconnect.page:
+                self.sps_disconnect.text = 'loading...'
+                self.sps_disconnect.bgcolor = ft.Colors.GREY
+                self.sps_disconnect.disabled = True
+                self.sps_disconnect.update()
+
             OperationLog.create(
                 user_id=user.id,
                 utc_date_time=gdata.configDateTime.utc,
@@ -260,10 +263,12 @@ class IOSettingSPS(ft.Container):
             return
 
         try:
-            self.sps2_connect.text = 'loading...'
-            self.sps2_connect.bgcolor = ft.Colors.GREY
-            self.sps2_connect.disabled = True
-            self.sps2_connect.update()
+            if self.sps2_connect and self.sps2_connect.page:
+                self.sps2_connect.text = 'loading...'
+                self.sps2_connect.bgcolor = ft.Colors.GREY
+                self.sps2_connect.disabled = True
+                self.sps2_connect.update()
+
             OperationLog.create(
                 user_id=user.id,
                 utc_date_time=gdata.configDateTime.utc,
@@ -276,10 +281,12 @@ class IOSettingSPS(ft.Container):
 
     def __close_sps2(self, user: User):
         try:
-            self.sps2_disconnect.text = 'loading...'
-            self.sps2_disconnect.bgcolor = ft.Colors.GREY
-            self.sps2_disconnect.disabled = True
-            self.sps2_disconnect.update()
+            if self.sps2_disconnect and self.sps2_disconnect.page:
+                self.sps2_disconnect.text = 'loading...'
+                self.sps2_disconnect.bgcolor = ft.Colors.GREY
+                self.sps2_disconnect.disabled = True
+                self.sps2_disconnect.update()
+
             OperationLog.create(
                 user_id=user.id,
                 utc_date_time=gdata.configDateTime.utc,

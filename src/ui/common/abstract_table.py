@@ -81,7 +81,6 @@ class AbstractTable(ft.Container):
         # print('===========cells=',cells)
         return cells
 
-
     def __on_double_tap(self, e, content):
         if self.page and content is not None:
             self.page.set_clipboard(str(content))
@@ -120,19 +119,15 @@ class AbstractTable(ft.Container):
                             on_select_changed=lambda e: self.__on_select_changed(e)
                         )
                     )
-
-                self.data_table.rows = rows
-                # print('====================1')
-                # print(self.data_table.columns)
-                # print('====================2')
-                # print(self.data_table.rows)
-                self.data_table.update()
+                if self.data_table and self.data_table.page:
+                    self.data_table.rows = rows
+                    self.data_table.update()
         except:
             logging.exception('exception occured at abstract_table.__create_table_rows')
 
-    def __on_select_changed(self, e):
+    def __on_select_changed(self, e: ft.ControlEvent):
         try:
-            if e.control is not None:
+            if e.control and e.control.page:
                 e.control.selected = not e.control.selected
                 e.control.update()
         except:

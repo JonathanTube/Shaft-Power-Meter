@@ -38,6 +38,7 @@ class SingleInstantTorque(ft.Container):
                 torque = UnitParser.parse_torque(gdata.configSPS.torque, self.system_unit)
                 self.torque_value.value = torque[0]
                 self.torque_unit.value = torque[1]
-                self.content.update()
+                if self.content and self.content.page:
+                    self.content.update()
         except:
             logging.exception('exception occured at SingleInstantTorque.reload')

@@ -153,13 +153,15 @@ class SystemConfSettings(ft.Container):
             logging.exception('exception occured at SystemConfSettings.build')
 
     def __on_running_mode_change(self, e):
-        self.is_individual.visible = e.data == 'master'
-        self.is_individual.value = e.data == 'slave'
-        self.is_individual.update()
+        if self.is_individual and self.is_individual.page:
+            self.is_individual.visible = e.data == 'master'
+            self.is_individual.value = e.data == 'slave'
+            self.is_individual.update()
 
-        self.enable_gps.visible = e.data == 'master'
-        self.enable_gps.value = False
-        self.enable_gps.update()
+        if self.enable_gps and self.enable_gps.page:
+            self.enable_gps.visible = e.data == 'master'
+            self.enable_gps.value = False
+            self.enable_gps.update()
 
     def __get_unlimited_power(self) -> tuple[int, str]:
         _unlimited_power = self.system_settings.unlimited_power

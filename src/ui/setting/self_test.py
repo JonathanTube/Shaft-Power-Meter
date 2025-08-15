@@ -64,10 +64,11 @@ class SelfTest(ft.Tabs):
 
     def append_log(self, log_view: ft.ListView, text: str):
         """追加日志到 ListView，并限制最大行数"""
-        log_view.controls.append(ft.Text(text))
-        if len(log_view.controls) > self.MAX_LOG_LINES:
-            del log_view.controls[0]  # 删除最旧的一行
-        log_view.update()
+        if log_view and log_view.page:
+            log_view.controls.append(ft.Text(text))
+            if len(log_view.controls) > self.MAX_LOG_LINES:
+                del log_view.controls[0]  # 删除最旧的一行
+            log_view.update()
 
     def before_update(self):
         if self.tab_sps:

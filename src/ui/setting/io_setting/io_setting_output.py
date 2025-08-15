@@ -111,10 +111,11 @@ class IOSettingOutput(ft.Container):
 
     def on_start(self):
         try:
-            self.start_btn.text = "loading..."
-            self.start_btn.bgcolor = ft.Colors.GREY
-            self.start_btn.disabled = True
-            self.start_btn.update()
+            if self.start_btn and self.start_btn.page:
+                self.start_btn.text = "loading..."
+                self.start_btn.bgcolor = ft.Colors.GREY
+                self.start_btn.disabled = True
+                self.start_btn.update()
 
             self.save_data()
             self.conf.save()
@@ -141,10 +142,11 @@ class IOSettingOutput(ft.Container):
 
     def on_stop(self):
         try:
-            self.stop_btn.text = "loading..."
-            self.stop_btn.bgcolor = ft.Colors.GREY
-            self.stop_btn.disabled = True
-            self.stop_btn.update()
+            if self.stop_btn and self.stop_btn.page:
+                self.stop_btn.text = "loading..."
+                self.stop_btn.bgcolor = ft.Colors.GREY
+                self.stop_btn.disabled = True
+                self.stop_btn.update()
 
             self.page.run_task(modbus_output.stop)
         except:

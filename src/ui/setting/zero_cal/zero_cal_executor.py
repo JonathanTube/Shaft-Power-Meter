@@ -126,10 +126,17 @@ class ZeroCalExecutor(ft.Container):
                 self.accept_button.visible = False
                 self.accept_button.update()
 
-            self.zeroCalExecutorTips.update()
-            self.zeroCalExecutorThrust.reset()
-            self.zeroCalExecutorTorque.reset()
-            self.zeroCalExecutorResult.update()
+            if self.zeroCalExecutorTips and self.zeroCalExecutorTips.page:
+                self.zeroCalExecutorTips.update()
+
+            if self.zeroCalExecutorThrust and self.zeroCalExecutorThrust.page:    
+                self.zeroCalExecutorThrust.reset()
+
+            if self.zeroCalExecutorTorque and self.zeroCalExecutorTorque.page:    
+                self.zeroCalExecutorTorque.reset()
+
+            if self.zeroCalExecutorResult and self.zeroCalExecutorResult.page:    
+                self.zeroCalExecutorResult.update()
 
             Toast.show_success(self.page)
         except:

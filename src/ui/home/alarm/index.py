@@ -48,7 +48,7 @@ class AlarmList(ft.Container):
 
     def __on_export(self, e):
         try:
-            if self.page is not None:
+            if self.page:
                 self.file_picker = ft.FilePicker()
 
                 if self.page.overlay is not None:

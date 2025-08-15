@@ -51,7 +51,8 @@ class Pagination(ft.Container):
             self.current_page = 1
             if self.on_change is not None:
                 self.on_change(self.current_page, self.page_size)
-            self.update()
+            if self.page:
+                self.update()
         except:
             logging.exception("exception occured at Pagination.on_first_page_click")
 
@@ -60,7 +61,8 @@ class Pagination(ft.Container):
             self.current_page = max(1, self.current_page - 1)
             if self.on_change is not None:
                 self.on_change(self.current_page, self.page_size)
-            self.update()
+            if self.page:
+                self.update()
         except:
             logging.exception("exception occured at Pagination.on_previous_page_click")
 
@@ -69,7 +71,8 @@ class Pagination(ft.Container):
             self.current_page = min(self.total_pages, self.current_page + 1)
             if self.on_change is not None:
                 self.on_change(self.current_page, self.page_size)
-            self.update()
+            if self.page:                
+                self.update()
         except:
             logging.exception("exception occured at Pagination.on_next_page_click")
 
@@ -78,7 +81,8 @@ class Pagination(ft.Container):
             self.current_page = self.total_pages
             if self.on_change is not None:
                 self.on_change(self.current_page, self.page_size)
-            self.update()
+            if self.page:
+                self.update()
         except:
             logging.exception("exception occured at Pagination.on_last_page_click")
 

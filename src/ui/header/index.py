@@ -107,7 +107,7 @@ class Header(ft.AppBar):
 
     def __set_active(self, button: ft.ElevatedButton):
         try:
-            if button is not None and button.page is not None:
+            if button and button.page:
                 button.bgcolor = ft.Colors.BLUE_800
                 button.icon_color = ft.Colors.WHITE
                 button.color = ft.Colors.WHITE
@@ -117,7 +117,7 @@ class Header(ft.AppBar):
 
     def __set_inactive(self, button: ft.ElevatedButton):
         try:
-            if button is not None and button.page is not None:
+            if button and button.page:
                 button.bgcolor = ft.Colors.LIGHT_BLUE_100
                 button.icon_color = ft.Colors.GREY_800
                 button.color = ft.Colors.GREY_800
@@ -166,9 +166,10 @@ class Header(ft.AppBar):
     async def sync_utc_date_time(self):
         while self.task_running:
             try:
-                if gdata.configDateTime.utc and self.utc_date_time and self.utc_date_time.page:
-                    self.utc_date_time.text = gdata.configDateTime.utc.strftime(f"{gdata.configDateTime.date_format} %H:%M:%S")
-                    self.utc_date_time.update()
+                if gdata.configDateTime.utc:
+                    if self.utc_date_time and self.utc_date_time.page:
+                        self.utc_date_time.text = gdata.configDateTime.utc.strftime(f"{gdata.configDateTime.date_format} %H:%M:%S")
+                        self.utc_date_time.update()
             except:
                 logging.exception('exception occured at Header.sync_utc_date_time')
             await asyncio.sleep(1)

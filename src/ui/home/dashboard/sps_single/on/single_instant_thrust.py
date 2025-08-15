@@ -35,6 +35,7 @@ class SingleInstantThrust(ft.Container):
             thrust = UnitParser.parse_thrust(gdata.configSPS.thrust, self.system_unit)
             self.thrust_value.value = thrust[0]
             self.thrust_unit.value = thrust[1]
-            self.content.update()
+            if self.content and self.content.page:
+                self.content.update()
         except:
             logging.exception('exception occured at SingleInstantThrust.reload')

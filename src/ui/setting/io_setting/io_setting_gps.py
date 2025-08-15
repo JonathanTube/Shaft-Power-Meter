@@ -86,10 +86,11 @@ class IOSettingGPS(ft.Container):
             return
 
         try:
-            self.connect_btn.text = 'loading...'
-            self.connect_btn.disabled = True
-            self.connect_btn.bgcolor = ft.Colors.GREY
-            self.connect_btn.update()
+            if self.connect_btn and self.connect_btn.page:
+                self.connect_btn.text = 'loading...'
+                self.connect_btn.disabled = True
+                self.connect_btn.bgcolor = ft.Colors.GREY
+                self.connect_btn.update()
 
             OperationLog.create(
                 user_id=user.id,
@@ -103,10 +104,11 @@ class IOSettingGPS(ft.Container):
 
     def _on_close(self, user: User):
         try:
-            self.close_btn.text = 'loading...'
-            self.close_btn.disabled = True
-            self.close_btn.bgcolor = ft.Colors.GREY
-            self.close_btn.update()
+            if self.close_btn and self.close_btn.page:
+                self.close_btn.text = 'loading...'
+                self.close_btn.disabled = True
+                self.close_btn.bgcolor = ft.Colors.GREY
+                self.close_btn.update()
 
             OperationLog.create(
                 user_id=user.id,

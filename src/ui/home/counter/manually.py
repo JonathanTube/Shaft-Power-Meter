@@ -206,11 +206,13 @@ class ManuallyCounter(ft.Container):
                 self.display.set_average_power(0, self.system_unit)
                 self.display.set_total_energy(0, self.system_unit)
                 self.display.set_average_speed(0)
-                self.update()
+                if self.page:
+                    self.update()
                 return
 
             # 其余状态逻辑同理...
-            self.update()
+            if self.page:
+                self.update()
 
         except Exception:
             logging.exception("exception occured at ManuallyCounter.__calculate_async")

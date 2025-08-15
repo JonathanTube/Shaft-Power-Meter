@@ -116,15 +116,16 @@ class TestMode(ft.Container):
 
     def __on_toggle_auto_test(self):
         try:
-            if gdata.configTest.auto_testing:
-                self.auto_test_button.bgcolor = ft.Colors.GREEN
-                self.auto_test_button.text = self.page.session.get('lang.button.start_fatigue_testing')
-            else:
-                self.auto_test_button.bgcolor = ft.Colors.RED
-                self.auto_test_button.text = self.page.session.get('lang.button.stop_fatigue_testing')
+            if self.auto_test_button and self.auto_test_button.page:
+                if gdata.configTest.auto_testing:
+                    self.auto_test_button.bgcolor = ft.Colors.GREEN
+                    self.auto_test_button.text = self.page.session.get('lang.button.start_fatigue_testing')
+                else:
+                    self.auto_test_button.bgcolor = ft.Colors.RED
+                    self.auto_test_button.text = self.page.session.get('lang.button.stop_fatigue_testing')
 
-            self.auto_test_button.update()
-            gdata.configTest.auto_testing = not gdata.configTest.auto_testing
+                self.auto_test_button.update()
+                gdata.configTest.auto_testing = not gdata.configTest.auto_testing
         except:
             Toast.show_error(self.page, "__on_toggle_auto_test failed.")
 
@@ -149,10 +150,13 @@ class TestMode(ft.Container):
 
             self.range_card.enable()
 
-            self.start_button.visible = False
-            self.start_button.update()
-            self.stop_button.visible = True
-            self.stop_button.update()
+            if self.start_button and self.start_button.page:
+                self.start_button.visible = False
+                self.start_button.update()
+
+            if self.stop_button and self.stop_button:
+                self.stop_button.visible = True
+                self.stop_button.update()
 
             OperationLog.create(
                 user_id=self.op_user.id,
@@ -175,10 +179,13 @@ class TestMode(ft.Container):
             self.range_card.disable()
             self.page.close(self.dlg_stop_modal)
             self.running = False
-            self.start_button.visible = True
-            self.start_button.update()
-            self.stop_button.visible = False
-            self.stop_button.update()
+            if self.start_button and self.start_button.page:
+                self.start_button.visible = True
+                self.start_button.update()
+
+            if self.stop_button and self.stop_button.page:
+                self.stop_button.visible = False
+                self.stop_button.update()
 
             OperationLog.create(
                 user_id=self.op_user.id,
@@ -215,7 +222,8 @@ class TestMode(ft.Container):
                 time_diff = gdata.configDateTime.utc - self.last_op_utc_date_time
                 if time_diff.total_seconds() > 60 * 10:
                     self.__create_lock_button()
-                    self.update()
+                    if self.page:
+                        self.update()
             except:
                 return
             await asyncio.sleep(1)
