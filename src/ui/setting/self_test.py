@@ -185,11 +185,15 @@ class SelfTest(ft.Tabs):
     async def __read_hmi_server_data(self):
         while self.task_running:
             try:
+                if gdata.configTest.test_mode_running:
+                    self.append_log(self.sps_log, "Test mode is running")
+                    return
+
                 if ws_client.is_online:
-                    sps_data = f'sps: torque={gdata.configSPS.torque}, thrust={gdata.configSPS.thrust}, speed={gdata.configSPS.speed}'
+                    sps_data = f'sps:torque={round(gdata.configSPS.torque, 1)},thrust={round(gdata.configSPS.thrust, 1)},speed={round(gdata.configSPS.speed, 1)},gps={gdata.configGps.location}'
                     self.append_log(self.hmi_server_log, f"HMI Server Data: {sps_data}")
                     if gdata.configCommon.amount_of_propeller == 2:
-                        sps2_data = f'sps2: torque={gdata.configSPS2.torque}, thrust={gdata.configSPS2.thrust}, speed={gdata.configSPS2.speed}'
+                        sps2_data = f'sps2:torque={round(gdata.configSPS2.torque, 1)},thrust={round(gdata.configSPS2.thrust, 1)},speed={round(gdata.configSPS2.speed, 1)},gps={gdata.configGps.location}'
                         self.append_log(self.hmi_server_log, f"HMI Server Data: {sps2_data}")
                 else:
                     self.append_log(self.hmi_server_log, "Disconnected from HMI Server.")

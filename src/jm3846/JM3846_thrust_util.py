@@ -15,7 +15,7 @@ class JM3846ThrustUtil:
             ch_sel_1 = gdata.configSPS.ch_sel_1 if name == 'sps' else gdata.configSPS2.ch_sel_1
             ch_sel_0 = gdata.configSPS.ch_sel_0 if name == 'sps' else gdata.configSPS2.ch_sel_0
             speed_sel = gdata.configSPS.speed_sel if name == 'sps' else gdata.configSPS2.speed_sel
-            channel_count = 0
+            channel_count = 3
             if ch_sel_1 != 0 and ch_sel_0 != 0 and speed_sel == True:
                 channel_count = 3
                 for i in range(0, values_length, channel_count):
