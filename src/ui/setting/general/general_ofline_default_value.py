@@ -95,9 +95,9 @@ class GeneralOflineDefaultValue(ft.Container):
     def update_unit(self, system_unit: int):
         try:
             self.system_unit = system_unit
-            torque_default_value = int(self.odv.torque_default_value)
-            thrust_default_value = int(self.odv.thrust_default_value)
-            speed_default_value = float(self.odv.speed_default_value)
+            torque_default_value = int(gdata.configOffline.torque)
+            thrust_default_value = int(gdata.configOffline.thrust)
+            speed_default_value = float(gdata.configOffline.speed)
 
             if self.system_unit == 0:
 

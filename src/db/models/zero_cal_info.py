@@ -1,4 +1,4 @@
-from peewee import DateTimeField, FloatField, IntegerField, CharField
+from peewee import DateTimeField, FloatField, CharField
 
 from ..base import BaseModel
 

@@ -46,7 +46,7 @@ class SystemExitTool:
             msg = page.session.get("lang.toast.system_exit")
             Toast.show_success(page, msg, 1000 * 99)
 
-            await asyncio.sleep(1)
+            await asyncio.sleep(50)
 
             if gdata.configCommon.is_master:
                 # 关闭sps
