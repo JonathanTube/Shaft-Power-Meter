@@ -202,22 +202,28 @@ class PlcSyncTask:
     # ---------------- 低层读写封装 ----------------
 
     async def read_register(self, address: int) -> Optional[int]:
-        resp = await asyncio.wait_for(self.plc_client.read_holding_registers(address, count=1), timeout=2)
-        if resp is None or getattr(resp, "isError", lambda: True)():
-            return None
-        regs = getattr(resp, "registers", None)
-        return regs[0] if regs else None
+        try:
+            resp = await asyncio.wait_for(self.plc_client.read_holding_registers(address, count=1), timeout=2)
+            if resp is None or getattr(resp, "isError", lambda: True)():
+                return None
+            regs = getattr(resp, "registers", None)
+            return regs[0] if regs else None
+        except:
+            return 0
 
     async def read_register_32(self, high_addr: int, low_addr: int) -> Optional[int]:
         """读取 32 位（高位在前）——一次读两个寄存器，避免不一致"""
-        # 以高地址为起点读两个寄存器： [high, low]
-        resp = await asyncio.wait_for(self.plc_client.read_holding_registers(high_addr, count=2), timeout=2)
-        if resp is None or getattr(resp, "isError", lambda: True)():
-            return None
-        regs = getattr(resp, "registers", [])
-        if len(regs) < 2:
-            return None
-        return (int(regs[0]) << 16) | int(regs[1])
+        try:
+            # 以高地址为起点读两个寄存器： [high, low]
+            resp = await asyncio.wait_for(self.plc_client.read_holding_registers(high_addr, count=2), timeout=2)
+            if resp is None or getattr(resp, "isError", lambda: True)():
+                return None
+            regs = getattr(resp, "registers", [])
+            if len(regs) < 2:
+                return None
+            return (int(regs[0]) << 16) | int(regs[1])
+        except:
+            return 0
 
     async def write_register_32(self, high_addr: int, low_addr: int, value: int):
         """写入 32 位（高位在前）——一次写两个寄存器，保持原子性"""

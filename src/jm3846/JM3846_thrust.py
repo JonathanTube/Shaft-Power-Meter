@@ -64,11 +64,11 @@ class JM3846Thrust:
             if self.name == 'sps':
                 gdata.configSPS.ad1 = ch1_ad
                 gdata.configSPS.thrust = thrust
-                logging.info(f'获取SPS:ad1={round(ch1_ad, 1)}')
+                # logging.info(f'获取SPS:ad1={round(ch1_ad, 1)}')
             elif self.name == 'sps2':
                 gdata.configSPS2.ad1 = ch1_ad
                 gdata.configSPS2.thrust = thrust
-                logging.info(f'获取SPS2:ad1={round(ch1_ad, 1)}')
+                # logging.info(f'获取SPS2:ad1={round(ch1_ad, 1)}')
 
         except:
             logging.exception('exception occured at JM3846Thrust.handle_result')

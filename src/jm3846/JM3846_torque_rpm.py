@@ -45,12 +45,12 @@ class JM3846TorqueRpm:
                 gdata.configSPS.ad0 = ch0_ad
                 gdata.configSPS.torque = self.cal_torque(ch0_ad)
                 gdata.configSPS.speed = rpm
-                logging.info(f'获取SPS:ad0={round(ch0_ad, 1)},rpm={round(rpm, 1)}')
+                # logging.info(f'获取SPS:ad0={round(ch0_ad, 1)},rpm={round(rpm, 1)}')
             else:
                 gdata.configSPS2.ad0 = ch0_ad
                 gdata.configSPS2.torque = self.cal_torque(ch0_ad)
                 gdata.configSPS2.speed = rpm
-                logging.info(f'获取SPS2:ad0={round(ch0_ad, 1)},rpm={round(rpm, 1)}')
+                # logging.info(f'获取SPS2:ad0={round(ch0_ad, 1)},rpm={round(rpm, 1)}')
         except:
             logging.exception('exception occured at JM3846TorqueRpm.handle_result')
 
