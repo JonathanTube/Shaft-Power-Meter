@@ -128,19 +128,17 @@ class TestMode(ft.Container):
         except:
             Toast.show_error(self.page, "__on_toggle_auto_test failed.")
 
-    def convert_torque(self, torque):
-        value = float(torque)
+    def convert_torque(self, torque: int):
         if self.preference.system_unit == 0:
-            return float(value * 1000)
+            return torque * 1000
         else:
-            return UnitConverter.tm_to_nm(value)
+            return UnitConverter.tm_to_nm(torque)
 
-    def convert_thrust(self, thrust):
-        value = float(thrust)
+    def convert_thrust(self, thrust: int):
         if self.preference.system_unit == 0:
-            return float(value * 1000)
+            return thrust * 1000
         else:
-            return UnitConverter.t_to_n(value)
+            return UnitConverter.t_to_n(thrust)
 
     def start_test_mode(self, e):
         try:

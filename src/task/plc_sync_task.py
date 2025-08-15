@@ -110,7 +110,7 @@ class PlcSyncTask:
             logging.exception("[PLC] 读取实时数据失败: %s", e)
             return {"power": None, "torque": None, "thrust": None, "speed": None}
 
-    async def write_instant_data(self, power: float, torque: float, thrust: float, speed: float):
+    async def write_instant_data(self, power: int, torque: int, thrust: int, speed: float):
         """
         写入实时数据到PLC
         - 功率为 32 位，高位在前低位在后（一次写两个寄存器）
@@ -119,10 +119,10 @@ class PlcSyncTask:
         if not self.is_connected():
             return False
         try:
-            _power = int(power / 100)
-            _torque = int(torque / 100)
-            _thrust = int(thrust / 100)
-            _speed = int(speed * 10)
+            _power = round(power / 1000)
+            _torque = round(torque / 1000)
+            _thrust = round(thrust / 1000)
+            _speed = round(speed * 10)
             await self.write_register_32(*REGISTER_MAP["instant_power"], _power)  # 原子写
 
             if _torque <= 65535:

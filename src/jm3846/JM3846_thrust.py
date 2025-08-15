@@ -27,7 +27,7 @@ class JM3846Thrust:
             await asyncio.sleep(10)
 
             if gdata.configTest.test_mode_running:
-                logging.info('测试模式已打开,停止SPS数据采集-Thrust')
+                # logging.info('测试模式已打开,停止SPS数据采集-Thrust')
                 continue
 
             if name == 'sps':

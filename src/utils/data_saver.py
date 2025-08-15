@@ -16,7 +16,7 @@ from websocket.websocket_master import ws_server
 
 class DataSaver:
     @staticmethod
-    def save(name: str, torque: float, thrust: float, speed: float):
+    def save(name: str, torque: int, thrust: int, speed: float):
         try:
             utc_date_time = gdata.configDateTime.utc
             if utc_date_time is None:

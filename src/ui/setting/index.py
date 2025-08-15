@@ -189,7 +189,7 @@ class Setting(ft.Container):
         while self.task_running and gdata.configTest.auto_testing:
             try:
                 idx = int(random() * 10) % len(self.rail.destinations)
-                logging.info(f'&&&&&&&&&&&&&&-Setting.test_auto_run, idx = {idx}')
+                # logging.info(f'&&&&&&&&&&&&&&-Setting.test_auto_run, idx = {idx}')
                 self.__switch_content(idx=idx)
                 self.rail.selected_index = idx
                 self.rail.update()

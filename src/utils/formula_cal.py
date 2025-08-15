@@ -68,7 +68,7 @@ class FormulaCalculator:
         return abs(rpm)
 
     @staticmethod
-    def calculate_instant_power(torque:float, rpm:float):
+    def calculate_instant_power(torque: int, rpm: float):
         """
         Calculate the instant power.
 

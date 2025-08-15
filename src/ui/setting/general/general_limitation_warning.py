@@ -28,7 +28,7 @@ class GeneralLimitationWarning(ft.Container):
                     value=self.limitations.torque_warning,
                     read_only=True,
                     can_request_focus=False,
-                    on_click=lambda e: keyboard.open(e.control))
+                    on_click=lambda e: keyboard.open(e.control, "int"))
 
                 self.speed_warning = ft.TextField(
                     suffix_text="rpm",
@@ -44,7 +44,7 @@ class GeneralLimitationWarning(ft.Container):
                     value=self.limitations.power_warning,
                     read_only=True,
                     can_request_focus=False,
-                    on_click=lambda e: keyboard.open(e.control))
+                    on_click=lambda e: keyboard.open(e.control, "int"))
 
                 self.custom_card = CustomCard(
                     self.page.session.get("lang.setting.warning_limitations"),
@@ -65,7 +65,7 @@ class GeneralLimitationWarning(ft.Container):
                 if self.speed_warning is not None:
                     self.speed_warning.label = s.get("lang.common.speed")
 
-                if self.power_warning is not None:    
+                if self.power_warning is not None:
                     self.power_warning.label = s.get("lang.common.power")
 
                 if self.custom_card is not None:
@@ -83,11 +83,11 @@ class GeneralLimitationWarning(ft.Container):
 
                     if self.torque_warning is not None:
                         self.torque_warning.suffix_text = "kNm"
-                        self.torque_warning.value = round(torque_warning / 1000, 1)
+                        self.torque_warning.value = round(torque_warning / 1000)
 
                     if self.power_warning is not None:
                         self.power_warning.suffix_text = "kW"
-                        self.power_warning.value = round(power_warning / 1000, 1)
+                        self.power_warning.value = round(power_warning / 1000)
 
                 elif self.system_unit == 1:
                     if self.torque_warning is not None:
@@ -104,9 +104,9 @@ class GeneralLimitationWarning(ft.Container):
             logging.exception('exception occured at GeneralLimitationWarning.update_unit')
 
     def save_data(self, user_id: int):
-        warning_speed = float(self.speed_warning.value or 0)
-        warning_torque = float(self.torque_warning.value or 0)
-        warning_power = float(self.power_warning.value or 0)
+        warning_speed = float(self.speed_warning.value)
+        warning_torque = int(self.torque_warning.value)
+        warning_power = int(self.power_warning.value)
 
         if self.system_unit == 0:
             # kNm to Nm

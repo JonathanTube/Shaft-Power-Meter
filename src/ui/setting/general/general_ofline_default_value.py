@@ -27,7 +27,7 @@ class GeneralOflineDefaultValue(ft.Container):
                     col={"xs": 6},
                     read_only=True,
                     can_request_focus=False,
-                    on_click=lambda e: keyboard.open(e.control, type="int"))
+                    on_click=lambda e: keyboard.open(e.control, "int"))
 
                 self.thrust_default_value = ft.TextField(
                     suffix_text="N",
@@ -36,7 +36,7 @@ class GeneralOflineDefaultValue(ft.Container):
                     col={"xs": 6},
                     read_only=True,
                     can_request_focus=False,
-                    on_click=lambda e: keyboard.open(e.control, type="int"))
+                    on_click=lambda e: keyboard.open(e.control, "int"))
 
                 self.speed_default_value = ft.TextField(
                     suffix_text="rpm",
@@ -84,9 +84,9 @@ class GeneralOflineDefaultValue(ft.Container):
         if self.odv is None:
             return
 
-        self.odv.torque_default_value = self.torque_default_value.value
-        self.odv.thrust_default_value = self.thrust_default_value.value
-        self.odv.speed_default_value = self.speed_default_value.value
+        self.odv.torque_default_value = int(self.torque_default_value.value)
+        self.odv.thrust_default_value = int(self.thrust_default_value.value)
+        self.odv.speed_default_value = float(self.speed_default_value.value)
 
         if self.system_unit == 0:
             self.odv.torque_default_value = UnitConverter.knm_to_nm(self.odv.torque_default_value)
@@ -111,19 +111,19 @@ class GeneralOflineDefaultValue(ft.Container):
     def update_unit(self, system_unit: int):
         try:
             self.system_unit = system_unit
-            torque_default_value = float(self.odv.torque_default_value or 0)
-            thrust_default_value = float(self.odv.thrust_default_value or 0)
-            speed_default_value = float(self.odv.speed_default_value or 0)
+            torque_default_value = int(self.odv.torque_default_value)
+            thrust_default_value = int(self.odv.thrust_default_value)
+            speed_default_value = float(self.odv.speed_default_value)
 
             if self.system_unit == 0:
 
                 if self.torque_default_value is not None:
                     self.torque_default_value.suffix_text = "kNm"
-                    self.torque_default_value.value = round(torque_default_value / 1000, 1)
+                    self.torque_default_value.value = round(torque_default_value / 1000)
 
                 if self.thrust_default_value is not None:
                     self.thrust_default_value.suffix_text = "kN"
-                    self.thrust_default_value.value = round(thrust_default_value / 1000, 1)
+                    self.thrust_default_value.value = round(thrust_default_value / 1000)
 
                 if self.speed_default_value is not None:
                     self.speed_default_value.suffix_text = "rpm"

@@ -206,8 +206,8 @@ class SystemConfSettings(ft.Container):
 
         unit = self.preference.system_unit
         if unit == 0:
-            self.system_settings.unlimited_power = self.unlimited_power.value * 1000
-            self.system_settings.eexi_limited_power = self.eexi_limited_power.value * 1000
+            self.system_settings.unlimited_power = int(self.unlimited_power.value) * 1000
+            self.system_settings.eexi_limited_power = int(self.eexi_limited_power.value) * 1000
         else:
             self.system_settings.unlimited_power = UnitConverter.shp_to_w(self.unlimited_power.value)
             self.system_settings.eexi_limited_power = UnitConverter.shp_to_w(self.eexi_limited_power.value)

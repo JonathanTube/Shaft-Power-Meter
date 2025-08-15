@@ -141,7 +141,7 @@ class EEXIBreach:
                 EEXIBreach.__save_report_detail(item.name, item.utc_date_time, item.speed, item.ad_0_torque, item.power)
 
     @staticmethod
-    def __save_report_detail(name: str, utc_date_time: datetime, speed: float, torque: float, power: float):
+    def __save_report_detail(name: str, utc_date_time: datetime, speed: float, torque: int, power: int):
         # print(f"EEXIBreach.__save_report_detail: {name}, {utc_date_time}, {speed}, {torque}, {power}")
         try:
             # print(f"EEXIBreach.report_id: {EEXIBreach.report_id}")

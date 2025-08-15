@@ -25,7 +25,7 @@ class PropellerConfMcr(ft.Container):
                     value=self.ps.rpm_of_mcr_operating_point,
                     read_only=True,
                     can_request_focus=False,
-                    on_click=lambda e: keyboard.open(e.control, type='int')
+                    on_click=lambda e: keyboard.open(e.control)
                 )
 
                 shaft_power_value, shaft_power_unit = self.__get_shaft_power()
@@ -36,7 +36,7 @@ class PropellerConfMcr(ft.Container):
                     suffix_text=shaft_power_unit,
                     read_only=True,
                     can_request_focus=False,
-                    on_click=lambda e: keyboard.open(e.control)
+                    on_click=lambda e: keyboard.open(e.control, "int")
                 )
 
                 self.custom_card = CustomCard(
@@ -53,14 +53,14 @@ class PropellerConfMcr(ft.Container):
     def __get_shaft_power(self) -> tuple[float, str]:
         _shaft_power = float(self.ps.shaft_power_of_mcr_operating_point)
         if self.system_unit == 0:
-            return (_shaft_power / 1000, "kW")
+            return (round(_shaft_power / 1000), "kW")
         else:
             return (UnitConverter.w_to_shp(_shaft_power), "sHp")
 
     def save_data(self):
-        self.ps.rpm_of_mcr_operating_point = self.rpm_of_mcr_operating_point.value
+        self.ps.rpm_of_mcr_operating_point = float(self.rpm_of_mcr_operating_point.value)
 
-        shaft_power = float(self.shaft_power_of_mcr_operating_point.value)
+        shaft_power = int(self.shaft_power_of_mcr_operating_point.value)
         if self.system_unit == 0:
             self.ps.shaft_power_of_mcr_operating_point = shaft_power * 1000
         else:

@@ -16,13 +16,10 @@ class TestModeRange(ft.Container):
         self.conf: TestModeConf = TestModeConf.get()
         preference: Preference = Preference.get()
         self.system_unit: int = preference.system_unit
-
         limitations: Limitations = Limitations.get()
-
-        limitations: Limitations = Limitations.get()
-        self.max_torque: float = limitations.torque_max
+        self.max_torque: int = limitations.torque_max
         self.max_rpm: float = limitations.speed_max
-        self.max_thrust: float = 4000 * 1000
+        self.max_thrust: int = 4000 * 1000
 
     def build(self):
         try:

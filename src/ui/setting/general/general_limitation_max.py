@@ -36,7 +36,7 @@ class GeneralLimitationMax(ft.Container):
                     value=self.limitations.torque_max,
                     read_only=True,
                     can_request_focus=False,
-                    on_click=lambda e: keyboard.open(e.control))
+                    on_click=lambda e: keyboard.open(e.control, "int"))
 
                 self.power_max = ft.TextField(
                     suffix_text="kW",
@@ -44,7 +44,7 @@ class GeneralLimitationMax(ft.Container):
                     value=self.limitations.power_max,
                     read_only=True,
                     can_request_focus=False,
-                    on_click=lambda e: keyboard.open(e.control))
+                    on_click=lambda e: keyboard.open(e.control, "int"))
 
                 self.custom_card = CustomCard(
                     self.page.session.get("lang.setting.maximum_limitations"),
@@ -61,10 +61,10 @@ class GeneralLimitationMax(ft.Container):
                 if self.speed_max is not None:
                     self.speed_max.label = s.get("lang.common.speed")
 
-                if self.torque_max is not None:    
+                if self.torque_max is not None:
                     self.torque_max.label = s.get("lang.common.torque")
 
-                if self.power_max is not None:    
+                if self.power_max is not None:
                     self.power_max.label = s.get("lang.common.power")
 
                 if self.custom_card is not None:
@@ -82,11 +82,11 @@ class GeneralLimitationMax(ft.Container):
 
                     if self.torque_max is not None:
                         self.torque_max.suffix_text = "kNm"
-                        self.torque_max.value = round(torque_limit / 1000, 1)
+                        self.torque_max.value = round(torque_limit / 1000)
 
                     if self.power_max is not None:
                         self.power_max.suffix_text = "kW"
-                        self.power_max.value = round(power_limit / 1000, 1)
+                        self.power_max.value = round(power_limit / 1000)
 
                 elif self.system_unit == 1:
 
@@ -105,9 +105,9 @@ class GeneralLimitationMax(ft.Container):
 
     def save_data(self, user_id: int):
         # save limitations
-        max_speed = float(self.speed_max.value or 0)
-        max_torque = float(self.torque_max.value or 0)
-        max_power = float(self.power_max.value or 0)
+        max_speed = float(self.speed_max.value)
+        max_torque = int(self.torque_max.value)
+        max_power = int(self.power_max.value)
 
         if self.system_unit == 0:
             # kNm to Nm

@@ -36,7 +36,7 @@ class EventButton(ft.TextButton):
         while self.task_running:
             try:
                 if self.page:
-                    count = (EventLog.select(fn.COUNT(EventLog.id)).where(EventLog.breach_reason.is_null(True)).scalar() or 0)
+                    count = EventLog.select(fn.COUNT(EventLog.id)).where(EventLog.breach_reason.is_null(True)).scalar()
                     if count > 0:
                         self.badge = ft.Badge(text=str(count), bgcolor=ft.Colors.RED, text_color=ft.Colors.WHITE, label_visible=True)
                     else:

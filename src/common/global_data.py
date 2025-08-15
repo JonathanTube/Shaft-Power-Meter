@@ -92,9 +92,9 @@ class ConfigGps:
 @dataclass
 class ConfigOffline:
     # 默认离线数值
-    torque = 0
-    thrust = 0
-    speed = 0
+    torque: int = 0
+    thrust: int = 0
+    speed: float = 0.0
 
     def set_default_value(self):
         offline_default_value: OfflineDefaultValue = OfflineDefaultValue.get()
@@ -105,10 +105,10 @@ class ConfigOffline:
 
 @dataclass
 class ConfigSPS:
-    speed = 0.0
-    power = 0
-    torque = 0
-    thrust = 0
+    speed: float = 0.0
+    power: int = 0
+    torque: int = 0
+    thrust: int = 0
 
     ad0 = 0
     ad1 = 0
@@ -141,10 +141,10 @@ class ConfigSPS:
 
 @dataclass
 class ConfigSPS2:
-    speed = 0.0
-    power = 0
-    torque = 0
-    thrust = 0
+    speed: float = 0.0
+    power: int = 0
+    torque: int = 0
+    thrust: int = 0
 
     ad0 = 0
     ad1 = 0

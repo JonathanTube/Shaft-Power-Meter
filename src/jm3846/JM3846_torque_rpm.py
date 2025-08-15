@@ -28,7 +28,7 @@ class JM3846TorqueRpm:
             await asyncio.sleep(2)
 
             if gdata.configTest.test_mode_running:
-                logging.info('测试模式已打开,停止SPS数据采集-Speed-Torque')
+                # logging.info('测试模式已打开,停止SPS数据采集-Speed-Torque')
                 continue
 
             # 处理数据

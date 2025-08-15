@@ -37,7 +37,7 @@ class DataInit:
             OfflineDefaultValue.create(
                 torque_default_value=460 * 1000,
                 thrust_default_value=32 * 1000,
-                speed_default_value=95
+                speed_default_value=95.0
             )
 
     def __init_limitations():

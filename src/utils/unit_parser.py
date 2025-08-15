@@ -29,23 +29,21 @@ class UnitParser:
         return [round(_speed, 1), 'rpm']
 
     @staticmethod
-    def parse_torque(torque: float, system_unit: int, shrink: bool = False) -> tuple[int, str]:
-        _torque = torque if torque is not None else 0
+    def parse_torque(torque: int = 0, system_unit: int = 0, shrink: bool = False) -> tuple[int, str]:
         if system_unit == 0:
-            if shrink and _torque < 1000:
-                return [round(_torque), 'Nm']
+            if shrink and torque < 1000:
+                return [round(torque), 'Nm']
             else:
-                return [round(_torque/1000), 'kNm']
+                return [round(torque/1000), 'kNm']
         else:
-            return [round(UnitConverter.nm_to_tm(_torque)), 'Tm']
+            return [round(UnitConverter.nm_to_tm(torque)), 'Tm']
 
     @staticmethod
-    def parse_thrust(thrust: float, system_unit: int, shrink: bool = False) -> tuple[int, str]:
-        _thrust = thrust if thrust is not None else 0
+    def parse_thrust(thrust: int = 0, system_unit: int = 0, shrink: bool = False) -> tuple[int, str]:
         if system_unit == 0:
-            if shrink and _thrust < 1000:
-                return [round(_thrust), 'N']
+            if shrink and thrust < 1000:
+                return [round(thrust), 'N']
             else:
-                return [round(_thrust/1000), 'kN']
+                return [round(thrust/1000), 'kN']
         else:
-            return [round(UnitConverter.n_to_t(_thrust)), 'T']
+            return [round(UnitConverter.n_to_t(thrust)), 'T']

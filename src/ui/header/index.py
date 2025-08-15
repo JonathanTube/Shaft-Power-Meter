@@ -225,7 +225,7 @@ class Header(ft.AppBar):
         while self._auto_run_running:
             try:
                 if gdata.configTest.auto_testing:
-                    logging.info(f"&&&&&&&&&&&&&&-main menu auto testing, idx={idx}")
+                    # logging.info(f"&&&&&&&&&&&&&&-main menu auto testing, idx={idx}")
                     self.on_click(arr[idx % 3])
                     self.theme.toggle_theme()
                     idx += 1

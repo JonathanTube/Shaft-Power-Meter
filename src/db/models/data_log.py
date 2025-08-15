@@ -1,4 +1,4 @@
-from peewee import FloatField, DateTimeField, CharField, BooleanField
+from peewee import IntegerField, FloatField, DateTimeField, CharField, BooleanField
 from ..base import BaseModel
 
 
@@ -7,13 +7,13 @@ class DataLog(BaseModel):
 
     name = CharField(verbose_name="名称:sps or sps2")
 
-    ad_0_torque = FloatField(verbose_name="扭矩(Nm)")
+    ad_0_torque = IntegerField(verbose_name="扭矩(Nm)")
 
-    ad_1_thrust = FloatField(verbose_name="推力(N)")
+    ad_1_thrust = IntegerField(verbose_name="推力(N)")
 
     speed = FloatField(verbose_name="转速(RPM)")
 
-    power = FloatField(verbose_name="功率(W)")
+    power = IntegerField(verbose_name="功率(W)")
 
     is_overload = BooleanField(verbose_name="是否过载", default=False)
 
