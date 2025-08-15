@@ -61,7 +61,9 @@ class EEXILimitedPower(ft.Container):
                 vertical_alignment=ft.CrossAxisAlignment.CENTER
             )
 
-            identifications = ft.Column(expand=True, alignment=ft.alignment.top_right, controls=[self.common_alarm_group, self.gps_status_group])
+            identifications = ft.Column(expand=True, alignment=ft.alignment.top_right,
+                                        visible=not gdata.configCommon.is_master,
+                                        controls=[self.common_alarm_group, self.gps_status_group])
 
             center_items = ft.Row(expand=True, controls=[self.meter_half, identifications])
 

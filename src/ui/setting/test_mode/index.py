@@ -192,6 +192,19 @@ class TestMode(ft.Container):
             # 恢复现场
             gdata.configTest.test_mode_running = False
             gdata.configCommon.is_eexi_breaching = False
+            gdata.configSPS.speed = 0.0
+            gdata.configSPS.power = 0
+            gdata.configSPS.torque = 0
+            gdata.configSPS.thrust = 0
+            gdata.configSPS.ad0 = 0
+            gdata.configSPS.ad1 = 0
+
+            gdata.configSPS2.speed = 0.0
+            gdata.configSPS2.power = 0
+            gdata.configSPS2.torque = 0
+            gdata.configSPS2.thrust = 0
+            gdata.configSPS2.ad0 = 0
+            gdata.configSPS2.ad1 = 0
             # 这里只需要回复power_overload的告警，alarm不需要管。
             self.page.run_task(plc.write_power_overload, False)
             Toast.show_success(self.page)

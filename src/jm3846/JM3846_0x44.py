@@ -96,7 +96,7 @@ class JM38460x44:
                     await JM38460x44.send_0x44_again(name, reader, writer)
                     continue
                 else:
-                    # logging.info(f'[JM3846-{name}] 0x44响应=ok')
+                    # logging.info(f'[JM3846-{name}] 0x44响应={bytes.hex(frame)}')
                     pass
 
             except asyncio.TimeoutError:

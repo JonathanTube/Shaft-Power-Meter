@@ -28,6 +28,7 @@ class JM3846TorqueRpm:
             await asyncio.sleep(2)
 
             if gdata.configTest.test_mode_running:
+                logging.info('测试模式已打开,停止SPS数据采集-Speed-Torque')
                 continue
 
             # 处理数据
@@ -46,12 +47,14 @@ class JM3846TorqueRpm:
                     gdata.configSPS.torque = self.cal_torque(ch0_ad)
                 if rpm:
                     gdata.configSPS.speed = rpm
+                logging.info(f'获取SPS:ad0={round(ch0_ad, 1)},rpm={round(rpm, 1)}')
             else:
                 if ch0_ad:
                     gdata.configSPS2.ad0 = ch0_ad
                     gdata.configSPS2.torque = self.cal_torque(ch0_ad)
                 if rpm:
                     gdata.configSPS2.speed = rpm
+                logging.info(f'获取SPS2:ad0={round(ch0_ad, 1)},rpm={round(rpm, 1)}')
 
         except:
             logging.exception(

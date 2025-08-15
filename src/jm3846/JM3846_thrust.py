@@ -27,8 +27,8 @@ class JM3846Thrust:
             await asyncio.sleep(10)
 
             if gdata.configTest.test_mode_running:
-                logging.info('test mode is running, skip recording thrust.')
-                break
+                logging.info('测试模式已打开,停止SPS数据采集-Thrust')
+                continue
 
             if name == 'sps':
                 if gdata.configSPS.zero_cal_thrust_running:
@@ -64,9 +64,11 @@ class JM3846Thrust:
             if self.name == 'sps':
                 gdata.configSPS.ad1 = ch1_ad
                 gdata.configSPS.thrust = thrust
+                logging.info(f'获取SPS:ad1={round(ch1_ad, 1)}')
             elif self.name == 'sps2':
                 gdata.configSPS2.ad1 = ch1_ad
                 gdata.configSPS2.thrust = thrust
+                logging.info(f'获取SPS2:ad1={round(ch1_ad, 1)}')
 
         except:
             logging.exception('exception occured at JM3846Thrust.handle_result')
