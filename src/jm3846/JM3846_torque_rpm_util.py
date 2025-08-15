@@ -1,9 +1,10 @@
 import logging
 from common.global_data import gdata
 
+
 class JM3846TorqueRpmUtil:
     @staticmethod
-    def get_avg(data_list, name:str) -> tuple[float, float]:
+    def get_avg(data_list, name: str) -> tuple[float, float]:
         try:
             values_length = len(data_list)
             if values_length == 0:
@@ -18,6 +19,8 @@ class JM3846TorqueRpmUtil:
             ch_sel_1 = gdata.configSPS.ch_sel_1 if name == 'sps' else gdata.configSPS2.ch_sel_1
             ch_sel_0 = gdata.configSPS.ch_sel_0 if name == 'sps' else gdata.configSPS2.ch_sel_0
             speed_sel = gdata.configSPS.speed_sel if name == 'sps' else gdata.configSPS2.speed_sel
+            logging.info(f'ch_sel_1={ch_sel_1},ch_sel_0={ch_sel_0},speed_sel={speed_sel}')
+            logging.info(f'data_list={data_list}')
             if ch_sel_1 != 0 and ch_sel_0 != 0 and speed_sel == 1:
                 ch0_sum = 0
                 rpm_sum = 0
@@ -58,8 +61,8 @@ class JM3846TorqueRpmUtil:
                     if len(chunk) == channel_count:
                         ch0_sum += chunk[0]
 
-            ch0_ad = ch0_sum / part_length if ch0_sum else 0
-            rpm = rpm_sum / part_length if rpm_sum else 0
+            ch0_ad = round(ch0_sum / part_length, 1)
+            rpm = round(rpm_sum / part_length, 1)
 
             return (ch0_ad, rpm)
         except:

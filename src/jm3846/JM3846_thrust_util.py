@@ -44,7 +44,7 @@ class JM3846ThrustUtil:
                     if len(chunk) == channel_count:
                         ch1_sum += chunk[1]
 
-                return ch1_sum / part_length
+                return round(ch1_sum / part_length, 1)
 
         except:
             logging.exception('exception occured at JM3846Thrust.convert_data')
