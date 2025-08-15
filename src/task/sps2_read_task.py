@@ -1,12 +1,8 @@
 # task/sps2_read_task.py
-import logging
-import asyncio
 from jm3846.JM3846_client import JM3846AsyncClient
-from db.models.io_conf import IOConf
 from common.const_alarm_type import AlarmType
 from utils.alarm_saver import AlarmSaver
-
-logger = logging.getLogger("Sps2ReadTask")
+from common.global_data import gdata
 
 
 class Sps2ReadTask(JM3846AsyncClient):
@@ -16,12 +12,9 @@ class Sps2ReadTask(JM3846AsyncClient):
 
     def get_ip_port(self):
         """同步获取 SPS2 IP 和端口"""
-        try:
-            io_conf: IOConf = IOConf.get()
-            return io_conf.sps2_ip, io_conf.sps2_port
-        except Exception:
-            logger.exception("[Sps2ReadTask] 获取 IO 配置失败")
-            return "127.0.0.1", 502
+        ip = gdata.configIO.sps2_ip
+        port = gdata.configIO.sps2_port
+        return ip, port
 
     def set_online(self):
         """设置在线状态（非阻塞）"""

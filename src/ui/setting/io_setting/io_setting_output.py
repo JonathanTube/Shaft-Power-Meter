@@ -1,4 +1,3 @@
-import asyncio
 import logging
 import flet as ft
 import serial.tools.list_ports
@@ -6,13 +5,10 @@ from db.models.io_conf import IOConf
 from ui.common.custom_card import CustomCard
 from ui.common.toast import Toast
 from task.modbus_output_task import modbus_output
+from common.global_data import gdata
 
 
 class IOSettingOutput(ft.Container):
-    def __init__(self, conf: IOConf):
-        super().__init__()
-        self.conf = conf
-
     def build(self):
         try:
             if self.page and self.page.session:
@@ -23,7 +19,7 @@ class IOSettingOutput(ft.Container):
 
                 self.serial_port = ft.Dropdown(
                     label="Port",
-                    value=self.conf.output_com_port,
+                    value=gdata.configIO.output_com_port,
                     col={'sm': 8},
                     options=options
                 )
@@ -54,31 +50,31 @@ class IOSettingOutput(ft.Container):
 
                 self.check_torque = ft.Checkbox(
                     label=self.page.session.get("lang.common.torque"),
-                    value=self.conf.output_torque
+                    value=gdata.configIO.output_torque
                 )
                 self.check_thrust = ft.Checkbox(
                     label=self.page.session.get("lang.common.thrust"),
-                    value=self.conf.output_thrust
+                    value=gdata.configIO.output_thrust
                 )
 
                 self.check_power = ft.Checkbox(
                     label=self.page.session.get("lang.common.power"),
-                    value=self.conf.output_power
+                    value=gdata.configIO.output_power
                 )
 
                 self.check_speed = ft.Checkbox(
                     label=self.page.session.get("lang.common.speed"),
-                    value=self.conf.output_speed
+                    value=gdata.configIO.output_speed
                 )
 
                 self.check_avg_power = ft.Checkbox(
                     label=self.page.session.get("lang.common.average_power"),
-                    value=self.conf.output_avg_power
+                    value=gdata.configIO.output_avg_power
                 )
 
                 self.check_sum_power = ft.Checkbox(
                     label=self.page.session.get("lang.common.total_energy"),
-                    value=self.conf.output_sum_power
+                    value=gdata.configIO.output_sum_power
                 )
 
                 self.custom_card = CustomCard(
@@ -111,21 +107,22 @@ class IOSettingOutput(ft.Container):
 
     def on_start(self):
         try:
+            self.save_data()
+            gdata.configIO.set_default_value()
+
             if self.start_btn and self.start_btn.page:
                 self.start_btn.text = "loading..."
                 self.start_btn.bgcolor = ft.Colors.GREY
                 self.start_btn.disabled = True
                 self.start_btn.update()
 
-            self.save_data()
-            self.conf.save()
             count_list = [
-                self.conf.output_torque,
-                self.conf.output_thrust,
-                self.conf.output_power,
-                self.conf.output_speed,
-                self.conf.output_avg_power,
-                self.conf.output_sum_power
+                gdata.configIO.output_torque,
+                gdata.configIO.output_thrust,
+                gdata.configIO.output_power,
+                gdata.configIO.output_speed,
+                gdata.configIO.output_avg_power,
+                gdata.configIO.output_sum_power
             ]
             output_count: int = sum(count_list)
             if output_count == 0:
@@ -136,9 +133,9 @@ class IOSettingOutput(ft.Container):
                 Toast.show_warning(self.page, self.page.session.get('lang.setting.io_conf.serial_port_can_not_be_empty'))
                 return
 
-            asyncio.create_task(modbus_output.start())
-        except:
-            logging.exception('exception occured at IOSettingOutput.on_start')
+            self.page.run_task(modbus_output.start)
+        except Exception as e:
+            Toast.show_error(self.page, str(e))
 
     def on_stop(self):
         try:
@@ -153,13 +150,19 @@ class IOSettingOutput(ft.Container):
             logging.exception('exception occured at IOSettingOutput.on_start')
 
     def save_data(self):
-        self.conf.output_torque = self.check_torque.value
-        self.conf.output_thrust = self.check_thrust.value
-        self.conf.output_power = self.check_power.value
-        self.conf.output_speed = self.check_speed.value
-        self.conf.output_avg_power = self.check_avg_power.value
-        self.conf.output_sum_power = self.check_sum_power.value
-        self.conf.output_com_port = self.serial_port.value
+        output_torque = bool(self.check_torque.value)
+        output_thrust = bool(self.check_thrust.value)
+        output_power = bool(self.check_power.value)
+        output_speed = bool(self.check_speed.value)
+        output_avg_power = bool(self.check_avg_power.value)
+        output_sum_power = bool(self.check_sum_power.value)
+        output_com_port = self.serial_port.value  # 保存串口名
+        IOConf.update(
+            output_torque=output_torque, output_thrust=output_thrust,
+            output_power=output_power, output_speed=output_speed,
+            output_avg_power=output_avg_power, output_sum_power=output_sum_power,
+            output_com_port=output_com_port
+        ).execute()
 
     def before_update(self):
         try:

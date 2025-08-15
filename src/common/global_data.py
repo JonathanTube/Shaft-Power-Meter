@@ -175,6 +175,49 @@ class ConfigSPS2:
 
 
 @dataclass
+class ConfigIO:
+    plc_enabled = None
+    plc_ip = None
+    plc_port = None
+    gps_ip = None
+    gps_port = None
+    hmi_server_ip = None
+    hmi_server_port = None
+    sps_ip = None
+    sps_port = None
+    sps2_ip = None
+    sps2_port = None
+    output_torque = None
+    output_thrust = None
+    output_power = None
+    output_speed = None
+    output_avg_power = None
+    output_sum_power = None
+    output_com_port = None
+
+    def set_default_value(self):
+        io_conf: IOConf = IOConf.get()
+        self.plc_enabled = io_conf.plc_enabled
+        self.plc_ip = io_conf.plc_ip
+        self.plc_port = io_conf.plc_port
+        self.gps_ip = io_conf.gps_ip
+        self.gps_port = io_conf.gps_port
+        self.hmi_server_ip = io_conf.hmi_server_ip
+        self.hmi_server_port = io_conf.hmi_server_port
+        self.sps_ip = io_conf.sps_ip
+        self.sps_port = io_conf.sps_port
+        self.sps2_ip = io_conf.sps2_ip
+        self.sps2_port = io_conf.sps2_port
+        self.output_torque = io_conf.output_torque
+        self.output_thrust = io_conf.output_thrust
+        self.output_power = io_conf.output_power
+        self.output_speed = io_conf.output_speed
+        self.output_avg_power = io_conf.output_avg_power
+        self.output_sum_power = io_conf.output_sum_power
+        self.output_com_port = io_conf.output_com_port
+
+
+@dataclass
 class ConfigCalc:
     # 计算参数
     bearing_outer_diameter_D = 0
@@ -220,6 +263,7 @@ class GlobalData:
     configOffline = None
     configSPS = None
     configSPS2 = None
+    configIO = None
     configCalc = None
     configPropperCurve = None
 
@@ -246,6 +290,9 @@ class GlobalData:
 
         self.configCalc = ConfigCalc()
         self.configCalc.set_default_value()
+
+        self.configIO = ConfigIO()
+        self.configIO.set_default_value()
 
         self.configPropperCurve = ConfigPropperCurve()
         self.configPropperCurve.set_default_value()

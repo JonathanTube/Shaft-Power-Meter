@@ -3,9 +3,7 @@ import logging
 import asyncio
 import flet as ft
 from common.const_alarm_type import AlarmType
-from common.operation_type import OperationType
 from db.models.io_conf import IOConf
-from db.models.operation_log import OperationLog
 from db.models.user import User
 from ui.common.custom_card import CustomCard
 from ui.common.keyboard import keyboard
@@ -17,16 +15,12 @@ from common.global_data import gdata
 
 
 class IOSettingPLC(ft.Container):
-    def __init__(self, conf: IOConf):
-        super().__init__()
-        self.conf = conf
-
     def build(self):
         try:
             if self.page and self.page.session:
                 self.plc_enabled = ft.Checkbox(
                     label=self.page.session.get("lang.setting.plc_enabled"),
-                    value=self.conf.plc_enabled, col={'sm': 12},
+                    value=gdata.configIO.plc_enabled, col={'sm': 12},
                     on_change=lambda e: self.__plc_enabled_change(e)
                 )
 
@@ -70,7 +64,7 @@ class IOSettingPLC(ft.Container):
                 # ----------------- 输入框 -----------------
                 self.plc_ip = ft.TextField(
                     label=self.page.session.get("lang.setting.ip"),
-                    value=self.conf.plc_ip,
+                    value=gdata.configIO.plc_ip,
                     col={'sm': 4},
                     can_request_focus=False,
                     read_only=True, on_click=lambda e: keyboard.open(e.control, 'ip')
@@ -78,7 +72,7 @@ class IOSettingPLC(ft.Container):
 
                 self.plc_port = ft.TextField(
                     label=self.page.session.get("lang.setting.port"),
-                    value=self.conf.plc_port,
+                    value=gdata.configIO.plc_port,
                     can_request_focus=False,
                     col={'sm': 4},
                     read_only=True, on_click=lambda e: keyboard.open(e.control, 'int')
@@ -122,7 +116,7 @@ class IOSettingPLC(ft.Container):
                 )
 
                 self.plc_enabled_items = ft.Container(
-                    visible=self.conf.plc_enabled,
+                    visible=gdata.configIO.plc_enabled,
                     content=ft.ResponsiveRow(
                         controls=[
                             self.plc_ip,
@@ -175,27 +169,15 @@ class IOSettingPLC(ft.Container):
     def __on_connect(self, user: User):
         try:
             self.save_data()
-            self.conf.save()
-        except Exception as e:
-            Toast.show_error(self.page, str(e))
-            return
-
-        try:
+            gdata.configIO.set_default_value()
             if self.connect_btn and self.connect_btn.page:
                 self.connect_btn.text = 'loading...'
                 self.connect_btn.disabled = True
                 self.connect_btn.bgcolor = ft.Colors.GREY
                 self.connect_btn.update()
-
-            OperationLog.create(
-                user_id=user.id,
-                utc_date_time=gdata.configDateTime.utc,
-                operation_type=OperationType.CONNECT_TO_PLC,
-                operation_content=user.user_name
-            )
             self.page.run_task(plc.connect)
-        except:
-            logging.exception("exception occured at io_setting_plc.__start_plc_task")
+        except Exception as e:
+            Toast.show_error(self.page, str(e))
 
     def __on_close(self, user: User):
         try:
@@ -208,13 +190,6 @@ class IOSettingPLC(ft.Container):
             if self.fetch_btn and self.fetch_btn.page:
                 self.fetch_btn.visible = False
                 self.fetch_btn.update()
-
-            OperationLog.create(
-                user_id=user.id,
-                utc_date_time=gdata.configDateTime.utc,
-                operation_type=OperationType.DISCONNECT_FROM_PLC,
-                operation_content=user.user_name
-            )
             self.page.run_task(plc.close)
         except:
             logging.exception('exception occured at __stop_plc_task')
@@ -225,7 +200,7 @@ class IOSettingPLC(ft.Container):
 
     async def load_range_data(self):
         try:
-            if self.conf.plc_enabled:
+            if gdata.configIO.plc_enabled:
                 plc_4_20_ma_data = await asyncio.wait_for(plc.read_4_20_ma_data(), timeout=5)
                 logging.info(f'加载PLC,4-20毫安配置={plc_4_20_ma_data}')
 
@@ -258,11 +233,13 @@ class IOSettingPLC(ft.Container):
         except ValueError:
             raise ValueError(f'{self.page.session.get("lang.common.ip_address_format_error")}: {self.plc_ip.value}')
 
-        self.conf.plc_ip = self.plc_ip.value
-        self.conf.plc_port = self.plc_port.value
-        self.conf.plc_enabled = self.plc_enabled.value
+        plc_enabled = self.plc_enabled.value
+        plc_ip = self.plc_ip.value
+        plc_port = self.plc_port.value
 
-        if self.conf.plc_enabled:
+        IOConf.update(plc_enabled=plc_enabled, plc_ip=plc_ip, plc_port=plc_port).execute()
+
+        if plc_enabled:
             self.page.run_task(self.__write_to_plc)
         else:
             self.page.run_task(plc.close)

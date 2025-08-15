@@ -5,7 +5,6 @@ import msgpack
 from peewee import fn
 from common.const_alarm_type import AlarmType
 from db.models.alarm_log import AlarmLog
-from db.models.io_conf import IOConf
 from db.models.propeller_setting import PropellerSetting
 from utils.alarm_saver import AlarmSaver
 from playhouse.shortcuts import dict_to_model
@@ -29,8 +28,9 @@ class WebSocketSlave:
 
         while not gdata.configCommon.is_master and not self.is_canceled:
             try:
-                io_conf: IOConf = IOConf.get()
-                uri = f"ws://{io_conf.hmi_server_ip}:{io_conf.hmi_server_port}"
+                ip = gdata.configIO.hmi_server_ip
+                port = gdata.configIO.hmi_server_port
+                uri = f"ws://{ip}:{port}"
                 self.websocket = await websockets.connect(uri)
                 self.set_online()
                 logging.info(f"[Slave] 已连接到 {uri}")

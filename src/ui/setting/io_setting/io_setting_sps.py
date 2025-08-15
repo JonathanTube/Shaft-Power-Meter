@@ -2,27 +2,21 @@ import asyncio
 import ipaddress
 import logging
 import flet as ft
-from common.operation_type import OperationType
-from db.models.factor_conf import FactorConf
-from db.models.io_conf import IOConf
-from db.models.operation_log import OperationLog
 from db.models.user import User
+from ui.common.toast import Toast
+from db.models.io_conf import IOConf
+from db.models.factor_conf import FactorConf
 from ui.common.custom_card import CustomCard
-from ui.common.keyboard import keyboard
 from ui.common.permission_check import PermissionCheck
 from common.global_data import gdata
+from ui.common.keyboard import keyboard
 from task.sps_read_task import sps_read_task
 from task.sps2_read_task import sps2_read_task
-from ui.common.toast import Toast
 
 
 class IOSettingSPS(ft.Container):
-    def __init__(self, conf: IOConf):
+    def __init__(self):
         super().__init__()
-        self.conf: IOConf = conf
-
-        self.factor_conf: FactorConf = FactorConf.get()
-
         self.task = None
         self.task_running = False
 
@@ -32,7 +26,7 @@ class IOSettingSPS(ft.Container):
                 # sps conf. start
                 self.sps_ip = ft.TextField(
                     label=f'{self.page.session.get("lang.setting.ip")} SPS',
-                    value=self.conf.sps_ip,
+                    value=gdata.configIO.sps_ip,
                     read_only=True,
                     col={'sm': 4},
                     can_request_focus=False,
@@ -41,7 +35,7 @@ class IOSettingSPS(ft.Container):
 
                 self.sps_port = ft.TextField(
                     label=f'{self.page.session.get("lang.setting.port")} SPS',
-                    value=self.conf.sps_port,
+                    value=gdata.configIO.sps_port,
                     read_only=True,
                     col={'sm': 4},
                     can_request_focus=False,
@@ -57,7 +51,7 @@ class IOSettingSPS(ft.Container):
                     style=ft.ButtonStyle(
                         shape=ft.RoundedRectangleBorder(radius=5)
                     ),
-                    on_click=lambda e: self.page.open(PermissionCheck(self.__connect_sps, 2))
+                    on_click=lambda e: self.page.open(PermissionCheck(self.connect_sps, 2))
                 )
 
                 self.sps_disconnect = ft.FilledButton(
@@ -69,12 +63,12 @@ class IOSettingSPS(ft.Container):
                     style=ft.ButtonStyle(
                         shape=ft.RoundedRectangleBorder(radius=5)
                     ),
-                    on_click=lambda e: self.page.open(PermissionCheck(self.__close_sps, 2))
+                    on_click=lambda e: self.page.open(PermissionCheck(self.close_sps, 2))
                 )
 
                 self.sps2_ip = ft.TextField(
                     label=f'{self.page.session.get("lang.setting.ip")} SPS2',
-                    value=self.conf.sps2_ip,
+                    value=gdata.configIO.sps2_ip,
                     read_only=True,
                     col={'sm': 4},
                     can_request_focus=False,
@@ -83,7 +77,7 @@ class IOSettingSPS(ft.Container):
 
                 self.sps2_port = ft.TextField(
                     label=f'{self.page.session.get("lang.setting.port")} SPS2',
-                    value=self.conf.sps2_port,
+                    value=gdata.configIO.sps2_port,
                     read_only=True,
                     col={'sm': 4},
                     can_request_focus=False,
@@ -99,7 +93,7 @@ class IOSettingSPS(ft.Container):
                     style=ft.ButtonStyle(
                         shape=ft.RoundedRectangleBorder(radius=5)
                     ),
-                    on_click=lambda e: self.page.open(PermissionCheck(self.__connect_sps2, 2))
+                    on_click=lambda e: self.page.open(PermissionCheck(self.connect_sps2, 2))
                 )
 
                 self.sps2_disconnect = ft.FilledButton(
@@ -111,14 +105,14 @@ class IOSettingSPS(ft.Container):
                     style=ft.ButtonStyle(
                         shape=ft.RoundedRectangleBorder(radius=5)
                     ),
-                    on_click=lambda e: self.page.open(PermissionCheck(self.__close_sps2, 2))
+                    on_click=lambda e: self.page.open(PermissionCheck(self.close_sps2, 2))
                 )
                 # sps conf. end
 
                 # factor conf. start
                 self.shaft_outer_diameter = ft.TextField(
                     label=self.page.session.get("lang.setting.bearing_outer_diameter_D"), suffix_text="m",
-                    value=self.factor_conf.bearing_outer_diameter_D,
+                    value=gdata.configCalc.bearing_outer_diameter_D,
                     read_only=True,
                     col={'sm': 4},
                     can_request_focus=False,
@@ -129,7 +123,7 @@ class IOSettingSPS(ft.Container):
                     label=self.page.session.get(
                         "lang.setting.bearing_inner_diameter_d"),
                     suffix_text="m",
-                    value=self.factor_conf.bearing_inner_diameter_d,
+                    value=gdata.configCalc.bearing_inner_diameter_d,
                     read_only=True,
                     col={'sm': 4},
                     can_request_focus=False,
@@ -138,7 +132,7 @@ class IOSettingSPS(ft.Container):
 
                 self.sensitivity_factor_k = ft.TextField(
                     label=self.page.session.get("lang.setting.sensitivity_factor_k"),
-                    value=self.factor_conf.sensitivity_factor_k,
+                    value=gdata.configCalc.sensitivity_factor_k,
                     read_only=True,
                     col={'sm': 4},
                     can_request_focus=False,
@@ -147,7 +141,7 @@ class IOSettingSPS(ft.Container):
 
                 self.elastic_modulus_E = ft.TextField(
                     label=self.page.session.get("lang.setting.elastic_modulus_E"),
-                    value=self.factor_conf.elastic_modulus_E,
+                    value=gdata.configCalc.elastic_modulus_E,
                     suffix_text="Mpa",
                     read_only=True,
                     col={'sm': 4},
@@ -157,7 +151,7 @@ class IOSettingSPS(ft.Container):
 
                 self.poisson_ratio_mu = ft.TextField(
                     label=self.page.session.get("lang.setting.poisson_ratio_mu"),
-                    value=self.factor_conf.poisson_ratio_mu,
+                    value=gdata.configCalc.poisson_ratio_mu,
                     read_only=True,
                     col={'sm': 4},
                     can_request_focus=False,
@@ -211,32 +205,21 @@ class IOSettingSPS(ft.Container):
         except:
             logging.exception('exception occured at IOSettingSPS.build')
 
-    def __connect_sps(self, user: User):
+    def connect_sps(self, user: User):
         try:
-            self.save_data()
-            self.conf.save()
-        except Exception as e:
-            Toast.show_error(self.page, str(e))
-            return
-
-        try:
+            self.save_sps_conf()
+            gdata.configIO.set_default_value()
             if self.sps_connect and self.sps_connect.page:
                 self.sps_connect.text = 'loading...'
                 self.sps_connect.bgcolor = ft.Colors.GREY
                 self.sps_connect.disabled = True
                 self.sps_connect.update()
 
-            OperationLog.create(
-                user_id=user.id,
-                utc_date_time=gdata.configDateTime.utc,
-                operation_type=OperationType.CONNECT_TO_SPS,
-                operation_content=user.user_name
-            )
             self.page.run_task(sps_read_task.start)
-        except:
-            logging.exception("exception occured at __connect_to_sps")
+        except Exception as e:
+            Toast.show_error(self.page, str(e))
 
-    def __close_sps(self, user: User):
+    def close_sps(self, user: User):
         try:
             if self.sps_disconnect and self.sps_disconnect.page:
                 self.sps_disconnect.text = 'loading...'
@@ -244,42 +227,25 @@ class IOSettingSPS(ft.Container):
                 self.sps_disconnect.disabled = True
                 self.sps_disconnect.update()
 
-            OperationLog.create(
-                user_id=user.id,
-                utc_date_time=gdata.configDateTime.utc,
-                operation_type=OperationType.DISCONNECT_FROM_SPS,
-                operation_content=user.user_name
-            )
             self.page.run_task(sps_read_task.close)
         except:
-            logging.exception("exception occured at __disconnect_from_sps")
+            logging.exception("exception occured at disconnect_from_sps")
 
-    def __connect_sps2(self, user: User):
+    def connect_sps2(self, user: User):
         try:
-            self.save_data()
-            self.conf.save()
-        except Exception as e:
-            Toast.show_error(self.page, str(e))
-            return
-
-        try:
+            self.save_sps2_conf()
+            gdata.configIO.set_default_value()
             if self.sps2_connect and self.sps2_connect.page:
                 self.sps2_connect.text = 'loading...'
                 self.sps2_connect.bgcolor = ft.Colors.GREY
                 self.sps2_connect.disabled = True
                 self.sps2_connect.update()
 
-            OperationLog.create(
-                user_id=user.id,
-                utc_date_time=gdata.configDateTime.utc,
-                operation_type=OperationType.CONNECT_TO_SPS2,
-                operation_content=user.user_name
-            )
             asyncio.create_task(sps2_read_task.connect())
-        except:
-            logging.exception("exception occured at __connect_to_sps2")
+        except Exception as e:
+            Toast.show_error(self.page, str(e))
 
-    def __close_sps2(self, user: User):
+    def close_sps2(self, user: User):
         try:
             if self.sps2_disconnect and self.sps2_disconnect.page:
                 self.sps2_disconnect.text = 'loading...'
@@ -287,51 +253,48 @@ class IOSettingSPS(ft.Container):
                 self.sps2_disconnect.disabled = True
                 self.sps2_disconnect.update()
 
-            OperationLog.create(
-                user_id=user.id,
-                utc_date_time=gdata.configDateTime.utc,
-                operation_type=OperationType.DISCONNECT_FROM_SPS2,
-                operation_content=user.user_name
-            )
             self.page.run_task(sps2_read_task.close)
         except:
-            logging.exception("exception occured at __disconnect_from_sps2")
+            logging.exception("exception occured at disconnect_from_sps2")
 
     def save_data(self):
+        self.save_sps_conf()
+        self.save_sps2_conf()
+        self.save_factor()
+
+    def save_sps_conf(self):
         try:
             ipaddress.ip_address(self.sps_ip.value)
-            self.conf.sps_ip = self.sps_ip.value
-            self.conf.sps_port = self.sps_port.value
         except ValueError:
             raise ValueError(f'{self.page.session.get("lang.common.ip_address_format_error")}: {self.sps_ip.value}')
 
+        sps_ip = self.sps_ip.value
+        sps_port = self.sps_port.value
+        IOConf.update(sps_ip=sps_ip, sps_port=sps_port).execute()
+
+    def save_sps2_conf(self):
         if gdata.configCommon.amount_of_propeller == 2:
             try:
                 ipaddress.ip_address(self.sps2_ip.value)
-                self.conf.sps2_ip = self.sps2_ip.value
-                self.conf.sps2_port = self.sps2_port.value
             except ValueError:
                 raise ValueError(f'{self.page.session.get("lang.common.ip_address_format_error")}: {self.sps2_ip.value}')
 
-        self.save_factor()
+        sps2_ip = self.sps2_ip.value
+        sps2_port = self.sps2_port.value
+        IOConf.update(sps2_ip=sps2_ip, sps2_port=sps2_port).execute()
 
     def save_factor(self):
-        try:
-            self.factor_conf.bearing_outer_diameter_D = self.shaft_outer_diameter.value
-            self.factor_conf.bearing_inner_diameter_d = self.shaft_inner_diameter.value
-            self.factor_conf.sensitivity_factor_k = self.sensitivity_factor_k.value
-            self.factor_conf.elastic_modulus_E = self.elastic_modulus_E.value
-            self.factor_conf.poisson_ratio_mu = self.poisson_ratio_mu.value
+        bearing_outer_diameter_D = self.shaft_outer_diameter.value
+        bearing_inner_diameter_d = self.shaft_inner_diameter.value
+        sensitivity_factor_k = self.sensitivity_factor_k.value
+        elastic_modulus_E = self.elastic_modulus_E.value
+        poisson_ratio_mu = self.poisson_ratio_mu.value
 
-            self.factor_conf.save()
-
-            gdata.configCalc.bearing_outer_diameter_D = float(self.shaft_outer_diameter.value)
-            gdata.configCalc.bearing_inner_diameter_d = float(self.shaft_inner_diameter.value)
-            gdata.configCalc.sensitivity_factor_k = float(self.sensitivity_factor_k.value)
-            gdata.configCalc.elastic_modulus_E = float(self.elastic_modulus_E.value)
-            gdata.configCalc.poisson_ratio_mu = float(self.poisson_ratio_mu.value)
-        except:
-            logging.exception('exception occured at IOSettingSPS.save_factor')
+        FactorConf.update(
+            bearing_outer_diameter_D=bearing_outer_diameter_D, bearing_inner_diameter_d=bearing_inner_diameter_d,
+            sensitivity_factor_k=sensitivity_factor_k, elastic_modulus_E=elastic_modulus_E,
+            poisson_ratio_mu=poisson_ratio_mu
+        ).execute()
 
     def before_update(self):
         try:

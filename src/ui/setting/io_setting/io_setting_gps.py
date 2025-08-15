@@ -1,11 +1,8 @@
-import asyncio
 import ipaddress
 import logging
 import flet as ft
 from common.const_alarm_type import AlarmType
-from common.operation_type import OperationType
 from db.models.io_conf import IOConf
-from db.models.operation_log import OperationLog
 from db.models.user import User
 from task.gps_sync_task import gps
 from ui.common.custom_card import CustomCard
@@ -17,16 +14,12 @@ from utils.alarm_saver import AlarmSaver
 
 
 class IOSettingGPS(ft.Container):
-    def __init__(self, conf: IOConf):
-        super().__init__()
-        self.conf = conf
-
     def build(self):
         try:
             if self.page and self.page.session:
                 self.gps_ip = ft.TextField(
                     label=self.page.session.get("lang.setting.ip"),
-                    value=self.conf.gps_ip,
+                    value=gdata.configIO.gps_ip,
                     read_only=True,
                     col={"sm": 4},
                     can_request_focus=False,
@@ -35,7 +28,7 @@ class IOSettingGPS(ft.Container):
 
                 self.gps_port = ft.TextField(
                     label=self.page.session.get("lang.setting.port"),
-                    value=self.conf.gps_port,
+                    value=gdata.configIO.gps_port,
                     read_only=True,
                     col={"sm": 4},
                     can_request_focus=False,
@@ -80,27 +73,15 @@ class IOSettingGPS(ft.Container):
     def _on_connect(self, user: User):
         try:
             self.save_data()
-            self.conf.save()
-        except Exception as e:
-            Toast.show_error(self.page, str(e))
-            return
-
-        try:
+            gdata.configIO.set_default_value()
             if self.connect_btn and self.connect_btn.page:
                 self.connect_btn.text = 'loading...'
                 self.connect_btn.disabled = True
                 self.connect_btn.bgcolor = ft.Colors.GREY
                 self.connect_btn.update()
-
-            OperationLog.create(
-                user_id=user.id,
-                utc_date_time=gdata.configDateTime.utc,
-                operation_type=OperationType.CONNECT_TO_GPS,
-                operation_content=user.user_name
-            )
             self.page.run_task(gps.start)
-        except:
-            logging.exception("exception occured at IOSettingGPS.__on_connect")
+        except Exception as e:
+            Toast.show_error(self.page, str(e))
 
     def _on_close(self, user: User):
         try:
@@ -110,12 +91,6 @@ class IOSettingGPS(ft.Container):
                 self.close_btn.bgcolor = ft.Colors.GREY
                 self.close_btn.update()
 
-            OperationLog.create(
-                user_id=user.id,
-                utc_date_time=gdata.configDateTime.utc,
-                operation_type=OperationType.DISCONNECT_FROM_GPS,
-                operation_content=user.user_name
-            )
             self.page.run_task(gps.stop)
             AlarmSaver.create(AlarmType.MASTER_GPS)
         except:
@@ -126,9 +101,9 @@ class IOSettingGPS(ft.Container):
             ipaddress.ip_address(self.gps_ip.value)
         except:
             raise ValueError(f'{self.page.session.get("lang.common.ip_address_format_error")}: {self.gps_ip.value}')
-
-        self.conf.gps_ip = self.gps_ip.value
-        self.conf.gps_port = self.gps_port.value
+        gps_ip = self.gps_ip.value
+        gps_port = self.gps_port.value
+        IOConf.update(gps_ip=gps_ip, gps_port=gps_port).execute()
 
     def before_update(self):
         try:

@@ -1,7 +1,5 @@
-import asyncio
 import logging
 import flet as ft
-from common.const_alarm_type import AlarmType
 from common.operation_type import OperationType
 from db.models.operation_log import OperationLog
 from db.models.user import User

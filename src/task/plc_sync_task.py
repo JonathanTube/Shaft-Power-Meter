@@ -3,8 +3,8 @@ import logging
 from typing import Optional
 from pymodbus.client import AsyncModbusTcpClient
 from common.const_alarm_type import AlarmType
-from db.models.io_conf import IOConf
 from utils.alarm_saver import AlarmSaver
+from common.global_data import gdata
 
 # 寄存器映射表（高位在前、低位在后）
 REGISTER_MAP = {
@@ -27,8 +27,8 @@ class PlcSyncTask:
         """连接PLC（非阻塞）"""
         async with self._lock:
             try:
-                io_conf: IOConf = IOConf.get()
-                ip, port = io_conf.plc_ip, io_conf.plc_port
+                ip = gdata.configIO.plc_ip
+                port = gdata.configIO.plc_port
                 logging.info(f'[PLC] 正在连接 {ip}:{port}')
                 self.plc_client = AsyncModbusTcpClient(
                     host=ip,

@@ -1,11 +1,8 @@
-import asyncio
 import ipaddress
 import logging
 import flet as ft
 from common.const_alarm_type import AlarmType
-from common.operation_type import OperationType
 from db.models.io_conf import IOConf
-from db.models.operation_log import OperationLog
 from db.models.user import User
 from ui.common.custom_card import CustomCard
 from ui.common.keyboard import keyboard
@@ -17,10 +14,6 @@ from common.global_data import gdata
 
 
 class InterfaceConf(ft.Container):
-    def __init__(self, conf: IOConf):
-        super().__init__()
-        self.conf: IOConf = conf
-
     def build(self):
         try:
             if self.page and self.page.session:
@@ -50,7 +43,7 @@ class InterfaceConf(ft.Container):
 
                 self.hmi_server_ip = ft.TextField(
                     label=self.page.session.get("lang.setting.hmi_server_ip"),
-                    value=self.conf.hmi_server_ip,
+                    value=gdata.configIO.hmi_server_ip,
                     read_only=True,
                     can_request_focus=False,
                     col={"sm": 4},
@@ -59,7 +52,7 @@ class InterfaceConf(ft.Container):
 
                 self.hmi_server_port = ft.TextField(
                     label=self.page.session.get("lang.setting.hmi_server_port"),
-                    value=self.conf.hmi_server_port,
+                    value=gdata.configIO.hmi_server_port,
                     read_only=True,
                     can_request_focus=False,
                     col={"sm": 4},
@@ -81,28 +74,15 @@ class InterfaceConf(ft.Container):
     def __on_connect(self, user: User):
         try:
             self.save_data()
-            self.conf.save()
-        except Exception as e:
-            Toast.show_error(self.page, str(e))
-            return
-
-        try:
+            gdata.configIO.set_default_value()
             if self.connect_btn and self.connect_btn.page:
                 self.connect_btn.text = 'loading...'
                 self.connect_btn.disabled = True
                 self.connect_btn.bgcolor = ft.Colors.GREY
                 self.connect_btn.update()
-
-            OperationLog.create(
-                user_id=user.id,
-                utc_date_time=gdata.configDateTime.utc,
-                operation_type=OperationType.CONNECT_TO_MASTER,
-                operation_content=user.user_name
-            )
-
             self.page.run_task(ws_client.start)
-        except:
-            logging.exception("exception occured at InterfaceConf.__on_connect")
+        except Exception as e:
+            Toast.show_error(self.page, str(e))
 
     def __on_close(self, user: User):
         try:
@@ -111,13 +91,6 @@ class InterfaceConf(ft.Container):
                 self.close_btn.disabled = True
                 self.close_btn.bgcolor = ft.Colors.GREY
                 self.close_btn.update()
-
-            OperationLog.create(
-                user_id=user.id,
-                utc_date_time=gdata.configDateTime.utc,
-                operation_type=OperationType.DISCONNECT_FROM_HMI_SERVER,
-                operation_content=user.user_name
-            )
             self.page.run_task(ws_client.stop)
             AlarmSaver.create(AlarmType.SLAVE_MASTER, True)
         except:
@@ -126,10 +99,12 @@ class InterfaceConf(ft.Container):
     def save_data(self):
         try:
             ipaddress.ip_address(self.hmi_server_ip.value)
-            self.conf.hmi_server_ip = self.hmi_server_ip.value
-            self.conf.hmi_server_port = self.hmi_server_port.value
         except ValueError:
             raise ValueError(f'{self.page.session.get("lang.common.ip_address_format_error")}: {self.hmi_server_port.value}')
+
+        hmi_server_ip = self.hmi_server_ip.value
+        hmi_server_port = self.hmi_server_port.value
+        IOConf.update(hmi_server_ip=hmi_server_ip, hmi_server_port=hmi_server_port).execute()
 
     def before_update(self):
         try:

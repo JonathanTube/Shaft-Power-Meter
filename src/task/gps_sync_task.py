@@ -6,7 +6,6 @@ from datetime import datetime
 from common.const_alarm_type import AlarmType
 from db.models.gps_log import GpsLog
 from common.global_data import gdata
-from db.models.io_conf import IOConf
 from utils.alarm_saver import AlarmSaver
 
 _logger = logging.getLogger("GpsSyncTask")
@@ -59,17 +58,12 @@ class GpsSyncTask:
 
     async def connect(self):
         async with self._lock:
-            try:
-                io_conf: IOConf = await asyncio.to_thread(IOConf.get)
-            except IOConf.DoesNotExist:
-                _logger.error("[GPS] 无 IOConf 配置")
-                await asyncio.sleep(5)
-                return False
-
-            _logger.info(f"[GPS] 连接 {io_conf.gps_ip}:{io_conf.gps_port}")
+            gps_ip = gdata.configIO.gps_ip
+            gps_port = gdata.configIO.gps_port
+            _logger.info(f"[GPS] 连接 {gps_ip}:{gps_port}")
             try:
                 self.reader, self.writer = await asyncio.wait_for(
-                    asyncio.open_connection(io_conf.gps_ip, io_conf.gps_port), timeout=5
+                    asyncio.open_connection(gps_ip, gps_port), timeout=5
                 )
                 self.set_online()
                 _logger.info("[GPS] 连接成功")
