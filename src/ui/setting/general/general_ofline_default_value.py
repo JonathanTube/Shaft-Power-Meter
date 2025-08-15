@@ -13,7 +13,6 @@ class GeneralOflineDefaultValue(ft.Container):
         super().__init__()
         self.expand = True
         self.system_unit = system_unit
-        self.odv: OfflineDefaultValue = OfflineDefaultValue.get()
 
     def build(self):
         try:
@@ -21,7 +20,7 @@ class GeneralOflineDefaultValue(ft.Container):
                 self.torque_default_value = ft.TextField(
                     suffix_text="Nm",
                     label=self.page.session.get("lang.common.torque"),
-                    value=self.odv.torque_default_value,
+                    value=gdata.configOffline.torque,
                     col={"xs": 6},
                     read_only=True,
                     can_request_focus=False,
@@ -30,7 +29,7 @@ class GeneralOflineDefaultValue(ft.Container):
                 self.thrust_default_value = ft.TextField(
                     suffix_text="N",
                     label=self.page.session.get("lang.common.thrust"),
-                    value=self.odv.thrust_default_value,
+                    value=gdata.configOffline.thrust,
                     col={"xs": 6},
                     read_only=True,
                     can_request_focus=False,
@@ -39,7 +38,7 @@ class GeneralOflineDefaultValue(ft.Container):
                 self.speed_default_value = ft.TextField(
                     suffix_text="rpm",
                     label=self.page.session.get("lang.common.speed"),
-                    value=self.odv.speed_default_value,
+                    value=gdata.configOffline.speed,
                     col={"xs": 6},
                     read_only=True,
                     can_request_focus=False,
@@ -79,24 +78,19 @@ class GeneralOflineDefaultValue(ft.Container):
             logging.exception('exception occured at GeneralOflineDefaultValue.before_update')
 
     def save_data(self, user_id: int):
-        if self.odv is None:
-            return
-
-        self.odv.torque_default_value = int(self.torque_default_value.value)
-        self.odv.thrust_default_value = int(self.thrust_default_value.value)
-        self.odv.speed_default_value = float(self.speed_default_value.value)
+        torque = int(self.torque_default_value.value)
+        thrust = int(self.thrust_default_value.value)
+        speed = float(self.speed_default_value.value)
 
         if self.system_unit == 0:
-            self.odv.torque_default_value = UnitConverter.knm_to_nm(self.odv.torque_default_value)
-            self.odv.thrust_default_value = UnitConverter.kn_to_n(self.odv.thrust_default_value)
+            torque = UnitConverter.knm_to_nm(torque)
+            thrust = UnitConverter.kn_to_n(thrust)
         elif self.system_unit == 1:
-            self.odv.torque_default_value = UnitConverter.tm_to_nm(self.odv.torque_default_value)
-            self.odv.thrust_default_value = UnitConverter.t_to_n(self.odv.thrust_default_value)
-        self.odv.save()
+            torque = UnitConverter.tm_to_nm(torque)
+            thrust = UnitConverter.t_to_n(thrust)
 
-        gdata.configOffline.torque = self.odv.torque_default_value
-        gdata.configOffline.speed = self.odv.speed_default_value
-        gdata.configOffline.thrust = self.odv.thrust_default_value
+        OfflineDefaultValue.update(torque_default_value=torque, thrust_default_value=thrust, speed_default_value=speed)
+        gdata.configOffline.set_default_value()
 
     def update_unit(self, system_unit: int):
         try:

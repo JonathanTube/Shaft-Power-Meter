@@ -253,7 +253,7 @@ class ConfigIO:
 
 
 @dataclass
-class ConfigCalc:
+class ConfigFactor:
     # 计算参数
     bearing_outer_diameter_D = 0
     bearing_inner_diameter_d = 0
@@ -301,7 +301,7 @@ class GlobalData:
     configSPS = None
     configSPS2 = None
     configIO = None
-    configCalc = None
+    configFactor = None
     configPropperCurve = None
 
     def set_default_value(self):
@@ -331,8 +331,8 @@ class GlobalData:
         self.configSPS2 = ConfigSPS2()
         self.configSPS2.set_default_value()
 
-        self.configCalc = ConfigCalc()
-        self.configCalc.set_default_value()
+        self.configFactor = ConfigFactor()
+        self.configFactor.set_default_value()
 
         self.configIO = ConfigIO()
         self.configIO.set_default_value()

@@ -5,7 +5,7 @@ import flet as ft
 
 class Toast:
     @staticmethod
-    def show_success(page: ft.Page, message: str = None, duration: int = 5):
+    def show_success(page: ft.Page, message: str = None, duration: int = 5000):
         if page is None or page.session is None:
             return
         msg = message if message is not None else page.session.get("lang.toast.success")
@@ -20,7 +20,7 @@ class Toast:
         )
 
     @staticmethod
-    def show_warning(page: ft.Page, message: str = None, duration: int = 5):
+    def show_warning(page: ft.Page, message: str = None, duration: int = 5000):
         if page is None or page.session is None:
             return
         msg = message if message is not None else page.session.get("lang.toast.warning")
@@ -35,7 +35,7 @@ class Toast:
         )
 
     @staticmethod
-    def show_error(page: ft.Page, message: str = None, duration: int = 5):
+    def show_error(page: ft.Page, message: str = None, duration: int = 5000):
         if page is None or page.session is None:
             return
         msg = message if message is not None else page.session.get("lang.toast.error")

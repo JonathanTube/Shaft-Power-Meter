@@ -29,21 +29,21 @@ class JM3846Calculator:
     def calculate_microstrain(mv_per_v: float) -> float:
         """AD值转微应变 (精确浮点计算)"""
         # logging.info(f"calculate_microstrain: const_central={const_central}, ad_value={ad_value}, gain={gain}")
-        if gdata.configCalc.sensitivity_factor_k == 0:
+        if gdata.configFactor.sensitivity_factor_k == 0:
             return 0
-        result = mv_per_v / gdata.configCalc.sensitivity_factor_k * (10**3)
+        result = mv_per_v / gdata.configFactor.sensitivity_factor_k * (10**3)
         # logging.info(f"calculate_microstrain: result={result}")
         return result
 
     @staticmethod
     def calculate_torque(microstrain: float) -> float:
         """计算扭矩 (N·m)"""
-        D = gdata.configCalc.bearing_outer_diameter_D
-        d = gdata.configCalc.bearing_inner_diameter_d
+        D = gdata.configFactor.bearing_outer_diameter_D
+        d = gdata.configFactor.bearing_inner_diameter_d
 
         numerator = math.pi * microstrain * \
-            gdata.configCalc.elastic_modulus_E * (D**4 - d**4)
-        denominator = (1 + gdata.configCalc.poisson_ratio_mu) * 16 * D
+            gdata.configFactor.elastic_modulus_E * (D**4 - d**4)
+        denominator = (1 + gdata.configFactor.poisson_ratio_mu) * 16 * D
         if denominator == 0:
             return 0
         result = numerator / denominator
@@ -52,12 +52,12 @@ class JM3846Calculator:
     @staticmethod
     def calculate_thrust(mv_per_v: float) -> float:
         """计算推力 (N)"""
-        diameter_diff = (gdata.configCalc.bearing_outer_diameter_D / 2) ** 2 - \
-            (gdata.configCalc.bearing_inner_diameter_d / 2) ** 2
+        diameter_diff = (gdata.configFactor.bearing_outer_diameter_D / 2) ** 2 - \
+            (gdata.configFactor.bearing_inner_diameter_d / 2) ** 2
 
-        numerator = 2 * mv_per_v * math.pi * gdata.configCalc.elastic_modulus_E * diameter_diff
+        numerator = 2 * mv_per_v * math.pi * gdata.configFactor.elastic_modulus_E * diameter_diff
 
-        denominator = gdata.configCalc.sensitivity_factor_k * (1 + gdata.configCalc.poisson_ratio_mu)
+        denominator = gdata.configFactor.sensitivity_factor_k * (1 + gdata.configFactor.poisson_ratio_mu)
 
         if denominator == 0:
             return 0

@@ -112,7 +112,7 @@ class IOSettingSPS(ft.Container):
                 # factor conf. start
                 self.shaft_outer_diameter = ft.TextField(
                     label=self.page.session.get("lang.setting.bearing_outer_diameter_D"), suffix_text="m",
-                    value=gdata.configCalc.bearing_outer_diameter_D,
+                    value=gdata.configFactor.bearing_outer_diameter_D,
                     read_only=True,
                     col={'sm': 4},
                     can_request_focus=False,
@@ -123,7 +123,7 @@ class IOSettingSPS(ft.Container):
                     label=self.page.session.get(
                         "lang.setting.bearing_inner_diameter_d"),
                     suffix_text="m",
-                    value=gdata.configCalc.bearing_inner_diameter_d,
+                    value=gdata.configFactor.bearing_inner_diameter_d,
                     read_only=True,
                     col={'sm': 4},
                     can_request_focus=False,
@@ -132,7 +132,7 @@ class IOSettingSPS(ft.Container):
 
                 self.sensitivity_factor_k = ft.TextField(
                     label=self.page.session.get("lang.setting.sensitivity_factor_k"),
-                    value=gdata.configCalc.sensitivity_factor_k,
+                    value=gdata.configFactor.sensitivity_factor_k,
                     read_only=True,
                     col={'sm': 4},
                     can_request_focus=False,
@@ -141,7 +141,7 @@ class IOSettingSPS(ft.Container):
 
                 self.elastic_modulus_E = ft.TextField(
                     label=self.page.session.get("lang.setting.elastic_modulus_E"),
-                    value=gdata.configCalc.elastic_modulus_E,
+                    value=gdata.configFactor.elastic_modulus_E,
                     suffix_text="Mpa",
                     read_only=True,
                     col={'sm': 4},
@@ -151,7 +151,7 @@ class IOSettingSPS(ft.Container):
 
                 self.poisson_ratio_mu = ft.TextField(
                     label=self.page.session.get("lang.setting.poisson_ratio_mu"),
-                    value=gdata.configCalc.poisson_ratio_mu,
+                    value=gdata.configFactor.poisson_ratio_mu,
                     read_only=True,
                     col={'sm': 4},
                     can_request_focus=False,
@@ -295,6 +295,7 @@ class IOSettingSPS(ft.Container):
             sensitivity_factor_k=sensitivity_factor_k, elastic_modulus_E=elastic_modulus_E,
             poisson_ratio_mu=poisson_ratio_mu
         ).execute()
+        gdata.configFactor.set_default_value()
 
     def before_update(self):
         try:
