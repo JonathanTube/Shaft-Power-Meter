@@ -3,6 +3,7 @@ from datetime import datetime
 from db.models.factor_conf import FactorConf
 from db.models.io_conf import IOConf
 from db.models.offline_default_value import OfflineDefaultValue
+from db.models.preference import Preference
 from db.models.system_settings import SystemSettings
 from db.models.propeller_setting import PropellerSetting
 from db.models.date_time_conf import DateTimeConf
@@ -22,8 +23,6 @@ class ConfigCommon:
     amount_of_propeller = 1
 
     shapoli = False
-
-    enable_plc = False
 
     show_thrust = False
 
@@ -53,8 +52,14 @@ class ConfigCommon:
         self.show_propeller_curve = systemSettings.display_propeller_curve
         self.is_individual = systemSettings.is_individual
 
-        io_conf: IOConf = IOConf.get()
-        self.enable_plc = io_conf.plc_enabled
+
+@dataclass
+class ConfigPreference:
+    system_unit = None
+
+    def set_default_value(self):
+        preference: Preference = Preference.get()
+        self.system_unit = preference.system_unit
 
 
 @dataclass
@@ -257,6 +262,7 @@ class ConfigPropperCurve:
 @dataclass
 class GlobalData:
     configCommon = None
+    configPreference = None
     configDateTime = None
     configTest = None
     configGps = None
@@ -270,6 +276,9 @@ class GlobalData:
     def set_default_value(self):
         self.configCommon = ConfigCommon()
         self.configCommon.set_default_value()
+
+        self.configPreference = ConfigPreference()
+        self.configPreference.set_default_value()
 
         self.configDateTime = ConfigDateTime()
         self.configDateTime.set_default_value()

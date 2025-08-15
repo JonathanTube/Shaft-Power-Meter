@@ -1,21 +1,15 @@
 import logging
 import flet as ft
-from db.models.preference import Preference
-from db.models.system_settings import SystemSettings
 from db.models.user import User
 from ui.common.custom_card import CustomCard
 from utils.unit_converter import UnitConverter
+from db.models.system_settings import SystemSettings
 from ui.common.keyboard import keyboard
 from common.global_data import gdata
 from common.global_data import gdata
 
 
 class SystemConfSettings(ft.Container):
-    def __init__(self):
-        super().__init__()
-        self.system_settings: SystemSettings = SystemSettings.get()
-        self.preference: Preference = Preference.get()
-
     def build(self):
         try:
             if self.page and self.page.session:
@@ -29,7 +23,7 @@ class SystemConfSettings(ft.Container):
                 )
                 self.running_mode = ft.RadioGroup(
                     content=ft.Row([self.mode_master, self.mode_slave]),
-                    value='master' if self.system_settings.is_master else 'slave',
+                    value='master' if gdata.configCommon.is_master else 'slave',
                     on_change=self.__on_running_mode_change
                 )
 
@@ -46,29 +40,29 @@ class SystemConfSettings(ft.Container):
 
                 self.is_individual = ft.Checkbox(
                     col={"md": 6}, label=self.page.session.get("lang.setting.is_individual"),
-                    visible=self.system_settings.is_master,
-                    value=self.system_settings.is_individual
+                    visible=gdata.configCommon.is_master,
+                    value=gdata.configCommon.is_individual
                 )
 
                 self.enable_gps = ft.Checkbox(
                     col={"md": 6}, label=self.page.session.get("lang.setting.enable_gps"),
                     visible=gdata.configCommon.is_master,
-                    value=self.system_settings.enable_gps
+                    value=gdata.configCommon.enable_gps
                 )
 
                 self.display_thrust = ft.Checkbox(
                     col={"md": 6}, label=self.page.session.get("lang.setting.display_thrust"),
-                    value=self.system_settings.display_thrust
+                    value=gdata.configCommon.show_thrust
                 )
 
                 self.sha_po_li = ft.Checkbox(
                     col={"md": 6}, label=self.page.session.get("lang.setting.enable_sha_po_li"),
-                    value=self.system_settings.sha_po_li
+                    value=gdata.configCommon.shapoli
                 )
 
                 self.display_propeller_curve = ft.Checkbox(
                     col={"md": 6}, label=self.page.session.get("lang.setting.display_propeller_curve"),
-                    value=self.system_settings.display_propeller_curve
+                    value=gdata.configCommon.show_propeller_curve
                 )
 
                 unlimited_power_value, unlimited_power_unit = self.__get_unlimited_power()
@@ -77,7 +71,7 @@ class SystemConfSettings(ft.Container):
                     label=self.page.session.get("lang.setting.unlimited_power"),
                     value=unlimited_power_value,
                     suffix_text=unlimited_power_unit,
-                    visible=self.system_settings.sha_po_li,
+                    visible=gdata.configCommon.shapoli,
                     read_only=True,
                     can_request_focus=False,
                     on_click=lambda e: keyboard.open(e.control, 'int')
@@ -89,7 +83,7 @@ class SystemConfSettings(ft.Container):
                     label=self.page.session.get("lang.setting.eexi_limited_power"),
                     value=eexi_limited_power_value,
                     suffix_text=eexi_limited_power_unit,
-                    visible=self.system_settings.sha_po_li,
+                    visible=gdata.configCommon.shapoli,
                     read_only=True,
                     can_request_focus=False,
                     on_click=lambda e: keyboard.open(e.control, 'int')
@@ -98,9 +92,9 @@ class SystemConfSettings(ft.Container):
                 self.eexi_breach_checking_duration = ft.TextField(
                     col={"md": 6},
                     label=self.page.session.get("lang.setting.eexi_breach_checking_duration"),
-                    value=self.system_settings.eexi_breach_checking_duration,
+                    value=gdata.configCommon.eexi_breach_checking_duration,
                     suffix_text="seconds",
-                    visible=self.system_settings.sha_po_li,
+                    visible=gdata.configCommon.shapoli,
                     read_only=True,
                     can_request_focus=False,
                     on_click=lambda e: keyboard.open(e.control, 'int')
@@ -108,14 +102,14 @@ class SystemConfSettings(ft.Container):
 
                 self.chk_hide_admin_account = ft.Checkbox(
                     col={"md": 6}, label=self.page.session.get("lang.setting.hide_admin_account"),
-                    value=self.system_settings.hide_admin_account
+                    value=gdata.configCommon.hide_admin_account
                 )
 
                 self.single_propeller = ft.Radio(value="1", label=self.page.session.get("lang.setting.single_propeller"))
                 self.twins_propeller = ft.Radio(value="2", label=self.page.session.get("lang.setting.twins_propeller"))
                 self.amount_of_propeller_radios = ft.RadioGroup(
                     content=ft.Row([self.single_propeller, self.twins_propeller]),
-                    value=self.system_settings.amount_of_propeller
+                    value=gdata.configCommon.amount_of_propeller
                 )
                 self.amount_of_propeller_row = ft.Row(
                     col={"md": 6},
@@ -161,15 +155,15 @@ class SystemConfSettings(ft.Container):
             self.enable_gps.update()
 
     def __get_unlimited_power(self) -> tuple[int, str]:
-        _unlimited_power = self.system_settings.unlimited_power
-        if self.preference.system_unit == 0:
+        _unlimited_power = gdata.configCommon.unlimited_power
+        if gdata.configPreference.system_unit == 0:
             return (round(_unlimited_power / 1000), "kW")
         else:
             return (UnitConverter.w_to_shp(_unlimited_power), "sHp")
 
     def __get_eexi_limited_power(self) -> tuple[int, str]:
-        _eexi_limited_power = self.system_settings.eexi_limited_power
-        if self.preference.system_unit == 0:
+        _eexi_limited_power = gdata.configCommon.eexi_limited_power
+        if gdata.configPreference.system_unit == 0:
             return (round(_eexi_limited_power / 1000), "kW")
         else:
             return (UnitConverter.w_to_shp(_eexi_limited_power), "sHp")
@@ -179,43 +173,37 @@ class SystemConfSettings(ft.Container):
         if self.page is None or self.page.session is None:
             return
 
-        is_master_old = self.system_settings.is_master
-        is_master_new = True if self.running_mode.value == 'master' else False
-        self.system_settings.is_master = is_master_new
+        is_master = True if self.running_mode.value == 'master' else False
+        is_individual = self.is_individual.value
+        enable_gps = self.enable_gps.value
+        amount_of_propeller = self.amount_of_propeller_radios.value
+        display_thrust = self.display_thrust.value
+        sha_po_li = self.sha_po_li.value
+        display_propeller_curve = self.display_propeller_curve.value
+        hide_admin_account = self.chk_hide_admin_account.value
 
-        is_individual_old = self.system_settings.is_individual
-        is_individual_new = self.is_individual.value
-        self.system_settings.is_individual = is_individual_new
+        SystemSettings.update(
+            is_master=is_master, is_individual=is_individual, enable_gps=enable_gps, amount_of_propeller=amount_of_propeller,
+            display_thrust=display_thrust, sha_po_li=sha_po_li, display_propeller_curve=display_propeller_curve, hide_admin_account=hide_admin_account
+        ).execute()
 
-        enable_gps_old = self.system_settings.enable_gps
-        enable_gps_new = self.enable_gps.value
-        self.system_settings.enable_gps = enable_gps_new
+        unit = gdata.configPreference.system_unit
+        eexi_breach_checking_duration = self.eexi_breach_checking_duration.value
 
-        # 如果运行模式被切换
-        if is_master_new != is_master_old or is_individual_new != is_individual_old or enable_gps_new != enable_gps_old:
-            self.system_settings.save()
-            gdata.set_default_value()
-            raise SystemError("running mode changed")
-
-        self.system_settings.amount_of_propeller = self.amount_of_propeller_radios.value
-        self.system_settings.display_thrust = self.display_thrust.value
-        self.system_settings.sha_po_li = self.sha_po_li.value
-        self.system_settings.display_propeller_curve = self.display_propeller_curve.value
-        self.system_settings.hide_admin_account = self.chk_hide_admin_account.value
-
-        unit = self.preference.system_unit
+        unlimited_power = 0
+        eexi_limited_power = 0
         if unit == 0:
-            self.system_settings.unlimited_power = int(self.unlimited_power.value) * 1000
-            self.system_settings.eexi_limited_power = int(self.eexi_limited_power.value) * 1000
+            unlimited_power = int(self.unlimited_power.value) * 1000
+            eexi_limited_power = int(self.eexi_limited_power.value) * 1000
         else:
-            self.system_settings.unlimited_power = UnitConverter.shp_to_w(self.unlimited_power.value)
-            self.system_settings.eexi_limited_power = UnitConverter.shp_to_w(self.eexi_limited_power.value)
+            unlimited_power = UnitConverter.shp_to_w(self.unlimited_power.value)
+            eexi_limited_power = UnitConverter.shp_to_w(self.eexi_limited_power.value)
 
-        self.system_settings.eexi_breach_checking_duration = self.eexi_breach_checking_duration.value
-
-        self.system_settings.save()
-
-        gdata.set_default_value()
+        SystemSettings.update(
+            eexi_breach_checking_duration=eexi_breach_checking_duration,
+            unlimited_power=unlimited_power, eexi_limited_power=eexi_limited_power
+        ).execute()
+        gdata.configCommon.set_default_value()
 
     def before_update(self):
         try:

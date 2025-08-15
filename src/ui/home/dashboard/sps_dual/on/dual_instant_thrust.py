@@ -3,7 +3,6 @@ import flet as ft
 
 from ui.common.simple_card import SimpleCard
 from utils.unit_parser import UnitParser
-from db.models.system_settings import SystemSettings
 from common.global_data import gdata
 from db.models.preference import Preference
 from common.global_data import gdata

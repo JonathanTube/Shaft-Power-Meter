@@ -51,7 +51,7 @@ class SelfTest(ft.Tabs):
                 self.tab_sps2 = ft.Tab(text="SPS2", content=self.sps2_log, visible=gdata.configCommon.is_master and gdata.configCommon.amount_of_propeller == 2)
                 self.tab_hmi_server = ft.Tab(text="HMI Server", content=self.hmi_server_log, visible=not gdata.configCommon.is_master)
                 self.tab_gps = ft.Tab(text="GPS", content=self.gps_log, visible=gdata.configCommon.enable_gps)
-                self.tab_plc = ft.Tab(text="PLC", content=self.plc_log, visible=gdata.configCommon.enable_plc)
+                self.tab_plc = ft.Tab(text="PLC", content=self.plc_log, visible=gdata.configIO.plc_enabled)
                 self.tabs = [
                     self.tab_sps,
                     self.tab_sps2,
@@ -84,12 +84,12 @@ class SelfTest(ft.Tabs):
             self.tab_gps.visible = gdata.configCommon.enable_gps
 
         if self.tab_plc:
-            self.tab_plc.visible = gdata.configCommon.enable_plc
+            self.tab_plc.visible = gdata.configIO.plc_enabled
 
     def did_mount(self):
         self.task_running = True
 
-        if gdata.configCommon.enable_plc:
+        if gdata.configIO.plc_enabled:
             self.plc_task = self.page.run_task(self.__read_plc_data)
 
         if gdata.configCommon.is_master:
@@ -105,7 +105,7 @@ class SelfTest(ft.Tabs):
     def will_unmount(self):
         self.task_running = False
 
-        if gdata.configCommon.enable_plc and self.plc_task:
+        if gdata.configIO.plc_enabled and self.plc_task:
             self.plc_task.cancel()
 
         if gdata.configCommon.is_master:
