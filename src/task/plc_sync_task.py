@@ -124,9 +124,22 @@ class PlcSyncTask:
             _thrust = int(thrust / 100)
             _speed = int(speed * 10)
             await self.write_register_32(*REGISTER_MAP["instant_power"], _power)  # 原子写
-            await self.plc_client.write_register(12311, _torque)
-            await self.plc_client.write_register(12321, _thrust)
-            await self.plc_client.write_register(12331, _speed)
+
+            if _torque <= 65535:
+                await self.plc_client.write_register(12311, _torque)
+            else:
+                logging.error(f'torque to plc is too big,{_torque}')
+
+            if _thrust <= 65535:
+                await self.plc_client.write_register(12321, _thrust)
+            else:
+                logging.error(f'thrust to plc is too big,{_thrust}')
+
+            if _speed <= 65535:
+                await self.plc_client.write_register(12331, _speed)
+            else:
+                logging.error(f'speed to plc is too big,{_speed}')
+
             return True
         except Exception as e:
             logging.exception("[PLC] 写入实时数据失败: %s", e)
