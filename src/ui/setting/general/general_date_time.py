@@ -8,30 +8,28 @@ from ui.common.custom_card import CustomCard
 from db.models.date_time_conf import DateTimeConf
 from db.models.operation_log import OperationLog
 from common.operation_type import OperationType
-from playhouse.shortcuts import model_to_dict
 
 
 class GeneralDateTime(ft.Container):
     def __init__(self):
         super().__init__()
         self.expand = True
-        self.date_time_conf: DateTimeConf = DateTimeConf.get()
 
     def build(self):
         try:
             if self.page and self.page.session:
                 s = self.page.session
-                utc_date_time = self.date_time_conf.utc_date_time
-
+                utc = gdata.configDateTime.utc
+                fmt = gdata.configDateTime.date_format
                 self.utc_date = ft.TextField(
                     label=s.get("lang.setting.date"),
                     col={"md": 6},
                     can_request_focus=False,
-                    value=utc_date_time.strftime(self.date_time_conf.date_format) if utc_date_time else '',
+                    value=utc.strftime(fmt) if utc else '',
                     on_click=lambda e: e.page.open(
                         ft.DatePicker(
                             on_change=self.__handle_date_change,
-                            current_date=utc_date_time.date() if utc_date_time else datetime.now()
+                            current_date=utc.date() if utc else datetime.now()
                         )
                     )
                 )
@@ -40,7 +38,7 @@ class GeneralDateTime(ft.Container):
                     label=s.get("lang.setting.time"),
                     col={"md": 6},
                     can_request_focus=False,
-                    value=utc_date_time.strftime('%H:%M') if utc_date_time else '',
+                    value=utc.strftime('%H:%M') if utc else '',
                     on_click=lambda e: e.page.open(
                         ft.TimePicker(
                             on_change=self.__handle_time_change
@@ -50,7 +48,7 @@ class GeneralDateTime(ft.Container):
 
                 self.date_format = ft.Dropdown(
                     label=s.get("lang.setting.date_format"), col={"md": 6},
-                    value=self.date_time_conf.date_format,
+                    value=fmt,
                     options=[
                         ft.DropdownOption(text="YYYY-MM-DD", key="%Y-%m-%d"),
                         ft.DropdownOption(text="DD-MM-YYYY", key="%d-%m-%Y"),
@@ -62,7 +60,7 @@ class GeneralDateTime(ft.Container):
                     label=s.get("lang.setting.sync_with_gps"),
                     col={"md": 6},
                     visible=gdata.configCommon.enable_gps,
-                    value=self.date_time_conf.sync_with_gps
+                    value=gdata.configDateTime.sync_with_gps
                 )
 
                 self.custom_card = CustomCard(
@@ -87,8 +85,9 @@ class GeneralDateTime(ft.Container):
                 s = self.page.session
                 if self.utc_date:
                     self.utc_date.label = s.get("lang.setting.date")
-                    if self.date_time_conf and self.date_time_conf.utc_date_time:
-                        self.utc_date.value = self.date_time_conf.utc_date_time.strftime(self.date_time_conf.date_format)
+                    utc = gdata.configDateTime.utc
+                    fmt = gdata.configDateTime.date_format
+                    self.utc_date.value = utc.strftime(fmt)
 
                 if self.utc_time:
                     self.utc_time.label = s.get("lang.setting.time")
@@ -126,35 +125,26 @@ class GeneralDateTime(ft.Container):
 
     async def save_data(self, user_id: int):
         """异步保存，避免阻塞 UI"""
-        if not self.page or not self.date_time_conf:
-            return
-
-        standard_date_time_format = f'{self.date_time_conf.date_format} %H:%M:%S'
+        standard_date_time_format = f'{gdata.configDateTime.date_format} %H:%M:%S'
         new_date = self.utc_date.value
         new_time = self.utc_time.value
 
         try:
             # 更新时间配置
             new_utc = datetime.strptime(f"{new_date} {new_time}:00", standard_date_time_format)
-            self.date_time_conf.utc_date_time = new_utc
-            self.date_time_conf.system_date_time = datetime.now()
-            self.date_time_conf.date_format = self.date_format.value
-            self.date_time_conf.sync_with_gps = self.sync_with_gps.value
-            gdata.configDateTime.sync_with_gps = self.sync_with_gps.value
-            gdata.configDateTime.date_format = self.date_format.value
-
+            DateTimeConf.update(
+                utc_date_time=new_utc, system_date_time=datetime.now(),
+                date_format=self.date_format.value, sync_with_gps=self.sync_with_gps.value
+            ).execute()
+            gdata.set_default_value()
             # 异步保存数据库
-            await asyncio.to_thread(self.date_time_conf.save)
             await asyncio.to_thread(
                 OperationLog.create,
                 user_id=user_id,
                 utc_date_time=gdata.configDateTime.utc,
                 operation_type=OperationType.GENERAL_UTC_DATE_TIME,
-                operation_content=model_to_dict(self.date_time_conf)
+                operation_content='change utc date time'
             )
-
-            # 更新全局 UTC 时间
-            gdata.configDateTime.utc = new_utc
 
             # 删除未来时间的数据
             await asyncio.to_thread(

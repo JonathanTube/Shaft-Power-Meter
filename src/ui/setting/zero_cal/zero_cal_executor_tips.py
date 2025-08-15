@@ -1,8 +1,7 @@
 import logging
 import flet as ft
 from matplotlib.dates import relativedelta
-
-from db.models.date_time_conf import DateTimeConf
+from common.global_data import gdata
 from db.models.zero_cal_info import ZeroCalInfo
 
 
@@ -54,9 +53,7 @@ class ZeroCalExecutorTips(ft.Card):
             if self.latest_zero_cal is None:
                 return
 
-            date_time_conf: DateTimeConf = DateTimeConf.get()
-            self.date_format = date_time_conf.date_format
-            format_str = f'{self.date_format} %H:%M'
+            format_str = f'{gdata.configDateTime.date_format} %H:%M'
 
             self.last_performed = self.latest_zero_cal.utc_date_time.strftime(format_str)
             # 默认每隔6个月建议调零一次

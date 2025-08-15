@@ -3,7 +3,6 @@ import flet as ft
 from ui.common.abstract_table import AbstractTable
 from db.models.alarm_log import AlarmLog
 from common.global_data import gdata
-from db.models.date_time_conf import DateTimeConf
 from ui.home.alarm.alarm_util import AlarmUtil
 from utils.datetime_util import DateTimeUtil
 from peewee import fn
@@ -12,11 +11,6 @@ from peewee import fn
 class AlarmTable(AbstractTable):
     def __init__(self):
         super().__init__()
-
-        datetime_conf: DateTimeConf = DateTimeConf.get()
-        date_format = datetime_conf.date_format
-        self.date_time_format = f"{date_format} %H:%M:%S"
-
         self.show_checkbox_column = True
         self.table_width = gdata.configCommon.default_table_width
 
@@ -54,17 +48,18 @@ class AlarmTable(AbstractTable):
 
             data_list = []
 
+            date_time_format = f"{gdata.configDateTime.date_format} %H:%M:%S"
             for item in data:
                 recovery_block = "⚠️"
                 if item.recovery_time:
-                    recovery_block = DateTimeUtil.format_date(item.recovery_time, self.date_time_format)
+                    recovery_block = DateTimeUtil.format_date(item.recovery_time, date_time_format)
 
                 data_list.append([
                     item.id,
                     AlarmUtil.get_event_name(self.page, item.alarm_type),
-                    DateTimeUtil.format_date(item.occured_time, self.date_time_format),
+                    DateTimeUtil.format_date(item.occured_time, date_time_format),
                     recovery_block,
-                    DateTimeUtil.format_date(item.acknowledge_time, self.date_time_format)
+                    DateTimeUtil.format_date(item.acknowledge_time, date_time_format)
                 ])
 
             return data_list

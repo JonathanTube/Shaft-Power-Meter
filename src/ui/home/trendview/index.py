@@ -4,7 +4,6 @@ from db.models.data_log import DataLog
 from ui.common.datetime_search import DatetimeSearch
 from ui.home.trendview.diagram import TrendViewDiagram
 from ui.common.toast import Toast
-from db.models.date_time_conf import DateTimeConf
 import logging
 from typing import Literal
 from peewee import fn
@@ -18,8 +17,6 @@ class TrendView(ft.Container):
         self.padding = 10
 
         self.is_twins = gdata.configCommon.amount_of_propeller == 2
-        datetime_conf: DateTimeConf = DateTimeConf.get()
-        self.date_format = datetime_conf.date_format
 
     def build(self):
         try:
@@ -56,7 +53,7 @@ class TrendView(ft.Container):
             return
         try:
             if self.page and self.page.session:
-                date_time_format = f"{self.date_format} %H:%M:%S"
+                date_time_format = f"{gdata.configDateTime.date_format} %H:%M:%S"
                 days_diff = (datetime.strptime(end_date, date_time_format) - datetime.strptime(start_date, date_time_format)).days
                 if days_diff > 90:
                     Toast.show_error(self.page, self.page.session.get('lang.trendview.cannot_search_more_than_90_days'))

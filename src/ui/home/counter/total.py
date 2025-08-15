@@ -4,7 +4,6 @@ import flet as ft
 from typing import Literal
 from db.models.counter_log import CounterLog
 from db.models.preference import Preference
-from db.models.date_time_conf import DateTimeConf
 from ui.home.counter.display import CounterDisplay
 from common.global_data import gdata
 
@@ -15,18 +14,15 @@ class TotalCounter(ft.Container):
         self.name = name
 
         self.height = 280
-        
+
         self.expand = True
         self.border_radius = ft.border_radius.all(10)
         self.padding = 10
         self.border = ft.border.all(width=0.5, color=ft.Colors.with_opacity(0.15, ft.Colors.INVERSE_SURFACE))
 
         preference: Preference = Preference.get()
-        datetime_conf: DateTimeConf = DateTimeConf.get()
         self.system_unit = preference.system_unit
         self.interval = preference.data_refresh_interval
-        self.standard_date_time_format = '%Y-%m-%d %H:%M:%S'
-        self.date_format = datetime_conf.date_format
 
         self.task = None
         self.task_running = False
@@ -69,7 +65,6 @@ class TotalCounter(ft.Container):
         except:
             logging.exception('exception occured at TotalCounter.build')
 
-
     def did_mount(self):
         self.task_running = True
         if self.page:
@@ -103,10 +98,10 @@ class TotalCounter(ft.Container):
 
             # 如果当前时间小于，装机时间，肯定调整过时间；
             if hours < 0:
-                hours = 0 # 直接置0
+                hours = 0  # 直接置0
                 # reset
                 CounterLog.update(
-                    start_utc_date_time = gdata.configDateTime.utc
+                    start_utc_date_time=gdata.configDateTime.utc
                 ).where(
                     CounterLog.sps_name == self.name,
                     CounterLog.counter_type == 2
@@ -121,7 +116,7 @@ class TotalCounter(ft.Container):
             seconds = time_elapsed.seconds % 60
 
             time_elapsed = f'{days:02d} d {hours:02d}:{minutes:02d}:{seconds:02d} h'
-            started_at = start_time.strftime(f"{self.date_format} %H:%M:%S")
+            started_at = start_time.strftime(f"{gdata.configDateTime.date_format} %H:%M:%S")
 
             if self.time_elapsed and self.time_elapsed.page:
                 self.time_elapsed.value = f'{time_elapsed} {self.txt_measured}'

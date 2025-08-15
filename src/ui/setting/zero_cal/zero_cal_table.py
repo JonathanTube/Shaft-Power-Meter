@@ -1,7 +1,6 @@
 from db.models.zero_cal_info import ZeroCalInfo
 from ui.common.abstract_table import AbstractTable
 from common.global_data import gdata
-from db.models.date_time_conf import DateTimeConf
 from peewee import fn
 
 
@@ -9,7 +8,6 @@ class ZeroCalTable(AbstractTable):
     def __init__(self):
         super().__init__()
         self.table_width = gdata.configCommon.default_table_width - 160
-        self.dtc: DateTimeConf = DateTimeConf.get()
 
     def load_total(self):
         try:
@@ -50,7 +48,7 @@ class ZeroCalTable(AbstractTable):
                 [
                     item.id,
                     item.name,
-                    item.utc_date_time.strftime(f'{self.dtc.date_format} %H:%M:%S'),
+                    item.utc_date_time.strftime(f'{gdata.configDateTime.date_format} %H:%M:%S'),
                     round(item.torque_offset, 10) if item.torque_offset else 0,
                     round(item.thrust_offset, 10) if item.thrust_offset else 0
                 ] for item in data

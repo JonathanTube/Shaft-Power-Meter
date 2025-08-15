@@ -6,7 +6,6 @@ from db.models.ship_info import ShipInfo
 from db.models.preference import Preference
 from db.models.report_detail import ReportDetail
 from utils.unit_parser import UnitParser
-from db.models.date_time_conf import DateTimeConf
 from common.global_data import gdata
 
 
@@ -14,9 +13,7 @@ class ReportInfoExporter(FPDF):
     def __init__(self):
         super().__init__()
 
-        datetime_conf: DateTimeConf = DateTimeConf.get()
-        self.date_format = datetime_conf.date_format
-        self.date_time_format = f"{self.date_format} %H:%M:%S"
+        self.date_time_format = f"{gdata.configDateTime.date_format} %H:%M:%S"
 
         self.per_cell_width = 47.5
         self.add_page()

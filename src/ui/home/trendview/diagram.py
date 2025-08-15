@@ -3,12 +3,12 @@ import flet as ft
 import matplotlib.backends.backend_svg
 from matplotlib import pyplot as plt
 from db.models.data_log import DataLog
-from db.models.date_time_conf import DateTimeConf
 from flet.matplotlib_chart import MatplotlibChart
 from matplotlib import dates as mdates
 from db.models.preference import Preference
 from utils.unit_converter import UnitConverter
 from typing import List
+from common.global_data import gdata
 
 matplotlib.use('Agg')  # 使用非GUI后端
 plt.rcParams['font.sans-serif'] = ['Microsoft YaHei', 'SimHei']  # 指定常用中文字体
@@ -21,11 +21,7 @@ class TrendViewDiagram(ft.Container):
         self.expand = True
         self.data_list = []
 
-        """初始化配置参数"""
-        datetime_conf: DateTimeConf = DateTimeConf.get()
         preference: Preference = Preference.get()
-
-        self.date_format = datetime_conf.date_format
         self.system_unit = preference.system_unit
 
     def before_update(self):
@@ -40,7 +36,7 @@ class TrendViewDiagram(ft.Container):
                 # 替换容器内容
                 self.content = self.chart
         except:
-            logging.exception('exception occured at TrendViewDiagram.before_update') 
+            logging.exception('exception occured at TrendViewDiagram.before_update')
 
     def create_chart(self) -> MatplotlibChart:
         try:
@@ -71,10 +67,7 @@ class TrendViewDiagram(ft.Container):
         """配置主轴参数"""
         # 日期轴格式化
         self.ax_rpm.xaxis.set_major_locator(mdates.AutoDateLocator())
-
-        date_time_conf: DateTimeConf = DateTimeConf.get()
-        date_format = date_time_conf.date_format
-        self.ax_rpm.xaxis.set_major_formatter(mdates.DateFormatter(f'{date_format} %H:%M')) 
+        self.ax_rpm.xaxis.set_major_formatter(mdates.DateFormatter(f'{gdata.configDateTime.date_format} %H:%M'))
 
         # 主轴样式
         self.ax_rpm.set_xlabel(xlabel=self.page.session.get('lang.common.utc_date_time'), fontsize=10)

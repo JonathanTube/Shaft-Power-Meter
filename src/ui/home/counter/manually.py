@@ -6,7 +6,6 @@ from asyncio import to_thread
 from db.models.counter_log import CounterLog
 from .display import CounterDisplay
 from db.models.preference import Preference
-from db.models.date_time_conf import DateTimeConf
 from common.global_data import gdata
 
 
@@ -27,10 +26,8 @@ class ManuallyCounter(ft.Container):
         )
 
         preference: Preference = Preference.get()
-        datetime_conf: DateTimeConf = DateTimeConf.get()
         self.system_unit = preference.system_unit
         self.interval = preference.data_refresh_interval
-        self.date_format = f'{datetime_conf.date_format} %H:%M:%S'
 
     async def __on_start(self, e):
         try:
@@ -40,11 +37,11 @@ class ManuallyCounter(ft.Container):
             ).execute)
 
             await to_thread(CounterLog.create,
-                sps_name=self.name,
-                counter_type=1,
-                start_utc_date_time=gdata.configDateTime.utc,
-                counter_status="running"
-            )
+                            sps_name=self.name,
+                            counter_type=1,
+                            start_utc_date_time=gdata.configDateTime.utc,
+                            counter_status="running"
+                            )
             await self.__calculate_async()
         except Exception:
             logging.exception('exception occured at ManuallyCounter.__on_start')
