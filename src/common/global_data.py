@@ -1,5 +1,6 @@
 from dataclasses import dataclass, field
 from datetime import datetime
+from db.models.alarm_log import AlarmLog
 from db.models.factor_conf import FactorConf
 from db.models.io_conf import IOConf
 from db.models.limitations import Limitations
@@ -9,6 +10,7 @@ from db.models.system_settings import SystemSettings
 from db.models.propeller_setting import PropellerSetting
 from db.models.date_time_conf import DateTimeConf
 from db.models.zero_cal_info import ZeroCalInfo
+from peewee import fn
 
 
 @dataclass
@@ -39,6 +41,9 @@ class ConfigCommon:
     # 是否功率突破EEXI
     is_eexi_breaching = False
 
+    alarm_total_count = 0
+    alarm_not_ack_count = 0
+
     def set_default_value(self):
         systemSettings: SystemSettings = SystemSettings.get()
         self.is_master = systemSettings.is_master
@@ -52,6 +57,8 @@ class ConfigCommon:
         self.show_thrust = systemSettings.display_thrust
         self.show_propeller_curve = systemSettings.display_propeller_curve
         self.is_individual = systemSettings.is_individual
+        self.alarm_total_count = AlarmLog.select(fn.COUNT(AlarmLog.id)).where(AlarmLog.recovery_time.is_null()).scalar()
+        self.alarm_not_ack_count = AlarmLog.select(fn.COUNT(AlarmLog.id)).where(AlarmLog.acknowledge_time.is_null()).scalar()
 
 
 @dataclass

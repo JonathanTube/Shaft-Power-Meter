@@ -30,7 +30,7 @@ from websocket.websocket_master import ws_server
 from task.data_record_task import data_record_task
 from task.data_cleanup_task import data_cleanup_task
 
-Logger(show_sql=False)
+Logger(show_sql=True)
 add_to_startup()
 
 

@@ -16,9 +16,6 @@ class AlarmButton(ft.TextButton):
         self.task = None
         self.task_running = True
 
-        self.alarm_count = 0
-        self.not_ack_count = 0
-
         self.active = False
 
         self.style = style
@@ -33,15 +30,6 @@ class AlarmButton(ft.TextButton):
                 self.text = self.page.session.get("lang.home.tab.alarm")
         except:
             logging.exception('exception occured at AlarmButton.build')
-
-    def handle_data(self):
-        try:
-            self.alarm_count = AlarmLog.select(fn.COUNT(AlarmLog.id)).where(AlarmLog.recovery_time.is_null()).scalar()
-            self.not_ack_count = AlarmLog.select(fn.COUNT(AlarmLog.id)).where(AlarmLog.acknowledge_time.is_null()).scalar()
-        except:
-            logging.exception('exception occured at AlarmButton.handle_data')
-            self.alarm_count = 0
-            self.not_ack_count = 0
 
     def set_normal_button(self):
         try:
@@ -76,9 +64,10 @@ class AlarmButton(ft.TextButton):
     def toggle_badge(self):
         try:
             if self.page:
-                if self.alarm_count > 0:
+                alarm_count = gdata.configCommon.alarm_total_count
+                if alarm_count > 0:
                     self.badge = ft.Badge(
-                        text=str(self.alarm_count), label_visible=True,
+                        text=str(alarm_count), label_visible=True,
                         bgcolor=ft.Colors.RED, text_color=ft.Colors.WHITE
                     )
                 else:
@@ -104,10 +93,9 @@ class AlarmButton(ft.TextButton):
             try:
                 # 每隔5检查一下数据
                 if cnt % 5 == 0:
-                    self.handle_data()
                     self.toggle_badge()
 
-                if self.not_ack_count > 0:
+                if gdata.configCommon.alarm_not_ack_count > 0:
                     self.toggle_button(cnt % 2 == 0)
                 else:
                     self.set_normal_button()

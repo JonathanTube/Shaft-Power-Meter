@@ -10,6 +10,7 @@ from ui.common.toast import Toast
 from ui.home.alarm.alarm_table import AlarmTable
 from common.global_data import gdata
 from ui.home.alarm.alarm_util import AlarmUtil
+from peewee import fn
 
 
 class AlarmList(ft.Container):
@@ -143,6 +144,10 @@ class AlarmList(ft.Container):
                     AlarmLog.id == row.cells[0].data,
                     AlarmLog.acknowledge_time == None
                 ).execute()
+
+            # 刷新全局变量
+            alarm_not_ack_count = AlarmLog.select(fn.COUNT(AlarmLog.id)).where(AlarmLog.acknowledge_time.is_null()).scalar()
+            gdata.configCommon.alarm_not_ack_count = alarm_not_ack_count
 
             self.table.search()
             Toast.show_success(self.page)

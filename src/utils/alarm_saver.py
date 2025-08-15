@@ -18,23 +18,32 @@ class AlarmSaver:
             if AlarmSaver.has_alarm(alarm_type):
                 return
 
-            AlarmLog.create(
-                alarm_uuid=uuid.uuid4().hex,
-                alarm_type=alarm_type,
-                occured_time=gdata.configDateTime.utc,
-                out_of_sync=out_of_sync
-            )
-            logging.info(f'[创建alarm] {alarm_type}')
+            try:
+                AlarmLog.create(
+                    alarm_uuid=uuid.uuid4().hex,
+                    alarm_type=alarm_type,
+                    occured_time=gdata.configDateTime.utc,
+                    out_of_sync=out_of_sync
+                )
+                logging.info(f'[创建alarm] {alarm_type}')
+                gdata.configCommon.alarm_total_count += 1
+            except Exception as e:
+                logging.exception(f'[创建alarm] 异常{e}')
 
     @staticmethod
     def recovery(alarm_type: AlarmType):
         with AlarmSaver._lock:
-            if AlarmSaver.has_alarm(alarm_type):
-                AlarmLog.update(
-                    recovery_time=gdata.configDateTime.utc,
-                    is_synced=False
-                ).where(AlarmLog.alarm_type == alarm_type).execute()
-                logging.info(f'[恢复alarm] {alarm_type}')
+            try:
+                if AlarmSaver.has_alarm(alarm_type):
+                    AlarmLog.update(
+                        recovery_time=gdata.configDateTime.utc,
+                        is_synced=False
+                    ).where(AlarmLog.alarm_type == alarm_type).execute()
+                    logging.info(f'[恢复alarm] {alarm_type}')
+                else:
+                    gdata.configCommon.alarm_total_count = 0
+            except Exception as e:
+                logging.exception(f'[恢复alarm] 异常{e}')
 
     @staticmethod
     def has_alarm(alarm_type: AlarmType) -> tuple[int, int]:
