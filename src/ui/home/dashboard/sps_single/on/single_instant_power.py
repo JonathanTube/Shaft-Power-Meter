@@ -1,6 +1,5 @@
 import logging
 import flet as ft
-from db.models.preference import Preference
 from ui.common.simple_card import SimpleCard
 from utils.unit_parser import UnitParser
 from common.global_data import gdata
@@ -11,8 +10,6 @@ class SingleInstantPower(ft.Container):
         super().__init__()
         self.margin = 0
         self.expand = True
-        preference: Preference = Preference.get()
-        self.system_unit = preference.system_unit
 
     def build(self):
         try:
@@ -35,11 +32,10 @@ class SingleInstantPower(ft.Container):
         except:
             logging.exception('exception occured at SingleInstantPower.build')
 
-
-
     def reload(self):
         try:
-            power = UnitParser.parse_power(gdata.configSPS.power, self.system_unit)
+            unit = gdata.configPreference.system_unit
+            power = UnitParser.parse_power(gdata.configSPS.power, unit)
             self.power_value.value = power[0]
             self.power_unit.value = power[1]
             if self.content and self.content.page:

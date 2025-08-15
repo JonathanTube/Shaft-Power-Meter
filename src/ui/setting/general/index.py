@@ -1,6 +1,5 @@
 import flet as ft
 import logging
-from db.models.preference import Preference
 from ui.setting.general.general_limitation_max import GeneralLimitationMax
 from ui.setting.general.general_date_time import GeneralDateTime
 from ui.setting.general.general_limitation_warning import GeneralLimitationWarning
@@ -10,14 +9,14 @@ from ui.common.permission_check import PermissionCheck
 from ui.common.keyboard import keyboard
 from db.models.user import User
 from ui.setting.general.general_ofline_default_value import GeneralOflineDefaultValue
+from common.global_data import gdata
 
 
 class General(ft.Container):
     def __init__(self):
         super().__init__()
         self.expand = True
-        self.preference: Preference = Preference.get()
-        self.system_unit = self.preference.system_unit
+        self.system_unit = gdata.configPreference.system_unit
         self.is_saving = False
 
     def __on_save_button_click(self, e):
@@ -99,11 +98,11 @@ class General(ft.Container):
                 self.reset_btn.update()
 
             user_id = user.id
-            self.page.run_task(self.general_preference.save_data,user_id)
+            self.general_preference.save_data(user_id)
             self.limitation_max.save_data(user_id)
             self.limitation_warning.save_data(user_id)
             self.general_ofline_default_value.save_data(user_id)
-            self.page.run_task(self.general_date_time.save_data, user_id)
+            self.general_date_time.save_data(user_id)
             Toast.show_success(self.page)
         except:
             logging.exception("general save data error")

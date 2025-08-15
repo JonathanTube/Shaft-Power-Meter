@@ -1,7 +1,6 @@
 import logging
 import flet as ft
 from common.global_data import gdata
-from db.models.preference import Preference
 from db.models.propeller_setting import PropellerSetting
 from ui.common.custom_card import CustomCard
 from utils.unit_converter import UnitConverter
@@ -12,8 +11,7 @@ class PropellerConfMcr(ft.Container):
     def __init__(self, ps: PropellerSetting):
         super().__init__()
         self.ps = ps
-        preference: Preference = Preference.get()
-        self.system_unit = preference.system_unit
+        self.system_unit = gdata.configPreference.system_unit
 
     def build(self):
         try:

@@ -2,6 +2,7 @@ from dataclasses import dataclass, field
 from datetime import datetime
 from db.models.factor_conf import FactorConf
 from db.models.io_conf import IOConf
+from db.models.limitations import Limitations
 from db.models.offline_default_value import OfflineDefaultValue
 from db.models.preference import Preference
 from db.models.system_settings import SystemSettings
@@ -55,11 +56,40 @@ class ConfigCommon:
 
 @dataclass
 class ConfigPreference:
-    system_unit = None
+    theme = 0
+    fullscreen = True
+    system_unit = 0
+    language = 0
+    data_refresh_interval = 2
 
     def set_default_value(self):
         preference: Preference = Preference.get()
+        self.theme = preference.theme
+        self.fullscreen = preference.fullscreen
         self.system_unit = preference.system_unit
+        self.language = preference.language
+        self.data_refresh_interval = preference.data_refresh_interval
+
+
+@dataclass
+class ConfigLimitation:
+    power_max = 0
+    speed_max = 0
+    torque_max = 0
+    power_max = 0
+    speed_warning = 0
+    torque_warning = 0
+    power_warning = 0
+
+    def set_default_value(self):
+        limitations: Limitations = Limitations.get()
+        self.power_max = limitations.power_max
+        self.speed_max = limitations.speed_max
+        self.torque_max = limitations.torque_max
+        self.power_max = limitations.power_max
+        self.speed_warning = limitations.speed_warning
+        self.torque_warning = limitations.torque_warning
+        self.power_warning = limitations.power_warning
 
 
 @dataclass
@@ -264,6 +294,7 @@ class GlobalData:
     configCommon = None
     configPreference = None
     configDateTime = None
+    configLimitation = None
     configTest = None
     configGps = None
     configOffline = None
@@ -282,6 +313,9 @@ class GlobalData:
 
         self.configDateTime = ConfigDateTime()
         self.configDateTime.set_default_value()
+
+        self.configLimitation = ConfigLimitation()
+        self.configLimitation.set_default_value()
 
         self.configTest = ConfigTest()
 

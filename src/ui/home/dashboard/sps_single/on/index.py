@@ -2,11 +2,10 @@ import asyncio
 import logging
 import flet as ft
 
-from db.models.preference import Preference
 from ui.home.dashboard.chart.single_power_line import SinglePowerLine
 from ui.home.dashboard.eexi.eexi_limited_power import EEXILimitedPower
 from ui.home.dashboard.sps_single.on.single_instant_grid import SingleInstantGrid
-
+from common.global_data import gdata
 
 class SingleShaPoLiOn(ft.Container):
     def __init__(self):
@@ -38,8 +37,6 @@ class SingleShaPoLiOn(ft.Container):
             logging.exception("exception occured at SingleShaPoLiOn.build")
 
     async def load_data(self):
-        preference: Preference = Preference.get()
-        interval = preference.data_refresh_interval
         while self.task_running:
             try:
                 self.eexi_limited_power.reload()
@@ -48,7 +45,7 @@ class SingleShaPoLiOn(ft.Container):
             except:
                 logging.exception("exception occured at SingleShaPoLiOn.load_data")
                 break
-            await asyncio.sleep(interval)
+            await asyncio.sleep(gdata.configPreference.data_refresh_interval)
 
     def did_mount(self):
         self.task_running = True

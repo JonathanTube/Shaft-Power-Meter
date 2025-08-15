@@ -5,7 +5,6 @@ from matplotlib import pyplot as plt
 from db.models.data_log import DataLog
 from flet.matplotlib_chart import MatplotlibChart
 from matplotlib import dates as mdates
-from db.models.preference import Preference
 from utils.unit_converter import UnitConverter
 from typing import List
 from common.global_data import gdata
@@ -20,9 +19,7 @@ class TrendViewDiagram(ft.Container):
         super().__init__()
         self.expand = True
         self.data_list = []
-
-        preference: Preference = Preference.get()
-        self.system_unit = preference.system_unit
+        self.system_unit = gdata.configPreference.system_unit
 
     def before_update(self):
         try:

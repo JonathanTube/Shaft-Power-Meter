@@ -2,7 +2,6 @@ import logging
 import flet as ft
 from ui.common.meter_round import MeterRound
 from common.global_data import gdata
-from db.models.limitations import Limitations
 from typing import Literal
 
 
@@ -18,9 +17,8 @@ class SpeedMeter(ft.Container):
             if self.page is None or self.page.session is None:
                 return
 
-            limitations: Limitations = Limitations.get()
-            max = limitations.speed_max
-            limit = limitations.speed_warning
+            max = gdata.configLimitation.speed_max
+            limit = gdata.configLimitation.speed_warning
 
             heading = self.page.session.get("lang.common.speed")
             self.content: MeterRound = MeterRound(heading=heading, radius=self.radius, unit="rpm", max=max, limit=limit)

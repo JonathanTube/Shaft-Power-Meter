@@ -5,6 +5,7 @@ import logging
 import os
 from task.sps_read_task import sps_read_task
 from task.sps2_read_task import sps2_read_task
+from ui.common.toast import Toast
 from websocket.websocket_slave import ws_client
 from websocket.websocket_master import ws_server
 from task.plc_sync_task import plc
@@ -41,9 +42,11 @@ class SystemExitTool:
             return
 
         try:
-            user_id = user.id
 
-            logging.info('start closing all of the connections...')
+            msg = page.session.get("lang.toast.system_exit")
+            Toast.show_success(page, msg, 99999)
+
+            await asyncio.sleep(1)
 
             if gdata.configCommon.is_master:
                 # 关闭sps

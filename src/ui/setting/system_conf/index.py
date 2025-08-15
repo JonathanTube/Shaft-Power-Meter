@@ -1,6 +1,3 @@
-import asyncio
-import flet as ft
-import time
 import flet as ft
 import logging
 from db.models.user import User
@@ -15,10 +12,6 @@ from utils.system_exit_tool import SystemExitTool
 
 
 class SystemConf(ft.Container):
-    def __init__(self):
-        super().__init__()
-        self.is_saving = False
-
     def build(self):
         try:
             if self.page and self.page.session:
@@ -53,29 +46,11 @@ class SystemConf(ft.Container):
         except:
             logging.exception('exception occured at SystemConf.__on_save_button_click')
 
-    def __change_buttons(self):
-        try:
-            if self.save_button and self.save_button.page:
-                self.save_button.disabled = self.is_saving
-                self.save_button.update()
-
-            if self.reset_button and self.reset_button.page:
-                self.reset_button.disabled = self.is_saving
-                self.reset_button.update()
-        except:
-            logging.exception('exception occured at SystemConf.__change_buttons')
-
     def __save_data(self, user: User):
         if self.page is None:
             return
 
-        if self.is_saving:
-            return
-
         try:
-            self.is_saving = True
-            self.__change_buttons()
-
             keyboard.close()
 
             if self.system_conf_settings and self.system_conf_settings.page:
@@ -85,18 +60,10 @@ class SystemConf(ft.Container):
             if self.system_conf_ship_info and self.system_conf_ship_info.page:
                 self.system_conf_ship_info.update()
                 self.system_conf_ship_info.save(user)
-
-            Toast.show_success(self.page)
-            self.is_saving = False
-            self.__change_buttons()
-        except SystemError:
-            # 退出系统
-            msg = self.page.session.get("lang.toast.system_exit")
-            Toast.show_error(self.page, msg, auto_hide=False)
             # 清理数据
             TableInit.handle_change_running_mode()
+            # 退出系统
             self.page.run_task(SystemExitTool.exit_app, self.page, user)
-
         except:
             logging.exception("system conf save data error")
             Toast.show_error(self.page)

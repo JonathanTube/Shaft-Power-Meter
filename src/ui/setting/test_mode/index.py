@@ -7,7 +7,6 @@ from ui.setting.test_mode.test_mode_instant import TestModeInstant
 from ui.setting.test_mode.test_mode_range import TestModeRange
 from task.plc_sync_task import plc
 from utils.unit_converter import UnitConverter
-from db.models.preference import Preference
 from task.test_mode_task import test_mode_task
 from ui.common.toast import Toast
 from common.global_data import gdata
@@ -18,7 +17,6 @@ class TestMode(ft.Container):
     def __init__(self):
         super().__init__()
         self.running = test_mode_task.is_running
-        self.preference: Preference = Preference.get()
 
         self.last_op_utc_date_time = gdata.configDateTime.utc
 
@@ -128,13 +126,13 @@ class TestMode(ft.Container):
             Toast.show_error(self.page, "__on_toggle_auto_test failed.")
 
     def convert_torque(self, torque: int):
-        if self.preference.system_unit == 0:
+        if gdata.configPreference.system_unit == 0:
             return torque * 1000
         else:
             return UnitConverter.tm_to_nm(torque)
 
     def convert_thrust(self, thrust: int):
-        if self.preference.system_unit == 0:
+        if gdata.configPreference.system_unit == 0:
             return thrust * 1000
         else:
             return UnitConverter.t_to_n(thrust)

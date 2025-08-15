@@ -1,11 +1,10 @@
 import asyncio
 import logging
 import flet as ft
-
-from db.models.preference import Preference
 from ui.home.dashboard.sps_dual.on.dual_instant_grid import DualInstantGrid
 from ui.home.dashboard.eexi.eexi_limited_power import EEXILimitedPower
 from ui.home.dashboard.chart.single_power_line import SinglePowerLine
+from common.global_data import gdata
 
 
 class DualShaPoLiOn(ft.Container):
@@ -35,16 +34,7 @@ class DualShaPoLiOn(ft.Container):
         except:
             logging.exception('exception occured at DualShaPoLiOn.build')
 
-
-
     async def load_data(self):
-        interval = 5
-        try:
-            preference: Preference = Preference.get()
-            interval = preference.data_refresh_interval
-        except:
-            pass
-
         while self.task_running:
             try:
                 self.instant_grid.reload()
@@ -53,7 +43,7 @@ class DualShaPoLiOn(ft.Container):
             except:
                 logging.exception("exception occured at DualShaPoLiOn.load_data")
                 break
-            await asyncio.sleep(interval)
+            await asyncio.sleep(gdata.configPreference.data_refresh_interval)
 
     def did_mount(self):
         self.task_running = True

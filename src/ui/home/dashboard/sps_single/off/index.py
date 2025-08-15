@@ -1,9 +1,9 @@
 import asyncio
 import logging
 import flet as ft
-from db.models.preference import Preference
 from ui.home.dashboard.sps_single.off.single_meters import SingleMeters
 from ui.home.dashboard.thrust.index import ThrustBlock
+from common.global_data import gdata
 
 
 class SingleShaPoLiOff(ft.Stack):
@@ -30,21 +30,18 @@ class SingleShaPoLiOff(ft.Stack):
         except:
             logging.exception('exception occured at SingleShaPoLiOff.build')
 
-
     async def load_data(self):
-        preference: Preference = Preference.get()
-        interval = preference.data_refresh_interval
         while self.task_running:
             try:
                 if self.single_meters:
                     self.single_meters.reload()
-                
+
                 if self.thrust_power:
                     self.thrust_power.reload()
             except:
                 logging.exception("exception occured at SingleShaPoLiOff.load_data")
                 break
-            await asyncio.sleep(interval)
+            await asyncio.sleep(gdata.configPreference.data_refresh_interval)
 
     def did_mount(self):
         self.task_running = True

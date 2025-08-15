@@ -1,7 +1,6 @@
 import logging
 import flet as ft
 from utils.unit_parser import UnitParser
-from db.models.preference import Preference
 from common.global_data import gdata
 from typing import Literal
 from common.global_data import gdata
@@ -13,15 +12,10 @@ class ThrustBlock(ft.Container):
         self.right = 10
         self.top = 10
         self.name = name
-
-        self.system_unit = 0
         self.visible = gdata.configCommon.show_thrust
 
     def build(self):
         try:
-            preference: Preference = Preference.get()
-            self.system_unit = preference.system_unit
-            
             if self.page is None or self.page.session is None:
                 return
 
@@ -45,11 +39,12 @@ class ThrustBlock(ft.Container):
                 return
 
             if self.name == "sps":
-                thrust_and_unit = UnitParser.parse_thrust(gdata.configSPS.thrust, self.system_unit)
+                unit = gdata.configPreference.system_unit
+                thrust_and_unit = UnitParser.parse_thrust(gdata.configSPS.thrust, unit)
                 self.thrust_value.value = thrust_and_unit[0]
                 self.thrust_unit.value = thrust_and_unit[1]
             else:
-                thrust_and_unit = UnitParser.parse_thrust(gdata.configSPS2.thrust, self.system_unit)
+                thrust_and_unit = UnitParser.parse_thrust(gdata.configSPS2.thrust, unit)
                 self.thrust_value.value = thrust_and_unit[0]
                 self.thrust_unit.value = thrust_and_unit[1]
             if self.content and self.content.page:

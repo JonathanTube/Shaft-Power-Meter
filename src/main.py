@@ -2,12 +2,9 @@ import asyncio
 import ctypes
 import sys
 import logging
-import flet as ft
-from task.data_cleanup_task import data_cleanup_task
-from task.task_manager import TaskManager
 import ui_safety
-from db.models.io_conf import IOConf
-from db.models.system_settings import SystemSettings
+import flet as ft
+from task.task_manager import TaskManager
 from ui.common.fullscreen_alert import FullscreenAlert
 from ui.common.keyboard import keyboard
 from ui.header.index import Header
@@ -16,7 +13,6 @@ from ui.report.index import Report
 from ui.setting.index import Setting
 from db.data_init import DataInit
 from db.table_init import TableInit
-from db.models.preference import Preference
 from db.models.language import Language
 from ui.common.audio_alarm import AudioAlarm
 from common.global_data import gdata
@@ -25,13 +21,14 @@ from utils.auto_startup import add_to_startup
 from utils.logger import Logger
 from db.base import db
 from task.gps_sync_task import gps
-from task.data_record_task import data_record_task
+from task.plc_sync_task import plc
 from task.utc_timer_task import utc_timer
 from task.sps_read_task import sps_read_task
 from task.sps2_read_task import sps2_read_task
-from task.plc_sync_task import plc
-from websocket.websocket_master import ws_server
 from websocket.websocket_slave import ws_client
+from websocket.websocket_master import ws_server
+from task.data_record_task import data_record_task
+from task.data_cleanup_task import data_cleanup_task
 
 Logger(show_sql=False)
 add_to_startup()
@@ -48,9 +45,9 @@ def check_single_instance(mutex_name: str = "shaft-power-meter"):
         sys.exit(0)
 
 
-def load_language(page: ft.Page, preference: Preference):
+def load_language(page: ft.Page):
     language_items = Language.select()
-    if preference.language == 0:
+    if gdata.configPreference.language == 0:
         for item in language_items:
             page.session.set(item.code, item.english)
     else:
@@ -58,17 +55,17 @@ def load_language(page: ft.Page, preference: Preference):
             page.session.set(item.code, item.chinese)
 
 
-def set_appearance(page: ft.Page, preference: Preference):
+def set_appearance(page: ft.Page):
     page.theme = ft.Theme(scrollbar_theme=ft.ScrollbarTheme(thickness=20))
     page.title = page.session.get("lang.common.app_name")
     page.padding = 0
-    page.theme_mode = ft.ThemeMode.LIGHT if preference.theme == 0 else ft.ThemeMode.DARK
+    page.theme_mode = ft.ThemeMode.LIGHT if gdata.configPreference.theme == 0 else ft.ThemeMode.DARK
     page.window.resizable = False
     page.window.frameless = True
     page.window.left = 0
     page.window.top = 0
     if page.window.width <= 1200:
-        if preference.fullscreen:
+        if gdata.configPreference.fullscreen:
             page.window.full_screen = True
         else:
             page.window.maximized = True
@@ -143,29 +140,26 @@ async def start_all_tasks():
     await modbus_output.start()
     task_manager.add(modbus_output)
 
-    system_settings: SystemSettings = SystemSettings.get()
-
     # GPS
-    if system_settings.enable_gps:
+    if gdata.configCommon.enable_gps:
         await gps.start()
         task_manager.add(gps)
 
     # PLC
-    io_conf: IOConf = IOConf.get()
-    if system_settings.is_master and io_conf.plc_enabled:
+    if gdata.configCommon.is_master and gdata.configIO.plc_enabled:
         await plc.connect()
         task_manager.add(plc)
 
     # SPS 读取
-    if system_settings.is_master:
+    if gdata.configCommon.is_master:
         await sps_read_task.start()
         task_manager.add(sps_read_task)
-        if system_settings.amount_of_propeller == 2:
+        if gdata.configCommon.amount_of_propeller == 2:
             await sps2_read_task.start()
             task_manager.add(sps2_read_task)
 
     # WS
-    if not system_settings.is_individual:
+    if not gdata.configCommon.is_individual:
         await ws_server.start()
         task_manager.add(ws_server)
     else:
@@ -185,9 +179,8 @@ async def main_async_setup(page: ft.Page):
     DataInit.init()
     gdata.set_default_value()
 
-    preference: Preference = Preference.get()
-    load_language(page, preference)
-    set_appearance(page, preference)
+    load_language(page)
+    set_appearance(page)
 
     set_content(page)
 

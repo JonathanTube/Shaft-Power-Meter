@@ -3,8 +3,6 @@ import flet as ft
 import math
 from ui.common.simple_card import SimpleCard
 from utils.unit_parser import UnitParser
-from db.models.limitations import Limitations
-from db.models.preference import Preference
 from common.global_data import gdata
 
 
@@ -16,12 +14,6 @@ class DualPowerLine(ft.Container):
         self.sps2_color = ft.Colors.BLUE
 
         self.expand = True
-
-        preference: Preference = Preference.get()
-        self.unit = preference.system_unit
-
-        limitations: Limitations = Limitations.get()
-        self.power_max = limitations.power_max
 
     def build(self):
         try:
@@ -40,7 +32,7 @@ class DualPowerLine(ft.Container):
 
             border = ft.BorderSide(width=.5, color=ft.Colors.with_opacity(0.15, ft.Colors.INVERSE_SURFACE))
 
-            power_and_unit = UnitParser.parse_power(self.power_max, self.unit)
+            power_and_unit = UnitParser.parse_power(gdata.configLimitation.power_max, gdata.configPreference.system_unit)
             left_max = math.ceil(power_and_unit[0])
             left_unit = power_and_unit[1]
 
@@ -103,7 +95,7 @@ class DualPowerLine(ft.Container):
                         )
                     )
                     labels.append(label)
-            
+
             if self.chart and self.chart.bottom_axis:
                 self.chart.bottom_axis.labels = labels
                 self.chart.bottom_axis.visible = len(labels) > 0
@@ -118,7 +110,7 @@ class DualPowerLine(ft.Container):
             data_points = []
             for index, item in enumerate(gdata.configSPS.power_history):
                 if len(item) > 0:
-                    _power = UnitParser.parse_power(item[0], self.unit)
+                    _power = UnitParser.parse_power(item[0], gdata.configPreference.system_unit)
                     data_points.append(ft.LineChartDataPoint(index, _power[0]))
 
             if self.sps_data_series is not None:
@@ -132,7 +124,7 @@ class DualPowerLine(ft.Container):
             data_points = []
             for index, item in enumerate(gdata.configSPS2.power_history):
                 if len(item) > 0:
-                    _power = UnitParser.parse_power(item[0], self.unit)
+                    _power = UnitParser.parse_power(item[0], gdata.configPreference.system_unit)
                     data_points.append(ft.LineChartDataPoint(index, _power[0]))
 
             if self.sps2_data_series is not None:

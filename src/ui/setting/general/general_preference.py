@@ -2,8 +2,8 @@ import asyncio
 import logging
 import flet as ft
 from db.models.language import Language
-from ui.common.custom_card import CustomCard
 from db.models.preference import Preference
+from ui.common.custom_card import CustomCard
 from ui.common.keyboard import keyboard
 from common.global_data import gdata
 
@@ -12,7 +12,6 @@ class GeneralPreference(ft.Container):
     def __init__(self, on_system_unit_change: callable):
         super().__init__()
         self.expand = True
-        self.preference: Preference = Preference.get()
         self.on_system_unit_change = on_system_unit_change
 
     def build(self):
@@ -29,7 +28,7 @@ class GeneralPreference(ft.Container):
 
                 self.default_theme = ft.RadioGroup(
                     content=ft.Row([self.theme_light, self.theme_dark]),
-                    value=self.preference.theme
+                    value=gdata.configPreference.theme
                 )
 
                 self.system_unit_si = ft.Radio(value="0", label=s.get("lang.setting.unit.si"))
@@ -37,25 +36,25 @@ class GeneralPreference(ft.Container):
 
                 self.system_unit = ft.RadioGroup(
                     content=ft.Row([self.system_unit_si, self.system_unit_metric]),
-                    value=self.preference.system_unit,
+                    value=gdata.configPreference.system_unit,
                     on_change=lambda e: self.__handle_system_unit_change(e)
                 )
 
                 self.language = ft.RadioGroup(
                     content=ft.Row([ft.Radio(value="0", label="English"), ft.Radio(value="1", label="中文")]),
-                    value=self.preference.language
+                    value=gdata.configPreference.language
                 )
 
                 self.fullscreen = ft.Checkbox(
                     col={"md": 6}, label=self.page.session.get("lang.setting.fullscreen"),
                     label_position=ft.LabelPosition.LEFT,
-                    value=self.preference.fullscreen
+                    value=gdata.configPreference.fullscreen
                 )
 
                 self.data_refresh_interval = ft.TextField(
                     label=self.data_refresh_interval_label,
                     suffix_text="seconds",
-                    value=self.preference.data_refresh_interval,
+                    value=gdata.configPreference.data_refresh_interval,
                     col={"md": 6},
                     read_only=True,
                     can_request_focus=False,
@@ -105,33 +104,37 @@ class GeneralPreference(ft.Container):
     def __handle_system_unit_change(self, e):
         self.on_system_unit_change(int(self.system_unit.value))
 
-    async def save_data(self, user_id: int):
+    def save_data(self, user_id: int):
         if self.page is None or self.page.session is None:
             return
 
         # save preference
-        new_theme = int(self.default_theme.value)
-        self.preference.theme = new_theme
+        theme = int(self.default_theme.value)
+        language = int(self.language.value)
+        fullscreen = self.fullscreen.value
+        system_unit = int(self.system_unit.value)
+        data_refresh_interval = int(self.data_refresh_interval.value)
 
-        new_language = int(self.language.value)
-        self.preference.language = new_language
+        Preference.update(
+            theme=theme, language=language, fullscreen=fullscreen,
+            system_unit=system_unit, data_refresh_interval=data_refresh_interval
+        ).execute()
 
-        new_fullscreen = self.fullscreen.value
-        self.preference.fullscreen = new_fullscreen
+        gdata.configPreference.set_default_value()
 
-        self.preference.system_unit = int(self.system_unit.value)
-        self.preference.data_refresh_interval = int(self.data_refresh_interval.value)
-
-        await asyncio.to_thread(self.preference.save)
-
-        languages = await asyncio.to_thread(Language.select)
-        for item in languages:
-            self.page.session.set(item.code, item.english if self.preference.language == 0 else item.chinese)
+        self.page.run_task(self.refresh_language)
 
         if self.page.window is not None:
-            self.page.window.full_screen = new_fullscreen
+            self.page.window.full_screen = fullscreen
 
-        theme = int(self.preference.theme)
         if self.page:
             self.page.theme_mode = ft.ThemeMode.LIGHT if theme == 0 else ft.ThemeMode.DARK
             self.page.update()
+
+    async def refresh_language(self):
+        languages = await asyncio.to_thread(Language.select)
+        for item in languages:
+            if gdata.configPreference.language == 0:
+                self.page.session.set(item.code, item.english)
+            else:
+                self.page.session.set(item.code, item.chinese)

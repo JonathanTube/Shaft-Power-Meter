@@ -4,7 +4,6 @@ import flet as ft
 from ui.common.simple_card import SimpleCard
 from utils.unit_parser import UnitParser
 from common.global_data import gdata
-from db.models.preference import Preference
 from common.global_data import gdata
 
 
@@ -19,13 +18,8 @@ class DualInstantThrust(ft.Container):
 
         self.visible = gdata.configCommon.show_thrust
 
-        self.unit = 0
-
     def build(self):
         try:
-            preference: Preference = Preference.get()
-            self.unit = preference.system_unit
-
             if self.page is None or self.page.session is None:
                 return
 
@@ -54,8 +48,9 @@ class DualInstantThrust(ft.Container):
 
     def reload(self):
         try:
-            thrust_sps = UnitParser.parse_thrust(gdata.configSPS.thrust, self.unit)
-            thrust_sps2 = UnitParser.parse_thrust(gdata.configSPS2.thrust, self.unit)
+            unit = gdata.configPreference.system_unit
+            thrust_sps = UnitParser.parse_thrust(gdata.configSPS.thrust, unit)
+            thrust_sps2 = UnitParser.parse_thrust(gdata.configSPS2.thrust, unit)
 
             self.thrust_sps_value.value = thrust_sps[0]
             self.thrust_sps_unit.value = thrust_sps[1]

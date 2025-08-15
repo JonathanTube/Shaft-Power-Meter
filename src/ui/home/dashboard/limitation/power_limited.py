@@ -1,7 +1,6 @@
 import logging
 import flet as ft
 from utils.unit_parser import UnitParser
-from db.models.preference import Preference
 from common.global_data import gdata
 
 
@@ -10,21 +9,14 @@ class PowerLimited(ft.Container):
         super().__init__()
         self.expand = True
 
-        self.system_unit = 0
-
-        self.power = gdata.configCommon.eexi_limited_power
-
     def build(self):
         try:
-            preference: Preference = Preference.get()
-            self.system_unit = preference.system_unit
-
             if self.page is None or self.page.session is None:
                 return
 
             self.title = ft.Text(self.page.session.get("lang.common.limited_power"), weight=ft.FontWeight.W_600)
 
-            power_and_unit = UnitParser.parse_power(self.power, self.system_unit)
+            power_and_unit = UnitParser.parse_power(gdata.configCommon.eexi_limited_power, gdata.configPreference.system_unit)
             if len(power_and_unit) < 2:
                 return
 

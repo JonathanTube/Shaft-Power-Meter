@@ -4,8 +4,6 @@ import logging
 from ui.common.simple_card import SimpleCard
 from utils.unit_parser import UnitParser
 from common.global_data import gdata
-from db.models.preference import Preference
-from db.models.limitations import Limitations
 
 
 class SinglePowerLine(ft.Container):
@@ -16,18 +14,15 @@ class SinglePowerLine(ft.Container):
 
         self.chart = None
 
-        preference: Preference = Preference.get()
-        self.system_unit = preference.system_unit
-
+        self.system_unit = gdata.configPreference.system_unit
         self.threshold_power = gdata.configCommon.eexi_limited_power
         self.max_power = gdata.configCommon.unlimited_power
 
     def build(self):
         try:
             if not gdata.configCommon.shapoli:
-                limitations: Limitations = Limitations.get()
-                self.threshold_power = limitations.power_warning
-                self.max_power = limitations.power_max
+                self.threshold_power = gdata.configLimitation.power_warning
+                self.max_power = gdata.configLimitation.power_max
 
             self.data_line = ft.LineChartData(
                 above_line_bgcolor=ft.Colors.SURFACE,

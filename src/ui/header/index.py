@@ -97,10 +97,7 @@ class Header(ft.AppBar):
             logging.exception('exception occured at Header.build')
 
     def __on_exit(self, user):
-        if self.page and self.page.session:
-            msg = self.page.session.get("lang.toast.system_exit")
-            Toast.show_error(self.page, msg, auto_hide=False)
-            asyncio.run(SystemExitTool.exit_app(self.page, user))
+        asyncio.run(SystemExitTool.exit_app(self.page, user))
 
     def __stop_auto_testing(self, e):
         gdata.configTest.auto_testing = False

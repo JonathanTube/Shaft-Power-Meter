@@ -5,6 +5,7 @@ from db.models.limitations import Limitations
 from ui.common.custom_card import CustomCard
 from utils.unit_converter import UnitConverter
 from ui.common.keyboard import keyboard
+from common.global_data import gdata
 
 
 class GeneralLimitationMax(ft.Container):
@@ -13,7 +14,6 @@ class GeneralLimitationMax(ft.Container):
         self.expand = True
         self.col = {"md": 6}
         self.system_unit = system_unit
-        self.limitations: Limitations = Limitations.get()
 
     def build(self):
         try:
@@ -21,7 +21,7 @@ class GeneralLimitationMax(ft.Container):
                 self.speed_max = ft.TextField(
                     suffix_text="rpm",
                     label=self.page.session.get("lang.common.speed"),
-                    value=self.limitations.speed_max,
+                    value=gdata.configLimitation.speed_max,
                     read_only=True,
                     can_request_focus=False,
                     on_click=lambda e: keyboard.open(e.control))
@@ -29,7 +29,7 @@ class GeneralLimitationMax(ft.Container):
                 self.torque_max = ft.TextField(
                     suffix_text="kNm",
                     label=self.page.session.get("lang.common.torque"),
-                    value=self.limitations.torque_max,
+                    value=gdata.configLimitation.torque_max,
                     read_only=True,
                     can_request_focus=False,
                     on_click=lambda e: keyboard.open(e.control, "int"))
@@ -37,7 +37,7 @@ class GeneralLimitationMax(ft.Container):
                 self.power_max = ft.TextField(
                     suffix_text="kW",
                     label=self.page.session.get("lang.common.power"),
-                    value=self.limitations.power_max,
+                    value=gdata.configLimitation.power_max,
                     read_only=True,
                     can_request_focus=False,
                     on_click=lambda e: keyboard.open(e.control, "int"))
@@ -72,8 +72,8 @@ class GeneralLimitationMax(ft.Container):
         try:
             if self.page:
                 self.system_unit = system_unit
-                torque_limit = self.limitations.torque_max
-                power_limit = self.limitations.power_max
+                torque_limit = gdata.configLimitation.torque_max
+                power_limit = gdata.configLimitation.power_max
                 if self.system_unit == 0:
 
                     if self.torque_max is not None:
@@ -100,7 +100,7 @@ class GeneralLimitationMax(ft.Container):
             logging.exception('exception occured at GeneralLimitationMax.update_unit')
 
     def save_data(self, user_id: int):
-        # save limitations
+        # save
         max_speed = float(self.speed_max.value)
         max_torque = int(self.torque_max.value)
         max_power = int(self.power_max.value)
@@ -116,11 +116,8 @@ class GeneralLimitationMax(ft.Container):
             # shp to w
             max_power = UnitConverter.shp_to_w(max_power)
 
-        Limitations.update(
-            power_max=max_power,
-            torque_max=max_torque,
-            speed_max=max_speed
-        ).where(Limitations.id == self.limitations.id).execute()
+        Limitations.update(power_max=max_power, torque_max=max_torque, speed_max=max_speed).execute()
+        gdata.configLimitation.set_default_value()
 
     def did_mount(self):
         self.update_unit(self.system_unit)

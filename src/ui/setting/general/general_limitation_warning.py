@@ -14,7 +14,6 @@ class GeneralLimitationWarning(ft.Container):
         self.expand = True
         self.col = {"md": 6}
         self.system_unit = system_unit
-        self.limitations: Limitations = Limitations.get()
 
     def build(self):
         try:
@@ -22,7 +21,7 @@ class GeneralLimitationWarning(ft.Container):
                 self.torque_warning = ft.TextField(
                     suffix_text="kNm",
                     label=self.page.session.get("lang.common.torque"),
-                    value=self.limitations.torque_warning,
+                    value=gdata.configLimitation.torque_warning,
                     read_only=True,
                     can_request_focus=False,
                     on_click=lambda e: keyboard.open(e.control, "int"))
@@ -30,7 +29,7 @@ class GeneralLimitationWarning(ft.Container):
                 self.speed_warning = ft.TextField(
                     suffix_text="rpm",
                     label=self.page.session.get("lang.common.speed"),
-                    value=self.limitations.speed_warning,
+                    value=gdata.configLimitation.speed_warning,
                     read_only=True,
                     can_request_focus=False,
                     on_click=lambda e: keyboard.open(e.control))
@@ -38,7 +37,7 @@ class GeneralLimitationWarning(ft.Container):
                 self.power_warning = ft.TextField(
                     suffix_text="kW",
                     label=self.page.session.get("lang.common.power"),
-                    value=self.limitations.power_warning,
+                    value=gdata.configLimitation.power_warning,
                     read_only=True,
                     can_request_focus=False,
                     on_click=lambda e: keyboard.open(e.control, "int"))
@@ -74,8 +73,8 @@ class GeneralLimitationWarning(ft.Container):
         try:
             if self.page:
                 self.system_unit = system_unit
-                torque_warning = self.limitations.torque_warning
-                power_warning = self.limitations.power_warning
+                torque_warning = gdata.configLimitation.torque_warning
+                power_warning = gdata.configLimitation.power_warning
                 if self.system_unit == 0:
 
                     if self.torque_warning is not None:
@@ -116,11 +115,8 @@ class GeneralLimitationWarning(ft.Container):
             # shp to w
             warning_power = UnitConverter.shp_to_w(warning_power)
 
-        Limitations.update(
-            power_warning=warning_power,
-            torque_warning=warning_torque,
-            speed_warning=warning_speed
-        ).where(Limitations.id == self.limitations.id).execute()
+        Limitations.update(power_warning=warning_power, torque_warning=warning_torque, speed_warning=warning_speed).execute()
+        gdata.configLimitation.set_default_value()
 
     def did_mount(self):
         self.update_unit(self.system_unit)

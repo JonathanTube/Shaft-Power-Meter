@@ -4,7 +4,6 @@ import flet as ft
 from ui.common.simple_card import SimpleCard
 from utils.unit_parser import UnitParser
 from common.global_data import gdata
-from db.models.preference import Preference
 
 
 class DualInstantPower(ft.Container):
@@ -15,14 +14,6 @@ class DualInstantPower(ft.Container):
         self.font_size_of_label = 14
         self.font_size_of_value = 16
         self.font_size_of_unit = 12
-
-        # 默认标准单位0-SI
-        self.unit = 0
-        try:
-            preference: Preference = Preference.get()
-            self.unit = preference.system_unit
-        except:
-            pass
 
     def build(self):
         try:
@@ -59,11 +50,12 @@ class DualInstantPower(ft.Container):
 
     def reload(self):
         try:
-            power_sps = UnitParser.parse_power(gdata.configSPS.power, self.unit)
-            power_sps2 = UnitParser.parse_power(gdata.configSPS2.power, self.unit)
+            unit = gdata.configPreference.system_unit
+            power_sps = UnitParser.parse_power(gdata.configSPS.power, unit)
+            power_sps2 = UnitParser.parse_power(gdata.configSPS2.power, unit)
             power_total = UnitParser.parse_power(
                 gdata.configSPS.power + gdata.configSPS2.power,
-                self.unit
+                unit
             )
 
             self.power_sps_value.value = power_sps[0]

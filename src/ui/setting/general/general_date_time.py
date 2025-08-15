@@ -121,7 +121,7 @@ class GeneralDateTime(ft.Container):
         except:
             logging.exception('exception occured at GeneralDateTime.__handle_time_change')
 
-    async def save_data(self, user_id: int):
+    def save_data(self, user_id: int):
         """异步保存，避免阻塞 UI"""
         standard_date_time_format = f'{gdata.configDateTime.date_format} %H:%M:%S'
         new_date = self.utc_date.value
@@ -135,12 +135,16 @@ class GeneralDateTime(ft.Container):
                 date_format=self.date_format.value, sync_with_gps=self.sync_with_gps.value
             ).execute()
             gdata.set_default_value()
-            # 删除未来时间的数据
-            await asyncio.to_thread(
-                DataLog.delete().where(DataLog.utc_date_time >= gdata.configDateTime.utc).execute
-            )
+
+            self.page.run_task(self.clean_future_data)
 
             if self.page:
                 self.page.update()
         except:
             logging.exception("exception occured at GeneralDateTime.save_data_async")
+
+    async def clean_future_data(self):
+        # 删除未来时间的数据
+        await asyncio.to_thread(DataLog.delete().where(
+            DataLog.utc_date_time >= gdata.configDateTime.utc
+        ).execute)

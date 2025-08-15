@@ -5,7 +5,6 @@ import matplotlib.pyplot as plt
 import numpy as np
 import flet as ft
 from flet.matplotlib_chart import MatplotlibChart
-from db.models.preference import Preference
 from db.table_init import PropellerSetting
 from common.global_data import gdata
 import logging
@@ -73,7 +72,7 @@ class PropellerCurveDiagram(ft.Container):
                 # 替换容器内容
                 self.content = self.chart
         except:
-            logging.exception('exception occured at PropellerCurveDiagram.before_update') 
+            logging.exception('exception occured at PropellerCurveDiagram.before_update')
 
     def create_chart(self) -> MatplotlibChart:
         try:
@@ -198,8 +197,6 @@ class PropellerCurveDiagram(ft.Container):
         ax.plot(rpm_points, power_points, color=color, linewidth=1, linestyle='--', label=self.page.session.get('lang.propeller_curve.overload_curve'))
 
     async def update_sps_points(self):
-        preference: Preference = Preference.get()
-        interval = preference.data_refresh_interval
         while self.task_running:
             try:
                 if self.rpm_of_mcr == 0 or self.power_of_mcr == 0:
@@ -223,7 +220,7 @@ class PropellerCurveDiagram(ft.Container):
                     self.chart.update()
             except:
                 logging.exception("exception occured at update_sps_points")
-            await asyncio.sleep(interval)
+            await asyncio.sleep(gdata.configPreference.data_refresh_interval)
 
     def did_mount(self):
         self.task_running = True

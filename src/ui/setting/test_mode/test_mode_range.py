@@ -1,8 +1,6 @@
 import flet as ft
 import logging
 from common.global_data import gdata
-from db.models.limitations import Limitations
-from db.models.preference import Preference
 from db.models.test_mode_conf import TestModeConf
 from ui.common.custom_card import CustomCard
 from ui.common.toast import Toast
@@ -14,11 +12,10 @@ class TestModeRange(ft.Container):
     def __init__(self):
         super().__init__()
         self.conf: TestModeConf = TestModeConf.get()
-        preference: Preference = Preference.get()
-        self.system_unit: int = preference.system_unit
-        limitations: Limitations = Limitations.get()
-        self.max_torque: int = limitations.torque_max
-        self.max_rpm: float = limitations.speed_max
+
+        self.system_unit: int = gdata.configPreference.system_unit
+        self.max_torque: int = gdata.configLimitation.torque_max
+        self.max_rpm: float = gdata.configLimitation.speed_max
         self.max_thrust: int = 4000 * 1000
 
     def build(self):
@@ -95,7 +92,7 @@ class TestModeRange(ft.Container):
                 self.start_torque_text.value = f'{self.page.session.get('lang.setting.test_mode.min_torque')}: {min_torque_value} {min_torque_unit}'
                 self.start_torque_text.update()
 
-            if self.end_torque_text and self.end_torque_text.page:    
+            if self.end_torque_text and self.end_torque_text.page:
                 self.end_torque_text.value = f'{self.page.session.get('lang.setting.test_mode.max_torque')}: {max_torque_value} {max_torque_unit}'
                 self.end_torque_text.update()
 
@@ -131,7 +128,7 @@ class TestModeRange(ft.Container):
                 self.start_thrust_text.value = f'{self.page.session.get('lang.setting.test_mode.min_thrust')}: {min_thrust_value} {min_thrust_unit}'
                 self.start_thrust_text.update()
 
-            if self.end_thrust_text and self.end_thrust_text.page:    
+            if self.end_thrust_text and self.end_thrust_text.page:
                 self.end_thrust_text.value = f'{self.page.session.get('lang.setting.test_mode.max_thrust')}: {max_thrust_value} {max_thrust_unit}'
                 self.end_thrust_text.update()
 

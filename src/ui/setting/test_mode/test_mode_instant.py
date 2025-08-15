@@ -1,7 +1,6 @@
 import logging
 import flet as ft
 import asyncio
-from db.models.preference import Preference
 from ui.common.custom_card import CustomCard
 from common.global_data import gdata
 from utils.unit_parser import UnitParser
@@ -10,8 +9,8 @@ from utils.unit_parser import UnitParser
 class TestModeInstant(ft.ResponsiveRow):
     def __init__(self):
         super().__init__()
-        preference: Preference = Preference.get()
-        self.system_unit = preference.system_unit
+
+        self.system_unit = gdata.configPreference.system_unit
 
         self.task = None
         self.task_running = False

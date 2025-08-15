@@ -182,11 +182,6 @@ class SystemConfSettings(ft.Container):
         display_propeller_curve = self.display_propeller_curve.value
         hide_admin_account = self.chk_hide_admin_account.value
 
-        SystemSettings.update(
-            is_master=is_master, is_individual=is_individual, enable_gps=enable_gps, amount_of_propeller=amount_of_propeller,
-            display_thrust=display_thrust, sha_po_li=sha_po_li, display_propeller_curve=display_propeller_curve, hide_admin_account=hide_admin_account
-        ).execute()
-
         unit = gdata.configPreference.system_unit
         eexi_breach_checking_duration = self.eexi_breach_checking_duration.value
 
@@ -200,6 +195,8 @@ class SystemConfSettings(ft.Container):
             eexi_limited_power = UnitConverter.shp_to_w(self.eexi_limited_power.value)
 
         SystemSettings.update(
+            is_master=is_master, is_individual=is_individual, enable_gps=enable_gps, amount_of_propeller=amount_of_propeller,
+            display_thrust=display_thrust, sha_po_li=sha_po_li, display_propeller_curve=display_propeller_curve, hide_admin_account=hide_admin_account,
             eexi_breach_checking_duration=eexi_breach_checking_duration,
             unlimited_power=unlimited_power, eexi_limited_power=eexi_limited_power
         ).execute()

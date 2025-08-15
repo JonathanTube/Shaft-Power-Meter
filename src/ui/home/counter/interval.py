@@ -4,7 +4,6 @@ import logging
 from typing import Literal
 import flet as ft
 from db.models.data_log import DataLog
-from db.models.preference import Preference
 from ui.common.toast import Toast
 from .display import CounterDisplay
 from ui.common.keyboard import keyboard
@@ -25,9 +24,6 @@ class IntervalCounter(ft.Container):
         self.border = ft.border.all(width=0.5, color=ft.Colors.with_opacity(0.15, ft.Colors.INVERSE_SURFACE))
 
         self.hours = 24
-        preference: Preference = Preference.get()
-        self.system_unit = preference.system_unit
-        self.interval = preference.data_refresh_interval
 
         self.task = None
         self.task_running = False
@@ -136,7 +132,7 @@ class IntervalCounter(ft.Container):
             except:
                 logging.exception("exception occured at IntervalCounter.__running")
 
-            await asyncio.sleep(self.interval)
+            await asyncio.sleep(gdata.configPreference.data_refresh_interval)
 
     def __calculate(self):
         try:
@@ -169,8 +165,9 @@ class IntervalCounter(ft.Container):
             total_energy = (average_power * hours) / 1000  # kWh
 
             if self.display is not None:
-                self.display.set_average_power(average_power, self.system_unit)
-                self.display.set_total_energy(total_energy, self.system_unit)
+                system_unit = gdata.configPreference.system_unit
+                self.display.set_average_power(average_power, system_unit)
+                self.display.set_total_energy(total_energy, system_unit)
                 self.display.set_average_speed(average_speed)
         except:
             logging.exception("exception occured at IntervalCounter.__calculate")

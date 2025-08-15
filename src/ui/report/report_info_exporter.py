@@ -3,7 +3,6 @@ from fpdf import FPDF
 from db.models.event_log import EventLog
 from db.models.report_info import ReportInfo
 from db.models.ship_info import ShipInfo
-from db.models.preference import Preference
 from db.models.report_detail import ReportDetail
 from utils.unit_parser import UnitParser
 from common.global_data import gdata
@@ -21,8 +20,6 @@ class ReportInfoExporter(FPDF):
     def __load_data(self, id: int):
         try:
             self.ship_info: ShipInfo = ShipInfo.get()
-            self.preference: Preference = Preference.get()
-
             self.is_dual = gdata.configCommon.amount_of_propeller == 2
             self.report_info: ReportInfo = ReportInfo.get_by_id(id)
             self.event_log: EventLog = self.report_info.event_log
@@ -75,7 +72,7 @@ class ReportInfoExporter(FPDF):
         self.__insert_value(self.ship_info.ship_name, w=self.per_cell_width)
         self.ln()
 
-        system_unit = self.preference.system_unit
+        system_unit = gdata.configPreference.system_unit
         self.__insert_label("Un-limited Power", w=self.per_cell_width)
         unlimited_power = gdata.configCommon.unlimited_power
         unlimited_power, unlimited_unit = UnitParser.parse_power(unlimited_power, system_unit, shrink=False)
@@ -108,7 +105,7 @@ class ReportInfoExporter(FPDF):
         if self.is_dual:
             col_widths.append(35)
 
-        system_unit = self.preference.system_unit
+        system_unit = gdata.configPreference.system_unit
 
         headers = ["No.", "Date/Time", "Speed"]
         if system_unit == 0:
