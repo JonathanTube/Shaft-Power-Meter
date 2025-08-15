@@ -99,7 +99,7 @@ class General(ft.Container):
                 self.reset_btn.update()
 
             user_id = user.id
-            self.general_preference.save_data(user_id)
+            self.page.run_task(self.general_preference.save_data,user_id)
             self.limitation_max.save_data(user_id)
             self.limitation_warning.save_data(user_id)
             self.general_ofline_default_value.save_data(user_id)

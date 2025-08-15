@@ -1,3 +1,4 @@
+import asyncio
 import logging
 import flet as ft
 from db.models.language import Language
@@ -78,7 +79,6 @@ class GeneralPreference(ft.Container):
         except:
             logging.exception('exception occured at GeneralPreference.build')
 
-
     def before_update(self):
         try:
             if self.page and self.page.session:
@@ -87,30 +87,28 @@ class GeneralPreference(ft.Container):
                 self.theme_label.value = s.get("lang.setting.theme")
                 self.theme_light.label = s.get("lang.setting.theme.light")
                 self.theme_dark.label = s.get("lang.setting.theme.dark")
-                
+
                 # 更新语言设置部分
                 self.language_label.value = s.get("lang.setting.language")
-                
+
                 # 更新单位设置部分
                 self.system_unit_label.value = s.get("lang.setting.unit")
                 self.system_unit_si.label = s.get("lang.setting.unit.si")
                 self.system_unit_metric.label = s.get("lang.setting.unit.metric")
-                
+
                 # 更新其他设置
                 self.fullscreen.label = s.get("lang.setting.fullscreen")
                 self.data_refresh_interval_label.value = s.get("lang.setting.data_refresh_interval")
-                
+
                 # 确保更新界面
                 self.custom_card.set_title(s.get("lang.setting.preference"))
         except:
             logging.exception('exception occured at GeneralPreference.before_update')
 
-
-
     def __handle_system_unit_change(self, e):
         self.on_system_unit_change(int(self.system_unit.value))
 
-    def save_data(self, user_id: int):
+    async def save_data(self, user_id: int):
         if self.page is None or self.page.session is None:
             return
 
@@ -126,16 +124,19 @@ class GeneralPreference(ft.Container):
 
         self.preference.system_unit = int(self.system_unit.value)
         self.preference.data_refresh_interval = int(self.data_refresh_interval.value)
-        self.preference.save()
 
-        OperationLog.create(
+        await asyncio.to_thread(self.preference.save)
+
+        await asyncio.to_thread(
+            OperationLog.create,
             user_id=user_id,
             utc_date_time=gdata.configDateTime.utc,
             operation_type=OperationType.GENERAL_PREFERENCE,
             operation_content=model_to_dict(self.preference)
         )
 
-        for item in Language.select():
+        languages = await asyncio.to_thread(Language.select)
+        for item in languages:
             self.page.session.set(item.code, item.english if self.preference.language == 0 else item.chinese)
 
         if self.page.window is not None:
