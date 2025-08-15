@@ -4,9 +4,6 @@ import flet as ft
 from ui.common.custom_card import CustomCard
 from db.models.limitations import Limitations
 from utils.unit_converter import UnitConverter
-from db.models.operation_log import OperationLog
-from common.operation_type import OperationType
-from playhouse.shortcuts import model_to_dict
 from ui.common.keyboard import keyboard
 from common.global_data import gdata
 
@@ -124,13 +121,6 @@ class GeneralLimitationWarning(ft.Container):
             torque_warning=warning_torque,
             speed_warning=warning_speed
         ).where(Limitations.id == self.limitations.id).execute()
-
-        OperationLog.create(
-            user_id=user_id,
-            utc_date_time=gdata.configDateTime.utc,
-            operation_type=OperationType.GENERAL_LIMITATION_WARNING,
-            operation_content=model_to_dict(self.limitations)
-        )
 
     def did_mount(self):
         self.update_unit(self.system_unit)

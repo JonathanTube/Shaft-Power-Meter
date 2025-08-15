@@ -11,8 +11,6 @@ from db.models.preference import Preference
 from task.test_mode_task import test_mode_task
 from ui.common.toast import Toast
 from common.global_data import gdata
-from db.models.operation_log import OperationLog
-from common.operation_type import OperationType
 from db.models.user import User
 
 
@@ -158,12 +156,6 @@ class TestMode(ft.Container):
                 self.stop_button.visible = True
                 self.stop_button.update()
 
-            OperationLog.create(
-                user_id=self.op_user.id,
-                utc_date_time=gdata.configDateTime.utc,
-                operation_type=OperationType.TEST_MODE_CONF,
-                operation_content='started test mode'
-            )
             self.running = True
             gdata.configTest.test_mode_running = True
             Toast.show_success(self.page)
@@ -186,13 +178,6 @@ class TestMode(ft.Container):
             if self.stop_button and self.stop_button.page:
                 self.stop_button.visible = False
                 self.stop_button.update()
-
-            OperationLog.create(
-                user_id=self.op_user.id,
-                utc_date_time=gdata.configDateTime.utc,
-                operation_type=OperationType.TEST_MODE_CONF,
-                operation_content='stopped test mode'
-            )
 
             # 恢复现场
             gdata.configTest.test_mode_running = False

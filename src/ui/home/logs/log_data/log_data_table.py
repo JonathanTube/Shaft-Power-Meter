@@ -2,7 +2,6 @@ import logging
 from db.models.data_log import DataLog
 from ui.common.abstract_table import AbstractTable
 from common.global_data import gdata
-from db.models.date_time_conf import DateTimeConf
 from utils.unit_parser import UnitParser
 from peewee import fn
 
@@ -11,7 +10,6 @@ class LogDataTable(AbstractTable):
     def __init__(self):
         super().__init__()
         self.table_width = gdata.configCommon.default_table_width
-        self.dtc: DateTimeConf = DateTimeConf.get()
 
     def load_total(self):
         try:
@@ -59,7 +57,7 @@ class LogDataTable(AbstractTable):
                 data_list.append([
                     item.id,
                     item.name,
-                    item.utc_date_time.strftime(f'{self.dtc.date_format} %H:%M:%S'),
+                    item.utc_date_time.strftime(f'{gdata.configDateTime.date_format} %H:%M:%S'),
                     torque[0],
                     thrust[0],
                     speed[0],

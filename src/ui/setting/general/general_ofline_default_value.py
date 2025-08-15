@@ -4,8 +4,6 @@ import flet as ft
 from ui.common.keyboard import keyboard
 from db.models.offline_default_value import OfflineDefaultValue
 from ui.common.custom_card import CustomCard
-from common.operation_type import OperationType
-from db.models.operation_log import OperationLog
 from common.global_data import gdata
 from utils.unit_converter import UnitConverter
 
@@ -99,14 +97,6 @@ class GeneralOflineDefaultValue(ft.Container):
         gdata.configOffline.torque = self.odv.torque_default_value
         gdata.configOffline.speed = self.odv.speed_default_value
         gdata.configOffline.thrust = self.odv.thrust_default_value
-
-        operation_log = OperationLog(
-            user_id=user_id,
-            utc_date_time=gdata.configDateTime.utc,
-            operation_type=OperationType.OFFLINE_DEFAULT_VALUE,
-            operation_content=f"update offline default value: {self.odv.torque_default_value}, {self.odv.thrust_default_value}, {self.odv.speed_default_value}"
-        )
-        operation_log.save()
 
     def update_unit(self, system_unit: int):
         try:

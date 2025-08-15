@@ -128,9 +128,6 @@ class ReportInfoTable(AbstractTable):
             logging.exception('exception occured at ReportInfoTable.__on_result')
 
     def create_columns(self):
-        return self.__get_language()
-
-    def __get_language(self):
         try:
             if self.page and self.page.session:
                 session = self.page.session

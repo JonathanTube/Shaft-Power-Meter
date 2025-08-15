@@ -3,9 +3,6 @@ import flet as ft
 from db.models.user import User
 from ui.common.custom_card import CustomCard
 from db.models.ship_info import ShipInfo
-from db.models.operation_log import OperationLog
-from common.operation_type import OperationType
-from playhouse.shortcuts import model_to_dict
 from common.global_data import gdata
 
 
@@ -59,12 +56,5 @@ class SystemConfShipInfo(ft.Container):
         self.ship_info.imo_number = self.imo_number.value
         self.ship_info.ship_size = self.ship_size.value
         self.ship_info.save()
-        OperationLog.create(
-            user_id=user.id,
-            utc_date_time=gdata.configDateTime.utc,
-            operation_type=OperationType.SYSTEM_CONF_SHIP_INFO,
-            operation_content=model_to_dict(self.ship_info)
-        )
-
     def before_update(self):
         self.visible = gdata.configCommon.shapoli

@@ -6,8 +6,6 @@ from common.global_data import gdata
 from db.models.data_log import DataLog
 from ui.common.custom_card import CustomCard
 from db.models.date_time_conf import DateTimeConf
-from db.models.operation_log import OperationLog
-from common.operation_type import OperationType
 
 
 class GeneralDateTime(ft.Container):
@@ -137,15 +135,6 @@ class GeneralDateTime(ft.Container):
                 date_format=self.date_format.value, sync_with_gps=self.sync_with_gps.value
             ).execute()
             gdata.set_default_value()
-            # 异步保存数据库
-            await asyncio.to_thread(
-                OperationLog.create,
-                user_id=user_id,
-                utc_date_time=gdata.configDateTime.utc,
-                operation_type=OperationType.GENERAL_UTC_DATE_TIME,
-                operation_content='change utc date time'
-            )
-
             # 删除未来时间的数据
             await asyncio.to_thread(
                 DataLog.delete().where(DataLog.utc_date_time >= gdata.configDateTime.utc).execute

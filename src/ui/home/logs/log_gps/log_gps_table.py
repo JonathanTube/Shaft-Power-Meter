@@ -1,7 +1,6 @@
 from db.models.gps_log import GpsLog
 from ui.common.abstract_table import AbstractTable
 from common.global_data import gdata
-from db.models.date_time_conf import DateTimeConf
 from peewee import fn
 
 
@@ -9,7 +8,6 @@ class LogGpsTable(AbstractTable):
     def __init__(self):
         super().__init__()
         self.table_width = gdata.configCommon.default_table_width
-        self.dtc: DateTimeConf = DateTimeConf.get()
 
     def load_total(self):
         start_date = self.kwargs.get('start_date')

@@ -5,10 +5,7 @@ import asyncio
 from ui.common.abstract_table import AbstractTable
 from db.models.user import User
 from ui.common.toast import Toast
-from db.models.operation_log import OperationLog
-from common.operation_type import OperationType
 from common.global_data import gdata
-from playhouse.shortcuts import model_to_dict
 from peewee import fn
 
 
@@ -179,13 +176,6 @@ class PermissionTable(AbstractTable):
                 ).where(User.id == user_id).execute()
             )
 
-            await asyncio.to_thread(
-                OperationLog.create,
-                user_id=self.op_user.id,
-                utc_date_time=gdata.configDateTime.utc,
-                operation_type=OperationType.USER_UPDATE,
-                operation_content=model_to_dict(User.select(User.id, User.user_name).where(User.id == user_id).get())
-            )
 
             self.page.close(self.edit_dialog)
             self.search()
@@ -213,14 +203,6 @@ class PermissionTable(AbstractTable):
         try:
             self.page.close(self.del_dialog)
 
-            await asyncio.to_thread(
-                OperationLog.create,
-                user_id=self.op_user.id,
-                utc_date_time=gdata.configDateTime.utc,
-                operation_type=OperationType.USER_DELETE,
-                operation_content=model_to_dict(User.select(User.id, User.user_name).where(User.id == user_id).get())
-            )
-
             await asyncio.to_thread(lambda: User.delete().where(User.id == user_id).execute())
             self.search()
             Toast.show_success(self.page)
@@ -228,9 +210,6 @@ class PermissionTable(AbstractTable):
             logging.exception('exception occured at PermissionTable.__on_delete_confirm')
 
     def create_columns(self):
-        return self.__get_language()
-
-    def __get_language(self):
         session = self.page.session
         return [
             session.get("lang.common.no"),

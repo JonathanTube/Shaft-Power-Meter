@@ -1,13 +1,10 @@
 import logging
 import flet as ft
-from db.models.operation_log import OperationLog
 from db.models.preference import Preference
 from db.models.system_settings import SystemSettings
 from db.models.user import User
 from ui.common.custom_card import CustomCard
 from utils.unit_converter import UnitConverter
-from common.operation_type import OperationType
-from playhouse.shortcuts import model_to_dict
 from ui.common.keyboard import keyboard
 from common.global_data import gdata
 from common.global_data import gdata
@@ -219,13 +216,6 @@ class SystemConfSettings(ft.Container):
         self.system_settings.save()
 
         gdata.set_default_value()
-
-        OperationLog.create(
-            user_id=user.id,
-            utc_date_time=gdata.configDateTime.utc,
-            operation_type=OperationType.SYSTEM_CONF_SETTING,
-            operation_content=model_to_dict(self.system_settings)
-        )
 
     def before_update(self):
         try:

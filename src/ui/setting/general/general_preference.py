@@ -4,9 +4,6 @@ import flet as ft
 from db.models.language import Language
 from ui.common.custom_card import CustomCard
 from db.models.preference import Preference
-from db.models.operation_log import OperationLog
-from common.operation_type import OperationType
-from playhouse.shortcuts import model_to_dict
 from ui.common.keyboard import keyboard
 from common.global_data import gdata
 
@@ -126,14 +123,6 @@ class GeneralPreference(ft.Container):
         self.preference.data_refresh_interval = int(self.data_refresh_interval.value)
 
         await asyncio.to_thread(self.preference.save)
-
-        await asyncio.to_thread(
-            OperationLog.create,
-            user_id=user_id,
-            utc_date_time=gdata.configDateTime.utc,
-            operation_type=OperationType.GENERAL_PREFERENCE,
-            operation_content=model_to_dict(self.preference)
-        )
 
         languages = await asyncio.to_thread(Language.select)
         for item in languages:

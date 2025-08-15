@@ -2,8 +2,6 @@ import asyncio
 import flet as ft
 import logging
 from db.models.propeller_setting import PropellerSetting
-from db.models.operation_log import OperationLog
-from common.operation_type import OperationType
 from common.global_data import gdata
 from playhouse.shortcuts import model_to_dict
 from db.models.user import User
@@ -125,12 +123,6 @@ class PropellerConf(ft.Container):
             self.speed_limit_curve_card.save_data()
             self.overload_curve_card.save_data()
             self.ps.save()
-            OperationLog.create(
-                user_id=user.id,
-                utc_date_time=gdata.configDateTime.utc,
-                operation_type=OperationType.PROPELLER_SETTING,
-                operation_content=model_to_dict(self.ps)
-            )
             Toast.show_success(self.page)
         except:
             logging.exception("propeller conf save data error")

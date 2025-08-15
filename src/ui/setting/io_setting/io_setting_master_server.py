@@ -1,12 +1,9 @@
 import logging
 import flet as ft
-from common.operation_type import OperationType
-from db.models.operation_log import OperationLog
 from db.models.user import User
 from ui.common.custom_card import CustomCard
 from ui.common.permission_check import PermissionCheck
 from websocket.websocket_master import ws_server
-from common.global_data import gdata
 
 
 class IOSettingMasterServer(ft.Container):
@@ -71,12 +68,6 @@ class IOSettingMasterServer(ft.Container):
                 self.start_btn.disabled = True
                 self.start_btn.update()
 
-            OperationLog.create(
-                user_id=user.id,
-                utc_date_time=gdata.configDateTime.utc,
-                operation_type=OperationType.START_HMI_SERVER,
-                operation_content=user.user_name
-            )
             self.page.run_task(ws_server.start)
         except:
             logging.exception('exception occured at IOSettingMasterServer.on_start')
@@ -89,12 +80,6 @@ class IOSettingMasterServer(ft.Container):
                 self.stop_btn.disabled = True
                 self.stop_btn.update()
 
-            OperationLog.create(
-                user_id=user.id,
-                utc_date_time=gdata.configDateTime.utc,
-                operation_type=OperationType.STOP_HMI_SERVER,
-                operation_content=user.user_name
-            )
             self.page.run_task(ws_server.stop)
         except:
             logging.exception('exception occured at IOSettingMasterServer.on_stop')

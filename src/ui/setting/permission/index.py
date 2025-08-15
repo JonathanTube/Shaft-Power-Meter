@@ -2,14 +2,11 @@ import logging
 import flet as ft
 import asyncio
 import hashlib
-from db.models.operation_log import OperationLog
 from ui.common.permission_check import PermissionCheck
 from ui.setting.permission.permission_table import PermissionTable
 from ui.common.toast import Toast
 from db.models.user import User
-from common.operation_type import OperationType
 from common.global_data import gdata
-from playhouse.shortcuts import model_to_dict
 
 
 class Permission(ft.Container):
@@ -154,12 +151,6 @@ class Permission(ft.Container):
                 user_name=self.user_name.value.strip(),
                 user_pwd=hashlib.sha256(self.password.value.strip().encode()).hexdigest(),
                 user_role=self.role.value
-            )
-            OperationLog.create(
-                user_id=self.op_user.id,
-                utc_date_time=gdata.configDateTime.utc,
-                operation_type=OperationType.USER_ADD,
-                operation_content=model_to_dict(User.select(User.id, User.user_name).where(User.id == user.id).get())
             )
             self.page.close(self.add_dialog)
             if self.permission_table and self.permission_table.page:

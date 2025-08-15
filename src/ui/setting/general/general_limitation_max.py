@@ -5,10 +5,6 @@ from db.models.limitations import Limitations
 from ui.common.custom_card import CustomCard
 from utils.unit_converter import UnitConverter
 from ui.common.keyboard import keyboard
-from db.models.operation_log import OperationLog
-from common.operation_type import OperationType
-from common.global_data import gdata
-from playhouse.shortcuts import model_to_dict
 
 
 class GeneralLimitationMax(ft.Container):
@@ -125,13 +121,6 @@ class GeneralLimitationMax(ft.Container):
             torque_max=max_torque,
             speed_max=max_speed
         ).where(Limitations.id == self.limitations.id).execute()
-
-        OperationLog.create(
-            user_id=user_id,
-            utc_date_time=gdata.configDateTime.utc,
-            operation_type=OperationType.GENERAL_LIMITATION_MAX,
-            operation_content=model_to_dict(self.limitations)
-        )
 
     def did_mount(self):
         self.update_unit(self.system_unit)

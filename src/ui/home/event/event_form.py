@@ -1,16 +1,10 @@
 import logging
 import flet as ft
-from common.operation_type import OperationType
 from db.models.breach_reason import BreachReason
 from db.models.event_log import EventLog
 from typing import Callable
-
-from db.models.operation_log import OperationLog
 from db.models.user import User
 from ui.common.permission_check import PermissionCheck
-from common.global_data import gdata
-from playhouse.shortcuts import model_to_dict
-
 from ui.common.toast import Toast
 
 
@@ -29,11 +23,10 @@ class EventForm(ft.AlertDialog):
         except:
             logging.exception('exception occured at EventForm.__load_data')
 
-
     def build(self):
         try:
             self.title = ft.Text(self.page.session.get("lang.log.event_log"))
-        
+
             self.breach_reason = ft.Dropdown(
                 expand=True,
                 width=500,
@@ -91,7 +84,6 @@ class EventForm(ft.AlertDialog):
         except:
             logging.exception('exception occured at EventForm.build')
 
-
     def __on_close(self, e):
         e.page.close(self)
 
@@ -110,16 +102,9 @@ class EventForm(ft.AlertDialog):
         except:
             logging.exception('exception occured at EventForm.__on_click_save')
 
-
     def __save_data(self, user: User):
         try:
             self.event_log.save()
-            OperationLog.create(
-                user_id=user.id,
-                utc_date_time=gdata.configDateTime.utc,
-                operation_type=OperationType.IO_CONF,
-                operation_content=model_to_dict(self.event_log)
-            )
             self.page.close(self)
             self.callback()
         except:
