@@ -18,6 +18,7 @@ from ui.common.audio_alarm import AudioAlarm
 from common.global_data import gdata
 from task.modbus_output_task import modbus_output
 from utils.auto_startup import add_to_startup
+from utils.eexi_breach import EEXIBreach
 from utils.logger import Logger
 from db.base import db
 from task.gps_sync_task import gps
@@ -103,6 +104,8 @@ def set_content(page: ft.Page):
     page.add(main_stack)
 
     async def watch_eexi_breach():
+        # 需要查看之前是否有遗留的report没处理
+        EEXIBreach.load_exist_report_event()
         is_running = False
         while True:
             try:

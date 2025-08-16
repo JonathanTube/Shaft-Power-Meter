@@ -74,7 +74,7 @@ class IOSettingOutput(ft.Container):
 
                 self.check_sum_power = ft.Checkbox(
                     label=self.page.session.get("lang.common.total_energy"),
-                    value=gdata.configIO.output_sum_power
+                    value=gdata.configIO.output_total_energy
                 )
 
                 self.custom_card = CustomCard(
@@ -122,7 +122,7 @@ class IOSettingOutput(ft.Container):
                 gdata.configIO.output_power,
                 gdata.configIO.output_speed,
                 gdata.configIO.output_avg_power,
-                gdata.configIO.output_sum_power
+                gdata.configIO.output_total_energy
             ]
             output_count: int = sum(count_list)
             if output_count == 0:

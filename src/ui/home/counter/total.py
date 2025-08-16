@@ -2,7 +2,6 @@ import asyncio
 import logging
 import flet as ft
 from typing import Literal
-from db.models.counter_log import CounterLog
 from ui.home.counter.display import CounterDisplay
 from common.global_data import gdata
 
@@ -13,7 +12,6 @@ class TotalCounter(ft.Container):
         self.name = name
 
         self.height = 280
-
         self.expand = True
         self.border_radius = ft.border_radius.all(10)
         self.padding = 10
@@ -80,38 +78,19 @@ class TotalCounter(ft.Container):
 
     def __calculate(self):
         try:
-            counter_log = CounterLog.get_or_none(CounterLog.sps_name == self.name, CounterLog.counter_type == 2)
-            if counter_log is None:
+            start_at = gdata.configCounterSPS.Total.start_at
+            if not start_at:
                 return
-            start_time = counter_log.start_utc_date_time
-            end_time = gdata.configDateTime.utc
 
-            average_power = counter_log.total_power / counter_log.times
-            average_speed = counter_log.total_speed / counter_log.times
-
-            hours = (end_time - start_time).total_seconds() / 3600
-
-            # 如果当前时间小于，装机时间，肯定调整过时间；
-            if hours < 0:
-                hours = 0  # 直接置0
-                # reset
-                CounterLog.update(
-                    start_utc_date_time=gdata.configDateTime.utc
-                ).where(
-                    CounterLog.sps_name == self.name,
-                    CounterLog.counter_type == 2
-                ).execute()
-
-            total_energy = (average_power * hours) / 1000  # kWh
-
-            time_elapsed = end_time - start_time
+            now = gdata.configDateTime.utc
+            time_elapsed = now - start_at
             days = time_elapsed.days
             hours = time_elapsed.seconds // 3600
             minutes = (time_elapsed.seconds % 3600) // 60
             seconds = time_elapsed.seconds % 60
 
             time_elapsed = f'{days:02d} d {hours:02d}:{minutes:02d}:{seconds:02d} h'
-            started_at = start_time.strftime(f"{gdata.configDateTime.date_format} %H:%M:%S")
+            started_at = start_at.strftime(f"{gdata.configDateTime.date_format} %H:%M:%S")
 
             if self.time_elapsed and self.time_elapsed.page:
                 self.time_elapsed.value = f'{time_elapsed} {self.txt_measured}'
@@ -125,8 +104,11 @@ class TotalCounter(ft.Container):
 
             if self.display:
                 system_unit = gdata.configPreference.system_unit
-                self.display.set_average_power(average_power, system_unit)
+                avg_power = gdata.configCounterSPS.avg_power + gdata.configCounterSPS2.avg_power
+                total_energy = gdata.configCounterSPS.total_energy + gdata.configCounterSPS2.total_energy
+                avg_speed = gdata.configCounterSPS.avg_speed + gdata.configCounterSPS2.avg_speed
+                self.display.set_average_power(avg_power, system_unit)
                 self.display.set_total_energy(total_energy, system_unit)
-                self.display.set_average_speed(average_speed)
+                self.display.set_average_speed(avg_speed)
         except:
             logging.exception('exception occured at TotalCounter.__calculate')

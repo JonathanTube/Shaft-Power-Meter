@@ -1,9 +1,5 @@
-import asyncio
 import logging
 import flet as ft
-from peewee import fn
-from common.const_alarm_type import AlarmType
-from db.models.alarm_log import AlarmLog
 from ui.common.meter_half import MeterHalf
 from common.global_data import gdata
 
@@ -100,36 +96,19 @@ class EEXILimitedPower(ft.Container):
                         self.meter_half.set_center_value(percentage_of_eexi)
 
                 self.update_mode()
-                self.page.run_task(self.update_idenfications)
+                self.update_idenfications()
         except:
             logging.exception('exception occured at EEXILimitedPower.reload')
 
     async def update_idenfications(self):
-        try:
-            # 在后台线程执行 Peewee 同步查询
-            cnt_common_alarm = await asyncio.to_thread(
-                lambda: AlarmLog.select(fn.COUNT(AlarmLog.id))
-                .where(AlarmLog.alarm_type != AlarmType.MASTER_GPS, AlarmLog.recovery_time == None)
-                .scalar()
-            )
+        # 更新 UI（这里已经回到主线程）
+        if self.common_alarm_dot and self.common_alarm_dot.page:
+            self.common_alarm_dot.value = '🔴' if gdata.configAlarm.common_count > 0 else '🟢'
+            self.common_alarm_dot.update()
 
-            cnt_gps_alarm = await asyncio.to_thread(
-                lambda: AlarmLog.select(fn.COUNT(AlarmLog.id))
-                .where(AlarmLog.alarm_type == AlarmType.MASTER_GPS, AlarmLog.recovery_time == None)
-                .scalar()
-            )
-
-            # 更新 UI（这里已经回到主线程）
-            if self.common_alarm_dot and self.common_alarm_dot.page:
-                self.common_alarm_dot.value = '🔴' if cnt_common_alarm > 0 else '🟢'
-                self.common_alarm_dot.update()
-
-            if self.gps_status_dot and self.gps_status_dot.page:
-                self.gps_status_dot.value = '🔴' if cnt_gps_alarm > 0 else '🟢'
-                self.gps_status_dot.update()
-
-        except:
-            logging.exception("exception occured at EEXILimitedPower.update_idenfications")
+        if self.gps_status_dot and self.gps_status_dot.page:
+            self.gps_status_dot.value = '🔴' if gdata.configAlarm.gps_count > 0 else '🟢'
+            self.gps_status_dot.update()
 
     def update_mode(self):
         try:

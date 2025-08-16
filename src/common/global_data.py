@@ -1,5 +1,6 @@
 from dataclasses import dataclass, field
 from datetime import datetime
+from common.const_alarm_type import AlarmType
 from db.models.alarm_log import AlarmLog
 from db.models.factor_conf import FactorConf
 from db.models.io_conf import IOConf
@@ -10,6 +11,7 @@ from db.models.system_settings import SystemSettings
 from db.models.propeller_setting import PropellerSetting
 from db.models.date_time_conf import DateTimeConf
 from db.models.zero_cal_info import ZeroCalInfo
+from typing import Literal
 from peewee import fn
 
 
@@ -43,9 +45,6 @@ class ConfigCommon:
     # 是否功率突破EEXI
     is_eexi_breaching = False
 
-    alarm_total_count = 0
-    alarm_not_ack_count = 0
-
     def set_default_value(self):
         systemSettings: SystemSettings = SystemSettings.get()
         self.is_master = systemSettings.is_master
@@ -60,8 +59,26 @@ class ConfigCommon:
         self.show_thrust = systemSettings.display_thrust
         self.show_propeller_curve = systemSettings.display_propeller_curve
         self.is_individual = systemSettings.is_individual
-        self.alarm_total_count = AlarmLog.select(fn.COUNT(AlarmLog.id)).where(AlarmLog.recovery_time.is_null()).scalar()
-        self.alarm_not_ack_count = AlarmLog.select(fn.COUNT(AlarmLog.id)).where(AlarmLog.acknowledge_time.is_null()).scalar()
+
+
+@dataclass
+class ConfigAlarm:
+    # 报警总数
+    total_count = 0
+    # 未应答数量
+    not_ack_count = 0
+
+    # 除GPS的公共报警
+    common_count = 0
+    # gps告警
+    gps_count = 0
+
+    def set_default_value(self):
+        self.total_count = AlarmLog.select(fn.COUNT(AlarmLog.id)).where(AlarmLog.recovery_time.is_null()).scalar()
+        self.not_ack_count = AlarmLog.select(fn.COUNT(AlarmLog.id)).where(AlarmLog.acknowledge_time.is_null()).scalar()
+
+        self.gps_count = AlarmLog.select(fn.COUNT(AlarmLog.id)).where(AlarmLog.acknowledge_time.is_null(), AlarmLog.alarm_type == AlarmType.MASTER_GPS).scalar()
+        self.common_count = self.total_count - self.gps_count
 
 
 @dataclass
@@ -151,9 +168,9 @@ class ConfigOffline:
 @dataclass
 class ConfigSPS:
     speed: float = 0.0
-    power: int = 0
     torque: int = 0
     thrust: int = 0
+    power: int = 0
 
     ad0 = 0
     ad1 = 0
@@ -220,6 +237,43 @@ class ConfigSPS2:
 
 
 @dataclass
+class ConfigCounterSPS:
+    @dataclass
+    class Total:
+        start_at: datetime | None = None
+        avg_speed: float = 0.0
+        avg_power: int = 0
+        total_energy: int = 0
+
+    class Manually:
+        status: Literal["stopped", "reset", "running"] | None = "stopped"
+        start_at: datetime | None = None
+        stop_at: datetime | None = None
+        times: int = 0
+        total_power: int = 0
+        total_energy: int = 0
+        total_speed: float = 0.0
+
+
+@dataclass
+class ConfigCounterSPS2:
+    class Total:
+        start_at: datetime | None = None
+        avg_speed: float = 0.0
+        avg_power: int = 0
+        total_energy: int = 0
+
+    class Manually:
+        status: Literal["stopped", "reset", "running"] | None = "stopped"
+        start_at: datetime | None = None
+        stop_at: datetime | None = None
+        times: int = 0
+        total_power: int = 0
+        total_energy: int = 0
+        total_speed: float = 0.0
+
+
+@dataclass
 class ConfigIO:
     plc_enabled = None
     plc_ip = None
@@ -237,7 +291,7 @@ class ConfigIO:
     output_power = None
     output_speed = None
     output_avg_power = None
-    output_sum_power = None
+    output_total_energy = None
     output_com_port = None
 
     def set_default_value(self):
@@ -258,7 +312,7 @@ class ConfigIO:
         self.output_power = io_conf.output_power
         self.output_speed = io_conf.output_speed
         self.output_avg_power = io_conf.output_avg_power
-        self.output_sum_power = io_conf.output_sum_power
+        self.output_total_energy = io_conf.output_total_energy
         self.output_com_port = io_conf.output_com_port
 
 
@@ -313,6 +367,9 @@ class GlobalData:
     configIO = None
     configFactor = None
     configPropperCurve = None
+    configCounterSPS = None
+    configCounterSPS2 = None
+    configAlarm = None
 
     def set_default_value(self):
         self.configCommon = ConfigCommon()
@@ -349,6 +406,11 @@ class GlobalData:
 
         self.configPropperCurve = ConfigPropperCurve()
         self.configPropperCurve.set_default_value()
+
+        self.configCounterSPS = ConfigCounterSPS()
+        self.configCounterSPS2 = ConfigCounterSPS2()
+
+        self.configAlarm = ConfigAlarm()
 
 
 gdata: GlobalData = GlobalData()

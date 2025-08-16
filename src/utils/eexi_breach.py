@@ -31,8 +31,6 @@ class EEXIBreach:
                 # 保存报告明细
                 EEXIBreach.save_report_detail()
             else:
-                # 如果是开启后，一直恢复，需要查看之前是否有遗留的report没处理
-                EEXIBreach.load_exist_report_event()
                 EEXIBreach.update_recovery_event()
         except Exception as e:
             logging.exception(f'eexi breach判定异常:{e}')
@@ -81,7 +79,7 @@ class EEXIBreach:
 
     @staticmethod
     def load_exist_report_event():
-        """判断是否有未完结的报告"""
+        """软件启动的时候调用一下，判断是否有未完结的报告"""
         event = EventLog.get_or_none(EventLog.ended_at.is_null())
         if not event:
             return

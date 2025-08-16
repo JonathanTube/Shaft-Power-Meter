@@ -2,9 +2,7 @@ import asyncio
 import logging
 import flet as ft
 from typing import Callable
-from peewee import fn
 from common.global_data import gdata
-from db.models.alarm_log import AlarmLog
 
 
 class AlarmButton(ft.TextButton):
@@ -64,10 +62,10 @@ class AlarmButton(ft.TextButton):
     def toggle_badge(self):
         try:
             if self.page:
-                alarm_count = gdata.configCommon.alarm_total_count
-                if alarm_count > 0:
+                cnt = gdata.configAlarm.total_count
+                if cnt > 0:
                     self.badge = ft.Badge(
-                        text=str(alarm_count), label_visible=True,
+                        text=str(cnt), label_visible=True,
                         bgcolor=ft.Colors.RED, text_color=ft.Colors.WHITE
                     )
                 else:

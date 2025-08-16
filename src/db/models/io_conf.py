@@ -32,7 +32,7 @@ class IOConf(BaseModel):
 
     output_avg_power = BooleanField(verbose_name="Average Power(kw)", default=False)
 
-    output_sum_power = BooleanField(verbose_name="Sum of Power(kw)", default=False)
+    output_total_energy = BooleanField(verbose_name="Sum of Power(kw)", default=False)
 
     output_com_port = CharField(verbose_name="COM port", null=True)
 

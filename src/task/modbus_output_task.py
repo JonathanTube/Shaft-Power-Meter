@@ -6,7 +6,6 @@ from typing import Optional, Tuple
 from pymodbus.server import StartAsyncSerialServer
 from pymodbus.datastore import ModbusSlaveContext, ModbusServerContext, ModbusSequentialDataBlock
 
-from db.models.counter_log import CounterLog
 from common.global_data import gdata
 
 logger = logging.getLogger("ModbusOutputTask")
@@ -118,7 +117,9 @@ class ModbusOutputTask:
         sps_thrust = round(gdata.configSPS.thrust/1000, 1) if gdata.configIO.output_thrust else 0.0
         sps_power = round(gdata.configSPS.power/1000, 1) if gdata.configIO.output_power else 0.0
         sps_speed = round(gdata.configSPS.speed, 1) if gdata.configIO.output_speed else 0.0
-        vals32.extend([sps_torque, sps_thrust, sps_speed, sps_power])
+        sps_avg_power = round(gdata.configCounterSPS.Total.avg_power, 1) if gdata.configIO.output_avg_power else 0.0
+        sps_total_energy = round(gdata.configCounterSPS.Total.total_energy, 1) if gdata.configIO.output_total_energy else 0.0
+        vals32.extend([sps_torque, sps_thrust, sps_speed, sps_power, sps_avg_power, sps_total_energy])
 
         # ========== SPS2 ==========
         if gdata.configCommon.is_twins:
@@ -126,10 +127,9 @@ class ModbusOutputTask:
             sps2_thrust = round(gdata.configSPS2.thrust/1000, 1) if gdata.configIO.output_thrust else 0.0
             sps2_power = round(gdata.configSPS2.power/1000, 1) if gdata.configIO.output_power else 0.0
             sps2_speed = round(gdata.configSPS2.speed, 1) if gdata.configIO.output_speed else 0.0
-            vals32.extend([sps2_torque, sps2_thrust, sps2_speed, sps2_power])
-
-        # 占位：合计 avg_power / total_energy（后面替换）
-        vals32.extend([0.0, 0.0])
+            sps2_avg_power = round(gdata.configCounterSPS2.Total.avg_power, 1) if gdata.configIO.output_avg_power else 0.0
+            sps2_total_energy = round(gdata.configCounterSPS2.Total.avg_power, 1) if gdata.configIO.output_total_energy else 0.0
+            vals32.extend([sps2_torque, sps2_thrust, sps2_speed, sps2_power, sps2_avg_power, sps2_total_energy])
 
         regs = []
         for v in vals32:
@@ -137,40 +137,6 @@ class ModbusOutputTask:
             regs.extend([h, l])
 
         return regs
-
-    def _get_total_avg_power_and_energy_sync(self) -> Tuple[float, float]:
-        """两个浆的合计平均功率 & 总能量（结果除以 1000，保留 1 位小数）"""
-        try:
-            total_avg = 0.0
-            total_energy = 0.0
-
-            for sps_name in ["sps", "sps2"] if gdata.configCommon.is_twins else ["sps"]:
-                counter_log: CounterLog = CounterLog.get_or_none(
-                    (CounterLog.sps_name == sps_name) & (CounterLog.counter_type == 2)
-                )
-                if not counter_log:
-                    continue
-
-                avg_power = 0.0
-                if gdata.configIO.output_avg_power and counter_log.times > 0:
-                    avg_power = (counter_log.total_power / counter_log.times) / 1000  # 除以 1000
-                    avg_power = round(avg_power, 1)
-
-                energy = 0.0
-                if gdata.configIO.output_sum_power and avg_power > 0:
-                    start_time = counter_log.start_utc_date_time
-                    if start_time and gdata.configDateTime.utc:
-                        hours = (gdata.configDateTime.utc - start_time).total_seconds() / 3600
-                        energy = avg_power * hours
-                        energy = round(energy, 1)
-
-                total_avg += avg_power
-                total_energy += energy
-
-            return round(total_avg, 1), round(total_energy, 1)
-        except Exception:
-            logger.exception("计算合计平均功率与能量失败")
-            return 0.0, 0.0
 
     async def update_registers(self) -> None:
         if not self._is_started or not self.context:
@@ -182,18 +148,6 @@ class ModbusOutputTask:
         async with self._update_lock:
             try:
                 base_regs = await asyncio.to_thread(self._gather_values_sync)
-
-                total_avg, total_energy = await asyncio.to_thread(self._get_total_avg_power_and_energy_sync)
-
-                # 替换最后两个 float
-                idx = len(base_regs) - 4  # 最后两个寄存器对
-                h, l = self._split_float_to_registers(total_avg)
-                base_regs[idx] = h
-                base_regs[idx + 1] = l
-                h2, l2 = self._split_float_to_registers(total_energy)
-                base_regs[idx + 2] = h2
-                base_regs[idx + 3] = l2
-
                 async with self._ctx_lock:
                     if len(base_regs) > self.register_size:
                         base_regs = base_regs[:self.register_size]

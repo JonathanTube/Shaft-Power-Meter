@@ -25,8 +25,16 @@ class AlarmSaver:
                     occured_time=gdata.configDateTime.utc,
                     out_of_sync=out_of_sync
                 )
+
+                gdata.configAlarm.total_count += 1
+
+                if alarm_type == AlarmType.MASTER_GPS:
+                    gdata.configAlarm.gps_count += 1
+                else:
+                    gdata.configAlarm.common_count += 1
+
                 logging.info(f'[创建alarm] {alarm_type}')
-                gdata.configCommon.alarm_total_count += 1
+
             except Exception as e:
                 logging.exception(f'[创建alarm] 异常{e}')
 
@@ -40,8 +48,15 @@ class AlarmSaver:
                         is_synced=False
                     ).where(AlarmLog.alarm_type == alarm_type).execute()
                     logging.info(f'[恢复alarm] {alarm_type}')
+                    gdata.configAlarm.total_count -= 1
+                    if alarm_type == AlarmType.MASTER_GPS:
+                        gdata.configAlarm.gps_count = 0
+                    else:
+                        gdata.configAlarm.common_count -= 1
                 else:
-                    gdata.configCommon.alarm_total_count = 0
+                    gdata.configAlarm.total_count = 0
+                    gdata.configAlarm.gps_count = 0
+                    gdata.configAlarm.common_count = 0
             except Exception as e:
                 logging.exception(f'[恢复alarm] 异常{e}')
 
