@@ -23,79 +23,72 @@ class DataRecordTask:
     async def _run_loop(self):
         while self.task_running:
             try:
-                is_dual = gdata.configCommon.amount_of_propeller == 2
 
-                # 测试模式
-                if gdata.configTest.test_mode_running:
-                    self.save_sps_online_data()
-                    if is_dual:
-                        self.save_sps2_online_data()
-                    await asyncio.sleep(2)
-                    continue
-
-                # 主机
-                if gdata.configCommon.is_master:
-                    # 处理SPS1
-                    if sps_read_task.is_online:
-                        self.save_sps_online_data()
-                    else:
-                        self.save_sps_offline_data()
-
-                    # 处理SPS2（双螺旋桨）
-                    if is_dual:
-                        if sps2_read_task.is_online:
-                            self.save_sps2_online_data()
-                        else:
-                            self.save_sps2_offline_data()
-                    await asyncio.sleep(2)
-                    continue
-
-                # 从机
-                if ws_client.is_online:
-                    self.save_sps_online_data()
-                    if is_dual:
-                        self.save_sps2_online_data()
-                else:
-                    self.save_sps_offline_data()
-                    if is_dual:
-                        self.save_sps2_offline_data()
-
+                if gdata.configTest.test_mode_running:  # 测试模式
+                    await self.handle_test_mode()
+                elif gdata.configCommon.is_master:     # 主机
+                    await self.handle_master()
+                else:                                 # 从机
+                    await self.handle_slave()
             except Exception:
                 logging.exception("DataRecordTask 循环异常")
+            finally:
+                await asyncio.sleep(2)  # 控制循环频率
 
-            await asyncio.sleep(2)  # 控制循环频率
+    async def handle_test_mode(self):
+        await self.save_sps_online_data()
+        if gdata.configCommon.is_twins:
+            await self.save_sps2_online_data()
 
-    def save_sps_online_data(self):
-        DataSaver.save(
-            "sps",
-            gdata.configSPS.torque,
-            gdata.configSPS.thrust,
-            gdata.configSPS.speed
-        )
+    async def handle_master(self):
+        # 处理SPS1
+        if sps_read_task.is_online:
+            await self.save_sps_online_data()
+        else:
+            await self.save_sps_offline_data()
 
-    def save_sps2_online_data(self):
-        DataSaver.save(
-            "sps2",
-            gdata.configSPS2.torque,
-            gdata.configSPS2.thrust,
-            gdata.configSPS2.speed
-        )
+        # 处理SPS2（双螺旋桨）
+        if gdata.configCommon.is_twins:
+            if sps2_read_task.is_online:
+                await self.save_sps2_online_data()
+            else:
+                await self.save_sps2_offline_data()
+        # await asyncio.sleep(2)
+        # continue
 
-    def save_sps_offline_data(self):
-        DataSaver.save(
-            "sps",
-            gdata.configOffline.torque,
-            gdata.configOffline.thrust,
-            gdata.configOffline.speed
-        )
+    async def handle_slave(self):
+        if ws_client.is_online:
+            await self.save_sps_online_data()
+            if gdata.configCommon.is_twins:
+                await self.save_sps2_online_data()
+        else:
+            await self.save_sps_offline_data()
+            if gdata.configCommon.is_twins:
+                await self.save_sps2_offline_data()
 
-    def save_sps2_offline_data(self):
-        DataSaver.save(
-            "sps2",
-            gdata.configOffline.torque,
-            gdata.configOffline.thrust,
-            gdata.configOffline.speed
-        )
+    async def save_sps_online_data(self):
+        await DataSaver.save("sps",
+                             gdata.configSPS.torque,
+                             gdata.configSPS.thrust,
+                             gdata.configSPS.speed)
+
+    async def save_sps2_online_data(self):
+        await DataSaver.save("sps2",
+                             gdata.configSPS2.torque,
+                             gdata.configSPS2.thrust,
+                             gdata.configSPS2.speed)
+
+    async def save_sps_offline_data(self):
+        await DataSaver.save("sps",
+                             gdata.configOffline.torque,
+                             gdata.configOffline.thrust,
+                             gdata.configOffline.speed)
+
+    async def save_sps2_offline_data(self):
+        await DataSaver.save("sps2",
+                             gdata.configOffline.torque,
+                             gdata.configOffline.thrust,
+                             gdata.configOffline.speed)
 
     async def stop(self):
         if self._task and not self._task.done():

@@ -186,7 +186,7 @@ class IOSettingSPS(ft.Container):
                                 self.sps2_disconnect
                             ])
                     ],
-                    visible=gdata.configCommon.amount_of_propeller == 2
+                    visible=gdata.configCommon.is_twins
                 )
 
                 self.custom_card = CustomCard(
@@ -273,7 +273,7 @@ class IOSettingSPS(ft.Container):
         IOConf.update(sps_ip=sps_ip, sps_port=sps_port).execute()
 
     def save_sps2_conf(self):
-        if gdata.configCommon.amount_of_propeller == 2:
+        if gdata.configCommon.is_twins:
             try:
                 ipaddress.ip_address(self.sps2_ip.value)
             except ValueError:
@@ -312,7 +312,7 @@ class IOSettingSPS(ft.Container):
                     self.sps_disconnect.bgcolor = ft.Colors.RED
                     self.sps_disconnect.disabled = False
 
-                if gdata.configCommon.amount_of_propeller == 2:
+                if gdata.configCommon.is_twins:
                     if self.sps2_connect:
                         self.sps2_connect.text = self.page.session.get("lang.setting.connect")
                         self.sps2_connect.visible = sps2_read_task.is_online == None or sps2_read_task == False

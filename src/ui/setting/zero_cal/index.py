@@ -51,7 +51,7 @@ class ZeroCal(ft.Container):
                     self.executor_sps
                 ]
 
-                if gdata.configCommon.amount_of_propeller > 1:
+                if gdata.configCommon.is_twins:
                     tabs.append(self.executor_sps2)
 
                 self.content = ft.Tabs(

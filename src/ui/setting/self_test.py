@@ -48,7 +48,7 @@ class SelfTest(ft.Tabs):
                     padding=10, auto_scroll=True, height=500, spacing=5, expand=True)
 
                 self.tab_sps = ft.Tab(text="SPS", content=self.sps_log, visible=gdata.configCommon.is_master)
-                self.tab_sps2 = ft.Tab(text="SPS2", content=self.sps2_log, visible=gdata.configCommon.is_master and gdata.configCommon.amount_of_propeller == 2)
+                self.tab_sps2 = ft.Tab(text="SPS2", content=self.sps2_log, visible=gdata.configCommon.is_master and gdata.configCommon.is_twins)
                 self.tab_hmi_server = ft.Tab(text="HMI Server", content=self.hmi_server_log, visible=not gdata.configCommon.is_master)
                 self.tab_gps = ft.Tab(text="GPS", content=self.gps_log, visible=gdata.configCommon.enable_gps)
                 self.tab_plc = ft.Tab(text="PLC", content=self.plc_log, visible=gdata.configIO.plc_enabled)
@@ -75,7 +75,7 @@ class SelfTest(ft.Tabs):
             self.tab_sps.visible = gdata.configCommon.is_master
 
         if self.tab_sps2:
-            self.tab_sps2.visible = gdata.configCommon.is_master and gdata.configCommon.amount_of_propeller == 2
+            self.tab_sps2.visible = gdata.configCommon.is_master and gdata.configCommon.is_twins
 
         if self.tab_hmi_server:
             self.tab_hmi_server.visible = not gdata.configCommon.is_master
@@ -94,7 +94,7 @@ class SelfTest(ft.Tabs):
 
         if gdata.configCommon.is_master:
             self.sps_task = self.page.run_task(self.__read_sps_data)
-            if gdata.configCommon.amount_of_propeller == 2:
+            if gdata.configCommon.is_twins:
                 self.sps2_task = self.page.run_task(self.__read_sps2_data)
         else:
             self.hmi_server_task = self.page.run_task(self.__read_hmi_server_data)
@@ -112,7 +112,7 @@ class SelfTest(ft.Tabs):
             if self.sps_task:
                 self.sps_task.cancel()
 
-            if self.sps2_task and gdata.configCommon.amount_of_propeller == 2:
+            if self.sps2_task and gdata.configCommon.is_twins:
                 self.sps2_task.cancel()
         elif self.hmi_server_task:
             self.hmi_server_task.cancel()
@@ -193,7 +193,7 @@ class SelfTest(ft.Tabs):
                 if ws_client.is_online:
                     sps_data = f'sps:torque={round(gdata.configSPS.torque, 1)},thrust={round(gdata.configSPS.thrust, 1)},speed={round(gdata.configSPS.speed, 1)},gps={gdata.configGps.location}'
                     self.append_log(self.hmi_server_log, f"HMI Server Data: {sps_data}")
-                    if gdata.configCommon.amount_of_propeller == 2:
+                    if gdata.configCommon.is_twins:
                         sps2_data = f'sps2:torque={round(gdata.configSPS2.torque, 1)},thrust={round(gdata.configSPS2.thrust, 1)},speed={round(gdata.configSPS2.speed, 1)},gps={gdata.configGps.location}'
                         self.append_log(self.hmi_server_log, f"HMI Server Data: {sps2_data}")
                 else:

@@ -13,10 +13,10 @@ class UnitParser:
             return [round(UnitConverter.kwh_to_shph(_energy)), 'SHph']
 
     @staticmethod
-    def parse_power(power: float, system_unit: int, shrink: bool = False) -> tuple[int, str]:
+    def parse_power(power: float, system_unit: int) -> tuple[int, str]:
         _power = power if power is not None else 0
         if system_unit == 0:
-            if shrink and _power < 1000:
+            if _power < 1000:
                 return [round(_power), 'W']
             else:
                 return [round(_power/1000), 'kW']
@@ -29,9 +29,9 @@ class UnitParser:
         return [round(_speed, 1), 'rpm']
 
     @staticmethod
-    def parse_torque(torque: int = 0, system_unit: int = 0, shrink: bool = False) -> tuple[int, str]:
+    def parse_torque(torque: int = 0, system_unit: int = 0) -> tuple[int, str]:
         if system_unit == 0:
-            if shrink and torque < 1000:
+            if torque < 1000:
                 return [round(torque), 'Nm']
             else:
                 return [round(torque/1000), 'kNm']
@@ -39,9 +39,9 @@ class UnitParser:
             return [round(UnitConverter.nm_to_tm(torque)), 'Tm']
 
     @staticmethod
-    def parse_thrust(thrust: int = 0, system_unit: int = 0, shrink: bool = False) -> tuple[int, str]:
+    def parse_thrust(thrust: int = 0, system_unit: int = 0) -> tuple[int, str]:
         if system_unit == 0:
-            if shrink and thrust < 1000:
+            if thrust < 1000:
                 return [round(thrust), 'N']
             else:
                 return [round(thrust/1000), 'kN']

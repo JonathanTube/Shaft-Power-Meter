@@ -46,13 +46,16 @@ class SystemExitTool:
             msg = page.session.get("lang.toast.system_exit")
             Toast.show_success(page, msg, 1000 * 99)
 
-            await asyncio.sleep(50)
+            try:
+                await asyncio.sleep(5)
+            except:
+                pass
 
             if gdata.configCommon.is_master:
                 # 关闭sps
                 SystemExitTool._safe_schedule_stop(sps_read_task.close())
                 # 如果是dual才关闭
-                if gdata.configCommon.amount_of_propeller == 2:
+                if gdata.configCommon.is_twins:
                     SystemExitTool._safe_schedule_stop(sps2_read_task.close())
 
                 # 关闭websocket

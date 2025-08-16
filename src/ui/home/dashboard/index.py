@@ -15,15 +15,17 @@ class Dashboard(ft.Container):
 
     def build(self):
         try:
-            if gdata.configCommon.amount_of_propeller == 1:
-                if gdata.configCommon.shapoli:
-                    self.content = SingleShaPoLiOn()
-                else:
-                    self.content = SingleShaPoLiOff()
-            else:
+            if gdata.configCommon.is_twins:
                 if gdata.configCommon.shapoli:
                     self.content = DualShaPoLiOn()
                 else:
                     self.content = DualShaPoLiOff()
+                return
+
+            if gdata.configCommon.shapoli:
+                self.content = SingleShaPoLiOn()
+            else:
+                self.content = SingleShaPoLiOff()
+
         except:
             logging.exception('exception occured at Dashboard.build')

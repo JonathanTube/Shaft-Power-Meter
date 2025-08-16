@@ -41,7 +41,7 @@ class ReportInfoDialog(ft.AlertDialog):
             if self.report_info is not None:
                 self.event_log: EventLog = self.report_info.event_log
                 # limit the max report details to 200 otherwise the database will be locked
-                if gdata.configCommon.amount_of_propeller == 2:
+                if gdata.configCommon.is_twins:
                     self.report_details: list[ReportDetail] = ReportDetail.select().where(
                         ReportDetail.report_info == self.report_info.id
                     ).order_by(
@@ -83,8 +83,8 @@ class ReportInfoDialog(ft.AlertDialog):
             unlimited_power = gdata.configCommon.unlimited_power
             limited_power = gdata.configCommon.eexi_limited_power
             system_unit = gdata.configPreference.system_unit
-            unlimited_power_value, unlimited_power_unit = UnitParser.parse_power(unlimited_power, system_unit, shrink=False)
-            limited_power_value, limited_power_unit = UnitParser.parse_power(limited_power, system_unit, shrink=False)
+            unlimited_power_value, unlimited_power_unit = UnitParser.parse_power(unlimited_power, system_unit)
+            limited_power_value, limited_power_unit = UnitParser.parse_power(limited_power, system_unit)
 
             basic_info = ft.ResponsiveRow(
                 expand=True,
@@ -276,7 +276,7 @@ class ReportInfoDialog(ft.AlertDialog):
 
             rows = []
 
-            if gdata.configCommon.amount_of_propeller == 2:
+            if gdata.configCommon.is_twins:
                 # get distinct utc_date_time list from report_details
                 utc_date_times = list(set([report_detail.utc_date_time for report_detail in self.report_details]))
                 for index, utc_date_time in enumerate(utc_date_times):
@@ -290,16 +290,16 @@ class ReportInfoDialog(ft.AlertDialog):
                     for report_detail in report_details:
                         if report_detail.name == 'sps':
                             _speed_value = f"{report_detail.speed}"
-                            _sps_torque, _ = UnitParser.parse_torque(report_detail.torque, system_unit, shrink=False)
+                            _sps_torque, _ = UnitParser.parse_torque(report_detail.torque, system_unit)
                             _torque_value = f"{_sps_torque}"
-                            _sps_power, _ = UnitParser.parse_power(report_detail.power, system_unit, shrink=False)
+                            _sps_power, _ = UnitParser.parse_power(report_detail.power, system_unit)
                             _power_value = f"{_sps_power}"
                             _total_power_value = _sps_power
                         else:
                             _speed_value = f"{_speed_value} ; {report_detail.speed}"
-                            _sps2_torque, _ = UnitParser.parse_torque(report_detail.torque, system_unit, shrink=False)
+                            _sps2_torque, _ = UnitParser.parse_torque(report_detail.torque, system_unit)
                             _torque_value = f"{_torque_value} ; {_sps2_torque}"
-                            _sps2_power, _ = UnitParser.parse_power(report_detail.power, system_unit, shrink=False)
+                            _sps2_power, _ = UnitParser.parse_power(report_detail.power, system_unit)
                             _power_value = f"{_power_value} ; {_sps2_power}"
                             _total_power_value = round(_total_power_value + _sps2_power, 1)
 
@@ -317,8 +317,8 @@ class ReportInfoDialog(ft.AlertDialog):
             else:
                 for index, report_detail in enumerate(self.report_details):
                     utc_date_time = report_detail.utc_date_time.strftime(self.date_time_format)
-                    torque_value, _ = UnitParser.parse_torque(report_detail.torque, system_unit, shrink=False)
-                    power_value, _ = UnitParser.parse_power(report_detail.power, system_unit, shrink=False)
+                    torque_value, _ = UnitParser.parse_torque(report_detail.torque, system_unit)
+                    power_value, _ = UnitParser.parse_power(report_detail.power, system_unit)
 
                     rows.append(ft.DataRow(
                         cells=[
@@ -337,7 +337,7 @@ class ReportInfoDialog(ft.AlertDialog):
                 ft.DataColumn(ft.Text(f"Torque(kNm)") if system_unit == 0 else ft.Text(f"Torque(Tm)")),
                 ft.DataColumn(ft.Text(f"Power(kW)") if system_unit == 0 else ft.Text(f"Power(sHp)")),
             ]
-            if gdata.configCommon.amount_of_propeller == 2:
+            if gdata.configCommon.is_twins:
                 columns.append(ft.DataColumn(ft.Text(f"Total Power(kW)") if system_unit == 0 else ft.Text(f"Total Power(sHp)")))
 
             table = ft.DataTable(

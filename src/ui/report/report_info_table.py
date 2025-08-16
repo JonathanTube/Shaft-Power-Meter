@@ -9,7 +9,6 @@ from ui.report.report_info_detail import ReportInfoDialog
 from ui.report.report_info_exporter import ReportInfoExporter
 from common.global_data import gdata
 
-
 class ReportInfoTable(AbstractTable):
     def __init__(self):
         super().__init__()

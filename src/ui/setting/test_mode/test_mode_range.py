@@ -11,15 +11,15 @@ from task.test_mode_task import test_mode_task
 class TestModeRange(ft.Container):
     def __init__(self):
         super().__init__()
-
         self.system_unit: int = gdata.configPreference.system_unit
         self.max_torque: int = gdata.configLimitation.torque_max
         self.max_rpm: float = gdata.configLimitation.speed_max
         self.max_thrust: int = 4000 * 1000
 
+        self.conf: TestModeConf = TestModeConf.get()
+
     def build(self):
         try:
-            self.conf: TestModeConf = TestModeConf.get()
             if self.page and self.page.session:
                 disabled = not gdata.configTest.test_mode_running
                 min_torque_value, min_torque_unit = self.__get_torque_and_unit(self.conf.min_torque)

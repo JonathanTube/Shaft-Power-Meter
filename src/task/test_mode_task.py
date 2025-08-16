@@ -109,7 +109,7 @@ class TestModeTask:
                 # 生成并保存到内存（对 gdata 的赋值很快，允许在事件循环中做）
                 try:
                     self._save_generated_data('sps')
-                    if gdata.configCommon.amount_of_propeller == 2:
+                    if gdata.configCommon.is_twins:
                         self._save_generated_data('sps2')
                 except Exception:
                     _logger.exception("[TestMode] 生成或保存随机数据时出错")
@@ -182,7 +182,7 @@ class TestModeTask:
             DataLog.delete().where(DataLog.utc_date_time >= gdata.configTest.start_time).execute()
 
             # 删除对应 event_log / report_info
-            event_logs = list(EventLog.select().where(EventLog.started_at >= gdata.configTest.start_time))
+            event_logs: list[EventLog] = list(EventLog.select().where(EventLog.started_at >= gdata.configTest.start_time))
             for event in event_logs:
                 EventLog.delete().where(EventLog.id == event.id).execute()
                 ReportInfo.delete().where(ReportInfo.event_log == event).execute()

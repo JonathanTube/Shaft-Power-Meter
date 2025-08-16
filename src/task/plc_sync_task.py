@@ -75,9 +75,9 @@ class PlcSyncTask:
 
     async def write_4_20_ma_data(self, data: dict):
         """写入 4-20mA 配置数据"""
+        logging.info(f"[PLC] 写入 4-20mA 数据: {data}")
         if not self.is_connected():
             return
-        logging.info(f"[PLC] 写入 4-20mA 数据: {data}")
         try:
             # 功率相关（32 位，原子写入）
             await self.write_register_32(*REGISTER_MAP["power_range_min"], int(data["power_range_min"]))
@@ -154,8 +154,9 @@ class PlcSyncTask:
             logging.exception("[PLC] 读取报警状态失败: %s", e)
             return None
 
-    async def write_alarm(self, occured: bool):
+    async def write_common_alarm(self, occured: bool):
         """写入报警状态"""
+        logging.info(f'[PLC] 写入公共报警状态={occured}')
         if not self.is_connected():
             return
         try:
@@ -174,6 +175,7 @@ class PlcSyncTask:
 
     async def write_power_overload(self, occured: bool):
         """写入功率超载报警"""
+        logging.info(f'[PLC] 写入功率超载报警={occured}')
         if not self.is_connected():
             return
         try:
@@ -192,6 +194,7 @@ class PlcSyncTask:
 
     async def write_eexi_breach_alarm(self, occured: bool):
         """写入 EEXI 超限报警"""
+        logging.info(f'[PLC] 写入 EEXI 超限报警={occured}')
         if not self.is_connected():
             return
         try:

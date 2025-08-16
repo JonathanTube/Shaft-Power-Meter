@@ -20,7 +20,7 @@ class ReportInfoExporter(FPDF):
     def __load_data(self, id: int):
         try:
             self.ship_info: ShipInfo = ShipInfo.get()
-            self.is_dual = gdata.configCommon.amount_of_propeller == 2
+            self.is_dual = gdata.configCommon.is_twins
             self.report_info: ReportInfo = ReportInfo.get_by_id(id)
             self.event_log: EventLog = self.report_info.event_log
             self.report_details: list[ReportDetail] = ReportDetail.select().where(
@@ -75,12 +75,12 @@ class ReportInfoExporter(FPDF):
         system_unit = gdata.configPreference.system_unit
         self.__insert_label("Un-limited Power", w=self.per_cell_width)
         unlimited_power = gdata.configCommon.unlimited_power
-        unlimited_power, unlimited_unit = UnitParser.parse_power(unlimited_power, system_unit, shrink=False)
+        unlimited_power, unlimited_unit = UnitParser.parse_power(unlimited_power, system_unit)
         self.__insert_value(f"{unlimited_power} {unlimited_unit}", w=self.per_cell_width)
 
         self.__insert_label("Limited Power", w=self.per_cell_width)
         limited_power = gdata.configCommon.eexi_limited_power
-        limited_power, limited_unit = UnitParser.parse_power(limited_power, system_unit, shrink=False)
+        limited_power, limited_unit = UnitParser.parse_power(limited_power, system_unit)
         self.__insert_value(f"{limited_power} {limited_unit}", w=self.per_cell_width)
         self.ln()
 
@@ -145,16 +145,16 @@ class ReportInfoExporter(FPDF):
                 for report_detail in report_details:
                     if report_detail.name == 'sps':
                         _speed_value = f"{report_detail.speed}"
-                        _sps_torque, _ = UnitParser.parse_torque(report_detail.torque, system_unit, shrink=False)
+                        _sps_torque, _ = UnitParser.parse_torque(report_detail.torque, system_unit)
                         _torque_value = f"{_sps_torque}"
-                        _sps_power, _ = UnitParser.parse_power(report_detail.power, system_unit, shrink=False)
+                        _sps_power, _ = UnitParser.parse_power(report_detail.power, system_unit)
                         _power_value = f"{_sps_power}"
                         _total_power_value = _sps_power
                     else:
                         _speed_value = f"{_speed_value} ; {report_detail.speed}"
-                        _sps2_torque, _ = UnitParser.parse_torque(report_detail.torque, system_unit, shrink=False)
+                        _sps2_torque, _ = UnitParser.parse_torque(report_detail.torque, system_unit)
                         _torque_value = f"{_torque_value} ; {_sps2_torque}"
-                        _sps2_power, _ = UnitParser.parse_power(report_detail.power, system_unit, shrink=False)
+                        _sps2_power, _ = UnitParser.parse_power(report_detail.power, system_unit)
                         _power_value = f"{_power_value} ; {_sps2_power}"
                         _total_power_value = round(_total_power_value + _sps2_power, 1)
 
@@ -173,8 +173,8 @@ class ReportInfoExporter(FPDF):
                 else:
                     utc_date_time = "N/A"
 
-                torque, _ = UnitParser.parse_torque(report_detail.torque, system_unit, shrink=False)
-                power, _ = UnitParser.parse_power(report_detail.power, system_unit, shrink=False)
+                torque, _ = UnitParser.parse_torque(report_detail.torque, system_unit)
+                power, _ = UnitParser.parse_power(report_detail.power, system_unit)
 
                 rows.append([
                     str(index + 1),

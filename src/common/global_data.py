@@ -25,18 +25,20 @@ class ConfigCommon:
 
     amount_of_propeller = 1
 
+    is_twins = False
+
     shapoli = False
 
     show_thrust = False
 
     show_propeller_curve = False
 
-    eexi_limited_power = 999999
-    unlimited_power = 999999
+    eexi_limited_power: int = 999999
+    unlimited_power: int = 999999
 
-    eexi_breach_checking_duration = 5
+    eexi_breach_checking_duration: int = 5
 
-    default_table_width = 990
+    default_table_width: int = 990
 
     # 是否功率突破EEXI
     is_eexi_breaching = False
@@ -50,6 +52,7 @@ class ConfigCommon:
         self.enable_gps = systemSettings.enable_gps
         self.hide_admin_account = systemSettings.hide_admin_account
         self.amount_of_propeller = systemSettings.amount_of_propeller
+        self.is_twins = systemSettings.amount_of_propeller > 1
         self.shapoli = systemSettings.sha_po_li
         self.eexi_breach_checking_duration = systemSettings.eexi_breach_checking_duration
         self.eexi_limited_power = systemSettings.eexi_limited_power

@@ -154,7 +154,7 @@ async def start_all_tasks():
     if gdata.configCommon.is_master:
         await sps_read_task.start()
         task_manager.add(sps_read_task)
-        if gdata.configCommon.amount_of_propeller == 2:
+        if gdata.configCommon.is_twins:
             await sps2_read_task.start()
             task_manager.add(sps2_read_task)
 

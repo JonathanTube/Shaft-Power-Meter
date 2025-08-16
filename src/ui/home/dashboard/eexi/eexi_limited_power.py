@@ -88,7 +88,7 @@ class EEXILimitedPower(ft.Container):
             if self.page:
                 active_value = gdata.configSPS.power
 
-                if gdata.configCommon.amount_of_propeller == 2:
+                if gdata.configCommon.is_twins:
                     active_value += gdata.configSPS2.power
 
                 inactive_value = self.unlimited_power - active_value
@@ -135,7 +135,7 @@ class EEXILimitedPower(ft.Container):
         try:
             if self.page:
                 instant_power = gdata.configSPS.power
-                if gdata.configCommon.amount_of_propeller == 2:
+                if gdata.configCommon.is_twins:
                     instant_power += gdata.configSPS2.power
 
                 self.unlimited_mode_row.visible = instant_power > self.normal_power

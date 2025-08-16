@@ -16,14 +16,12 @@ class TrendView(ft.Container):
         self.expand = True
         self.padding = 10
 
-        self.is_twins = gdata.configCommon.amount_of_propeller == 2
-
     def build(self):
         try:
             self.search = DatetimeSearch(self.__on_search)
             self.sps_chart = TrendViewDiagram()
 
-            if self.is_twins:
+            if gdata.configCommon.is_twins:
                 self.sps2_chart = TrendViewDiagram()
                 self.content = ft.Column(
                     expand=True,
@@ -59,7 +57,7 @@ class TrendView(ft.Container):
                     Toast.show_error(self.page, self.page.session.get('lang.trendview.cannot_search_more_than_90_days'))
                     return
                 self.handle_data(start_date, end_date, 'sps')
-                if self.is_twins:
+                if gdata.configCommon.is_twins:
                     self.handle_data(start_date, end_date, 'sps2')
         except:
             pass

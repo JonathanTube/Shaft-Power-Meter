@@ -35,11 +35,7 @@ class TestModeInstant(ft.ResponsiveRow):
                         self.sps_power
                     ]
                 )
-                if gdata.configCommon.amount_of_propeller == 1:
-                    self.controls = [
-                        CustomCard(f'sps {self.page.session.get('lang.setting.test_mode.instant_mock_data')}', self.sps_instant_data_card)
-                    ]
-                else:
+                if gdata.configCommon.is_twins:
                     self.sps2_torque = self.__get_uniform_text("0")
                     self.sps2_speed = self.__get_uniform_text("0")
                     self.sps2_thrust = self.__get_uniform_text("0")
@@ -68,6 +64,11 @@ class TestModeInstant(ft.ResponsiveRow):
                             self.sps2_instant_data_card
                         )
                     ]
+                    return
+
+                self.controls = [
+                    CustomCard(f'sps {self.page.session.get('lang.setting.test_mode.instant_mock_data')}', self.sps_instant_data_card)
+                ]
         except:
             logging.exception('exception occured at TestModeInstant.build')
 
@@ -97,7 +98,7 @@ class TestModeInstant(ft.ResponsiveRow):
                         self.sps_power.value = f'{sps_power_value} {sps_power_unit}'
                         self.sps_power.update()
 
-                    if gdata.configCommon.amount_of_propeller == 2:
+                    if gdata.configCommon.is_twins:
                         if self.sps2_speed and self.sps2_speed.page:
                             self.sps2_speed.value = f'{gdata.configSPS2.speed} rpm'
                             self.sps2_speed.update()

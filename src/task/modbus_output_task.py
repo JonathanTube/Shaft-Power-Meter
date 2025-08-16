@@ -121,7 +121,7 @@ class ModbusOutputTask:
         vals32.extend([sps_torque, sps_thrust, sps_speed, sps_power])
 
         # ========== SPS2 ==========
-        if gdata.configCommon.amount_of_propeller == 2:
+        if gdata.configCommon.is_twins:
             sps2_torque = round(gdata.configSPS2.torque/1000, 1) if gdata.configIO.output_torque else 0.0
             sps2_thrust = round(gdata.configSPS2.thrust/1000, 1) if gdata.configIO.output_thrust else 0.0
             sps2_power = round(gdata.configSPS2.power/1000, 1) if gdata.configIO.output_power else 0.0
@@ -144,7 +144,7 @@ class ModbusOutputTask:
             total_avg = 0.0
             total_energy = 0.0
 
-            for sps_name in ["sps", "sps2"] if gdata.configCommon.amount_of_propeller == 2 else ["sps"]:
+            for sps_name in ["sps", "sps2"] if gdata.configCommon.is_twins else ["sps"]:
                 counter_log: CounterLog = CounterLog.get_or_none(
                     (CounterLog.sps_name == sps_name) & (CounterLog.counter_type == 2)
                 )

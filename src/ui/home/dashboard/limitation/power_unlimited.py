@@ -9,7 +9,6 @@ class PowerUnlimited(ft.Container):
         super().__init__()
         self.expand = True
 
-        self.is_dual = gdata.configCommon.amount_of_propeller == 2
         self.power = gdata.configCommon.unlimited_power
 
     def build(self):
@@ -18,7 +17,7 @@ class PowerUnlimited(ft.Container):
                 return
 
             self.title = ft.Text(self.page.session.get("lang.common.unlimited_power"), weight=ft.FontWeight.W_600)
-            power = self.power * 2 if self.is_dual else self.power
+            power = self.power * 2 if gdata.configCommon.is_twins else self.power
             power_and_unit = UnitParser.parse_power(power, gdata.configPreference.system_unit)
             self.unlimited_power_value = ft.Text(power_and_unit[0])
             self.unlimited_power_unit = ft.Text(power_and_unit[1])

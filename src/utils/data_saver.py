@@ -15,8 +15,10 @@ from websocket.websocket_master import ws_server
 
 
 class DataSaver:
+    accumulated_data = []
+
     @staticmethod
-    def save(name: str, torque: int, thrust: int, speed: float):
+    async def save(name: str, torque: int, thrust: int, speed: float):
         try:
             utc_date_time = gdata.configDateTime.utc
             if utc_date_time is None:
@@ -25,16 +27,20 @@ class DataSaver:
             power = FormulaCalculator.calculate_instant_power(torque, speed)
             is_overload = DataSaver.is_overload(speed, power)
 
-            # 保存瞬时数据
-            DataLog.create(
-                utc_date_time=utc_date_time,
-                name=name,
-                speed=speed,
-                power=power,
-                ad_0_torque=torque,
-                ad_1_thrust=thrust,
-                is_overload=is_overload
-            )
+            DataSaver.accumulated_data.append({
+                'utc_date_time': utc_date_time,
+                'name': name,
+                'speed': speed,
+                'power': power,
+                'ad_0_torque': torque,
+                'ad_1_thrust': thrust,
+                'is_overload': is_overload
+            })
+
+            # 每隔10s，保存瞬时数据
+            if len(DataSaver.accumulated_data) >= 30:
+                await asyncio.to_thread(DataLog.insert_many(DataSaver.accumulated_data).execute)
+                DataSaver.accumulated_data.clear()
 
             # 主站且PLC连接时写入瞬时数据
             if gdata.configCommon.is_master:
@@ -63,7 +69,7 @@ class DataSaver:
                 DataSaver._update_sps_data(gdata.configSPS2, power, torque, thrust, speed, utc_date_time)
 
             # 处理EEXI过载
-            EEXIBreach.handle_breach_and_recovery()
+            EEXIBreach.handle()
 
             # 更新 Modbus 输出
             DataSaver._safe_create_task(modbus_output.update_registers())

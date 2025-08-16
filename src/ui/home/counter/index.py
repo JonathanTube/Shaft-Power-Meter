@@ -18,7 +18,7 @@ class Counter(ft.Container):
             manually_counter_sps = ManuallyCounter('sps')
             total_counter_sps = TotalCounter('sps')
 
-            if gdata.configCommon.amount_of_propeller == 2:
+            if gdata.configCommon.is_twins:
                 interval_counter_sps2 = IntervalCounter('sps2')
                 manually_counter_sps2 = ManuallyCounter('sps2')
                 total_counter_sps2 = TotalCounter('sps2')

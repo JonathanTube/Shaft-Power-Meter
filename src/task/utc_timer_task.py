@@ -32,13 +32,15 @@ class UtcTimerTask:
                     gdata.configDateTime.utc = gdata.configDateTime.utc + timedelta(seconds=1)
                     gdata.configDateTime.system = datetime.now()
 
-                    # 更新数据库（放到线程池执行，防止阻塞UI）
-                    await asyncio.to_thread(
-                        DateTimeConf.update(
-                            utc_date_time=gdata.configDateTime.utc,
-                            system_date_time=gdata.configDateTime.system
-                        ).where(DateTimeConf.id == date_time_conf.id).execute
-                    )
+                    # 每隔60s写一次，没必要每秒都写
+                    if gdata.configDateTime.system.second % 60 == 0:
+                        # 更新数据库（放到线程池执行，防止阻塞UI）
+                        await asyncio.to_thread(
+                            DateTimeConf.update(
+                                utc_date_time=gdata.configDateTime.utc,
+                                system_date_time=gdata.configDateTime.system
+                            ).where(DateTimeConf.id == date_time_conf.id).execute
+                        )
                 except Exception:
                     logging.exception("UtcTimerTask 循环异常")
                 await asyncio.sleep(1)
