@@ -44,7 +44,7 @@ class SystemExitTool:
         try:
 
             msg = page.session.get("lang.toast.system_exit")
-            Toast.show_success(page, msg, 1000 * 10)
+            Toast.show_error(page, msg, 1000 * 10)
 
             try:
                 await asyncio.sleep(1)
