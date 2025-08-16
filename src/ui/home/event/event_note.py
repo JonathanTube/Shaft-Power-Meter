@@ -16,4 +16,4 @@ class EventNote(ft.AlertDialog):
             if event_log is not None:
                 self.content = ft.Text(value=event_log.note)
         except:
-            logging.exception('exception occured at EventNote.build')
+            logging.exception('EventNote.build')

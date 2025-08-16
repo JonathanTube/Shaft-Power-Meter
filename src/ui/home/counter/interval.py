@@ -116,6 +116,19 @@ class IntervalCounter(ft.Container):
             logging.exception('exception occured at AlarmList.on_hours_change')
 
     def did_mount(self):
+        self.init_data()
+        self.task_running = True
+        if self.page:
+            self.task = self.page.run_task(self.loop)
+
+    def init_data(self):
+        # 不为空直接跳过
+        if self.name == 'sps' and gdata.configCounterSPS.Interval.start_at:
+            return
+        # 不为空直接跳过
+        if self.name == 'sps2' and gdata.configCounterSPS2.Interval.start_at:
+            return
+
         threshold = gdata.configDateTime.utc - timedelta(hours=self.hours)
         if self.name == 'sps':
             result = DataLog.select(
@@ -130,10 +143,10 @@ class IntervalCounter(ft.Container):
             sum_power = result["sum_power"]
             sum_speed = result["sum_speed"]
 
-            ConfigCounterSPS.Interval.start_at = start_at
-            ConfigCounterSPS.Interval.times = times
-            ConfigCounterSPS.Interval.total_power = sum_power
-            ConfigCounterSPS.Interval.total_speed = sum_speed
+            ConfigCounterSPS.Interval.start_at = start_at or gdata.configDateTime.utc
+            ConfigCounterSPS.Interval.times = times or 0
+            ConfigCounterSPS.Interval.sum_power = sum_power or 0
+            ConfigCounterSPS.Interval.sum_speed = sum_speed or 0.0
         else:
             result = DataLog.select(
                 fn.MIN(DataLog.utc_date_time).alias("start_at"),
@@ -147,14 +160,10 @@ class IntervalCounter(ft.Container):
             sum_power = result["sum_power"]
             sum_speed = result["sum_speed"]
 
-            ConfigCounterSPS.Interval.start_at = start_at
-            ConfigCounterSPS2.Interval.times = times
-            ConfigCounterSPS2.Interval.total_power = sum_power
-            ConfigCounterSPS2.Interval.total_speed = sum_speed
-
-        self.task_running = True
-        if self.page:
-            self.task = self.page.run_task(self.loop)
+            ConfigCounterSPS.Interval.start_at = start_at or gdata.configDateTime.utc
+            ConfigCounterSPS2.Interval.times = times or 0
+            ConfigCounterSPS2.Interval.sum_power = sum_power or 0
+            ConfigCounterSPS2.Interval.sum_speed = sum_speed or 0.0
 
     def will_unmount(self):
         self.task_running = False

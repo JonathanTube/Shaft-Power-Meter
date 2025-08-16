@@ -24,8 +24,6 @@ class ManuallyCounter(ft.Container):
         self.interval = gdata.configPreference.data_refresh_interval
         self.date_format = f'{gdata.configDateTime.date_format} %H:%M:%S'
 
-        self.start_time = gdata.configCounterSPS.Manually.start_at if self.name == 'sps' else gdata.configCounterSPS.Manually.start_at
-
     def build(self):
         try:
             self.dlg_modal = ft.AlertDialog(
@@ -128,18 +126,27 @@ class ManuallyCounter(ft.Container):
     def on_start(self):
         if self.name == 'sps':
             gdata.configCounterSPS.Manually.status = 'running'
+            gdata.configCounterSPS.Manually.start_at = gdata.configDateTime.utc
         else:
             gdata.configCounterSPS2.Manually.status = 'running'
+            gdata.configCounterSPS2.Manually.start_at = gdata.configDateTime.utc
         self.set_style()
         self.update()
+        self.task_running = True
+        self.task = self.page.run_task(self.loop)
 
     def on_stop(self):
         if self.name == 'sps':
             gdata.configCounterSPS.Manually.status = 'reset'
+            gdata.configCounterSPS.Manually.stop_at = gdata.configDateTime.utc
         else:
             gdata.configCounterSPS2.Manually.status = 'reset'
+            gdata.configCounterSPS2.Manually.stop_at = gdata.configDateTime.utc
         self.set_style()
         self.update()
+        self.task_running = False
+        if self.task:
+            self.task.cancel()
 
     def on_resume(self):
         if not self.page:
@@ -158,25 +165,26 @@ class ManuallyCounter(ft.Container):
     def did_mount(self):
         self.task_running = True
         if self.page:
-            self._task = self.page.run_task(self.loop)
+            self.task = self.page.run_task(self.loop)
 
     def will_unmount(self):
         self.task_running = False
-        if self._task:
-            self._task.cancel()
+        if self.task:
+            self.task.cancel()
 
     async def loop(self):
         while self.task_running:
             try:
-                times = gdata.configCounterSPS.Manually.times if self.name == 'sps' else gdata.configCounterSPS2.Manually.times
-                if times != 0:
+                if self.name == 'sps' and gdata.configCounterSPS.Manually.status != 'running':
                     return
 
+                if self.name == 'sps2' and gdata.configCounterSPS2.Manually.status != 'running':
+                    return
+
+                start_time = gdata.configCounterSPS.Manually.start_at if self.name == 'sps' else gdata.configCounterSPS2.Manually.start_at
                 end_time = gdata.configDateTime.utc
-                if not self.start_time:
-                    return
 
-                time_elapsed = end_time - self.start_time
+                time_elapsed = end_time - start_time
                 hours = time_elapsed.total_seconds() / 3600
                 days = time_elapsed.days
                 hours = time_elapsed.seconds // 3600
@@ -193,7 +201,7 @@ class ManuallyCounter(ft.Container):
                 avg_speed = gdata.configCounterSPS.Manually.avg_speed if self.name == 'sps' else gdata.configCounterSPS2.Manually.avg_speed
                 self.set_data(avg_power, total_energy, avg_speed)
             except:
-                logging.exception("ManuallyCounter.loop exception")
+                logging.exception("ManuallyCounter.loop")
             finally:
                 await asyncio.sleep(self.interval)
 
@@ -223,4 +231,5 @@ class ManuallyCounter(ft.Container):
         elif status == 'running':
             self.status_text.value = self.page.session.get('lang.counter.running')
             self.status_container.bgcolor = ft.Colors.GREEN_500
-            self.started_at.value = f'{self.page.session.get("lang.counter.started_at")} {self.start_time.strftime(self.date_format) if self.start_time else None}'
+            start_at = gdata.configCounterSPS.Manually.start_at if self.name == 'sps' else gdata.configCounterSPS.Manually.start_at
+            self.started_at.value = f'{self.page.session.get("lang.counter.started_at")} {start_at.strftime(self.date_format) if start_at else None}'

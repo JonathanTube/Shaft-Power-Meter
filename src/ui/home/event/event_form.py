@@ -1,11 +1,13 @@
 import logging
 import flet as ft
+from peewee import fn
 from db.models.breach_reason import BreachReason
 from db.models.event_log import EventLog
 from typing import Callable
 from db.models.user import User
 from ui.common.permission_check import PermissionCheck
 from ui.common.toast import Toast
+from common.global_data import gdata
 
 
 class EventForm(ft.AlertDialog):
@@ -14,9 +16,9 @@ class EventForm(ft.AlertDialog):
         self.event_id = event_id
         self.callback = callback
         self.barrier_color = ft.Colors.TRANSPARENT
-        self.__load_data()
+        self.load_data()
 
-    def __load_data(self):
+    def load_data(self):
         try:
             self.breach_reasons = BreachReason.select()
             self.event_log: EventLog = EventLog.select().where(EventLog.id == self.event_id).first()
@@ -78,16 +80,16 @@ class EventForm(ft.AlertDialog):
                 ])
 
             self.actions = [
-                ft.ElevatedButton(text=self.page.session.get("lang.button.save"), on_click=self.__on_click_save),
-                ft.TextButton(text=self.page.session.get("lang.button.cancel"), on_click=self.__on_close)
+                ft.ElevatedButton(text=self.page.session.get("lang.button.save"), on_click=self.on_click_save),
+                ft.TextButton(text=self.page.session.get("lang.button.cancel"), on_click=self.on_close)
             ]
         except:
             logging.exception('exception occured at EventForm.build')
 
-    def __on_close(self, e):
+    def on_close(self, e):
         e.page.close(self)
 
-    def __on_click_save(self, e):
+    def on_click_save(self, e):
         try:
             if self.event_log is not None:
                 self.event_log.breach_reason = self.breach_reason.value
@@ -98,14 +100,16 @@ class EventForm(ft.AlertDialog):
                 if self.event_log.breach_reason is None or self.event_log.beaufort_number is None or self.event_log.beaufort_number == "" or self.event_log.wave_height is None or self.event_log.wave_height == "" or self.event_log.ice_condition is None or self.event_log.ice_condition == "":
                     Toast.show_warning(self.page, self.page.session.get("lang.event.please_input_all_fields_except_note"))
                     return
-                self.page.open(PermissionCheck(self.__save_data, 1))
+                self.page.open(PermissionCheck(self.save_data, 1))
         except:
             logging.exception('exception occured at EventForm.__on_click_save')
 
-    def __save_data(self, user: User):
+    def save_data(self, user: User):
         try:
             self.event_log.save()
             self.page.close(self)
             self.callback()
+            cnt = EventLog.select(fn.COUNT(EventLog.id)).where(EventLog.breach_reason.is_null()).scalar()
+            gdata.configEvent.not_confirmed_count = cnt
         except:
             Toast.show_error(self.page)

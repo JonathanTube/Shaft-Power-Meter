@@ -3,6 +3,7 @@ from datetime import datetime
 from common.const_alarm_type import AlarmType
 from db.models.alarm_log import AlarmLog
 from db.models.counter_log import CounterLog
+from db.models.event_log import EventLog
 from db.models.factor_conf import FactorConf
 from db.models.io_conf import IOConf
 from db.models.limitations import Limitations
@@ -246,8 +247,8 @@ class ConfigCounterSPS:
     class Interval:
         start_at: datetime | None = None
         times: int = 0
-        total_power: int = 0
-        total_speed: float = 0.0
+        sum_power: int = 0
+        sum_speed: float = 0.0
 
         avg_power: int = 0
         total_energy: int = 0
@@ -257,8 +258,8 @@ class ConfigCounterSPS:
     class Total:
         start_at: datetime | None = None
         times: int = 0
-        total_power: int = 0
-        total_speed: float = 0.0
+        sum_power: int = 0
+        sum_speed: float = 0.0
 
         avg_power: int = 0
         total_energy: int = 0
@@ -268,20 +269,24 @@ class ConfigCounterSPS:
     class Manually:
         status: Literal["stopped", "reset", "running"] | None = "stopped"
         start_at: datetime | None = None
+        stop_at: datetime | None = None
         times: int = 0
-        total_power: int = 0
-        total_speed: float = 0.0
+        sum_power: int = 0
+        sum_speed: float = 0.0
 
         avg_power: int = 0
         total_energy: int = 0
         avg_speed: float = 0.0
 
     def set_default_value(self):
-        counter_log: CounterLog = CounterLog.get()
-        ConfigCounterSPS.Total.start_at = counter_log.start_utc_date_time
-        ConfigCounterSPS.Total.times = counter_log.times
-        ConfigCounterSPS.Total.total_power = counter_log.total_power
-        ConfigCounterSPS.Total.total_speed = counter_log.total_speed
+        counter_log: CounterLog = CounterLog.get_or_none()
+        if not counter_log:
+            CounterLog.create(sps_name='sps', start_utc_date_time=gdata.configDateTime.utc)
+        else:
+            ConfigCounterSPS.Total.start_at = counter_log.start_utc_date_time
+            ConfigCounterSPS.Total.times = counter_log.times
+            ConfigCounterSPS.Total.sum_power = counter_log.sum_power
+            ConfigCounterSPS.Total.sum_speed = counter_log.sum_speed
 
 
 @dataclass
@@ -290,8 +295,8 @@ class ConfigCounterSPS2:
     class Interval:
         start_at: datetime | None = None
         times: int = 0
-        total_power: int = 0
-        total_speed: float = 0.0
+        sum_power: int = 0
+        sum_speed: float = 0.0
 
         avg_power: int = 0
         total_energy: int = 0
@@ -300,8 +305,8 @@ class ConfigCounterSPS2:
     class Total:
         start_at: datetime | None = None
         times: int = 0
-        total_power: int = 0
-        total_speed: float = 0.0
+        sum_power: int = 0
+        sum_speed: float = 0.0
 
         avg_power: int = 0
         total_energy: int = 0
@@ -311,20 +316,33 @@ class ConfigCounterSPS2:
     class Manually:
         status: Literal["stopped", "reset", "running"] | None = "stopped"
         start_at: datetime | None = None
+        stop_at: datetime | None = None
         times: int = 0
-        total_power: int = 0
-        total_speed: float = 0.0
+        sum_power: int = 0
+        sum_speed: float = 0.0
 
         avg_power: int = 0
         total_energy: int = 0
         avg_speed: float = 0.0
 
     def set_default_value(self):
-        counter_log: CounterLog = CounterLog.get()
-        ConfigCounterSPS2.Total.start_at = counter_log.start_utc_date_time
-        ConfigCounterSPS2.Total.times = counter_log.times
-        ConfigCounterSPS2.Total.total_power = counter_log.total_power
-        ConfigCounterSPS2.Total.total_speed = counter_log.total_speed
+        counter_log: CounterLog = CounterLog.get_or_none()
+        if not counter_log:
+            CounterLog.create(sps_name='sps2', start_utc_date_time=gdata.configDateTime.utc)
+        else:
+            ConfigCounterSPS.Total.start_at = counter_log.start_utc_date_time
+            ConfigCounterSPS.Total.times = counter_log.times
+            ConfigCounterSPS.Total.sum_power = counter_log.sum_power
+            ConfigCounterSPS.Total.sum_speed = counter_log.sum_speed
+
+
+
+@dataclass
+class ConfigEvent:
+    not_confirmed_count: int = 0
+
+    def set_default_value(self):
+        self.not_confirmed_count = EventLog.select(fn.COUNT(EventLog.id)).where(EventLog.breach_reason.is_null()).scalar()
 
 
 @dataclass
@@ -470,6 +488,9 @@ class GlobalData:
 
         self.configAlarm = ConfigAlarm()
         self.configAlarm.set_default_value()
+
+        self.configEvent = ConfigEvent()
+        self.configEvent.set_default_value()
 
 
 gdata: GlobalData = GlobalData()

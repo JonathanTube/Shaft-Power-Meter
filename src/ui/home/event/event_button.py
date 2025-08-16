@@ -2,9 +2,6 @@ import asyncio
 import logging
 import flet as ft
 from typing import Callable
-
-from db.models.event_log import EventLog
-from peewee import fn
 from common.global_data import gdata
 
 
@@ -32,11 +29,11 @@ class EventButton(ft.TextButton):
         except:
             logging.exception('exception occured at EventButton.build')
 
-    async def __loop(self):
+    async def loop(self):
         while self.task_running:
             try:
                 if self.page:
-                    count = EventLog.select(fn.COUNT(EventLog.id)).where(EventLog.breach_reason.is_null(True)).scalar()
+                    count = gdata.configEvent.not_confirmed_count
                     if count > 0:
                         self.badge = ft.Badge(text=str(count), bgcolor=ft.Colors.RED, text_color=ft.Colors.WHITE, label_visible=True)
                     else:
@@ -51,7 +48,7 @@ class EventButton(ft.TextButton):
     def did_mount(self):
         if not gdata.configCommon.shapoli:
             return
-        self.task = self.page.run_task(self.__loop)
+        self.task = self.page.run_task(self.loop)
 
     def will_unmount(self):
         self.task_running = False

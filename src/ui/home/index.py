@@ -109,14 +109,6 @@ class Home(ft.Container):
                     self.main_container
                 ]
             )
-
-            self.content_dashboard = Dashboard()
-            self.content_counter = Counter()
-            self.content_trend_view = TrendView()
-            self.content_propeller_curve = PropellerCurve()
-            self.content_alarm_list = AlarmList()
-            self.content_event_list = EventList()
-            self.content_logs = Logs()
         except:
             logging.error('exception occured at Home.build')
 
@@ -144,19 +136,19 @@ class Home(ft.Container):
 
             if self.page and self.main_container and self.main_container.page:
                 if index == 0:
-                    self.main_container.content = self.content_dashboard
+                    self.main_container.content = Dashboard()
                 elif index == 1:
-                    self.main_container.content = self.content_counter
+                    self.main_container.content = Counter()
                 elif index == 2:
-                    self.main_container.content = self.content_trend_view
+                    self.main_container.content = TrendView()
                 elif index == 3:
-                    self.main_container.content = self.content_propeller_curve
+                    self.main_container.content = PropellerCurve()
                 elif index == 4:
-                    self.main_container.content = self.content_alarm_list
+                    self.main_container.content = AlarmList()
                 elif index == 5:
-                    self.main_container.content = self.content_event_list
+                    self.main_container.content = EventList()
                 elif index == 6:
-                    self.main_container.content = self.content_logs
+                    self.main_container.content = Logs()
 
                 self.alarm_button.active = index == 4
 

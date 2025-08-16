@@ -59,10 +59,14 @@ class AudioAlarm(ft.Container):
         try:
             # 向plc发送报警-关闭
             await self.notify_eexi_breach(False)
-            event_log: EventLog = await asyncio.to_thread(lambda: EventLog.select().order_by(EventLog.id.desc()).first())
-            if event_log:
-                event_log.acknowledged_at = gdata.configDateTime.utc
-                event_log.save()
+
+            def update_event():
+                event_log: EventLog = EventLog.select().order_by(EventLog.id.desc()).first()
+                if event_log:
+                    event_log.acknowledged_at = gdata.configDateTime.utc
+                    event_log.save()
+
+            await asyncio.to_thread(update_event)
 
             if self.content and self.content.page:
                 self.content.icon = ft.Icons.NOTIFICATIONS_OFF_OUTLINED

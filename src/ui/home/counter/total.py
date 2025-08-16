@@ -99,12 +99,11 @@ class TotalCounter(ft.Container):
                     system_unit = gdata.configPreference.system_unit
 
                     avg_power = gdata.configCounterSPS.Total.avg_power if self.name == 'sps' else gdata.configCounterSPS2.Total.avg_power
-                    self.display.set_average_power(avg_power, system_unit)
-
                     total_energy = gdata.configCounterSPS.Total.total_energy if self.name == 'sps' else gdata.configCounterSPS2.Total.total_energy
-                    self.display.set_total_energy(total_energy, system_unit)
-
                     avg_speed = gdata.configCounterSPS.Total.avg_speed if self.name == 'sps' else gdata.configCounterSPS2.Total.avg_speed
+
+                    self.display.set_average_power(avg_power, system_unit)
+                    self.display.set_total_energy(total_energy, system_unit)
                     self.display.set_average_speed(avg_speed)
             except:
                 logging.exception('TotalCounter.loop')

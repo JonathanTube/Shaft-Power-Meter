@@ -4,6 +4,7 @@ from db.models.event_log import EventLog
 from db.models.report_detail import ReportDetail
 from db.models.report_info import ReportInfo
 from db.base import db
+from peewee import fn
 
 
 class EEXIBreach:
@@ -102,6 +103,9 @@ class EEXIBreach:
             EEXIBreach.event = EventLog.create(started_at=gdata.configDateTime.utc, started_position=gdata.configGps.location)
             # 创建报告
             EEXIBreach.report = ReportInfo.create(event_log=EEXIBreach.event, report_name=f"Compliance Report #{EEXIBreach.event.id}")
+
+        cnt = EventLog.select(fn.COUNT(EventLog.id)).where(EventLog.breach_reason.is_null()).scalar()
+        gdata.configEvent.not_confirmed_count = cnt
 
     @staticmethod
     def save_report_detail():

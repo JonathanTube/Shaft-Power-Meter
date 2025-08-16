@@ -79,25 +79,19 @@ def set_appearance(page: ft.Page):
 
 
 def set_content(page: ft.Page):
-    content_home = Home()
-    content_report = Report()
-    content_setting = Setting()
-
     def change_main_menu(name: str):
         if name == 'HOME':
-            content_home.current_index = 0
-            main_content.content = content_home
+            main_content.content = Home()
         elif name == 'REPORT':
-            main_content.content = content_report
+            main_content.content = Report()
         elif name == 'SETTING':
-            content_setting.set_index_0()
-            main_content.content = content_setting
+            main_content.content = Setting()
 
         if main_content and main_content.page:
             main_content.update()
 
     page.appbar = Header(on_menu_click=change_main_menu)
-    main_content = ft.Container(padding=0, margin=0, content=content_home)
+    main_content = ft.Container(padding=0, margin=0, content=Home())
     fullscreen_alert = FullscreenAlert()
     audio_alarm_btn = AudioAlarm()
     main_stack = ft.Stack(controls=[fullscreen_alert, main_content, audio_alarm_btn], expand=True)
