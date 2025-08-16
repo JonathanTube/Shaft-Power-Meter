@@ -188,12 +188,10 @@ class ManuallyCounter(ft.Container):
                     self.time_elapsed.value = f'{time_elapsed} {self.page.session.get("lang.counter.measured")}'
                     self.time_elapsed.update()
 
-                # TODO:???
-                total_power = gdata.configCounterSPS.Manually.total_power if self.name == 'sps' else gdata.configCounterSPS2.Manually.total_power
+                avg_power = gdata.configCounterSPS.Manually.avg_power if self.name == 'sps' else gdata.configCounterSPS2.Manually.avg_power
                 total_energy = gdata.configCounterSPS.Manually.total_energy if self.name == 'sps' else gdata.configCounterSPS2.Manually.total_energy
-                total_speed = gdata.configCounterSPS.Manually.total_speed if self.name == 'sps' else gdata.configCounterSPS2.Manually.total_speed
-
-                self.set_data(total_power, total_energy, total_speed)
+                avg_speed = gdata.configCounterSPS.Manually.avg_speed if self.name == 'sps' else gdata.configCounterSPS2.Manually.avg_speed
+                self.set_data(avg_power, total_energy, avg_speed)
             except:
                 logging.exception("ManuallyCounter.loop exception")
             finally:

@@ -61,54 +61,51 @@ class TotalCounter(ft.Container):
     def did_mount(self):
         self.task_running = True
         if self.page:
-            self.task = self.page.run_task(self.__running)
+            self.task = self.page.run_task(self.loop)
 
     def will_unmount(self):
         self.task_running = False
         if self.task:
             self.task.cancel()
 
-    async def __running(self):
+    async def loop(self):
         while self.task_running:
             try:
-                self.__calculate()
+                start_at = gdata.configCounterSPS.Total.start_at
+                if not start_at:
+                    return
+
+                now = gdata.configDateTime.utc
+                time_elapsed = now - start_at
+                days = time_elapsed.days
+                hours = time_elapsed.seconds // 3600
+                minutes = (time_elapsed.seconds % 3600) // 60
+                seconds = time_elapsed.seconds % 60
+
+                time_elapsed = f'{days:02d} d {hours:02d}:{minutes:02d}:{seconds:02d} h'
+                started_at = start_at.strftime(f"{gdata.configDateTime.date_format} %H:%M:%S")
+
+                if self.time_elapsed and self.time_elapsed.page:
+                    self.time_elapsed.value = f'{time_elapsed} {self.txt_measured}'
+                    self.time_elapsed.visible = True
+                    self.time_elapsed.update()
+
+                if self.started_at and self.started_at.page:
+                    self.started_at.value = f'{self.txt_started_at} {started_at}'
+                    self.started_at.visible = True
+                    self.started_at.update()
+
+                if self.display:
+                    system_unit = gdata.configPreference.system_unit
+
+                    avg_power = gdata.configCounterSPS.Total.avg_power if self.name == 'sps' else gdata.configCounterSPS2.Total.avg_power
+                    self.display.set_average_power(avg_power, system_unit)
+
+                    total_energy = gdata.configCounterSPS.Total.total_energy if self.name == 'sps' else gdata.configCounterSPS2.Total.total_energy
+                    self.display.set_total_energy(total_energy, system_unit)
+
+                    avg_speed = gdata.configCounterSPS.Total.avg_speed if self.name == 'sps' else gdata.configCounterSPS2.Total.avg_speed
+                    self.display.set_average_speed(avg_speed)
             except:
-                logging.exception('exception occured at TotalCounter.__running')
+                logging.exception('TotalCounter.loop')
             await asyncio.sleep(gdata.configPreference.data_refresh_interval)
-
-    def __calculate(self):
-        try:
-            start_at = gdata.configCounterSPS.Total.start_at
-            if not start_at:
-                return
-
-            now = gdata.configDateTime.utc
-            time_elapsed = now - start_at
-            days = time_elapsed.days
-            hours = time_elapsed.seconds // 3600
-            minutes = (time_elapsed.seconds % 3600) // 60
-            seconds = time_elapsed.seconds % 60
-
-            time_elapsed = f'{days:02d} d {hours:02d}:{minutes:02d}:{seconds:02d} h'
-            started_at = start_at.strftime(f"{gdata.configDateTime.date_format} %H:%M:%S")
-
-            if self.time_elapsed and self.time_elapsed.page:
-                self.time_elapsed.value = f'{time_elapsed} {self.txt_measured}'
-                self.time_elapsed.visible = True
-                self.time_elapsed.update()
-
-            if self.started_at and self.started_at.page:
-                self.started_at.value = f'{self.txt_started_at} {started_at}'
-                self.started_at.visible = True
-                self.started_at.update()
-
-            if self.display:
-                system_unit = gdata.configPreference.system_unit
-                avg_power = gdata.configCounterSPS.avg_power + gdata.configCounterSPS2.avg_power
-                total_energy = gdata.configCounterSPS.total_energy + gdata.configCounterSPS2.total_energy
-                avg_speed = gdata.configCounterSPS.avg_speed + gdata.configCounterSPS2.avg_speed
-                self.display.set_average_power(avg_power, system_unit)
-                self.display.set_total_energy(total_energy, system_unit)
-                self.display.set_average_speed(avg_speed)
-        except:
-            logging.exception('exception occured at TotalCounter.__calculate')

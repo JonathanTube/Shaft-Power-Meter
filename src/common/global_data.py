@@ -2,6 +2,7 @@ from dataclasses import dataclass, field
 from datetime import datetime
 from common.const_alarm_type import AlarmType
 from db.models.alarm_log import AlarmLog
+from db.models.counter_log import CounterLog
 from db.models.factor_conf import FactorConf
 from db.models.io_conf import IOConf
 from db.models.limitations import Limitations
@@ -141,6 +142,9 @@ class ConfigTest:
     test_mode_running: bool = False
     start_time = None
 
+    def set_default_value(self):
+        pass
+
 
 @dataclass
 class ConfigGps:
@@ -239,38 +243,88 @@ class ConfigSPS2:
 @dataclass
 class ConfigCounterSPS:
     @dataclass
-    class Total:
+    class Interval:
         start_at: datetime | None = None
-        avg_speed: float = 0.0
+        times: int = 0
+        total_power: int = 0
+        total_speed: float = 0.0
+
         avg_power: int = 0
         total_energy: int = 0
+        avg_speed: float = 0.0
 
+    @dataclass
+    class Total:
+        start_at: datetime | None = None
+        times: int = 0
+        total_power: int = 0
+        total_speed: float = 0.0
+
+        avg_power: int = 0
+        total_energy: int = 0
+        avg_speed: float = 0.0
+
+    @dataclass
     class Manually:
         status: Literal["stopped", "reset", "running"] | None = "stopped"
         start_at: datetime | None = None
-        stop_at: datetime | None = None
         times: int = 0
         total_power: int = 0
-        total_energy: int = 0
         total_speed: float = 0.0
+
+        avg_power: int = 0
+        total_energy: int = 0
+        avg_speed: float = 0.0
+
+    def set_default_value(self):
+        counter_log: CounterLog = CounterLog.get()
+        ConfigCounterSPS.Total.start_at = counter_log.start_utc_date_time
+        ConfigCounterSPS.Total.times = counter_log.times
+        ConfigCounterSPS.Total.total_power = counter_log.total_power
+        ConfigCounterSPS.Total.total_speed = counter_log.total_speed
 
 
 @dataclass
 class ConfigCounterSPS2:
-    class Total:
+    @dataclass
+    class Interval:
         start_at: datetime | None = None
-        avg_speed: float = 0.0
+        times: int = 0
+        total_power: int = 0
+        total_speed: float = 0.0
+
         avg_power: int = 0
         total_energy: int = 0
+        avg_speed: float = 0.0
 
+    class Total:
+        start_at: datetime | None = None
+        times: int = 0
+        total_power: int = 0
+        total_speed: float = 0.0
+
+        avg_power: int = 0
+        total_energy: int = 0
+        avg_speed: float = 0.0
+
+    @dataclass
     class Manually:
         status: Literal["stopped", "reset", "running"] | None = "stopped"
         start_at: datetime | None = None
-        stop_at: datetime | None = None
         times: int = 0
         total_power: int = 0
-        total_energy: int = 0
         total_speed: float = 0.0
+
+        avg_power: int = 0
+        total_energy: int = 0
+        avg_speed: float = 0.0
+
+    def set_default_value(self):
+        counter_log: CounterLog = CounterLog.get()
+        ConfigCounterSPS2.Total.start_at = counter_log.start_utc_date_time
+        ConfigCounterSPS2.Total.times = counter_log.times
+        ConfigCounterSPS2.Total.total_power = counter_log.total_power
+        ConfigCounterSPS2.Total.total_speed = counter_log.total_speed
 
 
 @dataclass
@@ -385,6 +439,7 @@ class GlobalData:
         self.configLimitation.set_default_value()
 
         self.configTest = ConfigTest()
+        self.configTest.set_default_value()
 
         self.configGps = ConfigGps()
         self.configGps.set_default_value()
@@ -408,9 +463,13 @@ class GlobalData:
         self.configPropperCurve.set_default_value()
 
         self.configCounterSPS = ConfigCounterSPS()
+        self.configCounterSPS.set_default_value()
+
         self.configCounterSPS2 = ConfigCounterSPS2()
+        self.configCounterSPS2.set_default_value()
 
         self.configAlarm = ConfigAlarm()
+        self.configAlarm.set_default_value()
 
 
 gdata: GlobalData = GlobalData()

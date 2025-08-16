@@ -14,7 +14,7 @@ class UnitParser:
 
     @staticmethod
     def parse_power(power: float, system_unit: int) -> tuple[int, str]:
-        _power = power if power is not None else 0
+        _power = power if power else 0
         if system_unit == 0:
             if _power < 1000:
                 return [round(_power), 'W']
@@ -25,7 +25,7 @@ class UnitParser:
 
     @staticmethod
     def parse_speed(speed: float) -> tuple[int, str]:
-        _speed = float(speed) if speed is not None else 0.0
+        _speed = float(speed) if speed else 0.0
         return [round(_speed, 1), 'rpm']
 
     @staticmethod

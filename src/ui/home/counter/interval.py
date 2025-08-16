@@ -1,14 +1,14 @@
-import asyncio
-from datetime import datetime, timedelta
-import logging
-from typing import Literal
 import flet as ft
+import asyncio
+import logging
+from datetime import timedelta
+from peewee import fn
+from typing import Literal
 from db.models.data_log import DataLog
 from ui.common.toast import Toast
 from .display import CounterDisplay
 from ui.common.keyboard import keyboard
-from common.global_data import gdata
-from peewee import fn
+from common.global_data import ConfigCounterSPS, ConfigCounterSPS2, gdata
 
 
 class IntervalCounter(ft.Container):
@@ -116,58 +116,66 @@ class IntervalCounter(ft.Container):
             logging.exception('exception occured at AlarmList.on_hours_change')
 
     def did_mount(self):
+        threshold = gdata.configDateTime.utc - timedelta(hours=self.hours)
+        if self.name == 'sps':
+            result = DataLog.select(
+                fn.MIN(DataLog.utc_date_time).alias("start_at"),
+                fn.SUM(DataLog.power).alias("times"),
+                fn.SUM(DataLog.power).alias("sum_power"),
+                fn.SUM(DataLog.speed).alias("sum_speed")
+            ).where(DataLog.utc_date_time >= threshold, DataLog.name == 'sps').dicts().get()
+
+            start_at = result['start_at']
+            times = result['times']
+            sum_power = result["sum_power"]
+            sum_speed = result["sum_speed"]
+
+            ConfigCounterSPS.Interval.start_at = start_at
+            ConfigCounterSPS.Interval.times = times
+            ConfigCounterSPS.Interval.total_power = sum_power
+            ConfigCounterSPS.Interval.total_speed = sum_speed
+        else:
+            result = DataLog.select(
+                fn.MIN(DataLog.utc_date_time).alias("start_at"),
+                fn.SUM(DataLog.power).alias("times"),
+                fn.SUM(DataLog.power).alias("sum_power"),
+                fn.SUM(DataLog.speed).alias("sum_speed")
+            ).where(DataLog.utc_date_time >= threshold, DataLog.name == 'sps').dicts().get()
+
+            start_at = result['start_at']
+            times = result['times']
+            sum_power = result["sum_power"]
+            sum_speed = result["sum_speed"]
+
+            ConfigCounterSPS.Interval.start_at = start_at
+            ConfigCounterSPS2.Interval.times = times
+            ConfigCounterSPS2.Interval.total_power = sum_power
+            ConfigCounterSPS2.Interval.total_speed = sum_speed
+
         self.task_running = True
         if self.page:
-            self.task = self.page.run_task(self.__running)
+            self.task = self.page.run_task(self.loop)
 
     def will_unmount(self):
         self.task_running = False
         if self.task:
             self.task.cancel()
 
-    async def __running(self):
+    async def loop(self):
         while self.task_running:
             try:
-                self.__calculate()
+                if self.display:
+                    system_unit = gdata.configPreference.system_unit
+
+                    avg_power = gdata.configCounterSPS.Interval.avg_power if self.name == 'sps' else gdata.configCounterSPS2.Interval.avg_power
+                    self.display.set_average_power(avg_power, system_unit)
+
+                    total_energy = gdata.configCounterSPS.Interval.total_energy if self.name == 'sps' else gdata.configCounterSPS2.Interval.total_energy
+                    self.display.set_total_energy(total_energy, system_unit)
+
+                    avg_speed = gdata.configCounterSPS.Interval.avg_speed if self.name == 'sps' else gdata.configCounterSPS2.Interval.avg_speed
+                    self.display.set_average_speed(avg_speed)
             except:
-                logging.exception("exception occured at IntervalCounter.__running")
-
-            await asyncio.sleep(gdata.configPreference.data_refresh_interval)
-
-    def __calculate(self):
-        try:
-            param_end_time = gdata.configDateTime.utc
-            param_start_time = param_end_time - timedelta(hours=self.hours)
-
-            data_log = DataLog.select(
-                fn.COALESCE(fn.AVG(DataLog.power), 0).alias('average_power'),
-                fn.COALESCE(fn.AVG(DataLog.speed), 0).alias('average_speed'),
-                fn.COALESCE(fn.MIN(DataLog.utc_date_time), None).alias('start_time'),
-                fn.COALESCE(fn.MAX(DataLog.utc_date_time), None).alias('end_time')
-            ).where(
-                DataLog.name == self.name,
-                DataLog.utc_date_time >= param_start_time,
-                DataLog.utc_date_time <= param_end_time
-            ).dicts().get()
-
-            average_power = data_log['average_power']
-            average_speed = data_log['average_speed']
-
-            if data_log['start_time'] is None or data_log['end_time'] is None:
-                return
-
-            date_time_format = '%Y-%m-%d %H:%M:%S'
-            start_time = datetime.strptime(data_log['start_time'], date_time_format)
-            end_time = datetime.strptime(data_log['end_time'], date_time_format)
-
-            hours = (end_time - start_time).total_seconds() / 3600
-
-            total_energy = (average_power * hours) / 1000  # kWh
-
-            if self.display is not None:
-                system_unit = gdata.configPreference.system_unit
-                self.display.set_average_power(average_power, system_unit)
-                self.display.set_total_energy(total_energy, system_unit)
-                self.display.set_average_speed(average_speed)
-        except:
-            logging.exception("exception occured at IntervalCounter.__calculate")
+                logging.exception("IntervalCounter.loop")
+            finally:
+                await asyncio.sleep(gdata.configPreference.data_refresh_interval)

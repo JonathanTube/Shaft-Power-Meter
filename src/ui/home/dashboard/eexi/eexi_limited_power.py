@@ -77,7 +77,7 @@ class EEXILimitedPower(ft.Container):
                 )
             )
         except:
-            logging.exception('exception occured at EEXILimitedPower.reload')
+            logging.exception('EEXILimitedPower.build')
 
     def reload(self):
         try:
@@ -98,10 +98,13 @@ class EEXILimitedPower(ft.Container):
                 self.update_mode()
                 self.update_idenfications()
         except:
-            logging.exception('exception occured at EEXILimitedPower.reload')
+            logging.exception('EEXILimitedPower.reload')
 
-    async def update_idenfications(self):
-        # 更新 UI（这里已经回到主线程）
+    def update_idenfications(self):
+        # 主机不更新
+        if not gdata.configCommon.is_master:
+            return
+
         if self.common_alarm_dot and self.common_alarm_dot.page:
             self.common_alarm_dot.value = '🔴' if gdata.configAlarm.common_count > 0 else '🟢'
             self.common_alarm_dot.update()

@@ -93,7 +93,7 @@ class AlarmButton(ft.TextButton):
                 if cnt % 5 == 0:
                     self.toggle_badge()
 
-                if gdata.configCommon.alarm_not_ack_count > 0:
+                if gdata.configAlarm.not_ack_count > 0:
                     self.toggle_button(cnt % 2 == 0)
                 else:
                     self.set_normal_button()
