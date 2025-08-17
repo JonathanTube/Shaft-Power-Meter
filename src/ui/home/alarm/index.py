@@ -146,8 +146,7 @@ class AlarmList(ft.Container):
                 ).execute()
 
             # 刷新全局变量
-            alarm_not_ack_count = AlarmLog.select(fn.COUNT(AlarmLog.id)).where(AlarmLog.acknowledge_time.is_null()).scalar()
-            gdata.configCommon.alarm_not_ack_count = alarm_not_ack_count
+            gdata.configAlarm.set_default_value()
 
             self.table.search()
             Toast.show_success(self.page)

@@ -144,6 +144,10 @@ class SystemConfSettings(ft.Container):
             logging.exception('exception occured at SystemConfSettings.build')
 
     def __on_running_mode_change(self, e):
+        if self.sha_po_li and self.sha_po_li.page:
+            self.sha_po_li.value = e.data == 'slave'
+            self.sha_po_li.update()
+
         if self.is_individual and self.is_individual.page:
             self.is_individual.visible = e.data == 'master'
             self.is_individual.value = e.data == 'slave'

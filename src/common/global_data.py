@@ -66,21 +66,30 @@ class ConfigCommon:
 @dataclass
 class ConfigAlarm:
     # 报警总数
-    total_count = 0
+    alarm_total_count = 0
     # 未应答数量
-    not_ack_count = 0
+    alarm_not_ack = 0
 
     # 除GPS的公共报警
-    common_count = 0
+    alarm_common_count = 0
     # gps告警
-    gps_count = 0
+    gps_total_count = 0
 
     def set_default_value(self):
-        self.total_count = AlarmLog.select(fn.COUNT(AlarmLog.id)).where(AlarmLog.recovery_time.is_null()).scalar()
-        self.not_ack_count = AlarmLog.select(fn.COUNT(AlarmLog.id)).where(AlarmLog.acknowledge_time.is_null()).scalar()
+        # 所有告警数量
+        self.alarm_total_count = AlarmLog.select(fn.COUNT(AlarmLog.id)).where(AlarmLog.recovery_time.is_null()).scalar()
+        # 未确认告警数量
+        self.alarm_not_ack = AlarmLog.select(fn.COUNT(AlarmLog.id)).where(AlarmLog.acknowledge_time.is_null()).scalar()
 
-        self.gps_count = AlarmLog.select(fn.COUNT(AlarmLog.id)).where(AlarmLog.acknowledge_time.is_null(), AlarmLog.alarm_type == AlarmType.MASTER_GPS).scalar()
-        self.common_count = self.total_count - self.gps_count
+        # 所有gps告警数量
+        self.gps_total_count = AlarmLog.select(fn.COUNT(AlarmLog.id)).where(AlarmLog.recovery_time.is_null(), AlarmLog.alarm_type == AlarmType.MASTER_GPS).scalar()
+        # 未确认gps告警数量
+        self.gps_not_ack = AlarmLog.select(fn.COUNT(AlarmLog.id)).where(AlarmLog.acknowledge_time.is_null(), AlarmLog.alarm_type == AlarmType.MASTER_GPS).scalar()
+
+        # 通用告警数量
+        self.alarm_common_count = self.alarm_total_count - self.gps_total_count
+        # 未确认告警数量
+        self.alarm_common_not_ack = self.alarm_not_ack - self.gps_not_ack
 
 
 @dataclass
@@ -334,7 +343,6 @@ class ConfigCounterSPS2:
             ConfigCounterSPS.Total.times = counter_log.times
             ConfigCounterSPS.Total.sum_power = counter_log.sum_power
             ConfigCounterSPS.Total.sum_speed = counter_log.sum_speed
-
 
 
 @dataclass

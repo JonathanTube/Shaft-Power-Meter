@@ -56,7 +56,7 @@ class DataInit:
             SystemSettings.create(
                 display_thrust=False,
                 amount_of_propeller=1,
-                sha_po_li=True,
+                sha_po_li=False,
                 unlimited_power=7710 * 1000,
                 eexi_limited_power=6300 * 1000,
                 eexi_breach_checking_duration=60
@@ -182,1630 +182,1630 @@ class DataInit:
         if Language.select().count() > 0:
             Language.truncate_table()
         Language.insert_many([
-                {
-                    "code": "lang.toast.system_exit",
-                    "chinese": "系统正在关闭中，请勿操作...",
-                    "english": "System is closing, please do not operate..."
-                },
-
-                {
-                    "code": "lang.toast.success",
-                    "chinese": "操作成功",
-                    "english": "Operation Success"
-                },
-
-                {
-                    "code": "lang.toast.warning",
-                    "chinese": "操作存在警告",
-                    "english": "Operation Warning"
-                },
-
-                {
-                    "code": "lang.toast.error",
-                    "chinese": "操作发生错误",
-                    "english": "Operation Error"
-                },
-
-                {
-                    "code": "lang.button.save",
-                    "chinese": "保存",
-                    "english": "Save"
-                },
-
-                {
-                    "code": "lang.button.start",
-                    "chinese": "开始",
-                    "english": "Start"
-                },
-
-                {
-                    "code": "lang.button.stop",
-                    "chinese": "停止",
-                    "english": "Stop"
-                },
-
-                {
-                    "code": "lang.button.cancel",
-                    "chinese": "取消",
-                    "english": "Cancel"
-                },
-
-                {
-                    "code": "lang.button.reset",
-                    "chinese": "重置",
-                    "english": "Reset"
-                },
-
-                {
-                    "code": "lang.button.push_to_slave",
-                    "chinese": "推送到从机",
-                    "english": "Push To Slave"
-                },
-
-                {
-                    "code": "lang.button.search",
-                    "chinese": "搜索",
-                    "english": "Search"
-                },
-
-                {
-                    "code": "lang.button.confirm",
-                    "chinese": "确认",
-                    "english": "Confirm"
-                },
-                {
-                    "code": "lang.button.edit",
-                    "chinese": "编辑",
-                    "english": "Edit"
-                },
-                {
-                    "code": "lang.button.delete",
-                    "chinese": "删除",
-                    "english": "Delete"
-                },
-
-                {
-                    "code": "lang.button.start_test_mode",
-                    "chinese": "开始测试模式",
-                    "english": "Start Test Mode"
-                },
-                {
-                    "code": "lang.button.stop_test_mode",
-                    "chinese": "停止测试模式",
-                    "english": "Stop Test Mode"
-                },
-
-                {
-                    "code": "lang.button.start_fatigue_testing",
-                    "chinese": "开始疲劳测试",
-                    "english": "Start Fatigue Testing"
-                },
-
-                {
-                    "code": "lang.button.stop_fatigue_testing",
-                    "chinese": "停止疲劳测试",
-                    "english": "Stop Fatigue Testing"
-                },
-
-                {
-                    "code": "lang.common.app_name",
-                    "chinese": "轴功率仪",
-                    "english": "Shaft Power Meter"
-                },
-                {
-                    "code": "lang.common.operation",
-                    "chinese": "操作",
-                    "english": "Operation"
-                },
-
-                {
-                    "code": "lang.common.power",
-                    "chinese": "功率",
-                    "english": "Power"
-                },
-
-                {
-                    "code": "lang.common.is_overload",
-                    "chinese": "过载",
-                    "english": "Overload"
-                },
-
-                {
-                    "code": "lang.common.speed",
-                    "chinese": "转速",
-                    "english": "Speed"
-                },
-
-                {
-                    "code": "lang.common.torque",
-                    "chinese": "扭矩",
-                    "english": "Torque"
-                },
-
-                {
-                    "code": "lang.common.thrust",
-                    "chinese": "推力",
-                    "english": "Thrust"
-                },
-
-                {
-                    "code": "lang.common.average_power",
-                    "chinese": "平均功率",
-                    "english": "Average Power"
-                },
-
-                {
-                    "code": "lang.common.total_energy",
-                    "chinese": "总能耗",
-                    "english": "Total Energy"
-                },
-
-                {
-                    "code": "lang.common.sps",
-                    "chinese": "螺旋桨1",
-                    "english": "sps"
-                },
-
-                {
-                    "code": "lang.common.sps2",
-                    "chinese": "螺旋桨2",
-                    "english": "sps2"
-                },
-
-                {
-                    "code": "lang.common.total",
-                    "chinese": "总计",
-                    "english": "Total"
-                },
-
-                {
-                    "code": "lang.common.limited_power",
-                    "chinese": "限制功率",
-                    "english": "Limited Power"
-                },
-                {
-                    "code": "lang.common.unlimited_power",
-                    "chinese": "非限制最大功率",
-                    "english": "Un-limited Power"
-                },
-
-                {
-                    "code": "lang.common.eexi_limited_power",
-                    "chinese": "EEXI 限制功率",
-                    "english": "EEXI Limited Power"
-                },
-                {
-                    "code": "lang.common.power_unlimited_mode",
-                    "chinese": "功率无限制模式",
-                    "english": "Power Un-limited Mode"
-                },
-                {
-                    "code": "lang.common.start_date",
-                    "chinese": "UTC 开始日期",
-                    "english": "UTC Start Date"
-                },
-
-                {
-                    "code": "lang.common.end_date",
-                    "chinese": "UTC 结束日期",
-                    "english": "UTC End Date"
-                },
-
-                {
-                    "code": "lang.common.created_at",
-                    "chinese": "创建时间",
-                    "english": "Created At"
-                },
-
-                {
-                    "code": "lang.common.updated_at",
-                    "chinese": "更新时间",
-                    "english": "Updated At"
-                },
-
-                {
-                    "code": "lang.common.propeller_name",
-                    "chinese": "名称",
-                    "english": "Name"
-                },
-
-                {
-                    "code": "lang.common.no",
-                    "chinese": "序号",
-                    "english": "No."
-                },
-
-                {
-                    "code": "lang.common.utc_date_time",
-                    "chinese": "UTC 日期时间",
-                    "english": "UTC Date Time"
-                },
-
-                {
-                    "code": "lang.common.location",
-                    "chinese": "位置",
-                    "english": "Location"
-                },
-
-                {
-                    "code": "lang.common.breach_reason",
-                    "chinese": "突破原因",
-                    "english": "Breach Reason"
-                },
-
-                {
-                    "code": "lang.common.start_position",
-                    "chinese": "开始位置",
-                    "english": "Start Position"
-                },
-
-                {
-                    "code": "lang.common.end_position",
-                    "chinese": "结束位置",
-                    "english": "End Position"
-                },
-
-                {
-                    "code": "lang.common.acknowledged_at",
-                    "chinese": "应答于", 
-                    "english": "Acknowledged At"
-                },
-                {
-                    "code": "lang.common.note",
-                    "chinese": "备注",
-                    "english": "Note"
-                },
-                {
-                    "code": "lang.common.event_name",
-                    "chinese": "事件名称",
-                    "english": "Event Name"
-                },
-                {
-                    "code": "lang.common.acknowledge_time",
-                    "chinese": "应答时间",
-                    "english": "Acknowledge Time"
-                },
-
-                {
-                    "code": "lang.common.view",
-                    "chinese": "查看",
-                    "english": "View"
-                },
-
-                {
-                    "code": "lang.common.export",
-                    "chinese": "导出",
-                    "english": "Export"
-                },
-                {
-                    "code": "lang.common.ip_address_format_error",
-                    "chinese": "IP地址格式错误",
-                    "english": "IP Address Format Error"
-                },
-                {
-                    "code": "lang.common.connecting",
-                    "chinese": "连接中",
-                    "english": "Connecting..."
-                },
-                {
-                    "code": "lang.header.home",
-                    "chinese": "主页",
-                    "english": "Home"
-                },
-                {
-                    "code": "lang.header.report",
-                    "chinese": "报告",
-                    "english": "Report"
-                },
-                {
-                    "code": "lang.header.setting",
-                    "chinese": "设置",
-                    "english": "Setting"
-                },
-                {
-                    "code": "lang.header.shapoli",
-                    "chinese": "ShaPoLi",
-                    "english": "ShaPoLi"
-                },
-
-                {
-                    "code": "lang.home.tab.dashboard",
-                    "chinese": "仪表板",
-                    "english": "Dashboard"
-                },
-                {
-                    "code": "lang.home.tab.counter",
-                    "chinese": "计数器",
-                    "english": "Counter"
-                },
-
-                {
-                    "code": "lang.home.tab.trendview",
-                    "chinese": "趋势视图",
-                    "english": "Trend View"
-                },
-                {
-                    "code": "lang.home.tab.propeller_curve",
-                    "chinese": "螺旋桨曲线",
-                    "english": "Propeller Curve"
-                },
-                {
-                    "code": "lang.home.tab.alarm",
-                    "chinese": "报警",
-                    "english": "Alarm"
-                },
-                {
-                    "code": "lang.home.tab.logs",
-                    "chinese": "日志",
-                    "english": "Logs"
-                },
-                {
-                    "code": "lang.home.tab.event",
-                    "chinese": "事件",
-                    "english": "Event"
-                },
-
-                {
-                    "code": "lang.setting.system_conf.title",
-                    "chinese": "系统配置",
-                    "english": "System Conf."
-                },
-
-                {
-                    "code": "lang.setting.general.title",
-                    "chinese": "通用配置",
-                    "english": "General"
-                },
-
-                {
-                    "code": "lang.setting.propeller_setting.title",
-                    "chinese": "螺旋桨配置",
-                    "english": "Propeller Setting"
-                },
-
-                {
-                    "code": "lang.setting.zero_cal.title",
-                    "chinese": "零点校准",
-                    "english": "Zero Cal."
-                },
-
-                {
-                    "code": "lang.setting.zero_cal.submitted",
-                    "chinese": "已提交",
-                    "english": "Submitted"
-                },
-
-                {
-                    "code": "lang.setting.zero_cal.started",
-                    "chinese": "已开始",
-                    "english": "Started"
-                },
-
-                {
-                    "code": "lang.setting.zero_cal.aborted",
-                    "chinese": "已中止",
-                    "english": "Aborted"
-                },
-                {
-                    "code": "lang.setting.zero_cal.accepted",
-                    "chinese": "已接受",
-                    "english": "Accepted"
-                },
-
-                {
-                    "code": "lang.setting.zero_cal.disabled",
-                    "chinese": "此HMI运行在从机模式，无需配置调零。",
-                    "english": "This HMI is running as a slave mode without zero cal."
-                },
-                {
-                    "code": "lang.setting.io_conf.title",
-                    "chinese": "IO 配置",
-                    "english": "IO Conf."
-                },
-                {
-                    "code": "lang.setting.io_conf.serial_port_can_not_be_empty",
-                    "chinese": "请选择一个输出端口",
-                    "english": "please select a serial port to start to output"
-                },
-                {
-                    "code": "lang.setting.io_conf.output_option_does_not_selected",
-                    "chinese": "请至少选择输出一个项目",
-                    "english": "please check one output option at least."
-                },
-                {
-                    "code": "lang.setting.language_conf.title",
-                    "chinese": "语言配置",
-                    "english": "Language Conf."
-                },
-
-                {
-                    "code": "lang.setting.language_conf.code",
-                    "chinese": "代码",
-                    "english": "Code"
-                },
-
-                {
-                    "code": "lang.setting.language_conf.chinese",
-                    "chinese": "中文",
-                    "english": "Chinese"
-                },
-
-                {
-                    "code": "lang.setting.language_conf.english",
-                    "chinese": "英文",
-                    "english": "English"
-                },
-
-                {
-                    "code": "lang.setting.self_test.title",
-                    "chinese": "自检",
-                    "english": "Self Test"
-                },
-
-                {
-                    "code": "lang.setting.permission_conf.title",
-                    "chinese": "权限配置",
-                    "english": "Authority Conf."
-                },
-
-                {
-                    "code": "lang.setting.test_mode.title",
-                    "chinese": "测试模式",
-                    "english": "Test Mode"
-                },
-
-                {
-                    "code": "lang.setting.test_mode.customize_data_range",
-                    "chinese": "自定义数据范围",
-                    "english": "Customize Data Range"
-                },
-
-                {
-                    "code": "lang.setting.test_mode.instant_mock_data",
-                    "chinese": "瞬时模拟数据",
-                    "english": "Instant Mock Data"
-                },
-
-                {
-                    "code": "lang.setting.test_mode.min_torque",
-                    "chinese": "最小扭矩",
-                    "english": "Min Torque"
-                },
-
-                {
-                    "code": "lang.setting.test_mode.max_torque",
-                    "chinese": "最大扭矩",
-                    "english": "Max Torque"
-                },
-
-                {
-                    "code": "lang.setting.test_mode.min_speed",
-                    "chinese": "最小转速",
-                    "english": "Min Speed"
-                },
-
-                {
-                    "code": "lang.setting.test_mode.max_speed",
-                    "chinese": "最大转速",
-                    "english": "Max Speed"
-                },
-
-                {
-                    "code": "lang.setting.test_mode.min_thrust",
-                    "chinese": "最小推力",
-                    "english": "Min Thrust"
-                },
-
-                {
-                    "code": "lang.setting.test_mode.max_thrust",
-                    "chinese": "最大推力",
-                    "english": "Max Thrust"
-                },
-
-                {
-                    "code": "lang.setting.test_mode.please_confirm",
-                    "chinese": "请确认",
-                    "english": "Please Confirm"
-                },
-
-                {
-                    "code": "lang.setting.test_mode.system_restart_after_change",
-                    "chinese": "修改系统配置后,软件需要重启才能生效",
-                    "english": "This software need to be restarted after you changed the system settings."
-                },
-
-                {
-                    "code": "lang.setting.offline_default_value",
-                    "chinese": "SPS离线默认值",
-                    "english": "SPS Offline Default Value"
-                },
-
-                {
-                    "code": "lang.setting.setting",
-                    "chinese": "设置",
-                    "english": "Setting"
-                },
-
-                {
-                    "code": "lang.setting.running_mode",
-                    "chinese": "运行模式",
-                    "english": "Running Mode"
-                },
-
-                {
-                    "code": "lang.setting.is_individual",
-                    "chinese": "单机",
-                    "english": "Individual"
-                },
-
-                {
-                    "code": "lang.setting.enable_gps",
-                    "chinese": "启用GPS",
-                    "english": "Enable GPS"
-                },
-
-                {
-                    "code": "lang.setting.master",
-                    "chinese": "主机",
-                    "english": "Master"
-                },
-
-                {
-                    "code": "lang.setting.slave",
-                    "chinese": "从机",
-                    "english": "Slave"
-                },
-
-                {
-                    "code": "lang.setting.display_thrust",
-                    "chinese": "显示推力",
-                    "english": "Display Thrust"
-                },
-
-                {
-                    "code": "lang.setting.amount_of_propeller",
-                    "chinese": "螺旋桨数量",
-                    "english": "Amount of Propeller"
-                },
-
-                {
-                    "code": "lang.setting.enable_sha_po_li",
-                    "chinese": "启用ShaPoLi",
-                    "english": "Enable ShaPoLi"
-                },
-                {
-                    "code": "lang.setting.display_propeller_curve",
-                    "chinese": "显示螺旋桨曲线",
-                    "english": "Display Propeller Curve"
-                },
-                {
-                    "code": "lang.setting.single_propeller",
-                    "chinese": "单桨",
-                    "english": "Single"
-                },
-
-                {
-                    "code": "lang.setting.twins_propeller",
-                    "chinese": "双桨",
-                    "english": "Twins"
-                },
-
-                {
-                    "code": "lang.setting.unlimited_power",
-                    "chinese": "最大功率",
-                    "english": "Unlimited Power"
-                },
-
-                {
-                    "code": "lang.setting.eexi_limited_power",
-                    "chinese": "EEXI 限制功率",
-                    "english": "EEXI Limited Power"
-                },
-
-                {
-                    "code": "lang.setting.eexi_breach_checking_duration",
-                    "chinese": "EEXI 超限检查周期",
-                    "english": "EEXI Breach Checking Duration"
-                },
-
-                {
-                    "code": "lang.setting.hide_admin_account",
-                    "chinese": "隐藏Admin账号",
-                    "english": "Hide Admin Accounts"
-                },
-
-                {
-                    "code": "lang.setting.ship_info",
-                    "chinese": "船舶信息",
-                    "english": "Ship Info"
-                },
-
-                {
-                    "code": "lang.setting.ship_type",
-                    "chinese": "船舶类型",
-                    "english": "Ship Type"
-                },
-
-                {
-                    "code": "lang.setting.ship_name",
-                    "chinese": "船舶名称",
-                    "english": "Ship Name"
-                },
-
-                {
-                    "code": "lang.setting.imo_number",
-                    "chinese": "IMO 号码",
-                    "english": "IMO Number"
-                },
-
-                {
-                    "code": "lang.setting.ship_size",
-                    "chinese": "船舶尺寸",
-                    "english": "Ship Size"
-                },
-
-                {
-                    "code": "lang.setting.bearing_outer_diameter_D",
-                    "chinese": "轴外径",
-                    "english": "Shaft Outer Diameter"
-                },
-
-                {
-                    "code": "lang.setting.bearing_inner_diameter_d",
-                    "chinese": "轴内径",
-                    "english": "Shaft Inner Diameter"
-                },
-
-                {
-                    "code": "lang.setting.sensitivity_factor_k",
-                    "chinese": "应变片系数",
-                    "english": "Strain gauge Factor"
-                },
-
-                {
-                    "code": "lang.setting.elastic_modulus_E",
-                    "chinese": "杨氏模量",
-                    "english": "Young's Modulus"
-                },
-
-                {
-                    "code": "lang.setting.poisson_ratio_mu",
-                    "chinese": "泊松比",
-                    "english": "Poisson's Ratio"
-                },
-
-
-
-                {
-                    "code": "lang.setting.preference",
-                    "chinese": "偏好设置",
-                    "english": "Preference"
-                },
-
-                {
-                    "code": "lang.setting.theme",
-                    "chinese": "主题",
-                    "english": "Theme"
-                },
-                {
-                    "code": "lang.setting.theme.light",
-                    "chinese": "浅色",
-                    "english": "Light"
-                },
-
-                {
-                    "code": "lang.setting.theme.dark",
-                    "chinese": "深色",
-                    "english": "Dark"
-                },
-
-                {
-                    "code": "lang.setting.unit",
-                    "chinese": "单位",
-                    "english": "Unit"
-                },
-
-                {
-                    "code": "lang.setting.unit.metric",
-                    "chinese": "公制",
-                    "english": "Metric"
-                },
-
-
-                {
-                    "code": "lang.setting.fullscreen",
-                    "chinese": "全屏",
-                    "english": "Fullscreen"
-                },
-
-                {
-                    "code": "lang.setting.unit.si",
-                    "chinese": "国际单位制",
-                    "english": "SI"
-                },
-
-                {
-                    "code": "lang.setting.language",
-                    "chinese": "语言",
-                    "english": "Language"
-                },
-
-                {
-                    "code": "lang.setting.data_refresh_interval",
-                    "chinese": "界面数据刷新间隔",
-                    "english": "Dashboard Data Refresh Interval"
-                },
-
-                {
-                    "code": "lang.setting.maximum_limitations",
-                    "chinese": "最大限制",
-                    "english": "Maximum Limitations"
-                },
-
-                {
-                    "code": "lang.setting.warning_limitations",
-                    "chinese": "警告限制",
-                    "english": "Warning Limitations"
-                },
-
-                {
-                    "code": "lang.setting.utc_date_time_conf",
-                    "chinese": "UTC 日期时间配置",
-                    "english": "UTC Date Time Conf."
-                },
-
-                {
-                    "code": "lang.setting.current_utc_date_time",
-                    "chinese": "当前UTC日期时间",
-                    "english": "Current UTC Date Time"
-                },
-
-                {
-                    "code": "lang.setting.date",
-                    "chinese": "日期",
-                    "english": "Date"
-                },
-
-                {
-                    "code": "lang.setting.time",
-                    "chinese": "时间",
-                    "english": "Time"
-                },
-
-                {
-                    "code": "lang.setting.date_format",
-                    "chinese": "日期格式",
-                    "english": "Date Format"
-                },
-
-                {
-                    "code": "lang.setting.sync_with_gps",
-                    "chinese": "与GPS同步",
-                    "english": "Sync with GPS"
-                },
-
-                {
-                    "code": "lang.setting.mcr_operating_point",
-                    "chinese": "MCR 运行点",
-                    "english": "MCR Operating Point"
-                },
-
-                {
-                    "code": "lang.setting.normal_propeller_curve",
-                    "chinese": "正常螺旋桨曲线 (1)",
-                    "english": "Normal Propeller Curve (1)"
-                },
-
-                {
-                    "code": "lang.setting.rpm_left",
-                    "chinese": "左转速",
-                    "english": "RPM Left"
-                },
-
-                {
-                    "code": "lang.setting.rpm_right",
-                    "chinese": "右转速",
-                    "english": "RPM Right"
-                },
-
-                {
-                    "code": "lang.setting.power_left",
-                    "chinese": "左功率",
-                    "english": "Power Left"
-                },
-
-                {
-                    "code": "lang.setting.power_right",
-                    "chinese": "右功率",
-                    "english": "Power Right"
-                },
-
-                {
-                    "code": "lang.setting.light_propeller_curve",
-                    "chinese": "轻载螺旋桨曲线 (2)",
-                    "english": "Light Propeller Curve (2)"
-                },
-
-                {
-                    "code": "lang.setting.torque_load_limit_curve",
-                    "chinese": "扭矩负载限制曲线 (4)",
-                    "english": "Torque/Load Limit Curve (4)"
-                },
-
-                {
-                    "code": "lang.setting.overload_curve",
-                    "chinese": "过载曲线 (5)",
-                    "english": "Overload Curve (5)"
-                },
-
-                {
-                    "code": "lang.setting.speed_limit_curve",
-                    "chinese": "速度限制曲线 (3)",
-                    "english": "Speed Limit Curve (3)"
-                },
-
-                {
-                    "code": "lang.setting.enable_overload_alarm",
-                    "chinese": "启用过载报警",
-                    "english": "Enable Overload Alarm"
-                },
-
-                {
-                    "code": "lang.setting.plc_conf",
-                    "chinese": "PLC 配置",
-                    "english": "PLC Conf."
-                },
-
-                {
-                    "code": "lang.setting.save_limitations_to_plc_failed",
-                    "chinese": "保存上下限到PLC失败",
-                    "english": "Save Limitations to PLC Failed"
-                },
-
-
-                {
-                    "code": "lang.setting.check_plc_connection",
-                    "chinese": "检查PLC连接",
-                    "english": "Check PLC Connection"
-                },
-
-                {
-                    "code": "lang.setting.check_gps_connection",
-                    "chinese": "检查GPS连接",
-                    "english": "Check GPS Connection"
-                },
-
-                {
-                    "code": "lang.setting.check_sps_connection",
-                    "chinese": "检查SPS连接",
-                    "english": "Check SPS Connection"
-                },
-
-                {
-                    "code": "lang.setting.4_20_ma_power_min",
-                    "chinese": "4-20mA 功率最小值",
-                    "english": "4-20mA Power Min"
-                },
-
-
-                {
-                    "code": "lang.setting.4_20_ma_power_max",
-                    "chinese": "4-20mA 功率最大值",
-                    "english": "4-20mA Power Max"
-                },
-
-                {
-                    "code": "lang.setting.4_20_ma_power_offset",
-                    "chinese": "4-20mA 功率偏移",
-                    "english": "4-20mA Power Offset"
-                },
-
-                {
-                    "code": "lang.setting.4_20_ma_torque_min",
-                    "chinese": "4-20mA 扭矩最小值   ",
-                    "english": "4-20mA Torque Min"
-                },
-
-                {
-                    "code": "lang.setting.4_20_ma_torque_max",
-                    "chinese": "4-20mA 扭矩最大值",
-                    "english": "4-20mA Torque Max"
-                },
-
-                {
-                    "code": "lang.setting.4_20_ma_torque_offset",
-                    "chinese": "4-20mA 扭矩偏置",
-                    "english": "4-20mA Torque Offset"
-                },
-
-                {
-                    "code": "lang.setting.4_20_ma_thrust_min",
-                    "chinese": "4-20mA 推力最小值",
-                    "english": "4-20mA Thrust Min"
-                },
-
-
-                {
-                    "code": "lang.setting.4_20_ma_thrust_max",
-                    "chinese": "4-20mA 推力最大值",
-                    "english": "4-20mA Thrust Max"
-                },
-
-                {
-                    "code": "lang.setting.4_20_ma_thrust_offset",
-                    "chinese": "4-20mA 推力偏置",
-                    "english": "4-20mA Thrust Offset"
-                },
-
-                {
-                    "code": "lang.setting.4_20_ma_speed_min",
-                    "chinese": "4-20mA 速度最小值",
-                    "english": "4-20mA Speed Min"
-                },
-
-                {
-                    "code": "lang.setting.4_20_ma_speed_max",
-                    "chinese": "4-20mA 速度最大值",
-                    "english": "4-20mA Speed Max"
-                },
-
-                {
-                    "code": "lang.setting.4_20_ma_speed_offset",
-                    "chinese": "4-20mA 速度偏置",
-                    "english": "4-20mA Speed Offset"
-                },
-
-                {
-                    "code": "lang.setting.hmi_server_ip",
-                    "chinese": "HMI 服务器IP",
-                    "english": "HMI Server IP"
-                },
-
-                {
-                    "code": "lang.setting.hmi_server_port",
-                    "chinese": "HMI 服务器端口",
-                    "english": "HMI Server Port"
-                },
-
-                {
-                    "code": "lang.setting.start_master_server",
-                    "chinese": "启动主机服务",
-                    "english": "Start Server"
-                },
-
-                {
-                    "code": "lang.setting.stop_master_server",
-                    "chinese": "停止主机服务器",
-                    "english": "Stop Server"
-                },
-
-                {
-                    "code": "lang.setting.connect_to_master",
-                    "chinese": "连接到主机",
-                    "english": "Connect to Master"
-                },
-
-                {
-                    "code": "lang.setting.disconnect_from_master",
-                    "chinese": "断开HMI服务器",
-                    "english": "Disconnect from Master"
-                },
-
-                {
-                    "code": "lang.setting.connect",
-                    "chinese": "连接",
-                    "english": "Connect"
-                },
-
-                {
-                    "code": "lang.setting.disconnect",
-                    "chinese": "断开",
-                    "english": "Disconnect"
-                },
-
-                {
-                    "code": "lang.setting.fetch_data",
-                    "chinese": "获取数据",
-                    "english": "Fetch Data"
-                },
-
-                {
-                    "code": "lang.setting.ip",
-                    "chinese": "IP 地址",
-                    "english": "IP Address"
-                },
-
-                {
-                    "code": "lang.setting.port",
-                    "chinese": "端口",
-                    "english": "Port"
-                },
-
-                {
-                    "code": "lang.setting.output_conf",
-                    "chinese": "输出配置",
-                    "english": "Output Conf."
-                },
-
-                {
-                    "code": "lang.setting.gps_conf",
-                    "chinese": "GPS 配置",
-                    "english": "GPS Conf."
-                },
-
-                {
-                    "code": "lang.setting.sps_conf",
-                    "chinese": "SPS 配置",
-                    "english": "SPS Conf."
-                },
-
-                {
-                    "code": "lang.setting.master_server_conf",
-                    "chinese": "主机服务配置",
-                    "english": "Master Server Conf."
-                },
-
-                {
-                    "code": "lang.setting.interface_conf",
-                    "chinese": "接口配置",
-                    "english": "Interface Conf."
-                },
-
-                {
-                    "code": "lang.setting.plc_enabled",
-                    "chinese": "启用PLC",
-                    "english": "PLC Enabled"
-                },
-
-                {
-                    "code": "lang.log.event_log",
-                    "chinese": "事件日志",
-                    "english": "Event Log"
-                },
-
-                {
-                    "code": "lang.log.data_log",
-                    "chinese": "数据日志",
-                    "english": "Data Log"
-                },
-
-                {
-                    "code": "lang.log.gps_log",
-                    "chinese": "GPS 日志",
-                    "english": "GPS Log"
-                },
-                {
-                    "code": "lang.log.operation_log",
-                    "chinese": "操作日志",
-                    "english": "Operation Log"
-                },
-                {
-                    "code": "lang.operation_log.operation_type",
-                    "chinese": "操作类型",
-                    "english": "Operation Type"
-                },
-                {
-                    "code": "lang.operation_log.operation_content",
-                    "chinese": "操作内容",
-                    "english": "Operation Content"
-                },
-                {
-                    "code": "lang.report.report_name",
-                    "chinese": "报告名称",
-                    "english": "Report Name"
-                },
-
-                {
-                    "code": "lang.report.export_success",
-                    "chinese": "导出成功",
-                    "english": "Export Success"
-                },
-                {
-                    "code": "lang.counter.interval",
-                    "chinese": "间隔",
-                    "english": "Interval"
-                },
-                {
-                    "code": "lang.counter.manually",
-                    "chinese": "手动",
-                    "english": "Manually"
-                },
-                {
-                    "code": "lang.counter.total",
-                    "chinese": "总计",
-                    "english": "Total"
-                },
-                {
-                    "code": "lang.counter.running",
-                    "chinese": "运行中",
-                    "english": "Running"
-                },
-                {
-                    "code": "lang.counter.reset",
-                    "chinese": "重置",
-                    "english": "Reset"
-                },
-                {
-                    "code": "lang.counter.stopped",
-                    "chinese": "已停止",
-                    "english": "Stopped"
-                },
-                {
-                    "code": "lang.counter.start",
-                    "chinese": "启动",
-                    "english": "Start"
-                },
-                {
-                    "code": "lang.counter.stop",
-                    "chinese": "停止",
-                    "english": "Stop"
-                },
-                {
-                    "code": "lang.counter.reset",
-                    "chinese": "恢复",
-                    "english": "Reset"
-                },
-                {
-                    "code": "lang.counter.total_energy",
-                    "chinese": "总耗量",
-                    "english": "Total Energy"
-                },
-                {
-                    "code": "lang.counter.average_power",
-                    "chinese": "平均功率",
-                    "english": "Average Power"
-                },
-                {
-                    "code": "lang.counter.average_speed",
-                    "chinese": "转速",
-                    "english": "Rotational Speed"
-                },
-                {
-                    "code": "lang.counter.interval_setting",
-                    "chinese": "间隔设置",
-                    "english": "Interval Setting"
-                },
-                {
-                    "code": "lang.counter.hours",
-                    "chinese": "小时",
-                    "english": "Hours"
-                },
-                {
-                    "code": "lang.counter.started_at",
-                    "chinese": "开始于",
-                    "english": "Started At"
-                },
-                {
-                    "code": "lang.counter.stopped_at",
-                    "chinese": "停止于",
-                    "english": "Stopped At"
-                },
-                {
-                    "code": "lang.counter.measured",
-                    "chinese": "已测量",
-                    "english": "Measured"
-                },
-                {
-                    "code": "lang.counter.please_confirm",
-                    "chinese": "请确认",
-                    "english": "Please Confirm"
-                },
-                {
-                    "code": "lang.counter.do_you_really_want_to_reset_counter",
-                    "chinese": "你确定要重置计数器吗？",
-                    "english": "Do you really want to reset the counter?"
-                },
-                {
-                    "code": "lang.counter.yes",
-                    "chinese": "是",
-                    "english": "Yes"
-                },
-                {
-                    "code": "lang.counter.no",
-                    "chinese": "否",
-                    "english": "No"
-                },
-                {
-                    "code": "lang.counter.interval_has_been_changed",
-                    "chinese": "间隔已更改",
-                    "english": "Interval has been changed"
-                },
-                {
-                    "code": "lang.counter.interval_cannot_be_empty",
-                    "chinese": "间隔不能为空",
-                    "english": "Interval cannot be empty"
-                },
-                {
-                    "code": "lang.counter.interval_must_be_greater_than_0",
-                    "chinese": "间隔必须大于0",
-                    "english": "Interval must be greater than 0"
-                },
-                {
-                    "code": "lang.trendview.cannot_search_more_than_90_days",
-                    "chinese": "不能搜索超过90天",
-                    "english": "Cannot search more than 90 days"
-                },
-
-                {
-                    "code": "lang.propeller_curve.disabled_under_slave_mode",
-                    "chinese": "此HMI运行在从机模式，无需配置螺旋桨曲线。",
-                    "english": "This HMI is running as a slave mode without propeller setting."
-                },
-
-                {
-                    "code": "lang.propeller_curve.propeller_curve_disabled",
-                    "chinese": "螺旋线曲线被禁用",
-                    "english": "Propeller Curve is disabled"
-                },
-
-                {
-                    "code": "lang.propeller_curve.mcr_operating_point",
-                    "chinese": "MCR 操作点",
-                    "english": "MCR Operating Point"
-                },
-                {
-                    "code": "lang.propeller_curve.normal_propeller_curve",
-                    "chinese": "正常螺旋桨曲线",
-                    "english": "Normal Propeller Curve"
-                },
-                {
-                    "code": "lang.propeller_curve.light_propeller_curve",
-                    "chinese": "轻载螺旋桨曲线",
-                    "english": "Light Propeller Curve"
-                },
-                {
-                    "code": "lang.propeller_curve.speed_limit_curve",
-                    "chinese": "速度限制曲线",
-                    "english": "Speed Limit Curve"
-                },
-                {
-                    "code": "lang.propeller_curve.torque_load_limit_curve",
-                    "chinese": "扭矩负载限制曲线",
-                    "english": "Torque Load Limit Curve"
-                },
-                {
-                    "code": "lang.propeller_curve.overload_curve",
-                    "chinese": "过载曲线",
-                    "english": "Overload Curve"
-                },
-                {
-                    "code": "lang.propeller_curve.engine_speed",
-                    "chinese": "发动机转速, % of A",
-                    "english": "Engine Speed, % of A"
-                },
-                {
-                    "code": "lang.propeller_curve.engine_shaft_power",
-                    "chinese": "发动机轴功率, % of A",
-                    "english": "Engine Shaft Power, % of A"
-                },
-                {
-                    "code": "lang.alarm.occured_time",
-                    "chinese": "发生时间",
-                    "english": "Event Time"
-                },
-                {
-                    "code": "lang.alarm.recovery_time",
-                    "chinese": "恢复时间",
-                    "english": "Recovery Time"
-                },
-                {
-                    "code": "lang.alarm.master_plc_disconnected",
-                    "chinese": "PLC断开",
-                    "english": "Master PLC Disconnected"
-                },
-                {
-                    "code": "lang.alarm.master_plc_connected",
-                    "chinese": "PLC连接",
-                    "english": "Master PLC Connected"
-                },
-                {
-                    "code": "lang.alarm.master_gps_connected",
-                    "chinese": "主机GPS连接",
-                    "english": "Master GPS Connected"
-                },
-                {
-                    "code": "lang.alarm.master_gps_disconnected",
-                    "chinese": "主机GPS断开",
-                    "english": "Master GPS Disconnected"
-                },
-                {
-                    "code": "lang.alarm.master_sps_disconnected",
-                    "chinese": "主机SPS断开",
-                    "english": "Master SPS Disconnected"
-                },
-                {
-                    "code": "lang.alarm.master_sps_connected",
-                    "chinese": "主机SPS连接",
-                    "english": "Master SPS Connected"
-                },
-                {
-                    "code": "lang.alarm.master_sps2_disconnected",
-                    "chinese": "主机SPS2断开",
-                    "english": "Master SPS2 Disconnected"
-                },
-                {
-                    "code": "lang.alarm.master_sps2_connected",
-                    "chinese": "主机SPS2连接",
-                    "english": "Master SPS2 Connected"
-                },
-                {
-                    "code": "lang.alarm.master_server_stopped",
-                    "chinese": "Master服务端已停止",
-                    "english": "Master Server Stopped"
-                },
-                {
-                    "code": "lang.alarm.master_server_started",
-                    "chinese": "Master服务端已启动",
-                    "english": "Master Server Started"
-                },
-                {
-                    "code": "lang.alarm.slave_master_disconnected",
-                    "chinese": "从机已断开连接",
-                    "english": "Slave-Master Disconnected"
-                },
-                {
-                    "code": "lang.alarm.slave_master_connected",
-                    "chinese": "从机已恢复连接",
-                    "english": "Slave-Master Connected"
-                },
-                {
-                    "code": "lang.alarm.power_optimal_load",
-                    "chinese": "功率正常",
-                    "english": "Power Optimal Load"
-                },
-                {
-                    "code": "lang.alarm.power_overload",
-                    "chinese": "功率过载",
-                    "english": "Power Overload"
-                },
-                {
-                    "code": "lang.alarm.unknown",
-                    "chinese": "未知",
-                    "english": "Unknown"
-                },
-                {
-                    "code": "lang.alarm.acknowledge",
-                    "chinese": "确认",
-                    "english": "Acknowledge"
-                },
-                {
-                    "code": "lang.alarm.please_select_at_least_one_alarm",
-                    "chinese": "请至少选择一个告警",
-                    "english": "Please select at least one alarm"
-                },
-                {
-                    "code": "lang.event.reason_for_power_reserve_breach",
-                    "chinese": "功率突破原因",
-                    "english": "Reason for Power Reserve Breach"
-                },
-                {
-                    "code": "lang.event.date_time_of_power_reserve_breach",
-                    "chinese": "功率突破时间",
-                    "english": "Date/Time of Power Reserve Breach"
-                },
-                {
-                    "code": "lang.event.ship_position_of_power_reserve_breach",
-                    "chinese": "功率突破时的位置",
-                    "english": "Ship Position of Power Reserve Breach"
-                },
-                {
-                    "code": "lang.event.date_time_when_returning_to_limited_power",
-                    "chinese": "功率恢复时间",
-                    "english": "Date/Time when Returning to Limited Power"
-                },
-                {
-                    "code": "lang.event.ship_position_when_returning_to_limited_power",
-                    "chinese": "功率恢复时的位置",
-                    "english": "Ship Position when Returning to Limited Power"
-                },
-                {
-                    "code": "lang.event.note",
-                    "chinese": "备注",
-                    "english": "Note"
-                },
-                {
-                    "code": "lang.event.ice_condition",
-                    "chinese": "冰况",
-                    "english": "Ice Condition"
-                },
-                {
-                    "code": "lang.event.wave_height",
-                    "chinese": "浪高",
-                    "english": "Wave Height"
-                },
-                {
-                    "code": "lang.event.beaufort_number",
-                    "chinese": "风级",
-                    "english": "Beaufort Number"
-                },
-                {
-                    "code": "lang.event.please_input_all_fields_except_note",
-                    "chinese": "请输入除备注外的所有字段",
-                    "english": "Please input all fields except note"
-                },
-                {
-                    "code": "lang.permission.user_name",
-                    "chinese": "用户名",
-                    "english": "User Name"
-                },
-                {
-                    "code": "lang.permission.user_pwd",
-                    "chinese": "密码",
-                    "english": "Password"
-                },
-                {
-                    "code": "lang.permission.user_role",
-                    "chinese": "角色",
-                    "english": "Role"
-                },
-                {
-                    "code": "lang.permission.edit_user",
-                    "chinese": "编辑用户",
-                    "english": "Edit User"
-                },
-                {
-                    "code": "lang.permission.delete_user",
-                    "chinese": "删除用户",
-                    "english": "Delete User"
-                },
-                {
-                    "code": "lang.permission.role",
-                    "chinese": "角色",
-                    "english": "Role"
-                },
-                {
-                    "code": "lang.permission.add_user",
-                    "chinese": "添加用户",
-                    "english": "Add User"
-                },
-                {
-                    "code": "lang.permission.confirm_user_pwd",
-                    "chinese": "确认密码",
-                    "english": "Confirm Password"
-                },
-                {
-                    "code": "lang.permission.user_name_exists",
-                    "chinese": "用户名已存在",
-                    "english": "User Name Exists"
-                },
-                {
-                    "code": "lang.permission.password_not_match",
-                    "chinese": "密码不匹配",
-                    "english": "Password Not Match"
-                },
-                {
-                    "code": "lang.permission.user_name_required",
-                    "chinese": "用户名不能为空",
-                    "english": "User Name Required"
-                },
-                {
-                    "code": "lang.permission.user_pwd_required",
-                    "chinese": "密码不能为空",
-                    "english": "Password Required"
-                },
-                {
-                    "code": "lang.permission.confirm_user_pwd_required",
-                    "chinese": "确认密码不能为空",
-                    "english": "Confirm Password Required"
-                },
-                {
-                    "code": "lang.permission.user_role_required",
-                    "chinese": "角色不能为空",
-                    "english": "User Role Required"
-                },
-                {
-                    "code": "lang.permission.all",
-                    "chinese": "所有",
-                    "english": "All"
-                },
-                {
-                    "code": "lang.permission.admin",
-                    "chinese": "管理员",
-                    "english": "Admin"
-                },
-                {
-                    "code": "lang.permission.master",
-                    "chinese": "主控",
-                    "english": "Master"
-                },
-                {
-                    "code": "lang.permission.user",
-                    "chinese": "用户",
-                    "english": "User"
-                },
-                {
-                    "code": "lang.permission.authentication",
-                    "chinese": "认证",
-                    "english": "Authentication"
-                },
-                {
-                    "code": "lang.permission.user_name_and_pwd_are_required",
-                    "chinese": "用户名和密码不能为空",
-                    "english": "User Name and Password are required"
-                },
-                {
-                    "code": "lang.permission.user_name_or_pwd_is_incorrect",
-                    "chinese": "用户名或密码不正确",
-                    "english": "User Name or Password is Incorrect"
-                },
-                {
-                    "code": "lang.zero_cal.name",
-                    "chinese": "名称",
-                    "english": "Name"
-                },
-                {
-                    "code": "lang.zero_cal.torque_offset",
-                    "chinese": "扭矩-偏移量",
-                    "english": "Torque-Offset"
-                },
-                {
-                    "code": "lang.zero_cal.thrust_offset",
-                    "chinese": "推力-偏移量",
-                    "english": "Thrust-Offset"
-                },
-                {
-                    "code": "lang.zero_cal.executor",
-                    "chinese": "调零",
-                    "english": "Zero Cal."
-                },
-                {
-                    "code": "lang.zero_cal.history",
-                    "chinese": "历史记录",
-                    "english": "Zero Cal. History"
-                },
-                {
-                    "code": "lang.zero_cal.last_performed",
-                    "chinese": "上次调零时间:",
-                    "english": "Last Performed:"
-                },
-                {
-                    "code": "lang.zero_cal.recommend_next_performing_time",
-                    "chinese": "推荐下次调零时间:",
-                    "english": "Recommend Next Performing Time:"
-                },
-                {
-                    "code": "lang.zero_cal.start",
-                    "chinese": "开始",
-                    "english": "Start"
-                },
-                {
-                    "code": "lang.zero_cal.accept",
-                    "chinese": "接受",
-                    "english": "Accept"
-                },
-                {
-                    "code": "lang.zero_cal.abort",
-                    "chinese": "中止",
-                    "english": "Abort"
-                },
-                {
-                    "code": "lang.zero_cal.fetch_data",
-                    "chinese": "获取数据",
-                    "english": "Fetch Data"
-                },
-                {
-                    "code": "lang.zero_cal.reset",
-                    "chinese": "重置",
-                    "english": "Reset"
-                },
-                {
-                    "code": "lang.zero_cal.mv_per_v_for_torque",
-                    "chinese": "mv/v - 扭矩",
-                    "english": "mv/v for Torque"
-                },
-                {
-                    "code": "lang.zero_cal.mv_per_v_for_thrust",
-                    "chinese": "mv/v - 推力",
-                    "english": "mv/v for Thrust"
-                },
-                {
-                    "code": "lang.zero_cal.new_torque_offset",
-                    "chinese": "新扭矩-偏置量",
-                    "english": "New Torque Offset"
-                },
-                {
-                    "code": "lang.zero_cal.new_thrust_offset",
-                    "chinese": "新推力-偏置量",
-                    "english": "New Thrust Offset"
-                }
-            ]).execute()
+            {
+                "code": "lang.toast.system_exit",
+                "chinese": "系统正在关闭中，请勿操作...",
+                "english": "System is closing, please do not operate..."
+            },
+
+            {
+                "code": "lang.toast.success",
+                "chinese": "操作成功",
+                "english": "Operation Success"
+            },
+
+            {
+                "code": "lang.toast.warning",
+                "chinese": "操作存在警告",
+                "english": "Operation Warning"
+            },
+
+            {
+                "code": "lang.toast.error",
+                "chinese": "操作发生错误",
+                "english": "Operation Error"
+            },
+
+            {
+                "code": "lang.button.save",
+                "chinese": "保存",
+                "english": "Save"
+            },
+
+            {
+                "code": "lang.button.start",
+                "chinese": "开始",
+                "english": "Start"
+            },
+
+            {
+                "code": "lang.button.stop",
+                "chinese": "停止",
+                "english": "Stop"
+            },
+
+            {
+                "code": "lang.button.cancel",
+                "chinese": "取消",
+                "english": "Cancel"
+            },
+
+            {
+                "code": "lang.button.reset",
+                "chinese": "重置",
+                "english": "Reset"
+            },
+
+            {
+                "code": "lang.button.push_to_slave",
+                "chinese": "推送到从机",
+                "english": "Push To Slave"
+            },
+
+            {
+                "code": "lang.button.search",
+                "chinese": "搜索",
+                "english": "Search"
+            },
+
+            {
+                "code": "lang.button.confirm",
+                "chinese": "确认",
+                "english": "Confirm"
+            },
+            {
+                "code": "lang.button.edit",
+                "chinese": "编辑",
+                "english": "Edit"
+            },
+            {
+                "code": "lang.button.delete",
+                "chinese": "删除",
+                "english": "Delete"
+            },
+
+            {
+                "code": "lang.button.start_test_mode",
+                "chinese": "开始测试模式",
+                "english": "Start Test Mode"
+            },
+            {
+                "code": "lang.button.stop_test_mode",
+                "chinese": "停止测试模式",
+                "english": "Stop Test Mode"
+            },
+
+            {
+                "code": "lang.button.start_fatigue_testing",
+                "chinese": "开始疲劳测试",
+                "english": "Start Fatigue Testing"
+            },
+
+            {
+                "code": "lang.button.stop_fatigue_testing",
+                "chinese": "停止疲劳测试",
+                "english": "Stop Fatigue Testing"
+            },
+
+            {
+                "code": "lang.common.app_name",
+                "chinese": "轴功率仪",
+                "english": "Shaft Power Meter"
+            },
+            {
+                "code": "lang.common.operation",
+                "chinese": "操作",
+                "english": "Operation"
+            },
+
+            {
+                "code": "lang.common.power",
+                "chinese": "功率",
+                "english": "Power"
+            },
+
+            {
+                "code": "lang.common.is_overload",
+                "chinese": "过载",
+                "english": "Overload"
+            },
+
+            {
+                "code": "lang.common.speed",
+                "chinese": "转速",
+                "english": "Speed"
+            },
+
+            {
+                "code": "lang.common.torque",
+                "chinese": "扭矩",
+                "english": "Torque"
+            },
+
+            {
+                "code": "lang.common.thrust",
+                "chinese": "推力",
+                "english": "Thrust"
+            },
+
+            {
+                "code": "lang.common.average_power",
+                "chinese": "平均功率",
+                "english": "Average Power"
+            },
+
+            {
+                "code": "lang.common.total_energy",
+                "chinese": "总能耗",
+                "english": "Total Energy"
+            },
+
+            {
+                "code": "lang.common.sps",
+                "chinese": "螺旋桨1",
+                "english": "sps"
+            },
+
+            {
+                "code": "lang.common.sps2",
+                "chinese": "螺旋桨2",
+                "english": "sps2"
+            },
+
+            {
+                "code": "lang.common.total",
+                "chinese": "总计",
+                "english": "Total"
+            },
+
+            {
+                "code": "lang.common.limited_power",
+                "chinese": "限制功率",
+                "english": "Limited Power"
+            },
+            {
+                "code": "lang.common.unlimited_power",
+                "chinese": "非限制最大功率",
+                "english": "Un-limited Power"
+            },
+
+            {
+                "code": "lang.common.eexi_limited_power",
+                "chinese": "EEXI 限制功率",
+                "english": "EEXI Limited Power"
+            },
+            {
+                "code": "lang.common.power_unlimited_mode",
+                "chinese": "功率无限制模式",
+                "english": "Power Un-limited Mode"
+            },
+            {
+                "code": "lang.common.start_date",
+                "chinese": "UTC 开始日期",
+                "english": "UTC Start Date"
+            },
+
+            {
+                "code": "lang.common.end_date",
+                "chinese": "UTC 结束日期",
+                "english": "UTC End Date"
+            },
+
+            {
+                "code": "lang.common.created_at",
+                "chinese": "创建时间",
+                "english": "Created At"
+            },
+
+            {
+                "code": "lang.common.updated_at",
+                "chinese": "更新时间",
+                "english": "Updated At"
+            },
+
+            {
+                "code": "lang.common.propeller_name",
+                "chinese": "名称",
+                "english": "Name"
+            },
+
+            {
+                "code": "lang.common.no",
+                "chinese": "序号",
+                "english": "No."
+            },
+
+            {
+                "code": "lang.common.utc_date_time",
+                "chinese": "UTC 日期时间",
+                "english": "UTC Date Time"
+            },
+
+            {
+                "code": "lang.common.location",
+                "chinese": "位置",
+                "english": "Location"
+            },
+
+            {
+                "code": "lang.common.breach_reason",
+                "chinese": "突破原因",
+                "english": "Breach Reason"
+            },
+
+            {
+                "code": "lang.common.start_position",
+                "chinese": "开始位置",
+                "english": "Start Position"
+            },
+
+            {
+                "code": "lang.common.end_position",
+                "chinese": "结束位置",
+                "english": "End Position"
+            },
+
+            {
+                "code": "lang.common.acknowledged_at",
+                "chinese": "应答于",
+                "english": "Acknowledged At"
+            },
+            {
+                "code": "lang.common.note",
+                "chinese": "备注",
+                "english": "Note"
+            },
+            {
+                "code": "lang.common.event_name",
+                "chinese": "事件名称",
+                "english": "Event Name"
+            },
+            {
+                "code": "lang.common.acknowledge_time",
+                "chinese": "应答时间",
+                "english": "Acknowledge Time"
+            },
+
+            {
+                "code": "lang.common.view",
+                "chinese": "查看",
+                "english": "View"
+            },
+
+            {
+                "code": "lang.common.export",
+                "chinese": "导出",
+                "english": "Export"
+            },
+            {
+                "code": "lang.common.ip_address_format_error",
+                "chinese": "IP地址格式错误",
+                "english": "IP Address Format Error"
+            },
+            {
+                "code": "lang.common.connecting",
+                "chinese": "连接中",
+                "english": "Connecting..."
+            },
+            {
+                "code": "lang.header.home",
+                "chinese": "主页",
+                "english": "Home"
+            },
+            {
+                "code": "lang.header.report",
+                "chinese": "报告",
+                "english": "Report"
+            },
+            {
+                "code": "lang.header.setting",
+                "chinese": "设置",
+                "english": "Setting"
+            },
+            {
+                "code": "lang.header.shapoli",
+                "chinese": "ShaPoLi",
+                "english": "ShaPoLi"
+            },
+
+            {
+                "code": "lang.home.tab.dashboard",
+                "chinese": "仪表板",
+                "english": "Dashboard"
+            },
+            {
+                "code": "lang.home.tab.counter",
+                "chinese": "计数器",
+                "english": "Counter"
+            },
+
+            {
+                "code": "lang.home.tab.trendview",
+                "chinese": "趋势视图",
+                "english": "Trend View"
+            },
+            {
+                "code": "lang.home.tab.propeller_curve",
+                "chinese": "螺旋桨曲线",
+                "english": "Propeller Curve"
+            },
+            {
+                "code": "lang.home.tab.alarm",
+                "chinese": "报警",
+                "english": "Alarm"
+            },
+            {
+                "code": "lang.home.tab.logs",
+                "chinese": "日志",
+                "english": "Logs"
+            },
+            {
+                "code": "lang.home.tab.event",
+                "chinese": "事件",
+                "english": "Event"
+            },
+
+            {
+                "code": "lang.setting.system_conf.title",
+                "chinese": "系统配置",
+                "english": "System Conf."
+            },
+
+            {
+                "code": "lang.setting.general.title",
+                "chinese": "通用配置",
+                "english": "General"
+            },
+
+            {
+                "code": "lang.setting.propeller_setting.title",
+                "chinese": "螺旋桨配置",
+                "english": "Propeller Setting"
+            },
+
+            {
+                "code": "lang.setting.zero_cal.title",
+                "chinese": "零点校准",
+                "english": "Zero Cal."
+            },
+
+            {
+                "code": "lang.setting.zero_cal.submitted",
+                "chinese": "已提交",
+                "english": "Submitted"
+            },
+
+            {
+                "code": "lang.setting.zero_cal.started",
+                "chinese": "已开始",
+                "english": "Started"
+            },
+
+            {
+                "code": "lang.setting.zero_cal.aborted",
+                "chinese": "已中止",
+                "english": "Aborted"
+            },
+            {
+                "code": "lang.setting.zero_cal.accepted",
+                "chinese": "已接受",
+                "english": "Accepted"
+            },
+
+            {
+                "code": "lang.setting.zero_cal.disabled",
+                "chinese": "此HMI运行在从机模式，无需配置调零。",
+                "english": "This HMI is running as a slave mode without zero cal."
+            },
+            {
+                "code": "lang.setting.io_conf.title",
+                "chinese": "IO 配置",
+                "english": "IO Conf."
+            },
+            {
+                "code": "lang.setting.io_conf.serial_port_can_not_be_empty",
+                "chinese": "请选择一个输出端口",
+                "english": "please select a serial port to start to output"
+            },
+            {
+                "code": "lang.setting.io_conf.output_option_does_not_selected",
+                "chinese": "请至少选择输出一个项目",
+                "english": "please check one output option at least."
+            },
+            {
+                "code": "lang.setting.language_conf.title",
+                "chinese": "语言配置",
+                "english": "Language Conf."
+            },
+
+            {
+                "code": "lang.setting.language_conf.code",
+                "chinese": "代码",
+                "english": "Code"
+            },
+
+            {
+                "code": "lang.setting.language_conf.chinese",
+                "chinese": "中文",
+                "english": "Chinese"
+            },
+
+            {
+                "code": "lang.setting.language_conf.english",
+                "chinese": "英文",
+                "english": "English"
+            },
+
+            {
+                "code": "lang.setting.self_test.title",
+                "chinese": "自检",
+                "english": "Self Test"
+            },
+
+            {
+                "code": "lang.setting.permission_conf.title",
+                "chinese": "权限配置",
+                "english": "Authority Conf."
+            },
+
+            {
+                "code": "lang.setting.test_mode.title",
+                "chinese": "测试模式",
+                "english": "Test Mode"
+            },
+
+            {
+                "code": "lang.setting.test_mode.customize_data_range",
+                "chinese": "自定义数据范围",
+                "english": "Customize Data Range"
+            },
+
+            {
+                "code": "lang.setting.test_mode.instant_mock_data",
+                "chinese": "瞬时模拟数据",
+                "english": "Instant Mock Data"
+            },
+
+            {
+                "code": "lang.setting.test_mode.min_torque",
+                "chinese": "最小扭矩",
+                "english": "Min Torque"
+            },
+
+            {
+                "code": "lang.setting.test_mode.max_torque",
+                "chinese": "最大扭矩",
+                "english": "Max Torque"
+            },
+
+            {
+                "code": "lang.setting.test_mode.min_speed",
+                "chinese": "最小转速",
+                "english": "Min Speed"
+            },
+
+            {
+                "code": "lang.setting.test_mode.max_speed",
+                "chinese": "最大转速",
+                "english": "Max Speed"
+            },
+
+            {
+                "code": "lang.setting.test_mode.min_thrust",
+                "chinese": "最小推力",
+                "english": "Min Thrust"
+            },
+
+            {
+                "code": "lang.setting.test_mode.max_thrust",
+                "chinese": "最大推力",
+                "english": "Max Thrust"
+            },
+
+            {
+                "code": "lang.setting.test_mode.please_confirm",
+                "chinese": "请确认",
+                "english": "Please Confirm"
+            },
+
+            {
+                "code": "lang.setting.test_mode.system_restart_after_change",
+                "chinese": "修改系统配置后,软件需要重启才能生效",
+                "english": "This software need to be restarted after you changed the system settings."
+            },
+
+            {
+                "code": "lang.setting.offline_default_value",
+                "chinese": "SPS离线默认值",
+                "english": "SPS Offline Default Value"
+            },
+
+            {
+                "code": "lang.setting.setting",
+                "chinese": "设置",
+                "english": "Setting"
+            },
+
+            {
+                "code": "lang.setting.running_mode",
+                "chinese": "运行模式",
+                "english": "Running Mode"
+            },
+
+            {
+                "code": "lang.setting.is_individual",
+                "chinese": "单机",
+                "english": "Individual"
+            },
+
+            {
+                "code": "lang.setting.enable_gps",
+                "chinese": "启用GPS",
+                "english": "Enable GPS"
+            },
+
+            {
+                "code": "lang.setting.master",
+                "chinese": "主机",
+                "english": "Master"
+            },
+
+            {
+                "code": "lang.setting.slave",
+                "chinese": "从机",
+                "english": "Slave"
+            },
+
+            {
+                "code": "lang.setting.display_thrust",
+                "chinese": "显示推力",
+                "english": "Display Thrust"
+            },
+
+            {
+                "code": "lang.setting.amount_of_propeller",
+                "chinese": "螺旋桨数量",
+                "english": "Amount of Propeller"
+            },
+
+            {
+                "code": "lang.setting.enable_sha_po_li",
+                "chinese": "启用ShaPoLi",
+                "english": "Enable ShaPoLi"
+            },
+            {
+                "code": "lang.setting.display_propeller_curve",
+                "chinese": "显示螺旋桨曲线",
+                "english": "Display Propeller Curve"
+            },
+            {
+                "code": "lang.setting.single_propeller",
+                "chinese": "单桨",
+                "english": "Single"
+            },
+
+            {
+                "code": "lang.setting.twins_propeller",
+                "chinese": "双桨",
+                "english": "Twins"
+            },
+
+            {
+                "code": "lang.setting.unlimited_power",
+                "chinese": "最大功率",
+                "english": "Unlimited Power"
+            },
+
+            {
+                "code": "lang.setting.eexi_limited_power",
+                "chinese": "EEXI 限制功率",
+                "english": "EEXI Limited Power"
+            },
+
+            {
+                "code": "lang.setting.eexi_breach_checking_duration",
+                "chinese": "EEXI 超限检查周期",
+                "english": "EEXI Breach Checking Duration"
+            },
+
+            {
+                "code": "lang.setting.hide_admin_account",
+                "chinese": "隐藏Admin账号",
+                "english": "Hide Admin Accounts"
+            },
+
+            {
+                "code": "lang.setting.ship_info",
+                "chinese": "船舶信息",
+                "english": "Ship Info"
+            },
+
+            {
+                "code": "lang.setting.ship_type",
+                "chinese": "船舶类型",
+                "english": "Ship Type"
+            },
+
+            {
+                "code": "lang.setting.ship_name",
+                "chinese": "船舶名称",
+                "english": "Ship Name"
+            },
+
+            {
+                "code": "lang.setting.imo_number",
+                "chinese": "IMO 号码",
+                "english": "IMO Number"
+            },
+
+            {
+                "code": "lang.setting.ship_size",
+                "chinese": "船舶尺寸",
+                "english": "Ship Size"
+            },
+
+            {
+                "code": "lang.setting.bearing_outer_diameter_D",
+                "chinese": "轴外径",
+                "english": "Shaft Outer Diameter"
+            },
+
+            {
+                "code": "lang.setting.bearing_inner_diameter_d",
+                "chinese": "轴内径",
+                "english": "Shaft Inner Diameter"
+            },
+
+            {
+                "code": "lang.setting.sensitivity_factor_k",
+                "chinese": "应变片系数",
+                "english": "Strain gauge Factor"
+            },
+
+            {
+                "code": "lang.setting.elastic_modulus_E",
+                "chinese": "杨氏模量",
+                "english": "Young's Modulus"
+            },
+
+            {
+                "code": "lang.setting.poisson_ratio_mu",
+                "chinese": "泊松比",
+                "english": "Poisson's Ratio"
+            },
+
+
+
+            {
+                "code": "lang.setting.preference",
+                "chinese": "偏好设置",
+                "english": "Preference"
+            },
+
+            {
+                "code": "lang.setting.theme",
+                "chinese": "主题",
+                "english": "Theme"
+            },
+            {
+                "code": "lang.setting.theme.light",
+                "chinese": "浅色",
+                "english": "Light"
+            },
+
+            {
+                "code": "lang.setting.theme.dark",
+                "chinese": "深色",
+                "english": "Dark"
+            },
+
+            {
+                "code": "lang.setting.unit",
+                "chinese": "单位",
+                "english": "Unit"
+            },
+
+            {
+                "code": "lang.setting.unit.metric",
+                "chinese": "公制",
+                "english": "Metric"
+            },
+
+
+            {
+                "code": "lang.setting.fullscreen",
+                "chinese": "全屏",
+                "english": "Fullscreen"
+            },
+
+            {
+                "code": "lang.setting.unit.si",
+                "chinese": "国际单位制",
+                "english": "SI"
+            },
+
+            {
+                "code": "lang.setting.language",
+                "chinese": "语言",
+                "english": "Language"
+            },
+
+            {
+                "code": "lang.setting.data_refresh_interval",
+                "chinese": "界面数据刷新间隔",
+                "english": "Dashboard Data Refresh Interval"
+            },
+
+            {
+                "code": "lang.setting.maximum_limitations",
+                "chinese": "最大限制",
+                "english": "Maximum Limitations"
+            },
+
+            {
+                "code": "lang.setting.warning_limitations",
+                "chinese": "警告限制",
+                "english": "Warning Limitations"
+            },
+
+            {
+                "code": "lang.setting.utc_date_time_conf",
+                "chinese": "UTC 日期时间配置",
+                "english": "UTC Date Time Conf."
+            },
+
+            {
+                "code": "lang.setting.current_utc_date_time",
+                "chinese": "当前UTC日期时间",
+                "english": "Current UTC Date Time"
+            },
+
+            {
+                "code": "lang.setting.date",
+                "chinese": "日期",
+                "english": "Date"
+            },
+
+            {
+                "code": "lang.setting.time",
+                "chinese": "时间",
+                "english": "Time"
+            },
+
+            {
+                "code": "lang.setting.date_format",
+                "chinese": "日期格式",
+                "english": "Date Format"
+            },
+
+            {
+                "code": "lang.setting.sync_with_gps",
+                "chinese": "与GPS同步",
+                "english": "Sync with GPS"
+            },
+
+            {
+                "code": "lang.setting.mcr_operating_point",
+                "chinese": "MCR 运行点",
+                "english": "MCR Operating Point"
+            },
+
+            {
+                "code": "lang.setting.normal_propeller_curve",
+                "chinese": "正常螺旋桨曲线 (1)",
+                "english": "Normal Propeller Curve (1)"
+            },
+
+            {
+                "code": "lang.setting.rpm_left",
+                "chinese": "左转速",
+                "english": "RPM Left"
+            },
+
+            {
+                "code": "lang.setting.rpm_right",
+                "chinese": "右转速",
+                "english": "RPM Right"
+            },
+
+            {
+                "code": "lang.setting.power_left",
+                "chinese": "左功率",
+                "english": "Power Left"
+            },
+
+            {
+                "code": "lang.setting.power_right",
+                "chinese": "右功率",
+                "english": "Power Right"
+            },
+
+            {
+                "code": "lang.setting.light_propeller_curve",
+                "chinese": "轻载螺旋桨曲线 (2)",
+                "english": "Light Propeller Curve (2)"
+            },
+
+            {
+                "code": "lang.setting.torque_load_limit_curve",
+                "chinese": "扭矩负载限制曲线 (4)",
+                "english": "Torque/Load Limit Curve (4)"
+            },
+
+            {
+                "code": "lang.setting.overload_curve",
+                "chinese": "过载曲线 (5)",
+                "english": "Overload Curve (5)"
+            },
+
+            {
+                "code": "lang.setting.speed_limit_curve",
+                "chinese": "速度限制曲线 (3)",
+                "english": "Speed Limit Curve (3)"
+            },
+
+            {
+                "code": "lang.setting.enable_overload_alarm",
+                "chinese": "启用过载报警",
+                "english": "Enable Overload Alarm"
+            },
+
+            {
+                "code": "lang.setting.plc_conf",
+                "chinese": "PLC 配置",
+                "english": "PLC Conf."
+            },
+
+            {
+                "code": "lang.setting.save_limitations_to_plc_failed",
+                "chinese": "保存上下限到PLC失败",
+                "english": "Save Limitations to PLC Failed"
+            },
+
+
+            {
+                "code": "lang.setting.check_plc_connection",
+                "chinese": "检查PLC连接",
+                "english": "Check PLC Connection"
+            },
+
+            {
+                "code": "lang.setting.check_gps_connection",
+                "chinese": "检查GPS连接",
+                "english": "Check GPS Connection"
+            },
+
+            {
+                "code": "lang.setting.check_sps_connection",
+                "chinese": "检查SPS连接",
+                "english": "Check SPS Connection"
+            },
+
+            {
+                "code": "lang.setting.4_20_ma_power_min",
+                "chinese": "4-20mA 功率最小值",
+                "english": "4-20mA Power Min"
+            },
+
+
+            {
+                "code": "lang.setting.4_20_ma_power_max",
+                "chinese": "4-20mA 功率最大值",
+                "english": "4-20mA Power Max"
+            },
+
+            {
+                "code": "lang.setting.4_20_ma_power_offset",
+                "chinese": "4-20mA 功率偏移",
+                "english": "4-20mA Power Offset"
+            },
+
+            {
+                "code": "lang.setting.4_20_ma_torque_min",
+                "chinese": "4-20mA 扭矩最小值   ",
+                "english": "4-20mA Torque Min"
+            },
+
+            {
+                "code": "lang.setting.4_20_ma_torque_max",
+                "chinese": "4-20mA 扭矩最大值",
+                "english": "4-20mA Torque Max"
+            },
+
+            {
+                "code": "lang.setting.4_20_ma_torque_offset",
+                "chinese": "4-20mA 扭矩偏置",
+                "english": "4-20mA Torque Offset"
+            },
+
+            {
+                "code": "lang.setting.4_20_ma_thrust_min",
+                "chinese": "4-20mA 推力最小值",
+                "english": "4-20mA Thrust Min"
+            },
+
+
+            {
+                "code": "lang.setting.4_20_ma_thrust_max",
+                "chinese": "4-20mA 推力最大值",
+                "english": "4-20mA Thrust Max"
+            },
+
+            {
+                "code": "lang.setting.4_20_ma_thrust_offset",
+                "chinese": "4-20mA 推力偏置",
+                "english": "4-20mA Thrust Offset"
+            },
+
+            {
+                "code": "lang.setting.4_20_ma_speed_min",
+                "chinese": "4-20mA 速度最小值",
+                "english": "4-20mA Speed Min"
+            },
+
+            {
+                "code": "lang.setting.4_20_ma_speed_max",
+                "chinese": "4-20mA 速度最大值",
+                "english": "4-20mA Speed Max"
+            },
+
+            {
+                "code": "lang.setting.4_20_ma_speed_offset",
+                "chinese": "4-20mA 速度偏置",
+                "english": "4-20mA Speed Offset"
+            },
+
+            {
+                "code": "lang.setting.hmi_server_ip",
+                "chinese": "HMI 服务器IP",
+                "english": "HMI Server IP"
+            },
+
+            {
+                "code": "lang.setting.hmi_server_port",
+                "chinese": "HMI 服务器端口",
+                "english": "HMI Server Port"
+            },
+
+            {
+                "code": "lang.setting.start_master_server",
+                "chinese": "启动主机服务",
+                "english": "Start Server"
+            },
+
+            {
+                "code": "lang.setting.stop_master_server",
+                "chinese": "停止主机服务器",
+                "english": "Stop Server"
+            },
+
+            {
+                "code": "lang.setting.connect_to_master",
+                "chinese": "连接到主机",
+                "english": "Connect to Master"
+            },
+
+            {
+                "code": "lang.setting.disconnect_from_master",
+                "chinese": "断开HMI服务器",
+                "english": "Disconnect from Master"
+            },
+
+            {
+                "code": "lang.setting.connect",
+                "chinese": "连接",
+                "english": "Connect"
+            },
+
+            {
+                "code": "lang.setting.disconnect",
+                "chinese": "断开",
+                "english": "Disconnect"
+            },
+
+            {
+                "code": "lang.setting.fetch_data",
+                "chinese": "获取数据",
+                "english": "Fetch Data"
+            },
+
+            {
+                "code": "lang.setting.ip",
+                "chinese": "IP 地址",
+                "english": "IP Address"
+            },
+
+            {
+                "code": "lang.setting.port",
+                "chinese": "端口",
+                "english": "Port"
+            },
+
+            {
+                "code": "lang.setting.output_conf",
+                "chinese": "输出配置",
+                "english": "Output Conf."
+            },
+
+            {
+                "code": "lang.setting.gps_conf",
+                "chinese": "GPS 配置",
+                "english": "GPS Conf."
+            },
+
+            {
+                "code": "lang.setting.sps_conf",
+                "chinese": "SPS 配置",
+                "english": "SPS Conf."
+            },
+
+            {
+                "code": "lang.setting.master_server_conf",
+                "chinese": "主机服务配置",
+                "english": "Master Server Conf."
+            },
+
+            {
+                "code": "lang.setting.interface_conf",
+                "chinese": "接口配置",
+                "english": "Interface Conf."
+            },
+
+            {
+                "code": "lang.setting.plc_enabled",
+                "chinese": "启用PLC",
+                "english": "PLC Enabled"
+            },
+
+            {
+                "code": "lang.log.event_log",
+                "chinese": "事件日志",
+                "english": "Event Log"
+            },
+
+            {
+                "code": "lang.log.data_log",
+                "chinese": "数据日志",
+                "english": "Data Log"
+            },
+
+            {
+                "code": "lang.log.gps_log",
+                "chinese": "GPS 日志",
+                "english": "GPS Log"
+            },
+            {
+                "code": "lang.log.operation_log",
+                "chinese": "操作日志",
+                "english": "Operation Log"
+            },
+            {
+                "code": "lang.operation_log.operation_type",
+                "chinese": "操作类型",
+                "english": "Operation Type"
+            },
+            {
+                "code": "lang.operation_log.operation_content",
+                "chinese": "操作内容",
+                "english": "Operation Content"
+            },
+            {
+                "code": "lang.report.report_name",
+                "chinese": "报告名称",
+                "english": "Report Name"
+            },
+
+            {
+                "code": "lang.report.export_success",
+                "chinese": "导出成功",
+                "english": "Export Success"
+            },
+            {
+                "code": "lang.counter.interval",
+                "chinese": "间隔",
+                "english": "Interval"
+            },
+            {
+                "code": "lang.counter.manually",
+                "chinese": "手动",
+                "english": "Manually"
+            },
+            {
+                "code": "lang.counter.total",
+                "chinese": "总计",
+                "english": "Total"
+            },
+            {
+                "code": "lang.counter.running",
+                "chinese": "运行中",
+                "english": "Running"
+            },
+            {
+                "code": "lang.counter.reset",
+                "chinese": "重置",
+                "english": "Reset"
+            },
+            {
+                "code": "lang.counter.stopped",
+                "chinese": "已停止",
+                "english": "Stopped"
+            },
+            {
+                "code": "lang.counter.start",
+                "chinese": "启动",
+                "english": "Start"
+            },
+            {
+                "code": "lang.counter.stop",
+                "chinese": "停止",
+                "english": "Stop"
+            },
+            {
+                "code": "lang.counter.reset",
+                "chinese": "恢复",
+                "english": "Reset"
+            },
+            {
+                "code": "lang.counter.total_energy",
+                "chinese": "总耗量",
+                "english": "Total Energy"
+            },
+            {
+                "code": "lang.counter.average_power",
+                "chinese": "平均功率",
+                "english": "Average Power"
+            },
+            {
+                "code": "lang.counter.average_speed",
+                "chinese": "转速",
+                "english": "Rotational Speed"
+            },
+            {
+                "code": "lang.counter.interval_setting",
+                "chinese": "间隔设置",
+                "english": "Interval Setting"
+            },
+            {
+                "code": "lang.counter.hours",
+                "chinese": "小时",
+                "english": "Hours"
+            },
+            {
+                "code": "lang.counter.started_at",
+                "chinese": "开始于",
+                "english": "Started At"
+            },
+            {
+                "code": "lang.counter.stopped_at",
+                "chinese": "停止于",
+                "english": "Stopped At"
+            },
+            {
+                "code": "lang.counter.measured",
+                "chinese": "已测量",
+                "english": "Measured"
+            },
+            {
+                "code": "lang.counter.please_confirm",
+                "chinese": "请确认",
+                "english": "Please Confirm"
+            },
+            {
+                "code": "lang.counter.do_you_really_want_to_reset_counter",
+                "chinese": "你确定要重置计数器吗？",
+                "english": "Do you really want to reset the counter?"
+            },
+            {
+                "code": "lang.counter.yes",
+                "chinese": "是",
+                "english": "Yes"
+            },
+            {
+                "code": "lang.counter.no",
+                "chinese": "否",
+                "english": "No"
+            },
+            {
+                "code": "lang.counter.interval_has_been_changed",
+                "chinese": "间隔已更改",
+                "english": "Interval has been changed"
+            },
+            {
+                "code": "lang.counter.interval_cannot_be_empty",
+                "chinese": "间隔不能为空",
+                "english": "Interval cannot be empty"
+            },
+            {
+                "code": "lang.counter.interval_must_be_greater_than_0",
+                "chinese": "间隔必须大于0",
+                "english": "Interval must be greater than 0"
+            },
+            {
+                "code": "lang.trendview.cannot_search_more_than_90_days",
+                "chinese": "不能搜索超过90天",
+                "english": "Cannot search more than 90 days"
+            },
+
+            {
+                "code": "lang.propeller_curve.disabled_under_slave_mode",
+                "chinese": "此HMI运行在从机模式，无需配置螺旋桨曲线。",
+                "english": "This HMI is running as a slave mode without propeller setting."
+            },
+
+            {
+                "code": "lang.propeller_curve.propeller_curve_disabled",
+                "chinese": "螺旋线曲线被禁用",
+                "english": "Propeller Curve is disabled"
+            },
+
+            {
+                "code": "lang.propeller_curve.mcr_operating_point",
+                "chinese": "MCR 操作点",
+                "english": "MCR Operating Point"
+            },
+            {
+                "code": "lang.propeller_curve.normal_propeller_curve",
+                "chinese": "正常螺旋桨曲线",
+                "english": "Normal Propeller Curve"
+            },
+            {
+                "code": "lang.propeller_curve.light_propeller_curve",
+                "chinese": "轻载螺旋桨曲线",
+                "english": "Light Propeller Curve"
+            },
+            {
+                "code": "lang.propeller_curve.speed_limit_curve",
+                "chinese": "速度限制曲线",
+                "english": "Speed Limit Curve"
+            },
+            {
+                "code": "lang.propeller_curve.torque_load_limit_curve",
+                "chinese": "扭矩负载限制曲线",
+                "english": "Torque Load Limit Curve"
+            },
+            {
+                "code": "lang.propeller_curve.overload_curve",
+                "chinese": "过载曲线",
+                "english": "Overload Curve"
+            },
+            {
+                "code": "lang.propeller_curve.engine_speed",
+                "chinese": "发动机转速, % of A",
+                "english": "Engine Speed, % of A"
+            },
+            {
+                "code": "lang.propeller_curve.engine_shaft_power",
+                "chinese": "发动机轴功率, % of A",
+                "english": "Engine Shaft Power, % of A"
+            },
+            {
+                "code": "lang.alarm.occured_time",
+                "chinese": "发生时间",
+                "english": "Event Time"
+            },
+            {
+                "code": "lang.alarm.recovery_time",
+                "chinese": "恢复时间",
+                "english": "Recovery Time"
+            },
+            {
+                "code": "lang.alarm.master_plc_disconnected",
+                "chinese": "PLC断开",
+                "english": "Master PLC Disconnected"
+            },
+            {
+                "code": "lang.alarm.master_plc_connected",
+                "chinese": "PLC连接",
+                "english": "Master PLC Connected"
+            },
+            {
+                "code": "lang.alarm.master_gps_connected",
+                "chinese": "主机GPS连接",
+                "english": "Master GPS Connected"
+            },
+            {
+                "code": "lang.alarm.master_gps_disconnected",
+                "chinese": "主机GPS断开",
+                "english": "Master GPS Disconnected"
+            },
+            {
+                "code": "lang.alarm.master_sps_disconnected",
+                "chinese": "主机SPS断开",
+                "english": "Master SPS Disconnected"
+            },
+            {
+                "code": "lang.alarm.master_sps_connected",
+                "chinese": "主机SPS连接",
+                "english": "Master SPS Connected"
+            },
+            {
+                "code": "lang.alarm.master_sps2_disconnected",
+                "chinese": "主机SPS2断开",
+                "english": "Master SPS2 Disconnected"
+            },
+            {
+                "code": "lang.alarm.master_sps2_connected",
+                "chinese": "主机SPS2连接",
+                "english": "Master SPS2 Connected"
+            },
+            {
+                "code": "lang.alarm.master_server_stopped",
+                "chinese": "Master服务端已停止",
+                "english": "Master Server Stopped"
+            },
+            {
+                "code": "lang.alarm.master_server_started",
+                "chinese": "Master服务端已启动",
+                "english": "Master Server Started"
+            },
+            {
+                "code": "lang.alarm.slave_master_disconnected",
+                "chinese": "从机已断开连接",
+                "english": "Slave-Master Disconnected"
+            },
+            {
+                "code": "lang.alarm.slave_master_connected",
+                "chinese": "从机已恢复连接",
+                "english": "Slave-Master Connected"
+            },
+            {
+                "code": "lang.alarm.power_optimal_load",
+                "chinese": "功率正常",
+                "english": "Power Optimal Load"
+            },
+            {
+                "code": "lang.alarm.power_overload",
+                "chinese": "功率过载",
+                "english": "Power Overload"
+            },
+            {
+                "code": "lang.alarm.unknown",
+                "chinese": "未知",
+                "english": "Unknown"
+            },
+            {
+                "code": "lang.alarm.acknowledge",
+                "chinese": "确认",
+                "english": "Acknowledge"
+            },
+            {
+                "code": "lang.alarm.please_select_at_least_one_alarm",
+                "chinese": "请至少选择一个告警",
+                "english": "Please select at least one alarm"
+            },
+            {
+                "code": "lang.event.reason_for_power_reserve_breach",
+                "chinese": "功率突破原因",
+                "english": "Reason for Power Reserve Breach"
+            },
+            {
+                "code": "lang.event.date_time_of_power_reserve_breach",
+                "chinese": "功率突破时间",
+                "english": "Date/Time of Power Reserve Breach"
+            },
+            {
+                "code": "lang.event.ship_position_of_power_reserve_breach",
+                "chinese": "功率突破时的位置",
+                "english": "Ship Position of Power Reserve Breach"
+            },
+            {
+                "code": "lang.event.date_time_when_returning_to_limited_power",
+                "chinese": "功率恢复时间",
+                "english": "Date/Time when Returning to Limited Power"
+            },
+            {
+                "code": "lang.event.ship_position_when_returning_to_limited_power",
+                "chinese": "功率恢复时的位置",
+                "english": "Ship Position when Returning to Limited Power"
+            },
+            {
+                "code": "lang.event.note",
+                "chinese": "备注",
+                "english": "Note"
+            },
+            {
+                "code": "lang.event.ice_condition",
+                "chinese": "冰况",
+                "english": "Ice Condition"
+            },
+            {
+                "code": "lang.event.wave_height",
+                "chinese": "浪高",
+                "english": "Wave Height"
+            },
+            {
+                "code": "lang.event.beaufort_number",
+                "chinese": "风级",
+                "english": "Beaufort Number"
+            },
+            {
+                "code": "lang.event.please_input_all_fields_except_note",
+                "chinese": "请输入除备注外的所有字段",
+                "english": "Please input all fields except note"
+            },
+            {
+                "code": "lang.permission.user_name",
+                "chinese": "用户名",
+                "english": "User Name"
+            },
+            {
+                "code": "lang.permission.user_pwd",
+                "chinese": "密码",
+                "english": "Password"
+            },
+            {
+                "code": "lang.permission.user_role",
+                "chinese": "角色",
+                "english": "Role"
+            },
+            {
+                "code": "lang.permission.edit_user",
+                "chinese": "编辑用户",
+                "english": "Edit User"
+            },
+            {
+                "code": "lang.permission.delete_user",
+                "chinese": "删除用户",
+                "english": "Delete User"
+            },
+            {
+                "code": "lang.permission.role",
+                "chinese": "角色",
+                "english": "Role"
+            },
+            {
+                "code": "lang.permission.add_user",
+                "chinese": "添加用户",
+                "english": "Add User"
+            },
+            {
+                "code": "lang.permission.confirm_user_pwd",
+                "chinese": "确认密码",
+                "english": "Confirm Password"
+            },
+            {
+                "code": "lang.permission.user_name_exists",
+                "chinese": "用户名已存在",
+                "english": "User Name Exists"
+            },
+            {
+                "code": "lang.permission.password_not_match",
+                "chinese": "密码不匹配",
+                "english": "Password Not Match"
+            },
+            {
+                "code": "lang.permission.user_name_required",
+                "chinese": "用户名不能为空",
+                "english": "User Name Required"
+            },
+            {
+                "code": "lang.permission.user_pwd_required",
+                "chinese": "密码不能为空",
+                "english": "Password Required"
+            },
+            {
+                "code": "lang.permission.confirm_user_pwd_required",
+                "chinese": "确认密码不能为空",
+                "english": "Confirm Password Required"
+            },
+            {
+                "code": "lang.permission.user_role_required",
+                "chinese": "角色不能为空",
+                "english": "User Role Required"
+            },
+            {
+                "code": "lang.permission.all",
+                "chinese": "所有",
+                "english": "All"
+            },
+            {
+                "code": "lang.permission.admin",
+                "chinese": "管理员",
+                "english": "Admin"
+            },
+            {
+                "code": "lang.permission.master",
+                "chinese": "主控",
+                "english": "Master"
+            },
+            {
+                "code": "lang.permission.user",
+                "chinese": "用户",
+                "english": "User"
+            },
+            {
+                "code": "lang.permission.authentication",
+                "chinese": "认证",
+                "english": "Authentication"
+            },
+            {
+                "code": "lang.permission.user_name_and_pwd_are_required",
+                "chinese": "用户名和密码不能为空",
+                "english": "User Name and Password are required"
+            },
+            {
+                "code": "lang.permission.user_name_or_pwd_is_incorrect",
+                "chinese": "用户名或密码不正确",
+                "english": "User Name or Password is Incorrect"
+            },
+            {
+                "code": "lang.zero_cal.name",
+                "chinese": "名称",
+                "english": "Name"
+            },
+            {
+                "code": "lang.zero_cal.torque_offset",
+                "chinese": "扭矩-偏移量",
+                "english": "Torque-Offset"
+            },
+            {
+                "code": "lang.zero_cal.thrust_offset",
+                "chinese": "推力-偏移量",
+                "english": "Thrust-Offset"
+            },
+            {
+                "code": "lang.zero_cal.executor",
+                "chinese": "调零",
+                "english": "Zero Cal."
+            },
+            {
+                "code": "lang.zero_cal.history",
+                "chinese": "历史记录",
+                "english": "Zero Cal. History"
+            },
+            {
+                "code": "lang.zero_cal.last_performed",
+                "chinese": "上次调零时间:",
+                "english": "Last Performed:"
+            },
+            {
+                "code": "lang.zero_cal.recommend_next_performing_time",
+                "chinese": "推荐下次调零时间:",
+                "english": "Recommend Next Performing Time:"
+            },
+            {
+                "code": "lang.zero_cal.start",
+                "chinese": "开始",
+                "english": "Start"
+            },
+            {
+                "code": "lang.zero_cal.accept",
+                "chinese": "接受",
+                "english": "Accept"
+            },
+            {
+                "code": "lang.zero_cal.abort",
+                "chinese": "中止",
+                "english": "Abort"
+            },
+            {
+                "code": "lang.zero_cal.fetch_data",
+                "chinese": "获取数据",
+                "english": "Fetch Data"
+            },
+            {
+                "code": "lang.zero_cal.reset",
+                "chinese": "重置",
+                "english": "Reset"
+            },
+            {
+                "code": "lang.zero_cal.mv_per_v_for_torque",
+                "chinese": "mv/v - 扭矩",
+                "english": "mv/v for Torque"
+            },
+            {
+                "code": "lang.zero_cal.mv_per_v_for_thrust",
+                "chinese": "mv/v - 推力",
+                "english": "mv/v for Thrust"
+            },
+            {
+                "code": "lang.zero_cal.new_torque_offset",
+                "chinese": "新扭矩-偏置量",
+                "english": "New Torque Offset"
+            },
+            {
+                "code": "lang.zero_cal.new_thrust_offset",
+                "chinese": "新推力-偏置量",
+                "english": "New Thrust Offset"
+            }
+        ]).execute()

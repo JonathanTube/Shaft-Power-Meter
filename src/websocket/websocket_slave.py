@@ -118,6 +118,8 @@ class WebSocketSlave:
                 )
             # 每条处理完毕，需要回复服务器
             await self.ack_alarm(alarm['alarm_uuid'])
+            # 刷新全局变量
+            gdata.configAlarm.set_default_value()
 
     async def ack_alarm(self, alarm_uuid):
         """发送告警处理确认"""

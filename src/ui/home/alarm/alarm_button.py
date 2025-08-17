@@ -62,7 +62,7 @@ class AlarmButton(ft.TextButton):
     def toggle_badge(self):
         try:
             if self.page:
-                cnt = gdata.configAlarm.total_count
+                cnt = gdata.configAlarm.alarm_total_count
                 if cnt > 0:
                     self.badge = ft.Badge(
                         text=str(cnt), label_visible=True,
@@ -93,7 +93,7 @@ class AlarmButton(ft.TextButton):
                 if cnt % 5 == 0:
                     self.toggle_badge()
 
-                if gdata.configAlarm.not_ack_count > 0:
+                if gdata.configAlarm.alarm_not_ack > 0:
                     self.toggle_button(cnt % 2 == 0)
                 else:
                     self.set_normal_button()

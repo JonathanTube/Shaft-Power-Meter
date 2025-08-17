@@ -80,7 +80,7 @@ class WebSocketMaster:
                 if type == 'eexi_breach':
                     await plc.write_eexi_breach_alarm(res['data'])
                 if type == 'alarm_ack':
-                    self._handle_alarm_ack(res['data'])
+                    self._handle_alarm_synced(res['data'])
 
         except websockets.exceptions.ConnectionClosed:
             logging.info("[Master] 客户端断开")
@@ -89,7 +89,7 @@ class WebSocketMaster:
         finally:
             self.client = None
 
-    def _handle_alarm_ack(self, alarm_uuid):
+    def _handle_alarm_synced(self, alarm_uuid):
         try:
             AlarmLog.update(is_synced=True).where(AlarmLog.alarm_uuid == alarm_uuid).execute()
         except Exception as e:

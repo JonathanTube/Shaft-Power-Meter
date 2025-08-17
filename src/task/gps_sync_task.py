@@ -69,7 +69,7 @@ class GpsSyncTask:
                 _logger.info("[GPS] 连接成功")
                 return True
             except Exception as e:
-                _logger.error(f"[GPS] 连接失败: {e}")
+                _logger.error(f"[GPS] 连接失败 {e}")
                 return False
 
     async def _receive_loop(self):
@@ -123,8 +123,9 @@ class GpsSyncTask:
         AlarmSaver.recovery(AlarmType.MASTER_GPS)
 
     def set_offline(self):
-        self.is_online = False
-        AlarmSaver.create(AlarmType.MASTER_GPS)
+        if self.is_online:
+            self.is_online = False
+            AlarmSaver.create(AlarmType.MASTER_GPS)
 
 
 gps = GpsSyncTask()

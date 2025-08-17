@@ -16,6 +16,8 @@ class EEXILimitedPower(ft.Container):
         self.eexi_power = gdata.configCommon.eexi_limited_power
         self.normal_power = self.eexi_power * 0.9
 
+        self.blinks = 0
+
     def build(self):
         try:
             if self.page is None or self.page.window is None or self.page.session is None:
@@ -41,29 +43,18 @@ class EEXILimitedPower(ft.Container):
 
             top_items = ft.Row(alignment=ft.MainAxisAlignment.SPACE_BETWEEN, controls=[self.title, self.unlimited_mode_row])
 
-            self.common_alarm_text = ft.Text("Common Alarm")
-            self.common_alarm_dot = ft.Text("🔴")
-            self.common_alarm_group = ft.Row(
-                controls=[self.common_alarm_text, self.common_alarm_dot],
-                alignment=ft.MainAxisAlignment.END,
-                vertical_alignment=ft.CrossAxisAlignment.CENTER
-            )
+            self.common_alarm_text = ft.Text("Common Alarm", weight=ft.FontWeight.BOLD, visible=False, color=ft.Colors.RED)
 
-            self.gps_status_text = ft.Text("GPS Status")
-            self.gps_status_dot = ft.Text("🟢")
-            self.gps_status_group = ft.Row(
-                controls=[self.gps_status_text, self.gps_status_dot],
-                alignment=ft.MainAxisAlignment.END,
-                vertical_alignment=ft.CrossAxisAlignment.CENTER
-            )
+            self.gps_status_text = ft.Text("GPS Status", weight=ft.FontWeight.BOLD, visible=False, color=ft.Colors.RED)
 
-            identifications = ft.Column(expand=True, alignment=ft.alignment.top_right,
-                                        visible=not gdata.configCommon.is_master,
-                                        controls=[self.common_alarm_group, self.gps_status_group])
+            identifications = ft.Column(
+                expand=True,
+                horizontal_alignment=ft.CrossAxisAlignment.END,
+                visible=not gdata.configCommon.is_master,
+                controls=[self.common_alarm_text, self.gps_status_text],
+                right=10, top=40)
 
-            center_items = ft.Row(expand=True, controls=[self.meter_half, identifications])
-
-            self.content = ft.Container(
+            main_content = ft.Container(
                 border=ft.border.all(
                     width=0.5,
                     color=ft.Colors.with_opacity(0.15, ft.Colors.INVERSE_SURFACE)
@@ -73,9 +64,13 @@ class EEXILimitedPower(ft.Container):
                 content=ft.Column(
                     spacing=10,
                     horizontal_alignment=ft.CrossAxisAlignment.CENTER,
-                    controls=[top_items, center_items]
+                    controls=[top_items, self.meter_half]
                 )
             )
+            self.content = ft.Stack(controls=[
+                identifications,
+                main_content
+            ])
         except:
             logging.exception('EEXILimitedPower.build')
 
@@ -102,16 +97,24 @@ class EEXILimitedPower(ft.Container):
 
     def update_idenfications(self):
         # 主机不更新
-        if not gdata.configCommon.is_master:
+        if gdata.configCommon.is_master:
             return
 
-        if self.common_alarm_dot and self.common_alarm_dot.page:
-            self.common_alarm_dot.value = '🔴' if gdata.configAlarm.common_count > 0 else '🟢'
-            self.common_alarm_dot.update()
+        if self.common_alarm_text and self.common_alarm_text.page:
+            if gdata.configAlarm.alarm_common_count > 0:
+                self.common_alarm_text.visible = self.blinks % 2 == 0
+            else:
+                self.common_alarm_text.visible = False
+            self.common_alarm_text.update()
 
-        if self.gps_status_dot and self.gps_status_dot.page:
-            self.gps_status_dot.value = '🔴' if gdata.configAlarm.gps_count > 0 else '🟢'
-            self.gps_status_dot.update()
+        if self.gps_status_text and self.gps_status_text.page:
+            if gdata.configAlarm.gps_total_count > 0:
+                self.gps_status_text.visible = self.blinks % 2 == 0
+            else:
+                self.common_alarm_text.visible = False
+            self.gps_status_text.update()
+
+        self.blinks += 1
 
     def update_mode(self):
         try:
