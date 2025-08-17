@@ -72,9 +72,11 @@ class SystemConf(ft.Container):
         try:
             keyboard.close()
             if self.system_conf_settings and self.system_conf_settings.page:
+                self.system_conf_settings.reset()
                 self.system_conf_settings.update()
             if self.system_conf_ship_info and self.system_conf_ship_info.page:
-                self.system_conf_ship_info.update()
+                self.system_conf_ship_info.reset()
+                self.system_conf_settings.update()
             Toast.show_success(e.page)
         except:
             logging.exception("exception occured at SystemConf.__reset_data")

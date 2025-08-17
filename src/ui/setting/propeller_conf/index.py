@@ -95,10 +95,6 @@ class PropellerConf(ft.Container):
             self.save_button.disabled = self.is_saving
             self.save_button.update()
 
-        if self.reset_button and self.reset_button.page:
-            self.reset_button.disabled = self.is_saving
-            self.reset_button.update()
-
     def __save_data(self, user: User):
         if self.is_saving:
             return

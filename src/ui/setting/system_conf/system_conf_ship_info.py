@@ -11,7 +11,6 @@ class SystemConfShipInfo(ft.Container):
         super().__init__()
         self.col = {'xs': 12}
         self.ship_info: ShipInfo = ShipInfo.get()
-
     def build(self):
         try:
             if self.page and self.page.session:
@@ -57,7 +56,8 @@ class SystemConfShipInfo(ft.Container):
         self.ship_info.ship_size = self.ship_size.value
         self.ship_info.save()
 
-    def before_update(self):
+    def reset(self):
+        self.ship_info: ShipInfo = ShipInfo.get()
         self.ship_type.value = self.ship_info.ship_type
         self.ship_name.value = self.ship_info.ship_name
         self.imo_number.value = self.ship_info.imo_number

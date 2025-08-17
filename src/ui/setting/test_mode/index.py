@@ -56,7 +56,7 @@ class TestMode(ft.Container):
         self.dlg_stop_modal = ft.AlertDialog(
             modal=True,
             title=ft.Text(s.get("lang.setting.test_mode.please_confirm")),
-            content=None,
+            content=ft.Text(value=""),
             actions=[
                 ft.TextButton(s.get("lang.button.confirm"), on_click=self.stop_test_mode),
                 ft.TextButton(s.get("lang.button.cancel"), on_click=lambda e: e.page.close(self.dlg_stop_modal))

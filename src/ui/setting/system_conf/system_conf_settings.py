@@ -205,7 +205,7 @@ class SystemConfSettings(ft.Container):
         ).execute()
         gdata.configCommon.set_default_value()
 
-    def before_update(self):
+    def reset(self):
         try:
             self.running_mode.value = 'master' if gdata.configCommon.is_master else 'slave'
             self.is_individual.value = gdata.configCommon.is_individual

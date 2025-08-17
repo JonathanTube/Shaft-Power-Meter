@@ -10,8 +10,8 @@ class ColorDialog(ft.IconButton):
 
         self.icon = ft.Icons.COLOR_LENS
 
-        self.icon_color = color if color is not None else ft.Colors.BLUE
-        self.color = color if color is not None else ft.Colors.BLUE
+        self.icon_color = color or ft.Colors.BLUE
+        self.color = color or ft.Colors.BLUE
 
         self.icon_size = 30
         self.on_click = self.__open_color_picker
@@ -49,10 +49,10 @@ class ColorDialog(ft.IconButton):
 
                 if callable(self.on_color_change):
                     self.on_color_change(color)
-                    
+
                 if self.alert_dialog:
                     self.alert_dialog.open = False
-                
+
                 if self.page:
                     self.page.update()
         except:
