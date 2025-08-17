@@ -190,9 +190,9 @@ async def main(page: ft.Page):
 
     page.overlay.append(keyboard)
 
-    def handle_error(e):
-        logging.error('global exception')
-        logging.exception(e)
+    def handle_error(e: ft.ControlEvent):
+        print(e)
+        logging.info(e)
 
     try:
         page.on_error = handle_error

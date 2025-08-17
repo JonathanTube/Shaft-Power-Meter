@@ -72,7 +72,7 @@ class IOSettingOutput(ft.Container):
                     value=gdata.configIO.output_avg_power
                 )
 
-                self.check_sum_power = ft.Checkbox(
+                self.check_total_energy = ft.Checkbox(
                     label=self.page.session.get("lang.common.total_energy"),
                     value=gdata.configIO.output_total_energy
                 )
@@ -88,7 +88,7 @@ class IOSettingOutput(ft.Container):
                                 self.check_speed,
                                 self.check_power,
                                 self.check_avg_power,
-                                self.check_sum_power
+                                self.check_total_energy
                             ]
                         ),
                         ft.Row(
@@ -155,12 +155,12 @@ class IOSettingOutput(ft.Container):
         output_power = bool(self.check_power.value)
         output_speed = bool(self.check_speed.value)
         output_avg_power = bool(self.check_avg_power.value)
-        output_sum_power = bool(self.check_sum_power.value)
+        output_total_energy = bool(self.check_total_energy.value)
         output_com_port = self.serial_port.value  # 保存串口名
         IOConf.update(
             output_torque=output_torque, output_thrust=output_thrust,
             output_power=output_power, output_speed=output_speed,
-            output_avg_power=output_avg_power, output_sum_power=output_sum_power,
+            output_avg_power=output_avg_power, output_total_energy=output_total_energy,
             output_com_port=output_com_port
         ).execute()
 
