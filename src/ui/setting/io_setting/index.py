@@ -101,8 +101,27 @@ class IOSetting(ft.Container):
     def __reset_data(self, e):
         try:
             keyboard.close()
-            self.content.clean()
-            self.build()
+            if gdata.configCommon.is_master:
+                if gdata.configCommon.enable_gps:
+                    if self.gps_conf and self.gps_conf.page:
+                        self.gps_conf.update()
+
+                if gdata.configIO.plc_enabled:
+                    if self.plc_conf and self.plc_conf.page:
+                        self.plc_conf.update()
+
+                if self.sps_conf and self.sps_conf.page:
+                    self.sps_conf.update()
+
+                if self.master_server_conf and self.master_server_conf.page:
+                    self.master_server_conf.update()
+
+                if self.output_conf and self.output_conf.page:
+                    self.output_conf.update()
+            else:
+                if self.interface_conf and self.interface_conf.page:
+                    self.interface_conf.update()
+
             Toast.show_success(e.page)
         except:
             logging.exception('exception occured at IOSetting.__reset_data')

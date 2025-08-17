@@ -324,5 +324,18 @@ class IOSettingSPS(ft.Container):
                         self.sps2_disconnect.visible = sps2_read_task.is_online == True
                         self.sps2_disconnect.bgcolor = ft.Colors.RED
                         self.sps2_disconnect.disabled = False
+
+            # 同步配置数据到控件显示
+            self.sps_ip.value = gdata.configIO.sps_ip
+            self.sps_port.value = gdata.configIO.sps_port
+            if gdata.configCommon.is_twins:
+                self.sps2_ip.value = gdata.configIO.sps2_ip
+                self.sps2_port.value = gdata.configIO.sps2_port
+
+            self.shaft_outer_diameter.value = gdata.configFactor.bearing_outer_diameter_D
+            self.shaft_inner_diameter.value = gdata.configFactor.bearing_inner_diameter_d
+            self.sensitivity_factor_k.value = gdata.configFactor.sensitivity_factor_k
+            self.elastic_modulus_E.value = gdata.configFactor.elastic_modulus_E
+            self.poisson_ratio_mu.value = gdata.configFactor.poisson_ratio_mu
         except:
             logging.exception('exception occured at IOSettingSPS.before_update')

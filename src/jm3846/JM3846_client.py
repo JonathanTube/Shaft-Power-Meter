@@ -58,7 +58,7 @@ class JM3846AsyncClient(ABC):
 
             await self.release()
             if not self.is_canceled:
-                await asyncio.sleep(60)  # 固定60秒重试
+                await asyncio.sleep(10)  # 固定10秒重试
 
     async def close(self):
         """强制退出连接"""

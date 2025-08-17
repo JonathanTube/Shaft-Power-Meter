@@ -56,5 +56,9 @@ class SystemConfShipInfo(ft.Container):
         self.ship_info.imo_number = self.imo_number.value
         self.ship_info.ship_size = self.ship_size.value
         self.ship_info.save()
+
     def before_update(self):
-        self.visible = gdata.configCommon.shapoli
+        self.ship_type.value = self.ship_info.ship_type
+        self.ship_name.value = self.ship_info.ship_name
+        self.imo_number.value = self.ship_info.imo_number
+        self.ship_size.value = self.ship_info.ship_size

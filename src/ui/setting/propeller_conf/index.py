@@ -55,13 +55,6 @@ class PropellerConf(ft.Container):
                     on_click=lambda e: self.page.open(PermissionCheck(self.__save_data, 2))
                 )
 
-                self.reset_button = ft.OutlinedButton(
-                    self.page.session.get("lang.button.reset"),
-                    width=120,
-                    height=40,
-                    on_click=lambda e: self.__reset_data(e)
-                )
-
                 self.push_button = ft.OutlinedButton(
                     self.page.session.get("lang.button.push_to_slave"),
                     height=40,
@@ -87,7 +80,6 @@ class PropellerConf(ft.Container):
                                     alignment=ft.MainAxisAlignment.CENTER,
                                     controls=[
                                         self.save_button,
-                                        self.reset_button,
                                         self.push_button
                                     ]
                                 )
@@ -131,16 +123,6 @@ class PropellerConf(ft.Container):
             self.is_saving = False
             self.__change_buttons()
 
-    def __reset_data(self, e):
-        try:
-            keyboard.close()
-            self.ps = PropellerSetting.get()
-            self.content.clean()
-            self.build()
-            Toast.show_success(e.page)
-        except:
-            logging.exception("exception occured at PropellerConf.__reset_data")
-
     def __on_push(self, e):
         try:
             if self.page:
@@ -148,7 +130,7 @@ class PropellerConf(ft.Container):
                 data = model_to_dict(settings)
                 del data['created_at']
                 del data['update_at']
-                asyncio.create_task(ws_server.send({
+                asyncio.run(ws_server.send({
                     'type': 'propeller_setting',
                     "data": data
                 }))

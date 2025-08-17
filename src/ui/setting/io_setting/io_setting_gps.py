@@ -108,14 +108,22 @@ class IOSettingGPS(ft.Container):
     def before_update(self):
         try:
             if self.page and self.page.session:
-                if self.connect_btn:
-                    self.connect_btn.visible = gps.is_online == None or gps.is_online == False
+                # 同步 GPS IP 和端口
+                if self.gps_ip and self.gps_ip.page:
+                    self.gps_ip.value = gdata.configIO.gps_ip
+
+                if self.gps_port and self.gps_port.page:
+                    self.gps_port.value = gdata.configIO.gps_port
+
+                # 按钮状态同步
+                if self.connect_btn and self.connect_btn.page:
+                    self.connect_btn.visible = not gps.is_online
                     self.connect_btn.text = self.page.session.get("lang.setting.connect")
                     self.connect_btn.bgcolor = ft.Colors.GREEN
                     self.connect_btn.disabled = False
 
-                if self.close_btn:
-                    self.close_btn.visible = gps.is_online == True
+                if self.close_btn and self.close_btn.page:
+                    self.close_btn.visible = gps.is_online
                     self.close_btn.text = self.page.session.get("lang.setting.disconnect")
                     self.close_btn.bgcolor = ft.Colors.RED
                     self.close_btn.disabled = False

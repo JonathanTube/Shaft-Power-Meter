@@ -45,22 +45,28 @@ class GpsSyncTask:
     async def _run(self):
         while not self.is_canceled:
             try:
-                if await self.connect():
+                ok = await self.connect()
+                if ok:
                     await self._receive_loop()
             except asyncio.CancelledError:
                 break
             except Exception:
                 _logger.exception("[GPS] 运行异常")
 
+            # 确保清理
             await self.close()
             self.set_offline()
-            await asyncio.sleep(3)
 
-    async def connect(self):
+            # 3 秒后重连
+            if not self.is_canceled:
+                _logger.info("[GPS] 3 秒后重试连接...")
+                await asyncio.sleep(3)
+
+    async def connect(self) -> bool:
         async with self._lock:
             gps_ip = gdata.configIO.gps_ip
             gps_port = gdata.configIO.gps_port
-            _logger.info(f"[GPS] 连接 {gps_ip}:{gps_port}")
+            _logger.info(f"[GPS] 尝试连接 {gps_ip}:{gps_port}")
             try:
                 self.reader, self.writer = await asyncio.wait_for(
                     asyncio.open_connection(gps_ip, gps_port), timeout=5
@@ -69,7 +75,7 @@ class GpsSyncTask:
                 _logger.info("[GPS] 连接成功")
                 return True
             except Exception as e:
-                _logger.error(f"[GPS] 连接失败 {e}")
+                _logger.warning(f"[GPS] 连接失败: {e}")
                 return False
 
     async def _receive_loop(self):

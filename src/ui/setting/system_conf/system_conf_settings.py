@@ -6,7 +6,6 @@ from utils.unit_converter import UnitConverter
 from db.models.system_settings import SystemSettings
 from ui.common.keyboard import keyboard
 from common.global_data import gdata
-from common.global_data import gdata
 
 
 class SystemConfSettings(ft.Container):
@@ -208,9 +207,28 @@ class SystemConfSettings(ft.Container):
 
     def before_update(self):
         try:
-            self.unlimited_power.visible = gdata.configCommon.shapoli
-            self.eexi_limited_power.visible = gdata.configCommon.shapoli
-            self.eexi_breach_checking_duration.visible = gdata.configCommon.shapoli
+            self.running_mode.value = 'master' if gdata.configCommon.is_master else 'slave'
+            self.is_individual.value = gdata.configCommon.is_individual
+            self.is_individual.visible = gdata.configCommon.is_master
+            self.enable_gps.value = gdata.configCommon.enable_gps
             self.enable_gps.visible = gdata.configCommon.is_master
+            self.display_thrust.value = gdata.configCommon.show_thrust
+            self.sha_po_li.value = gdata.configCommon.shapoli
+            self.display_propeller_curve.value = gdata.configCommon.show_propeller_curve
+            self.chk_hide_admin_account.value = gdata.configCommon.hide_admin_account
+            self.amount_of_propeller_radios.value = gdata.configCommon.amount_of_propeller
+
+            unlimited_power_value, unlimited_power_unit = self.__get_unlimited_power()
+            self.unlimited_power.value = unlimited_power_value
+            self.unlimited_power.suffix_text = unlimited_power_unit
+            self.unlimited_power.visible = gdata.configCommon.shapoli
+
+            eexi_limited_power_value, eexi_limited_power_unit = self.__get_eexi_limited_power()
+            self.eexi_limited_power.value = eexi_limited_power_value
+            self.eexi_limited_power.suffix_text = eexi_limited_power_unit
+            self.eexi_limited_power.visible = gdata.configCommon.shapoli
+
+            self.eexi_breach_checking_duration.value = gdata.configCommon.eexi_breach_checking_duration
+            self.eexi_breach_checking_duration.visible = gdata.configCommon.shapoli
         except:
             logging.exception('exception occured at SystemConfSettings.before_update')

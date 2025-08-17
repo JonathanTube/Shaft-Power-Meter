@@ -22,11 +22,13 @@ class PlcSyncTask:
         self._lock = asyncio.Lock()  # 连接锁，防止并发连接
         self.plc_client: Optional[AsyncModbusTcpClient] = None
         self.is_online = False       # 仅表示 TCP 连接是否建立
+        self.is_canceled = False
 
     async def connect(self):
         """连接PLC（非阻塞）"""
         async with self._lock:
             try:
+                self.is_canceled = False
                 ip = gdata.configIO.plc_ip
                 port = gdata.configIO.plc_port
                 logging.info(f'[PLC] 正在连接 {ip}:{port}')
@@ -111,20 +113,26 @@ class PlcSyncTask:
             return {"power": None, "torque": None, "thrust": None, "speed": None}
 
     async def write_instant_data(self, power: int, torque: int, thrust: int, speed: float):
-        """
-        写入实时数据到PLC
-        - 功率为 32 位，高位在前低位在后（一次写两个寄存器）
-        - 其他保持原逻辑
-        """
-        if not self.is_connected():
-            return False
+        """写入实时数据到PLC，失败自动重连"""
         try:
+            if not self.is_connected() and not self.is_canceled:
+                logging.warning("[PLC] 未连接，尝试重连...")
+                await self.release()
+                await asyncio.sleep(3)
+                await self.connect()
+                if not self.is_connected():
+                    logging.error("[PLC] 重连失败，写入中止")
+                    return False
+
             _power = round(power / 1000)
             _torque = round(torque / 1000)
             _thrust = round(thrust / 1000)
             _speed = round(speed * 10)
-            await self.write_register_32(*REGISTER_MAP["instant_power"], _power)  # 原子写
 
+            # 原子写入 32 位功率
+            await self.write_register_32(*REGISTER_MAP["instant_power"], _power)
+
+            # 写入 16 位寄存器
             if _torque <= 65535:
                 await self.plc_client.write_register(12311, _torque)
             else:
@@ -141,8 +149,19 @@ class PlcSyncTask:
                 logging.error(f'speed to plc is too big,{_speed}')
 
             return True
+
         except Exception as e:
-            logging.exception("[PLC] 写入实时数据失败: %s", e)
+            logging.error(f"[PLC] 写入实时数据失败: {e}, 尝试重连...")
+            # 写入失败 -> 停止连接，清空 client
+            await self.release()
+            if not self.is_canceled:
+                await asyncio.sleep(3)
+                # 尝试重连一次
+                await self.connect()
+                if self.is_connected():
+                    logging.info("[PLC] 重连成功，可以重新写入")
+                else:
+                    logging.error("[PLC] 重连失败")
             return False
 
     async def read_alarm(self) -> Optional[bool]:
@@ -257,6 +276,10 @@ class PlcSyncTask:
 
     async def close(self):
         """关闭PLC连接"""
+        await self.release()
+        self.is_canceled = True
+
+    async def release(self):
         if not self.is_connected():
             return
         try:

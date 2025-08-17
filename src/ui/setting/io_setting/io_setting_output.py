@@ -178,5 +178,15 @@ class IOSettingOutput(ft.Container):
                     self.stop_btn.text = self.page.session.get("lang.setting.disconnect")
                     self.stop_btn.bgcolor = ft.Colors.RED
                     self.stop_btn.disabled = False
+
+                # 同步gdata配置到控件，保证显示和数据一致
+                self.serial_port.value = gdata.configIO.output_com_port
+                self.check_torque.value = gdata.configIO.output_torque
+                self.check_thrust.value = gdata.configIO.output_thrust
+                self.check_power.value = gdata.configIO.output_power
+                self.check_speed.value = gdata.configIO.output_speed
+                self.check_avg_power.value = gdata.configIO.output_avg_power
+                self.check_total_energy.value = gdata.configIO.output_total_energy
+                # 父级刷新时子控件会自动更新，无需单独调用 update()
         except:
             logging.exception('exception occured at IOSettingOutput.before_update')

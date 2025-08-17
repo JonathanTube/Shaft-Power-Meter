@@ -163,6 +163,15 @@ class IOSettingPLC(ft.Container):
                     self.fetch_btn.visible = plc.is_online
                     self.fetch_btn.disabled = False
                     self.fetch_btn.bgcolor = ft.Colors.BLUE
+
+                # 同步gdata配置到控件，保证显示和数据一致
+                self.plc_enabled.value = gdata.configIO.plc_enabled
+                self.plc_ip.value = gdata.configIO.plc_ip
+                self.plc_port.value = gdata.configIO.plc_port
+
+                # 控制PLC相关输入框显示
+                if self.plc_enabled_items:
+                    self.plc_enabled_items.visible = gdata.configIO.plc_enabled
         except:
             logging.exception('exception occured at IOSettingPLC.before_update')
 
