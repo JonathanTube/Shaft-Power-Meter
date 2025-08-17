@@ -102,7 +102,7 @@ class WebSocketSlave:
     async def _handle_alarm(self, data):
         for alarm in data:
             cnt = AlarmLog.select(fn.COUNT(AlarmLog.id)).where(AlarmLog.alarm_uuid == alarm['alarm_uuid']).scalar()
-            if cnt:
+            if cnt > 0:
                 AlarmLog.update(
                     recovery_time=DateTimeUtil.parse_date(alarm['recovery_time']),
                     acknowledge_time=DateTimeUtil.parse_date(alarm['acknowledge_time'])
