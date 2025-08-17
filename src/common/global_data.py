@@ -77,14 +77,25 @@ class ConfigAlarm:
 
     def set_default_value(self):
         # 所有告警数量
-        self.alarm_total_count = AlarmLog.select(fn.COUNT(AlarmLog.id)).where(AlarmLog.recovery_time.is_null()).scalar()
+        self.alarm_total_count = AlarmLog.select(fn.COUNT(AlarmLog.id)).where(
+            AlarmLog.recovery_time.is_null()
+        ).scalar()
         # 未确认告警数量
-        self.alarm_not_ack = AlarmLog.select(fn.COUNT(AlarmLog.id)).where(AlarmLog.acknowledge_time.is_null()).scalar()
-
+        self.alarm_not_ack = AlarmLog.select(fn.COUNT(AlarmLog.id)).where(
+            AlarmLog.recovery_time.is_null(),
+            AlarmLog.acknowledge_time.is_null()
+        ).scalar()
         # 所有gps告警数量
-        self.gps_total_count = AlarmLog.select(fn.COUNT(AlarmLog.id)).where(AlarmLog.recovery_time.is_null(), AlarmLog.alarm_type == AlarmType.MASTER_GPS).scalar()
+        self.gps_total_count = AlarmLog.select(fn.COUNT(AlarmLog.id)).where(
+            AlarmLog.recovery_time.is_null(),
+            AlarmLog.alarm_type == AlarmType.MASTER_GPS
+        ).scalar()
         # 未确认gps告警数量
-        self.gps_not_ack = AlarmLog.select(fn.COUNT(AlarmLog.id)).where(AlarmLog.acknowledge_time.is_null(), AlarmLog.alarm_type == AlarmType.MASTER_GPS).scalar()
+        self.gps_not_ack = AlarmLog.select(fn.COUNT(AlarmLog.id)).where(
+            AlarmLog.recovery_time.is_null(),
+            AlarmLog.alarm_type == AlarmType.MASTER_GPS,
+            AlarmLog.acknowledge_time.is_null()
+        ).scalar()
 
         # 通用告警数量
         self.alarm_common_count = self.alarm_total_count - self.gps_total_count

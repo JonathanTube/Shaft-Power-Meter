@@ -2,6 +2,7 @@ import asyncio
 import logging
 import msgpack
 import websockets
+from peewee import fn
 from common.const_alarm_type import AlarmType
 from db.models.alarm_log import AlarmLog
 from utils.alarm_saver import AlarmSaver
@@ -73,6 +74,8 @@ class WebSocketMaster:
         self.client = ws
         logging.info("[Master] 客户端已连接")
         AlarmSaver.recovery(AlarmType.SLAVE_MASTER)
+        # 客户端重新连接，推送未同步完成的报警
+        self._sync_alarms_to_slave()
         try:
             async for msg in ws:
                 res = msgpack.unpackb(msg, raw=False)

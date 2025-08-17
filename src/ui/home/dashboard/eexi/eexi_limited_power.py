@@ -91,30 +91,56 @@ class EEXILimitedPower(ft.Container):
                         self.meter_half.set_center_value(percentage_of_eexi)
 
                 self.update_mode()
-                self.update_idenfications()
+                self.update_common_alarm()
+                self.update_gps_alarm()
+                self.blinks += 1
         except:
             logging.exception('EEXILimitedPower.reload')
 
-    def update_idenfications(self):
+    def update_common_alarm(self):
         # 主机不更新
         if gdata.configCommon.is_master:
             return
 
-        if self.common_alarm_text and self.common_alarm_text.page:
-            if gdata.configAlarm.alarm_common_count > 0:
-                self.common_alarm_text.visible = self.blinks % 2 == 0
-            else:
-                self.common_alarm_text.visible = False
+        if not self.common_alarm_text or not self.common_alarm_text.page:
+            return
+
+        # 无公共报警，不显示
+        if gdata.configAlarm.alarm_common_count == 0:
+            self.common_alarm_text.visible = False
             self.common_alarm_text.update()
+            return
 
-        if self.gps_status_text and self.gps_status_text.page:
-            if gdata.configAlarm.gps_total_count > 0:
-                self.gps_status_text.visible = self.blinks % 2 == 0
-            else:
-                self.common_alarm_text.visible = False
+        # 未确认公共报警数量等于0，常量
+        if gdata.configAlarm.alarm_common_not_ack == 0:
+            self.common_alarm_text.visible = True
+            self.common_alarm_text.update()
+            return
+
+        # 闪烁
+        self.common_alarm_text.visible = self.blinks % 2 == 0
+        self.common_alarm_text.update()
+
+    def update_gps_alarm(self):
+        # 主机不更新
+        if gdata.configCommon.is_master:
+            return
+
+        if not self.gps_status_text or self.gps_status_text.page:
+            return
+
+        if gdata.configAlarm.gps_total_count == 0:
+            self.gps_status_text.visible = False
             self.gps_status_text.update()
+            return
 
-        self.blinks += 1
+        if gdata.configAlarm.gps_not_ack == 0:
+            self.gps_status_text.visible = True
+            self.gps_status_text.update()
+            return
+
+        self.gps_status_text.visible = self.blinks % 2 == 0
+        self.gps_status_text.update()
 
     def update_mode(self):
         try:

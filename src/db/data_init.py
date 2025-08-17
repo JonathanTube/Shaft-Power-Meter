@@ -1182,13 +1182,13 @@ class DataInit:
             {
                 "code": "lang.setting.connect_to_master",
                 "chinese": "连接到主机",
-                "english": "Connect to Master"
+                "english": "Connect"
             },
 
             {
                 "code": "lang.setting.disconnect_from_master",
-                "chinese": "断开HMI服务器",
-                "english": "Disconnect from Master"
+                "chinese": "断开",
+                "english": "Disconnect"
             },
 
             {
