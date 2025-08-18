@@ -26,6 +26,12 @@ class PlcSyncTask:
 
     async def connect(self):
         """连接PLC（非阻塞）"""
+        if not gdata.configCommon.is_master:
+            return
+        
+        if not gdata.configIO.plc_enabled:
+            return
+    
         async with self._lock:
             try:
                 self.is_canceled = False
