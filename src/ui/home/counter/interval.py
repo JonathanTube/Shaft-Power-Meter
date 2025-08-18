@@ -111,24 +111,26 @@ class IntervalCounter(ft.Container):
                     return
 
                 self.hours = h
+
+                self.init_data()
                 Toast.show_success(e.page, self.page.session.get('lang.counter.interval_has_been_changed'))
         except:
             logging.exception('exception occured at AlarmList.on_hours_change')
 
     def did_mount(self):
-        self.init_data()
         self.task_running = True
         if self.page:
             self.task = self.page.run_task(self.loop)
 
-    def init_data(self):
         # 不为空直接跳过
         if self.name == 'sps' and gdata.configCounterSPS.Interval.start_at:
             return
         # 不为空直接跳过
         if self.name == 'sps2' and gdata.configCounterSPS2.Interval.start_at:
             return
+        self.init_data()
 
+    def init_data(self):
         threshold = gdata.configDateTime.utc - timedelta(hours=self.hours)
         if self.name == 'sps':
             result = DataLog.select(
