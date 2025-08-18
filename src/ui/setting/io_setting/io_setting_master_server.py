@@ -84,7 +84,7 @@ class IOSettingMasterServer(ft.Container):
         except:
             logging.exception('exception occured at IOSettingMasterServer.on_stop')
 
-    def before_update(self):
+    def reset(self):
         try:
             if self.page and self.page.session:
                 if self.start_btn:

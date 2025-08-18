@@ -106,7 +106,7 @@ class InterfaceConf(ft.Container):
         hmi_server_port = self.hmi_server_port.value
         IOConf.update(hmi_server_ip=hmi_server_ip, hmi_server_port=hmi_server_port).execute()
 
-    def before_update(self):
+    def reset(self):
         try:
             if self.page and self.page.session:
                 if self.connect_btn:

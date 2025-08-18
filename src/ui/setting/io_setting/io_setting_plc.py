@@ -143,7 +143,7 @@ class IOSettingPLC(ft.Container):
         except:
             logging.exception('exception occured at IOSettingPLC.build')
 
-    def before_update(self):
+    def reset(self):
         try:
             if self.page and self.page.session:
                 if self.connect_btn:

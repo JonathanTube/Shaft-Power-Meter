@@ -105,7 +105,7 @@ class IOSettingGPS(ft.Container):
         gps_port = self.gps_port.value
         IOConf.update(gps_ip=gps_ip, gps_port=gps_port).execute()
 
-    def before_update(self):
+    def reset(self):
         try:
             if self.page and self.page.session:
                 # 同步 GPS IP 和端口

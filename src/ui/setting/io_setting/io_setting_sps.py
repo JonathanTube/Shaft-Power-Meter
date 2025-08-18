@@ -297,7 +297,7 @@ class IOSettingSPS(ft.Container):
         ).execute()
         gdata.configFactor.set_default_value()
 
-    def before_update(self):
+    def reset(self):
         try:
             if self.page and self.page.session:
                 if self.sps_connect:

@@ -164,7 +164,7 @@ class IOSettingOutput(ft.Container):
             output_com_port=output_com_port
         ).execute()
 
-    def before_update(self):
+    def reset(self):
         try:
             if self.page and self.page.session:
                 if self.start_btn:
