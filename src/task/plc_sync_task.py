@@ -115,7 +115,10 @@ class PlcSyncTask:
     async def write_instant_data(self, power: int, torque: int, thrust: int, speed: float):
         """写入实时数据到PLC，失败自动重连"""
         try:
-            if not self.is_connected() and not self.is_canceled:
+            if self.is_canceled:
+                return
+            
+            if not self.is_connected():
                 logging.warning("[PLC] 未连接，尝试重连...")
                 await self.release()
                 await asyncio.sleep(3)
