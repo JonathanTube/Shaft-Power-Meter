@@ -20,7 +20,7 @@ class AlarmButton(ft.TextButton):
 
     def build(self):
         try:
-            self.visible = gdata.configCommon.is_master
+            # self.visible = gdata.configCommon.is_master
             if not self.visible:
                 return
 
