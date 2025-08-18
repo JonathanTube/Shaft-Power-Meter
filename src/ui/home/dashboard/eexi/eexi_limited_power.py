@@ -45,13 +45,13 @@ class EEXILimitedPower(ft.Container):
 
             self.common_alarm_text = ft.Text("Common Alarm", weight=ft.FontWeight.BOLD, visible=False, color=ft.Colors.RED)
 
-            self.gps_status_text = ft.Text(f"GPS Status{gdata.configAlarm.gps_total_count}", weight=ft.FontWeight.BOLD, visible=False, color=ft.Colors.RED)
+            self.gps_status_text = ft.Text("GPS Status", weight=ft.FontWeight.BOLD, visible=False, color=ft.Colors.RED)
 
             identifications = ft.Column(
                 expand=True,
                 horizontal_alignment=ft.CrossAxisAlignment.END,
                 visible=not gdata.configCommon.is_master,
-                controls=[self.common_alarm_text, self.gps_status_text],
+                controls=[self.common_alarm_text, self.gps_status_text, ft.Text(value=gdata.configAlarm.gps_total_count)],
                 right=10, top=40)
 
             main_content = ft.Container(
