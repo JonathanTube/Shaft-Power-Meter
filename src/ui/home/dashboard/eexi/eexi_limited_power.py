@@ -43,15 +43,29 @@ class EEXILimitedPower(ft.Container):
 
             top_items = ft.Row(alignment=ft.MainAxisAlignment.SPACE_BETWEEN, controls=[self.title, self.unlimited_mode_row])
 
-            self.common_alarm_text = ft.Text("Common Alarm", weight=ft.FontWeight.BOLD, visible=False, color=ft.Colors.RED)
+            self.common_alarm_block = ft.Container(
+                border_radius=ft.border_radius.all(2),
+                padding=ft.padding.symmetric(2, 6),
+                alignment=ft.alignment.center,
+                content=ft.Text("Common Alarm", color=ft.Colors.WHITE),
+                bgcolor=ft.Colors.RED,
+                visible=False
+            )
 
-            self.gps_status_text = ft.Text("GPS Status", weight=ft.FontWeight.BOLD, visible=False, color=ft.Colors.RED)
+            self.gps_status_block = ft.Container(
+                border_radius=ft.border_radius.all(2),
+                padding=ft.padding.symmetric(2, 6),
+                alignment=ft.alignment.center,
+                content=ft.Text("GPS Status", color=ft.Colors.WHITE),
+                bgcolor=ft.Colors.RED,
+                visible=False
+            )
 
             identifications = ft.Column(
                 expand=True,
                 horizontal_alignment=ft.CrossAxisAlignment.END,
                 visible=not gdata.configCommon.is_master,
-                controls=[self.common_alarm_text, self.gps_status_text, ft.Text(value=gdata.configAlarm.gps_total_count)],
+                controls=[self.common_alarm_block, self.gps_status_block],
                 right=10, top=40)
 
             main_content = ft.Container(
@@ -102,48 +116,48 @@ class EEXILimitedPower(ft.Container):
         if gdata.configCommon.is_master:
             return
 
-        if not self.common_alarm_text or not self.common_alarm_text.page:
+        if not self.common_alarm_block or not self.common_alarm_block.page:
             return
 
         # 无公共报警，不显示
         if gdata.configAlarm.alarm_common_count == 0:
-            self.common_alarm_text.visible = False
-            self.common_alarm_text.update()
+            self.common_alarm_block.visible = False
+            self.common_alarm_block.update()
             return
 
         # 未确认公共报警数量等于0，常亮
         if gdata.configAlarm.alarm_common_not_ack == 0:
-            self.common_alarm_text.visible = True
-            self.common_alarm_text.update()
+            self.common_alarm_block.visible = True
+            self.common_alarm_block.update()
             return
 
         # 闪烁
-        self.common_alarm_text.visible = self.blinks % 2 == 0
-        self.common_alarm_text.update()
+        self.common_alarm_block.visible = self.blinks % 2 == 0
+        self.common_alarm_block.update()
 
     def update_gps_alarm(self):
         # 主机不更新
         if gdata.configCommon.is_master:
             return
 
-        if not self.gps_status_text or self.gps_status_text.page:
+        if not self.gps_status_block or not self.gps_status_block.page:
             return
 
         # 无GPS报警，不显示
         if gdata.configAlarm.gps_total_count == 0:
-            self.gps_status_text.visible = False
-            self.gps_status_text.update()
+            self.gps_status_block.visible = False
+            self.gps_status_block.update()
             return
 
         # 未确认GPS报警数量等于0，常亮
         if gdata.configAlarm.gps_not_ack == 0:
-            self.gps_status_text.visible = True
-            self.gps_status_text.update()
+            self.gps_status_block.visible = True
+            self.gps_status_block.update()
             return
 
         # 闪烁
-        self.gps_status_text.visible = self.blinks % 2 == 0
-        self.gps_status_text.update()
+        self.gps_status_block.visible = self.blinks % 2 == 0
+        self.gps_status_block.update()
 
     def update_mode(self):
         try:
