@@ -44,7 +44,7 @@ class EEXILimitedPower(ft.Container):
             top_items = ft.Row(alignment=ft.MainAxisAlignment.SPACE_BETWEEN, controls=[self.title, self.unlimited_mode_row])
 
             self.common_alarm_block = ft.Container(
-                border_radius=ft.border_radius.all(8),
+                border_radius=ft.border_radius.all(5),
                 padding=ft.padding.only(left=2, right=2, bottom=4),
                 alignment=ft.alignment.center,
                 content=ft.Text("Common Alarm", color=ft.Colors.WHITE, size=12),
@@ -53,10 +53,10 @@ class EEXILimitedPower(ft.Container):
             )
 
             self.gps_status_block = ft.Container(
-                border_radius=ft.border_radius.all(8),
+                border_radius=ft.border_radius.all(5),
                 padding=ft.padding.only(left=2, right=2, bottom=4),
                 alignment=ft.alignment.center,
-                content=ft.Text("GPS Status", color=ft.Colors.WHITE, size=12),
+                content=ft.Text("GPS Disconnected", color=ft.Colors.WHITE, size=12),
                 bgcolor=ft.Colors.RED,
                 visible=False
             )
@@ -65,8 +65,8 @@ class EEXILimitedPower(ft.Container):
                 expand=True,
                 horizontal_alignment=ft.CrossAxisAlignment.END,
                 visible=not gdata.configCommon.is_master,
-                controls=[self.common_alarm_block, self.gps_status_block],
-                right=2, top=40)
+                controls=[self.gps_status_block, self.common_alarm_block],
+                right=4, top=40)
 
             main_content = ft.Container(
                 border=ft.border.all(
