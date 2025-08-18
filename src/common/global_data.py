@@ -70,10 +70,14 @@ class ConfigAlarm:
     # 未应答数量
     alarm_not_ack = 0
 
-    # 除GPS的公共报警
-    alarm_common_count = 0
     # gps告警
     gps_total_count = 0
+    # 未确认gps告警数量
+    gps_not_ack = 0
+
+    # 除GPS的公共报警
+    alarm_common_count = 0
+    alarm_common_not_ack = 0
 
     def set_default_value(self):
         # 所有告警数量
@@ -85,6 +89,7 @@ class ConfigAlarm:
             AlarmLog.recovery_time.is_null(),
             AlarmLog.acknowledge_time.is_null()
         ).scalar()
+
         # 所有gps告警数量
         self.gps_total_count = AlarmLog.select(fn.COUNT(AlarmLog.id)).where(
             AlarmLog.recovery_time.is_null(),
