@@ -81,39 +81,3 @@ class FormulaCalculator:
         """
         power = (2 * math.pi * rpm * torque) / 60
         return round(abs(power))
-
-    @staticmethod
-    def calculate_average_power_kw(sum_of_power: int, total_seconds: int):
-        """
-        Calculate the average power in kW.
-
-        Parameters:
-        sum_of_power (float): Sum of power values (in W).
-        hours (float): Total time period in hours.
-
-        Returns:
-        float: The average power (in kW).
-        """
-        if total_seconds == 0:
-            return 0
-
-        average_power_w = sum_of_power / total_seconds  # Average power in W
-        average_power_kw = average_power_w / 1000  # Convert W to kW
-        return abs(average_power_kw)
-
-    @staticmethod
-    def calculate_energy_kwh(sum_of_power):
-        """
-        Calculate the energy in kWh.
-
-        Parameters:
-        sum_of_power (float): posum_of_powerwer value (in W).
-        hours (float): Total time period in hours.
-
-        Returns:
-        float: The energy in kWh.
-        """
-        total_seconds = 60 * 60
-        total_energy_wh = sum_of_power / total_seconds
-        energy_kwh = total_energy_wh / 1000  # Convert Wh to kWh
-        return abs(energy_kwh)

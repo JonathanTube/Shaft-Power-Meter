@@ -133,7 +133,7 @@ class IntervalCounter(ft.Container):
         if self.name == 'sps':
             result = DataLog.select(
                 fn.MIN(DataLog.utc_date_time).alias("start_at"),
-                fn.SUM(DataLog.power).alias("times"),
+                fn.COUNT(DataLog.id).alias("times"),
                 fn.SUM(DataLog.power).alias("sum_power"),
                 fn.SUM(DataLog.speed).alias("sum_speed")
             ).where(DataLog.utc_date_time >= threshold, DataLog.name == 'sps').dicts().get()
@@ -160,7 +160,7 @@ class IntervalCounter(ft.Container):
             sum_power = result["sum_power"]
             sum_speed = result["sum_speed"]
 
-            ConfigCounterSPS.Interval.start_at = start_at or gdata.configDateTime.utc
+            ConfigCounterSPS2.Interval.start_at = start_at or gdata.configDateTime.utc
             ConfigCounterSPS2.Interval.times = times or 0
             ConfigCounterSPS2.Interval.sum_power = sum_power or 0
             ConfigCounterSPS2.Interval.sum_speed = sum_speed or 0.0
