@@ -6,11 +6,13 @@ from db.models.counter_log import CounterLog
 from db.models.data_log import DataLog
 from common.global_data import gdata
 from task.plc_sync_task import plc
+from utils.datetime_util import DateTimeUtil
 from utils.eexi_breach import EEXIBreach
 from utils.formula_cal import FormulaCalculator
 from utils.alarm_saver import AlarmSaver
 from task.modbus_output_task import modbus_output
 from websocket.websocket_master import ws_server
+
 
 class DataSaver:
     @staticmethod
@@ -52,7 +54,8 @@ class DataSaver:
                         'torque': torque,
                         'thrust': thrust,
                         'speed': speed,
-                        'gps': gdata.configGps.location
+                        'gps': gdata.configGps.location,
+                        'utc': DateTimeUtil.format_date(gdata.configDateTime.utc)
                     }
                 }))
 

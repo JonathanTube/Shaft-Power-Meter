@@ -14,8 +14,8 @@ class Logs(ft.Container):
     def build(self):
         try:
             tabs = [
-                ft.Tab(text=self.page.session.get("lang.log.data_log"), content=LogDataList()),
-                ft.Tab(text=self.page.session.get("lang.log.operation_log"), content=LogOperation())
+                ft.Tab(text=self.page.session.get("lang.log.data_log"), content=LogDataList())
+                # ft.Tab(text=self.page.session.get("lang.log.operation_log"), content=LogOperation())
             ]
 
             if gdata.configCommon.enable_gps:

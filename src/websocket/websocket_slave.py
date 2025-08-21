@@ -88,6 +88,10 @@ class WebSocketSlave:
         gdata.configSPS.thrust = data['thrust']
         gdata.configSPS.speed = data['speed']
         gdata.configGps.location = data['gps']
+        # 从机同步主机时间
+        utc = DateTimeUtil.parse_date(data['utc'])
+        if utc:
+            gdata.configDateTime.utc = utc
 
     def _handle_sps2_data(self, data):
         if gdata.configTest.test_mode_running:
