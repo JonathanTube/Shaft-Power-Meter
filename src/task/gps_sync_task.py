@@ -59,8 +59,8 @@ class GpsSyncTask:
 
             # 3 秒后重连
             if not self.is_canceled:
-                _logger.info("[GPS] 3 秒后重试连接...")
-                await asyncio.sleep(3)
+                _logger.info("[GPS] 5 秒后重试连接...")
+                await asyncio.sleep(5)
 
     async def connect(self) -> bool:
         async with self._lock:
@@ -129,9 +129,8 @@ class GpsSyncTask:
         AlarmSaver.recovery(AlarmType.MASTER_GPS)
 
     def set_offline(self):
-        if self.is_online:
-            self.is_online = False
-            AlarmSaver.create(AlarmType.MASTER_GPS)
+        self.is_online = False
+        AlarmSaver.create(AlarmType.MASTER_GPS)
 
 
 gps = GpsSyncTask()
