@@ -23,7 +23,6 @@ class DataRecordTask:
     async def _run_loop(self):
         while self.task_running:
             try:
-
                 if gdata.configTest.test_mode_running:  # 测试模式
                     await self.handle_test_mode()
                 elif gdata.configCommon.is_master:     # 主机

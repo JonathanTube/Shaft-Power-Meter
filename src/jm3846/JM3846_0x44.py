@@ -52,6 +52,8 @@ class JM38460x44:
                 # 没有在调零，才记录
                 if not gdata.configSPS.zero_cal_torque_running and not gdata.configSPS.zero_cal_thrust_running:
                     gdata.configSPS.accumulated_data_ad0_ad1_speed.append(val)
+                    gdata.configSPS.accumulated_data_ad0_ad1_speed_for_1s.append(val)
+                    gdata.configSPS.accumulated_data_ad0_ad1_speed_for_15s.append(val)
 
             else:
                 # 如果Torque调零打开,累计数据
@@ -65,6 +67,8 @@ class JM38460x44:
                 # 没有在调零，才记录
                 if not gdata.configSPS2.zero_cal_torque_running and not gdata.configSPS2.zero_cal_thrust_running:
                     gdata.configSPS2.accumulated_data_ad0_ad1_speed.append(val)
+                    gdata.configSPS2.accumulated_data_ad0_ad1_speed_for_1s.append(val)
+                    gdata.configSPS2.accumulated_data_ad0_ad1_speed_for_15s.append(val)
 
         return current_frame
 

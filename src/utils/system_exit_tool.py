@@ -3,6 +3,7 @@ import sys
 import flet as ft
 import logging
 import os
+from task.eexi_breach_task import eexi_breach_task
 from task.sps_read_task import sps_read_task
 from task.sps2_read_task import sps2_read_task
 from ui.common.toast import Toast
@@ -67,6 +68,9 @@ class SystemExitTool:
             else:
                 # 关闭websocket
                 SystemExitTool._safe_schedule_stop(ws_client.stop())
+
+            if gdata.configCommon.shapoli:
+                SystemExitTool._safe_schedule_stop(eexi_breach_task.stop())
 
             # 关闭GPS
             SystemExitTool._safe_schedule_stop(gps.close())

@@ -1,6 +1,3 @@
-
-
-import logging
 import math
 from common.global_data import gdata
 

@@ -5,7 +5,9 @@ from typing import Optional, List
 from jm3846.JM3846_0x03 import JM38460x03
 from jm3846.JM3846_0x44 import JM38460x44
 from jm3846.JM3846_0x45 import JM38460x45
-from jm3846.JM3846_data_handler import jm3846_data_handler
+from jm3846.JM3846_data_handler_for_ns import jm3846_data_handler_for_ns
+from jm3846.JM3846_data_handler_for_1s import jm3846_data_handler_for_1s
+from jm3846.JM3846_data_handler_for_15s import jm3846_data_handler_for_15s
 
 
 class JM3846AsyncClient(ABC):
@@ -113,11 +115,19 @@ class JM3846AsyncClient(ABC):
         pass
 
     def start_background_tasks(self):
-        if not jm3846_data_handler.is_running():
-            self._bg_tasks.append(asyncio.create_task(jm3846_data_handler.start(self.name)))
+        if not jm3846_data_handler_for_ns.is_running():
+            self._bg_tasks.append(asyncio.create_task(jm3846_data_handler_for_ns.start(self.name)))
+
+        if not jm3846_data_handler_for_1s.is_running():
+            self._bg_tasks.append(asyncio.create_task(jm3846_data_handler_for_1s.start(self.name)))
+
+        if not jm3846_data_handler_for_15s.is_running():
+            self._bg_tasks.append(asyncio.create_task(jm3846_data_handler_for_15s.start(self.name)))
 
     def stop_background_tasks(self):
-        jm3846_data_handler.stop()
+        jm3846_data_handler_for_ns.stop()
+        jm3846_data_handler_for_1s.stop()
+        jm3846_data_handler_for_15s.stop()
         for t in self._bg_tasks:
             if not t.done():
                 t.cancel()

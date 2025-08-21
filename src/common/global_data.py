@@ -218,6 +218,15 @@ class ConfigSPS:
 
     # 根据配置时间，从sps累积的平均值
     accumulated_data_ad0_ad1_speed: list[tuple[float, float, float]] = field(default_factory=list)
+    # 每秒累积
+    accumulated_data_ad0_ad1_speed_for_1s: list[tuple[float, float, float]] = field(default_factory=list)
+    # 每秒累计计算的功率
+    power_for_1s = 0
+    # 15s累积
+    accumulated_data_ad0_ad1_speed_for_15s: list[tuple[float, float, float]] = field(default_factory=list)
+    speed_for_15s: float = 0.0
+    torque_for_15s: int = 0
+    power_for_15s: int = 0
 
     zero_cal_torque_running = False
     zero_cal_thrust_running = False
@@ -257,6 +266,15 @@ class ConfigSPS2:
 
     # 根据配置时间，从sps累积的平均值
     accumulated_data_ad0_ad1_speed: list[tuple[float, float, float]] = field(default_factory=list)
+    # 每秒累积
+    accumulated_data_ad0_ad1_speed_for_1s: list[tuple[float, float, float]] = field(default_factory=list)
+    # 每秒累计计算的功率
+    power_for_1s = 0
+    # 15s累积，报告用
+    accumulated_data_ad0_ad1_speed_for_15s: list[tuple[float, float, float]] = field(default_factory=list)
+    speed_for_15s: float = 0.0
+    torque_for_15s: int = 0
+    power_for_15s: int = 0
 
     zero_cal_torque_running = False
     zero_cal_thrust_running = False

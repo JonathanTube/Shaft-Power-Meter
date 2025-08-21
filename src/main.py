@@ -18,12 +18,12 @@ from ui.common.audio_alarm import AudioAlarm
 from common.global_data import gdata
 from task.modbus_output_task import modbus_output
 from utils.auto_startup import add_to_startup
-from utils.eexi_breach import EEXIBreach
 from utils.logger import Logger
 from db.base import db
 from task.gps_sync_task import gps
 from task.plc_sync_task import plc
 from task.utc_timer_task import utc_timer
+from task.eexi_breach_task import eexi_breach_task
 from task.sps_read_task import sps_read_task
 from task.sps2_read_task import sps2_read_task
 from websocket.websocket_slave import ws_client
@@ -98,8 +98,6 @@ def set_content(page: ft.Page):
     page.add(main_stack)
 
     async def watch_eexi_breach():
-        # 需要查看之前是否有遗留的report没处理
-        EEXIBreach.load_exist_report_event()
         is_running = False
         while True:
             try:
@@ -132,6 +130,11 @@ async def start_all_tasks():
     # 数据记录
     await data_record_task.start()
     task_manager.add(data_record_task)
+
+    # eexi breach 判断
+    if gdata.configCommon.shapoli:
+        await eexi_breach_task.start()
+        task_manager.add(eexi_breach_task)
 
     # Modbus 输出
     await modbus_output.start()

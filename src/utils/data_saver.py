@@ -7,7 +7,6 @@ from db.models.data_log import DataLog
 from common.global_data import gdata
 from task.plc_sync_task import plc
 from utils.datetime_util import DateTimeUtil
-from utils.eexi_breach import EEXIBreach
 from utils.formula_cal import FormulaCalculator
 from utils.alarm_saver import AlarmSaver
 from task.modbus_output_task import modbus_output
@@ -78,9 +77,6 @@ class DataSaver:
                     gdata.configSPS2.power_history.pop(0)
                 else:
                     gdata.configSPS2.power_history.append((power, utc))
-
-            # 处理EEXI过载
-            EEXIBreach.handle()
 
             # 更新 Modbus 输出
             DataSaver._safe_create_task(modbus_output.update_registers())

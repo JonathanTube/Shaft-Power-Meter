@@ -99,9 +99,9 @@ class TestModeTask:
                 except Exception:
                     logging.exception("[TestMode] 生成或保存随机数据时出错")
 
-                # 与 SPS 采集周期一致（非阻塞）
                 try:
-                    await asyncio.sleep(gdata.configPreference.data_collection_seconds_range)
+                    # 测试模式，强制1s一次***
+                    await asyncio.sleep(1)
                 except asyncio.CancelledError:
                     # 如果任务被取消，安全退出
                     break
