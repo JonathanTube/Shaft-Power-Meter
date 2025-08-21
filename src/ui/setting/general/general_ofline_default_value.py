@@ -89,7 +89,7 @@ class GeneralOflineDefaultValue(ft.Container):
             torque = UnitConverter.tm_to_nm(torque)
             thrust = UnitConverter.t_to_n(thrust)
 
-        OfflineDefaultValue.update(torque_default_value=torque, thrust_default_value=thrust, speed_default_value=speed)
+        OfflineDefaultValue.update(torque_default_value=torque, thrust_default_value=thrust, speed_default_value=speed).execute()
         gdata.configOffline.set_default_value()
 
     def update_unit(self, system_unit: int):

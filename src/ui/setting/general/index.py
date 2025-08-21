@@ -31,7 +31,7 @@ class General(ft.Container):
         self.system_unit = system_unit
         self.limitation_max.update_unit(system_unit)
         self.limitation_warning.update_unit(system_unit)
-        self.general_ofline_default_value.update_unit(system_unit)
+        self.general_offline_default_value.update_unit(system_unit)
 
     def build(self):
         try:
@@ -40,7 +40,7 @@ class General(ft.Container):
                 self.limitation_max = GeneralLimitationMax(self.system_unit)
                 self.limitation_warning = GeneralLimitationWarning(self.system_unit)
                 self.general_date_time = GeneralDateTime()
-                self.general_ofline_default_value = GeneralOflineDefaultValue(self.system_unit)
+                self.general_offline_default_value = GeneralOflineDefaultValue(self.system_unit)
 
                 self.save_btn = ft.FilledButton(self.page.session.get("lang.button.save"), width=120, height=40, on_click=lambda e: self.__on_save_button_click(e))
                 self.reset_btn = ft.OutlinedButton(self.page.session.get("lang.button.reset"), width=120, height=40, on_click=lambda e: self.__reset_data(e))
@@ -54,7 +54,7 @@ class General(ft.Container):
                                 self.general_preference,
                                 self.limitation_max,
                                 self.limitation_warning,
-                                self.general_ofline_default_value,
+                                self.general_offline_default_value,
                                 self.general_date_time,
                                 ft.Row(
                                     alignment=ft.MainAxisAlignment.CENTER,
@@ -101,7 +101,7 @@ class General(ft.Container):
             self.general_preference.save_data(user_id)
             self.limitation_max.save_data(user_id)
             self.limitation_warning.save_data(user_id)
-            self.general_ofline_default_value.save_data(user_id)
+            self.general_offline_default_value.save_data(user_id)
             self.general_date_time.save_data(user_id)
             Toast.show_success(self.page)
         except:
