@@ -90,7 +90,8 @@ class IOSetting(ft.Container):
 
             self.output_conf.save_data()
 
-            gdata.set_default_value()
+            # 刷新IO相关的配置
+            gdata.configIO.set_default_value()
             Toast.show_success(self.page)
         except Exception as e:
             Toast.show_error(self.page, str(e))

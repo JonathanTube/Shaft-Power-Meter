@@ -134,7 +134,8 @@ class GeneralDateTime(ft.Container):
                 utc_date_time=new_utc, system_date_time=datetime.now(),
                 date_format=self.date_format.value, sync_with_gps=self.sync_with_gps.value
             ).execute()
-            gdata.set_default_value()
+            # 刷新时间相关配置
+            gdata.configDateTime.set_default_value()
 
             self.page.run_task(self.clean_future_data)
 
