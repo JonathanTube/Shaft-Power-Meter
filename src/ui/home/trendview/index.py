@@ -85,8 +85,8 @@ class TrendView(ft.Container):
             logging.info(f"{name} trendview query data portion: {portion}")
             data_logs = (
                 DataLog.select(
-                    DataLog.power, 
-                    DataLog.speed, 
+                    DataLog.power,
+                    DataLog.speed,
                     DataLog.utc_date_time
                 ).where(
                     (DataLog.utc_date_time >= self.start_date) &
@@ -96,8 +96,12 @@ class TrendView(ft.Container):
                 ).order_by(DataLog.id.desc())
             )
             if name == 'sps':
-                self.sps_chart.update_chart(data_logs)
+                if self.sps_chart and self.sps_chart.page:
+                    self.sps_chart.update_chart(data_logs)
+                    self.sps_chart.update()
             elif name == 'sps2':
-                self.sps2_chart.update_chart(data_logs)
+                if self.sps2_chart and self.sps2_chart.page:
+                    self.sps2_chart.update_chart(data_logs)
+                    self.sps2_chart.update()
         except:
             logging.exception('TrendView.handle_data')

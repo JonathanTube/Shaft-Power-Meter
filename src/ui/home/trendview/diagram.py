@@ -116,10 +116,6 @@ class TrendViewDiagram(ft.Container):
         self.ax_power.relim()
         self.ax_power.autoscale_view()
 
-        # 更新图表
-        if self.chart and self.chart.page:
-            self.chart.update()
-
     def _process_data(self):
         """处理原始数据"""
         date_times = []
