@@ -24,7 +24,6 @@ class GeneralPreference(ft.Container):
 
                 self.language_label = ft.Text(s.get("lang.setting.language"))
                 self.system_unit_label = ft.Text(s.get("lang.setting.unit"))
-                self.data_refresh_interval_label = ft.Text(s.get("lang.setting.data_refresh_interval"))
 
                 self.default_theme = ft.RadioGroup(
                     content=ft.Row([self.theme_light, self.theme_dark]),
@@ -51,14 +50,18 @@ class GeneralPreference(ft.Container):
                     value=gdata.configPreference.fullscreen
                 )
 
-                self.data_refresh_interval = ft.TextField(
-                    label=self.data_refresh_interval_label,
-                    suffix_text="seconds",
-                    value=gdata.configPreference.data_refresh_interval,
+                self.data_collection_seconds_range = ft.Dropdown(
+                    label=s.get("lang.setting.data_collection_seconds_range"),
                     col={"md": 6},
-                    read_only=True,
-                    can_request_focus=False,
-                    on_click=lambda e: keyboard.open(e.control, 'int')
+                    expand=True,
+                    width=200,
+                    value=gdata.configPreference.data_collection_seconds_range,
+                    options=[
+                        ft.DropdownOption(text="1s", key="1"),
+                        ft.DropdownOption(text="5s", key="5"),
+                        ft.DropdownOption(text="10s", key="10"),
+                        ft.DropdownOption(text="60s", key="60")
+                    ]
                 )
 
                 self.custom_card = CustomCard(
@@ -68,7 +71,7 @@ class GeneralPreference(ft.Container):
                         ft.Row(controls=[self.language_label, self.language], col={"md": 6}),
                         ft.Row(controls=[self.system_unit_label, self.system_unit], col={"md": 6}),
                         self.fullscreen,
-                        self.data_refresh_interval
+                        self.data_collection_seconds_range
                     ]),
                     col={"xs": 12})
                 self.content = self.custom_card
@@ -94,8 +97,7 @@ class GeneralPreference(ft.Container):
 
                 # 更新其他设置
                 self.fullscreen.label = s.get("lang.setting.fullscreen")
-                self.data_refresh_interval_label.value = s.get("lang.setting.data_refresh_interval")
-
+                self.data_collection_seconds_range.label = s.get("lang.setting.data_collection_seconds_range")
                 # 确保更新界面
                 self.custom_card.set_title(s.get("lang.setting.preference"))
         except:
@@ -113,11 +115,11 @@ class GeneralPreference(ft.Container):
         language = int(self.language.value)
         fullscreen = self.fullscreen.value
         system_unit = int(self.system_unit.value)
-        data_refresh_interval = int(self.data_refresh_interval.value)
+        data_collection_seconds_range = int(self.data_collection_seconds_range.value)
 
         Preference.update(
             theme=theme, language=language, fullscreen=fullscreen,
-            system_unit=system_unit, data_refresh_interval=data_refresh_interval
+            system_unit=system_unit, data_collection_seconds_range=data_collection_seconds_range
         ).execute()
 
         gdata.configPreference.set_default_value()

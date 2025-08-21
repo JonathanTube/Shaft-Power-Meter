@@ -84,9 +84,10 @@ class ConfigAlarm:
         self.alarm_total_count = AlarmLog.select(fn.COUNT(AlarmLog.id)).where(
             AlarmLog.recovery_time.is_null()
         ).scalar()
-        # 未确认告警数量
+        # 未确认告警数量（不能包含Slave_master_disconnected因为客户端确认不了)
         self.alarm_not_ack = AlarmLog.select(fn.COUNT(AlarmLog.id)).where(
-            AlarmLog.acknowledge_time.is_null()
+            AlarmLog.acknowledge_time.is_null(),
+            AlarmLog.alarm_type != AlarmType.SLAVE_MASTER
         ).scalar()
 
         # 所有gps告警数量
@@ -113,7 +114,7 @@ class ConfigPreference:
     fullscreen = True
     system_unit = 0
     language = 0
-    data_refresh_interval = 2
+    data_collection_seconds_range = 2
 
     def set_default_value(self):
         preference: Preference = Preference.get()
@@ -121,7 +122,7 @@ class ConfigPreference:
         self.fullscreen = preference.fullscreen
         self.system_unit = preference.system_unit
         self.language = preference.language
-        self.data_refresh_interval = preference.data_refresh_interval
+        self.data_collection_seconds_range = preference.data_collection_seconds_range
 
 
 @dataclass

@@ -189,4 +189,4 @@ class IntervalCounter(ft.Container):
             except:
                 logging.exception("IntervalCounter.loop")
             finally:
-                await asyncio.sleep(gdata.configPreference.data_refresh_interval)
+                await asyncio.sleep(1)

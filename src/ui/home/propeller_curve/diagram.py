@@ -160,14 +160,19 @@ class PropellerCurveDiagram(ft.Container):
                 if self.rpm_of_mcr and self.power_of_mcr:
                     # SPS
                     x1, y1 = gdata.configSPS.speed / self.rpm_of_mcr * 100, gdata.configSPS.power / self.power_of_mcr * 100
-                    if self.sps_point: self.sps_point.set_offsets([x1, y1]); self.sps_text.set_position((x1, y1 + 1))
+                    if self.sps_point:
+                        self.sps_point.set_offsets([x1, y1])
+                        self.sps_text.set_position((x1, y1 + 1))
                     # SPS2
                     x2, y2 = gdata.configSPS2.speed / self.rpm_of_mcr * 100, gdata.configSPS2.power / self.power_of_mcr * 100
-                    if self.sps2_point: self.sps2_point.set_offsets([x2, y2]); self.sps2_text.set_position((x2, y2 + 1))
-                    if self.chart: self.chart.update()
+                    if self.sps2_point:
+                        self.sps2_point.set_offsets([x2, y2])
+                        self.sps2_text.set_position((x2, y2 + 1))
+                    if self.chart:
+                        self.chart.update()
             except:
                 logging.exception("update_sps_points")
-            await asyncio.sleep(gdata.configPreference.data_refresh_interval)
+            await asyncio.sleep(1)
 
     # ========== 生命周期 ==========
     def did_mount(self):
@@ -179,4 +184,5 @@ class PropellerCurveDiagram(ft.Container):
             plt.close(self.chart.figure)
         self.chart = None
         self.task_running = False
-        if self.task: self.task.cancel()
+        if self.task:
+            self.task.cancel()

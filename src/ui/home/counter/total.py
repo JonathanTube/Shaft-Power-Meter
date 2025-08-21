@@ -107,4 +107,4 @@ class TotalCounter(ft.Container):
                     self.display.set_average_speed(avg_speed)
             except:
                 logging.exception('TotalCounter.loop')
-            await asyncio.sleep(gdata.configPreference.data_refresh_interval)
+            await asyncio.sleep(1)

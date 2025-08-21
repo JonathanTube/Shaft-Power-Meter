@@ -140,7 +140,7 @@ class DataInit:
                 fullscreen=False,
                 system_unit=0,
                 language=0,
-                data_refresh_interval=2
+                data_collection_seconds_range=5
             )
 
     def __init_io_conf():
@@ -931,9 +931,9 @@ class DataInit:
             },
 
             {
-                "code": "lang.setting.data_refresh_interval",
-                "chinese": "界面数据刷新间隔",
-                "english": "Dashboard Data Refresh Interval"
+                "code": "lang.setting.data_collection_seconds_range",
+                "chinese": "数据采集跨度(秒)",
+                "english": "Averaging Interval"
             },
 
             {

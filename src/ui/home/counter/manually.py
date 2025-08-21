@@ -21,7 +21,6 @@ class ManuallyCounter(ft.Container):
         self.task_running = False
 
         self.system_unit = gdata.configPreference.system_unit
-        self.interval = gdata.configPreference.data_refresh_interval
         self.date_format = f'{gdata.configDateTime.date_format} %H:%M:%S'
 
     def build(self):
@@ -203,7 +202,7 @@ class ManuallyCounter(ft.Container):
             except:
                 logging.exception("ManuallyCounter.loop")
             finally:
-                await asyncio.sleep(self.interval)
+                await asyncio.sleep(1)
 
     def set_data(self, avg_power, total_energy, avg_speed):
         if self.display and self.display.page:
