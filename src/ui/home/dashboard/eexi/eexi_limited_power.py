@@ -119,21 +119,23 @@ class EEXILimitedPower(ft.Container):
         if not self.common_alarm_block or not self.common_alarm_block.page:
             return
 
-        # 无公共报警，不显示
-        if gdata.configAlarm.alarm_common_count == 0:
+        # 无公共报警发生，并且无未确认公共报警，不显示
+        if gdata.configAlarm.alarm_common_count == 0 and gdata.configAlarm.alarm_common_not_ack == 0:
             self.common_alarm_block.visible = False
             self.common_alarm_block.update()
             return
 
-        # 未确认公共报警数量等于0，常亮
-        if gdata.configAlarm.alarm_common_not_ack == 0:
-            self.common_alarm_block.visible = True
+        # 有未确认的报警，闪烁
+        if gdata.configAlarm.alarm_common_not_ack > 0:
+            # 闪烁
+            self.common_alarm_block.visible = self.blinks % 2 == 0
             self.common_alarm_block.update()
             return
 
-        # 闪烁
-        self.common_alarm_block.visible = self.blinks % 2 == 0
-        self.common_alarm_block.update()
+        # 有报警常亮
+        if gdata.configAlarm.alarm_common_count > 0:
+            self.common_alarm_block.visible = True
+            self.common_alarm_block.update()
 
     def update_gps_alarm(self):
         # 主机不更新
@@ -143,21 +145,22 @@ class EEXILimitedPower(ft.Container):
         if not self.gps_status_block or not self.gps_status_block.page:
             return
 
-        # 无GPS报警，不显示
-        if gdata.configAlarm.gps_total_count == 0:
+        # 无GPS报警，无待确认GSP报警，不显示
+        if gdata.configAlarm.gps_total_count == 0 and gdata.configAlarm.gps_not_ack == 0:
             self.gps_status_block.visible = False
             self.gps_status_block.update()
             return
 
-        # 未确认GPS报警数量等于0，常亮
-        if gdata.configAlarm.gps_not_ack == 0:
-            self.gps_status_block.visible = True
+        # 未确认GPS报警数量大于0闪烁
+        if gdata.configAlarm.gps_not_ack > 0:
+            self.gps_status_block.visible = self.blinks % 2 == 0
             self.gps_status_block.update()
             return
 
-        # 闪烁
-        self.gps_status_block.visible = self.blinks % 2 == 0
-        self.gps_status_block.update()
+        # 有报警常亮
+        if gdata.configAlarm.gps_not_ack == 0:
+            self.gps_status_block.visible = True
+            self.gps_status_block.update()
 
     def update_mode(self):
         try:

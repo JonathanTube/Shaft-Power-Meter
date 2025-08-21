@@ -86,7 +86,6 @@ class ConfigAlarm:
         ).scalar()
         # 未确认告警数量
         self.alarm_not_ack = AlarmLog.select(fn.COUNT(AlarmLog.id)).where(
-            AlarmLog.recovery_time.is_null(),
             AlarmLog.acknowledge_time.is_null()
         ).scalar()
 
@@ -95,9 +94,9 @@ class ConfigAlarm:
             AlarmLog.recovery_time.is_null(),
             AlarmLog.alarm_type == AlarmType.MASTER_GPS
         ).scalar()
+
         # 未确认gps告警数量
         self.gps_not_ack = AlarmLog.select(fn.COUNT(AlarmLog.id)).where(
-            AlarmLog.recovery_time.is_null(),
             AlarmLog.alarm_type == AlarmType.MASTER_GPS,
             AlarmLog.acknowledge_time.is_null()
         ).scalar()
