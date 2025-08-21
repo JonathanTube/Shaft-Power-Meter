@@ -2,7 +2,6 @@ import asyncio
 import logging
 import msgpack
 import websockets
-from peewee import fn
 from common.const_alarm_type import AlarmType
 from db.models.alarm_log import AlarmLog
 from utils.alarm_saver import AlarmSaver
@@ -53,9 +52,9 @@ class WebSocketMaster:
             except asyncio.CancelledError:
                 break
             except Exception:
-                logging.exception("[Master] 异常，3秒后重试")
+                logging.exception("[Master] 异常，10秒后重试")
                 self.set_offline()
-            await asyncio.sleep(3)
+            await asyncio.sleep(10)
 
     async def _start_server(self):
         host, port = "0.0.0.0", 8001
@@ -129,7 +128,7 @@ class WebSocketMaster:
                     'data': arr
                 })
 
-                await asyncio.sleep(2)
+                await asyncio.sleep(3)
         except asyncio.CancelledError:
             pass
         except Exception:

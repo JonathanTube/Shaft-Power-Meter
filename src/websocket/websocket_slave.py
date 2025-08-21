@@ -38,7 +38,7 @@ class WebSocketSlave:
             except Exception as e:
                 logging.error(f"[Slave] 连接失败: {e}")
                 self.set_offline()
-                await asyncio.sleep(5)
+                await asyncio.sleep(10)
 
     def set_online(self):
         self.is_online = True

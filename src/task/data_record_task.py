@@ -33,7 +33,7 @@ class DataRecordTask:
             except Exception:
                 logging.exception("DataRecordTask 循环异常")
             finally:
-                await asyncio.sleep(2)  # 控制循环频率
+                await asyncio.sleep(gdata.configPreference.data_collection_seconds_range)  # 控制循环频率
 
     async def handle_test_mode(self):
         await self.save_sps_online_data()
@@ -53,8 +53,6 @@ class DataRecordTask:
                 await self.save_sps2_online_data()
             else:
                 await self.save_sps2_offline_data()
-        # await asyncio.sleep(2)
-        # continue
 
     async def handle_slave(self):
         if ws_client.is_online:
@@ -94,7 +92,7 @@ class DataRecordTask:
         if self._task and not self._task.done():
             self._task.cancel()
             try:
-                await asyncio.sleep(0)  # 给任务调度机会
+                await asyncio.sleep(0.5)  # 给任务调度机会
             except asyncio.CancelledError:
                 pass
         self._task = None

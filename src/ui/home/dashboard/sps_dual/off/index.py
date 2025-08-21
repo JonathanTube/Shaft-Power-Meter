@@ -2,6 +2,8 @@ import asyncio
 import logging
 import flet as ft
 from ui.home.dashboard.sps_dual.off.dual_meters import DualMeters
+from common.global_data import gdata
+
 
 class DualShaPoLiOff(ft.Container):
     def __init__(self):
@@ -36,7 +38,7 @@ class DualShaPoLiOff(ft.Container):
             except:
                 logging.exception('exception occured at DualShaPoLiOff.load_data')
                 break
-            await asyncio.sleep(1)
+            await asyncio.sleep(gdata.configPreference.data_collection_seconds_range)
 
     def did_mount(self):
         self.task_running = True

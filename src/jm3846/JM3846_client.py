@@ -5,8 +5,7 @@ from typing import Optional, List
 from jm3846.JM3846_0x03 import JM38460x03
 from jm3846.JM3846_0x44 import JM38460x44
 from jm3846.JM3846_0x45 import JM38460x45
-from jm3846.JM3846_torque_rpm import jm3846_torque_rpm
-from jm3846.JM3846_thrust import jm3846_thrust
+from jm3846.JM3846_data_handler import jm3846_data_handler
 
 
 class JM3846AsyncClient(ABC):
@@ -114,14 +113,11 @@ class JM3846AsyncClient(ABC):
         pass
 
     def start_background_tasks(self):
-        if not jm3846_torque_rpm.is_running():
-            self._bg_tasks.append(asyncio.create_task(jm3846_torque_rpm.start(self.name)))
-        if not jm3846_thrust.is_running():
-            self._bg_tasks.append(asyncio.create_task(jm3846_thrust.start(self.name)))
+        if not jm3846_data_handler.is_running():
+            self._bg_tasks.append(asyncio.create_task(jm3846_data_handler.start(self.name)))
 
     def stop_background_tasks(self):
-        jm3846_torque_rpm.stop()
-        jm3846_thrust.stop()
+        jm3846_data_handler.stop()
         for t in self._bg_tasks:
             if not t.done():
                 t.cancel()

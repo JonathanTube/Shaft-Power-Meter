@@ -168,7 +168,7 @@ class SelfTest(ft.Tabs):
                     return
             except:
                 logging.exception('exception occured at SelfTest.__read_sps_data')
-            await asyncio.sleep(2)
+            await asyncio.sleep(gdata.configPreference.data_collection_seconds_range)
 
     async def __read_sps2_data(self):
         while self.task_running:
@@ -181,7 +181,7 @@ class SelfTest(ft.Tabs):
             except:
                 logging.exception('exception occured at SelfTest.__read_sps2_data')
 
-            await asyncio.sleep(2)
+            await asyncio.sleep(gdata.configPreference.data_collection_seconds_range)
 
     async def __read_hmi_server_data(self):
         while self.task_running:
@@ -201,4 +201,4 @@ class SelfTest(ft.Tabs):
             except:
                 logging.exception('exception occured at SelfTest.__read_hmi_server_data')
 
-            await asyncio.sleep(2)
+            await asyncio.sleep(gdata.configPreference.data_collection_seconds_range)

@@ -47,7 +47,7 @@ class SystemExitTool:
             Toast.show_error(page, msg, 1000 * 10)
 
             try:
-                await asyncio.sleep(1)
+                await asyncio.sleep(0.5)
             except:
                 pass
 

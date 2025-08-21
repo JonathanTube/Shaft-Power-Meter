@@ -3,7 +3,7 @@ import logging
 import flet as ft
 from common.global_data import gdata
 from jm3846.JM3846_calculator import JM3846Calculator
-from jm3846.JM3846_thrust_util import JM3846ThrustUtil
+from jm3846.JM3846_data_handler import JM3846DataHandler
 
 
 class ZeroCalExecutorThrust(ft.Card):
@@ -153,11 +153,11 @@ class ZeroCalExecutorThrust(ft.Card):
 
                 # 时间到，调零结束
                 if self.name == 'sps':
-                    average_ad1 = JM3846ThrustUtil.get_avg(gdata.configSPS.zero_cal_ad1_for_thrust, self.name)
+                    average_ad1 = JM3846DataHandler.get_avg(gdata.configSPS.zero_cal_ad1_for_thrust, self.name)
                     mv_per_v = JM3846Calculator.calculate_mv_per_v(average_ad1, gdata.configSPS.gain_1)
                     self.seconds_tick.value = round(mv_per_v, 4)
                 elif self.name == 'sps2':
-                    average_ad1 = JM3846ThrustUtil.get_avg(gdata.configSPS2.zero_cal_ad1_for_thrust, self.name)
+                    average_ad1 = JM3846DataHandler.get_avg(gdata.configSPS2.zero_cal_ad1_for_thrust, self.name)
                     mv_per_v = JM3846Calculator.calculate_mv_per_v(average_ad1, gdata.configSPS2.gain_1)
                     self.seconds_tick.value = round(mv_per_v, 4)
                 self.seconds_tick.update()

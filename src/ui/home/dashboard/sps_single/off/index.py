@@ -3,6 +3,8 @@ import logging
 import flet as ft
 from ui.home.dashboard.sps_single.off.single_meters import SingleMeters
 from ui.home.dashboard.thrust.index import ThrustBlock
+from common.global_data import gdata
+
 
 class SingleShaPoLiOff(ft.Stack):
     def __init__(self):
@@ -39,7 +41,7 @@ class SingleShaPoLiOff(ft.Stack):
             except:
                 logging.exception("exception occured at SingleShaPoLiOff.load_data")
                 break
-            await asyncio.sleep(1)
+            await asyncio.sleep(gdata.configPreference.data_collection_seconds_range)
 
     def did_mount(self):
         self.task_running = True

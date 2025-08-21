@@ -218,6 +218,9 @@ class ConfigSPS:
     speed_sel = None
     sample_rate = None
 
+    # 根据配置时间，从sps累积的平均值
+    accumulated_data_ad0_ad1_speed: list[tuple[float, float, float]] = field(default_factory=list)
+
     zero_cal_torque_running = False
     zero_cal_thrust_running = False
     zero_cal_ad0_for_torque: list[float] = field(default_factory=list)
@@ -253,6 +256,9 @@ class ConfigSPS2:
     gain_0 = None
     speed_sel = None
     sample_rate = None
+
+    # 根据配置时间，从sps累积的平均值
+    accumulated_data_ad0_ad1_speed: list[tuple[float, float, float]] = field(default_factory=list)
 
     zero_cal_torque_running = False
     zero_cal_thrust_running = False

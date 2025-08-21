@@ -12,10 +12,7 @@ from utils.alarm_saver import AlarmSaver
 from task.modbus_output_task import modbus_output
 from websocket.websocket_master import ws_server
 
-
 class DataSaver:
-    accumulated_data = []
-
     @staticmethod
     async def save(name: str, torque: int, thrust: int, speed: float):
         try:
@@ -26,7 +23,7 @@ class DataSaver:
             power: int = FormulaCalculator.calculate_instant_power(torque, speed)
             is_overload = DataSaver.is_overload(speed, power)
 
-            DataSaver.accumulated_data.append({
+            data = {
                 'utc_date_time': utc,
                 'name': name,
                 'speed': speed,
@@ -34,12 +31,9 @@ class DataSaver:
                 'ad_0_torque': torque,
                 'ad_1_thrust': thrust,
                 'is_overload': is_overload
-            })
+            }
 
-            # 每隔10s，保存瞬时数据
-            if len(DataSaver.accumulated_data) >= 30:
-                await asyncio.to_thread(DataLog.insert_many(DataSaver.accumulated_data).execute)
-                DataSaver.accumulated_data.clear()
+            await asyncio.to_thread(DataLog.insert(data).execute)
 
             # 主站且PLC连接时写入瞬时数据
             if gdata.configCommon.is_master:
@@ -68,7 +62,7 @@ class DataSaver:
                 gdata.configSPS.thrust = thrust
                 gdata.configSPS.speed = speed
                 gdata.configSPS.power = power
-                if len(gdata.configSPS.power_history) > 60:
+                if len(gdata.configSPS.power_history) > 300:
                     gdata.configSPS.power_history.pop(0)
                 else:
                     gdata.configSPS.power_history.append((power, utc))
@@ -77,7 +71,7 @@ class DataSaver:
                 gdata.configSPS2.thrust = thrust
                 gdata.configSPS2.speed = speed
                 gdata.configSPS2.power = power
-                if len(gdata.configSPS2.power_history) > 60:
+                if len(gdata.configSPS2.power_history) > 300:
                     gdata.configSPS2.power_history.pop(0)
                 else:
                     gdata.configSPS2.power_history.append((power, utc))

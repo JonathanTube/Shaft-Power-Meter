@@ -3,7 +3,7 @@ import logging
 import flet as ft
 from common.global_data import gdata
 from jm3846.JM3846_calculator import JM3846Calculator
-from jm3846.JM3846_torque_rpm_util import JM3846TorqueRpmUtil
+from jm3846.JM3846_data_handler import JM3846DataHandler
 
 
 class ZeroCalExecutorTorque(ft.Card):
@@ -112,7 +112,7 @@ class ZeroCalExecutorTorque(ft.Card):
             # 2s倒计时结束，开始统计thrust-ad1
             data_list = gdata.configSPS.zero_cal_ad0_for_torque if self.name == 'sps' else gdata.configSPS2.zero_cal_ad0_for_torque
             gain_0 = gdata.configSPS.gain_0 if self.name == 'sps' else gdata.configSPS2.gain_0
-            result = JM3846TorqueRpmUtil.get_avg(data_list, self.name)
+            result = JM3846DataHandler.get_avg(self.name, data_list)
             avg_ad0: float = result[0]
             mv_per_v = JM3846Calculator.calculate_mv_per_v(avg_ad0, gain_0)
 

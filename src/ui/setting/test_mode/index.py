@@ -200,16 +200,13 @@ class TestMode(ft.Container):
             Toast.show_error(self.page, "stop test mode failed.")
 
     async def __auto_lock(self):
-        while self.task_running:
-            try:
-                time_diff = gdata.configDateTime.utc - self.last_op_utc_date_time
-                if time_diff.total_seconds() > 60 * 10:
-                    self.__create_lock_button()
-                    if self.page:
-                        self.update()
-            except:
-                return
-            await asyncio.sleep(1)
+        try:
+            await asyncio.sleep(600)  # 等待 10 分钟
+            self.__create_lock_button()
+            if self.page:
+                self.update()
+        except:
+            return
 
     def did_mount(self):
         self.task_running = True

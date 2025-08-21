@@ -202,7 +202,7 @@ class ManuallyCounter(ft.Container):
             except:
                 logging.exception("ManuallyCounter.loop")
             finally:
-                await asyncio.sleep(1)
+                await asyncio.sleep(gdata.configPreference.data_collection_seconds_range)
 
     def set_data(self, avg_power, total_energy, avg_speed):
         if self.display and self.display.page:

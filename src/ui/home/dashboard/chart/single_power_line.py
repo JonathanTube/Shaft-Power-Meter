@@ -74,7 +74,7 @@ class SinglePowerLine(ft.Container):
                         ft.ChartAxisLabel(value=0),
                         ft.ChartAxisLabel(value=left_max)
                     ]),
-                bottom_axis=ft.ChartAxis(labels_size=30, show_labels=True),
+                bottom_axis=ft.ChartAxis(show_labels=False),
                 data_series=[
                     self.threshold_filled,
                     self.data_line,
@@ -96,7 +96,6 @@ class SinglePowerLine(ft.Container):
 
     def reload(self):
         try:
-            self.__handle_bottom_axis()
             self.__handle_data_line()
 
             if self.threshold_filled:
@@ -110,42 +109,18 @@ class SinglePowerLine(ft.Container):
         except:
             logging.exception('exception occured at SinglePowerLine.reload')
 
-    def __handle_bottom_axis(self):
-        try:
-            labels = []
-            for index, item in enumerate(gdata.configSPS.power_history):
-                # 每隔6个数据点显示一个标签
-                if index % 6 == 0:
-                    if len(item) > 1:
-                        label = ft.ChartAxisLabel(
-                            value=index,
-                            label=ft.Container(
-                                content=ft.Text(value=item[1].strftime('%H:%M:%S')),
-                                padding=ft.padding.only(top=10)
-                            )
-                        )
-                        labels.append(label)
-
-            if self.chart and self.chart.bottom_axis:
-                self.chart.bottom_axis.labels = labels
-                self.chart.bottom_axis.visible = len(labels) > 0
-                size = 8
-                if len(labels) > size:
-                    self.chart.bottom_axis.labels_interval = (len(labels) + size) // size
-        except:
-            logging.exception('exception occured at SinglePowerLine.__handle_bottom_axis')
-
     def __handle_data_line(self):
         try:
             data_points = []
             for index in range(len(gdata.configSPS.power_history)):
                 power_sps = gdata.configSPS.power_history[index][0]
                 power_sps2 = 0
-                try:
-                    power_sps2 = gdata.configSPS2.power_history[index][0]
-                except IndexError:
-                    # 这里有可能是单浆，不处理
-                    power_sps2 = 0
+                if gdata.configCommon.is_twins:
+                    try:
+                        power_sps2 = gdata.configSPS2.power_history[index][0]
+                    except IndexError:
+                        # 这里有可能是单浆，不处理
+                        power_sps2 = 0
 
                 power = power_sps + power_sps2
                 if power > self.max_power:

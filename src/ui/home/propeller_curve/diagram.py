@@ -172,7 +172,7 @@ class PropellerCurveDiagram(ft.Container):
                         self.chart.update()
             except:
                 logging.exception("update_sps_points")
-            await asyncio.sleep(1)
+            await asyncio.sleep(gdata.configPreference.data_collection_seconds_range)
 
     # ========== 生命周期 ==========
     def did_mount(self):

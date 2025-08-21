@@ -3,8 +3,7 @@ import logging
 import struct
 from common.global_data import gdata
 from jm3846.JM3846_0x45 import JM38460x45
-from jm3846.JM3846_torque_rpm import jm3846_torque_rpm
-from jm3846.JM3846_thrust import jm3846_thrust
+from jm3846.JM3846_data_handler import jm3846_data_handler
 from jm3846.JM3846_util import JM3846Util
 
 
@@ -43,25 +42,30 @@ class JM38460x44:
             val = struct.unpack('<H', payload[i:i+2])[0]
 
             if name == 'sps':
+                # 如果Torque调零打开,累计数据
                 if gdata.configSPS.zero_cal_torque_running:
                     gdata.configSPS.zero_cal_ad0_for_torque.append(val)
-                else:
-                    jm3846_torque_rpm.accumulated_data.append(val)
 
+                # 如果thrust调零打开，累计数据
                 if gdata.configSPS.zero_cal_thrust_running:
                     gdata.configSPS.zero_cal_ad1_for_thrust.append(val)
-                else:
-                    jm3846_thrust.accumulated_data.append(val)
+
+                # 没有在调零，才记录
+                if not gdata.configSPS.zero_cal_torque_running and not gdata.configSPS.zero_cal_thrust_running:
+                    gdata.configSPS.accumulated_data_ad0_ad1_speed.append(val)
+
             else:
+                # 如果Torque调零打开,累计数据
                 if gdata.configSPS2.zero_cal_torque_running:
                     gdata.configSPS2.zero_cal_ad0_for_torque.append(val)
-                else:
-                    jm3846_torque_rpm.accumulated_data.append(val)
 
+                # 如果thrust调零打开，累计数据
                 if gdata.configSPS2.zero_cal_thrust_running:
                     gdata.configSPS2.zero_cal_ad1_for_thrust.append(val)
-                else:
-                    jm3846_thrust.accumulated_data.append(val)
+
+                # 没有在调零，才记录
+                if not gdata.configSPS2.zero_cal_torque_running and not gdata.configSPS2.zero_cal_thrust_running:
+                    gdata.configSPS2.accumulated_data_ad0_ad1_speed.append(val)
 
         return current_frame
 
@@ -93,6 +97,7 @@ class JM38460x44:
                 frame = await JM3846Util.read_frame(reader)
                 if frame is None:
                     logging.info(f'[JM3846-{name}] 0x44响应请求头为空,重新请求0x44')
+                    await asyncio.sleep(1.2)
                     await JM38460x44.send_0x44_again(name, reader, writer)
                     continue
                 else:

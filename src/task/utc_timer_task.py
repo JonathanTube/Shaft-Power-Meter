@@ -52,7 +52,7 @@ class UtcTimerTask:
         if self._task and not self._task.done():
             try:
                 self._task.cancel()
-                await asyncio.sleep(0)  # 给任务调度机会
+                await asyncio.sleep(0.5)  # 给任务调度机会
             except asyncio.CancelledError:
                 pass
         self._task = None

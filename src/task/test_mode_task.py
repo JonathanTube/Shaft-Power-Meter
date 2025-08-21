@@ -101,7 +101,7 @@ class TestModeTask:
 
                 # 与 SPS 采集周期一致（非阻塞）
                 try:
-                    await asyncio.sleep(2)
+                    await asyncio.sleep(gdata.configPreference.data_collection_seconds_range)
                 except asyncio.CancelledError:
                     # 如果任务被取消，安全退出
                     break

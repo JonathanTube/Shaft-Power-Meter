@@ -23,6 +23,7 @@ class PlcSyncTask:
         self.plc_client: Optional[AsyncModbusTcpClient] = None
         self.is_online = False       # 仅表示 TCP 连接是否建立
         self.is_canceled = False
+        self.is_connecting = False  # 是否正在重连
 
     async def connect(self):
         """连接PLC（非阻塞）"""
@@ -35,6 +36,7 @@ class PlcSyncTask:
         async with self._lock:
             try:
                 self.is_canceled = False
+                self.is_connecting = True
                 ip = gdata.configIO.plc_ip
                 port = gdata.configIO.plc_port
                 logging.info(f'[PLC] 正在连接 {ip}:{port}')
@@ -54,6 +56,9 @@ class PlcSyncTask:
             except Exception as e:
                 logging.exception(f'[PLC] 连接异常: {e}')
                 self.set_offline()
+            finally:
+                await asyncio.sleep(10)
+                self.is_connecting = False
 
     async def read_4_20_ma_data(self) -> dict:
         """读取 4-20mA 配置数据"""
@@ -83,6 +88,10 @@ class PlcSyncTask:
     async def write_4_20_ma_data(self, data: dict):
         """写入 4-20mA 配置数据"""
         logging.info(f"[PLC] 写入 4-20mA 数据: {data}")
+
+        if not gdata.configIO.plc_enabled:
+            return
+        
         if not self.is_connected():
             return
         try:
@@ -120,17 +129,17 @@ class PlcSyncTask:
     async def write_instant_data(self, power: int, torque: int, thrust: int, speed: float):
         """写入实时数据到PLC，失败自动重连"""
         try:
+            if not gdata.configIO.plc_enabled:
+                return
+    
             if self.is_canceled:
                 return
 
-            if not self.is_connected() and not self.is_canceled:
+            if not self.is_connected() and not self.is_connecting:
                 logging.warning("[PLC] 未连接，尝试重连...")
                 await self.release()
-                await asyncio.sleep(3)
                 await self.connect()
-                if not self.is_connected():
-                    logging.error("[PLC] 重连失败，写入中止")
-                    return False
+                return
 
             _power = round(power / 1000)
             _torque = round(torque / 1000)
@@ -155,22 +164,13 @@ class PlcSyncTask:
                 await self.plc_client.write_register(12331, _speed)
             else:
                 logging.error(f'speed to plc is too big,{_speed}')
-
-            return True
-
         except Exception as e:
             logging.error(f"[PLC] 写入实时数据失败: {e}, 尝试重连...")
             # 写入失败 -> 停止连接，清空 client
             await self.release()
-            if not self.is_canceled:
-                await asyncio.sleep(3)
+            if not self.is_canceled and not self.is_connecting:
                 # 尝试重连一次
                 await self.connect()
-                if self.is_connected():
-                    logging.info("[PLC] 重连成功，可以重新写入")
-                else:
-                    logging.error("[PLC] 重连失败")
-            return False
 
     async def read_alarm(self) -> Optional[bool]:
         if not self.is_connected():
@@ -260,7 +260,8 @@ class PlcSyncTask:
         high = (int(value) >> 16) & 0xFFFF
         low = int(value) & 0xFFFF
         # 从高位地址起写两个值：[high, low]
-        await self.plc_client.write_registers(high_addr, [high, low])
+        if self.is_connected():
+            await self.plc_client.write_registers(high_addr, [high, low])
 
     async def read_coil(self, address: int) -> Optional[bool]:
         resp = await asyncio.wait_for(self.plc_client.read_coils(address, count=1), timeout=2)
