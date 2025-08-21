@@ -130,7 +130,6 @@ class ConfigLimitation:
     power_max = 0
     speed_max = 0
     torque_max = 0
-    power_max = 0
     speed_warning = 0
     torque_warning = 0
     power_warning = 0
@@ -140,7 +139,6 @@ class ConfigLimitation:
         self.power_max = limitations.power_max
         self.speed_max = limitations.speed_max
         self.torque_max = limitations.torque_max
-        self.power_max = limitations.power_max
         self.speed_warning = limitations.speed_warning
         self.torque_warning = limitations.torque_warning
         self.power_warning = limitations.power_warning

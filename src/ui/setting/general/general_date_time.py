@@ -77,7 +77,7 @@ class GeneralDateTime(ft.Container):
         except:
             logging.exception('exception occured at GeneralDateTime.build')
 
-    def before_update(self):
+    def reset(self):
         try:
             if self.page and self.page.session:
                 s = self.page.session
@@ -138,9 +138,6 @@ class GeneralDateTime(ft.Container):
             gdata.configDateTime.set_default_value()
 
             self.page.run_task(self.clean_future_data)
-
-            if self.page:
-                self.page.update()
         except:
             logging.exception("exception occured at GeneralDateTime.save_data_async")
 

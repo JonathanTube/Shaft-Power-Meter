@@ -3,7 +3,6 @@ import logging
 import struct
 from common.global_data import gdata
 from jm3846.JM3846_0x45 import JM38460x45
-from jm3846.JM3846_data_handler import jm3846_data_handler
 from jm3846.JM3846_util import JM3846Util
 
 

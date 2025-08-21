@@ -50,7 +50,7 @@ class GeneralLimitationMax(ft.Container):
         except:
             logging.exception('exception occured at GeneralLimitationMax.build')
 
-    def before_update(self):
+    def reset(self):
         try:
             if self.page and self.page.session:
                 s = self.page.session

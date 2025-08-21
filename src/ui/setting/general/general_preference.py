@@ -78,7 +78,7 @@ class GeneralPreference(ft.Container):
         except:
             logging.exception('exception occured at GeneralPreference.build')
 
-    def before_update(self):
+    def reset(self):
         try:
             if self.page and self.page.session:
                 s = self.page.session

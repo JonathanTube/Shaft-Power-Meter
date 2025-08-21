@@ -23,40 +23,29 @@ class JM3846DataHandler:
 
             # 清理数据
             if self.name == 'sps':
-                gdata.configSPS.accumulated_data_ad0_ad1_speed.clear()
                 # 处理数据
                 ch0_ad, ch1_ad, rpm = JM3846DataHandler.get_avg(self.name, gdata.configSPS.accumulated_data_ad0_ad1_speed)
-                self.handle_result(ch0_ad, ch1_ad, rpm)
+                gdata.configSPS.ad0 = ch0_ad
+                gdata.configSPS.ad1 = ch1_ad
+                gdata.configSPS.speed = rpm
+                gdata.configSPS.torque = self.cal_torque(ch0_ad)
+                gdata.configSPS.thrust = self.cal_thrust(ch1_ad)
+                gdata.configSPS.accumulated_data_ad0_ad1_speed.clear()
             else:
-                gdata.configSPS2.accumulated_data_ad0_ad1_speed.clear()
                 # 处理数据
                 ch0_ad, ch1_ad, rpm = JM3846DataHandler.get_avg(self.name, gdata.configSPS2.accumulated_data_ad0_ad1_speed)
-                self.handle_result(ch0_ad, ch1_ad, rpm)
+                gdata.configSPS2.ad0 = ch0_ad
+                gdata.configSPS2.ad1 = ch1_ad
+                gdata.configSPS2.speed = rpm
+                gdata.configSPS2.torque = self.cal_torque(ch0_ad)
+                gdata.configSPS2.thrust = self.cal_thrust(ch1_ad)
+                gdata.configSPS2.accumulated_data_ad0_ad1_speed.clear()
 
             # 等待数据累积
             await asyncio.sleep(seconds)
 
     def stop(self):
         self._is_running = False
-
-    def handle_result(self, ch0_ad, ch1_ad, rpm):
-        try:
-            if self.name == 'sps':
-                gdata.configSPS.ad0 = ch0_ad
-                gdata.configSPS.ad1 = ch1_ad
-                gdata.configSPS.speed = rpm
-                gdata.configSPS.torque = self.cal_torque(ch0_ad)
-                gdata.configSPS.thrust = self.cal_thrust(ch1_ad)
-                # logging.info(f'获取SPS:ad0={round(ch0_ad, 1)},rpm={round(rpm, 1)}')
-            else:
-                gdata.configSPS2.ad0 = ch0_ad
-                gdata.configSPS2.ad1 = ch1_ad
-                gdata.configSPS2.speed = rpm
-                gdata.configSPS2.torque = self.cal_torque(ch0_ad)
-                gdata.configSPS2.thrust = self.cal_thrust(ch1_ad)
-                # logging.info(f'获取SPS2:ad0={round(ch0_ad, 1)},rpm={round(rpm, 1)}')
-        except:
-            logging.exception('exception occured at JM3846TorqueRpm.handle_result')
 
     def cal_torque(self, ch0_ad):
         try:

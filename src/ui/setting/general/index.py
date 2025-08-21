@@ -115,8 +115,25 @@ class General(ft.Container):
         try:
             if self.page:
                 keyboard.close()
-                self.content.clean()
-                self.build()
-                self.update()
+                if self.general_date_time and self.general_date_time.page:
+                    self.general_date_time.reset()
+                    self.general_date_time.update()
+
+                if self.limitation_max and self.limitation_max.page:
+                    self.limitation_max.reset()
+                    self.limitation_max.update()
+
+                if self.limitation_warning and self.limitation_warning.page:
+                    self.limitation_warning.reset()
+                    self.limitation_warning.update()
+
+                if self.general_offline_default_value and self.general_offline_default_value.page:
+                    self.general_offline_default_value.reset()
+                    self.general_offline_default_value.update()
+
+                if self.general_preference and self.general_preference.page:
+                    self.general_preference.reset()
+                    self.general_preference.update()
+
         except:
             logging.exception('exception occured at General.__reset_data')
