@@ -107,6 +107,8 @@ class IOSettingGPS(ft.Container):
 
     def reset(self):
         try:
+            # 按钮状态同步
+            self.update_buttons()
             if self.page and self.page.session:
                 # 同步 GPS IP 和端口
                 if self.gps_ip and self.gps_ip.page:
@@ -114,7 +116,12 @@ class IOSettingGPS(ft.Container):
 
                 if self.gps_port and self.gps_port.page:
                     self.gps_port.value = gdata.configIO.gps_port
+        except:
+            logging.exception("IOSettingGPS.reset")
 
+    def update_buttons(self):
+        try:
+            if self.page and self.page.session:
                 # 按钮状态同步
                 if self.connect_btn and self.connect_btn.page:
                     self.connect_btn.visible = not gps.is_online
@@ -128,4 +135,4 @@ class IOSettingGPS(ft.Container):
                     self.close_btn.bgcolor = ft.Colors.RED
                     self.close_btn.disabled = False
         except:
-            logging.exception("exception occured at IOSettingGPS.before_update")
+            logging.exception("IOSettingGPS.update_buttons")

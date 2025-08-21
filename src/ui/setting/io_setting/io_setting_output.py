@@ -166,19 +166,8 @@ class IOSettingOutput(ft.Container):
 
     def reset(self):
         try:
+            self.update_buttons()
             if self.page and self.page.session:
-                if self.start_btn:
-                    self.start_btn.visible = not modbus_output.is_started
-                    self.start_btn.text = self.page.session.get("lang.setting.connect")
-                    self.start_btn.bgcolor = ft.Colors.GREEN
-                    self.start_btn.disabled = False
-
-                if self.stop_btn:
-                    self.stop_btn.visible = modbus_output.is_started
-                    self.stop_btn.text = self.page.session.get("lang.setting.disconnect")
-                    self.stop_btn.bgcolor = ft.Colors.RED
-                    self.stop_btn.disabled = False
-
                 # 同步gdata配置到控件，保证显示和数据一致
                 self.serial_port.value = gdata.configIO.output_com_port
                 self.check_torque.value = gdata.configIO.output_torque
@@ -189,4 +178,20 @@ class IOSettingOutput(ft.Container):
                 self.check_total_energy.value = gdata.configIO.output_total_energy
                 # 父级刷新时子控件会自动更新，无需单独调用 update()
         except:
-            logging.exception('exception occured at IOSettingOutput.before_update')
+            logging.exception('IOSettingOutput.reset')
+
+    def update_buttons(self):
+        try:
+            if self.start_btn and self.start_btn.page:
+                self.start_btn.visible = not modbus_output.is_started
+                self.start_btn.text = self.page.session.get("lang.setting.connect")
+                self.start_btn.bgcolor = ft.Colors.GREEN
+                self.start_btn.disabled = False
+
+            if self.stop_btn and self.stop_btn.page:
+                self.stop_btn.visible = modbus_output.is_started
+                self.stop_btn.text = self.page.session.get("lang.setting.disconnect")
+                self.stop_btn.bgcolor = ft.Colors.RED
+                self.stop_btn.disabled = False
+        except:
+            logging.exception('IOSettingOutput.reset')

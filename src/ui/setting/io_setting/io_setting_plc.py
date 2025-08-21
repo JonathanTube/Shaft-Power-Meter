@@ -145,25 +145,8 @@ class IOSettingPLC(ft.Container):
 
     def reset(self):
         try:
+            self.update_buttons()
             if self.page and self.page.session:
-                if self.connect_btn:
-                    self.connect_btn.text = self.page.session.get("lang.setting.connect")
-                    self.connect_btn.visible = not plc.is_online
-                    self.connect_btn.disabled = False
-                    self.connect_btn.bgcolor = ft.Colors.GREEN
-
-                if self.close_btn:
-                    self.close_btn.text = self.page.session.get("lang.setting.disconnect")
-                    self.close_btn.visible = plc.is_online
-                    self.close_btn.disabled = False
-                    self.close_btn.bgcolor = ft.Colors.RED
-
-                if self.fetch_btn:
-                    self.fetch_btn.text = self.page.session.get("lang.setting.fetch_data")
-                    self.fetch_btn.visible = plc.is_online
-                    self.fetch_btn.disabled = False
-                    self.fetch_btn.bgcolor = ft.Colors.BLUE
-
                 # 同步gdata配置到控件，保证显示和数据一致
                 self.plc_enabled.value = gdata.configIO.plc_enabled
                 self.plc_ip.value = gdata.configIO.plc_ip
@@ -174,6 +157,28 @@ class IOSettingPLC(ft.Container):
                     self.plc_enabled_items.visible = gdata.configIO.plc_enabled
         except:
             logging.exception('exception occured at IOSettingPLC.before_update')
+
+    def update_buttons(self):
+        try:
+            if self.connect_btn and self.connect_btn.page:
+                self.connect_btn.text = self.page.session.get("lang.setting.connect")
+                self.connect_btn.visible = not plc.is_online
+                self.connect_btn.disabled = False
+                self.connect_btn.bgcolor = ft.Colors.GREEN
+
+            if self.close_btn and self.close_btn.page:
+                self.close_btn.text = self.page.session.get("lang.setting.disconnect")
+                self.close_btn.visible = plc.is_online
+                self.close_btn.disabled = False
+                self.close_btn.bgcolor = ft.Colors.RED
+
+            if self.fetch_btn and self.fetch_btn.page:
+                self.fetch_btn.text = self.page.session.get("lang.setting.fetch_data")
+                self.fetch_btn.visible = plc.is_online
+                self.fetch_btn.disabled = False
+                self.fetch_btn.bgcolor = ft.Colors.BLUE
+        except:
+            logging.exception('IOSettingPLC.before_update')
 
     def __on_connect(self, user: User):
         try:

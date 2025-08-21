@@ -28,10 +28,10 @@ class PlcSyncTask:
         """连接PLC（非阻塞）"""
         if not gdata.configCommon.is_master:
             return
-        
+
         if not gdata.configIO.plc_enabled:
             return
-    
+
         async with self._lock:
             try:
                 self.is_canceled = False
@@ -41,9 +41,8 @@ class PlcSyncTask:
                 self.plc_client = AsyncModbusTcpClient(
                     host=ip,
                     port=port,
-                    timeout=5,          # 每次请求超时
-                    retries=5,          # 每次请求重试次数
-                    reconnect_delay=5   # 重试间隔
+                    timeout=10,          # 每次请求超时
+                    retries=0          # 每次请求重试次数
                 )
                 await self.plc_client.connect()
                 if self.is_connected():
@@ -123,8 +122,8 @@ class PlcSyncTask:
         try:
             if self.is_canceled:
                 return
-            
-            if not self.is_connected():
+
+            if not self.is_connected() and not self.is_canceled:
                 logging.warning("[PLC] 未连接，尝试重连...")
                 await self.release()
                 await asyncio.sleep(3)

@@ -2,6 +2,7 @@ import logging
 import flet as ft
 from db.models.user import User
 from ui.common.custom_card import CustomCard
+from ui.common.toast import Toast
 from utils.unit_converter import UnitConverter
 from db.models.system_settings import SystemSettings
 from ui.common.keyboard import keyboard
@@ -187,6 +188,8 @@ class SystemConfSettings(ft.Container):
 
         unit = gdata.configPreference.system_unit
         eexi_breach_checking_duration = self.eexi_breach_checking_duration.value
+        if eexi_breach_checking_duration is None or eexi_breach_checking_duration == '' or int(eexi_breach_checking_duration) <= 0:
+            raise ValueError('invalid eexi breach checking duration.')
 
         unlimited_power = 0
         eexi_limited_power = 0

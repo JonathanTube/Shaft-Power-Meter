@@ -299,43 +299,48 @@ class IOSettingSPS(ft.Container):
 
     def reset(self):
         try:
+            self.update_buttons()
             if self.page and self.page.session:
-                if self.sps_connect:
-                    self.sps_connect.text = self.page.session.get("lang.setting.connect")
-                    self.sps_connect.visible = sps_read_task.is_online == None or sps_read_task.is_online == False
-                    self.sps_connect.bgcolor = ft.Colors.GREEN
-                    self.sps_connect.disabled = False
-
-                if self.sps_disconnect:
-                    self.sps_disconnect.text = self.page.session.get("lang.setting.disconnect")
-                    self.sps_disconnect.visible = sps_read_task.is_online == True
-                    self.sps_disconnect.bgcolor = ft.Colors.RED
-                    self.sps_disconnect.disabled = False
-
+                # 同步配置数据到控件显示
+                self.sps_ip.value = gdata.configIO.sps_ip
+                self.sps_port.value = gdata.configIO.sps_port
                 if gdata.configCommon.is_twins:
-                    if self.sps2_connect:
-                        self.sps2_connect.text = self.page.session.get("lang.setting.connect")
-                        self.sps2_connect.visible = sps2_read_task.is_online == None or sps2_read_task == False
-                        self.sps2_connect.bgcolor = ft.Colors.GREEN
-                        self.sps2_connect.disabled = False
+                    self.sps2_ip.value = gdata.configIO.sps2_ip
+                    self.sps2_port.value = gdata.configIO.sps2_port
 
-                    if self.sps2_disconnect:
-                        self.sps2_disconnect.text = self.page.session.get("lang.setting.disconnect")
-                        self.sps2_disconnect.visible = sps2_read_task.is_online == True
-                        self.sps2_disconnect.bgcolor = ft.Colors.RED
-                        self.sps2_disconnect.disabled = False
-
-            # 同步配置数据到控件显示
-            self.sps_ip.value = gdata.configIO.sps_ip
-            self.sps_port.value = gdata.configIO.sps_port
-            if gdata.configCommon.is_twins:
-                self.sps2_ip.value = gdata.configIO.sps2_ip
-                self.sps2_port.value = gdata.configIO.sps2_port
-
-            self.shaft_outer_diameter.value = gdata.configFactor.bearing_outer_diameter_D
-            self.shaft_inner_diameter.value = gdata.configFactor.bearing_inner_diameter_d
-            self.sensitivity_factor_k.value = gdata.configFactor.sensitivity_factor_k
-            self.elastic_modulus_E.value = gdata.configFactor.elastic_modulus_E
-            self.poisson_ratio_mu.value = gdata.configFactor.poisson_ratio_mu
+                self.shaft_outer_diameter.value = gdata.configFactor.bearing_outer_diameter_D
+                self.shaft_inner_diameter.value = gdata.configFactor.bearing_inner_diameter_d
+                self.sensitivity_factor_k.value = gdata.configFactor.sensitivity_factor_k
+                self.elastic_modulus_E.value = gdata.configFactor.elastic_modulus_E
+                self.poisson_ratio_mu.value = gdata.configFactor.poisson_ratio_mu
         except:
-            logging.exception('exception occured at IOSettingSPS.before_update')
+            logging.exception('IOSettingSPS.reset')
+
+    def update_buttons(self):
+        try:
+            if self.sps_connect and self.sps_connect.page:
+                self.sps_connect.text = self.page.session.get("lang.setting.connect")
+                self.sps_connect.visible = sps_read_task.is_online == None or sps_read_task.is_online == False
+                self.sps_connect.bgcolor = ft.Colors.GREEN
+                self.sps_connect.disabled = False
+
+            if self.sps_disconnect and self.sps_disconnect.page:
+                self.sps_disconnect.text = self.page.session.get("lang.setting.disconnect")
+                self.sps_disconnect.visible = sps_read_task.is_online == True
+                self.sps_disconnect.bgcolor = ft.Colors.RED
+                self.sps_disconnect.disabled = False
+
+            if gdata.configCommon.is_twins:
+                if self.sps2_connect and self.sps2_connect.page:
+                    self.sps2_connect.text = self.page.session.get("lang.setting.connect")
+                    self.sps2_connect.visible = sps2_read_task.is_online == None or sps2_read_task == False
+                    self.sps2_connect.bgcolor = ft.Colors.GREEN
+                    self.sps2_connect.disabled = False
+
+                if self.sps2_disconnect and self.sps2_disconnect.page:
+                    self.sps2_disconnect.text = self.page.session.get("lang.setting.disconnect")
+                    self.sps2_disconnect.visible = sps2_read_task.is_online == True
+                    self.sps2_disconnect.bgcolor = ft.Colors.RED
+                    self.sps2_disconnect.disabled = False
+        except:
+            logging.exception('IOSettingSPS.update_buttons')

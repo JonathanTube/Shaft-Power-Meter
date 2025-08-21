@@ -193,7 +193,7 @@ class TestMode(ft.Container):
             gdata.configSPS2.thrust = 0
             gdata.configSPS2.ad0 = 0
             gdata.configSPS2.ad1 = 0
-            # 这里只需要回复power_overload的告警，alarm不需要管。
+            # 这里只需要恢复power_overload的告警，alarm不需要管。
             self.page.run_task(plc.write_power_overload, False)
             Toast.show_success(self.page)
         except:

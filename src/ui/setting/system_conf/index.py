@@ -64,9 +64,9 @@ class SystemConf(ft.Container):
             TableInit.handle_change_running_mode()
             # 退出系统
             self.page.run_task(SystemExitTool.exit_app, self.page, user)
-        except:
-            logging.exception("system conf save data error")
-            Toast.show_error(self.page)
+        except Exception as e:
+            logging.exception(f"system conf save data error{e}")
+            Toast.show_error(self.page, e)
 
     def __reset_data(self, e):
         try:
