@@ -39,8 +39,8 @@ class TrendViewDiagram(ft.Container):
         try:
             self.set_style()
             """创建初始图表结构"""
-            self.fig, self.ax_rpm = plt.subplots(figsize=(10, 5.5))
-            self.fig.subplots_adjust(left=0.08, right=0.92, top=0.95, bottom=0.1)
+            self.fig, self.ax_rpm = plt.subplots(figsize=(10, 6))
+            self.fig.subplots_adjust(left=0.08, right=0.92, top=0.98, bottom=0.1)
             self.fig.autofmt_xdate()
             self._configure_axes()
             self._setup_power_axis()
@@ -62,9 +62,8 @@ class TrendViewDiagram(ft.Container):
 
     def _configure_axes(self):
         """配置主轴参数"""
-        # 日期轴格式化
-        self.ax_rpm.xaxis.set_major_locator(mdates.AutoDateLocator())
-        self.ax_rpm.xaxis.set_major_formatter(mdates.DateFormatter(f'{gdata.configDateTime.date_format} %H:%M'))
+        self.ax_rpm.xaxis.set_major_locator(mdates.HourLocator(byhour=range(0, 24, 2)))
+        self.ax_rpm.xaxis.set_major_formatter(mdates.DateFormatter(f'%H:%M'))
 
         # 主轴样式
         self.ax_rpm.set_xlabel(xlabel=self.page.session.get('lang.common.utc_date_time'), fontsize=10)
