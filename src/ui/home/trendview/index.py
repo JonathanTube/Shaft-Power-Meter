@@ -19,6 +19,13 @@ class TrendView(ft.Container):
 
     def build(self):
         try:
+
+            # 当前时间
+            now = gdata.configDateTime.utc
+            # 24 小时前
+            self.start_date = now - timedelta(hours=24)
+            self.end_date = now
+
             self.sps_chart = TrendViewDiagram()
 
             top_block = ft.Row(
@@ -57,12 +64,6 @@ class TrendView(ft.Container):
             logging.exception('exception occured at TrendView.build')
 
     def did_mount(self):
-        # 当前时间
-        now = gdata.configDateTime.utc
-        # 24 小时前
-        self.start_date = now - timedelta(hours=24)
-        self.end_date = now
-
         self.handle_data('sps')
         if gdata.configCommon.is_twins:
             self.handle_data('sps2')
@@ -78,18 +79,22 @@ class TrendView(ft.Container):
                 ).scalar() or 0
             )
             logging.info(f"trendview query data count: {cnt}")
-            max_data_count = 8000
+            max_data_count = 500
             # 假设chart最优显示8000条数据,那么需要分段查询
             portion = (cnt + max_data_count) // max_data_count
             logging.info(f"{name} trendview query data portion: {portion}")
-            data_logs = DataLog.select(
-                DataLog.power,
-                DataLog.speed,
-                DataLog.utc_date_time
-            ).where(
-                DataLog.utc_date_time >= self.start_date,
-                DataLog.utc_date_time <= self.end_date
-            ).where(DataLog.name == name).where(DataLog.id % portion == 0).order_by(DataLog.id.desc())
+            data_logs = (
+                DataLog.select(
+                    DataLog.power, 
+                    DataLog.speed, 
+                    DataLog.utc_date_time
+                ).where(
+                    (DataLog.utc_date_time >= self.start_date) &
+                    (DataLog.utc_date_time <= self.end_date) &
+                    (DataLog.name == name) &
+                    (fn.MOD(DataLog.id, portion) == 0)
+                ).order_by(DataLog.id.desc())
+            )
             if name == 'sps':
                 self.sps_chart.update_chart(data_logs)
             elif name == 'sps2':
