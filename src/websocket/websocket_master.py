@@ -75,7 +75,7 @@ class WebSocketMaster:
         logging.info("[Master] 客户端已连接")
         AlarmSaver.recovery(AlarmType.SLAVE_MASTER)
         # 客户端重新连接，推送未同步完成的报警
-        await self._sync_alarms_to_slave()
+        asyncio.create_task(self._sync_alarms_to_slave())
         try:
             async for msg in ws:
                 res = msgpack.unpackb(msg, raw=False)
