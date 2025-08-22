@@ -1,3 +1,4 @@
+import asyncio
 import logging
 import threading
 import uuid
@@ -5,6 +6,7 @@ from peewee import fn
 from common.const_alarm_type import AlarmType
 from db.models.alarm_log import AlarmLog
 from common.global_data import gdata
+from task.plc_sync_task import plc
 
 
 class AlarmSaver:
@@ -28,6 +30,7 @@ class AlarmSaver:
 
                 gdata.configAlarm.set_default_value()
 
+                asyncio.create_task(plc.write_common_alarm(True))
                 logging.info(f'[创建alarm] {alarm_type}')
 
             except Exception as e:
@@ -43,7 +46,8 @@ class AlarmSaver:
                         is_synced=False
                     ).where(AlarmLog.alarm_type == alarm_type).execute()
                     logging.info(f'[恢复alarm] {alarm_type}')
-
+                else:
+                    asyncio.create_task(plc.write_common_alarm(False))
                 gdata.configAlarm.set_default_value()
             except Exception as e:
                 logging.exception(f'[恢复alarm] 异常{e}')
