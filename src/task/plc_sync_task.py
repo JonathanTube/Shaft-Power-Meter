@@ -305,20 +305,20 @@ class PlcSyncTask:
 
     def set_online(self):
         self.is_online = True
+        AlarmLog.update(
+            recovery_time=gdata.configDateTime.utc,
+            is_synced=False
+        ).where(AlarmLog.alarm_type == AlarmType.MASTER_PLC).execute()
+        gdata.configAlarm.set_default_value()
+
+    def set_offline(self):
+        self.is_online = False
         AlarmLog.create(
             alarm_uuid=uuid.uuid4().hex,
             alarm_type=AlarmType.MASTER_PLC,
             occured_time=gdata.configDateTime.utc,
             out_of_sync=False
         )
-        gdata.configAlarm.set_default_value()
-
-    def set_offline(self):
-        self.is_online = False
-        AlarmLog.update(
-            recovery_time=gdata.configDateTime.utc,
-            is_synced=False
-        ).where(AlarmLog.alarm_type == AlarmType.MASTER_PLC).execute()
         gdata.configAlarm.set_default_value()
 
 
