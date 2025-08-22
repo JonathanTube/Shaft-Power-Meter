@@ -310,7 +310,7 @@ class PlcSyncTask:
         except Exception as e:
             logging.exception('[PLC] 关闭PLC连接失败: %s', e)
         finally:
-            self.set_offline()
+            await self.set_offline()
 
     # ---------------- 报警状态（仅反映连接本身） ----------------
 
