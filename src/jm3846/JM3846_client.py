@@ -42,8 +42,9 @@ class JM3846AsyncClient(ABC):
                     logging.info(f'[JM3846-{self.name}] 连接成功 {host}:{port}')
                     self.start_background_tasks()
                     await JM38460x45.handle(self.name, self.reader, self.writer)
+                    await asyncio.sleep(1)
                     await JM38460x03.handle(self.name, self.reader, self.writer)
-
+                    await asyncio.sleep(1)
                 # 0x44 循环放到锁外执行
                 await JM38460x44.handle(self.name, self.reader, self.writer, self.set_online, self.set_offline)
 
