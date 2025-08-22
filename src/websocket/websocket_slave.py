@@ -69,10 +69,17 @@ class WebSocketSlave:
                     self._handle_sps_data(receive_data['data'])
                 elif type == 'sps2':
                     self._handle_sps2_data(receive_data['data'])
+
                 elif type == 'sps_1s':
                     self._handle_sps_data_1s(receive_data['data'])
                 elif type == 'sps2_1s':
                     self._handle_sps2_data_1s(receive_data['data'])
+
+                elif type == 'sps_15s':
+                    self._handle_sps_data_15s(receive_data['data'])
+                elif type == 'sps2_15s':
+                    self._handle_sps2_data_15s(receive_data['data'])
+
                 elif type == 'alarms':
                     await self._handle_alarm(receive_data['data'])
                 elif type == 'propeller_setting':
@@ -128,6 +135,32 @@ class WebSocketSlave:
             gdata.configSPS2.power_history.pop(0)
         else:
             gdata.configSPS2.power_history.append((power_for_1s, gdata.configDateTime.utc))
+
+    def _handle_sps_data_15s(self, data):
+        if gdata.configTest.test_mode_running:
+            # logging.info('[Slave] 测试模式运行中，跳过SPS数据处理')
+            return
+
+        torque_for_15s = data['torque']
+        speed_for_15s = data['speed']
+        power_for_15s = data['power']
+
+        gdata.configSPS.torque_for_15s = torque_for_15s
+        gdata.configSPS.speed_for_15s = speed_for_15s
+        gdata.configSPS.power_for_15s = power_for_15s
+
+    def _handle_sps2_data_15s(self, data):
+        if gdata.configTest.test_mode_running:
+            # logging.info('[Slave] 测试模式运行中，跳过SPS数据处理')
+            return
+
+        torque_for_15s = data['torque']
+        speed_for_15s = data['speed']
+        power_for_15s = data['power']
+
+        gdata.configSPS2.torque_for_15s = torque_for_15s
+        gdata.configSPS2.speed_for_15s = speed_for_15s
+        gdata.configSPS2.power_for_15s = power_for_15s
 
     async def _handle_alarm(self, data):
         for alarm in data:
