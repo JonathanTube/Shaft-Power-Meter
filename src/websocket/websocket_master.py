@@ -23,7 +23,6 @@ class WebSocketMaster:
         self.is_canceled = False
         if not self._task or self._task.done():
             self._task = asyncio.create_task(self._run())
-        return self._task
 
     async def stop(self):
         """停止 Master 监听"""

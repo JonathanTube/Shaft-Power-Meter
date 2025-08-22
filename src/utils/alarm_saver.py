@@ -11,12 +11,12 @@ from task.plc_sync_task import plc
 
 class AlarmSaver:
     # 新增：全局锁对象
-    _lock = threading.Lock()
+    _lock = asyncio.Lock()
 
     @staticmethod
     async def create(alarm_type: AlarmType, out_of_sync: bool = False):
         # 加锁（使用with语句确保锁自动释放）
-        with AlarmSaver._lock:
+        async with AlarmSaver._lock:
             if await asyncio.to_thread(AlarmSaver.has_alarm, alarm_type):
                 return
 
@@ -39,7 +39,7 @@ class AlarmSaver:
 
     @staticmethod
     async def recovery(alarm_type: AlarmType):
-        with AlarmSaver._lock:
+        async with AlarmSaver._lock:
             try:
                 has_alarm = await asyncio.to_thread(AlarmSaver.has_alarm, alarm_type)
                 if has_alarm:

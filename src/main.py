@@ -4,7 +4,6 @@ import sys
 import logging
 import ui_safety
 import flet as ft
-from task.task_manager import TaskManager
 from ui.common.fullscreen_alert import FullscreenAlert
 from ui.common.keyboard import keyboard
 from ui.header.index import Header
@@ -33,9 +32,6 @@ from task.data_cleanup_task import data_cleanup_task
 
 Logger(show_sql=False)
 add_to_startup()
-
-
-task_manager = TaskManager()
 
 
 def check_single_instance(mutex_name: str = "shaft-power-meter"):
@@ -121,54 +117,40 @@ def set_content(page: ft.Page):
 async def start_all_tasks():
     # UTC 时钟
     await utc_timer.start()
-    task_manager.add(utc_timer)
 
     # 数据清理
     await data_cleanup_task.start()
-    task_manager.add(data_cleanup_task)
 
     # 数据记录
     await data_record_task.start()
-    task_manager.add(data_record_task)
 
     # eexi breach 判断
     if gdata.configCommon.shapoli:
         await eexi_breach_task.start()
-        task_manager.add(eexi_breach_task)
 
     # Modbus 输出
     await modbus_output.start()
-    task_manager.add(modbus_output)
 
     # GPS
     if gdata.configCommon.enable_gps:
         await gps.start()
-        task_manager.add(gps)
 
     # PLC
     if gdata.configCommon.is_master and gdata.configIO.plc_enabled:
         await plc.connect()
-        task_manager.add(plc)
 
     # SPS 读取
     if gdata.configCommon.is_master:
         await sps_read_task.start()
-        task_manager.add(sps_read_task)
+
         if gdata.configCommon.is_twins:
             await sps2_read_task.start()
-            task_manager.add(sps2_read_task)
 
     # WS
     if not gdata.configCommon.is_individual:
         await ws_server.start()
-        task_manager.add(ws_server)
     else:
         await ws_client.start()
-        task_manager.add(ws_client)
-
-
-async def stop_all_tasks():
-    await task_manager.stop_all()
 
 
 async def main_async_setup(page: ft.Page):
@@ -200,7 +182,6 @@ async def main(page: ft.Page):
     try:
         page.on_error = handle_error
         await main_async_setup(page)
-        page.on_close = lambda _: asyncio.create_task(stop_all_tasks())
     except Exception:
         logging.exception('exception in main')
 
