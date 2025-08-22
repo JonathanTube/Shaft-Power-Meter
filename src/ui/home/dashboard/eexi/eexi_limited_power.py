@@ -43,10 +43,11 @@ class EEXILimitedPower(ft.Container):
 
             self.common_alarm_block = ft.Container(
                 border_radius=ft.border_radius.all(5),
-                padding=ft.padding.only(left=2, right=2, bottom=4),
+                padding=ft.padding.only(left=4, right=4, bottom=4),
                 alignment=ft.alignment.center,
                 content=ft.Text("Common Alarm", color=ft.Colors.WHITE, size=12),
                 bgcolor=ft.Colors.RED,
+                right=4, top=40,
                 visible=False
             )
 
