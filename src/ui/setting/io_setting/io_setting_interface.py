@@ -92,7 +92,8 @@ class InterfaceConf(ft.Container):
                 self.close_btn.bgcolor = ft.Colors.GREY
                 self.close_btn.update()
             self.page.run_task(ws_client.stop)
-            AlarmSaver.create(AlarmType.SLAVE_MASTER, True)
+            self.page.run_task(AlarmSaver.create, AlarmType.SLAVE_MASTER, True)
+
         except:
             logging.exception("exception occured at InterfaceConf.__on_close")
 

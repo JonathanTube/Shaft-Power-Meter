@@ -14,14 +14,15 @@ class AlarmSaver:
     _lock = threading.Lock()
 
     @staticmethod
-    def create(alarm_type: AlarmType, out_of_sync: bool = False):
+    async def create(alarm_type: AlarmType, out_of_sync: bool = False):
         # 加锁（使用with语句确保锁自动释放）
         with AlarmSaver._lock:
-            if AlarmSaver.has_alarm(alarm_type):
+            if await asyncio.to_thread(AlarmSaver.has_alarm, alarm_type):
                 return
 
             try:
-                AlarmLog.create(
+                await asyncio.to_thread(
+                    AlarmLog.create,
                     alarm_uuid=uuid.uuid4().hex,
                     alarm_type=alarm_type,
                     occured_time=gdata.configDateTime.utc,
@@ -29,31 +30,38 @@ class AlarmSaver:
                 )
 
                 gdata.configAlarm.set_default_value()
+                await plc.write_common_alarm(True)
 
-                asyncio.run(plc.write_common_alarm(True))
                 logging.info(f'[创建alarm] {alarm_type}')
 
             except Exception as e:
                 logging.exception(f'[创建alarm] 异常{e}')
 
     @staticmethod
-    def recovery(alarm_type: AlarmType):
+    async def recovery(alarm_type: AlarmType):
         with AlarmSaver._lock:
             try:
-                if AlarmSaver.has_alarm(alarm_type):
-                    AlarmLog.update(
-                        recovery_time=gdata.configDateTime.utc,
-                        is_synced=False
-                    ).where(AlarmLog.alarm_type == alarm_type).execute()
+                has_alarm = await asyncio.to_thread(AlarmSaver.has_alarm, alarm_type)
+                if has_alarm:
+                    # update 也放线程池
+                    await asyncio.to_thread(
+                        lambda: AlarmLog.update(
+                            recovery_time=gdata.configDateTime.utc,
+                            is_synced=False
+                        ).where(AlarmLog.alarm_type == alarm_type).execute()
+                    )
+                    gdata.configAlarm.set_default_value()
                     logging.info(f'[恢复alarm] {alarm_type}')
-                else:
-                    asyncio.run(plc.write_common_alarm(False))
-                gdata.configAlarm.set_default_value()
+
+                has_alarm = await asyncio.to_thread(AlarmSaver.has_alarm, alarm_type)
+                if not has_alarm:
+                    await plc.write_common_alarm(False)
+
             except Exception as e:
                 logging.exception(f'[恢复alarm] 异常{e}')
 
     @staticmethod
-    def has_alarm(alarm_type: AlarmType) -> tuple[int, int]:
+    def has_alarm(alarm_type: AlarmType) -> bool:
         cnt = AlarmLog.select(fn.COUNT(AlarmLog.id)).where(
             AlarmLog.alarm_type == alarm_type,
             AlarmLog.recovery_time.is_null()

@@ -40,7 +40,7 @@ class GpsSyncTask:
             except asyncio.CancelledError:
                 pass
         await self.close()
-        self.set_offline()
+        await self.set_offline()
 
     async def _run(self):
         while not self.is_canceled:
@@ -55,7 +55,7 @@ class GpsSyncTask:
 
             # 确保清理
             await self.close()
-            self.set_offline()
+            await self.set_offline()
 
             # 3 秒后重连
             if not self.is_canceled:
@@ -71,7 +71,7 @@ class GpsSyncTask:
                 self.reader, self.writer = await asyncio.wait_for(
                     asyncio.open_connection(gps_ip, gps_port), timeout=5
                 )
-                self.set_online()
+                await self.set_online()
                 _logger.info("[GPS] 连接成功")
                 return True
             except Exception as e:
@@ -124,13 +124,13 @@ class GpsSyncTask:
         except Exception:
             _logger.exception("[GPS] 解析失败")
 
-    def set_online(self):
+    async def set_online(self):
         self.is_online = True
-        AlarmSaver.recovery(AlarmType.MASTER_GPS)
+        await AlarmSaver.recovery(AlarmType.MASTER_GPS)
 
-    def set_offline(self):
+    async def set_offline(self):
         self.is_online = False
-        AlarmSaver.create(AlarmType.MASTER_GPS)
+        await AlarmSaver.create(AlarmType.MASTER_GPS)
 
 
 gps = GpsSyncTask()

@@ -41,19 +41,19 @@ class WebSocketMaster:
             self._periodic_task_handle = None
         self.server = None
         self.client = None
-        self.set_offline()
+        await self.set_offline()
 
     async def _run(self):
         while not self.is_canceled:
             try:
                 await self._start_server()
                 await self.server.wait_closed()
-                self.set_offline()
+                await self.set_offline()
             except asyncio.CancelledError:
                 break
             except Exception:
                 logging.exception("[Master] 异常，10秒后重试")
-                self.set_offline()
+                await self.set_offline()
             await asyncio.sleep(10)
 
     async def _start_server(self):
@@ -61,7 +61,7 @@ class WebSocketMaster:
         logging.info(f"[Master] 启动 ws://{host}:{port}")
         try:
             self.server = await websockets.serve(self._client_handler, host, port)
-            self.set_online()
+            await self.set_online()
             # 启动定时任务
             self._periodic_task_handle = asyncio.create_task(self._sync_alarms_to_slave())
         except Exception as e:
@@ -72,7 +72,7 @@ class WebSocketMaster:
     async def _client_handler(self, ws):
         self.client = ws
         logging.info("[Master] 客户端已连接")
-        AlarmSaver.recovery(AlarmType.SLAVE_MASTER)
+        await AlarmSaver.recovery(AlarmType.SLAVE_MASTER)
         # 客户端重新连接，推送未同步完成的报警
         asyncio.create_task(self._sync_alarms_to_slave())
         try:
@@ -144,16 +144,16 @@ class WebSocketMaster:
             logging.exception("[Master] 发送客户端消息失败")
         return False
 
-    def set_online(self):
+    async def set_online(self):
         self.is_online = True
         logging.info("[Master] 监听已启动")
-        AlarmSaver.recovery(AlarmType.MASTER_SERVER)
+        await AlarmSaver.recovery(AlarmType.MASTER_SERVER)
 
-    def set_offline(self):
+    async def set_offline(self):
         self.is_online = False
         logging.warning("[Master] 监听已停止")
-        AlarmSaver.create(AlarmType.MASTER_SERVER, True)
-        AlarmSaver.create(AlarmType.SLAVE_MASTER, True)
+        await AlarmSaver.create(AlarmType.MASTER_SERVER, True)
+        await AlarmSaver.create(AlarmType.SLAVE_MASTER, True)
 
 
 ws_server = WebSocketMaster()

@@ -49,14 +49,14 @@ class PlcSyncTask:
                 )
                 await self.plc_client.connect()
                 if self.is_connected():
-                    self.set_online()
+                    await self.set_online()
                     logging.info(f'[PLC] 已连接 {ip}:{port}')
                 else:
-                    self.set_offline()
+                    await self.set_offline()
                     logging.error('[PLC] 连接失败（底层未建立）')
             except Exception as e:
                 logging.exception(f'[PLC] 连接异常: {e}')
-                self.set_offline()
+                await self.set_offline()
             finally:
                 await asyncio.sleep(10)
                 self.is_connecting = False
@@ -303,17 +303,18 @@ class PlcSyncTask:
 
     # ---------------- 报警状态（仅反映连接本身） ----------------
 
-    def set_online(self):
+    async def set_online(self):
         self.is_online = True
-        AlarmLog.update(
+        await asyncio.to_thread(AlarmLog.update(
             recovery_time=gdata.configDateTime.utc,
             is_synced=False
-        ).where(AlarmLog.alarm_type == AlarmType.MASTER_PLC).execute()
+        ).where(AlarmLog.alarm_type == AlarmType.MASTER_PLC).execute)
         gdata.configAlarm.set_default_value()
 
-    def set_offline(self):
+    async def set_offline(self):
         self.is_online = False
-        AlarmLog.create(
+        await asyncio.to_thread(
+            AlarmLog.create,
             alarm_uuid=uuid.uuid4().hex,
             alarm_type=AlarmType.MASTER_PLC,
             occured_time=gdata.configDateTime.utc,

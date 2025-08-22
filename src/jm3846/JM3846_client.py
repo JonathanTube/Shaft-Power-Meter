@@ -100,7 +100,7 @@ class JM3846AsyncClient(ABC):
         finally:
             self.writer = None
             self.reader = None
-            self.set_offline()
+            await self.set_offline()
 
     # ---- 抽象方法 ----
     @abstractmethod
@@ -108,11 +108,11 @@ class JM3846AsyncClient(ABC):
         pass
 
     @abstractmethod
-    def set_online(self):
+    async def set_online(self):
         pass
 
     @abstractmethod
-    def set_offline(self):
+    async def set_offline(self):
         pass
 
     def start_background_tasks(self):

@@ -16,17 +16,17 @@ class Sps2ReadTask(JM3846AsyncClient):
         port = gdata.configIO.sps2_port
         return ip, port
 
-    def set_online(self):
+    async def set_online(self):
         """设置在线状态（非阻塞）"""
         if self.is_online is None or self.is_online == False:
             self.is_online = True
-            AlarmSaver.recovery(AlarmType.MASTER_SPS)
+            await AlarmSaver.recovery(AlarmType.MASTER_SPS)
 
-    def set_offline(self):
+    async def set_offline(self):
         """设置离线状态（非阻塞）"""
         if self.is_online is None or self.is_online == True:
             self.is_online = False
-            AlarmSaver.create(AlarmType.MASTER_SPS)
+            await AlarmSaver.create(AlarmType.MASTER_SPS)
 
 
 sps2_read_task = Sps2ReadTask()

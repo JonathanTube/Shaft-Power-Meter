@@ -111,11 +111,11 @@ class JM38460x44:
                 logging.warning(f'[JM3846-{name}] 0x44响应 超时')
                 continue
             except asyncio.CancelledError:
-                on_error()
+                await on_error()
                 break
             except:
                 logging.exception(f'[JM3846-{name}] 0x44响应 error')
-                on_error()
+                await on_error()
                 break
 
             func_code = struct.unpack(">B", frame[7:8])[0]
@@ -128,7 +128,7 @@ class JM38460x44:
                 if current_frame + 1 >= JM38460x44.total_frames:
                     logging.info(f'[JM3846-{name}] 0x44响应, 当前帧={current_frame}大于总帧数={JM38460x44.total_frames},重新请求0x44')
                     await JM38460x44.send_0x44_again(name, reader, writer)
-                on_success()
+                await on_success()
 
     @staticmethod
     async def send_0x44_again(name, reader, writer):

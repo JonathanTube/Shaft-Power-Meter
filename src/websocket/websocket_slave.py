@@ -32,21 +32,21 @@ class WebSocketSlave:
                 port = gdata.configIO.hmi_server_port
                 uri = f"ws://{ip}:{port}"
                 self.websocket = await websockets.connect(uri)
-                self.set_online()
+                await self.set_online()
                 logging.info(f"[Slave] 已连接到 {uri}")
                 await self.receive_data_from_master()
             except Exception as e:
                 logging.error(f"[Slave] 连接失败: {e}")
-                self.set_offline()
+                await self.set_offline()
                 await asyncio.sleep(10)
 
-    def set_online(self):
+    async def set_online(self):
         self.is_online = True
-        AlarmSaver.recovery(AlarmType.SLAVE_MASTER)
+        await AlarmSaver.recovery(AlarmType.SLAVE_MASTER)
 
-    def set_offline(self):
+    async def set_offline(self):
         self.is_online = False
-        AlarmSaver.create(AlarmType.SLAVE_MASTER, True)
+        await AlarmSaver.create(AlarmType.SLAVE_MASTER, True)
 
     async def send_eexi_breach_alarm_to_master(self, occured):
         if not (self.is_online and not gdata.configCommon.is_master):
@@ -79,10 +79,10 @@ class WebSocketSlave:
                     dict_to_model(PropellerSetting, receive_data['data']).save()
         except (websockets.ConnectionClosed, websockets.ConnectionClosedError, websockets.ConnectionClosedOK):
             logging.error("[Slave] 连接断开")
-            self.set_offline()
+            await self.set_offline()
         except:
             logging.exception("[Slave] 接收数据异常")
-            self.set_offline()
+            await self.set_offline()
 
     def _handle_sps_data(self, data):
         if gdata.configTest.test_mode_running:
@@ -173,7 +173,7 @@ class WebSocketSlave:
         except:
             logging.error("[Slave] 关闭连接失败")
         finally:
-            self.set_offline()
+            await self.set_offline()
 
 
 ws_client = WebSocketSlave()

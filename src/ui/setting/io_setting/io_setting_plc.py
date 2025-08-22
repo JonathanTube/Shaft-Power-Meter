@@ -257,7 +257,7 @@ class IOSettingPLC(ft.Container):
             self.page.run_task(self.__write_to_plc)
         else:
             self.page.run_task(plc.close)
-            AlarmSaver.recovery(AlarmType.MASTER_PLC)
+            self.page.run_task(AlarmSaver.recovery, AlarmType.MASTER_PLC)
 
     def __plc_enabled_change(self, e):
         if self.plc_enabled_items and self.plc_enabled_items.page:

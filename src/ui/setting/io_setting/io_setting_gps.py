@@ -92,7 +92,7 @@ class IOSettingGPS(ft.Container):
                 self.close_btn.update()
 
             self.page.run_task(gps.stop)
-            AlarmSaver.create(AlarmType.MASTER_GPS)
+            self.page.run_task(AlarmSaver.create, AlarmType.MASTER_GPS)
         except:
             logging.exception("exception occured at IOSettingGPS.__on_close")
 
