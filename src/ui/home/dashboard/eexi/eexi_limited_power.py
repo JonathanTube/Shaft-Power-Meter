@@ -16,8 +16,6 @@ class EEXILimitedPower(ft.Container):
         self.eexi_power = gdata.configCommon.eexi_limited_power
         self.normal_power = self.eexi_power * 0.9
 
-        self.blinks = 0
-
     def build(self):
         try:
             if self.page is None or self.page.window is None or self.page.session is None:
@@ -52,22 +50,6 @@ class EEXILimitedPower(ft.Container):
                 visible=False
             )
 
-            self.gps_status_block = ft.Container(
-                border_radius=ft.border_radius.all(5),
-                padding=ft.padding.only(left=2, right=2, bottom=4),
-                alignment=ft.alignment.center,
-                content=ft.Text("GPS Disconnected", color=ft.Colors.WHITE, size=12),
-                bgcolor=ft.Colors.RED,
-                visible=False
-            )
-
-            identifications = ft.Column(
-                expand=True,
-                horizontal_alignment=ft.CrossAxisAlignment.END,
-                visible=not gdata.configCommon.is_master,
-                controls=[self.gps_status_block, self.common_alarm_block],
-                right=4, top=40)
-
             main_content = ft.Container(
                 border=ft.border.all(
                     width=0.5,
@@ -82,7 +64,7 @@ class EEXILimitedPower(ft.Container):
                 )
             )
             self.content = ft.Stack(controls=[
-                identifications,
+                self.common_alarm_block,
                 main_content
             ])
         except:
@@ -106,8 +88,6 @@ class EEXILimitedPower(ft.Container):
 
                 self.update_mode()
                 self.update_common_alarm()
-                self.update_gps_alarm()
-                self.blinks += 1
         except:
             logging.exception('EEXILimitedPower.reload')
 
@@ -116,51 +96,9 @@ class EEXILimitedPower(ft.Container):
         if gdata.configCommon.is_master:
             return
 
-        if not self.common_alarm_block or not self.common_alarm_block.page:
-            return
-
-        # 无公共报警发生，并且无未确认公共报警，不显示
-        if gdata.configAlarm.alarm_common_count == 0 and gdata.configAlarm.alarm_common_not_ack == 0:
-            self.common_alarm_block.visible = False
+        if self.common_alarm_block and self.common_alarm_block.page:
+            self.common_alarm_block.visible = gdata.configAlarm.alarm_total_count > 0
             self.common_alarm_block.update()
-            return
-
-        # 有未确认的报警，闪烁
-        if gdata.configAlarm.alarm_common_not_ack > 0:
-            # 闪烁
-            self.common_alarm_block.visible = self.blinks % 2 == 0
-            self.common_alarm_block.update()
-            return
-
-        # 有报警常亮
-        if gdata.configAlarm.alarm_common_count > 0:
-            self.common_alarm_block.visible = True
-            self.common_alarm_block.update()
-
-    def update_gps_alarm(self):
-        # 主机不更新
-        if gdata.configCommon.is_master:
-            return
-
-        if not self.gps_status_block or not self.gps_status_block.page:
-            return
-
-        # 无GPS报警，无待确认GSP报警，不显示
-        if gdata.configAlarm.gps_total_count == 0 and gdata.configAlarm.gps_not_ack == 0:
-            self.gps_status_block.visible = False
-            self.gps_status_block.update()
-            return
-
-        # 未确认GPS报警数量大于0闪烁
-        if gdata.configAlarm.gps_not_ack > 0:
-            self.gps_status_block.visible = self.blinks % 2 == 0
-            self.gps_status_block.update()
-            return
-
-        # 有报警常亮
-        if gdata.configAlarm.gps_not_ack == 0:
-            self.gps_status_block.visible = True
-            self.gps_status_block.update()
 
     def update_mode(self):
         try:
