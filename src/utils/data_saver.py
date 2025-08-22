@@ -14,6 +14,8 @@ from websocket.websocket_master import ws_server
 
 
 class DataSaver:
+    overload = None
+
     @staticmethod
     async def save(name: str, torque: int, thrust: int, speed: float):
         try:
@@ -22,7 +24,7 @@ class DataSaver:
                 return
 
             power: int = FormulaCalculator.calculate_instant_power(torque, speed)
-            is_overload = DataSaver.is_overload(speed, power)
+            DataSaver.is_overload(speed, power)
 
             data = {
                 'utc_date_time': utc,
@@ -31,7 +33,7 @@ class DataSaver:
                 'power': power,
                 'ad_0_torque': torque,
                 'ad_1_thrust': thrust,
-                'is_overload': is_overload
+                'is_overload': DataSaver.is_overload
             }
 
             # 测试模式数据不插入
@@ -99,15 +101,18 @@ class DataSaver:
 
         overload = actual_power_percentage > overload_power_percentage
 
+        # 没变化
+        if overload == DataSaver.overload:
+            return
+
+        # 有变化
         if gdata.configPropperCurve.enable_power_overload_alarm:
-            if overload:
+            if DataSaver.overload:
                 DataSaver._safe_create_task(AlarmSaver.create(AlarmType.POWER_OVERLOAD))
                 DataSaver._safe_create_task(plc.write_power_overload(True))
             else:
                 DataSaver._safe_create_task(AlarmSaver.recovery(AlarmType.POWER_OVERLOAD))
                 DataSaver._safe_create_task(plc.write_power_overload(False))
-
-        return overload
 
     @staticmethod
     def save_counter_manually(name: str, speed: float, power: float):

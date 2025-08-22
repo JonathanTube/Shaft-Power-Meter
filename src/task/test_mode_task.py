@@ -159,6 +159,8 @@ class TestModeTask:
                 await ws_server.send({
                     'type': f'{name}_15s',
                     'data': {
+                        'torque': instant_torque,
+                        'speed': instant_speed,
                         'power': power
                     }
                 })
