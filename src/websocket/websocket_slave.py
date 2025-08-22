@@ -69,6 +69,10 @@ class WebSocketSlave:
                     self._handle_sps_data(receive_data['data'])
                 elif type == 'sps2':
                     self._handle_sps2_data(receive_data['data'])
+                elif type == 'sps_1s':
+                    self._handle_sps_data_1s(receive_data['data'])
+                elif type == 'sps2_1s':
+                    self._handle_sps2_data_1s(receive_data['data'])
                 elif type == 'alarms':
                     await self._handle_alarm(receive_data['data'])
                 elif type == 'propeller_setting':
@@ -102,6 +106,28 @@ class WebSocketSlave:
         gdata.configSPS2.speed = data['speed']
         # 这里gps不处理了，sps已经处理过一次了
         # gdata.configGps.location = data['gps']
+
+    def _handle_sps_data_1s(self, data):
+        if gdata.configTest.test_mode_running:
+            # logging.info('[Slave] 测试模式运行中，跳过SPS数据处理')
+            return
+        power_for_1s = data['power']
+        gdata.configSPS.power_for_1s = power_for_1s
+        if len(gdata.configSPS.power_history) > 300:
+            gdata.configSPS.power_history.pop(0)
+        else:
+            gdata.configSPS.power_history.append((power_for_1s, gdata.configDateTime.utc))
+
+    def _handle_sps2_data_1s(self, data):
+        if gdata.configTest.test_mode_running:
+            # logging.info('[Slave] 测试模式运行中，跳过SPS数据处理')
+            return
+        power_for_1s = data['power']
+        gdata.configSPS2.power_for_1s = power_for_1s
+        if len(gdata.configSPS2.power_history) > 300:
+            gdata.configSPS2.power_history.pop(0)
+        else:
+            gdata.configSPS2.power_history.append((power_for_1s, gdata.configDateTime.utc))
 
     async def _handle_alarm(self, data):
         for alarm in data:

@@ -11,6 +11,7 @@ class SingleShaPoLiOn(ft.Container):
     def __init__(self):
         super().__init__()
         self.task = None
+        self.task_1s = None
         self.task_running = False
 
     def build(self):
@@ -41,18 +42,29 @@ class SingleShaPoLiOn(ft.Container):
             try:
                 self.eexi_limited_power.reload()
                 self.instant_value_grid.reload()
-                self.power_line_chart.reload()
             except:
-                logging.exception("exception occured at SingleShaPoLiOn.load_data")
+                logging.exception("SingleShaPoLiOn.load_data")
                 break
             await asyncio.sleep(gdata.configPreference.data_collection_seconds_range)
+
+    async def load_data_1s(self):
+        while self.task_running:
+            try:
+                self.power_line_chart.reload()
+            except:
+                logging.exception("SingleShaPoLiOn.load_data_1s")
+                break
+            await asyncio.sleep(1)
 
     def did_mount(self):
         self.task_running = True
         if self.page:
             self.task = self.page.run_task(self.load_data)
+            self.task_1s = self.page.run_task(self.load_data_1s)
 
     def will_unmount(self):
         self.task_running = False
         if self.task:
             self.task.cancel()
+        if self.task_1s:
+            self.task_1s.cancel()

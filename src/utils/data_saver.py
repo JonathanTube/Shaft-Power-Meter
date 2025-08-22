@@ -64,19 +64,11 @@ class DataSaver:
                 gdata.configSPS.thrust = thrust
                 gdata.configSPS.speed = speed
                 gdata.configSPS.power = power
-                if len(gdata.configSPS.power_history) > 300:
-                    gdata.configSPS.power_history.pop(0)
-                else:
-                    gdata.configSPS.power_history.append((power, utc))
             else:
                 gdata.configSPS2.torque = torque
                 gdata.configSPS2.thrust = thrust
                 gdata.configSPS2.speed = speed
                 gdata.configSPS2.power = power
-                if len(gdata.configSPS2.power_history) > 300:
-                    gdata.configSPS2.power_history.pop(0)
-                else:
-                    gdata.configSPS2.power_history.append((power, utc))
 
             # 更新 Modbus 输出
             DataSaver._safe_create_task(modbus_output.update_registers())
