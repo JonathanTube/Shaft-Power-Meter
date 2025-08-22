@@ -33,7 +33,7 @@ class DataSaver:
                 'power': power,
                 'ad_0_torque': torque,
                 'ad_1_thrust': thrust,
-                'is_overload': DataSaver.is_overload
+                'is_overload': DataSaver.overload
             }
 
             # 测试模式数据不插入

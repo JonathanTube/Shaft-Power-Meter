@@ -85,7 +85,7 @@ class TestModeTask:
         await plc.write_power_overload(False)
         await plc.write_eexi_breach_alarm(False)
         # 清客户端数据
-        await self.send({'type': 'stop_test_mode'})
+        await ws_server.send({'type': 'stop_test_mode'})
         # counter是唯一需要初始化的
         gdata.configCounterSPS.set_default_value()
         gdata.configCounterSPS2.set_default_value()
