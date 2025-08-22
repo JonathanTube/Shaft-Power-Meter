@@ -1,3 +1,4 @@
+import threading
 import flet as ft
 import logging
 from datetime import timedelta
@@ -64,11 +65,21 @@ class TrendView(ft.Container):
             logging.exception('exception occured at TrendView.build')
 
     def did_mount(self):
-        self.handle_data('sps')
-        if gdata.configCommon.is_twins:
-            self.handle_data('sps2')
+        threading.Thread(target=self.load_data_sync, daemon=True).start()
 
-    def handle_data(self, name: Literal['sps', 'sps2']):
+    def load_data_sync(self):
+        self.fetch_and_update("sps")
+        if gdata.configCommon.is_twins:
+            self.fetch_and_update("sps2")
+
+    def fetch_and_update(self, name):
+        data_logs = self.query_data(name)
+        chart = self.sps_chart if name == "sps" else self.sps2_chart
+        if chart and chart.page:
+            chart.update_chart(data_logs)
+            chart.update()
+
+    def query_data(self, name: Literal['sps', 'sps2']):
         try:
             cnt = (
                 DataLog.select(fn.COUNT(DataLog.id))
@@ -80,7 +91,6 @@ class TrendView(ft.Container):
             )
             logging.info(f"trendview query data count: {cnt}")
             max_data_count = 500
-            # 假设chart最优显示8000条数据,那么需要分段查询
             portion = (cnt + max_data_count) // max_data_count
             logging.info(f"{name} trendview query data portion: {portion}")
             data_logs = (
@@ -95,13 +105,7 @@ class TrendView(ft.Container):
                     (fn.MOD(DataLog.id, portion) == 0)
                 ).order_by(DataLog.id.desc())
             )
-            if name == 'sps':
-                if self.sps_chart and self.sps_chart.page:
-                    self.sps_chart.update_chart(data_logs)
-                    self.sps_chart.update()
-            elif name == 'sps2':
-                if self.sps2_chart and self.sps2_chart.page:
-                    self.sps2_chart.update_chart(data_logs)
-                    self.sps2_chart.update()
+            return list(data_logs)
         except:
-            logging.exception('TrendView.handle_data')
+            logging.exception('TrendView.query_data')
+            return []
