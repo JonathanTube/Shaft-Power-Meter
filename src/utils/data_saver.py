@@ -51,6 +51,7 @@ class DataSaver:
             if gdata.configCommon.is_master:
                 DataSaver._safe_create_task(ws_server.send({
                     'type': name,
+                    'test': gdata.configTest.test_mode_running,
                     'data': {
                         'torque': torque,
                         'thrust': thrust,

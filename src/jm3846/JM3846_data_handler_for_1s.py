@@ -61,7 +61,7 @@ class JM3846DataHandlerFor1s:
                     if len(gdata.configSPS2.power_history) > 300:
                         gdata.configSPS2.power_history.pop(0)
                     else:
-                        gdata.configSPS2.power_history.append((power_for_1s, utc))
+                        gdata.configSPS2.power_history.append((power_for_1s, gdata.configDateTime.utc))
                     # 发送数据到客户端
                     if gdata.configCommon.is_master:
                         await ws_server.send({

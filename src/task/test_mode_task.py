@@ -3,6 +3,8 @@ import random
 import logging
 from common.global_data import gdata
 from db.table_init import TableInit
+from utils.formula_cal import FormulaCalculator
+from websocket.websocket_master import ws_server
 
 
 class TestModeTask:
@@ -89,9 +91,9 @@ class TestModeTask:
             while self.is_running:
                 # 生成并保存到内存（对 gdata 的赋值很快，允许在事件循环中做）
                 try:
-                    self._save_generated_data('sps')
+                    await self._save_generated_data('sps')
                     if gdata.configCommon.is_twins:
-                        self._save_generated_data('sps2')
+                        await self._save_generated_data('sps2')
                 except Exception:
                     logging.exception("[TestMode] 生成或保存随机数据时出错")
 
@@ -111,7 +113,7 @@ class TestModeTask:
             # 确保 is_running 状态被清理
             self.is_running = False
 
-    def _save_generated_data(self, name: str):
+    async def _save_generated_data(self, name: str):
         """保存随机生成的模拟数据到全局变量（尽量保持快速）"""
         try:
             # 保证 min/max 合理（如果用户设置错误，避免异常）
@@ -143,6 +145,23 @@ class TestModeTask:
                 gdata.configSPS2.torque = instant_torque
                 gdata.configSPS2.thrust = instant_thrust
                 gdata.configSPS2.speed = instant_speed
+
+            power = FormulaCalculator.calculate_instant_power(instant_torque, instant_speed)
+            if gdata.configCommon.is_master:
+                # 发送数据到客户端-1s
+                await ws_server.send({
+                    'type': f'{name}_1s',
+                    'data': {
+                        'power': power
+                    }
+                })
+                # 发送数据到客户端-15s
+                await ws_server.send({
+                    'type': f'{name}_15s',
+                    'data': {
+                        'power': power
+                    }
+                })
 
             logging.debug(f"[TestMode] {name} 生成数据: Torque={instant_torque}, Thrust={instant_thrust}, Speed={instant_speed}")
 
