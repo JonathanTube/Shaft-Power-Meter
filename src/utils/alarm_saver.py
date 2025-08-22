@@ -30,7 +30,7 @@ class AlarmSaver:
 
                 gdata.configAlarm.set_default_value()
 
-                asyncio.create_task(plc.write_common_alarm(True))
+                asyncio.run(plc.write_common_alarm(True))
                 logging.info(f'[创建alarm] {alarm_type}')
 
             except Exception as e:
@@ -47,7 +47,7 @@ class AlarmSaver:
                     ).where(AlarmLog.alarm_type == alarm_type).execute()
                     logging.info(f'[恢复alarm] {alarm_type}')
                 else:
-                    asyncio.create_task(plc.write_common_alarm(False))
+                    asyncio.run(plc.write_common_alarm(False))
                 gdata.configAlarm.set_default_value()
             except Exception as e:
                 logging.exception(f'[恢复alarm] 异常{e}')
