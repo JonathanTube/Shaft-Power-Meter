@@ -26,21 +26,25 @@ class JM3846DataHandlerForNs:
             if self.name == 'sps':
                 # 处理数据
                 ch0_ad, ch1_ad, rpm = JM3846Util.get_avg(self.name, gdata.configSPS.accumulated_data_ad0_ad1_speed)
-                gdata.configSPS.ad0 = ch0_ad
-                gdata.configSPS.ad1 = ch1_ad
-                gdata.configSPS.speed = rpm
-                gdata.configSPS.torque = JM3846Util.cal_torque(self.name, ch0_ad)
-                gdata.configSPS.thrust = JM3846Util.cal_thrust(self.name, ch1_ad)
-                gdata.configSPS.accumulated_data_ad0_ad1_speed.clear()
+                # ad值不可能为0，为0，不处理
+                if ch0_ad != 0:
+                    gdata.configSPS.ad0 = ch0_ad
+                    gdata.configSPS.ad1 = ch1_ad
+                    gdata.configSPS.speed = rpm
+                    gdata.configSPS.torque = JM3846Util.cal_torque(self.name, ch0_ad)
+                    gdata.configSPS.thrust = JM3846Util.cal_thrust(self.name, ch1_ad)
+                    gdata.configSPS.accumulated_data_ad0_ad1_speed.clear()
             else:
                 # 处理数据
                 ch0_ad, ch1_ad, rpm = JM3846Util.get_avg(self.name, gdata.configSPS2.accumulated_data_ad0_ad1_speed)
-                gdata.configSPS2.ad0 = ch0_ad
-                gdata.configSPS2.ad1 = ch1_ad
-                gdata.configSPS2.speed = rpm
-                gdata.configSPS2.torque = JM3846Util.cal_torque(self.name, ch0_ad)
-                gdata.configSPS2.thrust = JM3846Util.cal_thrust(self.name, ch1_ad)
-                gdata.configSPS2.accumulated_data_ad0_ad1_speed.clear()
+                # ad值不可能为0，为0，不处理
+                if ch0_ad != 0:
+                    gdata.configSPS2.ad0 = ch0_ad
+                    gdata.configSPS2.ad1 = ch1_ad
+                    gdata.configSPS2.speed = rpm
+                    gdata.configSPS2.torque = JM3846Util.cal_torque(self.name, ch0_ad)
+                    gdata.configSPS2.thrust = JM3846Util.cal_thrust(self.name, ch1_ad)
+                    gdata.configSPS2.accumulated_data_ad0_ad1_speed.clear()
             # 等待数据累积
             await asyncio.sleep(seconds)
 
