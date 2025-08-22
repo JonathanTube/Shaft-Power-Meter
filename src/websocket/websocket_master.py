@@ -66,7 +66,7 @@ class WebSocketMaster:
             self._periodic_task_handle = asyncio.create_task(self._sync_alarms_to_slave())
         except Exception as e:
             logging.error(f"[Master] 监听失败: {e}")
-            self.set_offline()
+            await self.set_offline()
             raise
 
     async def _client_handler(self, ws):
