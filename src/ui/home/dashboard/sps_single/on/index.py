@@ -40,7 +40,6 @@ class SingleShaPoLiOn(ft.Container):
     async def load_data(self):
         while self.task_running:
             try:
-                self.eexi_limited_power.reload()
                 self.instant_value_grid.reload()
             except:
                 logging.exception("SingleShaPoLiOn.load_data")
@@ -50,6 +49,7 @@ class SingleShaPoLiOn(ft.Container):
     async def load_data_1s(self):
         while self.task_running:
             try:
+                self.eexi_limited_power.reload()
                 self.power_line_chart.reload()
             except:
                 logging.exception("SingleShaPoLiOn.load_data_1s")
