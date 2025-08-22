@@ -23,18 +23,18 @@ class JM3846DataHandlerFor1s:
             # 清理数据
             if self.name == 'sps':
                 # 处理数据
-                ch0_ad, _, rpm = JM3846Util.get_avg(self.name, gdata.configSPS.accumulated_data_ad0_ad1_speed)
+                ch0_ad, _, rpm = JM3846Util.get_avg(self.name, gdata.configSPS.accumulated_data_ad0_ad1_speed_for_1s)
                 torque = JM3846Util.cal_torque(self.name, ch0_ad)
                 # 直接计算power
                 gdata.configSPS.power_for_1s = FormulaCalculator.calculate_instant_power(torque, rpm)
-                gdata.configSPS.accumulated_data_ad0_ad1_speed.clear()
+                gdata.configSPS.accumulated_data_ad0_ad1_speed_for_1s.clear()
             else:
                 # 处理数据
-                ch0_ad, _, rpm = JM3846Util.get_avg(self.name, gdata.configSPS2.accumulated_data_ad0_ad1_speed)
+                ch0_ad, _, rpm = JM3846Util.get_avg(self.name, gdata.configSPS2.accumulated_data_ad0_ad1_speed_for_1s)
                 torque = JM3846Util.cal_torque(self.name, ch0_ad)
                 # 直接计算power
                 gdata.configSPS2.power_for_1s = FormulaCalculator.calculate_instant_power(torque, rpm)
-                gdata.configSPS2.accumulated_data_ad0_ad1_speed.clear()
+                gdata.configSPS2.accumulated_data_ad0_ad1_speed_for_1s.clear()
             # 等待数据累积
             await asyncio.sleep(1)
 
