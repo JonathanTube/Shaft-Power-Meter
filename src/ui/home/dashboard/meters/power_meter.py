@@ -22,7 +22,7 @@ class PowerMeter(ft.Container):
             limit = gdata.configLimitation.power_warning
 
             heading = self.page.session.get("lang.common.power")
-            self.content = MeterRound(heading=heading, radius=self.radius, unit="W", max=max, limit=limit)
+            self.content = MeterRound(heading=heading, radius=self.radius, unit='kW', max=max, limit=limit)
         except:
             logging.exception('exception occured at PowerMeter.build')
 

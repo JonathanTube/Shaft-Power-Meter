@@ -18,7 +18,7 @@ class SingleInstantPower(ft.Container):
                 text_align=ft.TextAlign.RIGHT
             )
             self.power_unit = ft.Text(
-                value='W', size=18, width=50,
+                value='kW', size=18, width=50,
                 text_align=ft.TextAlign.LEFT
             )
 

@@ -38,13 +38,12 @@ class JM3846DataHandlerFor1s:
 
                 # 发送数据到客户端
                 if gdata.configCommon.is_master:
-                    asyncio.to_thread(
-                        ws_server.send({
-                            'type': f'{name}_1s',
-                            'data': {
-                                'power': power_for_1s
-                            }
-                        }))
+                    await ws_server.send({
+                        'type': f'{name}_1s',
+                        'data': {
+                            'power': power_for_1s
+                        }
+                    })
                 gdata.configSPS.accumulated_data_ad0_ad1_speed_for_1s.clear()
             else:
                 # 处理数据
@@ -61,13 +60,12 @@ class JM3846DataHandlerFor1s:
                     gdata.configSPS2.power_history.append((power_for_1s, utc))
                 # 发送数据到客户端
                 if gdata.configCommon.is_master:
-                    asyncio.to_thread(
-                        ws_server.send({
-                            'type': f'{name}_1s',
-                            'data': {
-                                'power': power_for_1s
-                            }
-                        }))
+                    await ws_server.send({
+                        'type': f'{name}_1s',
+                        'data': {
+                            'power': power_for_1s
+                        }
+                    })
                 gdata.configSPS2.accumulated_data_ad0_ad1_speed_for_1s.clear()
             # 等待数据累积
             await asyncio.sleep(1)

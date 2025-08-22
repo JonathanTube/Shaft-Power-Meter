@@ -135,9 +135,13 @@ class WebSocketMaster:
             logging.exception("[Master] 定时任务异常")
 
     async def send(self, data) -> bool:
-        if self.is_online and self.client:
-            await self.client.send(msgpack.packb(data))
-            return True
+        try:
+            if self.is_online and self.client:
+                await self.client.send(msgpack.packb(data))
+                return True
+            return False
+        except:
+            logging.exception("[Master] 发送客户端消息失败")
         return False
 
     def set_online(self):

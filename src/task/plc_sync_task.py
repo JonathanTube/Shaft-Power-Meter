@@ -1,10 +1,11 @@
 import asyncio
 import logging
 from typing import Optional
+import uuid
 from pymodbus.client import AsyncModbusTcpClient
 from common.const_alarm_type import AlarmType
-from utils.alarm_saver import AlarmSaver
 from common.global_data import gdata
+from db.models.alarm_log import AlarmLog
 
 # 寄存器映射表（高位在前、低位在后）
 REGISTER_MAP = {
@@ -91,7 +92,7 @@ class PlcSyncTask:
 
         if not gdata.configIO.plc_enabled:
             return
-        
+
         if not self.is_connected():
             return
         try:
@@ -131,7 +132,7 @@ class PlcSyncTask:
         try:
             if not gdata.configIO.plc_enabled:
                 return
-    
+
             if self.is_canceled:
                 return
 
@@ -304,11 +305,21 @@ class PlcSyncTask:
 
     def set_online(self):
         self.is_online = True
-        AlarmSaver.recovery(AlarmType.MASTER_PLC)
+        AlarmLog.create(
+            alarm_uuid=uuid.uuid4().hex,
+            alarm_type=AlarmType.MASTER_PLC,
+            occured_time=gdata.configDateTime.utc,
+            out_of_sync=False
+        )
+        gdata.configAlarm.set_default_value()
 
     def set_offline(self):
         self.is_online = False
-        AlarmSaver.create(AlarmType.MASTER_PLC)
+        AlarmLog.update(
+            recovery_time=gdata.configDateTime.utc,
+            is_synced=False
+        ).where(AlarmLog.alarm_type == AlarmType.MASTER_PLC).execute()
+        gdata.configAlarm.set_default_value()
 
 
 # 全局单例

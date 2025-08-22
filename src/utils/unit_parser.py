@@ -16,10 +16,7 @@ class UnitParser:
     def parse_power(power: float, system_unit: int) -> tuple[int, str]:
         _power = power if power else 0
         if system_unit == 0:
-            if _power < 1000:
-                return [round(_power), 'W']
-            else:
-                return [round(_power/1000), 'kW']
+            return [round(_power/1000), 'kW']
         else:
             return [round(UnitConverter.w_to_shp(_power)), 'sHp']
 

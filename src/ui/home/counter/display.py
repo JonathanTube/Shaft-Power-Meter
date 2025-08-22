@@ -58,7 +58,7 @@ class CounterDisplay(ft.Container):
         try:
             self.average_power_label = self.__create_label(self.page.session.get('lang.counter.average_power'))
             self.average_power_value = self.__create_value()
-            self.average_power_unit = self.__create_unit('W')
+            self.average_power_unit = self.__create_unit('kW')
 
             self.average_power = ft.Row(
                 alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
