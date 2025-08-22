@@ -1,6 +1,5 @@
 import asyncio
 import logging
-import threading
 import uuid
 from peewee import fn
 from common.const_alarm_type import AlarmType

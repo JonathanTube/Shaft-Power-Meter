@@ -5,6 +5,7 @@ from common.global_data import gdata
 from db.table_init import TableInit
 from utils.formula_cal import FormulaCalculator
 from websocket.websocket_master import ws_server
+from task.plc_sync_task import plc
 
 
 class TestModeTask:
@@ -80,6 +81,11 @@ class TestModeTask:
                 self._task = None
 
         TableInit.cleanup()
+        # 这里只需要恢复power_overload的告警，alarm不需要管。
+        await plc.write_power_overload(False)
+        await plc.write_eexi_breach_alarm(False)
+        # 清客户端数据
+        await self.send({'type': 'stop_test_mode'})
         # counter是唯一需要初始化的
         gdata.configCounterSPS.set_default_value()
         gdata.configCounterSPS2.set_default_value()

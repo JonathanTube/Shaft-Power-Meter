@@ -105,6 +105,8 @@ class DataSaver:
         if overload == DataSaver.overload:
             return
 
+        DataSaver.overload = overload
+
         # 有变化
         if gdata.configPropperCurve.enable_power_overload_alarm:
             if DataSaver.overload:
