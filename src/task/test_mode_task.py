@@ -1,10 +1,8 @@
 import asyncio
 import random
 import logging
-from db.models.data_log import DataLog
 from common.global_data import gdata
-from db.models.event_log import EventLog
-from db.models.report_info import ReportInfo
+from db.table_init import TableInit
 
 
 class TestModeTask:
@@ -79,13 +77,11 @@ class TestModeTask:
             finally:
                 self._task = None
 
-        # 将所有耗时的 DB 操作放到线程池中执行（避免阻塞 UI / 事件循环）
-        try:
-            await asyncio.to_thread(self.cleanup_db)
-        except Exception:
-            logging.exception("[TestMode] 停止测试模式时执行 DB 清理出错")
+        TableInit.cleanup()
+        # counter是唯一需要初始化的
+        gdata.configCounterSPS.set_default_value()
+        gdata.configCounterSPS2.set_default_value()
 
-    # ===================== 内部方法 =====================
     async def _generate_random_data(self):
         """后台任务：按范围生成随机数据（异步）"""
         try:
@@ -152,31 +148,6 @@ class TestModeTask:
 
         except Exception:
             logging.exception(f"[TestMode] 保存{name}数据时出错")
-
-    def cleanup_db(self):
-        try:
-            # 删除 DataLog（测试期间）
-            DataLog.delete().where(DataLog.utc_date_time >= gdata.configTest.start_time).execute()
-
-            # 删除对应 event_log / report_info
-            event_logs: list[EventLog] = list(EventLog.select().where(EventLog.started_at >= gdata.configTest.start_time))
-            for event in event_logs:
-                EventLog.delete().where(EventLog.id == event.id).execute()
-                ReportInfo.delete().where(ReportInfo.event_log == event).execute()
-
-            gdata.configSPS.speed = 0
-            gdata.configSPS.power = 0
-            gdata.configSPS.torque = 0
-            gdata.configSPS.thrust = 0
-            gdata.configSPS.power_history = []
-
-            gdata.configSPS2.speed = 0
-            gdata.configSPS2.power = 0
-            gdata.configSPS2.torque = 0
-            gdata.configSPS2.thrust = 0
-            gdata.configSPS2.power_history = []
-        except Exception:
-            logging.exception("[TestMode] DB 清理失败（在线程池中执行）")
 
 
 # 单例

@@ -2,6 +2,7 @@ import asyncio
 import logging
 from typing import Optional
 import uuid
+from peewee import fn
 from pymodbus.client import AsyncModbusTcpClient
 from common.const_alarm_type import AlarmType
 from common.global_data import gdata
@@ -51,6 +52,7 @@ class PlcSyncTask:
                 if self.is_connected():
                     await self.set_online()
                     logging.info(f'[PLC] 已连接 {ip}:{port}')
+                    await self.init_state()
                 else:
                     await self.set_offline()
                     logging.error('[PLC] 连接失败（底层未建立）')
@@ -60,6 +62,15 @@ class PlcSyncTask:
             finally:
                 await asyncio.sleep(10)
                 self.is_connecting = False
+
+    async def init_state(self):
+        cnt = await asyncio.to_thread(AlarmLog.select(fn.COUNT(AlarmLog.id)).where(
+            AlarmLog.recovery_time.is_null()
+        ).scalar)
+        logging.error(f'[PLC] 首次连接写入默认公共报警={cnt > 0}')
+        await self.write_common_alarm(cnt > 0)
+        await self.write_eexi_breach_alarm(False)
+        await self.write_power_overload(False)
 
     async def read_4_20_ma_data(self) -> dict:
         """读取 4-20mA 配置数据"""

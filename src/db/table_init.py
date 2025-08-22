@@ -59,17 +59,18 @@ class TableInit:
         ], safe=True)
 
     @staticmethod
-    def handle_change_running_mode():
-        logging.info('模式切换，清空相关表数据')
-        BreachReason.truncate_table()
-        DataLog.truncate_table()
-        EventLog.truncate_table()
-        GpsLog.truncate_table()
-        ReportDetail.truncate_table()
-        ReportInfo.truncate_table()
-        ZeroCalInfo.truncate_table()
-        ZeroCalRecord.truncate_table()
-        AlarmLog.truncate_table()
-        TestModeConf.truncate_table()
-        OperationLog.truncate_table()
-        CounterLog.truncate_table()
+    def cleanup():
+        try:
+            AlarmLog.truncate_table()
+            CounterLog.truncate_table()
+            DataLog.truncate_table()
+            DateTimeConf.truncate_table()
+            EventLog.truncate_table()
+            GpsLog.truncate_table()
+            OperationLog.truncate_table()
+            ReportDetail.truncate_table()
+            ReportInfo.truncate_table()
+            ZeroCalInfo.truncate_table()
+            ZeroCalRecord.truncate_table()
+        except Exception:
+            logging.exception("清理失败")

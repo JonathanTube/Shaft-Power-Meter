@@ -300,7 +300,7 @@ class ConfigCounterSPS:
         avg_speed: float = 0.0
 
     def set_default_value(self):
-        counter_log: CounterLog = CounterLog.get_or_none()
+        counter_log: CounterLog = CounterLog.get_or_none(CounterLog.sps_name == 'sps')
         if not counter_log:
             CounterLog.create(sps_name='sps', start_utc_date_time=gdata.configDateTime.utc)
         else:
@@ -347,9 +347,10 @@ class ConfigCounterSPS2:
         avg_speed: float = 0.0
 
     def set_default_value(self):
-        counter_log: CounterLog = CounterLog.get_or_none()
+        counter_log: CounterLog = CounterLog.get_or_none(CounterLog.sps_name == 'sps2')
         if not counter_log:
-            CounterLog.create(sps_name='sps2', start_utc_date_time=gdata.configDateTime.utc)
+            if gdata.configCommon.is_twins:
+                CounterLog.create(sps_name='sps2', start_utc_date_time=gdata.configDateTime.utc)
         else:
             ConfigCounterSPS.Total.start_at = counter_log.start_utc_date_time
             ConfigCounterSPS.Total.times = counter_log.times

@@ -43,7 +43,6 @@ class SystemExitTool:
             return
 
         try:
-
             msg = page.session.get("lang.toast.system_exit")
             Toast.show_error(page, msg, 1000 * 10)
 
@@ -94,9 +93,13 @@ class SystemExitTool:
             try:
                 page.window.destroy()
             except:
-                os._exit(0)  # 兜底强杀
+                pass
 
+            # 给0.5秒时间让协程清理
             try:
-                sys.exit(0)
+                await asyncio.sleep(0.5)
             except:
                 pass
+
+            logging.info("强制退出进程")
+            os._exit(0)

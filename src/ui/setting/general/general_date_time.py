@@ -136,13 +136,5 @@ class GeneralDateTime(ft.Container):
             ).execute()
             # 刷新时间相关配置
             gdata.configDateTime.set_default_value()
-
-            self.page.run_task(self.clean_future_data)
         except:
             logging.exception("exception occured at GeneralDateTime.save_data_async")
-
-    async def clean_future_data(self):
-        # 删除未来时间的数据
-        await asyncio.to_thread(DataLog.delete().where(
-            DataLog.utc_date_time >= gdata.configDateTime.utc
-        ).execute)

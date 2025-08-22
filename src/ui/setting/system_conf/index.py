@@ -1,13 +1,13 @@
 import flet as ft
 import logging
 from db.models.user import User
+from db.table_init import TableInit
 from ui.common.keyboard import keyboard
 from ui.common.permission_check import PermissionCheck
 from ui.common.toast import Toast
 from ui.setting.system_conf.system_conf_settings import SystemConfSettings
 from ui.setting.system_conf.system_conf_ship_info import SystemConfShipInfo
 from ui.common.toast import Toast
-from db.table_init import TableInit
 from utils.system_exit_tool import SystemExitTool
 
 
@@ -61,7 +61,7 @@ class SystemConf(ft.Container):
                 self.system_conf_ship_info.update()
                 self.system_conf_ship_info.save(user)
             # 清理数据
-            TableInit.handle_change_running_mode()
+            TableInit.cleanup()
             # 退出系统
             self.page.run_task(SystemExitTool.exit_app, self.page, user)
         except Exception as e:

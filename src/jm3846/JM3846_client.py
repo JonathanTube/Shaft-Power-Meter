@@ -69,7 +69,7 @@ class JM3846AsyncClient(ABC):
             self._connect_task.cancel()
             try:
                 await self._connect_task
-            except asyncio.CancelledError:
+            except:
                 pass
         await self.release()
 

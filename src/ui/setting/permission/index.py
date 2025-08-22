@@ -69,8 +69,7 @@ class Permission(ft.Container):
                     ft.dropdown.Option(text=self.page.session.get("lang.permission.admin"), key="0", visible=self.op_user.user_role <= 0),
                     ft.dropdown.Option(text=self.page.session.get("lang.permission.master"), key="1", visible=self.op_user.user_role <= 1),
                     ft.dropdown.Option(text=self.page.session.get("lang.permission.user"), key="2", visible=self.op_user.user_role <= 2)
-                ],
-                on_change=self.__on_dropdown_change
+                ]
             )
 
             self.add_user_button = ft.OutlinedButton(
