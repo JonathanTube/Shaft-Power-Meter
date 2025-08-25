@@ -175,13 +175,11 @@ class DataSaver:
 
             # 测试模式数据不插入
             if not gdata.configTest.test_mode_running:
-                # 每个15s保存一次
-                if gdata.configDateTime.utc.second in (0, 15, 30, 45):
-                    CounterLog.update(
-                        sum_speed=gdata.configCounterSPS.Total.sum_speed,
-                        sum_power=gdata.configCounterSPS.Total.sum_power,
-                        times=gdata.configCounterSPS.Total.times
-                    ).where(CounterLog.sps_name == 'sps').execute()
+                CounterLog.update(
+                    sum_speed=gdata.configCounterSPS.Total.sum_speed,
+                    sum_power=gdata.configCounterSPS.Total.sum_power,
+                    times=gdata.configCounterSPS.Total.times
+                ).where(CounterLog.sps_name == 'sps').execute()
         else:
             gdata.configCounterSPS2.Total.sum_speed += speed
             gdata.configCounterSPS2.Total.sum_power += power
@@ -201,13 +199,11 @@ class DataSaver:
 
             # 测试模式数据不插入
             if not gdata.configTest.test_mode_running:
-                # 每个15s保存一次
-                if gdata.configDateTime.utc.second in (0, 15, 30, 45):
-                    CounterLog.update(
-                        sum_speed=gdata.configCounterSPS.Total.sum_speed,
-                        sum_power=gdata.configCounterSPS.Total.sum_power,
-                        times=gdata.configCounterSPS.Total.times
-                    ).where(CounterLog.sps_name == 'sps').execute()
+                CounterLog.update(
+                    sum_speed=gdata.configCounterSPS.Total.sum_speed,
+                    sum_power=gdata.configCounterSPS.Total.sum_power,
+                    times=gdata.configCounterSPS.Total.times
+                ).where(CounterLog.sps_name == 'sps2').execute()
 
     @staticmethod
     def save_counter_interval(name: str, speed: float, power: float):

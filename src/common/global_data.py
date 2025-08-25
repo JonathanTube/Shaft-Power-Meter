@@ -1,6 +1,5 @@
 from dataclasses import dataclass, field
 from datetime import datetime
-from common.const_alarm_type import AlarmType
 from db.models.alarm_log import AlarmLog
 from db.models.counter_log import CounterLog
 from db.models.event_log import EventLog

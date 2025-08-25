@@ -16,7 +16,7 @@ class AlarmSaver:
     async def create(alarm_type: AlarmType, out_of_sync: bool = False):
         # 加锁（使用with语句确保锁自动释放）
         async with AlarmSaver._lock:
-            if await asyncio.to_thread(AlarmSaver.has_alarm, alarm_type):
+            if await asyncio.to_thread(AlarmSaver.has_alarm_type, alarm_type):
                 return
 
             try:
@@ -40,8 +40,8 @@ class AlarmSaver:
     async def recovery(alarm_type: AlarmType):
         async with AlarmSaver._lock:
             try:
-                has_alarm = await asyncio.to_thread(AlarmSaver.has_alarm, alarm_type)
-                if has_alarm:
+                has_alarm_type = await asyncio.to_thread(AlarmSaver.has_alarm_type, alarm_type)
+                if has_alarm_type:
                     # update 也放线程池
                     await asyncio.to_thread(
                         lambda: AlarmLog.update(
@@ -52,17 +52,25 @@ class AlarmSaver:
                     gdata.configAlarm.set_default_value()
                     logging.info(f'[恢复alarm] {alarm_type}')
 
-                has_alarm = await asyncio.to_thread(AlarmSaver.has_alarm, alarm_type)
-                if not has_alarm:
+                has_alarm_all = await asyncio.to_thread(AlarmSaver.has_alarm_all)
+
+                if not has_alarm_all:
                     await plc.write_common_alarm(False)
 
             except Exception as e:
                 logging.exception(f'[恢复alarm] 异常{e}')
 
     @staticmethod
-    def has_alarm(alarm_type: AlarmType) -> bool:
+    def has_alarm_type(alarm_type: AlarmType) -> bool:
         cnt = AlarmLog.select(fn.COUNT(AlarmLog.id)).where(
             AlarmLog.alarm_type == alarm_type,
+            AlarmLog.recovery_time.is_null()
+        ).scalar()
+        return cnt > 0
+
+    @staticmethod
+    def has_alarm_all() -> bool:
+        cnt = AlarmLog.select(fn.COUNT(AlarmLog.id)).where(
             AlarmLog.recovery_time.is_null()
         ).scalar()
         return cnt > 0
