@@ -80,7 +80,7 @@ class DualInstantTorque(ft.Container):
                 weight=ft.FontWeight.W_500
             )
             self.torque_sps_unit = ft.Text(
-                value='Nm',
+                value='kNm',
                 width=40,
                 text_align=ft.TextAlign.LEFT,
                 size=self.font_size_of_unit,
@@ -115,7 +115,7 @@ class DualInstantTorque(ft.Container):
                 weight=ft.FontWeight.W_500
             )
             self.torque_sps2_unit = ft.Text(
-                value='Nm',
+                value='kNm',
                 width=40,
                 text_align=ft.TextAlign.LEFT,
                 size=self.font_size_of_unit,

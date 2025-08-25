@@ -16,7 +16,7 @@ class SingleInstantThrust(ft.Container):
             self.thrust_value = ft.Text(
                 '0', size=18, width=80, text_align=ft.TextAlign.RIGHT)
             self.thrust_unit = ft.Text(
-                'N', size=18, width=50, text_align=ft.TextAlign.LEFT)
+                'kN', size=18, width=50, text_align=ft.TextAlign.LEFT)
             self.content = SimpleCard(
                 title=self.page.session.get("lang.common.thrust"),
                 body=ft.Row(

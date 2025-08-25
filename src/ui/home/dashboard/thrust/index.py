@@ -21,7 +21,7 @@ class ThrustBlock(ft.Container):
 
             self.title = ft.Text(self.page.session.get("lang.common.thrust"), weight=ft.FontWeight.W_500, size=20)
             self.thrust_value = ft.Text("0")
-            self.thrust_unit = ft.Text("N")
+            self.thrust_unit = ft.Text("kN")
             self.content = ft.Column(
                 horizontal_alignment=ft.CrossAxisAlignment.CENTER,
                 controls=[

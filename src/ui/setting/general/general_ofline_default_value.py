@@ -18,7 +18,7 @@ class GeneralOflineDefaultValue(ft.Container):
         try:
             if self.page and self.page.session:
                 self.torque_default_value = ft.TextField(
-                    suffix_text="Nm",
+                    suffix_text="kNm",
                     label=self.page.session.get("lang.common.torque"),
                     value=gdata.configOffline.torque,
                     col={"xs": 6},
@@ -27,7 +27,7 @@ class GeneralOflineDefaultValue(ft.Container):
                     on_click=lambda e: keyboard.open(e.control, "int"))
 
                 self.thrust_default_value = ft.TextField(
-                    suffix_text="N",
+                    suffix_text="kN",
                     label=self.page.session.get("lang.common.thrust"),
                     value=gdata.configOffline.thrust,
                     col={"xs": 6},

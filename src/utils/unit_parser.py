@@ -28,19 +28,13 @@ class UnitParser:
     @staticmethod
     def parse_torque(torque: int = 0, system_unit: int = 0) -> tuple[int, str]:
         if system_unit == 0:
-            if torque < 1000:
-                return [round(torque), 'Nm']
-            else:
-                return [round(torque/1000), 'kNm']
+            return [round(torque/1000), 'kNm']
         else:
             return [round(UnitConverter.nm_to_tm(torque)), 'Tm']
 
     @staticmethod
     def parse_thrust(thrust: int = 0, system_unit: int = 0) -> tuple[int, str]:
         if system_unit == 0:
-            if thrust < 1000:
-                return [round(thrust), 'N']
-            else:
-                return [round(thrust/1000), 'kN']
+            return [round(thrust/1000), 'kN']
         else:
             return [round(UnitConverter.n_to_t(thrust)), 'T']

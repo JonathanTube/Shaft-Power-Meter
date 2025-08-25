@@ -17,7 +17,7 @@ class SingleInstantTorque(ft.Container):
 
             self.torque_value = ft.Text('0', size=18, width=80, text_align=ft.TextAlign.RIGHT)
 
-            self.torque_unit = ft.Text('Nm', size=18, width=50, text_align=ft.TextAlign.LEFT)
+            self.torque_unit = ft.Text('kNm', size=18, width=50, text_align=ft.TextAlign.LEFT)
 
             self.content = SimpleCard(
                 title=self.page.session.get("lang.common.torque"),

@@ -22,7 +22,7 @@ class TorqueMeter(ft.Container):
             limit = gdata.configLimitation.torque_warning
 
             heading = self.page.session.get("lang.common.torque")
-            self.content = MeterRound(heading=heading, radius=self.radius, unit="Nm", max=max, limit=limit)
+            self.content = MeterRound(heading=heading, radius=self.radius, unit="kNm", max=max, limit=limit)
         except:
             logging.exception('exception occured at TorqueMeter.build')
 
