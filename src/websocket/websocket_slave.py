@@ -92,6 +92,7 @@ class WebSocketSlave:
         except (websockets.ConnectionClosed, websockets.ConnectionClosedError, websockets.ConnectionClosedOK):
             logging.error("[Slave] 连接断开")
             await self.set_offline()
+            raise 
         except:
             logging.exception("[Slave] 接收数据异常")
             await self.set_offline()

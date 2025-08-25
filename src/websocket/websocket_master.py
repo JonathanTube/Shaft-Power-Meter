@@ -71,7 +71,7 @@ class WebSocketMaster:
     async def _client_handler(self, ws):
         self.client = ws
         logging.info("[Master] 客户端已连接")
-        await AlarmSaver.recovery(AlarmType.SLAVE_MASTER)
+        await self.set_slave_connect()
         # 客户端重新连接，推送未同步完成的报警
         asyncio.create_task(self._sync_alarms_to_slave())
         try:
@@ -89,6 +89,7 @@ class WebSocketMaster:
             logging.exception("[Master] 客户端异常断开")
         finally:
             self.client = None
+            await self.set_slave_disconnect() 
 
     def _handle_alarm_synced(self, alarm_uuid):
         try:
@@ -152,6 +153,13 @@ class WebSocketMaster:
         self.is_online = False
         logging.warning("[Master] 监听已停止")
         await AlarmSaver.create(AlarmType.MASTER_SERVER, True)
+
+    async def set_slave_connect(self):
+        logging.info("[Master] 客户端已连接")
+        await AlarmSaver.recovery(AlarmType.SLAVE_MASTER)
+
+    async def set_slave_disconnect(self):
+        logging.info("[Master] 客户端已断开")
         await AlarmSaver.create(AlarmType.SLAVE_MASTER, True)
 
 
