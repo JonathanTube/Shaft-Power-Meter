@@ -1,4 +1,4 @@
-from peewee import BigIntegerField, CharField, DateTimeField
+from peewee import BigIntegerField, CharField
 from ..base import BaseModel
 
 
@@ -11,7 +11,7 @@ class CounterLog(BaseModel):
 
     times = BigIntegerField(verbose_name="累积次数", default=0)
 
-    start_utc_date_time = DateTimeField(verbose_name="开始时间")
+    seconds = BigIntegerField(verbose_name="累计运行秒", default=0)
 
     class Meta:
         table_name = 'counter_log'

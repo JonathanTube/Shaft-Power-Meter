@@ -25,7 +25,6 @@ class TotalCounter(ft.Container):
             if self.page and self.page.session:
                 self.display = CounterDisplay()
                 self.time_elapsed = ft.Text("")
-                self.started_at = ft.Text("")
 
                 self.title = ft.Text(self.page.session.get('lang.counter.total'), weight=ft.FontWeight.BOLD, size=16)
 
@@ -47,8 +46,7 @@ class TotalCounter(ft.Container):
                             spacing=0,
                             horizontal_alignment=ft.CrossAxisAlignment.CENTER,
                             controls=[
-                                self.time_elapsed,
-                                self.started_at
+                                self.time_elapsed
                             ]
                         )
                     ])
@@ -71,36 +69,39 @@ class TotalCounter(ft.Container):
     async def loop(self):
         while self.task_running:
             try:
-                start_at = gdata.configCounterSPS.Total.start_at
-                if not start_at:
-                    return
+                time_elapsed = 0
+                if self.name == 'sps':
+                    time_elapsed = gdata.configCounterSPS.Total.seconds
+                else:
+                    time_elapsed = gdata.configCounterSPS2.Total.seconds
 
-                now = gdata.configDateTime.utc
-                time_elapsed = now - start_at
-                days = time_elapsed.days
-                hours = time_elapsed.seconds // 3600
-                minutes = (time_elapsed.seconds % 3600) // 60
-                seconds = time_elapsed.seconds % 60
+                days = time_elapsed // (24 * 3600)
+                hours = (time_elapsed % (24 * 3600)) // 3600
+                minutes = (time_elapsed % 3600) // 60
+                seconds = time_elapsed % 60
 
                 time_elapsed = f'{days:02d} d {hours:02d}:{minutes:02d}:{seconds:02d} h'
-                started_at = start_at.strftime(f"{gdata.configDateTime.date_format} %H:%M:%S")
 
                 if self.time_elapsed and self.time_elapsed.page:
                     self.time_elapsed.value = f'{time_elapsed} {self.txt_measured}'
                     self.time_elapsed.visible = True
                     self.time_elapsed.update()
 
-                if self.started_at and self.started_at.page:
-                    self.started_at.value = f'{self.txt_started_at} {started_at}'
-                    self.started_at.visible = True
-                    self.started_at.update()
-
                 if self.display:
                     system_unit = gdata.configPreference.system_unit
 
-                    avg_power = gdata.configCounterSPS.Total.avg_power if self.name == 'sps' else gdata.configCounterSPS2.Total.avg_power
-                    total_energy = gdata.configCounterSPS.Total.total_energy if self.name == 'sps' else gdata.configCounterSPS2.Total.total_energy
-                    avg_speed = gdata.configCounterSPS.Total.avg_speed if self.name == 'sps' else gdata.configCounterSPS2.Total.avg_speed
+                    avg_power = 0
+                    total_energy = 0
+                    avg_speed = 0
+
+                    if self.name == 'sps':
+                        avg_power = gdata.configCounterSPS.Total.avg_power
+                        total_energy = gdata.configCounterSPS.Total.total_energy
+                        avg_speed = gdata.configCounterSPS.Total.avg_speed
+                    else:
+                        avg_power = gdata.configCounterSPS2.Total.avg_power
+                        total_energy = gdata.configCounterSPS2.Total.total_energy
+                        avg_speed = gdata.configCounterSPS2.Total.avg_speed
 
                     self.display.set_average_power(avg_power, system_unit)
                     self.display.set_total_energy(total_energy, system_unit)

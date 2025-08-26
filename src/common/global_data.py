@@ -276,7 +276,7 @@ class ConfigCounterSPS:
 
     @dataclass
     class Total:
-        start_at: datetime | None = None
+        seconds: int = 0
         times: int = 0
         sum_power: int = 0
         sum_speed: float = 0.0
@@ -299,11 +299,12 @@ class ConfigCounterSPS:
         avg_speed: float = 0.0
 
     def set_default_value(self):
+        # 设置的都是total
         counter_log: CounterLog = CounterLog.get_or_none(CounterLog.sps_name == 'sps')
         if not counter_log:
-            CounterLog.create(sps_name='sps', start_utc_date_time=gdata.configDateTime.utc)
+            CounterLog.create(sps_name='sps')
         else:
-            ConfigCounterSPS.Total.start_at = counter_log.start_utc_date_time
+            ConfigCounterSPS.Total.seconds = counter_log.seconds
             ConfigCounterSPS.Total.times = counter_log.times
             ConfigCounterSPS.Total.sum_power = counter_log.sum_power
             ConfigCounterSPS.Total.sum_speed = counter_log.sum_speed
@@ -323,7 +324,7 @@ class ConfigCounterSPS2:
         avg_speed: float = 0.0
 
     class Total:
-        start_at: datetime | None = None
+        seconds: int = 0
         times: int = 0
         sum_power: int = 0
         sum_speed: float = 0.0
@@ -349,12 +350,12 @@ class ConfigCounterSPS2:
         counter_log: CounterLog = CounterLog.get_or_none(CounterLog.sps_name == 'sps2')
         if not counter_log:
             if gdata.configCommon.is_twins:
-                CounterLog.create(sps_name='sps2', start_utc_date_time=gdata.configDateTime.utc)
+                CounterLog.create(sps_name='sps2')
         else:
-            ConfigCounterSPS.Total.start_at = counter_log.start_utc_date_time
-            ConfigCounterSPS.Total.times = counter_log.times
-            ConfigCounterSPS.Total.sum_power = counter_log.sum_power
-            ConfigCounterSPS.Total.sum_speed = counter_log.sum_speed
+            ConfigCounterSPS2.Total.seconds = counter_log.seconds
+            ConfigCounterSPS2.Total.times = counter_log.times
+            ConfigCounterSPS2.Total.sum_power = counter_log.sum_power
+            ConfigCounterSPS2.Total.sum_speed = counter_log.sum_speed
 
 
 @dataclass
