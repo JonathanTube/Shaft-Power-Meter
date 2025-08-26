@@ -56,18 +56,18 @@ class TestModeInstant(ft.ResponsiveRow):
 
                     self.controls = [
                         CustomCard(
-                            f'sps {self.page.session.get('lang.setting.test_mode.instant_mock_data')}',
+                            f"sps {self.page.session.get('lang.setting.test_mode.instant_mock_data')}",
                             self.sps_instant_data_card
                         ),
                         CustomCard(
-                            f'sps2 {self.page.session.get('lang.setting.test_mode.instant_mock_data')}',
+                            f"sps2 {self.page.session.get('lang.setting.test_mode.instant_mock_data')}",
                             self.sps2_instant_data_card
                         )
                     ]
                     return
 
                 self.controls = [
-                    CustomCard(f'sps {self.page.session.get('lang.setting.test_mode.instant_mock_data')}', self.sps_instant_data_card)
+                    CustomCard(f"sps {self.page.session.get('lang.setting.test_mode.instant_mock_data')}", self.sps_instant_data_card)
                 ]
         except:
             logging.exception('exception occured at TestModeInstant.build')
