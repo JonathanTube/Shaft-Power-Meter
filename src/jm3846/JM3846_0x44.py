@@ -109,8 +109,10 @@ class JM38460x44:
 
             except asyncio.TimeoutError:
                 logging.warning(f'[JM3846-{name}] 0x44响应 超时')
-                continue
+                await on_error()
+                break
             except asyncio.CancelledError:
+                logging.warning(f'[JM3846-{name}] 0x44连接被取消')
                 await on_error()
                 break
             except:

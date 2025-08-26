@@ -10,7 +10,7 @@ class JM3846Util:
     async def read_frame(reader) -> bytes | None:
         """按 Modbus TCP(MBAP) 帧格式读取一帧，连接断开或超时返回 None"""
         try:
-            header = await asyncio.wait_for(reader.readexactly(6), timeout=10)
+            header = await asyncio.wait_for(reader.readexactly(6), timeout=20)
         except asyncio.IncompleteReadError:
             logging.warning("[JM3846] 连接断开（读取头部失败）")
             return None
@@ -24,7 +24,7 @@ class JM3846Util:
             return None
 
         try:
-            body = await asyncio.wait_for(reader.readexactly(length), timeout=10)
+            body = await asyncio.wait_for(reader.readexactly(length), timeout=20)
         except asyncio.IncompleteReadError:
             logging.warning("[JM3846] 连接断开（读取主体失败）")
             return None
