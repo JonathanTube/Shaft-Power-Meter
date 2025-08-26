@@ -112,7 +112,6 @@ class IntervalCounter(ft.Container):
 
                 self.hours = h
 
-                self.init_data()
                 Toast.show_success(e.page, self.page.session.get('lang.counter.interval_has_been_changed'))
         except:
             logging.exception('exception occured at AlarmList.on_hours_change')
@@ -121,51 +120,6 @@ class IntervalCounter(ft.Container):
         self.task_running = True
         if self.page:
             self.task = self.page.run_task(self.loop)
-
-        # 不为空直接跳过
-        if self.name == 'sps' and gdata.configCounterSPS.Interval.start_at:
-            return
-        # 不为空直接跳过
-        if self.name == 'sps2' and gdata.configCounterSPS2.Interval.start_at:
-            return
-        self.init_data()
-
-    def init_data(self):
-        threshold = gdata.configDateTime.utc - timedelta(hours=self.hours)
-        if self.name == 'sps':
-            result = DataLog.select(
-                fn.MIN(DataLog.utc_date_time).alias("start_at"),
-                fn.COUNT(DataLog.id).alias("times"),
-                fn.SUM(DataLog.power).alias("sum_power"),
-                fn.SUM(DataLog.speed).alias("sum_speed")
-            ).where(DataLog.utc_date_time >= threshold, DataLog.name == 'sps').dicts().get()
-
-            start_at = result['start_at']
-            times = result['times']
-            sum_power = result["sum_power"]
-            sum_speed = result["sum_speed"]
-
-            ConfigCounterSPS.Interval.start_at = start_at or gdata.configDateTime.utc
-            ConfigCounterSPS.Interval.times = times or 0
-            ConfigCounterSPS.Interval.sum_power = sum_power or 0
-            ConfigCounterSPS.Interval.sum_speed = sum_speed or 0.0
-        else:
-            result = DataLog.select(
-                fn.MIN(DataLog.utc_date_time).alias("start_at"),
-                fn.SUM(DataLog.power).alias("times"),
-                fn.SUM(DataLog.power).alias("sum_power"),
-                fn.SUM(DataLog.speed).alias("sum_speed")
-            ).where(DataLog.utc_date_time >= threshold, DataLog.name == 'sps').dicts().get()
-
-            start_at = result['start_at']
-            times = result['times']
-            sum_power = result["sum_power"]
-            sum_speed = result["sum_speed"]
-
-            ConfigCounterSPS2.Interval.start_at = start_at or gdata.configDateTime.utc
-            ConfigCounterSPS2.Interval.times = times or 0
-            ConfigCounterSPS2.Interval.sum_power = sum_power or 0
-            ConfigCounterSPS2.Interval.sum_speed = sum_speed or 0.0
 
     def will_unmount(self):
         self.task_running = False
@@ -178,13 +132,39 @@ class IntervalCounter(ft.Container):
                 if self.display:
                     system_unit = gdata.configPreference.system_unit
 
-                    avg_power = gdata.configCounterSPS.Interval.avg_power if self.name == 'sps' else gdata.configCounterSPS2.Interval.avg_power
+                threshold = gdata.configDateTime.utc - timedelta(hours=self.hours) + timedelta(seconds=1)
+
+                result = DataLog.select(
+                    fn.MIN(DataLog.utc_date_time).alias("start_at"),
+                    fn.COUNT(DataLog.id).alias("times"),
+                    fn.SUM(DataLog.power).alias("sum_power"),
+                    fn.SUM(DataLog.speed).alias("sum_speed")
+                ).where(DataLog.utc_date_time >= threshold, DataLog.name == self.name).dicts().get()
+
+                times = result['times']
+
+                if times > 0:
+                    sum_power = result["sum_power"]
+                    sum_speed = result["sum_speed"]
+
+                    # 平均功率
+                    avg_power = round(sum_power / times)
                     self.display.set_average_power(avg_power, system_unit)
 
-                    total_energy = gdata.configCounterSPS.Interval.total_energy if self.name == 'sps' else gdata.configCounterSPS2.Interval.total_energy
+                    # 总能耗
+                    start_at = result["start_at"]
+
+                    time_elapsed = gdata.configDateTime.utc - start_at
+                    # print('===============================interval')
+                    # print(time_elapsed.total_seconds())
+
+                    hours = time_elapsed.total_seconds() / 3600
+
+                    total_energy = round(avg_power * hours / 1000)
                     self.display.set_total_energy(total_energy, system_unit)
 
-                    avg_speed = gdata.configCounterSPS.Interval.avg_speed if self.name == 'sps' else gdata.configCounterSPS2.Interval.avg_speed
+                    # 平均转速
+                    avg_speed = round(sum_speed / times)
                     self.display.set_average_speed(avg_speed)
             except:
                 logging.exception("IntervalCounter.loop")

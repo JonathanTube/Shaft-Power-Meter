@@ -35,9 +35,7 @@ class DataSaver:
                 'is_overload': DataSaver.overload
             }
 
-            # 测试模式数据不插入
-            if not gdata.configTest.test_mode_running:
-                await asyncio.to_thread(DataLog.insert(data).execute)
+            await asyncio.to_thread(DataLog.insert(data).execute)
 
             # 主站且PLC连接时写入瞬时数据
             if gdata.configCommon.is_master:
@@ -46,7 +44,6 @@ class DataSaver:
             # 更新计数器
             DataSaver.save_counter_manually(name, speed, power)
             DataSaver.save_counter_total(name, speed, power)
-            DataSaver.save_counter_interval(name, speed, power)
 
             # 发送数据到客户端
             if gdata.configCommon.is_master:
@@ -211,48 +208,10 @@ class DataSaver:
                 seconds=time_elapsed
             ).where(CounterLog.sps_name == 'sps2').execute()
 
-    @staticmethod
-    def save_counter_interval(name: str, speed: float, power: float):
-        if name == 'sps':
-            gdata.configCounterSPS.Interval.sum_speed += speed
-            gdata.configCounterSPS.Interval.sum_power += power
-            gdata.configCounterSPS.Interval.times += 1
-
-            start_at = gdata.configCounterSPS.Interval.start_at
-            if start_at:
-                time_diff = gdata.configDateTime.utc - start_at
-                time_elapsed = time_diff.total_seconds()
-                avg_power, total_energy, avg_speed = DataSaver.get_data(
-                    time_elapsed,
-                    gdata.configCounterSPS.Interval.sum_power,
-                    gdata.configCounterSPS.Interval.sum_speed,
-                    gdata.configCounterSPS.Interval.times
-                )
-
-                gdata.configCounterSPS.Interval.avg_power = avg_power
-                gdata.configCounterSPS.Interval.total_energy = total_energy
-                gdata.configCounterSPS.Interval.avg_speed = avg_speed
-        else:
-            gdata.configCounterSPS2.Interval.sum_speed += speed
-            gdata.configCounterSPS2.Interval.sum_power += power
-            gdata.configCounterSPS2.Interval.times += 1
-
-            start_at = gdata.configCounterSPS2.Interval.start_at
-            if start_at:
-                time_diff = gdata.configDateTime.utc - start_at
-                time_elapsed = time_diff.total_seconds()
-                avg_power, total_energy, avg_speed = DataSaver.get_data(
-                    time_elapsed,
-                    gdata.configCounterSPS2.Interval.sum_power,
-                    gdata.configCounterSPS2.Interval.sum_speed,
-                    gdata.configCounterSPS2.Interval.times
-                )
-
-                gdata.configCounterSPS2.Interval.avg_power = avg_power
-                gdata.configCounterSPS2.Interval.total_energy = total_energy
-                gdata.configCounterSPS2.Interval.avg_speed = avg_speed
-
     def get_data(time_elapsed: int, sum_power: int, sum_speed: float, times: int):
+        print('===============================total')
+        print(time_elapsed)
+
         if times == 0:
             return (0, 0, 0.0)
 

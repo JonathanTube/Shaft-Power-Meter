@@ -264,17 +264,6 @@ class ConfigSPS2:
 @dataclass
 class ConfigCounterSPS:
     @dataclass
-    class Interval:
-        start_at: datetime | None = None
-        times: int = 0
-        sum_power: int = 0
-        sum_speed: float = 0.0
-
-        avg_power: int = 0
-        total_energy: int = 0
-        avg_speed: float = 0.0
-
-    @dataclass
     class Manually:
         status: Literal["stopped", "reset", "running"] | None = "stopped"
         start_at: datetime | None = None
@@ -310,14 +299,6 @@ class ConfigCounterSPS:
             ConfigCounterSPS.Total.sum_speed = counter_log.sum_speed
 
     def reset_total(self):
-        ConfigCounterSPS.Interval.start_at = None
-        ConfigCounterSPS.Interval.times = 0
-        ConfigCounterSPS.Interval.sum_power = 0
-        ConfigCounterSPS.Interval.sum_speed = 0
-        ConfigCounterSPS.Interval.avg_power = 0
-        ConfigCounterSPS.Interval.total_energy = 0
-        ConfigCounterSPS.Interval.avg_speed = 0
-
         ConfigCounterSPS.Manually.status = 'stopped'
         ConfigCounterSPS.Manually.start_at = None
         ConfigCounterSPS.Manually.stop_at = None
@@ -339,17 +320,6 @@ class ConfigCounterSPS:
 
 @dataclass
 class ConfigCounterSPS2:
-    @dataclass
-    class Interval:
-        start_at: datetime | None = None
-        times: int = 0
-        sum_power: int = 0
-        sum_speed: float = 0.0
-
-        avg_power: int = 0
-        total_energy: int = 0
-        avg_speed: float = 0.0
-
     @dataclass
     class Manually:
         status: Literal["stopped", "reset", "running"] | None = "stopped"
@@ -386,14 +356,6 @@ class ConfigCounterSPS2:
             ConfigCounterSPS2.Total.sum_speed = counter_log.sum_speed
 
     def reset_total(self):
-        ConfigCounterSPS2.Interval.start_at = None
-        ConfigCounterSPS2.Interval.times = 0
-        ConfigCounterSPS2.Interval.sum_power = 0
-        ConfigCounterSPS2.Interval.sum_speed = 0
-        ConfigCounterSPS2.Interval.avg_power = 0
-        ConfigCounterSPS2.Interval.total_energy = 0
-        ConfigCounterSPS2.Interval.avg_speed = 0
-
         ConfigCounterSPS2.Manually.status = 'stopped'
         ConfigCounterSPS2.Manually.start_at = None
         ConfigCounterSPS2.Manually.stop_at = None
