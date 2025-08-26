@@ -120,20 +120,19 @@ class DataSaver:
                 gdata.configCounterSPS.Manually.sum_power += power
                 gdata.configCounterSPS.Manually.times += 1
 
-                start_at = gdata.configCounterSPS.Manually.start_at
-                if start_at:
-                    time_diff = gdata.configDateTime.utc - start_at
-                    time_elapsed = time_diff.total_seconds()
-                    avg_power, total_energy, avg_speed = DataSaver.get_data(
-                        time_elapsed,
-                        gdata.configCounterSPS.Manually.sum_power,
-                        gdata.configCounterSPS.Manually.sum_speed,
-                        gdata.configCounterSPS.Manually.times
-                    )
+                time_elapsed = gdata.configCounterSPS.Manually.seconds + gdata.configPreference.data_collection_seconds_range
+                gdata.configCounterSPS.Manually.seconds = time_elapsed
 
-                    gdata.configCounterSPS.Manually.avg_power = avg_power
-                    gdata.configCounterSPS.Manually.total_energy = total_energy
-                    gdata.configCounterSPS.Manually.avg_speed = avg_speed
+                avg_power, total_energy, avg_speed = DataSaver.get_data(
+                    time_elapsed,
+                    gdata.configCounterSPS.Manually.sum_power,
+                    gdata.configCounterSPS.Manually.sum_speed,
+                    gdata.configCounterSPS.Manually.times
+                )
+
+                gdata.configCounterSPS.Manually.avg_power = avg_power
+                gdata.configCounterSPS.Manually.total_energy = total_energy
+                gdata.configCounterSPS.Manually.avg_speed = avg_speed
             return
 
         if gdata.configCounterSPS2.Manually.status == 'running':
@@ -141,21 +140,19 @@ class DataSaver:
             gdata.configCounterSPS2.Manually.sum_power += power
             gdata.configCounterSPS2.Manually.times += 1
 
-            start_at = gdata.configCounterSPS2.Manually.start_at
-            if start_at:
-                time_diff = gdata.configDateTime.utc - start_at
-                time_elapsed = time_diff.total_seconds()
+            time_elapsed = gdata.configCounterSPS2.Manually.seconds + gdata.configPreference.data_collection_seconds_range
+            gdata.configCounterSPS2.Manually.seconds = time_elapsed
 
-                avg_power, total_energy, avg_speed = DataSaver.get_data(
-                    time_elapsed,
-                    gdata.configCounterSPS2.Manually.sum_power,
-                    gdata.configCounterSPS2.Manually.sum_speed,
-                    gdata.configCounterSPS2.Manually.times
-                )
+            avg_power, total_energy, avg_speed = DataSaver.get_data(
+                time_elapsed,
+                gdata.configCounterSPS2.Manually.sum_power,
+                gdata.configCounterSPS2.Manually.sum_speed,
+                gdata.configCounterSPS2.Manually.times
+            )
 
-                gdata.configCounterSPS2.Manually.avg_power = avg_power
-                gdata.configCounterSPS2.Manually.total_energy = total_energy
-                gdata.configCounterSPS2.Manually.avg_speed = avg_speed
+            gdata.configCounterSPS2.Manually.avg_power = avg_power
+            gdata.configCounterSPS2.Manually.total_energy = total_energy
+            gdata.configCounterSPS2.Manually.avg_speed = avg_speed
 
     @staticmethod
     def save_counter_total(name: str, speed: float, power: float):
@@ -209,9 +206,6 @@ class DataSaver:
             ).where(CounterLog.sps_name == 'sps2').execute()
 
     def get_data(time_elapsed: int, sum_power: int, sum_speed: float, times: int):
-        print('===============================total')
-        print(time_elapsed)
-
         if times == 0:
             return (0, 0, 0.0)
 
