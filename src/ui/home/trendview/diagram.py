@@ -20,6 +20,14 @@ class TrendViewDiagram(ft.Container):
         self.expand = True
         self.data_list = []
         self.system_unit = gdata.configPreference.system_unit
+        self.fig = None
+        self.ax_rpm = None
+        self.ax_power = None
+        self.chart = None
+
+    def did_mount(self):
+        # Ensure chart is created when control is mounted
+        self.before_update()
 
     def before_update(self):
         try:
@@ -53,7 +61,7 @@ class TrendViewDiagram(ft.Container):
 
     def set_style(self):
         # 重新应用样式
-        if self.page.theme_mode == ft.ThemeMode.DARK:
+        if self.page and self.page.theme_mode == ft.ThemeMode.DARK:
             plt.style.use('dark_background')
         else:
             plt.style.use('default')
@@ -63,6 +71,8 @@ class TrendViewDiagram(ft.Container):
 
     def _configure_axes(self):
         """配置主轴参数"""
+        if not self.ax_rpm:
+            return
         # self.ax_rpm.xaxis.set_major_locator(mdates.HourLocator(byhour=range(0, 24, 2)))
         # self.ax_rpm.xaxis.set_major_formatter(mdates.DateFormatter(f'%H:%M'))
 
@@ -80,6 +90,8 @@ class TrendViewDiagram(ft.Container):
 
     def _setup_power_axis(self):
         """配置功率副轴"""
+        if not self.ax_rpm:
+            return
         self.ax_power = self.ax_rpm.twinx()
         unit_label = 'kW' if self.system_unit == 0 else 'sHp'
         self.ax_power.set_ylabel(unit_label, fontsize=10)
@@ -90,6 +102,8 @@ class TrendViewDiagram(ft.Container):
 
     def _create_legends(self):
         """创建组合图例"""
+        if not self.ax_rpm or not self.ax_power:
+            return
         if self.page and self.page.session:
             lines = [
                 self.ax_rpm.plot([], [], label=self.page.session.get('lang.common.speed'), color='blue')[0],
@@ -103,12 +117,13 @@ class TrendViewDiagram(ft.Container):
 
     def handle_update_chart(self):
         """更新图表数据"""
-        if not self.data_list:
+        if not self.data_list or not self.ax_rpm or not self.ax_power:
             return
 
         # 清除旧数据
         for ax in [self.ax_rpm, self.ax_power]:
-            for line in ax.lines:
+            # copy list to avoid iteration issues while removing
+            for line in list(ax.lines):
                 line.remove()
 
         # 获取新数据

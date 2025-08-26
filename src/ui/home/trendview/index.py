@@ -8,6 +8,8 @@ from typing import Literal
 from peewee import fn
 from common.global_data import gdata
 from utils.datetime_util import DateTimeUtil
+import ui_safety
+import asyncio
 
 
 class TrendView(ft.Container):
@@ -38,14 +40,15 @@ class TrendView(ft.Container):
 
             if gdata.configCommon.is_twins:
                 self.sps2_chart = TrendViewDiagram()
+                # Tabs must contain only Tab items; place header row above Tabs
                 self.content = ft.Column(
                     expand=True,
                     spacing=0,
                     controls=[
+                        top_block,
                         ft.Tabs(
                             expand=True,
                             tabs=[
-                                top_block,
                                 ft.Tab(text='SPS', content=self.sps_chart),
                                 ft.Tab(text='SPS2', content=self.sps2_chart)
                             ]
@@ -65,19 +68,26 @@ class TrendView(ft.Container):
             logging.exception('exception occured at TrendView.build')
 
     def did_mount(self):
-        threading.Thread(target=self.load_data_sync, daemon=True).start()
+        # use page.run_task to run async loading on UI event loop
+        if self.page:
+            self.page.run_task(self.load_data_async)
 
-    def load_data_sync(self):
-        self.fetch_and_update("sps")
+    async def load_data_async(self):
+        await self.fetch_and_update_async("sps")
         if gdata.configCommon.is_twins:
-            self.fetch_and_update("sps2")
+            await self.fetch_and_update_async("sps2")
 
-    def fetch_and_update(self, name):
-        data_logs = self.query_data(name)
-        chart = self.sps_chart if name == "sps" else self.sps2_chart
+    def _apply_chart_update(self, chart: TrendViewDiagram, data_logs):
         if chart and chart.page:
             chart.update_chart(data_logs)
             chart.update()
+
+    async def fetch_and_update_async(self, name):
+        data_logs = await asyncio.to_thread(self.query_data, name)
+        chart = self.sps_chart if name == "sps" else getattr(self, "sps2_chart", None)
+        # Ensure UI updates happen on UI thread
+        if self.page and chart:
+            ui_safety.safe_invoke_on_page(self.page, self._apply_chart_update, chart, data_logs)
 
     def query_data(self, name: Literal['sps', 'sps2']):
         try:
