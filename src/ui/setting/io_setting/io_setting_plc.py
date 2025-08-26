@@ -28,7 +28,7 @@ class IOSettingPLC(ft.Container):
                     text=self.page.session.get("lang.setting.connect"),
                     bgcolor=ft.Colors.GREEN,
                     color=ft.Colors.WHITE,
-                    visible=not plc.is_online,
+                    visible=plc.is_online == False or plc.is_online == None,
                     style=ft.ButtonStyle(
                         shape=ft.RoundedRectangleBorder(radius=5)
                     ),
@@ -41,7 +41,7 @@ class IOSettingPLC(ft.Container):
                     text=self.page.session.get("lang.setting.disconnect"),
                     bgcolor=ft.Colors.RED,
                     color=ft.Colors.WHITE,
-                    visible=plc.is_online,
+                    visible=plc.is_online == True,
                     style=ft.ButtonStyle(
                         shape=ft.RoundedRectangleBorder(radius=5)
                     ),
@@ -54,7 +54,7 @@ class IOSettingPLC(ft.Container):
                     text=self.page.session.get("lang.setting.fetch_data"),
                     bgcolor=ft.Colors.BLUE,
                     color=ft.Colors.WHITE,
-                    visible=plc.is_online,
+                    visible=plc.is_online == True,
                     style=ft.ButtonStyle(
                         shape=ft.RoundedRectangleBorder(radius=5)
                     ),
