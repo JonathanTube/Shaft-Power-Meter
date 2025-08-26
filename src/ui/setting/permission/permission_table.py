@@ -154,14 +154,14 @@ class PermissionTable(AbstractTable):
                 ),
                 actions=[
                     ft.TextButton(e.page.session.get("lang.button.cancel"), on_click=lambda e: e.page.close(self.edit_dialog)),
-                    ft.TextButton(e.page.session.get("lang.button.save"), on_click=lambda e: asyncio.create_task(self.__on_confirm_edit_async(e, items[0])))
+                    ft.TextButton(e.page.session.get("lang.button.save"), on_click=lambda e: self.__on_confirm_edit_async(e, items[0]))
                 ]
             )
             self.page.open(self.edit_dialog)
         except:
             logging.exception('exception occured at PermissionTable.__show_edit_user')
 
-    async def __on_confirm_edit_async(self, e, user_id: int):
+    def __on_confirm_edit_async(self, e, user_id: int):
         try:
             if self.__is_empty(self.user_name.value):
                 Toast.show_warning(e.page, e.page.session.get("lang.permission.user_name_required"))
@@ -185,13 +185,10 @@ class PermissionTable(AbstractTable):
 
             encrypt_password = hashlib.sha256(self.password.value.strip().encode()).hexdigest()
 
-            await asyncio.to_thread(
-                lambda: User.update(
-                    user_pwd=encrypt_password,
-                    user_role=int(self.role.value)
-                ).where(User.id == user_id).execute()
-            )
-
+            User.update(
+                user_pwd=encrypt_password,
+                user_role=int(self.role.value)
+            ).where(User.id == user_id).execute()
 
             self.page.close(self.edit_dialog)
             self.search()
@@ -208,18 +205,18 @@ class PermissionTable(AbstractTable):
                 title=ft.Text(self.page.session.get("lang.permission.delete_user")),
                 actions=[
                     ft.TextButton(self.page.session.get("lang.button.cancel"), on_click=lambda e: e.page.close(self.del_dialog)),
-                    ft.TextButton(self.page.session.get("lang.button.confirm"), on_click=lambda e: asyncio.create_task(self.__on_delete_confirm_async(e, user_id)))
+                    ft.TextButton(self.page.session.get("lang.button.confirm"), on_click=lambda e: self.__on_delete_confirm_async(e, user_id))
                 ]
             )
             self.page.open(self.del_dialog)
         except:
             logging.exception('exception occured at PermissionTable.__on_delete')
 
-    async def __on_delete_confirm_async(self, e, user_id: int):
+    def __on_delete_confirm_async(self, e, user_id: int):
         try:
             self.page.close(self.del_dialog)
 
-            await asyncio.to_thread(lambda: User.delete().where(User.id == user_id).execute())
+            User.delete().where(User.id == user_id).execute()
             self.search()
             Toast.show_success(self.page)
         except:
