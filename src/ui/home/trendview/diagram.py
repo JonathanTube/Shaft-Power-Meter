@@ -40,7 +40,8 @@ class TrendViewDiagram(ft.Container):
             self.set_style()
             """创建初始图表结构"""
             self.fig, self.ax_rpm = plt.subplots(figsize=(10, 6))
-            self.fig.subplots_adjust(left=0.08, right=0.92, top=0.98, bottom=0.1)
+            # self.fig.subplots_adjust(left=0.08, right=0.92, top=0.98, bottom=0.1)
+            self.fig.subplots_adjust(left=0.1, right=0.9, top=0.9, bottom=0.01)
             self.fig.autofmt_xdate()
             self._configure_axes()
             self._setup_power_axis()
@@ -62,11 +63,17 @@ class TrendViewDiagram(ft.Container):
 
     def _configure_axes(self):
         """配置主轴参数"""
-        self.ax_rpm.xaxis.set_major_locator(mdates.HourLocator(byhour=range(0, 24, 2)))
-        self.ax_rpm.xaxis.set_major_formatter(mdates.DateFormatter(f'%H:%M'))
+        # self.ax_rpm.xaxis.set_major_locator(mdates.HourLocator(byhour=range(0, 24, 2)))
+        # self.ax_rpm.xaxis.set_major_formatter(mdates.DateFormatter(f'%H:%M'))
 
         # 主轴样式
-        self.ax_rpm.set_xlabel(xlabel=self.page.session.get('lang.common.utc_date_time'), fontsize=10)
+        # if self.page and self.page.session:
+        #     self.ax_rpm.set_xlabel(xlabel=self.page.session.get('lang.common.utc_date_time'), fontsize=10)
+
+        self.ax_rpm.set_xticks([])      # 不显示刻度
+        self.ax_rpm.set_xticklabels([]) # 不显示刻度文字
+        self.ax_rpm.set_xlabel("")      # 不显示 X 轴标签
+
         self.ax_rpm.set_ylabel(ylabel="RPM", fontsize=10)
         self.ax_rpm.grid(True, linestyle=':', alpha=0.5)
         self.ax_rpm.tick_params(axis='both', which='major', labelsize=8)
@@ -83,11 +90,12 @@ class TrendViewDiagram(ft.Container):
 
     def _create_legends(self):
         """创建组合图例"""
-        lines = [
-            self.ax_rpm.plot([], [], label=self.page.session.get('lang.common.speed'), color='blue')[0],
-            self.ax_power.plot([], [], label=self.page.session.get('lang.common.power'), color='red')[0]
-        ]
-        self.ax_rpm.legend(handles=lines, loc='upper left', fontsize=10)
+        if self.page and self.page.session:
+            lines = [
+                self.ax_rpm.plot([], [], label=self.page.session.get('lang.common.speed'), color='blue')[0],
+                self.ax_power.plot([], [], label=self.page.session.get('lang.common.power'), color='red')[0]
+            ]
+            self.ax_rpm.legend(handles=lines, loc='upper left', fontsize=10)
 
     def update_chart(self, data_list: List[DataLog]):
         self.data_list = data_list
