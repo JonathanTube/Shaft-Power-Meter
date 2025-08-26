@@ -14,9 +14,15 @@ class ZeroCal(ft.Container):
         self.alignment = ft.alignment.center
 
     def __on_change(self, e):
-        data = int(e.data)
-        if data == 0:
-            self.his.table.search()
+        try:
+            data = int(e.data) if e and getattr(e, "data", None) is not None else None
+        except Exception:
+            data = None
+        if data == 0 and hasattr(self, "his") and getattr(self.his, "table", None):
+            try:
+                self.his.table.search()
+            except Exception:
+                logging.exception('exception occured at ZeroCal.__on_change search')
 
     def build(self):
         try:
