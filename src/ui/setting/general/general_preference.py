@@ -35,13 +35,13 @@ class GeneralPreference(ft.Container):
 
                 self.system_unit = ft.RadioGroup(
                     content=ft.Row([self.system_unit_si, self.system_unit_metric]),
-                    value=gdata.configPreference.system_unit,
+                    value=str(gdata.configPreference.system_unit),
                     on_change=lambda e: self.__handle_system_unit_change(e)
                 )
 
                 self.language = ft.RadioGroup(
                     content=ft.Row([ft.Radio(value="0", label="English"), ft.Radio(value="1", label="中文")]),
-                    value=gdata.configPreference.language
+                    value=str(gdata.configPreference.language)
                 )
 
                 self.fullscreen = ft.Checkbox(
