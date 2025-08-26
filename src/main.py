@@ -97,7 +97,7 @@ def set_content(page: ft.Page):
         is_running = False
         while True:
             try:
-                if gdata.configCommon.is_eexi_breaching:
+                if gdata.configCommon.is_eexi_breaching == True:
                     if not is_running:
                         fullscreen_alert.show()
                         await audio_alarm_btn.show()

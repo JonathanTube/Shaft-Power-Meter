@@ -6,7 +6,7 @@ from peewee import fn
 from common.const_alarm_type import AlarmType
 from db.models.alarm_log import AlarmLog
 from db.models.propeller_setting import PropellerSetting
-from db.table_init import TableInit
+from task.test_mode_task import test_mode_task
 from utils.alarm_saver import AlarmSaver
 from playhouse.shortcuts import dict_to_model
 from common.global_data import gdata
@@ -87,12 +87,12 @@ class WebSocketSlave:
                     dict_to_model(PropellerSetting, receive_data['data']).save()
 
                 elif type == 'stop_test_mode':
-                    await asyncio.to_thread(TableInit.cleanup)
+                    await test_mode_task.stop()
 
         except (websockets.ConnectionClosed, websockets.ConnectionClosedError, websockets.ConnectionClosedOK):
             logging.error("[Slave] 连接断开")
             await self.set_offline()
-            raise 
+            raise
         except:
             logging.exception("[Slave] 接收数据异常")
             await self.set_offline()

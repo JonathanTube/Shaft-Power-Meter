@@ -3,6 +3,7 @@ import random
 import logging
 from common.global_data import gdata
 from db.table_init import TableInit
+from utils.data_saver import DataSaver
 from utils.formula_cal import FormulaCalculator
 from websocket.websocket_master import ws_server
 from task.plc_sync_task import plc
@@ -81,16 +82,21 @@ class TestModeTask:
                 self._task = None
 
         TableInit.cleanup()
-        # 这里只需要恢复power_overload的告警，alarm不需要管。
+        # 重置power_overload
         await plc.write_power_overload(False)
+        DataSaver.overload = None
+        # 重置eexi_breach
         await plc.write_eexi_breach_alarm(False)
-        # 清客户端数据
-        await ws_server.send({'type': 'stop_test_mode'})
-        # counter是唯一需要初始化的
+        gdata.configCommon.is_eexi_breaching = None
+        # 重置counter
         gdata.configCounterSPS.set_default_value()
         gdata.configCounterSPS2.set_default_value()
-        # 清理alarm
-        # gdata.configAlarm.set_default_value()
+        # 重置alarm
+        gdata.configAlarm.set_default_value()
+        # 重置event
+        gdata.configEvent.set_default_value()
+        # 重置客户端数据
+        await ws_server.send({'type': 'stop_test_mode'})
 
     async def _generate_random_data(self):
         """后台任务：按范围生成随机数据（异步）"""

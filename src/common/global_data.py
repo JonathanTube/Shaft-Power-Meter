@@ -44,7 +44,7 @@ class ConfigCommon:
     default_table_width: int = 990
 
     # 是否功率突破EEXI
-    is_eexi_breaching = False
+    is_eexi_breaching = None
 
     def set_default_value(self):
         systemSettings: SystemSettings = SystemSettings.get()

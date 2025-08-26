@@ -46,7 +46,7 @@ class EEXIBreachTask:
             self.is_recovery()
 
             # 如果正在突破
-            if gdata.configCommon.is_eexi_breaching:
+            if gdata.configCommon.is_eexi_breaching == True:
                 # 处理报告
                 self.create_report_event()
                 # 保存报告明细
