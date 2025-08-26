@@ -44,14 +44,17 @@ class GeneralDateTime(ft.Container):
                     )
                 )
 
+                options = [
+                    ft.DropdownOption(text="YYYY-MM-DD", key="%Y-%m-%d"),
+                    ft.DropdownOption(text="DD-MM-YYYY", key="%d-%m-%Y"),
+                    ft.DropdownOption(text="MM-DD-YYYY", key="%m-%d-%Y")
+                ]
+                value = fmt if fmt in [opt.key for opt in options] else options[0].key
+
                 self.date_format = ft.Dropdown(
                     label=s.get("lang.setting.date_format"), col={"md": 6},
-                    value=fmt,
-                    options=[
-                        ft.DropdownOption(text="YYYY-MM-DD", key="%Y-%m-%d"),
-                        ft.DropdownOption(text="DD-MM-YYYY", key="%d-%m-%Y"),
-                        ft.DropdownOption(text="MM-DD-YYYY", key="%m-%d-%Y")
-                    ]
+                    value=value,
+                    options=options
                 )
 
                 self.sync_with_gps = ft.Checkbox(

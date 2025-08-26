@@ -96,11 +96,19 @@ class Pagination(ft.Container):
         try:
             if self.page:
                 self.total_pages = (self.total + self.page_size - 1) // self.page_size
+                if self.total_pages <= 0:
+                    self.total_pages = 1
+
+                # clamp current page into range
+                if self.current_page < 1:
+                    self.current_page = 1
+                if self.current_page > self.total_pages:
+                    self.current_page = self.total_pages
 
                 self.visible = self.total > self.page_size
 
                 if self.page_number:
-                    self.page_number.value = f"{self.current_page} of {self.total_pages}"
+                    self.page_number.value = f"Page {self.current_page} of {self.total_pages}"
 
                 if self.first_page_button:
                     self.first_page_button.disabled = self.current_page <= 1
