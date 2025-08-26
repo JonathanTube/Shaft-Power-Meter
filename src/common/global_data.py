@@ -310,6 +310,24 @@ class ConfigCounterSPS:
             ConfigCounterSPS.Total.sum_speed = counter_log.sum_speed
 
     def reset_total(self):
+        ConfigCounterSPS.Interval.start_at = None
+        ConfigCounterSPS.Interval.times = 0
+        ConfigCounterSPS.Interval.sum_power = 0
+        ConfigCounterSPS.Interval.sum_speed = 0
+        ConfigCounterSPS.Interval.avg_power = 0
+        ConfigCounterSPS.Interval.total_energy = 0
+        ConfigCounterSPS.Interval.avg_speed = 0
+
+        ConfigCounterSPS.Manually.status = 'stopped'
+        ConfigCounterSPS.Manually.start_at = None
+        ConfigCounterSPS.Manually.stop_at = None
+        ConfigCounterSPS.Manually.times = 0
+        ConfigCounterSPS.Manually.sum_power = 0
+        ConfigCounterSPS.Manually.sum_speed = 0
+        ConfigCounterSPS.Manually.avg_power = 0
+        ConfigCounterSPS.Manually.total_energy = 0
+        ConfigCounterSPS.Manually.avg_speed = 0
+
         ConfigCounterSPS.Total.seconds = 0
         ConfigCounterSPS.Total.times = 0
         ConfigCounterSPS.Total.sum_power = 0
@@ -368,6 +386,24 @@ class ConfigCounterSPS2:
             ConfigCounterSPS2.Total.sum_speed = counter_log.sum_speed
 
     def reset_total(self):
+        ConfigCounterSPS2.Interval.start_at = None
+        ConfigCounterSPS2.Interval.times = 0
+        ConfigCounterSPS2.Interval.sum_power = 0
+        ConfigCounterSPS2.Interval.sum_speed = 0
+        ConfigCounterSPS2.Interval.avg_power = 0
+        ConfigCounterSPS2.Interval.total_energy = 0
+        ConfigCounterSPS2.Interval.avg_speed = 0
+
+        ConfigCounterSPS2.Manually.status = 'stopped'
+        ConfigCounterSPS2.Manually.start_at = None
+        ConfigCounterSPS2.Manually.stop_at = None
+        ConfigCounterSPS2.Manually.times = 0
+        ConfigCounterSPS2.Manually.sum_power = 0
+        ConfigCounterSPS2.Manually.sum_speed = 0
+        ConfigCounterSPS2.Manually.avg_power = 0
+        ConfigCounterSPS2.Manually.total_energy = 0
+        ConfigCounterSPS2.Manually.avg_speed = 0
+
         ConfigCounterSPS2.Total.seconds = 0
         ConfigCounterSPS2.Total.times = 0
         ConfigCounterSPS2.Total.sum_power = 0

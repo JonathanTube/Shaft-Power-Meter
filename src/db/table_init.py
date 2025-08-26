@@ -62,7 +62,7 @@ class TableInit:
     @staticmethod
     def cleanup():
         try:
-            AlarmLog.delete(AlarmLog.alarm_type == AlarmType.POWER_OVERLOAD).execute()
+            AlarmLog.delete().where(AlarmLog.alarm_type == AlarmType.POWER_OVERLOAD).execute()
             CounterLog.truncate_table()
             DataLog.truncate_table()
             DateTimeConf.truncate_table()
