@@ -268,6 +268,8 @@ class ConfigCounterSPS:
         status: Literal["stopped", "reset", "running"] | None = "stopped"
         start_at: datetime | None = None
         stop_at: datetime | None = None
+
+        seconds: int = 0
         times: int = 0
         sum_power: int = 0
         sum_speed: float = 0.0
@@ -302,6 +304,7 @@ class ConfigCounterSPS:
         ConfigCounterSPS.Manually.status = 'stopped'
         ConfigCounterSPS.Manually.start_at = None
         ConfigCounterSPS.Manually.stop_at = None
+        ConfigCounterSPS.Manually.seconds = 0
         ConfigCounterSPS.Manually.times = 0
         ConfigCounterSPS.Manually.sum_power = 0
         ConfigCounterSPS.Manually.sum_speed = 0
@@ -325,6 +328,8 @@ class ConfigCounterSPS2:
         status: Literal["stopped", "reset", "running"] | None = "stopped"
         start_at: datetime | None = None
         stop_at: datetime | None = None
+
+        seconds: int = 0
         times: int = 0
         sum_power: int = 0
         sum_speed: float = 0.0
@@ -359,6 +364,7 @@ class ConfigCounterSPS2:
         ConfigCounterSPS2.Manually.status = 'stopped'
         ConfigCounterSPS2.Manually.start_at = None
         ConfigCounterSPS2.Manually.stop_at = None
+        ConfigCounterSPS2.Manually.seconds = 0
         ConfigCounterSPS2.Manually.times = 0
         ConfigCounterSPS2.Manually.sum_power = 0
         ConfigCounterSPS2.Manually.sum_speed = 0
