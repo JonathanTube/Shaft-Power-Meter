@@ -17,9 +17,13 @@ class IOSettingOutput(ft.Container):
                     for port in serial.tools.list_ports.comports()
                 ]
 
+                saved_value = gdata.configIO.output_com_port
+                if saved_value not in [opt.key for opt in options]:
+                    saved_value = options[0].key if options else None
+
                 self.serial_port = ft.Dropdown(
                     label="Port",
-                    value=gdata.configIO.output_com_port,
+                    value=saved_value,
                     col={'sm': 8},
                     options=options
                 )
@@ -61,7 +65,6 @@ class IOSettingOutput(ft.Container):
                     label=self.page.session.get("lang.common.power"),
                     value=gdata.configIO.output_power
                 )
-
                 self.check_speed = ft.Checkbox(
                     label=self.page.session.get("lang.common.speed"),
                     value=gdata.configIO.output_speed
@@ -169,7 +172,14 @@ class IOSettingOutput(ft.Container):
             self.update_buttons()
             if self.page and self.page.session:
                 # 同步gdata配置到控件，保证显示和数据一致
-                self.serial_port.value = gdata.configIO.output_com_port
+                # Re-evaluate available ports and validate selection
+                options = [
+                    ft.dropdown.Option(key=port.name, text=f"{port.name} - {port.description}")
+                    for port in serial.tools.list_ports.comports()
+                ]
+                valid_value = gdata.configIO.output_com_port if gdata.configIO.output_com_port in [opt.key for opt in options] else (options[0].key if options else None)
+                self.serial_port.options = options
+                self.serial_port.value = valid_value
                 self.check_torque.value = gdata.configIO.output_torque
                 self.check_thrust.value = gdata.configIO.output_thrust
                 self.check_power.value = gdata.configIO.output_power

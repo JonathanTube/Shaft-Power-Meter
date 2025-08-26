@@ -74,13 +74,13 @@ class PermissionTable(AbstractTable):
             return "User"
         return 'Unknown'
 
-    def __get_role_key(self, role: int):
-        if role == 'Admin':
-            return 0
-        elif role == 'Master':
-            return 1
-        elif role == 'User':
-            return 2
+    def __get_role_key(self, role_label: str):
+        if role_label == 'Admin':
+            return "0"
+        elif role_label == 'Master':
+            return "1"
+        elif role_label == 'User':
+            return "2"
         return None
 
     def has_operations(self):
@@ -126,11 +126,12 @@ class PermissionTable(AbstractTable):
                 password=True,
                 can_reveal_password=True
             )
+            current_role_key = self.__get_role_key(items[3])
             self.role = ft.Dropdown(
                 label=e.page.session.get("lang.permission.user_role"),
                 expand=True,
                 width=400,
-                value=self.__get_role_key(items[3]),
+                value=current_role_key if current_role_key is not None else None,
                 options=[
                     ft.dropdown.Option(text="Admin", key="0", visible=self.op_user.user_role <= 0),
                     ft.dropdown.Option(text="Master", key="1", visible=self.op_user.user_role <= 1),

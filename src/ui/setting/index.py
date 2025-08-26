@@ -28,12 +28,24 @@ class Setting(ft.Container):
         self.rail = None
 
     def __set_content(self, e):
-        idx = e.control.selected_index
+        idx = getattr(e.control, "selected_index", 0)
         self.__switch_content(idx)
 
     def __switch_content(self, idx: int):
         if self.is_switching:
             return
+
+        # clamp idx to valid range based on destinations length
+        try:
+            dest_len = len(self.rail.destinations) if self.rail else 0
+        except Exception:
+            dest_len = 0
+        if dest_len == 0:
+            return
+        if idx < 0:
+            idx = 0
+        if idx >= dest_len:
+            idx = dest_len - 1
 
         if idx == self.idx:
             return
@@ -41,31 +53,33 @@ class Setting(ft.Container):
         try:
             self.is_switching = True
 
-            if self.page and self.right_content and self.right_content.page:
+            if not (self.page and self.right_content and self.right_content.page):
+                return
 
-                self.idx = idx
+            logging.info(f"[Setting] switch from {self.idx} to {idx}")
+            self.idx = idx
 
-                keyboard.close()
+            keyboard.close()
 
-                if idx == 0:
-                    self.right_content.content = SystemConf()
-                elif idx == 1:
-                    self.right_content.content = General()
-                elif idx == 2:
-                    self.right_content.content = IOSetting()
-                elif idx == 3:
-                    self.right_content.content = PropellerConf()
-                elif idx == 4:
-                    self.right_content.content = ZeroCal()
-                elif idx == 5:
-                    self.right_content.content = SelfTest()
-                elif idx == 6:
-                    self.right_content.content = Permission()
-                elif idx == 7:
-                    self.right_content.content = TestMode()
+            if idx == 0:
+                self.right_content.content = SystemConf()
+            elif idx == 1:
+                self.right_content.content = General()
+            elif idx == 2:
+                self.right_content.content = IOSetting()
+            elif idx == 3:
+                self.right_content.content = PropellerConf()
+            elif idx == 4:
+                self.right_content.content = ZeroCal()
+            elif idx == 5:
+                self.right_content.content = SelfTest()
+            elif idx == 6:
+                self.right_content.content = Permission()
+            elif idx == 7:
+                self.right_content.content = TestMode()
 
-                if self.right_content and self.right_content.page:
-                    self.right_content.update()
+            if self.right_content and self.right_content.page:
+                self.right_content.update()
         except:
             logging.exception("error occured while switch the button, please try it lately.")
         finally:
@@ -174,7 +188,10 @@ class Setting(ft.Container):
     async def test_auto_run(self):
         while self.task_running and gdata.configTest.auto_testing:
             try:
-                idx = int(random() * 10) % len(self.rail.destinations)
+                dest_len = len(self.rail.destinations) if self.rail else 0
+                if dest_len == 0:
+                    return
+                idx = int(random() * 10) % dest_len
                 # logging.info(f'&&&&&&&&&&&&&&-Setting.test_auto_run, idx = {idx}')
                 self.__switch_content(idx=idx)
                 if self.rail and self.rail.page:

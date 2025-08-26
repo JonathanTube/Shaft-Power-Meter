@@ -29,12 +29,17 @@ class EventForm(ft.AlertDialog):
         try:
             self.title = ft.Text(self.page.session.get("lang.log.event_log"))
 
+            options = [ft.dropdown.Option(key=reason.id, text=reason.reason) for reason in self.breach_reasons]
+            default_value = self.event_log.breach_reason if self.event_log else None
+            if default_value not in [opt.key for opt in options]:
+                default_value = options[0].key if options else None
+
             self.breach_reason = ft.Dropdown(
                 expand=True,
                 width=500,
                 label=self.page.session.get("lang.event.reason_for_power_reserve_breach"),
-                options=[ft.dropdown.Option(key=reason.id, text=reason.reason) for reason in self.breach_reasons],
-                value=self.event_log.breach_reason
+                options=options,
+                value=default_value
             )
 
             self.note = ft.TextField(
