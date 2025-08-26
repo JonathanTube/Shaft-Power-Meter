@@ -36,7 +36,7 @@ class PermissionCheck(ft.AlertDialog):
                 self.user_name = ft.Dropdown(
                     width=300,
                     label=s.get("lang.permission.user_name"),
-                    value=1,
+                    value=None,
                     options=[]
                 )
                 self.user_pwd = ft.TextField(
@@ -97,6 +97,9 @@ class PermissionCheck(ft.AlertDialog):
 
             if self.user_name:
                 self.user_name.options = [ft.dropdown.Option(text=user.user_name, key=user.id) for user in users]
+                # ensure a valid default selection only if options exist
+                if self.user_name.value not in [opt.key for opt in self.user_name.options]:
+                    self.user_name.value = self.user_name.options[0].key if self.user_name.options else None
         except:
             logging.exception('exception occured at PermissionCheck.before_update')
 
