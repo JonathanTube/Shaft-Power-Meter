@@ -260,9 +260,13 @@ class IOSettingPLC(ft.Container):
             self.page.run_task(AlarmSaver.recovery, AlarmType.MASTER_PLC)
 
     def __plc_enabled_change(self, e):
-        if self.plc_enabled_items and self.plc_enabled_items.page:
-            self.plc_enabled_items.visible = True if e.data == 'true' else False
-            self.plc_enabled_items.update()
+        try:
+            enabled = getattr(e.control, "value", None) if e is not None else None
+            if self.plc_enabled_items and self.plc_enabled_items.page:
+                self.plc_enabled_items.visible = bool(enabled)
+                self.plc_enabled_items.update()
+        except:
+            logging.exception('exception occured at IOSettingPLC.__plc_enabled_change')
 
     async def __write_to_plc(self):
         try:
