@@ -24,6 +24,7 @@ class JM3846AsyncClient(ABC):
 
     async def start(self):
         """启动异步连接任务（不阻塞外部）"""
+        await self.release()
         if self._connect_task is None or self._connect_task.done():
             self.is_canceled = False
             self._connect_task = asyncio.create_task(self._connect_loop())
@@ -50,6 +51,7 @@ class JM3846AsyncClient(ABC):
 
             except ConnectionRefusedError as e:
                 logging.error(f'[JM3846-{self.name}] 连接被拒绝: {e}')
+                await self.set_offline()
             except asyncio.TimeoutError:
                 logging.info(f'[JM3846-{self.name}] 连接超时')
             except asyncio.CancelledError:

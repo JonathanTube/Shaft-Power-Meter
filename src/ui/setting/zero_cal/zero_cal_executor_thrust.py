@@ -153,11 +153,11 @@ class ZeroCalExecutorThrust(ft.Card):
 
                 # 时间到，调零结束
                 if self.name == 'sps':
-                    average_ad1 = JM3846Util.get_avg(gdata.configSPS.zero_cal_ad1_for_thrust, self.name)
+                    _, average_ad1, _ = JM3846Util.get_avg(self.name, gdata.configSPS.zero_cal_ad1_for_thrust)
                     mv_per_v = JM3846Calculator.calculate_mv_per_v(average_ad1, gdata.configSPS.gain_1)
                     self.seconds_tick.value = round(mv_per_v, 4)
                 elif self.name == 'sps2':
-                    average_ad1 = JM3846Util.get_avg(gdata.configSPS2.zero_cal_ad1_for_thrust, self.name)
+                    _, average_ad1, _ = JM3846Util.get_avg(self.name, gdata.configSPS2.zero_cal_ad1_for_thrust)
                     mv_per_v = JM3846Calculator.calculate_mv_per_v(average_ad1, gdata.configSPS2.gain_1)
                     self.seconds_tick.value = round(mv_per_v, 4)
                 self.seconds_tick.update()

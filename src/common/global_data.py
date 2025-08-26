@@ -203,8 +203,8 @@ class ConfigSPS:
 
     zero_cal_torque_running = False
     zero_cal_thrust_running = False
-    zero_cal_ad0_for_torque: list[float] = field(default_factory=list)
-    zero_cal_ad1_for_thrust: list[float] = field(default_factory=list)
+    zero_cal_ad0_for_torque: list[tuple[float, float, float]] = field(default_factory=list)
+    zero_cal_ad1_for_thrust: list[tuple[float, float, float]] = field(default_factory=list)
 
     def set_default_value(self):
         # get the last accepted zero cal. record.
