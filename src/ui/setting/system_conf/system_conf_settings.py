@@ -109,7 +109,7 @@ class SystemConfSettings(ft.Container):
                 self.twins_propeller = ft.Radio(value="2", label=self.page.session.get("lang.setting.twins_propeller"))
                 self.amount_of_propeller_radios = ft.RadioGroup(
                     content=ft.Row([self.single_propeller, self.twins_propeller]),
-                    value=gdata.configCommon.amount_of_propeller
+                    value=str(gdata.configCommon.amount_of_propeller)
                 )
                 self.amount_of_propeller_row = ft.Row(
                     col={"md": 6},
