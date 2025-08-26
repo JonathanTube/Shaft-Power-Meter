@@ -120,7 +120,9 @@ class JM38460x44:
 
             func_code = struct.unpack(">B", frame[7:8])[0]
             if func_code & 0x80:
-                continue
+                logging.warning(f'[JM3846-{name}] 0x44错误{func_code}')
+                await on_error()
+                break
 
             if func_code == 0x44:
                 current_frame = JM38460x44.parse_response(frame, name)
