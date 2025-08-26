@@ -31,8 +31,14 @@ class TrendViewDiagram(ft.Container):
 
     def before_update(self):
         try:
-            # 清除当前图形缓存
-            plt.close('all')
+            # 清除当前图形缓存（仅关闭自身图形，避免影响其他图表）
+            if self.fig is not None:
+                try:
+                    plt.close(self.fig)
+                except Exception:
+                    logging.exception('exception closing previous figure')
+                finally:
+                    self.fig = None
             # 重新应用样式
             self.set_style()
             # 重建图表对象
@@ -117,27 +123,33 @@ class TrendViewDiagram(ft.Container):
 
     def handle_update_chart(self):
         """更新图表数据"""
-        if not self.data_list or not self.ax_rpm or not self.ax_power:
-            return
+        try:
+            if not self.data_list or not self.ax_rpm or not self.ax_power:
+                return
 
-        # 清除旧数据
-        for ax in [self.ax_rpm, self.ax_power]:
-            # copy list to avoid iteration issues while removing
-            for line in list(ax.lines):
-                line.remove()
+            # 清除旧数据
+            for ax in [self.ax_rpm, self.ax_power]:
+                # copy list to avoid iteration issues while removing
+                for line in list(ax.lines):
+                    try:
+                        line.remove()
+                    except Exception:
+                        pass
 
-        # 获取新数据
-        date_times, rpm_data, power_data = self._process_data()
+            # 获取新数据
+            date_times, rpm_data, power_data = self._process_data()
 
-        # 绘制新曲线
-        self.ax_rpm.plot(date_times, rpm_data, color='blue')
-        self.ax_power.plot(date_times, power_data, color='red')
+            # 绘制新曲线
+            self.ax_rpm.plot(date_times, rpm_data, color='blue')
+            self.ax_power.plot(date_times, power_data, color='red')
 
-        # 自动调整范围
-        self.ax_rpm.relim()
-        self.ax_rpm.autoscale_view()
-        self.ax_power.relim()
-        self.ax_power.autoscale_view()
+            # 自动调整范围
+            self.ax_rpm.relim()
+            self.ax_rpm.autoscale_view()
+            self.ax_power.relim()
+            self.ax_power.autoscale_view()
+        except Exception:
+            logging.exception('exception occured at TrendViewDiagram.handle_update_chart')
 
     def _process_data(self):
         """处理原始数据"""
@@ -157,4 +169,8 @@ class TrendViewDiagram(ft.Container):
         return date_times, rpm_data, power_data
 
     def will_unmount(self):
-        plt.close('all')
+        try:
+            if self.fig is not None:
+                plt.close(self.fig)
+        except Exception:
+            logging.exception('exception closing figure at will_unmount')
