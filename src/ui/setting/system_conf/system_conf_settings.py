@@ -144,19 +144,24 @@ class SystemConfSettings(ft.Container):
             logging.exception('exception occured at SystemConfSettings.build')
 
     def __on_running_mode_change(self, e):
-        if self.sha_po_li and self.sha_po_li.page:
-            self.sha_po_li.value = e.data == 'slave'
-            self.sha_po_li.update()
+        try:
+            value = getattr(e.control, "value", None) if e is not None else None
 
-        if self.is_individual and self.is_individual.page:
-            self.is_individual.visible = e.data == 'master'
-            self.is_individual.value = e.data == 'slave'
-            self.is_individual.update()
+            if self.sha_po_li and self.sha_po_li.page:
+                self.sha_po_li.value = (value == 'slave')
+                self.sha_po_li.update()
 
-        if self.enable_gps and self.enable_gps.page:
-            self.enable_gps.visible = e.data == 'master'
-            self.enable_gps.value = False
-            self.enable_gps.update()
+            if self.is_individual and self.is_individual.page:
+                self.is_individual.visible = (value == 'master')
+                self.is_individual.value = (value == 'slave')
+                self.is_individual.update()
+
+            if self.enable_gps and self.enable_gps.page:
+                self.enable_gps.visible = (value == 'master')
+                self.enable_gps.value = False
+                self.enable_gps.update()
+        except:
+            logging.exception('exception occured at SystemConfSettings.__on_running_mode_change')
 
     def __get_unlimited_power(self) -> tuple[int, str]:
         _unlimited_power = gdata.configCommon.unlimited_power
@@ -219,7 +224,7 @@ class SystemConfSettings(ft.Container):
             self.sha_po_li.value = gdata.configCommon.shapoli
             self.display_propeller_curve.value = gdata.configCommon.show_propeller_curve
             self.chk_hide_admin_account.value = gdata.configCommon.hide_admin_account
-            self.amount_of_propeller_radios.value = gdata.configCommon.amount_of_propeller
+            self.amount_of_propeller_radios.value = str(gdata.configCommon.amount_of_propeller)
 
             unlimited_power_value, unlimited_power_unit = self.__get_unlimited_power()
             self.unlimited_power.value = unlimited_power_value
