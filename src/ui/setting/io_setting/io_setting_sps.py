@@ -89,7 +89,7 @@ class IOSettingSPS(ft.Container):
                     bgcolor=ft.Colors.GREEN,
                     color=ft.Colors.WHITE,
                     col={'sm': 4},
-                    visible=sps2_read_task.is_online == None or sps2_read_task == False,
+                    visible=(sps2_read_task.is_online is None) or (sps2_read_task.is_online is False),
                     style=ft.ButtonStyle(
                         shape=ft.RoundedRectangleBorder(radius=5)
                     ),
@@ -101,7 +101,7 @@ class IOSettingSPS(ft.Container):
                     bgcolor=ft.Colors.RED,
                     color=ft.Colors.WHITE,
                     col={'sm': 4},
-                    visible=sps2_read_task.is_online == True,
+                    visible=(sps2_read_task.is_online is True),
                     style=ft.ButtonStyle(
                         shape=ft.RoundedRectangleBorder(radius=5)
                     ),
@@ -241,7 +241,7 @@ class IOSettingSPS(ft.Container):
                 self.sps2_connect.disabled = True
                 self.sps2_connect.update()
 
-            asyncio.create_task(sps2_read_task.connect())
+            self.page.run_task(sps2_read_task.connect)
         except Exception as e:
             Toast.show_error(self.page, str(e))
 
@@ -333,13 +333,13 @@ class IOSettingSPS(ft.Container):
             if gdata.configCommon.is_twins:
                 if self.sps2_connect and self.sps2_connect.page:
                     self.sps2_connect.text = self.page.session.get("lang.setting.connect")
-                    self.sps2_connect.visible = sps2_read_task.is_online == None or sps2_read_task == False
+                    self.sps2_connect.visible = (sps2_read_task.is_online is None) or (sps2_read_task.is_online is False)
                     self.sps2_connect.bgcolor = ft.Colors.GREEN
                     self.sps2_connect.disabled = False
 
                 if self.sps2_disconnect and self.sps2_disconnect.page:
                     self.sps2_disconnect.text = self.page.session.get("lang.setting.disconnect")
-                    self.sps2_disconnect.visible = sps2_read_task.is_online == True
+                    self.sps2_disconnect.visible = (sps2_read_task.is_online is True)
                     self.sps2_disconnect.bgcolor = ft.Colors.RED
                     self.sps2_disconnect.disabled = False
         except:
