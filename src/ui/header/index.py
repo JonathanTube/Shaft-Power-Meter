@@ -96,7 +96,9 @@ class Header(ft.AppBar):
             logging.exception('exception occured at Header.build')
 
     def __on_exit(self, user):
-        asyncio.run(SystemExitTool.exit_app(self.page, user))
+        # avoid blocking with asyncio.run in UI code; schedule on UI loop
+        if self.page:
+            self.page.run_task(SystemExitTool.exit_app, self.page, user)
 
     def __stop_auto_testing(self, e):
         gdata.configTest.auto_testing = False

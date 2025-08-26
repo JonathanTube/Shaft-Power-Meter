@@ -126,10 +126,11 @@ class PropellerConf(ft.Container):
                 data = model_to_dict(settings)
                 del data['created_at']
                 del data['update_at']
-                asyncio.run(ws_server.send({
+                # schedule send on UI event loop instead of blocking asyncio.run
+                self.page.run_task(ws_server.send, {
                     'type': 'propeller_setting',
-                    "data": data
-                }))
+                    'data': data
+                })
                 Toast.show_success(self.page)
         except:
             logging.exception('exception occured at PropellerConf.__on_push')
