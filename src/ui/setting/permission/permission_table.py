@@ -27,8 +27,13 @@ class PermissionTable(AbstractTable):
         return await asyncio.to_thread(_query)
 
     def load_total(self):
-        # 这里保留同步接口给 AbstractTable 用
-        return asyncio.run(self.load_total_async())
+        # 直接同步查询，避免在 UI 线程中调用 asyncio.run
+        role = self.kwargs.get("role")
+        role = int(role) if role else -1
+        q = User.select(fn.COUNT(User.id)).where(User.user_role >= self.op_user.user_role)
+        if role != -1:
+            q = q.where(User.user_role == role)
+        return q.scalar() or 0
 
     async def load_data_async(self):
         role = self.kwargs.get("role")
@@ -47,7 +52,18 @@ class PermissionTable(AbstractTable):
         return await asyncio.to_thread(_query)
 
     def load_data(self):
-        return asyncio.run(self.load_data_async())
+        # 直接同步查询，避免在 UI 线程中调用 asyncio.run
+        role = self.kwargs.get("role")
+        role = int(role) if role else -1
+        q = User.select(
+            User.id,
+            User.user_name,
+            User.user_pwd,
+            User.user_role
+        ).where(User.user_role >= self.op_user.user_role).order_by(User.id.desc()).paginate(self.current_page, self.page_size)
+        if role != -1:
+            q = q.where(User.user_role == role)
+        return [[item.id, item.user_name, '******', self.__get_role_name(item.user_role)] for item in q]
 
     def __get_role_name(self, role: int):
         if role == 0:
