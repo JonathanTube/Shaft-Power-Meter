@@ -109,7 +109,7 @@ class AbstractTable(ft.Container):
                     # 判断字段个数是否和渲染的cells个数相同，不同直接不渲染
                     cells = self.__create_cells(items)
                     if (len(cells) != column_length):
-                        rows == []
+                        rows = []
                         break
 
                     rows.append(
