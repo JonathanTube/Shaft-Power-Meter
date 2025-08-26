@@ -241,7 +241,7 @@ class IOSettingSPS(ft.Container):
                 self.sps2_connect.disabled = True
                 self.sps2_connect.update()
 
-            asyncio.create_task(sps2_read_task.connect())
+            self.page.run_task(sps2_read_task.connect)
         except Exception as e:
             Toast.show_error(self.page, str(e))
 

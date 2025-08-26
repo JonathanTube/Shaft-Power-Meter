@@ -155,7 +155,10 @@ class PermissionTable(AbstractTable):
                 ),
                 actions=[
                     ft.TextButton(e.page.session.get("lang.button.cancel"), on_click=lambda e: e.page.close(self.edit_dialog)),
-                    ft.TextButton(e.page.session.get("lang.button.save"), on_click=lambda e: asyncio.create_task(self.__on_confirm_edit_async(e, items[0])))
+                    ft.TextButton(
+                        e.page.session.get("lang.button.save"),
+                        on_click=lambda e: e.page.run_task(self.__on_confirm_edit_async, e, items[0])
+                    )
                 ]
             )
             self.page.open(self.edit_dialog)
@@ -209,7 +212,10 @@ class PermissionTable(AbstractTable):
                 title=ft.Text(self.page.session.get("lang.permission.delete_user")),
                 actions=[
                     ft.TextButton(self.page.session.get("lang.button.cancel"), on_click=lambda e: e.page.close(self.del_dialog)),
-                    ft.TextButton(self.page.session.get("lang.button.confirm"), on_click=lambda e: asyncio.create_task(self.__on_delete_confirm_async(e, user_id)))
+                    ft.TextButton(
+                        self.page.session.get("lang.button.confirm"),
+                        on_click=lambda e: e.page.run_task(self.__on_delete_confirm_async, e, user_id)
+                    )
                 ]
             )
             self.page.open(self.del_dialog)
