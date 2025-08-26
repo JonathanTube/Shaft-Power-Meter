@@ -50,18 +50,23 @@ class GeneralPreference(ft.Container):
                     value=gdata.configPreference.fullscreen
                 )
 
+                options = [
+                    ft.DropdownOption(text="1s", key="1"),
+                    ft.DropdownOption(text="5s", key="5"),
+                    ft.DropdownOption(text="10s", key="10"),
+                    ft.DropdownOption(text="60s", key="60")
+                ]
+                current_value = str(gdata.configPreference.data_collection_seconds_range)
+                if current_value not in [opt.key for opt in options]:
+                    current_value = options[0].key if options else None
+
                 self.data_collection_seconds_range = ft.Dropdown(
                     label=s.get("lang.setting.data_collection_seconds_range"),
                     col={"md": 6},
                     expand=True,
                     width=200,
-                    value=gdata.configPreference.data_collection_seconds_range,
-                    options=[
-                        ft.DropdownOption(text="1s", key="1"),
-                        ft.DropdownOption(text="5s", key="5"),
-                        ft.DropdownOption(text="10s", key="10"),
-                        ft.DropdownOption(text="60s", key="60")
-                    ]
+                    value=current_value,
+                    options=options
                 )
 
                 self.custom_card = CustomCard(
