@@ -19,15 +19,15 @@ class GeneralPreference(ft.Container):
             if self.page and self.page.session:
                 s = self.page.session
                 self.theme_label = ft.Text(s.get("lang.setting.theme"))
-                self.theme_light = ft.Radio(value=0, label=s.get("lang.setting.theme.light"))
-                self.theme_dark = ft.Radio(value=1, label=s.get("lang.setting.theme.dark"))
+                self.theme_light = ft.Radio(value="0", label=s.get("lang.setting.theme.light"))
+                self.theme_dark = ft.Radio(value="1", label=s.get("lang.setting.theme.dark"))
 
                 self.language_label = ft.Text(s.get("lang.setting.language"))
                 self.system_unit_label = ft.Text(s.get("lang.setting.unit"))
 
                 self.default_theme = ft.RadioGroup(
                     content=ft.Row([self.theme_light, self.theme_dark]),
-                    value=gdata.configPreference.theme
+                    value=str(gdata.configPreference.theme)
                 )
 
                 self.system_unit_si = ft.Radio(value="0", label=s.get("lang.setting.unit.si"))
