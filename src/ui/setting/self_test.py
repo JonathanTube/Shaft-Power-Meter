@@ -52,13 +52,16 @@ class SelfTest(ft.Tabs):
                 self.tab_hmi_server = ft.Tab(text="HMI Server", content=self.hmi_server_log, visible=not gdata.configCommon.is_master)
                 self.tab_gps = ft.Tab(text="GPS", content=self.gps_log, visible=gdata.configCommon.enable_gps)
                 self.tab_plc = ft.Tab(text="PLC", content=self.plc_log, visible=gdata.configIO.plc_enabled)
-                self.tabs = [
-                    self.tab_sps,
-                    self.tab_sps2,
-                    self.tab_hmi_server,
-                    self.tab_gps,
-                    self.tab_plc
-                ]
+                # Build list and clamp selected_index to visible tabs
+                tabs_all = [self.tab_sps, self.tab_sps2, self.tab_hmi_server, self.tab_gps, self.tab_plc]
+                visible_tabs = [t for t in tabs_all if t.visible]
+                self.tabs = visible_tabs if visible_tabs else tabs_all
+                try:
+                    if hasattr(self, "selected_index"):
+                        max_idx = max(0, len(self.tabs) - 1)
+                        self.selected_index = min(getattr(self, "selected_index", 0) or 0, max_idx)
+                except Exception:
+                    logging.exception('exception occured clamping SelfTest.selected_index')
         except:
             logging.exception('exception occured at SelfTest.build')
 
