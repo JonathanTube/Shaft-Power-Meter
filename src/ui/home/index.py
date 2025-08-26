@@ -116,6 +116,10 @@ class Home(ft.Container):
         if self.is_switching:
             return
 
+        # prevent selecting hidden propeller tab when not visible
+        if index == 3 and not gdata.configCommon.show_propeller_curve:
+            return
+
         if self.current_index == index:
             return
 
@@ -174,7 +178,9 @@ class Home(ft.Container):
             try:
                 logging.info(f'&&&&&&&&&&&&&&-home.test_auto_run, idx={idx}')
                 idx += 1
-                self.__on_click(int(random() * 10) % 7)
+                allowed = [0, 1, 2, 4, 5, 6] if not gdata.configCommon.show_propeller_curve else [0, 1, 2, 3, 4, 5, 6]
+                pick = allowed[int(random() * 10) % len(allowed)]
+                self.__on_click(pick)
             except:
                 return
             await asyncio.sleep(random())
