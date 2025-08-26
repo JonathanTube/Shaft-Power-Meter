@@ -89,6 +89,27 @@ class SelfTest(ft.Tabs):
         if self.tab_plc:
             self.tab_plc.visible = gdata.configIO.plc_enabled
 
+        # Recompute visible tabs and clamp selected_index defensively
+        try:
+            tabs_all = [t for t in [self.tab_sps, self.tab_sps2, self.tab_hmi_server, self.tab_gps, self.tab_plc] if t is not None]
+            visible_tabs = [t for t in tabs_all if t.visible]
+            new_tabs = visible_tabs if len(visible_tabs) > 0 else tabs_all
+
+            # Update tabs list only if changed in length or membership
+            if hasattr(self, "tabs") and (len(self.tabs) != len(new_tabs) or any(a is not b for a, b in zip(self.tabs, new_tabs))):
+                self.tabs = new_tabs
+
+            # Clamp selected index
+            max_idx = max(0, len(new_tabs) - 1)
+            cur_idx = getattr(self, "selected_index", 0) or 0
+            if cur_idx < 0:
+                cur_idx = 0
+            if cur_idx > max_idx:
+                cur_idx = max_idx
+            self.selected_index = cur_idx
+        except Exception:
+            logging.exception('exception occured clamping SelfTest.before_update selected_index')
+
     def did_mount(self):
         self.task_running = True
 
