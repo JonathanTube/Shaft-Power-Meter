@@ -89,8 +89,8 @@ class TestModeTask:
         await plc.write_eexi_breach_alarm(False)
         gdata.configCommon.is_eexi_breaching = None
         # 重置counter
-        gdata.configCounterSPS.set_default_value()
-        gdata.configCounterSPS2.set_default_value()
+        gdata.configCounterSPS.reset_total()
+        gdata.configCounterSPS2.reset_total()
         # 重置alarm
         gdata.configAlarm.set_default_value()
         # 重置event
