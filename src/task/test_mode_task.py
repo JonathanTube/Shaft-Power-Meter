@@ -28,19 +28,19 @@ class TestModeTask:
         """设置扭矩范围"""
         self.min_torque = min_val
         self.max_torque = max_val
-        logging.info(f"[TestMode] 扭矩范围已设置: {min_val} ~ {max_val}")
+        # logging.info(f"[TestMode] 扭矩范围已设置: {min_val} ~ {max_val}")
 
     def set_speed_range(self, min_val: float, max_val: float):
         """设置转速范围"""
         self.min_speed = min_val
         self.max_speed = max_val
-        logging.info(f"[TestMode] 转速范围已设置: {min_val} ~ {max_val}")
+        # logging.info(f"[TestMode] 转速范围已设置: {min_val} ~ {max_val}")
 
     def set_thrust_range(self, min_val: float, max_val: float):
         """设置推力范围"""
         self.min_thrust = min_val
         self.max_thrust = max_val
-        logging.info(f"[TestMode] 推力范围已设置: {min_val} ~ {max_val}")
+        # logging.info(f"[TestMode] 推力范围已设置: {min_val} ~ {max_val}")
 
     # ===================== 运行控制 =====================
     async def start(self):
@@ -89,6 +89,8 @@ class TestModeTask:
         # counter是唯一需要初始化的
         gdata.configCounterSPS.set_default_value()
         gdata.configCounterSPS2.set_default_value()
+        # 清理alarm
+        # gdata.configAlarm.set_default_value()
 
     async def _generate_random_data(self):
         """后台任务：按范围生成随机数据（异步）"""

@@ -23,7 +23,7 @@ class PlcSyncTask:
     def __init__(self):
         self._lock = asyncio.Lock()  # 连接锁，防止并发连接
         self.plc_client: Optional[AsyncModbusTcpClient] = None
-        self.is_online = False       # 仅表示 TCP 连接是否建立
+        self.is_online = None       # 仅表示 TCP 连接是否建立
         self.is_canceled = False
         self.is_connecting = False  # 是否正在重连
 
@@ -315,6 +315,9 @@ class PlcSyncTask:
     # ---------------- 报警状态（仅反映连接本身） ----------------
 
     async def set_online(self):
+        if self.is_online == True:
+            return
+
         self.is_online = True
         await asyncio.to_thread(AlarmLog.update(
             recovery_time=gdata.configDateTime.utc,
@@ -323,7 +326,11 @@ class PlcSyncTask:
         gdata.configAlarm.set_default_value()
 
     async def set_offline(self):
+        if self.is_online == False:
+            return
+
         self.is_online = False
+
         await asyncio.to_thread(
             AlarmLog.create,
             alarm_uuid=uuid.uuid4().hex,
