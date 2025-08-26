@@ -219,7 +219,7 @@ class SystemConfSettings(ft.Container):
             self.sha_po_li.value = gdata.configCommon.shapoli
             self.display_propeller_curve.value = gdata.configCommon.show_propeller_curve
             self.chk_hide_admin_account.value = gdata.configCommon.hide_admin_account
-            self.amount_of_propeller_radios.value = gdata.configCommon.amount_of_propeller
+            self.amount_of_propeller_radios.value = str(gdata.configCommon.amount_of_propeller)
 
             unlimited_power_value, unlimited_power_unit = self.__get_unlimited_power()
             self.unlimited_power.value = unlimited_power_value
