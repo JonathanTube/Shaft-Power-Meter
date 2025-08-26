@@ -89,11 +89,11 @@ class TestModeRange(ft.Container):
             max_torque_value, max_torque_unit = self.__get_torque_and_unit(e.control.end_value)
 
             if self.start_torque_text and self.start_torque_text.page:
-                self.start_torque_text.value = f'{self.page.session.get('lang.setting.test_mode.min_torque')}: {min_torque_value} {min_torque_unit}'
+                self.start_torque_text.value = f"{self.page.session.get('lang.setting.test_mode.min_torque')}: {min_torque_value} {min_torque_unit}"
                 self.start_torque_text.update()
 
             if self.end_torque_text and self.end_torque_text.page:
-                self.end_torque_text.value = f'{self.page.session.get('lang.setting.test_mode.max_torque')}: {max_torque_value} {max_torque_unit}'
+                self.end_torque_text.value = f"{self.page.session.get('lang.setting.test_mode.max_torque')}: {max_torque_value} {max_torque_unit}"
                 self.end_torque_text.update()
 
             self.__save_data()
@@ -107,11 +107,11 @@ class TestModeRange(ft.Container):
             end_speed_percentage = round(e.control.end_value * 100 / gdata.configPropperCurve.speed_of_mcr, 2)
 
             if self.start_speed_text and self.start_speed_text.page:
-                self.start_speed_text.value = f'{self.page.session.get('lang.setting.test_mode.min_speed')}: {int(e.control.start_value)} rpm, {start_speed_percentage}% MCR'
+                self.start_speed_text.value = f"{self.page.session.get('lang.setting.test_mode.min_speed')}: {int(e.control.start_value)} rpm, {start_speed_percentage}% MCR"
                 self.start_speed_text.update()
 
             if self.end_speed_text and self.end_speed_text.page:
-                self.end_speed_text.value = f'{self.page.session.get('lang.setting.test_mode.max_speed')}: {int(e.control.end_value)} rpm, {end_speed_percentage}% MCR'
+                self.end_speed_text.value = f"{self.page.session.get('lang.setting.test_mode.max_speed')}: {int(e.control.end_value)} rpm, {end_speed_percentage}% MCR"
                 self.end_speed_text.update()
 
             self.__save_data()
@@ -125,11 +125,11 @@ class TestModeRange(ft.Container):
             max_thrust_value, max_thrust_unit = self.__get_thrust_and_unit(e.control.end_value)
 
             if self.start_thrust_text and self.start_thrust_text.page:
-                self.start_thrust_text.value = f'{self.page.session.get('lang.setting.test_mode.min_thrust')}: {min_thrust_value} {min_thrust_unit}'
+                self.start_thrust_text.value = f"{self.page.session.get('lang.setting.test_mode.min_thrust')}: {min_thrust_value} {min_thrust_unit}"
                 self.start_thrust_text.update()
 
             if self.end_thrust_text and self.end_thrust_text.page:
-                self.end_thrust_text.value = f'{self.page.session.get('lang.setting.test_mode.max_thrust')}: {max_thrust_value} {max_thrust_unit}'
+                self.end_thrust_text.value = f"{self.page.session.get('lang.setting.test_mode.max_thrust')}: {max_thrust_value} {max_thrust_unit}"
                 self.end_thrust_text.update()
 
             self.__save_data()
