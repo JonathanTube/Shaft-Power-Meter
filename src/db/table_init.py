@@ -1,4 +1,5 @@
 import logging
+from common.const_alarm_type import AlarmType
 from db.models.breach_reason import BreachReason
 from db.models.counter_log import CounterLog
 from db.models.data_log import DataLog
@@ -61,7 +62,7 @@ class TableInit:
     @staticmethod
     def cleanup():
         try:
-            AlarmLog.truncate_table()
+            AlarmLog.delete(AlarmLog.alarm_type == AlarmType.POWER_OVERLOAD).execute()
             CounterLog.truncate_table()
             DataLog.truncate_table()
             DateTimeConf.truncate_table()
