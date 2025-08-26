@@ -30,7 +30,7 @@ class EventForm(ft.AlertDialog):
             self.title = ft.Text(self.page.session.get("lang.log.event_log"))
 
             options = [ft.dropdown.Option(key=reason.id, text=reason.reason) for reason in self.breach_reasons]
-            default_value = self.event_log.breach_reason if self.event_log else None
+            default_value = (self.event_log.breach_reason.id if (self.event_log and self.event_log.breach_reason) else None)
             if default_value not in [opt.key for opt in options]:
                 default_value = options[0].key if options else None
 
