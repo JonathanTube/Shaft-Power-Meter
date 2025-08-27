@@ -73,7 +73,7 @@ class AbstractTable(ft.Container):
         cells = []
         try:
             for item in items:
-                cells.append(ft.DataCell(ft.Text(item), data=item, on_double_tap=lambda e, content=item: self.__on_double_tap(e, content)))
+                cells.append(ft.DataCell(ft.Text(item), data=item, on_double_tap=lambda e: self.__on_double_tap(e, item)))
             if self.has_operations():
                 cells.append(ft.DataCell(self.create_operations(items), data=items))
         except:
