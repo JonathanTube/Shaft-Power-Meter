@@ -11,12 +11,11 @@ class HeaderLogo(ft.Container):
 
     def get_src(self):
         try:
-            # Get absolute path to ensure reliability
-            base_dir = Path(__file__).parent.parent.parent
+            # Always return web-served assets path (works in dev and packaged web)
             if self.page is not None and self.page.theme_mode == ft.ThemeMode.LIGHT:
-                return os.path.join(base_dir, "assets", "logo_dark.png")
+                return "assets/logo_dark.png"
             else:
-                return os.path.join(base_dir, "assets", "logo_light.png")
+                return "assets/logo_light.png"
         except:
             logging.exception('exception occured at HeaderLogo.get_src')
 
