@@ -4,6 +4,13 @@ import sys
 import logging
 import ui_safety
 import flet as ft
+import os
+# Ensure stderr/stdout exist in no-console environments (e.g., packaged GUI)
+if sys.stderr is None:
+    sys.stderr = open(os.devnull, "w")
+if sys.stdout is None:
+    sys.stdout = open(os.devnull, "w")
+
 from ui.common.fullscreen_alert import FullscreenAlert
 from ui.common.keyboard import keyboard
 from ui.header.index import Header
