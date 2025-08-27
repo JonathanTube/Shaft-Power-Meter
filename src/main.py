@@ -176,8 +176,12 @@ async def main(page: ft.Page):
     page.overlay.append(keyboard)
 
     def handle_error(e: ft.ControlEvent):
-        print(e)
-        logging.info(e)
+        msg = getattr(e, "data", None) or str(e)
+        logging.error("[Frontend Error] %s", msg)
+        try:
+            page.open(ft.SnackBar(ft.Text(f"⚠ 前端错误: {msg}")))
+        except Exception:
+            logging.exception("failed to show snackbar for frontend error")
 
     try:
         page.on_error = handle_error

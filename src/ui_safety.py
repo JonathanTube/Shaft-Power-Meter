@@ -142,8 +142,22 @@ _consumer_thread.start()
 def _global_on_event(e: ft.ControlEvent, page: Optional[ft.Page] = None):
     try:
         if getattr(e, "name", None) == "error":
-            err = str(getattr(e, "data", ""))
-            logging.error("Received Flutter error event: %r", err)
+            raw_data = getattr(e, "data", None)
+            err = str(raw_data)
+            # Log full event details to aid diagnosis
+            try:
+                logging.error("Received Flutter error event: name=%r, data=%r, attrs=%r", getattr(e, "name", None), raw_data, getattr(e, "__dict__", {}))
+            except Exception:
+                logging.exception("failed to log full flutter error event")
+
+            # Try to decode JSON payloads if any
+            if isinstance(raw_data, str) and raw_data and raw_data.strip().startswith("{"):
+                try:
+                    import json  # local import to avoid overhead when not needed
+                    parsed = json.loads(raw_data)
+                    logging.error("[Flutter Error JSON] %s", parsed)
+                except Exception:
+                    pass
 
             with _error_lock:
                 now = _now()
@@ -161,6 +175,10 @@ def _global_on_event(e: ft.ControlEvent, page: Optional[ft.Page] = None):
                     return
             # normal flow - log once
             logging.error("[Flutter Error] %s", err)
+
+            # Provide hint when Dart types are minified
+            if isinstance(err, str) and "minified:" in err:
+                logging.warning("Flutter error appears minified. For clearer messages, run an unminified/web-debug build.")
     except Exception:
         logging.exception("exception in global on_event")
 
