@@ -45,7 +45,7 @@ class Logger:
 
         # 根日志器使用队列处理器
         queue_handler = QueueHandler(self.log_queue)
-        logging.basicConfig(level=logging.DEBUG, handlers=[queue_handler])
+        logging.basicConfig(level=logging.INFO, handlers=[queue_handler])
 
         # SQL 日志（peewee）
         if show_sql:
