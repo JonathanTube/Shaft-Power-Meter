@@ -1,9 +1,9 @@
 import logging
 import flet as ft
-import io
-import base64
+import matplotlib.backends.backend_svg
 from matplotlib import pyplot as plt
 from db.models.data_log import DataLog
+from flet.matplotlib_chart import MatplotlibChart
 from matplotlib import dates as mdates
 from utils.unit_converter import UnitConverter
 from typing import List
@@ -23,7 +23,7 @@ class TrendViewDiagram(ft.Container):
         self.fig = None
         self.ax_rpm = None
         self.ax_power = None
-        self.image = None  # use PNG image to avoid inline SVG issues
+        self.chart = None
 
     def did_mount(self):
         # Ensure chart is created when control is mounted
@@ -31,25 +31,19 @@ class TrendViewDiagram(ft.Container):
 
     def before_update(self):
         try:
-            # 清除当前图形缓存（仅关闭自身图形，避免影响其他图表）
-            if self.fig is not None:
-                try:
-                    plt.close(self.fig)
-                except Exception:
-                    logging.exception('exception closing previous figure')
-                finally:
-                    self.fig = None
+            # 清除当前图形缓存
+            plt.close('all')
             # 重新应用样式
             self.set_style()
             # 重建图表对象
-            view = self.create_chart()
-            if view is not None:
+            self.chart = self.create_chart()
+            if self.chart:
                 # 替换容器内容
-                self.content = view
+                self.content = self.chart
         except:
             logging.exception('exception occured at TrendViewDiagram.before_update')
 
-    def create_chart(self):
+    def create_chart(self) -> MatplotlibChart:
         try:
             self.set_style()
             """创建初始图表结构"""
@@ -60,10 +54,7 @@ class TrendViewDiagram(ft.Container):
             self._configure_axes()
             self._setup_power_axis()
             self.handle_update_chart()
-            if self.image is None:
-                self.image = ft.Image(expand=True, fit=ft.ImageFit.CONTAIN)
-            self._refresh_png()
-            return self.image
+            return MatplotlibChart(self.fig, isolated=True, expand=True, transparent=True)
         except:
             logging.exception("exception occured at TrendViewDiagram.create_chart")
             return None
@@ -126,35 +117,27 @@ class TrendViewDiagram(ft.Container):
 
     def handle_update_chart(self):
         """更新图表数据"""
-        try:
-            if not self.data_list or not self.ax_rpm or not self.ax_power:
-                return
+        if not self.data_list or not self.ax_rpm or not self.ax_power:
+            return
 
-            # 清除旧数据
-            for ax in [self.ax_rpm, self.ax_power]:
-                # copy list to avoid iteration issues while removing
-                for line in list(ax.lines):
-                    try:
-                        line.remove()
-                    except Exception:
-                        pass
+        # 清除旧数据
+        for ax in [self.ax_rpm, self.ax_power]:
+            # copy list to avoid iteration issues while removing
+            for line in list(ax.lines):
+                line.remove()
 
-            # 获取新数据
-            date_times, rpm_data, power_data = self._process_data()
+        # 获取新数据
+        date_times, rpm_data, power_data = self._process_data()
 
-            # 绘制新曲线
-            self.ax_rpm.plot(date_times, rpm_data, color='blue')
-            self.ax_power.plot(date_times, power_data, color='red')
+        # 绘制新曲线
+        self.ax_rpm.plot(date_times, rpm_data, color='blue')
+        self.ax_power.plot(date_times, power_data, color='red')
 
-            # 自动调整范围
-            self.ax_rpm.relim()
-            self.ax_rpm.autoscale_view()
-            self.ax_power.relim()
-            self.ax_power.autoscale_view()
-            # re-render PNG and update image
-            self._refresh_png()
-        except Exception:
-            logging.exception('exception occured at TrendViewDiagram.handle_update_chart')
+        # 自动调整范围
+        self.ax_rpm.relim()
+        self.ax_rpm.autoscale_view()
+        self.ax_power.relim()
+        self.ax_power.autoscale_view()
 
     def _process_data(self):
         """处理原始数据"""
@@ -174,22 +157,4 @@ class TrendViewDiagram(ft.Container):
         return date_times, rpm_data, power_data
 
     def will_unmount(self):
-        try:
-            if self.fig is not None:
-                plt.close(self.fig)
-            self.image = None
-        except Exception:
-            logging.exception('exception closing figure at will_unmount')
-
-    def _refresh_png(self):
-        try:
-            if self.fig is None or self.image is None:
-                return
-            buf = io.BytesIO()
-            self.fig.savefig(buf, format="png", bbox_inches="tight", dpi=120)
-            b64 = base64.b64encode(buf.getvalue()).decode()
-            self.image.src_base64 = b64
-            if self.image.page:
-                self.image.update()
-        except Exception:
-            logging.exception('exception occured at TrendViewDiagram._refresh_png')
+        plt.close('all')
