@@ -8,7 +8,6 @@ from typing import Literal
 from peewee import fn
 from common.global_data import gdata
 from utils.datetime_util import DateTimeUtil
-import ui_safety
 import asyncio
 
 
@@ -86,8 +85,7 @@ class TrendView(ft.Container):
         data_logs = await asyncio.to_thread(self.query_data, name)
         chart = self.sps_chart if name == "sps" else getattr(self, "sps2_chart", None)
         # Ensure UI updates happen on UI thread
-        if self.page and chart:
-            ui_safety.safe_invoke_on_page(self.page, self._apply_chart_update, chart, data_logs)
+        self._apply_chart_update(chart, data_logs)
 
     def query_data(self, name: Literal['sps', 'sps2']):
         try:

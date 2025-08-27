@@ -2,7 +2,6 @@ import asyncio
 import ctypes
 import sys
 import logging
-import ui_safety
 import flet as ft
 from ui.common.fullscreen_alert import FullscreenAlert
 from ui.common.keyboard import keyboard
@@ -29,6 +28,12 @@ from websocket.websocket_slave import ws_client
 from websocket.websocket_master import ws_server
 from task.data_record_task import data_record_task
 from task.data_cleanup_task import data_cleanup_task
+import os
+# Ensure stderr/stdout exist in no-console environments (e.g., packaged GUI)
+if sys.stderr is None:
+    sys.stderr = open(os.devnull, "w")
+if sys.stdout is None:
+    sys.stdout = open(os.devnull, "w")
 
 Logger(show_sql=False)
 add_to_startup()
@@ -156,8 +161,6 @@ async def main_async_setup(page: ft.Page):
 
 
 async def main(page: ft.Page):
-    ui_safety.init_ui_safety(page)
-
     page.overlay.append(keyboard)
 
     def handle_error(e: ft.ControlEvent):
