@@ -195,6 +195,9 @@ class PlcSyncTask:
 
     async def write_common_alarm(self, occured: bool):
         """写入报警状态"""
+        if self.is_online is False or self.is_online is None:
+            return
+
         logging.info(f'[PLC] 写入公共报警状态={occured}')
         if not self.is_connected():
             return
