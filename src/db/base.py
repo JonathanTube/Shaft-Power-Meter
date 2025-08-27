@@ -3,15 +3,17 @@ import sys
 from peewee import SqliteDatabase, DateTimeField, Model, IntegerField
 from datetime import datetime
 
-# Get the absolute path to the project root directory
-# PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
- # 如果是打包环境（PyInstaller临时目录）
+# 选择可写的数据库目录
 if getattr(sys, 'frozen', False):
-    PROJECT_ROOT = sys._MEIPASS  # PyInstaller解压目录
+    # 打包环境：使用可写的可执行文件所在目录下的 data 子目录
+    exe_dir = os.path.dirname(sys.executable)
+    data_dir = os.path.join(exe_dir, 'data')
+    os.makedirs(data_dir, exist_ok=True)
+    DB_PATH = os.path.join(data_dir, '988bbc4fc383')
 else:
-    PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))  # 本地开发目录
-    
-DB_PATH = os.path.join(PROJECT_ROOT, '988bbc4fc383')
+    # 本地开发：使用当前文件所在目录
+    project_root = os.path.dirname(os.path.abspath(__file__))
+    DB_PATH = os.path.join(project_root, '988bbc4fc383')
 
 db = SqliteDatabase(DB_PATH)
 
