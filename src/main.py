@@ -124,21 +124,6 @@ async def start_all_tasks():
     # 数据记录
     await data_record_task.start()
 
-    # eexi breach 判断
-    if gdata.configCommon.shapoli:
-        await eexi_breach_task.start()
-
-    # Modbus 输出
-    await modbus_output.start()
-
-    # GPS
-    if gdata.configCommon.enable_gps:
-        await gps.start()
-
-    # PLC
-    if gdata.configCommon.is_master and gdata.configIO.plc_enabled:
-        await plc.connect()
-
     # SPS 读取
     if gdata.configCommon.is_master:
         await sps_read_task.start()
@@ -151,6 +136,21 @@ async def start_all_tasks():
         await ws_server.start()
     else:
         await ws_client.start()
+
+    # GPS
+    if gdata.configCommon.enable_gps:
+        await gps.start()
+
+    # PLC
+    if gdata.configCommon.is_master and gdata.configIO.plc_enabled:
+        await plc.connect()
+
+    # eexi breach 判断
+    if gdata.configCommon.shapoli:
+        await eexi_breach_task.start()
+
+    # Modbus 输出
+    await modbus_output.start()
 
 
 async def main_async_setup(page: ft.Page):
