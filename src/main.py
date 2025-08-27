@@ -3,6 +3,13 @@ import ctypes
 import sys
 import logging
 import flet as ft
+import os
+# Ensure stderr/stdout exist in no-console environments (e.g., packaged GUI)
+if sys.stderr is None:
+    sys.stderr = open(os.devnull, "w")
+if sys.stdout is None:
+    sys.stdout = open(os.devnull, "w")
+
 from ui.common.fullscreen_alert import FullscreenAlert
 from ui.common.keyboard import keyboard
 from ui.header.index import Header
@@ -176,6 +183,16 @@ async def main(page: ft.Page):
 if __name__ == "__main__":
     try:
         check_single_instance()
-        ft.app(target=main, view=ft.AppView.WEB_BROWSER, host='localhost', port=80)
+        # Start system tray for quick access and exit control
+        try:
+            from utils.systray import start_tray
+            # Use non-admin port for web
+            port = 3000
+            url = f"http://127.0.0.1:{port}"
+            start_tray("Shaft Power Meter", url, icon_rel_path='assets/icon.png')
+        except Exception:
+            logging.warning("failed to start tray icon", exc_info=True)
+
+        ft.app(target=main, view=ft.AppView.WEB_BROWSER, host='127.0.0.1', port=3000)
     except Exception:
         logging.exception("fatal")
