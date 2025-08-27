@@ -188,6 +188,6 @@ async def main(page: ft.Page):
 if __name__ == "__main__":
     try:
         check_single_instance()
-        ft.app(target=main)
+        ft.app(target=main, view=ft.AppView.WEB_BROWSER)
     except Exception:
         logging.exception("fatal")
