@@ -86,6 +86,11 @@ class SystemExitTool:
             # 关闭test mode
             SystemExitTool._safe_schedule_stop(test_mode_task.stop())
 
+            try:
+                await asyncio.sleep(3)
+            except:
+                pass
+
             logging.info('关闭所有外部资源连接')
         except:
             logging.exception('exception occured at Header.__exit_app')
