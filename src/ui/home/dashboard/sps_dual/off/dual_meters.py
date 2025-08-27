@@ -17,10 +17,10 @@ class DualMeters(ft.Container):
 
     def get_radius(self, radio):
         try:
-            if self.page is None or self.page.window is None:
+            if self.page is None:
                 return 0
 
-            radius = self.page.window.height * radio
+            radius = self.page.height * radio
             return radius * 0.62
         except:
             logging.exception('exception occured at DualMeters.get_radius')

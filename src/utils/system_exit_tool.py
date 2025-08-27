@@ -95,11 +95,6 @@ class SystemExitTool:
         except:
             logging.exception('exception occured at Header.__exit_app')
         finally:
-            try:
-                page.window.destroy()
-            except:
-                pass
-
             # 给0.5秒时间让协程清理
             try:
                 await asyncio.sleep(0.5)

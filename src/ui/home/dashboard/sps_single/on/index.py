@@ -16,8 +16,8 @@ class SingleShaPoLiOn(ft.Container):
 
     def build(self):
         try:
-            w = self.page.window.width * 0.5
-            h = self.page.window.height * 0.5
+            w = self.page.width * 0.5
+            h = self.page.height * 0.5
 
             self.eexi_limited_power = EEXILimitedPower(w, h)
             self.instant_value_grid = SingleInstantGrid(w, h)

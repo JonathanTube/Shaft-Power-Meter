@@ -29,7 +29,7 @@ class CounterDisplay(ft.Container):
         try:
             if self.page is None or self.page.session is None:
                 return
-                
+
             self.total_energy_value = self.__create_value()
             self.total_energy_label = self.__create_label(self.page.session.get('lang.counter.total_energy'))
             self.total_energy_unit = self.__create_unit('kWh')
@@ -104,16 +104,16 @@ class CounterDisplay(ft.Container):
 
     def build(self):
         try:
-            if self.page is None or self.page.window is None:
+            if self.page is None:
                 return
-            
+
             self.__create_total_energy()
             self.__create_average_power()
             self.__create_average_speed()
 
             self.content = ft.Column(
                 expand=True,
-                spacing=0 if self.page.window.height <= 600 else 10,
+                spacing=10,
                 controls=[
                     self.total_energy,
                     self.average_power,
@@ -129,14 +129,13 @@ class CounterDisplay(ft.Container):
             if self.total_energy_value is not None:
                 self.total_energy_value.value = value_and_unit[0]
 
-            if self.total_energy_unit is not None:    
+            if self.total_energy_unit is not None:
                 self.total_energy_unit.value = value_and_unit[1]
-            
+
             if self.total_energy and self.total_energy.page:
                 self.total_energy.update()
         except:
             logging.exception('exception occured at CounterDisplay.set_total_energy')
-
 
     def set_average_power(self, average_power: float = 0, system_unit: int = 0):
         try:
@@ -144,9 +143,9 @@ class CounterDisplay(ft.Container):
             if self.average_power_value is not None:
                 self.average_power_value.value = value_and_unit[0]
 
-            if self.average_power_unit is not None:    
+            if self.average_power_unit is not None:
                 self.average_power_unit.value = value_and_unit[1]
-            
+
             if self.average_power and self.average_power.page:
                 self.average_power.update()
         except:
@@ -158,9 +157,9 @@ class CounterDisplay(ft.Container):
             if self.average_speed_value is not None:
                 self.average_speed_value.value = value_and_unit[0]
 
-            if self.average_speed_unit is not None:    
+            if self.average_speed_unit is not None:
                 self.average_speed_unit.value = value_and_unit[1]
-            
+
             if self.average_speed and self.average_speed.page:
                 self.average_speed.update()
         except:

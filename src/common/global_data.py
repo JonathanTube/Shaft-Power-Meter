@@ -84,7 +84,6 @@ class ConfigAlarm:
 @dataclass
 class ConfigPreference:
     theme = 0
-    fullscreen = True
     system_unit = 0
     language = 0
     data_collection_seconds_range = 2
@@ -92,7 +91,6 @@ class ConfigPreference:
     def set_default_value(self):
         preference: Preference = Preference.get()
         self.theme = preference.theme
-        self.fullscreen = preference.fullscreen
         self.system_unit = preference.system_unit
         self.language = preference.language
         self.data_collection_seconds_range = preference.data_collection_seconds_range

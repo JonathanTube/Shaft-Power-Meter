@@ -57,21 +57,6 @@ def set_appearance(page: ft.Page):
     page.title = page.session.get("lang.common.app_name")
     page.padding = 0
     page.theme_mode = ft.ThemeMode.LIGHT if gdata.configPreference.theme == 0 else ft.ThemeMode.DARK
-    page.window.resizable = False
-    page.window.frameless = True
-    page.window.left = 0
-    page.window.top = 0
-    if page.window.width <= 1200:
-        if gdata.configPreference.fullscreen:
-            page.window.full_screen = True
-        else:
-            page.window.maximized = True
-    else:
-        page.window.maximizable = False
-        page.window.width = 1024
-        page.window.height = 800
-        page.window.resizable = False
-    page.window.prevent_close = True
 
 
 def set_content(page: ft.Page):
@@ -188,6 +173,6 @@ async def main(page: ft.Page):
 if __name__ == "__main__":
     try:
         check_single_instance()
-        ft.app(target=main, view=ft.AppView.WEB_BROWSER)
+        ft.app(target=main, view=ft.AppView.WEB_BROWSER, host='localhost', port=80)
     except Exception:
         logging.exception("fatal")

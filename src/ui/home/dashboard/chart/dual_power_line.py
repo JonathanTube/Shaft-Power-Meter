@@ -36,13 +36,8 @@ class DualPowerLine(ft.Container):
             left_max = math.ceil(power_and_unit[0])
             left_unit = power_and_unit[1]
 
-            width = 1000
-
-            if self.page and self.page.window:
-                width = self.page.window.width - 80
-
             self.chart = ft.LineChart(
-                width=width,
+                width=1000,
                 expand=True,
                 border=ft.Border(left=border, bottom=border),
                 max_y=left_max,

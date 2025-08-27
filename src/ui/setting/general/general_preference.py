@@ -44,12 +44,6 @@ class GeneralPreference(ft.Container):
                     value=str(gdata.configPreference.language)
                 )
 
-                self.fullscreen = ft.Checkbox(
-                    col={"md": 6}, label=self.page.session.get("lang.setting.fullscreen"),
-                    label_position=ft.LabelPosition.LEFT,
-                    value=gdata.configPreference.fullscreen
-                )
-
                 options = [
                     ft.DropdownOption(text="1s", key="1"),
                     ft.DropdownOption(text="5s", key="5"),
@@ -75,7 +69,6 @@ class GeneralPreference(ft.Container):
                         ft.Row(controls=[self.theme_label, self.default_theme], col={"md": 6}),
                         ft.Row(controls=[self.language_label, self.language], col={"md": 6}),
                         ft.Row(controls=[self.system_unit_label, self.system_unit], col={"md": 6}),
-                        self.fullscreen,
                         self.data_collection_seconds_range
                     ]),
                     col={"xs": 12})
@@ -101,7 +94,6 @@ class GeneralPreference(ft.Container):
                 self.system_unit_metric.label = s.get("lang.setting.unit.metric")
 
                 # 更新其他设置
-                self.fullscreen.label = s.get("lang.setting.fullscreen")
                 self.data_collection_seconds_range.label = s.get("lang.setting.data_collection_seconds_range")
                 # 确保更新界面
                 self.custom_card.set_title(s.get("lang.setting.preference"))
@@ -118,21 +110,17 @@ class GeneralPreference(ft.Container):
         # save preference
         theme = int(self.default_theme.value)
         language = int(self.language.value)
-        fullscreen = self.fullscreen.value
         system_unit = int(self.system_unit.value)
         data_collection_seconds_range = int(self.data_collection_seconds_range.value)
 
         Preference.update(
-            theme=theme, language=language, fullscreen=fullscreen,
+            theme=theme, language=language,
             system_unit=system_unit, data_collection_seconds_range=data_collection_seconds_range
         ).execute()
 
         gdata.configPreference.set_default_value()
 
         self.page.run_task(self.refresh_language)
-
-        if self.page.window is not None:
-            self.page.window.full_screen = fullscreen
 
         if self.page:
             self.page.theme_mode = ft.ThemeMode.LIGHT if theme == 0 else ft.ThemeMode.DARK

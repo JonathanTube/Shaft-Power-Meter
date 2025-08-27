@@ -18,13 +18,10 @@ class EEXILimitedPower(ft.Container):
 
     def build(self):
         try:
-            if self.page is None or self.page.window is None or self.page.session is None:
+            if self.page is None or self.page.session is None:
                 return
 
-            if self.page.window.height <= 600:
-                meter_radius = self.container_height * 0.55
-            else:
-                meter_radius = self.container_height * 0.56
+            meter_radius = self.container_height * 0.55
             green = self.normal_power
             orange = self.eexi_power - self.normal_power
             red = self.unlimited_power - self.eexi_power

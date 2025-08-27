@@ -73,11 +73,6 @@ class Header(ft.AppBar):
 
                 self.shapoli = ShaPoLi()
 
-                self.close_button = ft.IconButton(
-                    icon=ft.Icons.CLOSE_ROUNDED,
-                    on_click=lambda e: self.page.open(PermissionCheck(self.__on_exit, 1))
-                )
-
                 self.theme = Theme()
 
                 self.actions = [
@@ -89,16 +84,10 @@ class Header(ft.AppBar):
                     self.shapoli,
                     ft.VerticalDivider(width=.5, thickness=.5),
                     self.theme,
-                    ft.VerticalDivider(width=.5, thickness=.5),
-                    self.close_button
+                    ft.VerticalDivider(width=.5, thickness=.5)
                 ]
         except:
             logging.exception('exception occured at Header.build')
-
-    def __on_exit(self, user):
-        # avoid blocking with asyncio.run in UI code; schedule on UI loop
-        if self.page:
-            self.page.run_task(SystemExitTool.exit_app, self.page, user)
 
     def __stop_auto_testing(self, e):
         gdata.configTest.auto_testing = False

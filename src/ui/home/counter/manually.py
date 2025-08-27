@@ -109,7 +109,7 @@ class ManuallyCounter(ft.Container):
             self.content = ft.Column(
                 horizontal_alignment=ft.CrossAxisAlignment.CENTER,
                 alignment=ft.MainAxisAlignment.CENTER,
-                spacing=5 if self.page.window.height <= 600 else 20,
+                spacing=20,
                 controls=[
                     ft.Row(alignment=ft.MainAxisAlignment.SPACE_BETWEEN, controls=[self.title, self.status_container]),
                     self.display,

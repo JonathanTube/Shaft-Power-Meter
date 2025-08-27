@@ -68,14 +68,10 @@ class IntervalCounter(ft.Container):
                     size=16
                 )
 
-                spacing = 20
-                if self.page.window and self.page.window.height <= 600:
-                    spacing = 5
-
                 self.content = ft.Column(
                     expand=True,
                     horizontal_alignment=ft.CrossAxisAlignment.CENTER,
-                    spacing=spacing,
+                    spacing=20,
                     controls=[
                         ft.Row(alignment=ft.MainAxisAlignment.SPACE_BETWEEN, controls=[self.title, self.status_container]),
                         self.display,
