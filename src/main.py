@@ -116,12 +116,6 @@ async def start_all_tasks():
     # UTC 时钟
     await utc_timer.start()
 
-    # 数据清理
-    await data_cleanup_task.start()
-
-    # 数据记录
-    await data_record_task.start()
-
     # SPS 读取
     if gdata.configCommon.is_master:
         await sps_read_task.start()
@@ -139,16 +133,22 @@ async def start_all_tasks():
     if gdata.configCommon.enable_gps:
         await gps.start()
 
-    # PLC
-    if gdata.configCommon.is_master and gdata.configIO.plc_enabled:
-        await plc.connect()
-
     # eexi breach 判断
     if gdata.configCommon.shapoli:
         await eexi_breach_task.start()
 
     # Modbus 输出
     await modbus_output.start()
+
+    # 数据清理
+    await data_cleanup_task.start()
+
+    # 数据记录
+    await data_record_task.start()
+
+    # PLC
+    if gdata.configCommon.is_master and gdata.configIO.plc_enabled:
+        await plc.connect()
 
 
 async def main_async_setup(page: ft.Page):

@@ -1,4 +1,3 @@
-import asyncio
 import ipaddress
 import logging
 import flet as ft
@@ -47,11 +46,22 @@ class IOSettingSPS(ft.Container):
                     bgcolor=ft.Colors.GREEN,
                     color=ft.Colors.WHITE,
                     col={'sm': 4},
-                    visible=sps_read_task.is_online == None or sps_read_task.is_online == False,
+                    visible=sps_read_task.is_connecting is False and sps_read_task.is_online is False,
                     style=ft.ButtonStyle(
                         shape=ft.RoundedRectangleBorder(radius=5)
                     ),
                     on_click=lambda e: self.page.open(PermissionCheck(self.connect_sps, 2))
+                )
+
+                self.sps_connecting = ft.FilledButton(
+                    text="loading...",
+                    bgcolor=ft.Colors.GREY,
+                    color=ft.Colors.WHITE,
+                    col={'sm': 4},
+                    visible=sps_read_task.is_connecting is True,
+                    style=ft.ButtonStyle(
+                        shape=ft.RoundedRectangleBorder(radius=5)
+                    )
                 )
 
                 self.sps_disconnect = ft.FilledButton(
@@ -59,7 +69,7 @@ class IOSettingSPS(ft.Container):
                     bgcolor=ft.Colors.RED,
                     color=ft.Colors.WHITE,
                     col={'sm': 4},
-                    visible=sps_read_task.is_online == True,
+                    visible=sps_read_task is False and sps_read_task.is_online is True,
                     style=ft.ButtonStyle(
                         shape=ft.RoundedRectangleBorder(radius=5)
                     ),
@@ -89,11 +99,22 @@ class IOSettingSPS(ft.Container):
                     bgcolor=ft.Colors.GREEN,
                     color=ft.Colors.WHITE,
                     col={'sm': 4},
-                    visible=(sps2_read_task.is_online is None) or (sps2_read_task.is_online is False),
+                    visible=sps2_read_task.is_connecting is False and sps2_read_task.is_online is False,
                     style=ft.ButtonStyle(
                         shape=ft.RoundedRectangleBorder(radius=5)
                     ),
                     on_click=lambda e: self.page.open(PermissionCheck(self.connect_sps2, 2))
+                )
+
+                self.sps2_connecting = ft.FilledButton(
+                    text="loading...",
+                    bgcolor=ft.Colors.GREY,
+                    color=ft.Colors.WHITE,
+                    col={'sm': 4},
+                    visible=sps2_read_task.is_connecting is True,
+                    style=ft.ButtonStyle(
+                        shape=ft.RoundedRectangleBorder(radius=5)
+                    )
                 )
 
                 self.sps2_disconnect = ft.FilledButton(
@@ -101,7 +122,7 @@ class IOSettingSPS(ft.Container):
                     bgcolor=ft.Colors.RED,
                     color=ft.Colors.WHITE,
                     col={'sm': 4},
-                    visible=(sps2_read_task.is_online is True),
+                    visible=sps2_read_task.is_connecting is False and sps2_read_task.is_online is True,
                     style=ft.ButtonStyle(
                         shape=ft.RoundedRectangleBorder(radius=5)
                     ),
@@ -168,6 +189,7 @@ class IOSettingSPS(ft.Container):
                             alignment=ft.alignment.center_left,
                             controls=[
                                 self.sps_connect,
+                                self.sps_connecting,
                                 self.sps_disconnect
                             ]
                         )
@@ -183,6 +205,7 @@ class IOSettingSPS(ft.Container):
                             alignment=ft.alignment.center_left,
                             controls=[
                                 self.sps2_connect,
+                                self.sps2_connecting,
                                 self.sps2_disconnect
                             ])
                     ],
@@ -193,6 +216,7 @@ class IOSettingSPS(ft.Container):
                     self.page.session.get("lang.setting.sps_conf"),
                     ft.ResponsiveRow(
                         controls=[
+                            ft.Text(value=sps_read_task.is_connecting),
                             self.row_sps,
                             self.row_sps2,
                             self.shaft_outer_diameter,
@@ -209,53 +233,29 @@ class IOSettingSPS(ft.Container):
         try:
             self.save_sps_conf()
             gdata.configIO.set_default_value()
-            if self.sps_connect and self.sps_connect.page:
-                self.sps_connect.text = 'loading...'
-                self.sps_connect.bgcolor = ft.Colors.GREY
-                self.sps_connect.disabled = True
-                self.sps_connect.update()
-
             self.page.run_task(sps_read_task.start)
         except Exception as e:
             Toast.show_error(self.page, str(e))
 
     def close_sps(self, user: User):
         try:
-            if self.sps_disconnect and self.sps_disconnect.page:
-                self.sps_disconnect.text = 'loading...'
-                self.sps_disconnect.bgcolor = ft.Colors.GREY
-                self.sps_disconnect.disabled = True
-                self.sps_disconnect.update()
-
             self.page.run_task(sps_read_task.close)
         except:
-            logging.exception("exception occured at disconnect_from_sps")
+            logging.exception("disconnect_from_sps")
 
     def connect_sps2(self, user: User):
         try:
             self.save_sps2_conf()
             gdata.configIO.set_default_value()
-            if self.sps2_connect and self.sps2_connect.page:
-                self.sps2_connect.text = 'loading...'
-                self.sps2_connect.bgcolor = ft.Colors.GREY
-                self.sps2_connect.disabled = True
-                self.sps2_connect.update()
-
             self.page.run_task(sps2_read_task.connect)
         except Exception as e:
             Toast.show_error(self.page, str(e))
 
     def close_sps2(self, user: User):
         try:
-            if self.sps2_disconnect and self.sps2_disconnect.page:
-                self.sps2_disconnect.text = 'loading...'
-                self.sps2_disconnect.bgcolor = ft.Colors.GREY
-                self.sps2_disconnect.disabled = True
-                self.sps2_disconnect.update()
-
             self.page.run_task(sps2_read_task.close)
         except:
-            logging.exception("exception occured at disconnect_from_sps2")
+            logging.exception("disconnect_from_sps2")
 
     def save_data(self):
         self.save_sps_conf()
@@ -318,29 +318,25 @@ class IOSettingSPS(ft.Container):
 
     def update_buttons(self):
         try:
+            print('sps_read_task.is_connecting=', sps_read_task.is_connecting)
+            print('sps_read_task.is_online=', sps_read_task.is_online)
             if self.sps_connect and self.sps_connect.page:
-                self.sps_connect.text = self.page.session.get("lang.setting.connect")
-                self.sps_connect.visible = sps_read_task.is_online == None or sps_read_task.is_online == False
-                self.sps_connect.bgcolor = ft.Colors.GREEN
-                self.sps_connect.disabled = False
+                self.sps_connect.visible = sps_read_task.is_connecting is False and sps_read_task.is_online is False
+
+            if self.sps_connecting and self.sps_connecting.page:
+                self.sps_connecting.visible = sps_read_task.is_connecting is True
 
             if self.sps_disconnect and self.sps_disconnect.page:
-                self.sps_disconnect.text = self.page.session.get("lang.setting.disconnect")
-                self.sps_disconnect.visible = sps_read_task.is_online == True
-                self.sps_disconnect.bgcolor = ft.Colors.RED
-                self.sps_disconnect.disabled = False
+                self.sps_disconnect.visible = sps_read_task.is_connecting is False and sps_read_task.is_online is True
 
             if gdata.configCommon.is_twins:
                 if self.sps2_connect and self.sps2_connect.page:
-                    self.sps2_connect.text = self.page.session.get("lang.setting.connect")
-                    self.sps2_connect.visible = (sps2_read_task.is_online is None) or (sps2_read_task.is_online is False)
-                    self.sps2_connect.bgcolor = ft.Colors.GREEN
-                    self.sps2_connect.disabled = False
+                    self.sps2_connect.visible = sps2_read_task.is_connecting is False and sps2_read_task.is_online is False
+
+                if self.sps2_connecting and self.sps2_connecting.page:
+                    self.sps2_connecting.visible = sps2_read_task.is_connecting is True
 
                 if self.sps2_disconnect and self.sps2_disconnect.page:
-                    self.sps2_disconnect.text = self.page.session.get("lang.setting.disconnect")
-                    self.sps2_disconnect.visible = (sps2_read_task.is_online is True)
-                    self.sps2_disconnect.bgcolor = ft.Colors.RED
-                    self.sps2_disconnect.disabled = False
+                    self.sps2_disconnect.visible = sps2_read_task.is_connecting is False and sps2_read_task.is_online is True
         except:
             logging.exception('IOSettingSPS.update_buttons')

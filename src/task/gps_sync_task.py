@@ -17,7 +17,8 @@ class GpsSyncTask:
         self.writer: asyncio.StreamWriter | None = None
         self._lock = asyncio.Lock()
         self._task: asyncio.Task | None = None
-        self.is_online = None  # TCP连接状态
+        self.is_online = False  # TCP连接状态
+        self.is_connecting = False
         self.is_canceled = False
 
     @property
@@ -64,6 +65,7 @@ class GpsSyncTask:
 
     async def connect(self) -> bool:
         async with self._lock:
+            self.is_connecting = True
             gps_ip = gdata.configIO.gps_ip
             gps_port = gdata.configIO.gps_port
             _logger.info(f"[GPS] 尝试连接 {gps_ip}:{gps_port}")
@@ -125,13 +127,15 @@ class GpsSyncTask:
             _logger.exception("[GPS] 解析失败")
 
     async def set_online(self):
+        self.is_connecting = False
         if self.is_online == True:
             return
-        
+
         self.is_online = True
         await AlarmSaver.recovery(AlarmType.MASTER_GPS)
 
     async def set_offline(self):
+        self.is_connecting = False
         if self.is_online == False:
             return
 

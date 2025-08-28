@@ -21,6 +21,8 @@ class JM3846AsyncClient(ABC):
         self._bg_tasks: List[asyncio.Task] = []
         self.is_canceled = False
         self._connect_task: Optional[asyncio.Task] = None
+        self.is_online = False
+        self.is_connecting = True
 
     async def start(self):
         """启动异步连接任务（不阻塞外部）"""
@@ -34,6 +36,7 @@ class JM3846AsyncClient(ABC):
         while not self.is_canceled:
             try:
                 async with self._lock:
+                    self.is_connecting = True
                     host, port = self.get_ip_port()
                     logging.info(f'[JM3846-{self.name}] 正在连接 {host}:{port}')
                     self.reader, self.writer = await asyncio.wait_for(
@@ -43,9 +46,9 @@ class JM3846AsyncClient(ABC):
                     logging.info(f'[JM3846-{self.name}] 连接成功 {host}:{port}')
                     self.start_background_tasks()
                     await JM38460x45.handle(self.name, self.reader, self.writer)
-                    await asyncio.sleep(1)
+                    await asyncio.sleep(0.5)
                     await JM38460x03.handle(self.name, self.reader, self.writer)
-                    await asyncio.sleep(1)
+                    await asyncio.sleep(0.5)
                 # 0x44 循环放到锁外执行
                 await JM38460x44.handle(self.name, self.reader, self.writer, self.set_online, self.set_offline)
 
@@ -102,7 +105,6 @@ class JM3846AsyncClient(ABC):
         finally:
             self.writer = None
             self.reader = None
-            await self.set_offline()
 
     # ---- 抽象方法 ----
     @abstractmethod

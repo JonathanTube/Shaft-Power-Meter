@@ -39,18 +39,28 @@ class IOSettingGPS(ft.Container):
                     text=self.page.session.get("lang.setting.connect"),
                     bgcolor=ft.Colors.GREEN,
                     color=ft.Colors.WHITE,
-                    visible=gps.is_online == None or gps.is_online == False,
+                    visible=gps.is_connecting is False and gps.is_online is False,
                     style=ft.ButtonStyle(
                         shape=ft.RoundedRectangleBorder(radius=5)
                     ),
                     on_click=lambda e: self.page.open(PermissionCheck(self._on_connect, 2))
                 )
 
+                self.connecting_btn = ft.FilledButton(
+                    text='loading...',
+                    bgcolor=ft.Colors.GREY,
+                    color=ft.Colors.WHITE,
+                    visible=gps.is_connecting is True,
+                    style=ft.ButtonStyle(
+                        shape=ft.RoundedRectangleBorder(radius=5)
+                    )
+                )
+
                 self.close_btn = ft.FilledButton(
                     text=self.page.session.get("lang.setting.disconnect"),
                     bgcolor=ft.Colors.RED,
                     color=ft.Colors.WHITE,
-                    visible=gps.is_online == True,
+                    visible=gps.is_connecting is False and gps.is_online is True,
                     style=ft.ButtonStyle(
                         shape=ft.RoundedRectangleBorder(radius=5)
                     ),
@@ -68,32 +78,21 @@ class IOSettingGPS(ft.Container):
                     col={"xs": 12})
                 self.content = self.custom_card
         except:
-            logging.exception('exception occured at IOSettingGPS.build')
+            logging.exception('IOSettingGPS.build')
 
     def _on_connect(self, user: User):
         try:
             self.save_data()
             gdata.configIO.set_default_value()
-            if self.connect_btn and self.connect_btn.page:
-                self.connect_btn.text = 'loading...'
-                self.connect_btn.disabled = True
-                self.connect_btn.bgcolor = ft.Colors.GREY
-                self.connect_btn.update()
             self.page.run_task(gps.start)
         except Exception as e:
             Toast.show_error(self.page, str(e))
 
     def _on_close(self, user: User):
         try:
-            if self.close_btn and self.close_btn.page:
-                self.close_btn.text = 'loading...'
-                self.close_btn.disabled = True
-                self.close_btn.bgcolor = ft.Colors.GREY
-                self.close_btn.update()
-
             self.page.run_task(gps.stop)
         except:
-            logging.exception("exception occured at IOSettingGPS.__on_close")
+            logging.exception("IOSettingGPS.__on_close")
 
     def save_data(self):
         try:
@@ -123,15 +122,9 @@ class IOSettingGPS(ft.Container):
             if self.page and self.page.session:
                 # 按钮状态同步
                 if self.connect_btn and self.connect_btn.page:
-                    self.connect_btn.visible = not gps.is_online
-                    self.connect_btn.text = self.page.session.get("lang.setting.connect")
-                    self.connect_btn.bgcolor = ft.Colors.GREEN
-                    self.connect_btn.disabled = False
+                    self.connect_btn.visible = gps.is_connecting is False and gps.is_online is False
 
                 if self.close_btn and self.close_btn.page:
-                    self.close_btn.visible = gps.is_online
-                    self.close_btn.text = self.page.session.get("lang.setting.disconnect")
-                    self.close_btn.bgcolor = ft.Colors.RED
-                    self.close_btn.disabled = False
+                    self.close_btn.visible = gps.is_connecting is False and gps.is_online is True
         except:
             logging.exception("IOSettingGPS.update_buttons")

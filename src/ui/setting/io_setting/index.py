@@ -173,7 +173,7 @@ class IOSetting(ft.Container):
             except:
                 logging.exception("exception occured at IOSetting.__loop")
                 return
-            await asyncio.sleep(5)
+            await asyncio.sleep(1)
 
     def did_mount(self):
         self.task_running = True

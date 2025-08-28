@@ -28,36 +28,34 @@ class IOSettingPLC(ft.Container):
                     text=self.page.session.get("lang.setting.connect"),
                     bgcolor=ft.Colors.GREEN,
                     color=ft.Colors.WHITE,
-                    visible=plc.is_online == False or plc.is_online == None,
-                    style=ft.ButtonStyle(
-                        shape=ft.RoundedRectangleBorder(radius=5)
-                    ),
-                    on_click=lambda e: self.page.open(
-                        PermissionCheck(self.__on_connect, 2)
-                    )
+                    visible=plc.is_connecting is False and plc.is_online is False,
+                    style=ft.ButtonStyle(shape=ft.RoundedRectangleBorder(radius=5)),
+                    on_click=lambda e: self.page.open(PermissionCheck(self.__on_connect, 2))
+                )
+
+                self.connecting_btn = ft.FilledButton(
+                    text='loading...',
+                    bgcolor=ft.Colors.GREEN,
+                    color=ft.Colors.WHITE,
+                    visible=plc.is_connecting is True,
+                    style=ft.ButtonStyle(shape=ft.RoundedRectangleBorder(radius=5))
                 )
 
                 self.close_btn = ft.FilledButton(
                     text=self.page.session.get("lang.setting.disconnect"),
                     bgcolor=ft.Colors.RED,
                     color=ft.Colors.WHITE,
-                    visible=plc.is_online == True,
-                    style=ft.ButtonStyle(
-                        shape=ft.RoundedRectangleBorder(radius=5)
-                    ),
-                    on_click=lambda e: self.page.open(
-                        PermissionCheck(self.__on_close, 2)
-                    )
+                    visible=plc.is_connecting is False and plc.is_online is True,
+                    style=ft.ButtonStyle(shape=ft.RoundedRectangleBorder(radius=5)),
+                    on_click=lambda e: self.page.open(PermissionCheck(self.__on_close, 2))
                 )
 
                 self.fetch_btn = ft.FilledButton(
                     text=self.page.session.get("lang.setting.fetch_data"),
                     bgcolor=ft.Colors.BLUE,
                     color=ft.Colors.WHITE,
-                    visible=plc.is_online == True,
-                    style=ft.ButtonStyle(
-                        shape=ft.RoundedRectangleBorder(radius=5)
-                    ),
+                    visible=plc.is_connecting is False and plc.is_online is True,
+                    style=ft.ButtonStyle(shape=ft.RoundedRectangleBorder(radius=5)),
                     on_click=lambda e: self.page.run_task(self.on_fetch)
                 )
 
@@ -161,22 +159,17 @@ class IOSettingPLC(ft.Container):
     def update_buttons(self):
         try:
             if self.connect_btn and self.connect_btn.page:
-                self.connect_btn.text = self.page.session.get("lang.setting.connect")
-                self.connect_btn.visible = not plc.is_online
-                self.connect_btn.disabled = False
-                self.connect_btn.bgcolor = ft.Colors.GREEN
+                self.connect_btn.visible = plc.is_connecting is False and plc.is_online is False
+
+            if self.connecting_btn and self.connecting_btn.page:
+                self.connecting_btn.visible = plc.is_connecting is True
 
             if self.close_btn and self.close_btn.page:
-                self.close_btn.text = self.page.session.get("lang.setting.disconnect")
-                self.close_btn.visible = plc.is_online
-                self.close_btn.disabled = False
-                self.close_btn.bgcolor = ft.Colors.RED
+                self.close_btn.visible = plc.is_connecting is False and plc.is_online is True
 
             if self.fetch_btn and self.fetch_btn.page:
-                self.fetch_btn.text = self.page.session.get("lang.setting.fetch_data")
-                self.fetch_btn.visible = plc.is_online
-                self.fetch_btn.disabled = False
-                self.fetch_btn.bgcolor = ft.Colors.BLUE
+                self.fetch_btn.visible = plc.is_connecting is False and plc.is_online is True
+
         except:
             logging.exception('IOSettingPLC.before_update')
 
@@ -184,29 +177,15 @@ class IOSettingPLC(ft.Container):
         try:
             self.save_data()
             gdata.configIO.set_default_value()
-            if self.connect_btn and self.connect_btn.page:
-                self.connect_btn.text = 'loading...'
-                self.connect_btn.disabled = True
-                self.connect_btn.bgcolor = ft.Colors.GREY
-                self.connect_btn.update()
             self.page.run_task(plc.connect)
         except Exception as e:
             Toast.show_error(self.page, str(e))
 
     def __on_close(self, user: User):
         try:
-            if self.close_btn and self.close_btn.page:
-                self.close_btn.text = 'loading...'
-                self.close_btn.disabled = True
-                self.close_btn.bgcolor = ft.Colors.GREY
-                self.close_btn.update()
-
-            if self.fetch_btn and self.fetch_btn.page:
-                self.fetch_btn.visible = False
-                self.fetch_btn.update()
             self.page.run_task(plc.close)
         except:
-            logging.exception('exception occured at __stop_plc_task')
+            logging.exception('__on_close')
 
     async def on_fetch(self):
         if self.page:

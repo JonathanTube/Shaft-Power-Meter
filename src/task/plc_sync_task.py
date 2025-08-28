@@ -23,7 +23,7 @@ class PlcSyncTask:
     def __init__(self):
         self._lock = asyncio.Lock()  # 连接锁，防止并发连接
         self.plc_client: Optional[AsyncModbusTcpClient] = None
-        self.is_online = None       # 仅表示 TCP 连接是否建立
+        self.is_online = False       # 仅表示 TCP 连接是否建立
         self.is_canceled = False
         self.is_connecting = False  # 是否正在重连
 
@@ -236,9 +236,11 @@ class PlcSyncTask:
 
     async def write_eexi_breach_alarm(self, occured: bool):
         """写入 EEXI 超限报警"""
-        logging.info(f'[PLC] 写入 EEXI 超限报警={occured}')
         if not self.is_connected():
             return
+
+        logging.info(f'[PLC] 写入 EEXI 超限报警={occured}')
+
         try:
             await self.plc_client.write_coil(address=12290, value=occured)
         except Exception as e:
@@ -329,6 +331,7 @@ class PlcSyncTask:
         gdata.configAlarm.set_default_value()
 
     async def set_offline(self):
+        self.is_connecting = False
         if self.is_online == False:
             return
 
