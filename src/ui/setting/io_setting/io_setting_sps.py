@@ -318,8 +318,8 @@ class IOSettingSPS(ft.Container):
 
     def update_buttons(self):
         try:
-            print('sps_read_task.is_connecting=', sps_read_task.is_connecting)
-            print('sps_read_task.is_online=', sps_read_task.is_online)
+            # print('sps_read_task.is_connecting=', sps_read_task.is_connecting)
+            # print('sps_read_task.is_online=', sps_read_task.is_online)
             if self.sps_connect and self.sps_connect.page:
                 self.sps_connect.visible = sps_read_task.is_connecting is False and sps_read_task.is_online is False
 

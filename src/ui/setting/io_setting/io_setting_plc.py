@@ -158,6 +158,9 @@ class IOSettingPLC(ft.Container):
 
     def update_buttons(self):
         try:
+            # print('plc.is_connecting=', plc.is_connecting)
+            # print('plc.is_online=', plc.is_online)
+
             if self.connect_btn and self.connect_btn.page:
                 self.connect_btn.visible = plc.is_connecting is False and plc.is_online is False
 

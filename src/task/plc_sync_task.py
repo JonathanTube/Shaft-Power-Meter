@@ -61,7 +61,6 @@ class PlcSyncTask:
                 await self.set_offline()
             finally:
                 await asyncio.sleep(10)
-                self.is_connecting = False
 
     async def init_state(self):
         cnt = await asyncio.to_thread(AlarmLog.select(fn.COUNT(AlarmLog.id)).where(
@@ -320,6 +319,7 @@ class PlcSyncTask:
     # ---------------- 报警状态（仅反映连接本身） ----------------
 
     async def set_online(self):
+        self.is_connecting = False
         if self.is_online == True:
             return
 
