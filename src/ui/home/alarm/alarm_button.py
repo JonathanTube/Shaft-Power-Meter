@@ -26,6 +26,8 @@ class AlarmButton(ft.TextButton):
 
             if self.page and self.page.session:
                 self.text = self.page.session.get("lang.home.tab.alarm")
+
+            gdata.configAlarm.set_default_value()
         except:
             logging.exception('exception occured at AlarmButton.build')
 

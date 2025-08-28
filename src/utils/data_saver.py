@@ -35,7 +35,8 @@ class DataSaver:
                 'is_overload': DataSaver.overload
             }
 
-            await asyncio.to_thread(DataLog.insert(data).execute)
+            if speed != 0 or torque != 0 or thrust != 0:
+                await asyncio.to_thread(DataLog.insert(data).execute)
 
             # 主站且PLC连接时写入瞬时数据
             if gdata.configCommon.is_master:

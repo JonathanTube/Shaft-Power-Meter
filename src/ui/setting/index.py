@@ -56,7 +56,7 @@ class Setting(ft.Container):
             if not (self.page and self.right_content and self.right_content.page):
                 return
 
-            logging.info(f"[Setting] switch from {self.idx} to {idx}")
+            # logging.info(f"[Setting] switch from {self.idx} to {idx}")
             self.idx = idx
 
             keyboard.close()
