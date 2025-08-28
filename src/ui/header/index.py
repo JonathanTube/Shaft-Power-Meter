@@ -3,12 +3,10 @@ import logging
 import flet as ft
 from random import random
 from common.global_data import gdata
-from ui.common.permission_check import PermissionCheck
 from ui.header.shapoli import ShaPoLi
 from ui.header.logo import HeaderLogo
 from ui.header.theme import Theme
 from ui.common.keyboard import keyboard
-from utils.system_exit_tool import SystemExitTool
 
 
 class Header(ft.AppBar):
