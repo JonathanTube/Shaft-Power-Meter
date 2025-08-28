@@ -4,6 +4,7 @@ import sys
 import logging
 import flet as ft
 import os
+from utils.systray import start_tray
 # Ensure stderr/stdout exist in no-console environments (e.g., packaged GUI)
 if sys.stderr is None:
     sys.stderr = open(os.devnull, "w")
@@ -185,8 +186,7 @@ if __name__ == "__main__":
         check_single_instance()
         # Start system tray for quick access and exit control
         try:
-            from utils.systray import start_tray
-            start_tray("Shaft Power Meter", 'localhost', icon_rel_path='assets/icon.png')
+            start_tray()
         except Exception:
             logging.warning("failed to start tray icon", exc_info=True)
 

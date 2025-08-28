@@ -1,6 +1,4 @@
 import asyncio
-import sys
-import flet as ft
 import logging
 import os
 from task.eexi_breach_task import eexi_breach_task
@@ -38,14 +36,8 @@ class SystemExitTool:
             logging.exception("_safe_schedule_stop failed")
 
     @staticmethod
-    async def exit_app(page: ft.Page | None, user: User):
-        if page is None:
-            return
-
+    async def exit_app():
         try:
-            msg = page.session.get("lang.toast.system_exit")
-            Toast.show_error(page, msg, 1000 * 10)
-
             try:
                 await asyncio.sleep(0.5)
             except:

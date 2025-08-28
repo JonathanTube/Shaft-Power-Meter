@@ -62,8 +62,10 @@ class SystemConf(ft.Container):
                 self.system_conf_ship_info.save(user)
             # 清理数据
             TableInit.cleanup()
+            msg = self.page.session.get("lang.toast.system_exit")
+            Toast.show_error(self.page, msg, 1000 * 10)
             # 退出系统
-            self.page.run_task(SystemExitTool.exit_app, self.page, user)
+            self.page.run_task(SystemExitTool.exit_app)
         except Exception as e:
             logging.exception(f"system conf save data error{e}")
             Toast.show_error(self.page, e)
