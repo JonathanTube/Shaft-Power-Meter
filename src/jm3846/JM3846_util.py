@@ -100,7 +100,7 @@ class JM3846Util:
             part_length = values_length / channel_count
             ch0_ad = round(ch0_sum / part_length, 1)
             ch1_ad = round(ch1_sum / part_length, 1)
-            rpm = round(rpm_sum / part_length, 1)
+            rpm = round(rpm_sum / part_length / 10, 1)
 
             return (ch0_ad, ch1_ad, rpm)
         except:
