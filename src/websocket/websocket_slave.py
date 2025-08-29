@@ -170,12 +170,13 @@ class WebSocketSlave:
 
     async def _handle_alarm(self, data):
         for alarm in data:
-            cnt = AlarmLog.select(fn.COUNT(AlarmLog.id)).where(AlarmLog.alarm_uuid == alarm['alarm_uuid']).scalar()
+            # 这里只能根据类型来，否则id不匹配，从机永远得不到恢复
+            cnt = AlarmLog.select(fn.COUNT(AlarmLog.id)).where(AlarmLog.alarm_type == alarm['alarm_type']).scalar()
             if cnt > 0:
                 AlarmLog.update(
                     recovery_time=DateTimeUtil.parse_date(alarm['recovery_time']),
                     acknowledge_time=DateTimeUtil.parse_date(alarm['acknowledge_time'])
-                ).where(AlarmLog.alarm_uuid == alarm['alarm_uuid']).execute()
+                ).where(AlarmLog.alarm_type == alarm['alarm_type']).execute()
             else:
                 AlarmLog.create(
                     alarm_uuid=alarm['alarm_uuid'],
