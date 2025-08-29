@@ -57,14 +57,17 @@ class JM3846AsyncClient(ABC):
                 await self.set_offline()
             except asyncio.TimeoutError:
                 logging.info(f'[JM3846-{self.name}] 连接超时')
+                await self.set_offline()
             except asyncio.CancelledError:
                 logging.info(f'[JM3846-{self.name}] 连接任务被取消')
-                break
+                await self.set_offline()
             except Exception as e:
                 logging.exception(f'[JM3846-{self.name}] 连接异常: {e}')
+                await self.set_offline()
 
             await self.release()
             if not self.is_canceled:
+                logging.exception(f'[JM3846-{self.name}] 连接断开,10s后重连')
                 await asyncio.sleep(10)  # 固定10秒重试
 
     async def close(self):
