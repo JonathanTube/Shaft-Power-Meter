@@ -150,23 +150,25 @@ class TestModeTask:
             instant_torque = round(random.uniform(min_t, max_t), 1)
             instant_speed = round(random.uniform(min_s, max_s), 1)
             instant_thrust = round(random.uniform(min_thr, max_thr), 1)
+            instant_power = FormulaCalculator.calculate_instant_power(instant_torque, instant_speed)
 
             if name == 'sps':
                 gdata.configSPS.torque = instant_torque
                 gdata.configSPS.thrust = instant_thrust
                 gdata.configSPS.speed = instant_speed
+                gdata.configSPS.power = instant_power
             elif name == 'sps2':
                 gdata.configSPS2.torque = instant_torque
                 gdata.configSPS2.thrust = instant_thrust
                 gdata.configSPS2.speed = instant_speed
+                gdata.configSPS2.power = instant_power
 
-            power = FormulaCalculator.calculate_instant_power(instant_torque, instant_speed)
             if gdata.configCommon.is_master:
                 # 发送数据到客户端-1s
                 await ws_server.send({
                     'type': f'{name}_1s',
                     'data': {
-                        'power': power
+                        'power': instant_power
                     }
                 })
                 # 发送数据到客户端-15s
@@ -175,7 +177,7 @@ class TestModeTask:
                     'data': {
                         'torque': instant_torque,
                         'speed': instant_speed,
-                        'power': power
+                        'power': instant_power
                     }
                 })
 

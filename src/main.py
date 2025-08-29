@@ -116,6 +116,12 @@ async def start_all_tasks():
     # UTC 时钟
     await utc_timer.start()
 
+    # 数据清理
+    await data_cleanup_task.start()
+
+    # 数据记录
+    await data_record_task.start()
+
     # SPS 读取
     if gdata.configCommon.is_master:
         await sps_read_task.start()
@@ -139,12 +145,6 @@ async def start_all_tasks():
 
     # Modbus 输出
     await modbus_output.start()
-
-    # 数据清理
-    await data_cleanup_task.start()
-
-    # 数据记录
-    await data_record_task.start()
 
     # PLC
     if gdata.configCommon.is_master and gdata.configIO.plc_enabled:
