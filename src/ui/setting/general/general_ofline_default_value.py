@@ -13,7 +13,6 @@ class GeneralOflineDefaultValue(ft.Container):
         super().__init__()
         self.expand = True
         self.system_unit = system_unit
-        self.visible = gdata.configCommon.is_master
 
     def build(self):
         try:
