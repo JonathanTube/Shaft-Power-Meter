@@ -120,3 +120,12 @@ class GeneralLimitationWarning(ft.Container):
 
     def did_mount(self):
         self.update_unit(self.system_unit)
+
+    def before_update(self):
+        s = self.page.session
+        # 文本框标题（label）
+        self.torque_warning.label = s.get("lang.common.torque")
+        self.speed_warning.label = s.get("lang.common.speed")
+        self.power_warning.label = s.get("lang.common.power")
+        # 卡片标题
+        self.custom_card.heading = s.get("lang.setting.warning_limitations")

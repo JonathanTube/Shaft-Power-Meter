@@ -66,7 +66,7 @@ class GeneralLimitationMax(ft.Container):
                 if self.custom_card is not None:
                     self.custom_card.set_title(s.get("lang.setting.maximum_limitations"))
         except:
-            logging.exception('exception occured at GeneralLimitationMax.before_update')
+            logging.exception('GeneralLimitationMax.reset')
 
     def update_unit(self, system_unit: int):
         try:
@@ -121,3 +121,12 @@ class GeneralLimitationMax(ft.Container):
 
     def did_mount(self):
         self.update_unit(self.system_unit)
+
+    def before_update(self):
+        s = self.page.session
+        # 文本框标题（label）
+        self.speed_max.label = s.get("lang.common.speed")
+        self.torque_max.label = s.get("lang.common.torque")
+        self.power_max.label = s.get("lang.common.power")
+        # 卡片标题
+        self.custom_card.heading = s.get("lang.setting.maximum_limitations")

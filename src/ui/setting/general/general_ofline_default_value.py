@@ -133,3 +133,12 @@ class GeneralOflineDefaultValue(ft.Container):
 
     def did_mount(self):
         self.update_unit(self.system_unit)
+
+    def before_update(self):
+        s = self.page.session
+        # 文本框标题（label）
+        self.torque_default_value.label = s.get("lang.common.torque")
+        self.thrust_default_value.label = s.get("lang.common.thrust")
+        self.speed_default_value.label = s.get("lang.common.speed")
+        # 卡片标题
+        self.custom_card.heading = s.get("lang.setting.offline_default_value")

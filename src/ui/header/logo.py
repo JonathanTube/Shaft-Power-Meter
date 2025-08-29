@@ -16,11 +16,10 @@ class HeaderLogo(ft.Container):
         BASE_DIR = os.path.dirname(__file__)   # 当前 logo.py 所在目录
         ASSETS_DIR = os.path.join(BASE_DIR, "..", "..", "assets")  # ../../assets
 
-        if self.content and self.content.page:
-            if self.content.page.theme_mode == ft.ThemeMode.LIGHT:
-                path = os.path.join(ASSETS_DIR, "logo_dark.png")
-                with open(path, "rb") as f:
-                    return base64.b64encode(f.read()).decode("utf-8")
+        if self.page and self.page.theme_mode == ft.ThemeMode.LIGHT:
+            path = os.path.join(ASSETS_DIR, "logo_dark.png")
+            with open(path, "rb") as f:
+                return base64.b64encode(f.read()).decode("utf-8")
 
         # 读取本地图片并转成 base64
         path = os.path.join(ASSETS_DIR, "logo_light.png")

@@ -4,7 +4,6 @@ import flet as ft
 from db.models.language import Language
 from db.models.preference import Preference
 from ui.common.custom_card import CustomCard
-from ui.common.keyboard import keyboard
 from common.global_data import gdata
 
 
@@ -120,16 +119,33 @@ class GeneralPreference(ft.Container):
 
         gdata.configPreference.set_default_value()
 
-        self.page.run_task(self.refresh_language)
+        self.refresh_language()
 
         if self.page:
             self.page.theme_mode = ft.ThemeMode.LIGHT if theme == 0 else ft.ThemeMode.DARK
             self.page.update()
 
-    async def refresh_language(self):
-        languages = await asyncio.to_thread(Language.select)
+    def refresh_language(self):
+        languages = Language.select()
         for item in languages:
             if gdata.configPreference.language == 0:
                 self.page.session.set(item.code, item.english)
             else:
                 self.page.session.set(item.code, item.chinese)
+
+    def before_update(self):
+        s = self.page.session
+        # 主题
+        self.theme_label.value = s.get("lang.setting.theme")
+        self.theme_light.label = s.get("lang.setting.theme.light")
+        self.theme_dark.label = s.get("lang.setting.theme.dark")
+        # 语言
+        self.language_label.value = s.get("lang.setting.language")
+        # 单位
+        self.system_unit_label.value = s.get("lang.setting.unit")
+        self.system_unit_si.label = s.get("lang.setting.unit.si")
+        self.system_unit_metric.label = s.get("lang.setting.unit.metric")
+        # 数据采集间隔
+        self.data_collection_seconds_range.label = s.get("lang.setting.data_collection_seconds_range")
+        # 卡片标题
+        self.custom_card.heading = self.page.session.get("lang.setting.preference")

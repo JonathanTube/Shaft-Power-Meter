@@ -102,7 +102,7 @@ class GeneralDateTime(ft.Container):
                 if self.custom_card:
                     self.custom_card.set_title(s.get("lang.setting.utc_date_time_conf"))
         except:
-            logging.exception('exception occured at GeneralDateTime.before_update')
+            logging.exception('GeneralDateTime.reset')
 
     def __handle_date_change(self, e):
         try:
@@ -141,3 +141,13 @@ class GeneralDateTime(ft.Container):
             gdata.configDateTime.set_default_value()
         except:
             logging.exception("exception occured at GeneralDateTime.save_data_async")
+
+    def before_update(self):
+        s = self.page.session
+        # 更新标签
+        self.utc_date.label = s.get("lang.setting.date")
+        self.utc_time.label = s.get("lang.setting.time")
+        self.date_format.label = s.get("lang.setting.date_format")
+        self.sync_with_gps.label = s.get("lang.setting.sync_with_gps")
+        # 更新卡片标题
+        self.custom_card.heading = s.get("lang.setting.utc_date_time_conf")
