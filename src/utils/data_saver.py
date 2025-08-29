@@ -96,6 +96,9 @@ class DataSaver:
         overload_power_percentage = round((speed_percentage / max_speed) ** 2 * max_power, 2)
         actual_power_percentage = round(power / gdata.configPropperCurve.power_of_mcr * 100, 2)
 
+        # print(f'actual_power_percentage={actual_power_percentage}')
+        # print(f'overload_power_percentage={overload_power_percentage}')
+
         overload = actual_power_percentage > overload_power_percentage
 
         # 没变化

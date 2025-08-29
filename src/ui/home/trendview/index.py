@@ -35,6 +35,7 @@ class TrendView(ft.Container):
                     ft.Text(DateTimeUtil.format_date(self.start_date, f'{gdata.configDateTime.date_format} %H:%M:%S')),
                     ft.Text(" - "),
                     ft.Text(DateTimeUtil.format_date(self.end_date, f'{gdata.configDateTime.date_format} %H:%M:%S')),
+                    ft.Button(text=self.page.session.get('lang.button.reset'), on_click=lambda e: self._on_click())
                 ])
 
             if gdata.configCommon.is_twins:
@@ -69,6 +70,14 @@ class TrendView(ft.Container):
     def did_mount(self):
         # use page.run_task to run async loading on UI event loop
         if self.page:
+            self.page.run_task(self.load_data_async)
+
+    def before_update(self):
+        self.end_date = gdata.configDateTime.utc
+
+    def _on_click(self):
+        if self.page:
+            self.end_date = gdata.configDateTime.utc
             self.page.run_task(self.load_data_async)
 
     async def load_data_async(self):

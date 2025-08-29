@@ -58,9 +58,19 @@ class PropellerCurveDiagram(ft.Container):
         """更新前清理旧图表"""
         if self.chart and hasattr(self.chart, "figure"):
             plt.close(self.chart.figure)
+
+        self.sps_offset_text = ft.Text(value="")
+        self.sps2_offset_text = ft.Text(value="")
+
         self.chart = self.create_chart()
         if self.chart:
-            self.content = self.chart
+            self.content = ft.Column(
+                expand=True,
+                controls=[
+                    ft.Row(controls=[self.sps_offset_text, self.sps2_offset_text], spacing=10),
+                    self.chart
+                ]
+            )
 
     def set_style(self):
         """主题样式"""
@@ -160,11 +170,21 @@ class PropellerCurveDiagram(ft.Container):
                 if self.rpm_of_mcr and self.power_of_mcr:
                     # SPS
                     x1, y1 = gdata.configSPS.speed / self.rpm_of_mcr * 100, gdata.configSPS.power / self.power_of_mcr * 100
+
+                    if self.sps_offset_text:
+                        self.sps_offset_text.value = f"sps.x={round(x1, 1)}%,sps.y={round(y1, 1)}%"
+                        self.sps_offset_text.update()
+
                     if self.sps_point:
                         self.sps_point.set_offsets([x1, y1])
                         self.sps_text.set_position((x1, y1 + 1))
                     # SPS2
                     x2, y2 = gdata.configSPS2.speed / self.rpm_of_mcr * 100, gdata.configSPS2.power / self.power_of_mcr * 100
+
+                    if self.sps2_offset_text:
+                        self.sps_offset_text.value = f"sps2.x={round(x2, 1)}%,sps2.y={round(y2, 1)}%"
+                        self.sps2_offset_text.update()
+
                     if self.sps2_point:
                         self.sps2_point.set_offsets([x2, y2])
                         self.sps2_text.set_position((x2, y2 + 1))
