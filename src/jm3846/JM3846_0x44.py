@@ -117,6 +117,10 @@ class JM38460x44:
                 logging.warning(f'[JM3846-{name}] 0x44连接被取消')
                 await on_error()
                 break
+            except ConnectionAbortedError:
+                logging.warning(f'[JM3846-{name}] 0x44连接被中止')
+                await on_error()
+                break
             except:
                 logging.exception(f'[JM3846-{name}] 0x44响应 error')
                 await on_error()

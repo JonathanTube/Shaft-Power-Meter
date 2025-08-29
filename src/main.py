@@ -148,7 +148,7 @@ async def start_all_tasks():
 
     # PLC
     if gdata.configCommon.is_master and gdata.configIO.plc_enabled:
-        await plc.connect()
+        await plc.start()
 
 
 async def main_async_setup(page: ft.Page):
@@ -172,7 +172,6 @@ async def main(page: ft.Page):
     page.overlay.append(keyboard)
 
     def handle_error(e: ft.ControlEvent):
-        print(e)
         logging.info(e)
 
     try:

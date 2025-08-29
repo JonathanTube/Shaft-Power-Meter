@@ -36,8 +36,8 @@ class JM3846Util:
 
     @staticmethod
     def get_avg(name, accumulated_data) -> tuple[float, float, float]:
-        print('===============================')
-        print(accumulated_data)
+        # print('===============================')
+        # print(accumulated_data)
         try:
             values_length = len(accumulated_data)
             if values_length == 0:
@@ -104,7 +104,7 @@ class JM3846Util:
             ch1_ad = round(ch1_sum / part_length, 1)
             rpm = round(rpm_sum / part_length / 10, 1)
 
-            print(ch0_ad, ch1_ad, rpm)
+            # print(ch0_ad, ch1_ad, rpm)
 
             return (ch0_ad, ch1_ad, rpm)
         except:

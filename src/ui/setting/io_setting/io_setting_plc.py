@@ -35,7 +35,7 @@ class IOSettingPLC(ft.Container):
 
                 self.connecting_btn = ft.FilledButton(
                     text='loading...',
-                    bgcolor=ft.Colors.GREEN,
+                    bgcolor=ft.Colors.GREY,
                     color=ft.Colors.WHITE,
                     visible=plc.is_connecting is True,
                     style=ft.ButtonStyle(shape=ft.RoundedRectangleBorder(radius=5))
@@ -122,7 +122,7 @@ class IOSettingPLC(ft.Container):
                             ft.Row(
                                 alignment=ft.alignment.center_left,
                                 col={'sm': 4},
-                                controls=[self.connect_btn, self.close_btn, self.fetch_btn],
+                                controls=[self.connect_btn, self.connecting_btn, self.close_btn, self.fetch_btn],
                             ),
                             self.range_items
                         ])
@@ -180,7 +180,7 @@ class IOSettingPLC(ft.Container):
         try:
             self.save_data()
             gdata.configIO.set_default_value()
-            self.page.run_task(plc.connect)
+            self.page.run_task(plc.start)
         except Exception as e:
             Toast.show_error(self.page, str(e))
 

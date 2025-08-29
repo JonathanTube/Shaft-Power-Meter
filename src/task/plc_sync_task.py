@@ -26,27 +26,48 @@ class PlcSyncTask:
         self.is_online = False       # 仅表示 TCP 连接是否建立
         self.is_canceled = False
         self.is_connecting = False  # 是否正在重连
+        self._reconnect_task: Optional[asyncio.Task] = None
 
-    async def connect(self):
-        """连接PLC（非阻塞）"""
+    async def start(self):
+        """启动后台重连任务"""
         if not gdata.configCommon.is_master:
             return
 
         if not gdata.configIO.plc_enabled:
             return
 
+        self.is_canceled = False
+
+        self.is_connecting = True
+
+        self._reconnect_task = asyncio.create_task(self._reconnect_loop())
+
+    async def _reconnect_loop(self):
+        """后台循环，掉线时自动重连"""
+        while not self.is_canceled:
+            try:
+                if not self.is_connected():
+                    await self.connect()
+                else:
+                    # 心跳，避免长时间空闲被踢
+                    await self.read_coil(12288)
+            except Exception as e:
+                logging.error(f"[PLC] 重连循环异常: {e}")
+                await self.set_offline()
+            await asyncio.sleep(5)
+
+    async def connect(self):
+        """尝试连接PLC"""
         async with self._lock:
             try:
-                self.is_canceled = False
-                self.is_connecting = True
                 ip = gdata.configIO.plc_ip
                 port = gdata.configIO.plc_port
-                logging.info(f'[PLC] 正在连接 {ip}:{port}')
+                logging.info(f"[PLC] 正在连接 {ip}:{port}")
                 self.plc_client = AsyncModbusTcpClient(
                     host=ip,
                     port=port,
-                    timeout=10,          # 每次请求超时
-                    retries=0          # 每次请求重试次数
+                    reconnect_delay=10,
+                    timeout=10,
                 )
                 await self.plc_client.connect()
                 if self.is_connected():
@@ -60,7 +81,7 @@ class PlcSyncTask:
                 logging.exception(f'[PLC] 连接异常: {e}')
                 await self.set_offline()
             finally:
-                await asyncio.sleep(10)
+                self.is_connecting = False
 
     async def init_state(self):
         cnt = await asyncio.to_thread(AlarmLog.select(fn.COUNT(AlarmLog.id)).where(
@@ -94,6 +115,7 @@ class PlcSyncTask:
             }
         except Exception as e:
             logging.exception(f'[PLC] 读取 4-20mA 数据失败: {e}')
+            await self.set_offline()
             return self._empty_4_20ma_data()
 
     async def write_4_20_ma_data(self, data: dict):
@@ -122,6 +144,7 @@ class PlcSyncTask:
             await self.plc_client.write_register(12330, int(data["speed_range_offset"]))
         except Exception as e:
             logging.exception("[PLC] 写入 4-20mA 数据失败: %s", e)
+            await self.set_offline()
 
     async def read_instant_data(self) -> dict:
         if not self.is_connected():
@@ -135,6 +158,7 @@ class PlcSyncTask:
             }
         except Exception as e:
             logging.exception("[PLC] 读取实时数据失败: %s", e)
+            await self.set_offline()
             return {"power": None, "torque": None, "thrust": None, "speed": None}
 
     async def write_instant_data(self, power: int, torque: int, thrust: int, speed: float):
@@ -142,14 +166,7 @@ class PlcSyncTask:
         try:
             if not gdata.configIO.plc_enabled:
                 return
-
-            if self.is_canceled:
-                return
-
-            if not self.is_connected() and not self.is_connecting:
-                logging.warning("[PLC] 未连接，尝试重连...")
-                await self.release()
-                await self.connect()
+            if self.is_canceled or self.is_online is False:
                 return
 
             _power = round(power / 1000)
@@ -177,11 +194,7 @@ class PlcSyncTask:
                 logging.error(f'speed to plc is too big,{_speed}')
         except Exception as e:
             logging.error(f"[PLC] 写入实时数据失败: {e}, 尝试重连...")
-            # 写入失败 -> 停止连接，清空 client
-            await self.release()
-            if not self.is_canceled and not self.is_connecting:
-                # 尝试重连一次
-                await self.connect()
+            await self.set_offline()
 
     async def read_alarm(self) -> Optional[bool]:
         if not self.is_connected():
@@ -190,6 +203,7 @@ class PlcSyncTask:
             return await self.read_coil(12288)
         except Exception as e:
             logging.exception("[PLC] 读取报警状态失败: %s", e)
+            await self.set_offline()
             return None
 
     async def write_common_alarm(self, occured: bool):
@@ -204,6 +218,7 @@ class PlcSyncTask:
             await self.plc_client.write_coil(address=12288, value=occured)
         except Exception as e:
             logging.exception("[PLC] 写入报警状态失败: %s", e)
+            await self.set_offline()
 
     async def read_power_overload(self) -> Optional[bool]:
         if not self.is_connected():
@@ -212,6 +227,7 @@ class PlcSyncTask:
             return await self.read_coil(12289)
         except Exception as e:
             logging.exception("[PLC] 读取功率超载报警失败: %s", e)
+            await self.set_offline()
             return None
 
     async def write_power_overload(self, occured: bool):
@@ -223,6 +239,7 @@ class PlcSyncTask:
             await self.plc_client.write_coil(address=12289, value=occured)
         except Exception as e:
             logging.exception("[PLC] 写入功率超载报警失败: %s", e)
+            await self.set_offline()
 
     async def read_eexi_breach_alarm(self) -> Optional[bool]:
         if not self.is_connected():
@@ -231,6 +248,7 @@ class PlcSyncTask:
             return await self.read_coil(12290)
         except Exception as e:
             logging.exception("[PLC] 读取 EEXI 超限报警失败: %s", e)
+            await self.set_offline()
             return None
 
     async def write_eexi_breach_alarm(self, occured: bool):
@@ -244,6 +262,7 @@ class PlcSyncTask:
             await self.plc_client.write_coil(address=12290, value=occured)
         except Exception as e:
             logging.exception("[PLC] 写入 EEXI 超限报警失败: %s", e)
+            await self.set_offline()
 
     # ---------------- 低层读写封装 ----------------
 
@@ -251,10 +270,12 @@ class PlcSyncTask:
         try:
             resp = await asyncio.wait_for(self.plc_client.read_holding_registers(address, count=1), timeout=2)
             if resp is None or getattr(resp, "isError", lambda: True)():
+                await self.set_offline()
                 return None
             regs = getattr(resp, "registers", None)
             return regs[0] if regs else None
         except:
+            await self.set_offline()
             return 0
 
     async def read_register_32(self, high_addr: int, low_addr: int) -> Optional[int]:
@@ -263,12 +284,14 @@ class PlcSyncTask:
             # 以高地址为起点读两个寄存器： [high, low]
             resp = await asyncio.wait_for(self.plc_client.read_holding_registers(high_addr, count=2), timeout=2)
             if resp is None or getattr(resp, "isError", lambda: True)():
+                await self.set_offline()
                 return None
             regs = getattr(resp, "registers", [])
             if len(regs) < 2:
                 return None
             return (int(regs[0]) << 16) | int(regs[1])
         except:
+            await self.set_offline()
             return 0
 
     async def write_register_32(self, high_addr: int, low_addr: int, value: int):
@@ -277,14 +300,22 @@ class PlcSyncTask:
         low = int(value) & 0xFFFF
         # 从高位地址起写两个值：[high, low]
         if self.is_connected():
-            await self.plc_client.write_registers(high_addr, [high, low])
+            try:
+                await self.plc_client.write_registers(high_addr, [high, low])
+            except:
+                await self.set_offline()
 
     async def read_coil(self, address: int) -> Optional[bool]:
-        resp = await asyncio.wait_for(self.plc_client.read_coils(address, count=1), timeout=2)
-        if resp is None or getattr(resp, "isError", lambda: True)():
+        try:
+            resp = await asyncio.wait_for(self.plc_client.read_coils(address, count=1), timeout=2)
+            if resp is None or getattr(resp, "isError", lambda: True)():
+                await self.set_offline()
+                return None
+            bits = getattr(resp, "bits", None)
+            return bool(bits[0]) if bits else None
+        except:
+            await self.set_offline()
             return None
-        bits = getattr(resp, "bits", None)
-        return bool(bits[0]) if bits else None
 
     def is_connected(self) -> bool:
         """检查 TCP 是否已连接"""
@@ -300,9 +331,10 @@ class PlcSyncTask:
         ]}
 
     async def close(self):
-        """关闭PLC连接"""
-        await self.release()
         self.is_canceled = True
+        if self._reconnect_task:
+            self._reconnect_task.cancel()
+        await self.release()
 
     async def release(self):
         if not self.is_connected():
@@ -320,9 +352,8 @@ class PlcSyncTask:
 
     async def set_online(self):
         self.is_connecting = False
-        if self.is_online == True:
+        if self.is_online:
             return
-
         self.is_online = True
         await asyncio.to_thread(AlarmLog.update(
             recovery_time=gdata.configDateTime.utc,
@@ -332,7 +363,7 @@ class PlcSyncTask:
 
     async def set_offline(self):
         self.is_connecting = False
-        if self.is_online == False:
+        if not self.is_online:
             return
 
         self.is_online = False

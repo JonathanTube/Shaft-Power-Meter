@@ -1,7 +1,6 @@
 import ipaddress
 import logging
 import flet as ft
-from common.const_alarm_type import AlarmType
 from db.models.io_conf import IOConf
 from db.models.user import User
 from task.gps_sync_task import gps
@@ -10,7 +9,6 @@ from ui.common.keyboard import keyboard
 from ui.common.permission_check import PermissionCheck
 from common.global_data import gdata
 from ui.common.toast import Toast
-from utils.alarm_saver import AlarmSaver
 
 
 class IOSettingGPS(ft.Container):
@@ -73,6 +71,7 @@ class IOSettingGPS(ft.Container):
                         self.gps_ip,
                         self.gps_port,
                         self.connect_btn,
+                        self.connecting_btn,
                         self.close_btn
                     ]),
                     col={"xs": 12})
@@ -119,10 +118,15 @@ class IOSettingGPS(ft.Container):
 
     def update_buttons(self):
         try:
+            # print(gps.is_connecting)
+            # print(gps.is_online)
             if self.page and self.page.session:
                 # 按钮状态同步
                 if self.connect_btn and self.connect_btn.page:
                     self.connect_btn.visible = gps.is_connecting is False and gps.is_online is False
+
+                if self.connecting_btn and self.connecting_btn.page:
+                    self.connecting_btn.visible = gps.is_connecting is True
 
                 if self.close_btn and self.close_btn.page:
                     self.close_btn.visible = gps.is_connecting is False and gps.is_online is True
