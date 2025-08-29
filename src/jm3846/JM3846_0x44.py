@@ -100,6 +100,7 @@ class JM38460x44:
                 frame = await JM3846Util.read_frame(reader)
                 if frame is None:
                     logging.info(f'[JM3846-{name}] 0x44响应请求头为空,重新请求0x44')
+                    await on_error()
                     await asyncio.sleep(1.2)
                     await JM38460x44.send_0x44_again(name, reader, writer)
                     continue
@@ -121,6 +122,8 @@ class JM38460x44:
                 break
 
             func_code = struct.unpack(">B", frame[7:8])[0]
+            logging.info(f'[JM3846-{name}] func_code={func_code}')
+
             if func_code & 0x80:
                 logging.warning(f'[JM3846-{name}] 0x44错误{func_code}')
                 await on_error()
