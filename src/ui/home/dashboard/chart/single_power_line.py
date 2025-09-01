@@ -34,8 +34,9 @@ class SinglePowerLine(ft.Container):
 
             self.threshold_filled = ft.LineChartData(
                 visible=gdata.configCommon.shapoli,
-                above_line_bgcolor=ft.Colors.RED,
+                above_line_bgcolor=ft.Colors.with_opacity(0.9, ft.Colors.RED),
                 color=ft.Colors.TRANSPARENT,
+                stroke_width=0,
                 data_points=[]
             )
 
