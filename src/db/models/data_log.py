@@ -1,4 +1,4 @@
-from peewee import IntegerField, FloatField, DateTimeField, CharField, BooleanField
+from peewee import BigIntegerField, IntegerField, FloatField, DateTimeField, CharField, BooleanField
 from ..base import BaseModel
 
 
@@ -14,6 +14,8 @@ class DataLog(BaseModel):
     speed = FloatField(verbose_name="转速(RPM)")
 
     power = IntegerField(verbose_name="功率(W)")
+
+    energy = BigIntegerField(verbose_name="总能量:power * 采样时长")
 
     is_overload = BooleanField(verbose_name="是否过载", default=False)
 

@@ -7,7 +7,7 @@ class CounterLog(BaseModel):
 
     sum_speed = BigIntegerField(verbose_name="累积转速(RPM)", default=0)
 
-    sum_power = BigIntegerField(verbose_name="累积功率(W)", default=0)
+    total_energy = BigIntegerField(verbose_name="累积能耗(kwh)", default=0)
 
     times = BigIntegerField(verbose_name="累积次数", default=0)
 

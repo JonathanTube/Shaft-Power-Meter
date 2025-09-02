@@ -8,7 +8,7 @@ from db.models.data_log import DataLog
 from ui.common.toast import Toast
 from .display import CounterDisplay
 from ui.common.keyboard import keyboard
-from common.global_data import ConfigCounterSPS, ConfigCounterSPS2, gdata
+from common.global_data import gdata
 
 
 class IntervalCounter(ft.Container):
@@ -133,30 +133,25 @@ class IntervalCounter(ft.Container):
                 result = DataLog.select(
                     fn.MIN(DataLog.utc_date_time).alias("start_at"),
                     fn.COUNT(DataLog.id).alias("times"),
-                    fn.SUM(DataLog.power).alias("sum_power"),
+                    fn.SUM(DataLog.energy).alias("total_energy"),
                     fn.SUM(DataLog.speed).alias("sum_speed")
                 ).where(DataLog.utc_date_time >= threshold, DataLog.name == self.name).dicts().get()
 
                 times = result['times']
 
                 if times > 0:
-                    sum_power = result["sum_power"]
+                    # 总能耗
+                    total_energy = result["total_energy"]
                     sum_speed = result["sum_speed"]
 
-                    # 平均功率
-                    avg_power = round(sum_power / times)
-                    self.display.set_average_power(avg_power, system_unit)
-
-                    # 总能耗
                     start_at = result["start_at"]
-
                     time_elapsed = gdata.configDateTime.utc - start_at
-                    # print('===============================interval')
-                    # print(time_elapsed.total_seconds())
 
                     hours = time_elapsed.total_seconds() / 3600
+                    # 平均功率
+                    avg_power = round(total_energy * 1000 / hours) if hours > 0 else 0
 
-                    total_energy = round(avg_power * hours / 1000)
+                    self.display.set_average_power(avg_power, system_unit)
                     self.display.set_total_energy(total_energy, system_unit)
 
                     # 平均转速

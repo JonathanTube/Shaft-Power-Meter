@@ -27,11 +27,14 @@ class DataSaver:
             power: int = FormulaCalculator.calculate_instant_power(torque, speed)
             DataSaver.is_overload(speed, power)
 
+            energy: int = DataSaver.calc_total_energy(power)
+
             data = {
                 'utc_date_time': utc,
                 'name': name,
                 'speed': speed,
                 'power': power,
+                'energy': energy,
                 'ad_0_torque': torque,
                 'ad_1_thrust': thrust,
                 'is_overload': DataSaver.overload
@@ -138,101 +141,78 @@ class DataSaver:
         if name == 'sps':
             if gdata.configCounterSPS.Manually.status == 'running':
                 gdata.configCounterSPS.Manually.sum_speed += speed
-                gdata.configCounterSPS.Manually.sum_power += power
                 gdata.configCounterSPS.Manually.times += 1
 
                 time_elapsed = gdata.configCounterSPS.Manually.seconds + gdata.configPreference.data_collection_seconds_range
                 gdata.configCounterSPS.Manually.seconds = time_elapsed
 
-                avg_power, total_energy, avg_speed = DataSaver.get_data(
-                    time_elapsed,
-                    gdata.configCounterSPS.Manually.sum_power,
-                    gdata.configCounterSPS.Manually.sum_speed,
-                    gdata.configCounterSPS.Manually.times
-                )
-
-                gdata.configCounterSPS.Manually.avg_power = avg_power
-                gdata.configCounterSPS.Manually.total_energy = total_energy
-                gdata.configCounterSPS.Manually.avg_speed = avg_speed
+                gdata.configCounterSPS.Manually.total_energy += DataSaver.calc_total_energy(power)
+                gdata.configCounterSPS.Manually.avg_power = DataSaver.calc_avg_power(time_elapsed, gdata.configCounterSPS.Manually.total_energy)
+                gdata.configCounterSPS.Manually.avg_speed = DataSaver.calc_avg_speed(gdata.configCounterSPS.Manually.times, gdata.configCounterSPS.Manually.sum_speed)
             return
 
         if gdata.configCounterSPS2.Manually.status == 'running':
             gdata.configCounterSPS2.Manually.sum_speed += speed
-            gdata.configCounterSPS2.Manually.sum_power += power
             gdata.configCounterSPS2.Manually.times += 1
 
             time_elapsed = gdata.configCounterSPS2.Manually.seconds + gdata.configPreference.data_collection_seconds_range
             gdata.configCounterSPS2.Manually.seconds = time_elapsed
 
-            avg_power, total_energy, avg_speed = DataSaver.get_data(
-                time_elapsed,
-                gdata.configCounterSPS2.Manually.sum_power,
-                gdata.configCounterSPS2.Manually.sum_speed,
-                gdata.configCounterSPS2.Manually.times
-            )
-
-            gdata.configCounterSPS2.Manually.avg_power = avg_power
-            gdata.configCounterSPS2.Manually.total_energy = total_energy
-            gdata.configCounterSPS2.Manually.avg_speed = avg_speed
+            gdata.configCounterSPS2.Manually.total_energy += DataSaver.calc_total_energy(power)
+            gdata.configCounterSPS2.Manually.avg_power = DataSaver.calc_avg_power(time_elapsed, gdata.configCounterSPS.Manually.total_energy)
+            gdata.configCounterSPS2.Manually.avg_speed = DataSaver.calc_avg_speed(gdata.configCounterSPS.Manually.times, gdata.configCounterSPS.Manually.sum_speed)
 
     @staticmethod
     def save_counter_total(name: str, speed: float, power: float):
         if name == 'sps':
             gdata.configCounterSPS.Total.sum_speed += speed
-            gdata.configCounterSPS.Total.sum_power += power
             gdata.configCounterSPS.Total.times += 1
-
-            avg_power, total_energy, avg_speed = DataSaver.get_data(
-                gdata.configCounterSPS.Total.seconds,
-                gdata.configCounterSPS.Total.sum_power,
-                gdata.configCounterSPS.Total.sum_speed,
-                gdata.configCounterSPS.Total.times
-            )
-
-            gdata.configCounterSPS.Total.avg_power = avg_power
-            gdata.configCounterSPS.Total.total_energy = total_energy
-            gdata.configCounterSPS.Total.avg_speed = avg_speed
 
             time_elapsed = gdata.configCounterSPS.Total.seconds + gdata.configPreference.data_collection_seconds_range
             gdata.configCounterSPS.Total.seconds = time_elapsed
+
+            gdata.configCounterSPS.Total.total_energy += DataSaver.calc_total_energy(power)
+            gdata.configCounterSPS.Total.avg_power = DataSaver.calc_avg_power(time_elapsed, gdata.configCounterSPS.Total.total_energy)
+            gdata.configCounterSPS.Total.avg_speed = DataSaver.calc_avg_speed(gdata.configCounterSPS.Total.times, gdata.configCounterSPS.Total.sum_speed)
+
             CounterLog.update(
+                total_energy=gdata.configCounterSPS.Total.total_energy,
                 sum_speed=gdata.configCounterSPS.Total.sum_speed,
-                sum_power=gdata.configCounterSPS.Total.sum_power,
                 times=gdata.configCounterSPS.Total.times,
                 seconds=time_elapsed
             ).where(CounterLog.sps_name == 'sps').execute()
         else:
             gdata.configCounterSPS2.Total.sum_speed += speed
-            gdata.configCounterSPS2.Total.sum_power += power
             gdata.configCounterSPS2.Total.times += 1
-
-            avg_power, total_energy, avg_speed = DataSaver.get_data(
-                gdata.configCounterSPS2.Total.seconds,
-                gdata.configCounterSPS2.Total.sum_power,
-                gdata.configCounterSPS2.Total.sum_speed,
-                gdata.configCounterSPS2.Total.times
-            )
-
-            gdata.configCounterSPS2.Total.avg_power = avg_power
-            gdata.configCounterSPS2.Total.total_energy = total_energy
-            gdata.configCounterSPS2.Total.avg_speed = avg_speed
 
             time_elapsed = gdata.configCounterSPS2.Total.seconds + gdata.configPreference.data_collection_seconds_range
             gdata.configCounterSPS2.Total.seconds = time_elapsed
+
+            gdata.configCounterSPS2.Total.total_energy += DataSaver.calc_total_energy(power)
+            gdata.configCounterSPS2.Total.avg_power = DataSaver.calc_avg_power(time_elapsed, gdata.configCounterSPS.Total.total_energy)
+            gdata.configCounterSPS2.Total.avg_speed = DataSaver.calc_avg_speed(gdata.configCounterSPS.Total.times, gdata.configCounterSPS.Total.sum_speed)
+
             CounterLog.update(
+                total_energy=gdata.configCounterSPS2.Total.total_energy,
                 sum_speed=gdata.configCounterSPS2.Total.sum_speed,
-                sum_power=gdata.configCounterSPS2.Total.sum_power,
                 times=gdata.configCounterSPS2.Total.times,
                 seconds=time_elapsed
             ).where(CounterLog.sps_name == 'sps2').execute()
 
-    def get_data(time_elapsed: int, sum_power: int, sum_speed: float, times: int):
-        if times == 0:
-            return (0, 0, 0.0)
+    def calc_avg_power(time_elapsed: int, total_energy: int):
+        _time_elapsed = gdata.configPreference.data_collection_seconds_range if time_elapsed == 0 else time_elapsed
+        hours = _time_elapsed / 3600
+        avg_power = round(total_energy * 1000 / hours)
+        return avg_power
 
-        avg_power = round(sum_power/times)
+    def calc_avg_speed(times: int, sum_speed: float):
+        _times = 1 if times == 0 else times
+        avg_speed = round(sum_speed/_times, 1)
+        return avg_speed
 
-        hours = time_elapsed / 3600
-        total_energy = round(avg_power * hours / 1000)
-        avg_speed = round(sum_speed/times, 1)
-        return (avg_power, total_energy, avg_speed)
+    def calc_total_energy(power):
+        # 采集频率
+        seconds = gdata.configPreference.data_collection_seconds_range
+        hours = seconds / 3600
+        total_energy = round(power * hours / 1000)
+        return total_energy

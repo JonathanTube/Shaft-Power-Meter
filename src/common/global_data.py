@@ -269,22 +269,20 @@ class ConfigCounterSPS:
 
         seconds: int = 0
         times: int = 0
-        sum_power: int = 0
         sum_speed: float = 0.0
+        total_energy: int = 0
 
         avg_power: int = 0
-        total_energy: int = 0
         avg_speed: float = 0.0
 
     @dataclass
     class Total:
         seconds: int = 0
         times: int = 0
-        sum_power: int = 0
         sum_speed: float = 0.0
+        total_energy: int = 0
 
         avg_power: int = 0
-        total_energy: int = 0
         avg_speed: float = 0.0
 
     def set_default_value(self):
@@ -295,7 +293,7 @@ class ConfigCounterSPS:
         else:
             ConfigCounterSPS.Total.seconds = counter_log.seconds
             ConfigCounterSPS.Total.times = counter_log.times
-            ConfigCounterSPS.Total.sum_power = counter_log.sum_power
+            ConfigCounterSPS.Total.total_energy = counter_log.total_energy
             ConfigCounterSPS.Total.sum_speed = counter_log.sum_speed
 
     def reset_total(self):
@@ -304,7 +302,7 @@ class ConfigCounterSPS:
         ConfigCounterSPS.Manually.stop_at = None
         ConfigCounterSPS.Manually.seconds = 0
         ConfigCounterSPS.Manually.times = 0
-        ConfigCounterSPS.Manually.sum_power = 0
+        ConfigCounterSPS.Manually.total_energy = 0
         ConfigCounterSPS.Manually.sum_speed = 0
         ConfigCounterSPS.Manually.avg_power = 0
         ConfigCounterSPS.Manually.total_energy = 0
@@ -312,7 +310,7 @@ class ConfigCounterSPS:
 
         ConfigCounterSPS.Total.seconds = 0
         ConfigCounterSPS.Total.times = 0
-        ConfigCounterSPS.Total.sum_power = 0
+        ConfigCounterSPS.Total.total_energy = 0
         ConfigCounterSPS.Total.sum_speed = 0.0
         ConfigCounterSPS.Total.avg_power = 0
         ConfigCounterSPS.Total.total_energy = 0
@@ -329,22 +327,20 @@ class ConfigCounterSPS2:
 
         seconds: int = 0
         times: int = 0
-        sum_power: int = 0
         sum_speed: float = 0.0
+        total_energy: int = 0
 
         avg_power: int = 0
-        total_energy: int = 0
         avg_speed: float = 0.0
 
     @dataclass
     class Total:
         seconds: int = 0
         times: int = 0
-        sum_power: int = 0
         sum_speed: float = 0.0
+        total_energy: int = 0
 
         avg_power: int = 0
-        total_energy: int = 0
         avg_speed: float = 0.0
 
     def set_default_value(self):
@@ -355,7 +351,7 @@ class ConfigCounterSPS2:
         else:
             ConfigCounterSPS2.Total.seconds = counter_log.seconds
             ConfigCounterSPS2.Total.times = counter_log.times
-            ConfigCounterSPS2.Total.sum_power = counter_log.sum_power
+            ConfigCounterSPS2.Total.total_energy = counter_log.total_energy
             ConfigCounterSPS2.Total.sum_speed = counter_log.sum_speed
 
     def reset_total(self):
@@ -364,7 +360,7 @@ class ConfigCounterSPS2:
         ConfigCounterSPS2.Manually.stop_at = None
         ConfigCounterSPS2.Manually.seconds = 0
         ConfigCounterSPS2.Manually.times = 0
-        ConfigCounterSPS2.Manually.sum_power = 0
+        ConfigCounterSPS2.Manually.total_energy = 0
         ConfigCounterSPS2.Manually.sum_speed = 0
         ConfigCounterSPS2.Manually.avg_power = 0
         ConfigCounterSPS2.Manually.total_energy = 0
@@ -372,7 +368,7 @@ class ConfigCounterSPS2:
 
         ConfigCounterSPS2.Total.seconds = 0
         ConfigCounterSPS2.Total.times = 0
-        ConfigCounterSPS2.Total.sum_power = 0
+        ConfigCounterSPS2.Total.total_energy = 0
         ConfigCounterSPS2.Total.sum_speed = 0.0
         ConfigCounterSPS2.Total.avg_power = 0
         ConfigCounterSPS2.Total.total_energy = 0
