@@ -1,4 +1,3 @@
-# task/sps_read_task.py
 from jm3846.JM3846_client import JM3846AsyncClient
 from common.const_alarm_type import AlarmType
 from utils.alarm_saver import AlarmSaver

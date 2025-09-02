@@ -4,6 +4,8 @@ from common.const_alarm_type import AlarmType
 from db.models.counter_log import CounterLog
 from db.models.data_log import DataLog
 from common.global_data import gdata
+from task.sps_read_task import sps_read_task
+from task.sps2_read_task import sps2_read_task
 from task.plc_sync_task import plc
 from utils.datetime_util import DateTimeUtil
 from utils.formula_cal import FormulaCalculator
@@ -48,17 +50,32 @@ class DataSaver:
 
             # 发送数据到客户端
             if gdata.configCommon.is_master:
-                DataSaver._safe_create_task(ws_server.send({
-                    'type': name,
-                    'test': gdata.configTest.test_mode_running,
-                    'data': {
-                        'torque': torque,
-                        'thrust': thrust,
-                        'speed': speed,
-                        'gps': gdata.configGps.location,
-                        'utc': DateTimeUtil.format_date(gdata.configDateTime.utc)
-                    }
-                }))
+                # 主站且SPS在线时发送数据
+                if name == 'sps' and sps_read_task.is_online is True:
+                    DataSaver._safe_create_task(ws_server.send({
+                        'type': name,
+                        'test': gdata.configTest.test_mode_running,
+                        'data': {
+                            'torque': torque,
+                            'thrust': thrust,
+                            'speed': speed,
+                            'gps': gdata.configGps.location,
+                            'utc': DateTimeUtil.format_date(gdata.configDateTime.utc)
+                        }
+                    }))
+                # 主站且SPS2在线时发送数据
+                elif name == 'sps2' and sps2_read_task.is_online is True:
+                    DataSaver._safe_create_task(ws_server.send({
+                        'type': name,
+                        'test': gdata.configTest.test_mode_running,
+                        'data': {
+                            'torque': torque,
+                            'thrust': thrust,
+                            'speed': speed,
+                            'gps': gdata.configGps.location,
+                            'utc': DateTimeUtil.format_date(gdata.configDateTime.utc)
+                        }
+                    }))
 
             # 更新内存缓存
             if name == 'sps':
