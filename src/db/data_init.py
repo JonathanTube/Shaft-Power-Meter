@@ -224,6 +224,12 @@ class DataInit:
             },
 
             {
+                "code": "lang.button.refresh",
+                "chinese": "刷新",
+                "english": "Refresh"
+            },
+
+            {
                 "code": "lang.button.cancel",
                 "chinese": "取消",
                 "english": "Cancel"

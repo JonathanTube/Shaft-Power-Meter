@@ -31,11 +31,15 @@ class TrendView(ft.Container):
             self.sps_chart = TrendViewDiagram()
 
             top_block = ft.Row(
+                height=50,
+                alignment=ft.MainAxisAlignment.START,
+                vertical_alignment=ft.CrossAxisAlignment.CENTER,
+                spacing=10,
                 controls=[
-                    ft.Text(DateTimeUtil.format_date(self.start_date, f'{gdata.configDateTime.date_format} %H:%M:%S')),
+                    ft.Text(DateTimeUtil.format_date(self.start_date, f'    {gdata.configDateTime.date_format} %H:%M:%S')),
                     ft.Text(" - "),
                     ft.Text(DateTimeUtil.format_date(self.end_date, f'{gdata.configDateTime.date_format} %H:%M:%S')),
-                    ft.Button(text=self.page.session.get('lang.button.reset'), on_click=lambda e: self._on_click())
+                    ft.Button(text=self.page.session.get('lang.button.refresh'), on_click=lambda e: self._on_click())
                 ])
 
             if gdata.configCommon.is_twins:
