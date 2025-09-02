@@ -1476,6 +1476,11 @@ class DataInit:
                 "english": "Engine Shaft Power, % of A"
             },
             {
+                "code": "lang.alarm.connection_failure",
+                "chinese": "连接失败",
+                "english": "Connection Failure"
+            },
+            {
                 "code": "lang.alarm.occured_time",
                 "chinese": "发生时间",
                 "english": "Event Time"
