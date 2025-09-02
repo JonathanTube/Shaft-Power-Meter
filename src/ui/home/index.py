@@ -49,6 +49,7 @@ class Home(ft.Container):
                 icon=ft.Icons.TIMER_OUTLINED,
                 icon_color=ft.Colors.INVERSE_SURFACE,
                 style=self.default_button_style,
+                visible=gdata.configCommon.is_master is True,
                 on_click=lambda e: self.__on_click(1)
             )
             self.trendview = ft.TextButton(
@@ -56,6 +57,7 @@ class Home(ft.Container):
                 icon=ft.Icons.TRENDING_UP_OUTLINED,
                 icon_color=ft.Colors.INVERSE_SURFACE,
                 style=self.default_button_style,
+                visible=gdata.configCommon.is_master is True,
                 on_click=lambda e: self.__on_click(2)
             )
             self.propeller_curve = ft.TextButton(
@@ -63,7 +65,7 @@ class Home(ft.Container):
                 icon=ft.Icons.STACKED_LINE_CHART_OUTLINED,
                 icon_color=ft.Colors.INVERSE_SURFACE,
                 style=self.default_button_style,
-                visible=gdata.configCommon.show_propeller_curve,
+                visible=gdata.configCommon.is_master is True and gdata.configCommon.show_propeller_curve is True,
                 on_click=lambda e: self.__on_click(3)
             )
             self.alarm_button = AlarmButton(style=self.default_button_style, on_click=lambda _: self.__on_click(4))

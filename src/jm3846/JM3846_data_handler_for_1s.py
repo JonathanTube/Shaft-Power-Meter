@@ -1,8 +1,6 @@
 import asyncio
 from common.global_data import gdata
 from jm3846.JM3846_util import JM3846Util
-from task.sps_read_task import sps_read_task
-from task.sps2_read_task import sps2_read_task
 from utils.formula_cal import FormulaCalculator
 from websocket.websocket_master import ws_server
 
@@ -15,7 +13,7 @@ class JM3846DataHandlerFor1s:
     def is_running(self):
         return self._is_running
 
-    async def start(self, name):
+    async def start(self, name, is_online: bool):
         self.name = name
         self._is_running = True
         while self._is_running:
@@ -41,7 +39,7 @@ class JM3846DataHandlerFor1s:
                         gdata.configSPS.power_history.append((power_for_1s, gdata.configDateTime.utc))
 
                     # 发送数据到客户端
-                    if gdata.configCommon.is_master and sps_read_task.is_online is True:
+                    if gdata.configCommon.is_master and is_online:
                         await ws_server.send({
                             'type': f'{name}_1s',
                             'data': {
@@ -65,7 +63,7 @@ class JM3846DataHandlerFor1s:
                     else:
                         gdata.configSPS2.power_history.append((power_for_1s, gdata.configDateTime.utc))
                     # 发送数据到客户端
-                    if gdata.configCommon.is_master and sps2_read_task.is_online is True:
+                    if gdata.configCommon.is_master and is_online:
                         await ws_server.send({
                             'type': f'{name}_1s',
                             'data': {

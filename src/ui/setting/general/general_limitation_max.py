@@ -14,6 +14,7 @@ class GeneralLimitationMax(ft.Container):
         self.expand = True
         self.col = {"md": 6}
         self.system_unit = system_unit
+        self.visible = gdata.configCommon.is_master
 
     def build(self):
         try:

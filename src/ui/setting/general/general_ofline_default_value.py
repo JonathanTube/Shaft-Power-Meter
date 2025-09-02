@@ -13,6 +13,7 @@ class GeneralOflineDefaultValue(ft.Container):
         super().__init__()
         self.expand = True
         self.system_unit = system_unit
+        self.visible = gdata.configCommon.shapoli is False
 
     def build(self):
         try:

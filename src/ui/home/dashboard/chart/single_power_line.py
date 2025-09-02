@@ -54,7 +54,6 @@ class SinglePowerLine(ft.Container):
             left_unit = power_and_unit[1]
 
             self.chart = ft.LineChart(
-                width=1000,
                 min_y=0,
                 max_y=left_max,
                 bgcolor=ft.Colors.translate,

@@ -12,6 +12,7 @@ class GeneralDateTime(ft.Container):
     def __init__(self):
         super().__init__()
         self.expand = True
+        self.visible = gdata.configCommon.is_master is True
 
     def build(self):
         try:

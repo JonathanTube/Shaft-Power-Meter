@@ -43,14 +43,14 @@ class DataRecordTask:
         # 处理SPS1
         if sps_read_task.is_online:
             await self.save_sps_online_data()
-        else:
+        elif gdata.configCommon.shapoli is False:  # 只有shapoli功能关闭，才记录离线数据
             await self.save_sps_offline_data()
 
         # 处理SPS2（双螺旋桨）
         if gdata.configCommon.is_twins:
             if sps2_read_task.is_online:
                 await self.save_sps2_online_data()
-            else:
+            elif gdata.configCommon.shapoli is False:  # 只有shapoli功能关闭，才记录离线数据
                 await self.save_sps2_offline_data()
 
     async def handle_slave(self):
@@ -58,7 +58,7 @@ class DataRecordTask:
             await self.save_sps_online_data()
             if gdata.configCommon.is_twins:
                 await self.save_sps2_online_data()
-        else:
+        elif gdata.configCommon.shapoli is False:  # 只有shapoli功能关闭，才记录离线数据
             await self.save_sps_offline_data()
             if gdata.configCommon.is_twins:
                 await self.save_sps2_offline_data()
