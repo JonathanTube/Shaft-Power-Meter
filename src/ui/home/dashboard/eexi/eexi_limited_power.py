@@ -42,7 +42,7 @@ class EEXILimitedPower(ft.Container):
                 border_radius=ft.border_radius.all(5),
                 padding=ft.padding.only(left=4, right=4, bottom=4),
                 alignment=ft.alignment.center,
-                content=ft.Text("Common Alarm", color=ft.Colors.WHITE, size=12),
+                content=ft.Text(self.page.session.get('lang.alarm.connection_failure'), color=ft.Colors.WHITE, size=12),
                 bgcolor=ft.Colors.RED,
                 right=4, top=40,
                 visible=False
