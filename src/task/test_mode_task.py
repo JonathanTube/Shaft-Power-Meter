@@ -91,12 +91,16 @@ class TestModeTask:
         # 重置counter
         gdata.configCounterSPS.reset_total()
         gdata.configCounterSPS2.reset_total()
+        # 重置power_history
+        gdata.configSPS.power_history.clear()
+        gdata.configSPS2.power_history.clear()
         # 重置alarm
         gdata.configAlarm.set_default_value()
         # 重置event
         gdata.configEvent.set_default_value()
         # 重置客户端数据
         await ws_server.send({'type': 'stop_test_mode'})
+        
 
     async def _generate_random_data(self):
         """后台任务：按范围生成随机数据（异步）"""
@@ -157,11 +161,22 @@ class TestModeTask:
                 gdata.configSPS.thrust = instant_thrust
                 gdata.configSPS.speed = instant_speed
                 gdata.configSPS.power = instant_power
+
+                if len(gdata.configSPS.power_history) > 300:
+                    gdata.configSPS.power_history.pop(0)
+                else:
+                    gdata.configSPS.power_history.append((instant_power, gdata.configDateTime.utc))
+
             elif name == 'sps2':
                 gdata.configSPS2.torque = instant_torque
                 gdata.configSPS2.thrust = instant_thrust
                 gdata.configSPS2.speed = instant_speed
                 gdata.configSPS2.power = instant_power
+
+                if len(gdata.configSPS2.power_history) > 300:
+                    gdata.configSPS2.power_history.pop(0)
+                else:
+                    gdata.configSPS2.power_history.append((instant_power, gdata.configDateTime.utc))
 
             if gdata.configCommon.is_master:
                 # 发送数据到客户端-1s
