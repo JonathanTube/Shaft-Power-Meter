@@ -124,7 +124,7 @@ class EEXIBreachTask:
             # 创建事件
             self.event = EventLog.create(started_at=gdata.configDateTime.utc, started_position=gdata.configGps.location)
             # 创建报告
-            self.report = ReportInfo.create(event_log=self.event, report_name=f"Compliance Report #{self.event.id}")
+            self.report = ReportInfo.create(event_log=self.event, utc_date_time=gdata.configDateTime.utc, report_name=f"Compliance Report #{self.event.id}")
 
         cnt = EventLog.select(fn.COUNT(EventLog.id)).where(EventLog.breach_reason.is_null()).scalar()
         gdata.configEvent.not_confirmed_count = cnt

@@ -7,6 +7,8 @@ from datetime import timedelta
 from db.models.data_log import DataLog
 from common.global_data import gdata
 from db.models.gps_log import GpsLog
+from db.models.report_detail import ReportDetail
+from db.models.report_info import ReportInfo
 
 logger = logging.getLogger("DataCleanupTask")
 
@@ -33,6 +35,10 @@ class DataCleanupTask:
                         # 删除旧记录（放在线程池）
                         await asyncio.to_thread(DataLog.delete().where(DataLog.utc_date_time < cutoff).execute)
                         await asyncio.to_thread(GpsLog.delete().where(GpsLog.utc_date_time < cutoff).execute)
+
+                        cutoffReport = utc_now - timedelta(days=365)
+                        await asyncio.to_thread(ReportInfo.delete().where(ReportInfo.utc_date_time < cutoffReport).execute)
+                        await asyncio.to_thread(ReportDetail.delete().where(ReportDetail.utc_date_time < cutoffReport).execute)
                         logger.info("DataCleanupTask 已清理旧数据")
                 except Exception:
                     logger.exception("DataCleanupTask 清理异常")
