@@ -95,7 +95,7 @@ class EEXILimitedPower(ft.Container):
             return
 
         if self.common_alarm_block and self.common_alarm_block.page:
-            self.common_alarm_block.visible = gdata.configAlarm.alarm_total_count > 0
+            self.common_alarm_block.visible = gdata.configAlarm.connection_failure_count > 0
             self.common_alarm_block.update()
 
     def update_mode(self):

@@ -1,5 +1,6 @@
 from dataclasses import dataclass, field
 from datetime import datetime
+from common.const_alarm_type import AlarmType
 from db.models.alarm_log import AlarmLog
 from db.models.counter_log import CounterLog
 from db.models.event_log import EventLog
@@ -68,6 +69,10 @@ class ConfigAlarm:
     alarm_total_count = 0
     # 未应答数量
     alarm_not_ack = 0
+    # 连接报警总数(不含power overload)
+    connection_failure_count = 0
+    # 未连接报警应答连接报警数量(不含power overload)
+    connection_failure_not_ack = 0
 
     def set_default_value(self):
         # 所有告警数量
@@ -78,6 +83,18 @@ class ConfigAlarm:
         # 未确认告警数量
         self.alarm_not_ack = AlarmLog.select(fn.COUNT(AlarmLog.id)).where(
             AlarmLog.acknowledge_time.is_null()
+        ).scalar()
+
+        # 连接报警总数(不含power overload)
+        self.connection_failure_count = AlarmLog.select(fn.COUNT(AlarmLog.id)).where(
+            AlarmLog.recovery_time.is_null(),
+            AlarmLog.alarm_type != AlarmType.POWER_OVERLOAD
+        ).scalar()
+
+        # 未连接报警应答连接报警数量(不含power overload)
+        self.connection_failure_not_ack = AlarmLog.select(fn.COUNT(AlarmLog.id)).where(
+            AlarmLog.acknowledge_time.is_null(),
+            AlarmLog.alarm_type != AlarmType.POWER_OVERLOAD
         ).scalar()
 
 

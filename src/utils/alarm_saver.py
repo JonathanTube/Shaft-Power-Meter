@@ -29,7 +29,9 @@ class AlarmSaver:
                 )
 
                 gdata.configAlarm.set_default_value()
-                await plc.write_common_alarm(True)
+
+                if alarm_type != AlarmType.POWER_OVERLOAD:
+                    await plc.write_common_alarm(True)
 
                 logging.info(f'[创建alarm] {alarm_type}')
 
@@ -71,6 +73,7 @@ class AlarmSaver:
     @staticmethod
     def has_alarm_all() -> bool:
         cnt = AlarmLog.select(fn.COUNT(AlarmLog.id)).where(
-            AlarmLog.recovery_time.is_null()
+            AlarmLog.recovery_time.is_null(),
+            AlarmLog.alarm_type == AlarmType.POWER_OVERLOAD
         ).scalar()
         return cnt > 0

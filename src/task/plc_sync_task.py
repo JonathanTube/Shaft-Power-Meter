@@ -85,7 +85,8 @@ class PlcSyncTask:
 
     async def init_state(self):
         cnt = await asyncio.to_thread(AlarmLog.select(fn.COUNT(AlarmLog.id)).where(
-            AlarmLog.recovery_time.is_null()
+            AlarmLog.recovery_time.is_null(),
+            AlarmLog.alarm_type != AlarmType.POWER_OVERLOAD
         ).scalar)
         logging.error(f'[PLC] 首次连接写入默认公共报警={cnt > 0}')
         await self.write_common_alarm(cnt > 0)
