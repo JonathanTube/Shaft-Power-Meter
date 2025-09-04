@@ -77,14 +77,30 @@ class SinglePowerLine(ft.Container):
                 ]
             )
 
+            maskContainer = ft.Container(
+                content=None,
+                width=40, height=300,
+                bgcolor=ft.Colors.SURFACE,
+                right=-10, top=0
+            )
+            contentStack = ft.Stack(controls=[
+                ft.Container(content=self.chart, padding=ft.padding.only(left=10, right=10, bottom=10, top=30)),
+                maskContainer,
+                ft.Row(
+                    [ft.Text(self.page.session.get("lang.common.power"), size=20)],
+                    alignment=ft.MainAxisAlignment.CENTER
+                )
+            ])
             if self.page and self.page.session:
-                self.content = SimpleCard(
-                    title=self.page.session.get("lang.common.power"),
-                    body=ft.Container(
-                        content=self.chart,
-                        padding=ft.padding.only(right=30)
+                self.content = ft.Container(
+                    padding=ft.padding.all(10),
+                    border=ft.border.all(
+                        width=0.5,
+                        color=ft.Colors.with_opacity(0.15, ft.Colors.INVERSE_SURFACE)
                     ),
-                    text_center=True
+                    border_radius=10,
+                    expand=True,
+                    content=contentStack
                 )
         except:
             logging.exception('exception occured at SinglePowerLine.reload')
