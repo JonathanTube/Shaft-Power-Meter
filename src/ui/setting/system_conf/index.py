@@ -61,7 +61,7 @@ class SystemConf(ft.Container):
                 self.system_conf_ship_info.update()
                 self.system_conf_ship_info.save(user)
             # 清理数据
-            TableInit.cleanup()
+            TableInit.cleanup(True)
             msg = self.page.session.get("lang.toast.system_exit")
             Toast.show_error(self.page, msg, 1000 * 10)
             # 退出系统

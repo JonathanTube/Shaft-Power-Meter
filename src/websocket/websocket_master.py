@@ -8,7 +8,6 @@ from utils.alarm_saver import AlarmSaver
 from task.plc_sync_task import plc
 from utils.datetime_util import DateTimeUtil
 
-
 class WebSocketMaster:
     def __init__(self):
         self.client = None
@@ -40,7 +39,9 @@ class WebSocketMaster:
             self._periodic_task_handle = None
         self.server = None
         self.client = None
-        await self.set_offline()
+
+        if self.is_online:
+            await self.set_offline()
 
     async def _run(self):
         while not self.is_canceled:

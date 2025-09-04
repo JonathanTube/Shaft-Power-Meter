@@ -60,9 +60,12 @@ class TableInit:
         ], safe=True)
 
     @staticmethod
-    def cleanup():
+    def cleanup(cleanAllEvent: bool = False):
         try:
-            AlarmLog.delete().where(AlarmLog.alarm_type == AlarmType.POWER_OVERLOAD).execute()
+            if cleanAllEvent:
+                AlarmLog.truncate_table()
+            else:
+                AlarmLog.delete().where(AlarmLog.alarm_type == AlarmType.POWER_OVERLOAD).execute()
             CounterLog.update(sum_speed=0, total_energy=0, times=0, seconds=0).where(CounterLog.sps_name == 'sps').execute()
             CounterLog.update(sum_speed=0, total_energy=0, times=0, seconds=0).where(CounterLog.sps_name == 'sps2').execute()
             DataLog.truncate_table()
