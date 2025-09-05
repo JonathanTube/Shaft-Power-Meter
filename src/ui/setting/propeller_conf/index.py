@@ -55,14 +55,14 @@ class PropellerConf(ft.Container):
                     on_click=lambda e: self.page.open(PermissionCheck(self.__save_data, 2))
                 )
 
-                self.push_button = ft.OutlinedButton(
-                    self.page.session.get("lang.button.push_to_slave"),
-                    height=40,
-                    icon_color=ft.Colors.GREEN,
-                    visible=gdata.configCommon.is_master and not gdata.configCommon.is_individual,
-                    icon=ft.Icons.SYNC_OUTLINED,
-                    on_click=self.__on_push
-                )
+                # self.push_button = ft.OutlinedButton(
+                #     self.page.session.get("lang.button.push_to_slave"),
+                #     height=40,
+                #     icon_color=ft.Colors.GREEN,
+                #     visible=gdata.configCommon.is_master and not gdata.configCommon.is_individual,
+                #     icon=ft.Icons.SYNC_OUTLINED,
+                #     on_click=self.__on_push
+                # )
 
                 self.content = ft.Column(
                     scroll=ft.ScrollMode.ADAPTIVE,
@@ -79,8 +79,8 @@ class PropellerConf(ft.Container):
                                 ft.Row(
                                     alignment=ft.MainAxisAlignment.CENTER,
                                     controls=[
-                                        self.save_button,
-                                        self.push_button
+                                        self.save_button
+                                        # self.push_button
                                     ]
                                 )
                             ]
