@@ -13,7 +13,7 @@ class JM3846DataHandlerFor1s:
     def is_running(self):
         return self._is_running
 
-    async def start(self, name, is_online: bool):
+    async def start(self, name):
         self.name = name
         self._is_running = True
         while self._is_running:
@@ -39,7 +39,7 @@ class JM3846DataHandlerFor1s:
                         gdata.configSPS.power_history.append((power_for_1s, gdata.configDateTime.utc))
 
                     # 发送数据到客户端
-                    if gdata.configCommon.is_master and is_online:
+                    if gdata.configCommon.is_master:
                         await ws_server.send({
                             'type': f'{name}_1s',
                             'data': {
@@ -63,7 +63,7 @@ class JM3846DataHandlerFor1s:
                     else:
                         gdata.configSPS2.power_history.append((power_for_1s, gdata.configDateTime.utc))
                     # 发送数据到客户端
-                    if gdata.configCommon.is_master and is_online:
+                    if gdata.configCommon.is_master:
                         await ws_server.send({
                             'type': f'{name}_1s',
                             'data': {

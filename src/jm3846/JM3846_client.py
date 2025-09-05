@@ -127,7 +127,7 @@ class JM3846AsyncClient(ABC):
             self._bg_tasks.append(asyncio.create_task(jm3846_data_handler_for_ns.start(self.name)))
 
         if not jm3846_data_handler_for_1s.is_running():
-            self._bg_tasks.append(asyncio.create_task(jm3846_data_handler_for_1s.start(self.name, self.is_online)))
+            self._bg_tasks.append(asyncio.create_task(jm3846_data_handler_for_1s.start(self.name)))
 
         if not jm3846_data_handler_for_15s.is_running():
             self._bg_tasks.append(asyncio.create_task(jm3846_data_handler_for_15s.start(self.name)))
