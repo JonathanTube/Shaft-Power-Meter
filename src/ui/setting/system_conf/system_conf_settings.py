@@ -2,7 +2,6 @@ import logging
 import flet as ft
 from db.models.user import User
 from ui.common.custom_card import CustomCard
-from ui.common.toast import Toast
 from utils.unit_converter import UnitConverter
 from db.models.system_settings import SystemSettings
 from ui.common.keyboard import keyboard
@@ -57,7 +56,8 @@ class SystemConfSettings(ft.Container):
 
                 self.sha_po_li = ft.Checkbox(
                     col={"md": 6}, label=self.page.session.get("lang.setting.enable_sha_po_li"),
-                    value=gdata.configCommon.shapoli
+                    value=gdata.configCommon.shapoli,
+                    on_change=self.__on_shapoli_change
                 )
 
                 self.display_propeller_curve = ft.Checkbox(
@@ -100,10 +100,10 @@ class SystemConfSettings(ft.Container):
                     on_click=lambda e: keyboard.open(e.control, 'int')
                 )
 
-                self.chk_hide_admin_account = ft.Checkbox(
-                    col={"md": 6}, label=self.page.session.get("lang.setting.hide_admin_account"),
-                    value=gdata.configCommon.hide_admin_account
-                )
+                # self.chk_hide_admin_account = ft.Checkbox(
+                #     col={"md": 6}, label=self.page.session.get("lang.setting.hide_admin_account"),
+                #     value=gdata.configCommon.hide_admin_account
+                # )
 
                 self.single_propeller = ft.Radio(value="1", label=self.page.session.get("lang.setting.single_propeller"))
                 self.twins_propeller = ft.Radio(value="2", label=self.page.session.get("lang.setting.twins_propeller"))
@@ -133,7 +133,7 @@ class SystemConfSettings(ft.Container):
                         self.amount_of_propeller_row,
                         self.display_propeller_curve,
                         self.sha_po_li,
-                        self.chk_hide_admin_account,
+                        # self.chk_hide_admin_account,
                         self.unlimited_power,
                         self.eexi_limited_power,
                         self.eexi_breach_checking_duration
@@ -163,6 +163,19 @@ class SystemConfSettings(ft.Container):
         except:
             logging.exception('exception occured at SystemConfSettings.__on_running_mode_change')
 
+    def __on_shapoli_change(self, e):
+        if self.unlimited_power and self.unlimited_power.page:
+            self.unlimited_power.visible = e.data
+            self.unlimited_power.update()
+
+        if self.eexi_limited_power and self.eexi_limited_power.page:
+            self.eexi_limited_power.visible = e.data
+            self.eexi_limited_power.update()
+
+        if self.eexi_breach_checking_duration and self.eexi_breach_checking_duration.page:
+            self.eexi_breach_checking_duration.visible = e.data
+            self.eexi_breach_checking_duration.update()
+
     def __get_unlimited_power(self) -> tuple[int, str]:
         _unlimited_power = gdata.configCommon.unlimited_power
         if gdata.configPreference.system_unit == 0:
@@ -189,7 +202,7 @@ class SystemConfSettings(ft.Container):
         display_thrust = self.display_thrust.value
         sha_po_li = self.sha_po_li.value
         display_propeller_curve = self.display_propeller_curve.value
-        hide_admin_account = self.chk_hide_admin_account.value
+        # hide_admin_account = self.chk_hide_admin_account.value
 
         unit = gdata.configPreference.system_unit
         eexi_breach_checking_duration = self.eexi_breach_checking_duration.value
@@ -207,7 +220,10 @@ class SystemConfSettings(ft.Container):
 
         SystemSettings.update(
             is_master=is_master, is_individual=is_individual, enable_gps=enable_gps, amount_of_propeller=amount_of_propeller,
-            display_thrust=display_thrust, sha_po_li=sha_po_li, display_propeller_curve=display_propeller_curve, hide_admin_account=hide_admin_account,
+            display_thrust=display_thrust,
+            sha_po_li=sha_po_li,
+            display_propeller_curve=display_propeller_curve,
+            # hide_admin_account=hide_admin_account,
             eexi_breach_checking_duration=eexi_breach_checking_duration,
             unlimited_power=unlimited_power, eexi_limited_power=eexi_limited_power
         ).execute()
@@ -223,7 +239,7 @@ class SystemConfSettings(ft.Container):
             self.display_thrust.value = gdata.configCommon.show_thrust
             self.sha_po_li.value = gdata.configCommon.shapoli
             self.display_propeller_curve.value = gdata.configCommon.show_propeller_curve
-            self.chk_hide_admin_account.value = gdata.configCommon.hide_admin_account
+            # self.chk_hide_admin_account.value = gdata.configCommon.hide_admin_account
             self.amount_of_propeller_radios.value = str(gdata.configCommon.amount_of_propeller)
 
             unlimited_power_value, unlimited_power_unit = self.__get_unlimited_power()

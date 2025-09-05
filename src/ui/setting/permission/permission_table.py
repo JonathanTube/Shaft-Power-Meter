@@ -211,7 +211,7 @@ class PermissionTable(AbstractTable):
                     ft.TextButton(self.page.session.get("lang.button.cancel"), on_click=lambda e: e.page.close(self.del_dialog)),
                     ft.TextButton(
                         self.page.session.get("lang.button.confirm"),
-                        on_click=lambda e: e.page.run_task(self.__on_delete_confirm_async, e, user_id)
+                        on_click=lambda _: self.__on_delete_confirm_async(user_id)
                     )
                 ]
             )
@@ -219,7 +219,7 @@ class PermissionTable(AbstractTable):
         except:
             logging.exception('exception occured at PermissionTable.__on_delete')
 
-    def __on_delete_confirm_async(self, e, user_id: int):
+    def __on_delete_confirm_async(self, user_id: int):
         try:
             self.page.close(self.del_dialog)
 
